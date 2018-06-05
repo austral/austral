@@ -3,6 +3,8 @@ is
   src/util.sig
   src/util.sml
 
+  src/set.sig
+
   src/map.sig
   src/map.sml
 
