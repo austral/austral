@@ -16,5 +16,6 @@ is
   src/module.sml
 
   src/cst.sig
+  src/cst.sml
 
   $/basis.cm
