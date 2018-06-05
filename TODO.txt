@@ -1,0 +1,7 @@
+TODO:
+
+- CST
+- Parser
+- Symbol resolution in modules
+- Process escape sequences in parsed strings
+- Parse nested comments
