@@ -31,4 +31,7 @@ structure Module :> MODULE = struct
 
   fun moduleExports (Module (_, _, Exports e)) = e
   fun moduleImports (Module (_, Imports i, _)) = i
+
+  fun doesModuleExport (m: module) (s: symbol_name) =
+    Set.isIn (moduleExports m) s
 end
