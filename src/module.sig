@@ -24,5 +24,5 @@ signature MODULE = sig
   type menv
 
   val moduleName : module -> module_name
-  val moduleExports : module -> symbol_name list
+  val moduleExports : module -> symbol_name Set.set
 end
