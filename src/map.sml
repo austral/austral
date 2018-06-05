@@ -38,5 +38,4 @@ structure Map :> MAP = struct
       | NONE => Map ((k, v) :: (mapl m))
 
   fun size (Map m) = length m
-
 end
