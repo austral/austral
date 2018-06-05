@@ -4,6 +4,7 @@ is
   src/util.sml
 
   src/set.sig
+  src/set.sml
 
   src/map.sig
   src/map.sml
