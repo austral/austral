@@ -18,10 +18,8 @@
 *)
 
 signature MODULE = sig
-  include IDENT
-
-  type module_name = ident
-  type symbol_name = ident
+  type module_name = Ident.ident
+  type symbol_name = Ident.ident
   type module
   type menv
 
