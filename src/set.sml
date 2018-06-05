@@ -28,6 +28,8 @@ structure Set :> SET = struct
     else
         elem :: set
 
+  fun isIn set elem = Util.member elem set
+
   fun size set = List.length set
 
   fun fromList (x::xs) = add (fromList xs) x
