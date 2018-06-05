@@ -13,5 +13,6 @@ is
   src/ident.sml
 
   src/module.sig
+  src/module.sml
 
   $/basis.cm
