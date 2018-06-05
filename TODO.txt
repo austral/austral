@@ -5,3 +5,12 @@ TODO:
 - Symbol resolution in modules
 - Process escape sequences in parsed strings
 - Parse nested comments
+- Parser tests
+
+DONE:
+
+- Utils
+- Set
+- Map
+- Ident structure
+- Basic Module structure
