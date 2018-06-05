@@ -1,6 +1,5 @@
 TODO:
 
-- CST
 - Parser
 - Symbol resolution in modules
 - Process escape sequences in parsed strings
@@ -14,3 +13,4 @@ DONE:
 - Map
 - Ident structure
 - Basic Module structure
+- CST
