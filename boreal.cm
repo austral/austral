@@ -6,4 +6,6 @@ is
   src/ident.sig
   src/ident.sml
 
+  src/module.sig
+
   $/basis.cm
