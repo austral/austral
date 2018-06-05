@@ -3,6 +3,8 @@ is
   src/util.sig
   src/util.sml
 
+  src/map.sig
+
   src/ident.sig
   src/ident.sml
 
