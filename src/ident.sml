@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Ident :> IDENT = struct
+structure Ident : IDENT = struct
   datatype ident = Identifier of string
 
   val alphabet =
