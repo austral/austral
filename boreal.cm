@@ -25,5 +25,6 @@ is
   src/rcst.sml
 
   src/type.sig
+  src/type.sml
 
   $/basis.cm

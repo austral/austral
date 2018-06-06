@@ -17,6 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature TYPE = sig
-  type param
+structure Type :> TYPE = struct
+  datatype param = TypeParam of Symbol.symbol
+                 | RegionParam of Symbol.symbol
 end
