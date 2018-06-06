@@ -17,6 +17,12 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Symbol :> SYMBOL = struct
-  datatype symbol = Symbol of Ident.ident * Ident.ident
+structure Symbol : SYMBOL = struct
+  type module_name = Ident.ident
+  type symbol_name = Ident.ident
+
+  datatype symbol = Symbol of module_name * symbol_name
+
+  fun symbolModuleName (Symbol (m, _)) = m
+  fun symbolName (Symbol (_, n)) = n
 end
