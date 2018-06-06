@@ -29,6 +29,7 @@ structure Module :> MODULE = struct
   datatype menv = MEnv of (module_name, module) Map.map
 
   fun moduleName (Module (n, _, _, _)) = n
+  fun moduleNicknames (Module (_, ns, _, _)) = ns
   fun moduleExports (Module (_, _, _, Exports e)) = e
   fun moduleImports (Module (_, _, Imports i, _)) = i
 
