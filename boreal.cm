@@ -21,4 +21,6 @@ is
   src/rcst.sig
   src/rcst.sml
 
+  src/type.sig
+
   $/basis.cm
