@@ -27,6 +27,7 @@ signature MODULE = sig
   val moduleExports : module -> symbol_name Set.set
   val moduleImports : module -> (symbol_name, module_name) Map.map
 
+  val resolveNickname : module -> module_name -> module_name
   val sourceModule : module -> symbol_name -> module_name
   val doesModuleExport : module -> symbol_name -> bool
 end
