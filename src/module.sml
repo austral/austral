@@ -18,8 +18,7 @@
 *)
 
 structure Module :> MODULE = struct
-  type module_name = Ident.ident
-  type symbol_name = Ident.ident
+  open Symbol
 
   datatype module = Module of module_name * imports * exports
        and imports = Imports of (symbol_name, module_name) Map.map
