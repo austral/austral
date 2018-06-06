@@ -12,6 +12,9 @@ is
   src/ident.sig
   src/ident.sml
 
+  src/symbol.sig
+  src/symbol.sml
+
   src/module.sig
   src/module.sml
 
