@@ -5,6 +5,7 @@ TODO:
 - Process escape sequences in parsed strings
 - Parse nested comments
 - Parser tests
+- Kind inference
 
 DONE:
 
