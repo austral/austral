@@ -21,11 +21,13 @@ structure Type :> TYPE = struct
   datatype param = TypeParam of Symbol.symbol
                  | RegionParam of Symbol.symbol
 
-  datatype gty = Unit
-               | Bool
-               | TypeCons of Symbol.symbol * (gty list)
-               | Param of Symbol.symbol
+  datatype gtypespec = Unit
+                     | Bool
+                     | Name of Symbol.symbol
+                     | TypeCons of Symbol.symbol * (gtypespec list)
 
-  type typedef = param list * gty
+  datatype typedef = TypeAlias of param list * gtypespec
+                   | Datatype of param list * gtypespec
+
   type tenv = (Symbol.symbol, typedef) Map.map
 end
