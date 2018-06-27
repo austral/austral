@@ -43,4 +43,10 @@ structure Parser :> PARSER = struct
     | applySign (Negative, int) = ~int
 
   val integerParser = pmap applySign (seq signParser naturalParser)
+
+  (* Strings *)
+
+  val stringChar = or (seqR (pchar #"\\") (pchar #"\"")) (noneOf [#"\""])
+
+  val quotedString = pmap String.implode (between (pchar #"\"") (many stringChar) (pchar #"\""))
 end
