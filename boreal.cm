@@ -1,5 +1,7 @@
 Group
 is
+  vendor/parsimony/parsimony.cm
+
   src/util.sig
   src/util.sml
 

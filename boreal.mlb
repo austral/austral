@@ -1,4 +1,6 @@
 $(SML_LIB)/basis/basis.mlb
+vendor/parsimony/parsimony.mlb
+
 src/util.sig
 src/util.sml
 
