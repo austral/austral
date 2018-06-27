@@ -29,14 +29,23 @@ structure Ident : IDENT = struct
           alpha ^ alphaup ^ num ^ sym
       end
 
-  fun mkIdent s =
+  fun isValid s =
     let val sigma = explode alphabet
     in
-        if (List.all (fn c => Util.member c sigma) (explode s)) then
-            SOME (Identifier s)
-        else
-            NONE
+        List.all (fn c => Util.member c sigma) (explode s)
     end
+
+  fun mkIdent s =
+    if isValid s then
+        SOME (Identifier s)
+    else
+        NONE
+
+  fun mkIdentEx s =
+    if isValid s then
+        Identifier s
+    else
+        raise Fail "Not a valid identifier. This is an internal compiler bug stemming from a different between the Ident structure's definition of an identifier and the parser's definition."
 
   fun identString (Identifier s) = s
 end
