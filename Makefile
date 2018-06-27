@@ -17,6 +17,7 @@ MLUNIT := $(VENDOR_DIR)/mlunit
 MLUNIT_URL := https://github.com/eudoxia0/mlunit.git
 PARSIMONY := $(VENDOR_DIR)/parsimony
 PARSIMONY_URL := https://github.com/eudoxia0/parsimony.git
+DEPS := $(MLUNIT) $(PARSIMONY)
 
 all: compile
 
@@ -29,12 +30,10 @@ $(MLUNIT): $(VENDOR_DIR)
 $(PARSIMONY): $(VENDOR_DIR)
 	git clone $(PARSIMONY_URL) $(PARSIMONY)
 
-deps: $(MLUNIT) $(PARSIMONY)
-
-compile: $(SRC) deps
+compile: $(SRC) $(DEPS)
 	$(SML) $(SMLFLAGS) -m $(CM_FILE)
 
-$(TEST_BIN): $(SRC) $(TEST_SRC) deps
+$(TEST_BIN): $(SRC) $(TEST_SRC) $(DEPS)
 	$(MLTON) $(MLB_TEST_FILE)
 	./$(TEST_BIN)
 
