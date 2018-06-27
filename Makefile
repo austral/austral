@@ -10,6 +10,7 @@ MLB_TEST_FILE := boreal-test.mlb
 TEST_BIN := boreal-test
 
 SRC := src/*.sig src/*.sml
+TEST_SRC := test/*.sml
 
 VENDOR_DIR := vendor
 MLUNIT := $(VENDOR_DIR)/mlunit
@@ -26,8 +27,12 @@ $(MLUNIT): $(VENDOR_DIR)
 compile: $(SRC)
 	$(SML) $(SMLFLAGS) -m $(CM_FILE)
 
-test: $(SRC) $(MLUNIT)
+$(TEST_BIN): $(SRC) $(TEST_SRC) $(MLUNIT)
 	$(MLTON) $(MLB_TEST_FILE)
+	./$(TEST_BIN)
+
+test: $(TEST_BIN)
 
 clean:
 	rm -rf $(VENDOR_DIR)
+	rm $(TEST_BIN)
