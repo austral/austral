@@ -42,7 +42,7 @@ structure Parser :> PARSER = struct
   fun applySign (Positive, int) = int
     | applySign (Negative, int) = ~int
 
-  val integerParser = pmap applySign (seq signParser naturalParser)
+  val integerParser = pmap (CST.IntConstant o applySign) (seq signParser naturalParser)
 
   (* Strings *)
 
