@@ -56,4 +56,6 @@ structure Parser :> PARSER = struct
   val symbolChar = anyOfString Ident.alphabet
 
   val symbolNameParser = pmap String.implode (many1 symbolChar)
+
+  val unqualifiedSymbolParser = symbolNameParser
 end
