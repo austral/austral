@@ -58,4 +58,6 @@ structure Parser :> PARSER = struct
   val symbolNameParser = pmap String.implode (many1 symbolChar)
 
   val unqualifiedSymbolParser = symbolNameParser
+
+  val keywordParser = (seqR (pchar #":") symbolNameParser)
 end
