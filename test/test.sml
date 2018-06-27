@@ -1,0 +1,1 @@
+val _ = print "Stub"
