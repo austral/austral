@@ -48,7 +48,8 @@ structure Parser :> PARSER = struct
 
   val stringChar = or (seqR (pchar #"\\") (pchar #"\"")) (noneOf [#"\""])
 
-  val quotedString = pmap String.implode (between (pchar #"\"") (many stringChar) (pchar #"\""))
+  val quotedString = pmap (CST.StringConstant o CST.escapeString o String.implode)
+                          (between (pchar #"\"") (many stringChar) (pchar #"\""))
 
   (* Symbols *)
 
