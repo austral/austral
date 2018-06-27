@@ -23,6 +23,7 @@ signature SYMBOL = sig
 
   type symbol
 
+  val mkSymbol : module_name * symbol_name -> symbol
   val symbolModuleName : symbol -> module_name
   val symbolName : symbol -> symbol_name
 end

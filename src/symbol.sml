@@ -23,6 +23,7 @@ structure Symbol : SYMBOL = struct
 
   datatype symbol = Symbol of module_name * symbol_name
 
+  fun mkSymbol p = Symbol p
   fun symbolModuleName (Symbol (m, _)) = m
   fun symbolName (Symbol (_, n)) = n
 end
