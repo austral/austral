@@ -24,7 +24,7 @@ structure CST :> CST = struct
                | StringConstant of escaped_string
                | QualifiedSymbol of Symbol.symbol
                | UnqualifiedSymbol of Symbol.symbol_name
-               | Keyword of Module.symbol_name
+               | Keyword of Symbol.symbol_name
                | List of cst list
 
   fun escapeString s =
