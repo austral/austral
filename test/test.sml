@@ -75,7 +75,7 @@ open MLUnit
                 isParse "(())" (List [List nil]),
                 isParse "((()))" (List [List [List nil]]),
                 isParse "(((())))" (List [List [List [List nil]]]),
-                isParse "(derp)" (List [UnqualifiedSymbol (i "derp")]),
+                isParse "(test)" (List [UnqualifiedSymbol (i "test")]),
                 isParse "((a))" (List [List [UnqualifiedSymbol (i "a")]]),
                 isParse "(a b c)" (List [UnqualifiedSymbol (i "a"),
                                          UnqualifiedSymbol (i "b"),
@@ -87,7 +87,7 @@ open MLUnit
                                                  UnqualifiedSymbol (i "e"),
                                                  UnqualifiedSymbol (i "f")]),
                 isParse "(123)" (List [IntConstant 123]),
-                isParse "(\"derp\")" (List [StringConstant (escapeString "derp")])
+                isParse "(\"test\")" (List [StringConstant (escapeString "test")])
             ]
         ]
   end
