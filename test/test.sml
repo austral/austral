@@ -40,6 +40,8 @@ open MLUnit
 
   fun unsym s = CST.UnqualifiedSymbol (i s)
 
+  fun qsym s = CST.QualifiedSymbol (i s)
+
   (* Test suites *)
 
   local
