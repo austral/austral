@@ -67,6 +67,29 @@ open MLUnit
                 suite "Keywords" [
                     isParse ":test" (Keyword (i "test"))
                 ]
+            ],
+            suite "S-expressions" [
+                isParse "123" (IntConstant 123),
+                isParse "-123" (IntConstant ~123),
+                isParse "derp" (UnqualifiedSymbol (i "derp")),
+                isParse "\"derp\"" (StringConstant (escapeString "derp")),
+                isParse "()" (List nil),
+                isParse "(())" (List [List nil]),
+                isParse "((()))" (List [List [List nil]]),
+                isParse "(((())))" (List [List [List [List nil]]]),
+                isParse "(derp)" (List [UnqualifiedSymbol (i "derp")]),
+                isParse "((a))" (List [List [UnqualifiedSymbol (i "a")]]),
+                isParse "(a b c)" (List [UnqualifiedSymbol (i "a"),
+                                         UnqualifiedSymbol (i "b"),
+                                         UnqualifiedSymbol (i "c")]),
+                isParse "(a b (c d) e f)" (List [UnqualifiedSymbol (i "a"),
+                                                 UnqualifiedSymbol (i "b"),
+                                                 List [UnqualifiedSymbol (i "c"),
+                                                       UnqualifiedSymbol (i "d")],
+                                                 UnqualifiedSymbol (i "e"),
+                                                 UnqualifiedSymbol (i "f")]),
+                isParse "(123)" (List [IntConstant 123]),
+                isParse "(\"derp\")" (List [StringConstant (escapeString "derp")])
             ]
         ]
   end
