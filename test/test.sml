@@ -90,7 +90,8 @@ open MLUnit
                     isParse "()   " (List nil),
                     isParse "(   test)" (List [unsym "test"]),
                     isParse "(test   )" (List [unsym "test"]),
-                    isParse "(   test   )" (List [unsym "test"])
+                    isParse "(   test   )" (List [unsym "test"]),
+                    isParse "( a b c )" (List [unsym "a", unsym "b", unsym "c"])
                 ]
             ]
         ]
