@@ -84,7 +84,14 @@ open MLUnit
                                                  unsym "e",
                                                  unsym "f"]),
                 isParse "(123)" (List [IntConstant 123]),
-                isParse "(\"test\")" (List [StringConstant (escapeString "test")])
+                isParse "(\"test\")" (List [StringConstant (escapeString "test")]),
+                suite "Whitespace handling" [
+                    isParse "   ()" (List nil),
+                    isParse "()   " (List nil),
+                    isParse "(   test)" (List [unsym "test"]),
+                    isParse "(test   )" (List [unsym "test"]),
+                    isParse "(   test   )" (List [unsym "test"])
+                ]
             ]
         ]
   end
