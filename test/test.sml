@@ -62,8 +62,8 @@ open MLUnit
             ],
             suite "Symbols" [
                 suite "Qualified Symbols" [
-                    isParse "a:b" (QualifiedSymbol (Symbol.mkSymbol (i "a", i "b"))),
-                    isParse "test:test" (QualifiedSymbol (Symbol.mkSymbol (i "test", i "test")))
+                    isParse "a:b" (qsym "a" "b"),
+                    isParse "test:test" (qsym "test" "test")
                 ],
                 suite "Unqualified Symbols" [
                     isParse "test" (unsym "test")
