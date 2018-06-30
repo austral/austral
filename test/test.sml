@@ -36,6 +36,12 @@ open MLUnit
                    | Util.Failure f => Fail f)
        input
 
+  fun isNotParse input =
+    is (fn () => case (Parser.parseString input) of
+                     (Util.Result _) => Fail "Parse successful, should have failed"
+                   | _ => Pass)
+       input
+
   val i = Ident.mkIdentEx
 
   fun unsym s = CST.UnqualifiedSymbol (i s)
