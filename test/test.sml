@@ -38,6 +38,8 @@ open MLUnit
 
   val i = Ident.mkIdentEx
 
+  fun unsym s = CST.UnqualifiedSymbol (i s)
+
   (* Test suites *)
 
   local
@@ -62,7 +64,7 @@ open MLUnit
                     isParse "test:test" (QualifiedSymbol (Symbol.mkSymbol (i "test", i "test")))
                 ],
                 suite "Unqualified Symbols" [
-                    isParse "test" (UnqualifiedSymbol (i "test"))
+                    isParse "test" (unsym "test")
                 ],
                 suite "Keywords" [
                     isParse ":test" (Keyword (i "test"))
