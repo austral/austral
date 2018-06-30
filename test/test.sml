@@ -18,11 +18,57 @@
 *)
 
 structure BorealTest = struct
-  open MLUnit
+open MLUnit
 
-  val tests = suite "SUnit Tests" [
-          isTrue' true,
-          isFalse' false
+  (* Test utilities *)
+
+  structure ps = Parsimony(ParsimonyStringInput)
+
+  fun strInput str =
+    ParsimonyStringInput.fromString str
+
+  fun isParse input output =
+    is (fn () => case (Parser.parseString input) of
+                     (Util.Result v) => if v = output then
+                                            Pass
+                                        else
+                                            Fail "Parse successful, but not equal to output"
+                   | Util.Failure f => Fail f)
+       input
+
+  val i = Ident.mkIdentEx
+
+  (* Test suites *)
+
+  local
+    open CST
+  in
+    val parserSuite = suite "Parser" [
+            suite "Integers" [
+                isParse "123" (IntConstant 123),
+                isParse "0" (IntConstant 0),
+                isParse "00" (IntConstant 0),
+                isParse "10000" (IntConstant 10000),
+                isParse "+10000" (IntConstant 10000),
+                isParse "-10000" (IntConstant ~10000)
+            ],
+            suite "Symbols" [
+                suite "Qualified Symbols" [
+                    isParse "a:b" (QualifiedSymbol (Symbol.mkSymbol (i "a", i "b"))),
+                    isParse "test:test" (QualifiedSymbol (Symbol.mkSymbol (i "test", i "test")))
+                ],
+                suite "Unqualified Symbols" [
+                    isParse "test" (UnqualifiedSymbol (i "test"))
+                ],
+                suite "Keywords" [
+                    isParse ":test" (Keyword (i "test"))
+                ]
+            ]
+        ]
+  end
+
+  val tests = suite "Boreal Tests" [
+          parserSuite
       ]
 
   fun runTests () = runAndQuit tests defaultReporter
