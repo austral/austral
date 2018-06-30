@@ -1,10 +1,9 @@
 TODO:
 
-- Parser
+- Parse floating point numbers
 - Symbol resolution in modules
 - Process escape sequences in parsed strings
 - Parse nested comments
-- Parser tests
 - Kind inference
 
 DONE:
@@ -15,3 +14,5 @@ DONE:
 - Ident structure
 - Basic Module structure
 - CST
+- Parser tests
+- Parser
