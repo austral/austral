@@ -80,6 +80,7 @@ open MLUnit
                 isParse "(test)" (List [unsym "test"]),
                 isParse "((a))" (List [List [unsym "a"]]),
                 isParse "(a b c)" (List [unsym "a", unsym "b", unsym "c"]),
+                isParse "(m:a n:b o:c)" (List [qsym "m" "a", qsym "n" "b", qsym "o" "c"]),
                 isParse "(a b (c d) e f)" (List [unsym "a",
                                                  unsym "b",
                                                  List [unsym "c", unsym "d"],
