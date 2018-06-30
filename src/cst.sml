@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure CST :> CST = struct
+structure CST : CST = struct
   datatype escaped_string = EscapedString of string
 
   datatype cst = IntConstant of int
