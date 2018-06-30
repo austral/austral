@@ -26,7 +26,14 @@ structure RCST :> RCST = struct
 
   fun resolve _ _ (CST.IntConstant i) = IntConstant i
     | resolve _ _ (CST.StringConstant es) = StringConstant es
+    | resolve menv m (CST.QualifiedSymbol s) = resolveQualified menv
+                                                                m
+                                                                (Symbol.symbolModuleName s)
+                                                                (Symbol.symbolName s)
+    | resolve menv m (CST.UnqualifiedSymbol s) = resolveUnqualified menv m s
     | resolve _ _ (CST.Keyword n) = Keyword n
     | resolve menv m (CST.List l) = List (map (fn e => resolve menv m e) l)
     | resolve _ _ _ = raise Fail "NOT IMPLEMENTED YET"
+  and resolveUnqualified menv m (s: Symbol.symbol_name) =
+      Symbol (Symbol.mkSymbol (Module.sourceModule m s, s))
 end
