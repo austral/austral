@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Module :> MODULE = struct
+structure Module : MODULE = struct
   open Symbol
 
   type nicknames = (module_name, module_name) Map.map
