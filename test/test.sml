@@ -52,6 +52,10 @@ open MLUnit
                 isParse "+10000" (IntConstant 10000),
                 isParse "-10000" (IntConstant ~10000)
             ],
+            suite "Strings" [
+                isParse "\"derp\"" (StringConstant (escapeString "derp")),
+                isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (escapeString "derp \"herp\" derp"))
+            ],
             suite "Symbols" [
                 suite "Qualified Symbols" [
                     isParse "a:b" (QualifiedSymbol (Symbol.mkSymbol (i "a", i "b"))),
