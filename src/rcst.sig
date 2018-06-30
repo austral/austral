@@ -19,7 +19,7 @@
 
 signature RCST = sig
   datatype rcst = IntConstant of int
-                | StringConstant of string
+                | StringConstant of CST.escaped_string
                 | Symbol of Symbol.symbol
                 | Keyword of Module.symbol_name
                 | List of rcst list
