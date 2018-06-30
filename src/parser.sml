@@ -60,7 +60,52 @@ structure Parser :> PARSER = struct
   val unqualifiedSymbolParser = pmap CST.UnqualifiedSymbol symbolNameParser
 
   val qualifiedSymbolParser = pmap (CST.QualifiedSymbol o Symbol.mkSymbol)
-                                   (seq symbolNameParser (seqR (pchar #":") symbolNameParser))
+                                   (seq symbolNameParser
+                                        (seqR (pchar #":") symbolNameParser))
 
   val keywordParser = pmap CST.Keyword (seqR (pchar #":") symbolNameParser)
+
+  (* Comments *)
+
+  val singleLineComment = seqR (pchar #";")
+                               (seqR (many (noneOf [#"\n"]))
+                                     (pchar #"\n"))
+
+  (* S-expressions *)
+
+  val whitespaceParser = choice [pchar #" ",
+                                 pchar #"\n",
+                                 singleLineComment]
+
+  val ws = many whitespaceParser
+
+  fun defineSexpParser listParser =
+    seqR ws (choice [integerParser,
+                     quotedString,
+                     qualifiedSymbolParser,
+                     keywordParser,
+                     unqualifiedSymbolParser,
+                     listParser])
+
+  val listParser =
+      let val (sexpParser, r) = wrapper ()
+      in
+          let val listParser = pmap CST.List (seqR (pchar #"(")
+                                                   (between ws
+                                                            (many (seqL sexpParser ws))
+                                                            (pchar #")")))
+          in
+              r := defineSexpParser listParser;
+              listParser
+          end
+      end
+
+  val sexpParser = defineSexpParser listParser
+
+  (* Interface *)
+
+  fun parseString s =
+    case (run sexpParser (ParsimonyStringInput.fromString s)) of
+        (Success (r, _)) => Util.Result r
+      | f => Util.Failure ("Bad parse: " ^ (explain f))
 end
