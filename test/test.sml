@@ -69,10 +69,6 @@ open MLUnit
                 ]
             ],
             suite "S-expressions" [
-                isParse "123" (IntConstant 123),
-                isParse "-123" (IntConstant ~123),
-                isParse "derp" (UnqualifiedSymbol (i "derp")),
-                isParse "\"derp\"" (StringConstant (escapeString "derp")),
                 isParse "()" (List nil),
                 isParse "(())" (List [List nil]),
                 isParse "((()))" (List [List [List nil]]),
