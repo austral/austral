@@ -27,5 +27,6 @@ structure RCST :> RCST = struct
   fun resolve _ _ (CST.IntConstant i) = IntConstant i
     | resolve _ _ (CST.StringConstant es) = StringConstant es
     | resolve _ _ (CST.Keyword n) = Keyword n
+    | resolve menv m (CST.List l) = List (map (fn e => resolve menv m e) l)
     | resolve _ _ _ = raise Fail "NOT IMPLEMENTED YET"
 end
