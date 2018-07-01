@@ -29,7 +29,10 @@ structure CST : CST = struct
                | List of cst list
 
   fun escapeString s =
-    EscapedString s (* TODO: actually implement this *)
+    EscapedString (String.implode (escapeList (String.explode s)))
+  and escapeList (#"\\" :: #"n" :: rest) = #"\n" :: (escapeList rest)
+    | escapeList (head :: rest) = head :: (escapeList rest)
+    | escapeList nil = nil
 
   fun escapedToString (EscapedString s) = s
 end
