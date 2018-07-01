@@ -21,10 +21,10 @@ structure Module : MODULE = struct
   open Symbol
 
   type nicknames = (module_name, module_name) Map.map
+  datatype imports = Imports of (symbol_name, module_name) Map.map
+  datatype exports = Exports of symbol_name Set.set
 
   datatype module = Module of module_name * nicknames * imports * exports
-       and imports = Imports of (symbol_name, module_name) Map.map
-       and exports = Exports of symbol_name Set.set
 
   datatype menv = MEnv of (module_name, module) Map.map
 
