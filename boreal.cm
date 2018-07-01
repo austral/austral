@@ -29,6 +29,9 @@ is
   src/rcst.sig
   src/rcst.sml
 
+  src/ast.sig
+  src/ast.sml
+
   src/type.sig
   src/type.sml
 
