@@ -1,6 +1,5 @@
 TODO:
 
-- Parse floating point numbers
 - Process escape sequences in parsed strings
 - Parse nested comments
 - Define the toplevel AST datatype
@@ -21,3 +20,5 @@ DONE:
 - Parser
 - Symbol resolution in modules
 - Parse files
+- Parse floating point numbers
+- Test float parsing
