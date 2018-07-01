@@ -110,8 +110,13 @@ open MLUnit
         ]
   end
 
+  val moduleSuite = suite "Module System" [
+
+      ]
+
   val tests = suite "Boreal Tests" [
-          parserSuite
+          parserSuite,
+          moduleSuite
       ]
 
   fun runTests () = runAndQuit tests defaultReporter
