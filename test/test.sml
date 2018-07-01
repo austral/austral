@@ -80,7 +80,8 @@ open MLUnit
             ],
             suite "Strings" [
                 isParse "\"derp\"" (StringConstant (escapeString "derp")),
-                isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (escapeString "derp \"herp\" derp"))
+                isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (escapeString "derp \"herp\" derp")),
+                isParse "\"line\\nline\"" (StringConstant (escapeString "line\\nline"))
             ],
             suite "Symbols" [
                 suite "Qualified Symbols" [
