@@ -26,6 +26,7 @@ structure RCST :> RCST = struct
                 | List of rcst list
 
   fun innResolve _ _ (CST.IntConstant i) = IntConstant i
+    | innResolve _ _ (CST.FloatConstant f) = FloatConstant f
     | innResolve _ _ (CST.StringConstant es) = StringConstant es
     | innResolve menv m (CST.QualifiedSymbol s) = resolveQualified menv
                                                                 m
