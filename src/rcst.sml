@@ -33,7 +33,13 @@ structure RCST :> RCST = struct
     | resolve menv m (CST.UnqualifiedSymbol s) = resolveUnqualified menv m s
     | resolve _ _ (CST.Keyword n) = Keyword n
     | resolve menv m (CST.List l) = List (map (fn e => resolve menv m e) l)
-    | resolve _ _ _ = raise Fail "NOT IMPLEMENTED YET"
-  and resolveUnqualified menv m (s: Symbol.symbol_name) =
+  and resolveQualified menv module (mn: Symbol.module_name) (sn: Symbol.symbol_name) =
+      let val truename = Module.resolveNickname module mn
+      in
+          case (Module.menvGet menv truename) of
+              SOME formod => Symbol (Symbol.mkSymbol (Module.moduleName formod, sn))
+            | NONE => raise Fail ("No module named " ^ (Ident.identString truename))
+      end
+  and resolveUnqualified _ m (s: Symbol.symbol_name) =
       Symbol (Symbol.mkSymbol (Module.sourceModule m s, s))
 end

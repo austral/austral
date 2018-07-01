@@ -27,6 +27,8 @@ signature MODULE = sig
   val moduleExports : module -> symbol_name Set.set
   val moduleImports : module -> (symbol_name, module_name) Map.map
 
+  val menvGet : menv -> module_name -> module option
+
   (* Given the current module, and the name of a module (which is potentially a
      module-local nickname), this function returns the true name if it's a
      nickname, or returns the module name unchanged if it's not. *)

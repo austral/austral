@@ -33,6 +33,9 @@ structure Module : MODULE = struct
   fun moduleExports (Module (_, _, _, Exports e)) = e
   fun moduleImports (Module (_, _, Imports i, _)) = i
 
+  fun menvGet (MEnv map) n =
+    Map.get map n
+
   fun resolveNickname (m: module) (n: module_name) =
     case Map.get (moduleNicknames m) n of
         SOME n => n
