@@ -18,4 +18,8 @@
 *)
 
 signature AST = sig
+  datatype exp_ast = IntConstant of string
+                   | StringConstant of CST.escaped_string
+                   | Symbol of Symbol.symbol
+                   | Operator of Symbol.symbol * exp_ast list
 end
