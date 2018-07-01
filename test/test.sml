@@ -42,6 +42,12 @@ open MLUnit
                    | _ => Pass)
        input
 
+  fun isFailure value msg =
+    is (fn () => case value of
+                     (Util.Result v) => Fail "value is an instance of Util.Result"
+                   | Util.Failure _ => Pass)
+       msg
+
   val i = Ident.mkIdentEx
 
   fun unsym s = CST.UnqualifiedSymbol (i s)
@@ -139,7 +145,14 @@ open MLUnit
                               "Unqualified symbol, internal",
                       isEqual (RCST.resolve menv b (qsym "nick" "test"))
                               (Util.Result (rqsym "A" "test"))
-                              "Qualified symbol, nickname, external"
+                              "Qualified symbol, nickname, exported",
+                      isEqual (RCST.resolve menv b (qsym "A" "test"))
+                              (Util.Result (rqsym "A" "test"))
+                              "Qualified symbol, literal, exported",
+                      isFailure (RCST.resolve menv b (qsym "nick" "test1"))
+                                "Qualified symbol, nickname, unexported",
+                      isFailure (RCST.resolve menv b (qsym "A" "test1"))
+                                "Qualified symbol, literal, unexported"
                   ]
               ]
           end
