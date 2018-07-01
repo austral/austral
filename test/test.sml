@@ -133,7 +133,7 @@ open MLUnit
                           Exports Set.empty)
           and c = Module (i "C",
                           empty,
-                          Imports (iadd empty (i "A", i "test")),
+                          Imports (iadd empty (i "test", i "A")),
                           Exports Set.empty)
       in
           let val menv = addModule (addModule (addModule emptyEnv a) b) c
