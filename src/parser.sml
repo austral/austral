@@ -38,13 +38,15 @@ structure Parser :> PARSER = struct
   fun applySign (Positive, int) = int
     | applySign (Negative, int) = "-" ^ int
 
-  val integerParser = pmap (CST.IntConstant o applySign) (seq signParser naturalParser)
+  val integerTextParser = pmap applySign (seq signParser naturalParser)
+
+  val integerParser = pmap CST.IntConstant integerTextParser
 
   (* Floats *)
 
   val eParser = or (pchar #"e") (pchar #"E")
 
-  val exponentParser = seqR eParser integerParser
+  val exponentParser = seqR eParser integerTextParser
 
   fun toFloat (intPart, (decPart, exponent)) =
     let val expStr = case exponent of
@@ -60,8 +62,8 @@ structure Parser :> PARSER = struct
     end
 
   val floatParser = pmap (CST.FloatConstant o toFloat)
-                         (seq integerParser (seqR (pchar #".")
-                                                  (seq integerParser (opt exponentParser))))
+                         (seq integerTextParser (seqR (pchar #".")
+                                                      (seq integerTextParser (opt exponentParser))))
 
   (* Strings *)
 
