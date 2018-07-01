@@ -96,7 +96,8 @@ structure Parser :> PARSER = struct
   val ws = many whitespaceParser
 
   fun defineSexpParser listParser =
-    seqR ws (choice [integerParser,
+    seqR ws (choice [floatParser,
+                     integerParser,
                      quotedString,
                      qualifiedSymbolParser,
                      keywordParser,
