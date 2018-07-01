@@ -31,6 +31,7 @@ structure CST : CST = struct
   fun escapeString s =
     EscapedString (String.implode (escapeList (String.explode s)))
   and escapeList (#"\\" :: #"n" :: rest) = #"\n" :: (escapeList rest)
+  and escapeList (#"\\" :: #"r" :: rest) = #"\r" :: (escapeList rest)
     | escapeList (#"\\" :: #"t" :: rest) = #"\t" :: (escapeList rest)
     | escapeList (#"\\" :: #"\"" :: rest) = #"\"" :: (escapeList rest)
     | escapeList (#"\\" :: #"\\" :: rest) = #"\\" :: (escapeList rest)
