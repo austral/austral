@@ -120,7 +120,7 @@ open MLUnit
                                 Imports empty,
                                 Exports (Set.add Set.empty (i "test")))
             in
-                isEqual' 1 1
+                isEqual (moduleName a) (i "A") "Module name"
             end
         ]
   end
