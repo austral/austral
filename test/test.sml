@@ -62,8 +62,8 @@ open MLUnit
     val parserSuite = suite "Parser" [
             suite "Integers" [
                 isParse "123" (IntConstant "+123"),
-                isParse "0" (IntConstant "0"),
-                isParse "00" (IntConstant "0"),
+                isParse "0" (IntConstant "+0"),
+                isParse "00" (IntConstant "+00"),
                 isParse "10000" (IntConstant "+10000"),
                 isParse "+10000" (IntConstant "+10000"),
                 isParse "-10000" (IntConstant "-10000")
