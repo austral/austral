@@ -110,23 +110,40 @@ open MLUnit
         ]
   end
 
+  fun rqsym m s = RCST.Symbol (Symbol.mkSymbol (i m, i s))
+
   local
     open Module
     open Map
   in
-    val moduleSuite = suite "Module System" [
-            let val a = Module (i "A",
-                                empty,
-                                Imports empty,
-                                Exports (Set.add Set.empty (i "test")))
-                and b = Module (i "B",
-                                iadd empty (i "nick", i "A"),
-                                Imports empty,
-                                Exports Set.empty)
-            in
-                isEqual (moduleName a) (i "A") "Module name"
-            end
-        ]
+  val moduleSuite =
+      let val a = Module (i "A",
+                          empty,
+                          Imports empty,
+                          Exports (Set.add Set.empty (i "test")))
+          and b = Module (i "B",
+                          iadd empty (i "nick", i "A"),
+                          Imports empty,
+                          Exports Set.empty)
+      in
+          let val menv = addModule (addModule emptyEnv a) b
+          in
+              suite "Module System" [
+                  isEqual (moduleName a) (i "A") "Module name",
+                  suite "Symbol resolution" [
+                      isEqual (RCST.resolve menv b (CST.IntConstant 10))
+                              (Util.Result (RCST.IntConstant 10))
+                              "Int constant",
+                      isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test")))
+                              (Util.Result (rqsym "B" "test"))
+                              "Unqualified symbol, internal",
+                      isEqual (RCST.resolve menv b (qsym "nick" "test"))
+                              (Util.Result (rqsym "A" "test"))
+                              "Qualified symbol, nickname, external"
+                  ]
+              ]
+          end
+      end
   end
 
   val tests = suite "Boreal Tests" [
