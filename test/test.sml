@@ -140,6 +140,8 @@ open MLUnit
           in
               suite "Module System" [
                   isEqual (moduleName a) (i "A") "Module name",
+                  isEqual (moduleName b) (i "B") "Module name",
+                  isEqual (moduleName c) (i "C") "Module name",
                   suite "Symbol resolution" [
                       isEqual (RCST.resolve menv b (CST.IntConstant 10))
                               (Util.Result (RCST.IntConstant 10))
