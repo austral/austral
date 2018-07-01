@@ -1,6 +1,5 @@
 TODO:
 
-- Parse files
 - Parse floating point numbers
 - Process escape sequences in parsed strings
 - Parse nested comments
@@ -19,3 +18,4 @@ DONE:
 - Parser tests
 - Parser
 - Symbol resolution in modules
+- Parse files
