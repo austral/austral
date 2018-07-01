@@ -1,6 +1,5 @@
 TODO:
 
-- Process escape sequences in parsed strings
 - Parse nested comments
 - Define the toplevel AST datatype
 - Define the expression AST datatype
@@ -21,3 +20,4 @@ DONE:
 - Parse files
 - Parse floating point numbers
 - Test float parsing
+- Process escape sequences in parsed strings
