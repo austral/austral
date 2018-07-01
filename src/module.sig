@@ -28,6 +28,7 @@ signature MODULE = sig
   val moduleImports : module -> (symbol_name, module_name) Map.map
 
   val emptyEnv : menv
+  val addModule : menv -> module -> menv
   val envGet : menv -> module_name -> module option
 
   (* Given the current module, and the name of a module (which is potentially a

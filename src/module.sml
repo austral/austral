@@ -34,6 +34,10 @@ structure Module : MODULE = struct
   fun moduleImports (Module (_, _, Imports i, _)) = i
 
   val emptyEnv = MEnv (Map.empty)
+
+  fun addModule (MEnv map) m =
+    MEnv (Map.iadd map (moduleName m, m))
+
   fun envGet (MEnv map) n =
     Map.get map n
 
