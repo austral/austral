@@ -74,7 +74,9 @@ open MLUnit
                 isParse "123.0" (FloatConstant "123.0"),
                 isParse "-123.0" (FloatConstant "-123.0"),
                 isParse "123.456" (FloatConstant "123.456"),
-                isParse "-123.456" (FloatConstant "-123.456")
+                isParse "-123.456" (FloatConstant "-123.456"),
+                isParse "123.456e3" (FloatConstant "123.456e3"),
+                isParse "-123.456e-3" (FloatConstant "-123.456e-3")
             ],
             suite "Strings" [
                 isParse "\"derp\"" (StringConstant (escapeString "derp")),
