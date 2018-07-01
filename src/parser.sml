@@ -59,7 +59,7 @@ structure Parser :> PARSER = struct
         end
     end
 
-  val floatParser = pmap toFloat
+  val floatParser = pmap (CST.FloatConstant o toFloat)
                          (seq integerParser (seqR (pchar #".")
                                                   (seq integerParser (opt exponentParser))))
 
