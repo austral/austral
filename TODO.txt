@@ -3,6 +3,8 @@ TODO:
 - Parse floating point numbers
 - Process escape sequences in parsed strings
 - Parse nested comments
+- Define the toplevel AST datatype
+- Define the expression AST datatype
 - Parse RCST nodes into AST nodes
 - Parse RCST toplevel nodes into top-level AST nodes
 - Kind inference
