@@ -25,11 +25,7 @@ structure Parser :> PARSER = struct
 
   val digitParser = anyOf [#"0", #"1", #"2", #"3", #"4", #"5", #"6", #"7", #"8", #"9"]
 
-  fun parseInt str = case (Int.fromString str) of
-                         SOME i => i
-                       | NONE => raise Match
-
-  val naturalParser = pmap (parseInt o String.implode) (many1 digitParser)
+  val naturalParser = pmap String.implode (many1 digitParser)
 
   datatype sign = Positive | Negative
 
@@ -39,8 +35,8 @@ structure Parser :> PARSER = struct
                        or negParser posParser
                    end
 
-  fun applySign (Positive, int) = int
-    | applySign (Negative, int) = ~int
+  fun applySign (Positive, int) = "+" ^ int
+    | applySign (Negative, int) = "-" ^ int
 
   val integerParser = pmap (CST.IntConstant o applySign) (seq signParser naturalParser)
 

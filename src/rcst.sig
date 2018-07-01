@@ -18,7 +18,7 @@
 *)
 
 signature RCST = sig
-  datatype rcst = IntConstant of int
+  datatype rcst = IntConstant of string
                 | StringConstant of CST.escaped_string
                 | Symbol of Symbol.symbol
                 | Keyword of Symbol.symbol_name
