@@ -61,11 +61,11 @@ open MLUnit
   in
     val parserSuite = suite "Parser" [
             suite "Integers" [
-                isParse "123" (IntConstant "+123"),
-                isParse "0" (IntConstant "+0"),
-                isParse "00" (IntConstant "+00"),
-                isParse "10000" (IntConstant "+10000"),
-                isParse "+10000" (IntConstant "+10000"),
+                isParse "123" (IntConstant "123"),
+                isParse "0" (IntConstant "0"),
+                isParse "00" (IntConstant "00"),
+                isParse "10000" (IntConstant "10000"),
+                isParse "10000" (IntConstant "10000"),
                 isParse "-10000" (IntConstant "-10000")
             ],
             suite "Strings" [
@@ -98,7 +98,7 @@ open MLUnit
                                                  List [unsym "c", unsym "d"],
                                                  unsym "e",
                                                  unsym "f"]),
-                isParse "(123)" (List [IntConstant "+123"]),
+                isParse "(123)" (List [IntConstant "123"]),
                 isParse "(\"test\")" (List [StringConstant (escapeString "test")]),
                 suite "Whitespace handling" [
                     isParse "   ()" (List nil),
@@ -143,8 +143,8 @@ open MLUnit
                   isEqual (moduleName b) (i "B") "Module name",
                   isEqual (moduleName c) (i "C") "Module name",
                   suite "Symbol resolution" [
-                      isEqual (RCST.resolve menv b (CST.IntConstant "+10"))
-                              (Util.Result (RCST.IntConstant "+10"))
+                      isEqual (RCST.resolve menv b (CST.IntConstant "10"))
+                              (Util.Result (RCST.IntConstant "10"))
                               "Int constant",
                       isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test")))
                               (Util.Result (rqsym "B" "test"))
