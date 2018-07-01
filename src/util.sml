@@ -21,6 +21,8 @@ structure Util :> UTIL = struct
   datatype 'a result = Result of 'a
                      | Failure of string
 
+  type path = string
+
   fun readFileToString filepath =
     let val stream = TextIO.openIn filepath
         fun loop stream =
