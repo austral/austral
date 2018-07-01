@@ -2,7 +2,6 @@ TODO:
 
 - Parse nested comments
 - Define the toplevel AST datatype
-- Define the expression AST datatype
 - Parse RCST nodes into AST nodes
 - Parse RCST toplevel nodes into top-level AST nodes
 
@@ -21,3 +20,4 @@ DONE:
 - Parse floating point numbers
 - Test float parsing
 - Process escape sequences in parsed strings
+- Define the expression AST datatype
