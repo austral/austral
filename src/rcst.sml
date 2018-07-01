@@ -19,6 +19,7 @@
 
 structure RCST :> RCST = struct
   datatype rcst = IntConstant of string
+                | FloatConstant of string
                 | StringConstant of CST.escaped_string
                 | Symbol of Symbol.symbol
                 | Keyword of Symbol.symbol_name

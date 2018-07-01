@@ -21,6 +21,7 @@ structure CST : CST = struct
   datatype escaped_string = EscapedString of string
 
   datatype cst = IntConstant of string
+               | FloatConstant of string
                | StringConstant of escaped_string
                | QualifiedSymbol of Symbol.symbol
                | UnqualifiedSymbol of Symbol.symbol_name
