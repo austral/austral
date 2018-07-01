@@ -1,5 +1,6 @@
 TODO:
 
+- Parse files
 - Parse floating point numbers
 - Process escape sequences in parsed strings
 - Parse nested comments
