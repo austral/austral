@@ -119,6 +119,10 @@ open MLUnit
                                 empty,
                                 Imports empty,
                                 Exports (Set.add Set.empty (i "test")))
+                and b = Module (i "B",
+                                empty,
+                                Imports empty,
+                                Exports Set.empty)
             in
                 isEqual (moduleName a) (i "A") "Module name"
             end
