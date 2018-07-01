@@ -36,7 +36,7 @@ structure RCST :> RCST = struct
   and resolveQualified menv module (mn: Symbol.module_name) (sn: Symbol.symbol_name) =
       let val truename = Module.resolveNickname module mn
       in
-          case (Module.menvGet menv truename) of
+          case (Module.envGet menv truename) of
               SOME formod => Symbol (Symbol.mkSymbol (Module.moduleName formod, sn))
             | NONE => raise Fail ("No module named " ^ (Ident.identString truename))
       end

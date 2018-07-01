@@ -33,7 +33,8 @@ structure Module : MODULE = struct
   fun moduleExports (Module (_, _, _, Exports e)) = e
   fun moduleImports (Module (_, _, Imports i, _)) = i
 
-  fun menvGet (MEnv map) n =
+  val emptyEnv = MEnv (Map.empty)
+  fun envGet (MEnv map) n =
     Map.get map n
 
   fun resolveNickname (m: module) (n: module_name) =
