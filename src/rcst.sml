@@ -37,7 +37,13 @@ structure RCST :> RCST = struct
       let val truename = Module.resolveNickname module mn
       in
           case (Module.envGet menv truename) of
-              SOME formod => Symbol (Symbol.mkSymbol (Module.moduleName formod, sn))
+              SOME formod => if Module.doesModuleExport formod sn then
+                                 Symbol (Symbol.mkSymbol (Module.moduleName formod, sn))
+                             else
+                                 raise Fail ("Module "
+                                             ^ (Ident.identString truename)
+                                             ^ " does not export a symbol named "
+                                             ^ (Ident.identString sn))
             | NONE => raise Fail ("No module named " ^ (Ident.identString truename))
       end
   and resolveUnqualified _ m (s: Symbol.symbol_name) =
