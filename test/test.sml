@@ -136,7 +136,7 @@ open MLUnit
                           Imports (iadd empty (i "A", i "test")),
                           Exports Set.empty)
       in
-          let val menv = addModule (addModule emptyEnv a) b
+          let val menv = addModule (addModule (addModule emptyEnv a) b) c
           in
               suite "Module System" [
                   isEqual (moduleName a) (i "A") "Module name",
@@ -156,7 +156,10 @@ open MLUnit
                       isFailure (RCST.resolve menv b (qsym "nick" "test1"))
                                 "Qualified symbol, nickname, unexported",
                       isFailure (RCST.resolve menv b (qsym "A" "test1"))
-                                "Qualified symbol, literal, unexported"
+                                "Qualified symbol, literal, unexported",
+                      isEqual (RCST.resolve menv c (CST.UnqualifiedSymbol (i "test")))
+                              (Util.Result (rqsym "A" "test"))
+                              "Unqualified symbol, imported"
                   ]
               ]
           end
