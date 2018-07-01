@@ -69,7 +69,12 @@ open MLUnit
                 isParse "-10000" (IntConstant "-10000")
             ],
             suite "Floats" [
-                isParse "0.0" (FloatConstant "0.0")
+                isParse "0.0" (FloatConstant "0.0"),
+                isParse "-0.0" (FloatConstant "-0.0"),
+                isParse "123.0" (FloatConstant "123.0"),
+                isParse "-123.0" (FloatConstant "-123.0"),
+                isParse "123.456" (FloatConstant "123.456"),
+                isParse "-123.456" (FloatConstant "-123.456")
             ],
             suite "Strings" [
                 isParse "\"derp\"" (StringConstant (escapeString "derp")),
