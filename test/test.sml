@@ -54,6 +54,8 @@ open MLUnit
 
   fun qsym m s = CST.QualifiedSymbol (Symbol.mkSymbol (i m, i s))
 
+  fun escape s = escapedToString (escapeString "line\\nline")
+
   (* Test suites *)
 
   local
@@ -81,7 +83,7 @@ open MLUnit
             suite "Strings" [
                 isParse "\"derp\"" (StringConstant (escapeString "derp")),
                 isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (escapeString "derp \"herp\" derp")),
-                isEqual' (escapedToString (escapeString "line\\nline")) "line\nline"
+                isEqual' (escape "line\\nline") "line\nline"
             ],
             suite "Symbols" [
                 suite "Qualified Symbols" [
