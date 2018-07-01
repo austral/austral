@@ -40,6 +40,29 @@ structure Parser :> PARSER = struct
 
   val integerParser = pmap (CST.IntConstant o applySign) (seq signParser naturalParser)
 
+  (* Floats *)
+
+  val eParser = or (pchar #"e") (pchar #"E")
+
+  val exponentParser = seqR eParser integerParser
+
+  fun toFloat (intPart, (decPart, exponent)) =
+    let val expStr = case exponent of
+                         SOME e => "e" ^ e
+                       | NONE => ""
+    in
+        let val str = intPart ^ "." ^ decPart ^ expStr
+        in
+            case IEEEReal.fromString str of
+                SOME r => IEEEReal.toString r
+              | NONE => raise Fail ("Not a valid float: " ^ str)
+        end
+    end
+
+  val floatParser = pmap toFloat
+                         (seq integerParser (seqR (pchar #".")
+                                                  (seq integerParser (opt exponentParser))))
+
   (* Strings *)
 
   val stringChar = or (seqR (pchar #"\\") (pchar #"\"")) (noneOf [#"\""])
