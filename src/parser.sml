@@ -53,12 +53,7 @@ structure Parser :> PARSER = struct
                          SOME e => "e" ^ e
                        | NONE => ""
     in
-        let val str = intPart ^ "." ^ decPart ^ expStr
-        in
-            case IEEEReal.fromString str of
-                SOME r => IEEEReal.toString r
-              | NONE => raise Fail ("Not a valid float: " ^ str)
-        end
+        intPart ^ "." ^ decPart ^ expStr
     end
 
   val floatParser = pmap (CST.FloatConstant o toFloat)
