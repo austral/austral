@@ -54,7 +54,7 @@ open MLUnit
 
   fun qsym m s = CST.QualifiedSymbol (Symbol.mkSymbol (i m, i s))
 
-  fun escape s = escapedToString (escapeString "line\\nline")
+  fun escape s = CST.escapedToString (CST.escapeString s)
 
   (* Test suites *)
 
