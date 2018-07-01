@@ -110,9 +110,20 @@ open MLUnit
         ]
   end
 
-  val moduleSuite = suite "Module System" [
-
-      ]
+  local
+    open Module
+    open Map
+  in
+    val moduleSuite = suite "Module System" [
+            let val a = Module (i "A",
+                                empty,
+                                Imports empty,
+                                Exports (Set.add Set.empty (i "test")))
+            in
+                isEqual' 1 1
+            end
+        ]
+  end
 
   val tests = suite "Boreal Tests" [
           parserSuite,
