@@ -24,15 +24,15 @@ structure RCST :> RCST = struct
                 | Keyword of Symbol.symbol_name
                 | List of rcst list
 
-  fun resolve _ _ (CST.IntConstant i) = IntConstant i
-    | resolve _ _ (CST.StringConstant es) = StringConstant es
-    | resolve menv m (CST.QualifiedSymbol s) = resolveQualified menv
+  fun innResolve _ _ (CST.IntConstant i) = IntConstant i
+    | innResolve _ _ (CST.StringConstant es) = StringConstant es
+    | innResolve menv m (CST.QualifiedSymbol s) = resolveQualified menv
                                                                 m
                                                                 (Symbol.symbolModuleName s)
                                                                 (Symbol.symbolName s)
-    | resolve menv m (CST.UnqualifiedSymbol s) = resolveUnqualified menv m s
-    | resolve _ _ (CST.Keyword n) = Keyword n
-    | resolve menv m (CST.List l) = List (map (fn e => resolve menv m e) l)
+    | innResolve menv m (CST.UnqualifiedSymbol s) = resolveUnqualified menv m s
+    | innResolve _ _ (CST.Keyword n) = Keyword n
+    | innResolve menv m (CST.List l) = List (map (fn e => innResolve menv m e) l)
   and resolveQualified menv module (mn: Symbol.module_name) (sn: Symbol.symbol_name) =
       let val truename = Module.resolveNickname module mn
       in
@@ -42,4 +42,7 @@ structure RCST :> RCST = struct
       end
   and resolveUnqualified _ m (s: Symbol.symbol_name) =
       Symbol (Symbol.mkSymbol (Module.sourceModule m s, s))
+
+  fun resolve menv m e =
+    Util.Result (innResolve menv m e) handle Fail msg => Util.Failure msg
 end

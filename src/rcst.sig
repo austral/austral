@@ -24,5 +24,5 @@ signature RCST = sig
                 | Keyword of Symbol.symbol_name
                 | List of rcst list
 
-  val resolve : Module.menv -> Module.module -> CST.cst -> rcst
+  val resolve : Module.menv -> Module.module -> CST.cst -> rcst Util.result
 end
