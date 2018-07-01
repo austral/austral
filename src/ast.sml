@@ -23,6 +23,7 @@ structure AST :> AST = struct
                    | StringConstant of CST.escaped_string
                    | Symbol of Symbol.symbol
                    | Let of binding list * exp_ast
+                   | ExpProgn of exp_ast list
                    | Operator of Symbol.symbol * exp_ast list
        and binding = Binding of Symbol.symbol * exp_ast
 end
