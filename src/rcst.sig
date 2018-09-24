@@ -25,7 +25,9 @@ signature RCST = sig
                   | Keyword of Symbol.symbol_name
                   | List of rcst list
 
-    val resolveNicknames : Module.menv -> Module.module -> CST.cst -> CST.cst
+    (* Given the current module and a CST tree, resolve all nicknames in the CST
+       to the true module names *)
+    val resolveNicknames : Module.module -> CST.cst -> CST.cst
 
     val resolve : Module.menv -> Module.module -> CST.cst -> rcst Util.result
 end
