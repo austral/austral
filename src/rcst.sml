@@ -63,11 +63,11 @@ structure RCST :> RCST = struct
                                             ^ " does not export a symbol named "
                                             ^ (Ident.identString symName))
            | NONE => raise Fail ("No module named " ^ (Ident.identString modName)))
-    and resolveUnqualified _ m (s: Symbol.symbol_name) =
+    and resolveUnqualified menv m (s: Symbol.symbol_name) =
         (* This is an unqualified symbol, so either it was imported from another
            module or it belongs to the current module. We use sourceModule to
            figure this out *)
-        Symbol (Symbol.mkSymbol (Module.sourceModule m s, s))
+        Symbol (Symbol.mkSymbol (Module.sourceModule menv m s, s))
 
     fun resolve menv m e =
         Util.Result (innResolve menv m e) handle Fail msg => Util.Failure msg
