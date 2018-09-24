@@ -64,6 +64,9 @@ structure RCST :> RCST = struct
                                             ^ (Ident.identString symName))
            | NONE => raise Fail ("No module named " ^ (Ident.identString modName)))
     and resolveUnqualified _ m (s: Symbol.symbol_name) =
+        (* This is an unqualified symbol, so either it was imported from another
+           module or it belongs to the current module. We use sourceModule to
+           figure this out *)
         Symbol (Symbol.mkSymbol (Module.sourceModule m s, s))
 
     fun resolve menv m e =
