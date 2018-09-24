@@ -146,17 +146,22 @@ structure BorealTest = struct
         open Map
     in
     val moduleSuite =
+        (* Module A exports 'test', module B imports A:test and exports test,
+           and also has the nickname 'nick' for modue A, and finally, module C
+           imports test from B. Among other things, we should test that
+           transitive resolution works: that is, C:test should resolve to
+           A:test, rather than B:test. *)
         let val a = Module (i "A",
                             empty,
                             Imports empty,
                             Exports (Set.add Set.empty (i "test")))
             and b = Module (i "B",
                             iadd empty (i "nick", i "A"),
-                            Imports empty,
-                            Exports Set.empty)
+                            Imports (iadd empty (i "test", i "A")),
+                            Exports (Set.add Set.empty (i "test")))
             and c = Module (i "C",
                             empty,
-                            Imports (iadd empty (i "test", i "A")),
+                            Imports (iadd empty (i "test", i "B")),
                             Exports Set.empty)
         in
             let val menv = addModule (addModule (addModule emptyEnv a) b) c
