@@ -18,49 +18,48 @@
 *)
 
 structure BorealTest = struct
-open MLUnit
+    open MLUnit
+    (* Test utilities *)
 
-  (* Test utilities *)
+    structure ps = Parsimony(ParsimonyStringInput)
 
-  structure ps = Parsimony(ParsimonyStringInput)
+    fun strInput str =
+        ParsimonyStringInput.fromString str
 
-  fun strInput str =
-    ParsimonyStringInput.fromString str
+    fun isParse input output =
+        is (fn () => case (Parser.parseString input) of
+                         (Util.Result v) => if v = output then
+                                                Pass
+                                            else
+                                                Fail "Parse successful, but not equal to output"
+                       | Util.Failure f => Fail f)
+           input
 
-  fun isParse input output =
-    is (fn () => case (Parser.parseString input) of
-                     (Util.Result v) => if v = output then
-                                            Pass
-                                        else
-                                            Fail "Parse successful, but not equal to output"
-                   | Util.Failure f => Fail f)
-       input
+    fun isNotParse input =
+        is (fn () => case (Parser.parseString input) of
+                         (Util.Result _) => Fail "Parse successful, should have failed"
+                       | _ => Pass)
+           input
 
-  fun isNotParse input =
-    is (fn () => case (Parser.parseString input) of
-                     (Util.Result _) => Fail "Parse successful, should have failed"
-                   | _ => Pass)
-       input
+    fun isFailure value msg =
+        is (fn () => case value of
+                         (Util.Result v) => Fail "value is an instance of Util.Result"
+                       | Util.Failure _ => Pass)
+           msg
 
-  fun isFailure value msg =
-    is (fn () => case value of
-                     (Util.Result v) => Fail "value is an instance of Util.Result"
-                   | Util.Failure _ => Pass)
-       msg
+    val i = Ident.mkIdentEx
 
-  val i = Ident.mkIdentEx
+    fun unsym s = CST.UnqualifiedSymbol (i s)
 
-  fun unsym s = CST.UnqualifiedSymbol (i s)
+    fun qsym m s = CST.QualifiedSymbol (Symbol.mkSymbol (i m, i s))
 
-  fun qsym m s = CST.QualifiedSymbol (Symbol.mkSymbol (i m, i s))
+    fun escape s = CST.escapedToString (CST.escapeString s)
 
-  fun escape s = CST.escapedToString (CST.escapeString s)
+    (* Test suites *)
 
-  (* Test suites *)
-
-  local
-    open CST
-  in
+    local
+        open CST
+    in
     val parserSuite = suite "Parser" [
             suite "Integers" [
                 isParse "123" (IntConstant "123"),
@@ -138,66 +137,66 @@ open MLUnit
                 ]
             ]
         ]
-  end
+    end
 
-  fun rqsym m s = RCST.Symbol (Symbol.mkSymbol (i m, i s))
+    fun rqsym m s = RCST.Symbol (Symbol.mkSymbol (i m, i s))
 
-  local
-    open Module
-    open Map
-  in
-  val moduleSuite =
-      let val a = Module (i "A",
-                          empty,
-                          Imports empty,
-                          Exports (Set.add Set.empty (i "test")))
-          and b = Module (i "B",
-                          iadd empty (i "nick", i "A"),
-                          Imports empty,
-                          Exports Set.empty)
-          and c = Module (i "C",
-                          empty,
-                          Imports (iadd empty (i "test", i "A")),
-                          Exports Set.empty)
-      in
-          let val menv = addModule (addModule (addModule emptyEnv a) b) c
-          in
-              suite "Module System" [
-                  isEqual (moduleName a) (i "A") "Module name",
-                  isEqual (moduleName b) (i "B") "Module name",
-                  isEqual (moduleName c) (i "C") "Module name",
-                  suite "Symbol resolution" [
-                      isEqual (RCST.resolve menv b (CST.IntConstant "10"))
-                              (Util.Result (RCST.IntConstant "10"))
-                              "Int constant",
-                      isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test")))
-                              (Util.Result (rqsym "B" "test"))
-                              "Unqualified symbol, internal",
-                      isEqual (RCST.resolve menv b (qsym "nick" "test"))
-                              (Util.Result (rqsym "A" "test"))
-                              "Qualified symbol, nickname, exported",
-                      isEqual (RCST.resolve menv b (qsym "A" "test"))
-                              (Util.Result (rqsym "A" "test"))
-                              "Qualified symbol, literal, exported",
-                      isFailure (RCST.resolve menv b (qsym "nick" "test1"))
-                                "Qualified symbol, nickname, unexported",
-                      isFailure (RCST.resolve menv b (qsym "A" "test1"))
-                                "Qualified symbol, literal, unexported",
-                      isEqual (RCST.resolve menv c (CST.UnqualifiedSymbol (i "test")))
-                              (Util.Result (rqsym "A" "test"))
-                              "Unqualified symbol, imported"
-                  ]
-              ]
-          end
-      end
-  end
+    local
+        open Module
+        open Map
+    in
+    val moduleSuite =
+        let val a = Module (i "A",
+                            empty,
+                            Imports empty,
+                            Exports (Set.add Set.empty (i "test")))
+            and b = Module (i "B",
+                            iadd empty (i "nick", i "A"),
+                            Imports empty,
+                            Exports Set.empty)
+            and c = Module (i "C",
+                            empty,
+                            Imports (iadd empty (i "test", i "A")),
+                            Exports Set.empty)
+        in
+            let val menv = addModule (addModule (addModule emptyEnv a) b) c
+            in
+                suite "Module System" [
+                    isEqual (moduleName a) (i "A") "Module name",
+                    isEqual (moduleName b) (i "B") "Module name",
+                    isEqual (moduleName c) (i "C") "Module name",
+                    suite "Symbol resolution" [
+                        isEqual (RCST.resolve menv b (CST.IntConstant "10"))
+                                (Util.Result (RCST.IntConstant "10"))
+                                "Int constant",
+                        isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test")))
+                                (Util.Result (rqsym "B" "test"))
+                                "Unqualified symbol, internal",
+                        isEqual (RCST.resolve menv b (qsym "nick" "test"))
+                                (Util.Result (rqsym "A" "test"))
+                                "Qualified symbol, nickname, exported",
+                        isEqual (RCST.resolve menv b (qsym "A" "test"))
+                                (Util.Result (rqsym "A" "test"))
+                                "Qualified symbol, literal, exported",
+                        isFailure (RCST.resolve menv b (qsym "nick" "test1"))
+                                  "Qualified symbol, nickname, unexported",
+                        isFailure (RCST.resolve menv b (qsym "A" "test1"))
+                                  "Qualified symbol, literal, unexported",
+                        isEqual (RCST.resolve menv c (CST.UnqualifiedSymbol (i "test")))
+                                (Util.Result (rqsym "A" "test"))
+                                "Unqualified symbol, imported"
+                    ]
+                ]
+            end
+        end
+    end
 
-  val tests = suite "Boreal Tests" [
-          parserSuite,
-          moduleSuite
-      ]
+    val tests = suite "Boreal Tests" [
+            parserSuite,
+            moduleSuite
+        ]
 
-  fun runTests () = runAndQuit tests defaultReporter
+    fun runTests () = runAndQuit tests defaultReporter
 end
 
 val _ = BorealTest.runTests()
