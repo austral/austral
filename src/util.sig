@@ -18,11 +18,11 @@
 *)
 
 signature UTIL = sig
-  datatype 'a result = Result of 'a
-                     | Failure of string
+    datatype 'a result = Result of 'a
+                       | Failure of string
 
-  type path = string
-  val readFileToString : path -> string
+    type path = string
+    val readFileToString : path -> string
 
-  val member : ''a -> ''a list -> bool
+    val member : ''a -> ''a list -> bool
 end
