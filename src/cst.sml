@@ -52,5 +52,5 @@ structure CST : CST = struct
       | consumeWhitespace (#"\\" :: rest) = rest
       | consumeWhitespace _ = raise Fail "Bad whitespace escape sequence"
 
-  fun escapedToString (EscapedString s) = s
+    fun escapedToString (EscapedString s) = s
 end
