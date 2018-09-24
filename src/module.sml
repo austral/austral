@@ -48,9 +48,15 @@ structure Module : MODULE = struct
             SOME n => n
           | NONE => n
 
-    fun sourceModule m s =
+    fun sourceModule menv m s =
+        (* See if the current module imports a symbol with this name. If not,
+           just return the current module name. If it does, get that module, and
+           run sourceModule again on that module to transtively get the original
+           module. *)
         case (Map.get (moduleImports m) s) of
-            SOME n => n
+            SOME modName => (case (envGet menv modName) of
+                                 SOME sourceMod => sourceModule menv sourceMod s
+                               | NONE => raise Fail "Module not found in menv")
           | NONE => moduleName m
 
     fun doesModuleExport (m: module) (s: symbol_name) =

@@ -44,7 +44,7 @@ signature MODULE = sig
        of that module, otherwise, return the name of the first argument. This
        works transitively: if A exports a, and B imports a from A and exports a,
        and C imports a from B, then we get A as the result. *)
-    val sourceModule : module -> symbol_name -> module_name
+    val sourceModule : menv -> module -> symbol_name -> module_name
 
     (* Test whether a module exports a given symbol *)
     val doesModuleExport : module -> symbol_name -> bool
