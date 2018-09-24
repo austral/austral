@@ -70,5 +70,8 @@ structure RCST :> RCST = struct
         Symbol (Symbol.mkSymbol (Module.sourceModule menv m s, s))
 
     fun resolve menv m e =
-        Util.Result (innResolve menv m e) handle Fail msg => Util.Failure msg
+        let val e' = resolveNicknames m e
+        in
+            Util.Result (innResolve menv m e') handle Fail msg => Util.Failure msg
+        end
 end
