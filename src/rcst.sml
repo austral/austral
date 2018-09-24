@@ -43,7 +43,6 @@ structure RCST :> RCST = struct
             end
     end
 
-
     fun innResolve _ _ (CST.IntConstant i) = IntConstant i
       | innResolve _ _ (CST.FloatConstant f) = FloatConstant f
       | innResolve _ _ (CST.StringConstant es) = StringConstant es
@@ -54,19 +53,16 @@ structure RCST :> RCST = struct
       | innResolve menv m (CST.UnqualifiedSymbol s) = resolveUnqualified menv m s
       | innResolve _ _ (CST.Keyword n) = Keyword n
       | innResolve menv m (CST.List l) = List (map (fn e => innResolve menv m e) l)
-    and resolveQualified menv module (mn: Symbol.module_name) (sn: Symbol.symbol_name) =
-        let val truename = Module.resolveNickname module mn
-        in
-            case (Module.envGet menv truename) of
-                SOME formod => if Module.doesModuleExport formod sn then
-                                   Symbol (Symbol.mkSymbol (Module.moduleName formod, sn))
-                               else
-                                   raise Fail ("Module "
-                                               ^ (Ident.identString truename)
-                                               ^ " does not export a symbol named "
-                                               ^ (Ident.identString sn))
-              | NONE => raise Fail ("No module named " ^ (Ident.identString truename))
-        end
+    and resolveQualified menv module (modName: Symbol.module_name) (symName: Symbol.symbol_name) =
+        (case (Module.envGet menv modName) of
+             SOME formod => if Module.doesModuleExport formod symName then
+                                Symbol (Symbol.mkSymbol (Module.moduleName formod, symName))
+                            else
+                                raise Fail ("Module "
+                                            ^ (Ident.identString modName)
+                                            ^ " does not export a symbol named "
+                                            ^ (Ident.identString symName))
+           | NONE => raise Fail ("No module named " ^ (Ident.identString modName)))
     and resolveUnqualified _ m (s: Symbol.symbol_name) =
         Symbol (Symbol.mkSymbol (Module.sourceModule m s, s))
 
