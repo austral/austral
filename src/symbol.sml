@@ -18,12 +18,12 @@
 *)
 
 structure Symbol : SYMBOL = struct
-  type module_name = Ident.ident
-  type symbol_name = Ident.ident
+    type module_name = Ident.ident
+    type symbol_name = Ident.ident
 
-  datatype symbol = Symbol of module_name * symbol_name
+    datatype symbol = Symbol of module_name * symbol_name
 
-  fun mkSymbol p = Symbol p
-  fun symbolModuleName (Symbol (m, _)) = m
-  fun symbolName (Symbol (_, n)) = n
+    fun mkSymbol p = Symbol p
+    fun symbolModuleName (Symbol (m, _)) = m
+    fun symbolName (Symbol (_, n)) = n
 end
