@@ -34,14 +34,16 @@ signature MODULE = sig
     val addModule : menv -> module -> menv
     val envGet : menv -> module_name -> module option
 
-    (* Given the current module, and the name of a module (which is potentially a
-     module-local nickname), this function returns the true name if it's a
-     nickname, or returns the module name unchanged if it's not. *)
+    (* Given the current module, and the name of a module (which is potentially
+       a module-local nickname), this function returns the true name if it's a
+       nickname, or returns the module name unchanged if it's not. *)
     val resolveNickname : module -> module_name -> module_name
 
-    (* Given the current module and the name of a symbol, if the symbol was
-     imported from another module, return the name of that module, otherwise,
-     return the name of the first argument. *)
+    (* Given the module environment, the current module, and the name of a
+       symbol, if the symbol was imported from another module, return the name
+       of that module, otherwise, return the name of the first argument. This
+       works transitively: if A exports a, and B imports a from A and exports a,
+       and C imports a from B, then we get A as the result. *)
     val sourceModule : module -> symbol_name -> module_name
 
     (* Test whether a module exports a given symbol *)
