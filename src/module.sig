@@ -18,32 +18,32 @@
 *)
 
 signature MODULE = sig
-  include SYMBOL
+    include SYMBOL
 
-  type nicknames = (module_name, module_name) Map.map
-  datatype imports = Imports of (symbol_name, module_name) Map.map
-  datatype exports = Exports of symbol_name Set.set
-  datatype module = Module of module_name * nicknames * imports * exports
-  type menv
+    type nicknames = (module_name, module_name) Map.map
+    datatype imports = Imports of (symbol_name, module_name) Map.map
+    datatype exports = Exports of symbol_name Set.set
+    datatype module = Module of module_name * nicknames * imports * exports
+    type menv
 
-  val moduleName : module -> module_name
-  val moduleExports : module -> symbol_name Set.set
-  val moduleImports : module -> (symbol_name, module_name) Map.map
+    val moduleName : module -> module_name
+    val moduleExports : module -> symbol_name Set.set
+    val moduleImports : module -> (symbol_name, module_name) Map.map
 
-  val emptyEnv : menv
-  val addModule : menv -> module -> menv
-  val envGet : menv -> module_name -> module option
+    val emptyEnv : menv
+    val addModule : menv -> module -> menv
+    val envGet : menv -> module_name -> module option
 
-  (* Given the current module, and the name of a module (which is potentially a
+    (* Given the current module, and the name of a module (which is potentially a
      module-local nickname), this function returns the true name if it's a
      nickname, or returns the module name unchanged if it's not. *)
-  val resolveNickname : module -> module_name -> module_name
+    val resolveNickname : module -> module_name -> module_name
 
-  (* Given the current module and the name of a symbol, if the symbol was
+    (* Given the current module and the name of a symbol, if the symbol was
      imported from another module, return the name of that module, otherwise,
      return the name of the first argument. *)
-  val sourceModule : module -> symbol_name -> module_name
+    val sourceModule : module -> symbol_name -> module_name
 
-  (* Test whether a module exports a given symbol *)
-  val doesModuleExport : module -> symbol_name -> bool
+    (* Test whether a module exports a given symbol *)
+    val doesModuleExport : module -> symbol_name -> bool
 end
