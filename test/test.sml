@@ -175,7 +175,10 @@ structure BorealTest = struct
                                 (Util.Result (RCST.IntConstant "10"))
                                 "Int constant",
                         isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test")))
-                                (Util.Result (rqsym "B" "test"))
+                                (Util.Result (rqsym "A" "test"))
+                                "Unqualified symbol, imported",
+                        isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test2")))
+                                (Util.Result (rqsym "B" "test2"))
                                 "Unqualified symbol, internal",
                         isEqual (RCST.resolve menv b (qsym "nick" "test"))
                                 (Util.Result (rqsym "A" "test"))
