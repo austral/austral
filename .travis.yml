@@ -1,0 +1,8 @@
+language: generic
+sudo: false
+
+install:
+  - sudo apt-get install -y make smlnj mlton
+
+script:
+  - make test
