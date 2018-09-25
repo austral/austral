@@ -65,10 +65,10 @@ structure Module : MODULE = struct
     val defaultMenv =
         let val australExports = ["the"]
         in
-            let val australMod = Module (Ident.mkIdent "austral",
-                                         Map.empty,
+            let val australMod = Module (Ident.mkIdentEx "austral",
+                                         Nicknames Map.empty,
                                          Imports Map.empty,
-                                         Set.fromList (map Ident.mkIdent australExports))
+                                         Exports (Set.fromList (map Ident.mkIdentEx australExports)))
             in
                 addModule emptyEnv australMod
             end
