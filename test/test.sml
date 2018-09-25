@@ -205,10 +205,11 @@ structure BorealTest = struct
             let val module = valOf (Module.envGet menv (Ident.mkIdentEx "austral"))
             in
                 let fun parse str = Util.valOf (Parser.parseString str)
-                    and resolve cst = RCST.resolve menv module cst
+                    and resolve cst = Util.valOf (RCST.resolve menv module cst)
                 in
                     suite "AST" [
-
+                        isEqual (resolve (parse "123")) (RCST.IntConstant "123")
+                                "IntConstant 123"
                     ]
                 end
             end
