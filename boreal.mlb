@@ -33,3 +33,6 @@ src/ast.sml
 
 src/type.sig
 src/type.sml
+
+src/tast.sig
+src/tast.sml
