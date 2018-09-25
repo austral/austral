@@ -9,6 +9,8 @@ MLB_FILE := boreal.mlb
 CM_TEST_FILE := boreal-test.cm
 TEST_BIN := boreal-test
 
+BIN = boreal
+
 SRC := src/*.sig src/*.sml
 TEST_SRC := test/*.sml
 
@@ -32,6 +34,9 @@ $(PARSIMONY): $(VENDOR_DIR)
 
 compile: $(SRC) $(DEPS)
 	$(SML) $(SMLFLAGS) -m $(CM_FILE)
+
+$(BIN): $(SRC) $(DEPS)
+	$(MLTON) $(MLB_FILE)
 
 $(TEST_BIN): $(SRC) $(TEST_SRC) $(DEPS)
 	$(SML) $(SMLFLAGS) -m $(CM_TEST_FILE)
