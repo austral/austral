@@ -26,4 +26,6 @@ structure AST :> AST = struct
                  | The of RCST.rcst * ast
                  | Operator of Symbol.symbol * ast list
          and binding = Binding of Symbol.symbol * ast
+
+    val transform : RCST.rcst -> ast
 end
