@@ -28,5 +28,9 @@ signature AST = sig
                  | Operator of Symbol.symbol * ast list
          and binding = Binding of Symbol.symbol * ast
 
+    type docstring = string option
+
+    datatype top_ast = DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring
+
     val transform : RCST.rcst -> ast
 end
