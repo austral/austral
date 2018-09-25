@@ -61,4 +61,16 @@ structure Module : MODULE = struct
 
     fun doesModuleExport (m: module) (s: symbol_name) =
         Set.isIn (moduleExports m) s
+
+    val defaultMenv =
+        let val australExports = ["the"]
+        in
+            let val australMod = Module (Ident.mkIdent "austral",
+                                         Map.empty,
+                                         Imports Map.empty,
+                                         Set.fromList (map Ident.mkIdent australExports))
+            in
+                addModule emptyEnv australMod
+            end
+        end
 end
