@@ -28,13 +28,19 @@ structure AST :> AST = struct
                  | Operator of Symbol.symbol * ast list
          and binding = Binding of Symbol.symbol * ast
 
+    fun au name =
+        Symbol.mkSymbol (Ident.mkIdentEx "austral",
+                         Ident.mkIdentEx name)
+
+    val theOp = au "the"
+
     fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
       | transform (RCST.StringConstant s) = StringConstant s
       | transform (RCST.Symbol s) = Symbol s
       | transform (RCST.Keyword s) = Keyword s
       | transform (RCST.List l) = transformList l
-    and transformList ((Symbol "the", ty, exp)) = The (ty, transform exp)
-      | transformList ((Symbol f)::rest) = Operator (f, map transform rest)
+    and transformList ((RCST.Symbol theOp)::ty::exp::nil) = The (ty, transform exp)
+      | transformList ((RCST.Symbol f)::rest) = Operator (f, map transform rest)
       | transformList _ = raise Fail "Invalid form"
 end
