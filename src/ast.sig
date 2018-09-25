@@ -30,7 +30,15 @@ signature AST = sig
 
     type docstring = string option
 
-    datatype top_ast = DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring
+    datatype top_ast = Defun
+                     | Defclass
+                     | Definstance
+                     | Deftype
+                     | Defdisjunction
+                     | Defmacro
+                     | DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring
+                     | Defmodule
+                     | InModule of Symbol.symbol_name
 
     val transform : RCST.rcst -> ast
 end
