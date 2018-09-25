@@ -1,38 +1,39 @@
-$(SML_LIB)/basis/basis.mlb
-vendor/parsimony/parsimony.mlb
+local
+  $(SML_LIB)/basis/basis.mlb
+  vendor/parsimony/parsimony.mlb
 
-src/util.sig
-src/util.sml
+  src/util.sig
+  src/util.sml
 
-src/set.sig
-src/set.sml
+  src/set.sig
+  src/set.sml
 
-src/map.sig
-src/map.sml
+  src/map.sig
+  src/map.sml
 
-src/ident.sig
-src/ident.sml
+  src/ident.sig
+  src/ident.sml
 
-src/symbol.sig
-src/symbol.sml
+  src/symbol.sig
+  src/symbol.sml
 
-src/module.sig
-src/module.sml
+  src/module.sig
+  src/module.sml
 
-src/cst.sig
-src/cst.sml
+  src/cst.sig
+  src/cst.sml
 
-src/parser.sig
-src/parser.sml
+  src/parser.sig
+  src/parser.sml
 
-src/rcst.sig
-src/rcst.sml
+  src/rcst.sig
+  src/rcst.sml
 
-src/ast.sig
-src/ast.sml
+  src/ast.sig
+  src/ast.sml
 
-src/type.sig
-src/type.sml
+  src/type.sig
+  src/type.sml
 
-src/tast.sig
-src/tast.sml
+  src/tast.sig
+  src/tast.sml
