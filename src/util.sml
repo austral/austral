@@ -21,6 +21,9 @@ structure Util :> UTIL = struct
     datatype 'a result = Result of 'a
                        | Failure of string
 
+    fun valOf (Result v) = v
+      | valOf (Failure f) = raise Fail ("Result.Failure: " ^ f)
+
     type path = string
 
     fun readFileToString filepath =
