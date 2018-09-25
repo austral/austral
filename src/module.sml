@@ -66,7 +66,7 @@ structure Module : MODULE = struct
         let val australExports = ["the"]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
-                                         Nicknames Map.empty,
+                                         Map.empty,
                                          Imports Map.empty,
                                          Exports (Set.fromList (map Ident.mkIdentEx australExports)))
             in
