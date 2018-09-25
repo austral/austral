@@ -27,4 +27,14 @@ structure AST :> AST = struct
                  | The of RCST.rcst * ast
                  | Operator of Symbol.symbol * ast list
          and binding = Binding of Symbol.symbol * ast
+
+    fun transform (RCST.IntConstant i) = IntConstant i
+      | transform (RCST.FloatConstant f) = FloatConstant f
+      | transform (RCST.StringConstant s) = StringConstant s
+      | transform (RCST.Symbol s) = Symbol s
+      | transform (RCST.Keyword s) = Keyword s
+      | transform (RCST.List l) = transformList l
+    and transformList ((Symbol "the", ty, exp)) = The (ty, transform exp)
+      | transformList ((Symbol f)::rest) = Operator (f, map transform rest)
+      | transformList _ = raise Fail "Invalid form"
 end
