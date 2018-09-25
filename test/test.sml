@@ -200,12 +200,11 @@ structure BorealTest = struct
     end
 
     val astSuite =
-        let fun parse str =
-                (case (Parser.parseString str) of
-                     (Util.Result v) => v
-                   | Util.Failure _ => raise Domain)
+        let val menv = Module.defaultMenv
+            and module = Option.valOf (Module.envGet "austral")
         in
-            let val menv = Module.defaultMenv
+            let fun parse str = Util.valOf (Parser.parseString str)
+                and resolve cst = RCST.resolve menv module cst
             in
                 suite "AST" [
 
