@@ -199,9 +199,21 @@ structure BorealTest = struct
         end
     end
 
+    val astSuite =
+        let fun parse str =
+                (case (Parser.parseString str) of
+                     (Util.Result v) => v
+                   | Util.Failure _ => raise Domain)
+        in
+            suite "AST" [
+
+            ]
+        end
+
     val tests = suite "Boreal Tests" [
             parserSuite,
-            moduleSuite
+            moduleSuite,
+            astSuite
         ]
 
     fun runTests () = runAndQuit tests defaultReporter
