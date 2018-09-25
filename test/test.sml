@@ -201,14 +201,16 @@ structure BorealTest = struct
 
     val astSuite =
         let val menv = Module.defaultMenv
-            and module = Option.valOf (Module.envGet "austral")
         in
-            let fun parse str = Util.valOf (Parser.parseString str)
-                and resolve cst = RCST.resolve menv module cst
+            let val module = valOf (Module.envGet menv (Ident.mkIdentEx "austral"))
             in
-                suite "AST" [
+                let fun parse str = Util.valOf (Parser.parseString str)
+                    and resolve cst = RCST.resolve menv module cst
+                in
+                    suite "AST" [
 
-                ]
+                    ]
+                end
             end
         end
 
