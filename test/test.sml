@@ -205,9 +205,12 @@ structure BorealTest = struct
                      (Util.Result v) => v
                    | Util.Failure _ => raise Domain)
         in
-            suite "AST" [
+            let val menv = Module.defaultMenv
+            in
+                suite "AST" [
 
-            ]
+                ]
+            end
         end
 
     val tests = suite "Boreal Tests" [
