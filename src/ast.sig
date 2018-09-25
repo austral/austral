@@ -22,6 +22,7 @@ signature AST = sig
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
                  | Symbol of Symbol.symbol
+                 | Keyword of Symbol.symbol_name
                  | Let of binding list * ast
                  | The of RCST.rcst * ast
                  | Operator of Symbol.symbol * ast list
