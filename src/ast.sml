@@ -58,17 +58,17 @@ structure AST :> AST = struct
       | transformList0 _ = raise Fail "Invalid list form"
     and transformOp0 f args =
         if f = au "let" then
-            parseLet0 args
+            transformLet0 args
         else if f = au "the" then
             case args of
                 [ty, exp] => The0 (ty, transform0 exp)
               | _ => raise Fail "Invalid `the` form"
         else
             Operator0 (f, map transform0 args)
-    and parseLet0 ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) e =
+    and transformLet0 ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) e =
         (* A let with a single binding *)
         Let0 (var, transform0 v, Operation ("progn", map transform0 body))
-      | parseLet0 ((List ((List [Symbol var, v])::rest))::body) e =
+      | transformLet0 ((List ((List [Symbol var, v])::rest))::body) e =
         (* A let with at least one binding *)
         let val exp = RCST.List [RCST.Symbol "let",
                                  RCST.List [RCST.List [RCST.Symbol var,
@@ -77,7 +77,7 @@ structure AST :> AST = struct
         in
             transform0 exp
         end
-      | parseLet0 ((List nil)::body) e =
+      | transformLet0 ((List nil)::body) e =
         (* A let with no bindings *)
         Operation (au "progn", map transform0 body)
 
