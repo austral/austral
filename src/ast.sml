@@ -72,5 +72,13 @@ structure AST :> AST = struct
 
     fun transformTop (RCST.List l) = transformTopList l
       | transformTop _ = raise Fail "Invalid toplevel form"
-    and transformTopList _ = raise Fail "Not implemented yet"
+    and transformTopList ((Symbol f)::args) = transformT f args
+      | transformTopList _ = raise Fail "Invalid toplevel form"
+    and transformT f args =
+        if f = au "defun" then
+            transformDefun args
+        else if f = au "defclass" then
+            transformDefclass args
+        else
+            raise Fail "Unknown toplevel form"
 end
