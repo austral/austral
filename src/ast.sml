@@ -52,11 +52,13 @@ structure AST :> AST = struct
                   | Operator1 of Symbol.symbol * ast1 list
 
     fun transform1 (RCST.IntConstant i) = IntConstant0 i
-      | transform (RCST.FloatConstant f) = FloatConstant0 f
-      | transform (RCST.StringConstant s) = StringConstant0 s
-      | transform (RCST.Symbol s) = Symbol s
-      | transform (RCST.Keyword s) = Keyword s
-      | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
+      | transform1 (RCST.FloatConstant f) = FloatConstant0 f
+      | transform1 (RCST.StringConstant s) = StringConstant0 s
+      | transform1 (RCST.Symbol s) = Symbol0 s
+      | transform1 (RCST.Keyword s) = Keyword0 s
+      | transform1 (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
+      | transform1 (RCST.List l) = transformList0 l
+    and transformList0 _ = raise Fail "Not implemented yet"
 
     (*fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
