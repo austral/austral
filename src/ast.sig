@@ -32,7 +32,7 @@ signature AST = sig
     type docstring = string option
 
     datatype top_ast = Defun of name * param list * Type.typespec * docstring * ast
-                     | Defclass
+                     | Defclass of name * Symbol.symbol * docstring * class_case list
                      | Definstance
                      | Deftype of name * Type.param list * Type.typespec * docstring
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
