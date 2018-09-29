@@ -7,4 +7,4 @@ install:
 script:
   - make boreal
   - rm -rf vendor
-  - make test
+  - make mlton-test
