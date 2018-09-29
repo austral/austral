@@ -29,5 +29,5 @@ structure Macro :> MACRO = struct
 
     datatype template_case = TemplateCase of match * template_exp
 
-    datatype template = Symbol.symbol * string option * template_case list
+    datatype template = Template of Symbol.symbol * string option * template_case list
 end
