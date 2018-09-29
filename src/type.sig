@@ -23,5 +23,7 @@ signature TYPE = sig
     type typedef
     type tenv
 
+    val defaultTenv : tenv
+
     val parseTypespec : RCST.rcst -> typespec
 end
