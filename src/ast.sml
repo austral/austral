@@ -167,12 +167,15 @@ structure AST :> AST = struct
         DefineSymbolMacro (name, expansion, NONE)
       | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
 
-    fun transformDefmodule _ =
+    fun transformDefmodule ((RCST.Symbol name)::clauses) =
         raise Fail "Not implemented"
+      | transformDefmodule _ =
+        raise Fail "Bad defmodule form"
 
     fun transformInModule [RCST.Keyword moduleName] =
         InModule moduleName
-      | transformInModule _ = raise Fail "Bad in-module form"
+      | transformInModule _ =
+        raise Fail "Bad in-module form"
 
     fun transformTop (RCST.List l) = transformTopList l
       | transformTop _ = raise Fail "Invalid toplevel form"
