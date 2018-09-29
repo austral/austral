@@ -51,8 +51,6 @@ structure AST :> AST = struct
         Symbol.mkSymbol (Ident.mkIdentEx "austral",
                          Ident.mkIdentEx name)
 
-    val theOp = au "the"
-
     fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
       | transform (RCST.StringConstant s) = StringConstant s
@@ -60,12 +58,19 @@ structure AST :> AST = struct
       | transform (RCST.Keyword s) = Keyword s
       | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
       | transform (RCST.List l) = transformList l
-    and transformList ((RCST.Symbol theOp)::ty::exp::nil) = The (ty, transform exp)
-      | transformList ((RCST.Symbol f)::rest) = Operator (f, map transform rest)
-      | transformList _ = raise Fail "Invalid form"
+    and transformList ((RCST.Symbol f)::args) = transformOp f args
+      | transformList _ = raise Fail "Invalid list form"
+    and transformOp f args =
+        if f = au "the" then
+            case args of
+                [ty, exp] => The (ty, transform exp)
+              | _ => raise Fail "Invalid `the` form"
+        else
+            Operator (f, map transform args)
 
     (* Parse toplevel forms into the AST *)
 
     fun transformTop (RCST.List l) = transformTopList l
       | transformTop _ = raise Fail "Invalid toplevel form"
+    and transformTopList _ = raise Fail "Not implemented yet"
 end
