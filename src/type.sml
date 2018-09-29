@@ -57,6 +57,8 @@ structure Type :> TYPE = struct
         end
 
     fun parseTypespec (RCST.Symbol s) = NamedType s
+      | parseTypespec (RCST.List l) = parseTypespecList l
       | parseTypespec _ = raise Fail "Invalid type specifier"
-
+    and parseTypespecList ((RCST.Symbol f)::args) = TypeCons (f, map parseTypespec args)
+      | parseTypespecList _ = raise Fail "Invalid type constructor"
 end
