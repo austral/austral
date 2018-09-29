@@ -39,12 +39,17 @@ signature AST = sig
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
-                     | Defmodule of Module.module
+                     | Defmodule of defmodule_clause list
                      | InModule of Symbol.symbol_name
          and param = Param of name * typespec
          and method = Method of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and disjunction_case = DisjCase of name * typespec option
+         and defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
+                              | UseClause of Symbol.module_name list
+                              | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
+                              | ExportClause of Symbol.symbol_name list
+                              | DocstringClause of string
 
     val transform : RCST.rcst -> ast
 

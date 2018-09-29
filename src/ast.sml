@@ -150,6 +150,12 @@ structure AST :> AST = struct
          and method = Method of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and disjunction_case = DisjCase of name * typespec option
+         and defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
+                              | UseClause of Symbol.module_name list
+                              | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
+                              | ExportClause of Symbol.symbol_name list
+                              | DocstringClause of string
+
 
     (* Parse toplevel forms into the toplevel AST *)
 
@@ -166,12 +172,6 @@ structure AST :> AST = struct
       | transformDefSymbolMacro [RCST.Symbol name, expansion] =
         DefineSymbolMacro (name, expansion, NONE)
       | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
-
-    datatype defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
-                              | UseClause of Symbol.module_name list
-                              | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
-                              | ExportClause of Symbol.symbol_name list
-                              | DocstringClause of string
 
     fun transformDefmodule ((RCST.Symbol name)::clauses) =
         let val clauses = map parseClause clauses
