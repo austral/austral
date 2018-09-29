@@ -109,7 +109,18 @@ structure AST :> AST = struct
       | alphaRename _ (FloatConstant0 f) = FloatConstant f
       | alphaRename _ (StringConstant0 s) = StringConstant s
       | alphaRename s (Symbol0 name) = Variable (lookup s name)
-      | alphaRename s (Let0 _) = raise Fail "derp"
+      | alphaRename s (Let0 (var, value, body)) =
+        let val fresh = freshVar var
+          in
+              let val s' = (var, fresh) :: s
+              in
+                  let val body' = alphaRename s' body
+                  in
+                      Let (Binding (fresh, alphaRename s value), body')
+                  end
+              end
+        end
+      | alphaRename s (The0 (ty, exp)) = The (ty, alphaRename s exp)
     fun transform _ = raise Fail "derp"
 
     (* Toplevel AST *)
