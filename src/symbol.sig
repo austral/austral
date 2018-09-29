@@ -26,4 +26,6 @@ signature SYMBOL = sig
     val mkSymbol : module_name * symbol_name -> symbol
     val symbolModuleName : symbol -> module_name
     val symbolName : symbol -> symbol_name
+
+    datatype unique_symbol = UniqueSymbol of symbol * int
 end
