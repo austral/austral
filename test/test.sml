@@ -158,15 +158,18 @@ structure BorealTest = struct
         let val a = Module (i "A",
                             empty,
                             Imports empty,
-                            Exports (Set.add Set.empty (i "test")))
+                            Exports (Set.add Set.empty (i "test")),
+                            NONE)
             and b = Module (i "B",
                             iadd empty (i "nick", i "A"),
                             Imports (iadd empty (i "test", i "A")),
-                            Exports (Set.add Set.empty (i "test")))
+                            Exports (Set.add Set.empty (i "test")),
+                            NONE)
             and c = Module (i "C",
                             empty,
                             Imports (iadd empty (i "test", i "B")),
-                            Exports Set.empty)
+                            Exports Set.empty,
+                            NONE)
         in
             let val menv = addModule (addModule (addModule emptyEnv a) b) c
             in
