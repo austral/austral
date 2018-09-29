@@ -26,4 +26,6 @@ structure Macro :> MACRO = struct
                         | MatchFixed
 
     datatype template = Template of RCST.rcst
+
+    datatype macro_case = MacroCase of match * template
 end

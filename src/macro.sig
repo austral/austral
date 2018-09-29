@@ -26,4 +26,6 @@ signature MACRO = sig
                         | MatchFixed
 
     datatype template = Template of RCST.rcst
+
+    datatype macro_case = MacroCase of match * template
 end
