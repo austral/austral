@@ -30,7 +30,7 @@ structure AST :> AST = struct
 
     type docstring = string option
 
-    datatype top_ast = Defun of Symbol.symbol * param list * Type.typespec
+    datatype top_ast = Defun of Symbol.symbol * param list * Type.typespec * docstring * ast
                      | Defclass
                      | Definstance
                      | Deftype of Symbol.symbol * Type.param list * Type.typespec * docstring
