@@ -42,8 +42,7 @@ structure AST :> AST = struct
                   | FloatConstant0 of string
                   | StringConstant0 of CST.escaped_string
                   | Symbol0 of Symbol.symbol
-                  | Keyword0 of Symbol.symbol_name
-                  | Let0 of (Symbol.symbol * ast0) * ast0
+                  | Let0 of Symbol.symbol * ast0 * ast0
                   | The0 of RCST.rcst * ast0
                   | Operation0 of Symbol.symbol * ast0 list
 
@@ -51,7 +50,7 @@ structure AST :> AST = struct
       | transform0 (RCST.FloatConstant f) = FloatConstant0 f
       | transform0 (RCST.StringConstant s) = StringConstant0 s
       | transform0 (RCST.Symbol s) = Symbol0 s
-      | transform0 (RCST.Keyword s) = Keyword0 s
+      | transform0 (RCST.Keyword s) = raise Fail "Keywords not allowed in expressions"
       | transform0 (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
       | transform0 (RCST.List l) = transformList0 l
     and transformList0 ((RCST.Symbol f)::args) = transformOp0 f args
@@ -110,7 +109,7 @@ structure AST :> AST = struct
       | alphaRename _ (FloatConstant0 f) = FloatConstant f
       | alphaRename _ (StringConstant0 s) = StringConstant s
       | alphaRename s (Symbol0 name) = Variable (lookup s name)
-
+      | alphaRename s (Let0 _) = raise Fail "derp"
     fun transform _ = raise Fail "derp"
 
     (* Toplevel AST *)
