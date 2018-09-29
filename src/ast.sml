@@ -157,6 +157,23 @@ structure AST :> AST = struct
         raise Fail "defun not implemented"
       | transformDefun _ = raise Fail "Bad defun form"
 
+    fun transformDefclass ((RCST.Symbol name)::arg::body) =
+        raise Fail "defclass not implemented"
+      | transformDefclass _ = raise Fail "Bad defclass form"
+
+    fun transformDefSymbolMacro [RCST.Symbol name, expansion, RCST.StringConstant docstring] =
+        DefineSymbolMacro (name, expansion, SOME (CST.escapedToString docstring))
+      | transformDefSymbolMacro [RCST.Symbol name, expansion] =
+        DefineSymbolMacro (name, expansion, NONE)
+      | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
+
+    fun transformDefmodule _ =
+        raise Fail "Not implemented"
+
+    fun transformInModule [RCST.Keyword moduleName] =
+        InModule moduleName
+      | transformInModule _ = raise Fail "Bad in-module form"
+
     fun transformTop (RCST.List l) = transformTopList l
       | transformTop _ = raise Fail "Invalid toplevel form"
     and transformTopList ((RCST.Symbol f)::args) = transformT f args
@@ -174,16 +191,4 @@ structure AST :> AST = struct
             transformInModule args
         else
             raise Fail "Unknown toplevel form"
-    and transformDefclass ((RCST.Symbol name)::arg::body) =
-        raise Fail "defclass not implemented"
-      | transformDefclass _ = raise Fail "Bad defclass form"
-    and transformDefSymbolMacro [RCST.Symbol name, expansion, RCST.StringConstant docstring] =
-        DefineSymbolMacro (name, expansion, SOME (CST.escapedToString docstring))
-      | transformDefSymbolMacro [RCST.Symbol name, expansion] =
-        DefineSymbolMacro (name, expansion, NONE)
-      | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
-    and transformDefmodule _ = raise Fail "Not implemented"
-    and transformInModule [RCST.Keyword moduleName] =
-        InModule moduleName
-      | transformInModule _ = raise Fail "Bad in-module form"
 end
