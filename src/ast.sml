@@ -187,21 +187,25 @@ structure AST :> AST = struct
         end
       | transformDefun _ = raise Fail "Bad defun form"
 
-    fun transformDefclass ((RCST.Symbol name)::arg::body) =
+    fun transformDefclass ((RCST.Symbol name)::(RCST.List [arg])::body) =
         raise Fail "defclass not implemented"
       | transformDefclass _ = raise Fail "Bad defclass form"
 
-    fun transformDefinstance ((RCST.Symbol name)::arg::body) =
+    fun transformDefinstance ((RCST.Symbol name)::(RCST.List [arg])::body) =
         raise Fail "definstance not implemented"
       | transformDefinstance _ = raise Fail "Bad definstance form"
 
-    fun transformDeftype ((RCST.Symbol name)::arg::body) =
+    fun transformDeftype ((RCST.Symbol name)::(RCST.List params)::body) =
         raise Fail "deftype not implemented"
       | transformDeftype _ = raise Fail "Bad deftype form"
 
-    fun transformDefdisjunction ((RCST.Symbol name)::arg::body) =
+    fun transformDefdisjunction ((RCST.Symbol name)::(RCST.List params)::body) =
         raise Fail "defdisjunction not implemented"
       | transformDefdisjunction _ = raise Fail "Bad defdisjunction form"
+
+    fun transformDeftemplate ((RCST.Symbol name)::body) =
+        raise Fail "deftemplate not implemented"
+      | transformDeftemplate _ = raise Fail "Bad deftemplate form"
 
     fun transformDefSymbolMacro [RCST.Symbol name, expansion, RCST.StringConstant docstring] =
         DefineSymbolMacro (name, expansion, SOME (CST.escapedToString docstring))
@@ -282,10 +286,12 @@ structure AST :> AST = struct
             transformDefclass args
         else if f = au "definstance" then
             transformDefinstance args
-        else if f = au "defitype" then
+        else if f = au "deftype" then
             transformDeftype args
         else if f = au "defdisjunction" then
             transformDefdisjunction args
+        else if f = au "deftemplate" then
+            transformDeftemplate args
         else if f = au "define-symbol-macro" then
             transformDefSymbolMacro args
         else if f = au "defmodule" then
