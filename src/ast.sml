@@ -92,6 +92,10 @@ structure AST :> AST = struct
                                    lookup xs s
       | lookup nil s = raise Fail ("No such variable: '" ^ s ^ "'")
 
+    fun alphaRename _ (IntConstant0 s) = IntConstant s
+      | alphaRename _ (FloatConstant0 f) = FloatConstant f
+      | alphaRename _ _ = raise Fail "Not implemented yet"
+
     fun transform _ = raise Fail "derp"
 
     (* Toplevel AST *)
