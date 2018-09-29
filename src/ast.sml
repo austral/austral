@@ -18,6 +18,8 @@
 *)
 
 structure AST :> AST = struct
+    (* Expression AST *)
+
     datatype ast = IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
@@ -26,6 +28,8 @@ structure AST :> AST = struct
                  | The of RCST.rcst * ast
                  | Operator of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
+
+    (* Toplevel AST *)
 
     type name = Symbol.symbol
     type docstring = string option
@@ -67,7 +71,7 @@ structure AST :> AST = struct
         else
             Operator (f, map transform args)
 
-    (* Parse toplevel forms into the AST *)
+    (* Parse toplevel forms into the toplevel AST *)
 
     fun transformTop (RCST.List l) = transformTopList l
       | transformTop _ = raise Fail "Invalid toplevel form"
