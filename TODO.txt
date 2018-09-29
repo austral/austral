@@ -1,9 +1,8 @@
 TODO:
 
-- Parse nested comments
-- Define the toplevel AST datatype
-- Parse RCST nodes into AST nodes
 - Parse RCST toplevel nodes into top-level AST nodes
+- Parse nested comments
+- C++ backend
 
 DONE:
 
@@ -21,3 +20,6 @@ DONE:
 - Test float parsing
 - Process escape sequences in parsed strings
 - Define the expression AST datatype
+- Parse RCST nodes into AST nodes
+- Alpha renaming
+- Define the toplevel AST datatype
