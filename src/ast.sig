@@ -41,7 +41,7 @@ signature AST = sig
                      | Defmacro
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Module.module
-                     | InModule of symbol_name
+                     | InModule of Symbol.symbol_name
          and param = Param of symbol * typespec
          and method = Method of name * param list * typespec * docstring
          and disjunction_case = DisjCase of symbol * typespec option
