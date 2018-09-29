@@ -30,15 +30,16 @@ structure AST :> AST = struct
 
     type docstring = string option
 
-    datatype top_ast = Defun
+    datatype top_ast = Defun of Symbol.symbol * param list * Type.typespec
                      | Defclass
                      | Definstance
-                     | Deftype of Symbol.symbol * Type.param list * Type.gtypespec * docstring
+                     | Deftype of Symbol.symbol * Type.param list * Type.typespec * docstring
                      | Defdisjunction
                      | Defmacro
                      | DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring
                      | Defmodule of Module.module
                      | InModule of Symbol.symbol_name
+         and param = DefunParam of Symbol.symbol * Type.typespec
 
     fun au name =
         Symbol.mkSymbol (Ident.mkIdentEx "austral",
