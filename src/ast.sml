@@ -84,6 +84,18 @@ structure AST :> AST = struct
 
     (* Alpha renaming *)
 
+    val count = ref 0
+
+    fun freshVar sym =
+        let
+        in
+            count := !count + 1;
+            Symbol.Variable (name, !count)
+        end
+
+    fun resetCount () =
+        count := 0
+
     type stack = (Symbol.symbol * Symbol.variable) list
 
     fun lookup ((n,v)::xs) s = if (n = s) then
@@ -94,7 +106,8 @@ structure AST :> AST = struct
 
     fun alphaRename _ (IntConstant0 s) = IntConstant s
       | alphaRename _ (FloatConstant0 f) = FloatConstant f
-      | alphaRename _ _ = raise Fail "Not implemented yet"
+      | alphaRename _ (StringConstant0 s) = StringConstant s
+      | alphaRename s (Symbol0 s) = raise Fail "derp"
 
     fun transform _ = raise Fail "derp"
 
