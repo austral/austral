@@ -34,7 +34,7 @@ structure BorealTest = struct
                          else
                              Fail "Parse successful, but not equal to output"
                      end
-                     handle => Fail "Bad parse")
+                     handle _ => Fail "Bad parse")
            input
 
     fun isNotParse input =
@@ -42,7 +42,7 @@ structure BorealTest = struct
                      in
                        Fail "Parse successful, should have failed"
                      end
-                     handle => Pass)
+                     handle _ => Pass)
            input
 
     fun isFailure value msg =
