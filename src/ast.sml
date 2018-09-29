@@ -43,36 +43,43 @@ structure AST :> AST = struct
                    | StringConstant0 of CST.escaped_string
                    | Symbol0 of Symbol.symbol
                    | Keyword0 of Symbol.symbol_name
-                   | Let0 of (Symbol.symbol * ast0) list * ast0
+                   | Let0 of (Symbol.symbol * ast0) * ast0
                    | The0 of RCST.rcst * ast0
                    | Operator0 of Symbol.symbol * ast0 list
 
-    (* Intermediate AST 1 *)
-    datatype ast1 = IntConstant1 of string
-                  | FloatConstant1 of string
-                  | StringConstant1 of CST.escaped_string
-                  | Symbol1 of Symbol.symbol
-                  | Keyword1 of Symbol.symbol_name
-                  | Let1 of (Symbol.symbol * ast1) * ast1
-                  | The1 of RCST.rcst * ast1
-                  | Operator1 of Symbol.symbol * ast1 list
-
-    fun transform1 (RCST.IntConstant i) = IntConstant0 i
-      | transform1 (RCST.FloatConstant f) = FloatConstant0 f
-      | transform1 (RCST.StringConstant s) = StringConstant0 s
-      | transform1 (RCST.Symbol s) = Symbol0 s
-      | transform1 (RCST.Keyword s) = Keyword0 s
-      | transform1 (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
-      | transform1 (RCST.List l) = transformList0 l
+    fun transform0 (RCST.IntConstant i) = IntConstant0 i
+      | transform0 (RCST.FloatConstant f) = FloatConstant0 f
+      | transform0 (RCST.StringConstant s) = StringConstant0 s
+      | transform0 (RCST.Symbol s) = Symbol0 s
+      | transform0 (RCST.Keyword s) = Keyword0 s
+      | transform0 (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
+      | transform0 (RCST.List l) = transformList0 l
     and transformList0 ((RCST.Symbol f)::args) = transformOp0 f args
       | transformList0 _ = raise Fail "Invalid list form"
     and transformOp0 f args =
-        if f = au "the" then
+        if f = au "let" then
+            parseLet0 args
+        else if f = au "the" then
             case args of
-                [ty, exp] => The0 (ty, transform1 exp)
+                [ty, exp] => The0 (ty, transform0 exp)
               | _ => raise Fail "Invalid `the` form"
         else
-            Operator0 (f, map transform1 args)
+            Operator0 (f, map transform0 args)
+    and parseLet0 ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) e =
+        (* A let with a single binding *)
+        Let0 (var, transform0 v, Operation ("progn", map transform0 body))
+      | parseLet0 ((List ((List [Symbol var, v])::rest))::body) e =
+        (* A let with at least one binding *)
+        let val exp = RCST.List [RCST.Symbol "let",
+                                 RCST.List [RCST.List [RCST.Symbol var,
+                                                       v]],
+                                 RCST.List ((RCST.Symbol "let")::(RCST.List rest)::body)]
+        in
+            transform0 exp
+        end
+      | parseLet0 ((List nil)::body) e =
+        (* A let with no bindings *)
+        Operation (au "progn", map transform0 body)
 
     fun transform _ = raise Fail "derp"
 
