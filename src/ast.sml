@@ -170,4 +170,9 @@ structure AST :> AST = struct
     and transformDefclass ((RCST.Symbol name)::arg::body) =
         raise Fail "defclass not implemented"
       | transformDefclass _ = raise Fail "Bad defclass form"
+    and transformDefSymbolMacro [RCST.Symbol name, expansion, RCST.StringConstant docstring] =
+        DefineSymbolMacro (name, expansion, SOME docstring)
+      | transformDefSymbolMacro [RCST.Symbol name, expansion] =
+        DefineSymbolMacro (name, expansion, NONE)
+      | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
 end
