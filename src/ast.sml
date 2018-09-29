@@ -72,7 +72,7 @@ structure AST :> AST = struct
 
     fun transformTop (RCST.List l) = transformTopList l
       | transformTop _ = raise Fail "Invalid toplevel form"
-    and transformTopList ((Symbol f)::args) = transformT f args
+    and transformTopList ((RCST.Symbol f)::args) = transformT f args
       | transformTopList _ = raise Fail "Invalid toplevel form"
     and transformT f args =
         if f = au "defun" then
@@ -81,8 +81,8 @@ structure AST :> AST = struct
             transformDefclass args
         else
             raise Fail "Unknown toplevel form"
-    and transformDefun ((Symbol name)::params::rt::body) =
+    and transformDefun ((RCST.Symbol name)::params::rt::body) =
         raise Fail "defun not implemented"
-    and transformDefclass ((Symbol name)::arg::body) =
+    and transformDefclass ((RCST.Symbol name)::arg::body) =
         raise Fail "defclass not implemented"
 end
