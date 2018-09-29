@@ -28,8 +28,13 @@ structure Compiler :> COMPILER = sig
     datatype compilation_unit = FileUnit of pathname
                               | ReplUnit of string
 
-    fun compileForms c forms =
-        raise Fail "Not implemented yet"
+    fun compileForms (Compiler (menv, currModuleName)) forms =
+        let val currModule = case Module.envGet menv currModuleName of
+                                 SOME m => m
+                               | _ => raise Fail "No module with this name"
+        in
+            raise Fail "Not implemented yet"
+        end
 
     fun compileUnit c (FileUnit path) =
       | compileUnit c (ReplUnit string) =
