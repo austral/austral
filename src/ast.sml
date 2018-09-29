@@ -121,6 +121,7 @@ structure AST :> AST = struct
               end
         end
       | alphaRename s (The0 (ty, exp)) = The (ty, alphaRename s exp)
+      | alphaRename s (Operation0 (f, args)) = Operation (f, map (alphaRename s) args)
     fun transform _ = raise Fail "derp"
 
     (* Toplevel AST *)
