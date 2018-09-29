@@ -95,29 +95,31 @@ structure Parser :> PARSER = struct
 
     val ws = many whitespaceParser
 
-    fun defineSexpParser listParser =
+    fun defineSexpParser listParser spliceParser =
         seqR ws (choice [floatParser,
                          integerParser,
                          quotedString,
                          qualifiedSymbolParser,
                          keywordParser,
                          unqualifiedSymbolParser,
-                         listParser])
+                         listParser,
+                         spliceParser])
 
-    val listParser =
+    val (listParser, spliceParser) =
         let val (sexpParser, r) = wrapper ()
         in
             let val listParser = pmap CST.List (seqR (pchar #"(")
                                                      (between ws
                                                               (many (seqL sexpParser ws))
                                                               (pchar #")")))
+                and spliceParser = seqR (pchar #",") sexpParser
             in
-                r := defineSexpParser listParser;
-                listParser
+                r := defineSexpParser listParser sexpParser;
+                (listParser, spliceParser)
             end
         end
 
-    val sexpParser = defineSexpParser listParser
+    val sexpParser = defineSexpParser listParser spliceParser
 
     (* Interface *)
 
