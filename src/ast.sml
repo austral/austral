@@ -31,7 +31,25 @@ structure AST :> AST = struct
 
     (* Transform RCST to the expression AST *)
 
-    fun transform (RCST.IntConstant i) = IntConstant i
+    (* Intermediate AST 0 *)
+    datatype ast0 = IntConstant of string
+                   | FloatConstant of string
+                   | StringConstant of CST.escaped_string
+                   | Variable of Symbol.variable
+                   | Let of (Symbol.symbol * ast0) list * ast0
+                   | The of RCST.rcst * ast0
+                   | Operator of Symbol.symbol * ast0 list
+
+    (* Intermediate AST 1 *)
+    datatype ast1 = IntConstant of string
+                  | FloatConstant of string
+                  | StringConstant of CST.escaped_string
+                  | Variable of Symbol.variable
+                  | Let of (Symbol.symbol * ast1) * ast1
+                  | The of RCST.rcst * ast1
+                  | Operator of Symbol.symbol * ast1 list
+
+    (*fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
       | transform (RCST.StringConstant s) = StringConstant s
       | transform (RCST.Symbol s) = Symbol s
@@ -46,7 +64,8 @@ structure AST :> AST = struct
                 [ty, exp] => The (ty, transform exp)
               | _ => raise Fail "Invalid `the` form"
         else
-            Operator (f, map transform args)
+            Operator (f, map transform args)*)
+    fun transform _ = raise Fail "derp"
 
     (* Toplevel AST *)
 
