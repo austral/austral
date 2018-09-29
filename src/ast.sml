@@ -201,8 +201,10 @@ structure AST :> AST = struct
         raise Fail "Not implemented"
     and parseExportClause _ =
         raise Fail "Not imlpemented"
-    and parseDocstringClause _ =
-        raise Fail "Not implemented"
+    and parseDocstringClause [RCST.StringConstant s] =
+        SOME (CST.escapedToString s)
+      | parseDocstringClause _ =
+        NONE
 
 
     fun transformInModule [RCST.Keyword moduleName] =
