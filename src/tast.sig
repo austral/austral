@@ -24,7 +24,7 @@ signature TAST = sig
                  | Symbol of Symbol.symbol
                  | Keyword of Symbol.symbol_name
                  | Let of binding list * ast
-                 | The of Type.gtypespec * ast
+                 | The of Type.typespec * ast
                  | Operator of Symbol.symbol * ast list
          and binding = Binding of Symbol.symbol * ast
 
