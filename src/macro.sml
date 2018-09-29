@@ -33,6 +33,8 @@ structure Macro :> MACRO = struct
 
     datatype symbol_macro = SymbolMacro of Symbol.symbol * RCST.rcst * string option
 
+    fun symbolMacroExpansion (SymbolMacro (_, exp, _)) = exp
+
     type template_map = (Symbol.symbol, template) Map.map
     type symbol_macro_map = (Symbol.symbol, symbol_macro) Map.map
 
@@ -48,8 +50,15 @@ structure Macro :> MACRO = struct
     local
         open RCST
     in
-        fun macroexpandSymbolMacros (MacroEnv (_, mm)) form =
-            let fun expand _ = raise Fail "not implemented"
+        fun macroexpandSymbolMacros env form =
+            let fun expand (Symbol s) =
+                    (case (getSymbolMacro env s) of
+                         SOME mac => symbolMacroExpansion mac
+                       | NONE => (Symbol s))
+                  | expand (Keyword s) = Keyword s
+                  | expand (Splice exp) = Splice (expand exp)
+                  | expand (List l) = List (map expand l)
+                  | expand exp = exp
             in
                 expand form
             end
