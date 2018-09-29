@@ -199,8 +199,12 @@ structure AST :> AST = struct
             else
                 raise Fail "Unknown export clause"
         end
-    and parseNicknamesClause _ =
-        raise Fail "Not implemented"
+    and parseNicknamesClause args =
+        let fun parseNickElem (RCST.List [RCST.Keyword nick, RCST.Keyword modName]) = (nick, modName)
+              | parseNickElem _ = raise Fail "Bad :nicknames clause"
+        in
+            NicknamesClause (map parseNickElem args)
+        end
     and parseUseClause args =
         let fun parseUseElem (RCST.Keyword k) = k
               | parseUseElem _ = raise Fail "Bad :use clause"
