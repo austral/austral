@@ -14,9 +14,10 @@
 *)
 
 structure Compiler :> COMPILER = sig
-    datatype compiler = Compiler of unit
+    datatype compiler = Compiler of Module.menv * Symbol.module_name
     
-    val emptyCompiler = Compiler ()
+    val emptyCompiler = Compiler (Module.defaultMenv,
+                                  Ident.mkIdentEx "austral-user")
     
     type pathname = string
 
