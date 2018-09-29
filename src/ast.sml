@@ -102,12 +102,14 @@ structure AST :> AST = struct
                                    v
                                else
                                    lookup xs s
-      | lookup nil s = raise Fail ("No such variable: '" ^ s ^ "'")
+      | lookup nil s = raise Fail ("No such variable: '"
+                                   ^ (Ident.toString (Symbol.symbolName s))
+                                   ^ "'")
 
     fun alphaRename _ (IntConstant0 s) = IntConstant s
       | alphaRename _ (FloatConstant0 f) = FloatConstant f
       | alphaRename _ (StringConstant0 s) = StringConstant s
-      | alphaRename s (Symbol0 s) = raise Fail "derp"
+      | alphaRename s (Symbol0 name) = Variable (lookup s name)
 
     fun transform _ = raise Fail "derp"
 
