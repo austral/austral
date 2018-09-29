@@ -160,7 +160,31 @@ structure AST :> AST = struct
     (* Parse toplevel forms into the toplevel AST *)
 
     fun transformDefun ((RCST.Symbol name)::params::rt::body) =
-        raise Fail "defun not implemented"
+        let fun parseParams (RCST.List l) = map parseParam l
+              | parseParams _ = raise Fail "defun parameter list must be a list"
+            and parseParam (RCST.List [RCST.Symbol name, ty]) =
+                Param (name, Type.parseTypespec ty)
+              | parseParam _ = raise Fail "Bad defun parameter"
+            and parseBody ((RCST.StringConstant s)::head::tail) =
+                (* When the first element of the body is a string constant, and
+                   the remainder of the form is non-empty, we take the string
+                   constant to be the docstring. Otherwise, we parse the string
+                   constant as a regular expression *)
+                (SOME (CST.escapedToString s), transform (implicitProgn (head::tail)))
+              | parseBody body =
+                (NONE, transform (implicitProgn body))
+            and implicitProgn l =
+                (RCST.List ((RCST.Symbol (au "progn"))::l))
+        in
+            let val (docstring, body') = parseBody body
+            in
+                Defun (name,
+                       parseParams params,
+                       Type.parseTypespec rt,
+                       docstring,
+                       body')
+            end
+        end
       | transformDefun _ = raise Fail "Bad defun form"
 
     fun transformDefclass ((RCST.Symbol name)::arg::body) =
