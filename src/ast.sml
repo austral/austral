@@ -180,8 +180,16 @@ structure AST :> AST = struct
     and parseClauseInner name args =
         let fun key s = Ident.mkIdentEx s
         in
-            if name = key "export" then
+            if name = key "nicknames" then
+                parseNicknamesClause args
+            else if name = key "use" then
+                parseUseClause args
+            else if name = key "import-from" then
+                parseImportClause args
+            else if name = key "export" then
                 parseExportClause args
+            else if name = key "documentation" then
+                parseDocstringClause args
             else
                 raise Fail "Unknown export clause"
         end
