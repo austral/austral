@@ -64,7 +64,7 @@ structure AST :> AST = struct
                 [ty, exp] => The0 (ty, transform0 exp)
               | _ => raise Fail "Invalid `the` form"
         else
-            Operator0 (f, map transform0 args)
+            Operation0 (f, map transform0 args)
     and transformLet0 ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) e =
         (* A let with a single binding *)
         Let0 ((var, transform0 v), Operation0 ("progn", map transform0 body))
