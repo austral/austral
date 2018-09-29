@@ -76,7 +76,7 @@ structure Module : MODULE = struct
                 let val australUserMod = Module (Ident.mkIdentEx "austral-user",
                                                  Map.empty,
                                                  (* We import everything austral exports *)
-                                                 Imports (Set.fromList (map (fn n => (Ident.mkIdentEx n,
+                                                 Imports (Map.fromList (map (fn n => (Ident.mkIdentEx n,
                                                                                       Ident.mkIdentEx "austral"))
                                                                             australExports)),
                                                  Exports Set.empty)
