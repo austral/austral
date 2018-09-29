@@ -144,7 +144,7 @@ structure AST :> AST = struct
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
-                     | Defmodule of Module.module
+                     | Defmodule of defmodule_clause list
                      | InModule of Symbol.symbol_name
          and param = Param of name * typespec
          and method = Method of name * param list * typespec * docstring
