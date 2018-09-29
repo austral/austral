@@ -43,5 +43,5 @@ structure Map :> MAP = struct
 
     fun size (Map m) = length m
 
-    fun fromList l = empty l
+    fun fromList l = iaddList empty l
 end
