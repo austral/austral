@@ -48,4 +48,6 @@ signature AST = sig
          and disjunction_case = DisjCase of name * typespec option
 
     val transform : RCST.rcst -> ast
+
+    val transformTop : RCST.rcst -> top_ast
 end
