@@ -6,4 +6,5 @@ install:
 
 script:
   - make boreal
+  - rm -rf vendor
   - make test
