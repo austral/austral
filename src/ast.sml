@@ -103,7 +103,7 @@ structure AST :> AST = struct
                                else
                                    lookup xs s
       | lookup nil s = raise Fail ("No such variable: '"
-                                   ^ (Ident.toString (Symbol.symbolName s))
+                                   ^ (Ident.identString (Symbol.symbolName s))
                                    ^ "'")
 
     fun alphaRename _ (IntConstant0 s) = IntConstant s
