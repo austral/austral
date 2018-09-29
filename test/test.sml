@@ -111,6 +111,9 @@ structure BorealTest = struct
                     isParse ":test" (Keyword (i "test"))
                 ]
             ],
+            suite "Splices" [
+                isParse ",123" (Splice (IntConstant "123"))
+            ],
             suite "S-expressions" [
                 isParse "()" (List nil),
                 isParse "(())" (List [List nil]),
