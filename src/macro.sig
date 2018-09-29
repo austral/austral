@@ -24,4 +24,6 @@ signature MACRO = sig
                        | MatchList of match_exp list * match_rest
          and match_rest = MatchRest
                         | MatchFixed
+
+    datatype template = Template of RCST.rcst
 end
