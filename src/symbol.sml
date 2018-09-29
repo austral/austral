@@ -27,5 +27,5 @@ structure Symbol : SYMBOL = struct
     fun symbolModuleName (Symbol (m, _)) = m
     fun symbolName (Symbol (_, n)) = n
 
-    datatype unique_symbol = UniqueSymbol of symbol * int
+    datatype variable = Var of symbol * int
 end
