@@ -205,8 +205,12 @@ structure AST :> AST = struct
         raise Fail "Not implemented"
     and parseImportClause _ =
         raise Fail "Not implemented"
-    and parseExportClause _ =
-        raise Fail "Not imlpemented"
+    and parseExportClause args =
+        let fun parseExportElem (RCST.Keyword k) = k
+              | parseExportElem _ = raise Fail "Bad export clause"
+        in
+            ExportClause (map parseExportElem args)
+        end
     and parseDocstringClause [RCST.StringConstant s] =
         DocstringClause (CST.escapedToString s)
       | parseDocstringClause _ =
