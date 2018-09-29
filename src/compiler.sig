@@ -27,6 +27,7 @@ signature COMPILER = sig
     datatype compilation_unit = FileUnit of pathname
                               | ReplUnit of string
 
+    val unitForms : compilation_unit -> CST.cst list
     val compileForms : compiler -> CST.cst list -> compiler
     val compileUnit : compiler -> compilation_unit -> compiler
 end
