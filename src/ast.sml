@@ -77,7 +77,7 @@ structure AST :> AST = struct
         in
             transform0 exp
         end
-      | transformLet0 ((List nil)::body) e =
+      | transformLet0 ((RCST.List nil)::body) e =
         (* A let with no bindings *)
         Operation0 (au "progn", map transform0 body)
 
