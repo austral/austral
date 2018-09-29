@@ -164,6 +164,8 @@ structure AST :> AST = struct
             transformDefclass args
         else if f = au "define-symbol-macro" then
             transformDefSymbolMacro args
+        else if f = au "in-module" then
+            transformInModule args
         else
             raise Fail "Unknown toplevel form"
     and transformDefun ((RCST.Symbol name)::params::rt::body) =
