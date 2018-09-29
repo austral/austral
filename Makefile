@@ -7,6 +7,7 @@ CM_FILE := boreal.cm
 MLB_FILE := boreal.mlb
 
 CM_TEST_FILE := boreal-test.cm
+MLB_TEST_FILE := boreal-test.mlb
 TEST_BIN := boreal-test
 
 BIN = boreal
@@ -38,11 +39,16 @@ compile: $(SRC) $(DEPS)
 $(BIN): $(SRC) $(DEPS)
 	$(MLTON) $(MLB_FILE)
 
-$(TEST_BIN): $(SRC) $(TEST_SRC) $(DEPS)
+.PHONY: test
+test: $(SRC) $(TEST_SRC) $(DEPS)
 	$(SML) $(SMLFLAGS) -m $(CM_TEST_FILE)
 
-.PHONY: test
-test: $(TEST_BIN)
+$(TEST_BIN): $(SRC) $(TEST_SRC) $(DEPS)
+	$(MLTON) $(MLB_TEST_FILE)
+
+.PHONY: mlton-test
+mlton-test: $(TEST_BIN)
+	./$(TEST_BIN)
 
 clean:
 	rm -rf $(VENDOR_DIR)
