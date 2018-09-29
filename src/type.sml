@@ -56,9 +56,7 @@ structure Type :> TYPE = struct
                    ("f64",     Float Double)]
         end
 
-    fun parseTypespec (RCST.Symbol s) = parseSymbolSpec s
+    fun parseTypespec (RCST.Symbol s) = NamedType s
       | parseTypespec _ = raise Fail "Invalid type specifier"
-    and parseSymbolSpec sym =
-        NamedType sym
 
 end
