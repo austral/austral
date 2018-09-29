@@ -30,6 +30,8 @@ signature AST = sig
 
     type name = Symbol.symbol
     type docstring = string option
+    type symbol = Symbol.symbol
+    type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * Type.typespec * docstring * ast
                      | Defclass of name * Symbol.symbol * docstring * method list
@@ -40,7 +42,7 @@ signature AST = sig
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Module.module
                      | InModule of Symbol.symbol_name
-         and param = FuncParam of Symbol.symbol * Type.typespec
+         and param = Param of Symbol.symbol * Type.typespec
          and method = Method of name * param list * Type.typespec * docstring
          and disjunction_case = DisjCase of Symbol.symbol * Type.typespec option
 

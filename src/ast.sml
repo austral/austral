@@ -30,6 +30,8 @@ structure AST :> AST = struct
 
     type name = Symbol.symbol
     type docstring = string option
+    type symbol = Symbol.symbol
+    type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * Type.typespec * docstring * ast
                      | Defclass of name * Symbol.symbol * docstring * method list
