@@ -162,6 +162,8 @@ structure AST :> AST = struct
             transformDefun args
         else if f = au "defclass" then
             transformDefclass args
+        else if f = au "define-symbol-macro" then
+            transformDefSymbolMacro args
         else
             raise Fail "Unknown toplevel form"
     and transformDefun ((RCST.Symbol name)::params::rt::body) =
