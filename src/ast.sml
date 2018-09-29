@@ -167,7 +167,9 @@ structure AST :> AST = struct
         DefineSymbolMacro (name, expansion, NONE)
       | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
 
-    datatype defmodule_clause = ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
+    datatype defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
+                              | UseClause of Symbol.module_name
+                              | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
                               | ExportClause of Symbol.symbol_name list
                               | DocstringClause of string
 
