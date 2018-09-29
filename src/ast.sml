@@ -39,13 +39,13 @@ structure AST :> AST = struct
 
     (* Intermediate AST 0 *)
     datatype ast0 = IntConstant0 of string
-                   | FloatConstant0 of string
-                   | StringConstant0 of CST.escaped_string
-                   | Symbol0 of Symbol.symbol
-                   | Keyword0 of Symbol.symbol_name
-                   | Let0 of (Symbol.symbol * ast0) * ast0
-                   | The0 of RCST.rcst * ast0
-                   | Operation0 of Symbol.symbol * ast0 list
+                  | FloatConstant0 of string
+                  | StringConstant0 of CST.escaped_string
+                  | Symbol0 of Symbol.symbol
+                  | Keyword0 of Symbol.symbol_name
+                  | Let0 of (Symbol.symbol * ast0) * ast0
+                  | The0 of RCST.rcst * ast0
+                  | Operation0 of Symbol.symbol * ast0 list
 
     fun transform0 (RCST.IntConstant i) = IntConstant0 i
       | transform0 (RCST.FloatConstant f) = FloatConstant0 f
