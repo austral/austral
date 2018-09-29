@@ -36,7 +36,9 @@ structure Compiler :> COMPILER = sig
             raise Fail "Not implemented yet"
         end
 
-    fun compileUnit c (FileUnit path) =
-      | compileUnit c (ReplUnit string) =
+    fun unitForms (FileUnit path) =
+      | unitForms (ReplUnit string) = [Parser.parseString string]
 
+    fun compileUnit c u =
+        compileForms c (unitForms u)
 end
