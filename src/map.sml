@@ -42,4 +42,6 @@ structure Map :> MAP = struct
       | iaddList m nil = m
 
     fun size (Map m) = length m
+
+    fun fromList l = empty l
 end
