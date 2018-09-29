@@ -82,6 +82,16 @@ structure AST :> AST = struct
         Operation0 (au "progn", map transform0 body)
       | transformLet0 _ = raise Fail "Invalid let form"
 
+    (* Alpha renaming *)
+
+    type stack = (Symbol.symbol * Symbol.variable) list
+
+    fun lookup ((n,v)::xs) s = if (n = s) then
+                                   v
+                               else
+                                   lookup xs s
+      | lookup nil s = raise Fail ("No such variable: '" ^ s ^ "'")
+
     fun transform _ = raise Fail "derp"
 
     (* Toplevel AST *)
