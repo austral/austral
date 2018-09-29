@@ -193,8 +193,17 @@ structure AST :> AST = struct
             else
                 raise Fail "Unknown export clause"
         end
+    and parseNicknamesClause _ =
+        raise Fail "Not implemented"
+    and parseUseClause _ =
+        raise Fail "Not implemented"
+    and parseImportClause _ =
+        raise Fail "Not implemented"
     and parseExportClause _ =
         raise Fail "Not imlpemented"
+    and parseDocstringClause _ =
+        raise Fail "Not implemented"
+
 
     fun transformInModule [RCST.Keyword moduleName] =
         InModule moduleName
