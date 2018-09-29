@@ -63,4 +63,9 @@ structure AST :> AST = struct
     and transformList ((RCST.Symbol theOp)::ty::exp::nil) = The (ty, transform exp)
       | transformList ((RCST.Symbol f)::rest) = Operator (f, map transform rest)
       | transformList _ = raise Fail "Invalid form"
+
+    (* Parse toplevel forms into the AST *)
+
+    fun transformTop (RCST.List l) = transformTopList l
+      | transformTop _ = raise Fail "Invalid toplevel form"
 end
