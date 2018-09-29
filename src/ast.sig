@@ -24,7 +24,7 @@ signature AST = sig
                  | Variable of Symbol.variable
                  | Let of binding * ast
                  | The of RCST.rcst * ast
-                 | Operator of Symbol.symbol * ast list
+                 | Operation of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
 
     type name = Symbol.symbol
