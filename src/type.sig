@@ -19,7 +19,7 @@
 
 signature TYPE = sig
     type param
-    type gtypespec
+    type typespec
     type typedef
     type tenv
 end
