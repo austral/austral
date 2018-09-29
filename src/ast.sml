@@ -29,6 +29,25 @@ structure AST :> AST = struct
                  | Operator of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
 
+    (* Transform RCST to the expression AST *)
+
+    fun transform (RCST.IntConstant i) = IntConstant i
+      | transform (RCST.FloatConstant f) = FloatConstant f
+      | transform (RCST.StringConstant s) = StringConstant s
+      | transform (RCST.Symbol s) = Symbol s
+      | transform (RCST.Keyword s) = Keyword s
+      | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
+      | transform (RCST.List l) = transformList l
+    and transformList ((RCST.Symbol f)::args) = transformOp f args
+      | transformList _ = raise Fail "Invalid list form"
+    and transformOp f args =
+        if f = au "the" then
+            case args of
+                [ty, exp] => The (ty, transform exp)
+              | _ => raise Fail "Invalid `the` form"
+        else
+            Operator (f, map transform args)
+
     (* Toplevel AST *)
 
     type name = Symbol.symbol
@@ -53,23 +72,6 @@ structure AST :> AST = struct
     fun au name =
         Symbol.mkSymbol (Ident.mkIdentEx "austral",
                          Ident.mkIdentEx name)
-
-    fun transform (RCST.IntConstant i) = IntConstant i
-      | transform (RCST.FloatConstant f) = FloatConstant f
-      | transform (RCST.StringConstant s) = StringConstant s
-      | transform (RCST.Symbol s) = Symbol s
-      | transform (RCST.Keyword s) = Keyword s
-      | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
-      | transform (RCST.List l) = transformList l
-    and transformList ((RCST.Symbol f)::args) = transformOp f args
-      | transformList _ = raise Fail "Invalid list form"
-    and transformOp f args =
-        if f = au "the" then
-            case args of
-                [ty, exp] => The (ty, transform exp)
-              | _ => raise Fail "Invalid `the` form"
-        else
-            Operator (f, map transform args)
 
     (* Parse toplevel forms into the toplevel AST *)
 
