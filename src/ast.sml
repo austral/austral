@@ -201,8 +201,12 @@ structure AST :> AST = struct
         end
     and parseNicknamesClause _ =
         raise Fail "Not implemented"
-    and parseUseClause _ =
-        raise Fail "Not implemented"
+    and parseUseClause args =
+        let fun parseUseElem (RCST.Keyword k) = k
+              | parseUseElem _ = raise Fail "Bad :use clause"
+        in
+            UseClause (map parseUseElem args)
+        end
     and parseImportClause _ =
         raise Fail "Not implemented"
     and parseExportClause args =
