@@ -42,8 +42,18 @@ structure Type :> TYPE = struct
                                  Ident.mkIdentEx name)
         in
             map (fn (n, t) => (au n, t))
-                [("unit", Unit),
-                 ("boolean", Bool)]
+                [("unit",    Unit),
+                 ("boolean", Bool),
+                 ("u8",      Integer (Unsigned, Int8)),
+                 ("i8",      Integer (Signed,   Int8)),
+                 ("u16",     Integer (Unsigned, Int16)),
+                 ("i16",     Integer (Signed,   Int16)),
+                 ("u32",     Integer (Unsigned, Int32)),
+                 ("i32",     Integer (Signed,   Int32)),
+                 ("u64",     Integer (Unsigned, Int64)),
+                 ("i64",     Integer (Signed,   Int64)),
+                 ("f32",     Float Single),
+                 ("f64",     Float Double)]
         end
 
     fun parseTypespec (RCST.Symbol s) = parseSymbolSpec s
