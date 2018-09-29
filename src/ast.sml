@@ -153,6 +153,10 @@ structure AST :> AST = struct
 
     (* Parse toplevel forms into the toplevel AST *)
 
+    fun transformDefun ((RCST.Symbol name)::params::rt::body) =
+        raise Fail "defun not implemented"
+      | transformDefun _ = raise Fail "Bad defun form"
+
     fun transformTop (RCST.List l) = transformTopList l
       | transformTop _ = raise Fail "Invalid toplevel form"
     and transformTopList ((RCST.Symbol f)::args) = transformT f args
@@ -170,9 +174,6 @@ structure AST :> AST = struct
             transformInModule args
         else
             raise Fail "Unknown toplevel form"
-    and transformDefun ((RCST.Symbol name)::params::rt::body) =
-        raise Fail "defun not implemented"
-      | transformDefun _ = raise Fail "Bad defun form"
     and transformDefclass ((RCST.Symbol name)::arg::body) =
         raise Fail "defclass not implemented"
       | transformDefclass _ = raise Fail "Bad defclass form"
