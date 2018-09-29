@@ -18,6 +18,12 @@
 *)
 
 structure AST :> AST = struct
+    (* Utils *)
+
+    fun au name =
+        Symbol.mkSymbol (Ident.mkIdentEx "austral",
+                         Ident.mkIdentEx name)
+
     (* Expression AST *)
 
     datatype ast = IntConstant of string
@@ -58,7 +64,15 @@ structure AST :> AST = struct
       | transform1 (RCST.Keyword s) = Keyword0 s
       | transform1 (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
       | transform1 (RCST.List l) = transformList0 l
-    and transformList0 _ = raise Fail "Not implemented yet"
+    and transformList0 ((RCST.Symbol f)::args) = transformOp0 f args
+      | transformList0 _ = raise Fail "Invalid list form"
+    and transformOp0 f args =
+        if f = au "the" then
+            case args of
+                [ty, exp] => The0 (ty, transform1 exp)
+              | _ => raise Fail "Invalid `the` form"
+        else
+            Operator0 (f, map transform1 args)
 
     (*fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
@@ -98,10 +112,6 @@ structure AST :> AST = struct
          and method = Method of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and disjunction_case = DisjCase of name * typespec option
-
-    fun au name =
-        Symbol.mkSymbol (Ident.mkIdentEx "austral",
-                         Ident.mkIdentEx name)
 
     (* Parse toplevel forms into the toplevel AST *)
 
