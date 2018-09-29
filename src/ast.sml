@@ -81,4 +81,8 @@ structure AST :> AST = struct
             transformDefclass args
         else
             raise Fail "Unknown toplevel form"
+    and transformDefun ((Symbol name)::params::rt::body) =
+        raise Fail "defun not implemented"
+    and transformDefclass ((Symbol name)::arg::body) =
+        raise Fail "defclass not implemented"
 end
