@@ -38,7 +38,7 @@ signature AST = sig
                      | Definstance of name * typespec * docstring * method_def list
                      | Deftype of name * Type.param list * typespec * docstring
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
-                     | Deftemplate of name * docstring * template_case
+                     | Deftemplate of name * docstring * template_case list
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Module.module
                      | InModule of Symbol.symbol_name
