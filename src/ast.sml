@@ -74,22 +74,6 @@ structure AST :> AST = struct
         else
             Operator0 (f, map transform1 args)
 
-    (*fun transform (RCST.IntConstant i) = IntConstant i
-      | transform (RCST.FloatConstant f) = FloatConstant f
-      | transform (RCST.StringConstant s) = StringConstant s
-      | transform (RCST.Symbol s) = Symbol s
-      | transform (RCST.Keyword s) = Keyword s
-      | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
-      | transform (RCST.List l) = transformList l
-    and transformList ((RCST.Symbol f)::args) = transformOp f args
-      | transformList _ = raise Fail "Invalid list form"
-    and transformOp f args =
-        if f = au "the" then
-            case args of
-                [ty, exp] => The (ty, transform exp)
-              | _ => raise Fail "Invalid `the` form"
-        else
-            Operator (f, map transform args)*)
     fun transform _ = raise Fail "derp"
 
     (* Toplevel AST *)
