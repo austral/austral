@@ -25,7 +25,7 @@ structure Macro :> MACRO = struct
          and match_rest = MatchRest
                         | MatchFixed
 
-    datatype template_exp = Template of RCST.rcst
+    datatype template_exp = TemplateExp of RCST.rcst
 
     datatype template_case = TemplateCase of match * template_exp
 
