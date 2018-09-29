@@ -37,7 +37,7 @@ structure AST :> AST = struct
                      | Defdisjunction
                      | Defmacro
                      | DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring
-                     | Defmodule
+                     | Defmodule of Module.module
                      | InModule of Symbol.symbol_name
 
     fun au name =

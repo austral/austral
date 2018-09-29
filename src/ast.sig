@@ -37,7 +37,7 @@ signature AST = sig
                      | Defdisjunction
                      | Defmacro
                      | DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring
-                     | Defmodule
+                     | Defmodule of Module.module
                      | InModule of Symbol.symbol_name
 
     val transform : RCST.rcst -> ast
