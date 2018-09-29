@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Compiler :> COMPILER = sig
+structure Compiler :> COMPILER = struct
     datatype compiler = Compiler of Module.menv * Symbol.module_name
 
     val emptyCompiler = Compiler (Module.defaultMenv,
