@@ -168,9 +168,25 @@ structure AST :> AST = struct
       | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
 
     fun transformDefmodule ((RCST.Symbol name)::clauses) =
-        raise Fail "Not implemented"
+        let val clauses = map parseClause clauses
+        in
+            raise Fail "Not implemented"
+        end
       | transformDefmodule _ =
         raise Fail "Bad defmodule form"
+    and parseClause (RCST.List ((RCST.Keyword name)::rest)) =
+        parseClauseInner name rest
+      | parseClause _ = raise Fail "Bad defmodule clause"
+    and parseClauseInner name args =
+        let fun key s = Ident.mkIdentEx s
+        in
+            if name = key "export" then
+                parseExportClause args
+            else
+                raise Fail "Unknown export clause"
+        end
+    and parseExportClause _ =
+        raise Fail "Not imlpemented"
 
     fun transformInModule [RCST.Keyword moduleName] =
         InModule moduleName
