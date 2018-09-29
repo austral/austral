@@ -35,7 +35,8 @@ structure AST :> AST = struct
     datatype ast0 = IntConstant0 of string
                    | FloatConstant0 of string
                    | StringConstant0 of CST.escaped_string
-                   | Variable0 of Symbol.variable
+                   | Symbol0 of Symbol.symbol
+                   | Keyword0 of Symbol.symbol_name
                    | Let0 of (Symbol.symbol * ast0) list * ast0
                    | The0 of RCST.rcst * ast0
                    | Operator0 of Symbol.symbol * ast0 list
@@ -44,10 +45,18 @@ structure AST :> AST = struct
     datatype ast1 = IntConstant1 of string
                   | FloatConstant1 of string
                   | StringConstant1 of CST.escaped_string
-                  | Variable1 of Symbol.variable
+                  | Symbol1 of Symbol.symbol
+                  | Keyword1 of Symbol.symbol_name
                   | Let1 of (Symbol.symbol * ast1) * ast1
                   | The1 of RCST.rcst * ast1
                   | Operator1 of Symbol.symbol * ast1 list
+
+    fun transform1 (RCST.IntConstant i) = IntConstant0 i
+      | transform (RCST.FloatConstant f) = FloatConstant0 f
+      | transform (RCST.StringConstant s) = StringConstant0 s
+      | transform (RCST.Symbol s) = Symbol s
+      | transform (RCST.Keyword s) = Keyword s
+      | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
 
     (*fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
