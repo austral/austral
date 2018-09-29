@@ -18,4 +18,10 @@
 *)
 
 signature MACRO = sig
+    datatype match = Match of match_exp list * match_rest
+         and match_exp = MatchVariable of Symbol.symbol
+                       | MatchKeyword of Symbol.symbol_name
+                       | MatchList of match_exp list * match_rest
+         and match_rest = MatchRest
+                        | MatchFixed
 end
