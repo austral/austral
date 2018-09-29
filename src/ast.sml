@@ -65,10 +65,10 @@ structure AST :> AST = struct
               | _ => raise Fail "Invalid `the` form"
         else
             Operation0 (f, map transform0 args)
-    and transformLet0 ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) e =
+    and transformLet0 ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) =
         (* A let with a single binding *)
         Let0 ((var, transform0 v), Operation0 (au "progn", map transform0 body))
-      | transformLet0 ((RCST.List ((RCST.List [RCST.Symbol var, v])::rest))::body) e =
+      | transformLet0 ((RCST.List ((RCST.List [RCST.Symbol var, v])::rest))::body) =
         (* A let with at least one binding *)
         let val exp = RCST.List [RCST.Symbol (au "let"),
                                  RCST.List [RCST.List [RCST.Symbol var,
@@ -77,7 +77,7 @@ structure AST :> AST = struct
         in
             transform0 exp
         end
-      | transformLet0 ((RCST.List nil)::body) e =
+      | transformLet0 ((RCST.List nil)::body) =
         (* A let with no bindings *)
         Operation0 (au "progn", map transform0 body)
 
