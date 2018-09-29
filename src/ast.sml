@@ -83,6 +83,8 @@ structure AST :> AST = struct
             raise Fail "Unknown toplevel form"
     and transformDefun ((RCST.Symbol name)::params::rt::body) =
         raise Fail "defun not implemented"
+      | transformDefun _ = raise Fail "Bad defun form"
     and transformDefclass ((RCST.Symbol name)::arg::body) =
         raise Fail "defclass not implemented"
+      | transformDefclass _ = raise Fail "Bad defclass form"
 end
