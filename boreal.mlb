@@ -38,3 +38,4 @@ src/tast.sig
 src/tast.sml
 
 src/compiler.sig
+src/compiler.sml
