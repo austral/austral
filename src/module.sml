@@ -73,7 +73,16 @@ structure Module : MODULE = struct
                                          Imports Map.empty,
                                          Exports (Set.fromList (map Ident.mkIdentEx australExports)))
             in
-                addModule emptyEnv australMod
+                let val australUserMod = Module (Ident.mkIdentEx "austral-user",
+                                                 Map.empty,
+                                                 (* We import everything austral exports *)
+                                                 Imports (Set.fromList (map (fn n => (Ident.mkIdentExn,
+                                                                                      Ident.mkIdentEx "austral"))
+                                                                            australExports)),
+                                                 Exports Set.empty)
+                in
+                    addModule (addModule emptyEnv australMod) australUserMod
+                end
             end
         end
 end
