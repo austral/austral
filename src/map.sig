@@ -26,4 +26,6 @@ signature MAP = sig
     val iadd : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map
     val iaddList : (''k, 'v) map -> (''k * 'v) list -> (''k, 'v) map
     val size : (''k, 'v) map -> int
+
+    val fromList : (''k * 'v) list -> (''k, 'v) map
 end
