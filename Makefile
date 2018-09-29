@@ -46,4 +46,5 @@ test: $(TEST_BIN)
 
 clean:
 	rm -rf $(VENDOR_DIR)
+	rm $(BIN)
 	rm $(TEST_BIN)
