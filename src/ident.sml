@@ -21,7 +21,7 @@ structure Ident : IDENT = struct
     datatype ident = Identifier of string
 
     val alphabet =
-        let val alpha = "abcdefghijklmnopqrstuvwxyz"
+        let val alpha =   "abcdefghijklmnopqrstuvwxyz"
             and alphaup = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             and num = "0123456789"
             and sym = "!%&$#+-*/<=>?@\\~^|"
