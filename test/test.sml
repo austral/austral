@@ -208,7 +208,7 @@ structure BorealTest = struct
         in
             let val module = valOf (Module.envGet menv (Ident.mkIdentEx "austral"))
             in
-                let fun parse str = Util.valOf (Parser.parseString str)
+                let fun parse str = Parser.parseString str
                     and resolve cst = Util.valOf (RCST.resolve menv module cst)
                 in
                     suite "AST" [
