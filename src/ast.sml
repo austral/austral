@@ -34,12 +34,13 @@ structure AST :> AST = struct
                      | Defclass
                      | Definstance
                      | Deftype of Symbol.symbol * Type.param list * Type.typespec * docstring
-                     | Defdisjunction of Symbol.symbol * Type.param list * docstring
+                     | Defdisjunction of Symbol.symbol * Type.param list * disjunction_case list * docstring
                      | Defmacro
                      | DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring
                      | Defmodule of Module.module
                      | InModule of Symbol.symbol_name
          and param = DefunParam of Symbol.symbol * Type.typespec
+         and disjunction_case = DisjCase of Symbol.symbol * Type.typespec option
 
     fun au name =
         Symbol.mkSymbol (Ident.mkIdentEx "austral",
