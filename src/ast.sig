@@ -21,8 +21,7 @@ signature AST = sig
     datatype ast = IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
-                 | Symbol of Symbol.symbol
-                 | Keyword of Symbol.symbol_name
+                 | Variable of Symbol.variable
                  | Let of binding * ast
                  | The of RCST.rcst * ast
                  | Operator of Symbol.symbol * ast list
