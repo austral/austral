@@ -167,6 +167,8 @@ structure AST :> AST = struct
         DefineSymbolMacro (name, expansion, NONE)
       | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
 
+    datatype defmodule_clause = DocstringClause of string
+
     fun transformDefmodule ((RCST.Symbol name)::clauses) =
         let val clauses = map parseClause clauses
         in
@@ -202,9 +204,9 @@ structure AST :> AST = struct
     and parseExportClause _ =
         raise Fail "Not imlpemented"
     and parseDocstringClause [RCST.StringConstant s] =
-        SOME (CST.escapedToString s)
+        DocstringClause (CST.escapedToString s)
       | parseDocstringClause _ =
-        NONE
+        raise Fail "Bad docstring clause"
 
 
     fun transformInModule [RCST.Keyword moduleName] =
