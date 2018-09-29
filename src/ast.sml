@@ -26,7 +26,7 @@ structure AST :> AST = struct
                  | Let of binding * ast
                  | The of RCST.rcst * ast
                  | Operator of Symbol.symbol * ast list
-         and binding = Binding of Symbol.symbol * ast
+         and binding = Binding of Symbol.variable * ast
 
     type name = Symbol.symbol
     type docstring = string option
