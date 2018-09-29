@@ -80,6 +80,7 @@ structure AST :> AST = struct
       | transformLet0 ((RCST.List nil)::body) =
         (* A let with no bindings *)
         Operation0 (au "progn", map transform0 body)
+      | transformLet0 _ = raise Fail "Invalid let form"
 
     fun transform _ = raise Fail "derp"
 
