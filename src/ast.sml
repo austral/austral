@@ -32,22 +32,22 @@ structure AST :> AST = struct
     (* Transform RCST to the expression AST *)
 
     (* Intermediate AST 0 *)
-    datatype ast0 = IntConstant of string
-                   | FloatConstant of string
-                   | StringConstant of CST.escaped_string
-                   | Variable of Symbol.variable
-                   | Let of (Symbol.symbol * ast0) list * ast0
-                   | The of RCST.rcst * ast0
-                   | Operator of Symbol.symbol * ast0 list
+    datatype ast0 = IntConstant0 of string
+                   | FloatConstant0 of string
+                   | StringConstant0 of CST.escaped_string
+                   | Variable0 of Symbol.variable
+                   | Let0 of (Symbol.symbol * ast0) list * ast0
+                   | The0 of RCST.rcst * ast0
+                   | Operator0 of Symbol.symbol * ast0 list
 
     (* Intermediate AST 1 *)
-    datatype ast1 = IntConstant of string
-                  | FloatConstant of string
-                  | StringConstant of CST.escaped_string
-                  | Variable of Symbol.variable
-                  | Let of (Symbol.symbol * ast1) * ast1
-                  | The of RCST.rcst * ast1
-                  | Operator of Symbol.symbol * ast1 list
+    datatype ast1 = IntConstant1 of string
+                  | FloatConstant1 of string
+                  | StringConstant1 of CST.escaped_string
+                  | Variable1 of Symbol.variable
+                  | Let1 of (Symbol.symbol * ast1) * ast1
+                  | The1 of RCST.rcst * ast1
+                  | Operator1 of Symbol.symbol * ast1 list
 
     (*fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
