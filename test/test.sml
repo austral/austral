@@ -27,18 +27,19 @@ structure BorealTest = struct
         ParsimonyStringInput.fromString str
 
     fun isParse input output =
-        is (fn () => case (Parser.parseString input) of
-                         (Util.Result v) => if v = output then
-                                                Pass
-                                            else
-                                                Fail "Parse successful, but not equal to output"
-                       | Util.Failure f => Fail f)
+        is (fn () => case ((SOME (Parser.parseString input)) handle => NONE) of
+                         SOME v => if v = output then
+                                       Pass
+                                   else
+                                       Fail "Parse successful, but not equal to output"
+                       | NONE => Fail "Bad parse")
            input
 
     fun isNotParse input =
-        is (fn () => case (Parser.parseString input) of
-                         (Util.Result _) => Fail "Parse successful, should have failed"
-                       | _ => Pass)
+        is (fn () => let fun andPass _ = Pass
+                     in
+                       (andPass (Parser.parseString input)) handle => Fail "Parse successful, should have failed"
+                     end
            input
 
     fun isFailure value msg =
