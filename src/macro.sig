@@ -30,4 +30,14 @@ signature MACRO = sig
     datatype template_case = TemplateCase of match * template_exp
 
     datatype template = Template of Symbol.symbol * string option * template_case list
+
+    datatype symbol_macro = SymbolMacro of Symbol.symbol * RCST.rcst * string option
+
+    type macroenv
+
+    val emptyMacroEnv : macroenv
+
+    val getSymbolMacro : macroenv -> Symbol.symbol -> symbol_macro option
+
+    val macroexpandSymbolMacros : macroenv -> RCST.rcst -> RCST.rcst
 end

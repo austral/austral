@@ -30,4 +30,28 @@ structure Macro :> MACRO = struct
     datatype template_case = TemplateCase of match * template_exp
 
     datatype template = Template of Symbol.symbol * string option * template_case list
+
+    datatype symbol_macro = SymbolMacro of Symbol.symbol * RCST.rcst * string option
+
+    type template_map = (Symbol.symbol, template) Map.map
+    type symbol_macro_map = (Symbol.symbol, symbol_macro) Map.map
+
+    datatype macroenv = MacroEnv of template_map * symbol_macro_map
+
+    val emptyMacroEnv = MacroEnv (Map.empty, Map.empty)
+
+    fun getSymbolMacro (MacroEnv (_, mm)) s =
+        Map.get mm s
+
+    (* Macroexpansion *)
+
+    local
+        open RCST
+    in
+        fun macroexpandSymbolMacros (MacroEnv (_, mm)) form =
+            let fun expand _ = raise Fail "not implemented"
+            in
+                expand form
+            end
+    end
 end

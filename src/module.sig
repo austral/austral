@@ -49,7 +49,6 @@ signature MODULE = sig
     (* Test whether a module exports a given symbol *)
     val doesModuleExport : module -> symbol_name -> bool
 
-
     (* The default module environment: the Austral module, and related
        implementation modules *)
     val defaultMenv : menv
