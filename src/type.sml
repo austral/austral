@@ -35,4 +35,20 @@ structure Type :> TYPE = struct
                      | Datatype of param list * typespec
 
     type tenv = (Symbol.symbol, typedef) Map.map
+
+    val symbolTypes =
+        let fun au name =
+                Symbol.mkSymbol (Ident.mkIdentEx "austral",
+                                 Ident.mkIdentEx name)
+        in
+            map (fn (n, t) => (au n, t))
+                [("unit", Unit),
+                 ("boolean", Bool)]
+        end
+
+    fun parseTypespec (RCST.Symbol s) = parseSymbolSpec s
+      | parseTypespec _ = raise Fail "Invalid type specifier"
+    and parseSymbolSpec sym =
+        NamedType sym
+
 end
