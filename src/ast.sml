@@ -90,7 +90,7 @@ structure AST :> AST = struct
         let
         in
             count := !count + 1;
-            Symbol.Variable (name, !count)
+            Symbol.Var (name, !count)
         end
 
     fun resetCount () =
