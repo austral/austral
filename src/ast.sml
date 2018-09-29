@@ -58,6 +58,7 @@ structure AST :> AST = struct
       | transform (RCST.StringConstant s) = StringConstant s
       | transform (RCST.Symbol s) = Symbol s
       | transform (RCST.Keyword s) = Keyword s
+      | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
       | transform (RCST.List l) = transformList l
     and transformList ((RCST.Symbol theOp)::ty::exp::nil) = The (ty, transform exp)
       | transformList ((RCST.Symbol f)::rest) = Operator (f, map transform rest)
