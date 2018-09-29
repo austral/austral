@@ -33,18 +33,18 @@ signature AST = sig
     type symbol = Symbol.symbol
     type typespec = Type.typespec
 
-    datatype top_ast = Defun of name * param list * Type.typespec * docstring * ast
-                     | Defclass of name * Symbol.symbol * docstring * method list
+    datatype top_ast = Defun of name * param list * typespec * docstring * ast
+                     | Defclass of name * symbol * docstring * method list
                      | Definstance
-                     | Deftype of name * Type.param list * Type.typespec * docstring
+                     | Deftype of name * Type.param list * typespec * docstring
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
                      | Defmacro
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Module.module
-                     | InModule of Symbol.symbol_name
-         and param = Param of Symbol.symbol * Type.typespec
-         and method = Method of name * param list * Type.typespec * docstring
-         and disjunction_case = DisjCase of Symbol.symbol * Type.typespec option
+                     | InModule of symbol_name
+         and param = Param of symbol * typespec
+         and method = Method of name * param list * typespec * docstring
+         and disjunction_case = DisjCase of symbol * typespec option
 
     val transform : RCST.rcst -> ast
 end
