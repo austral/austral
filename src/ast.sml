@@ -167,7 +167,9 @@ structure AST :> AST = struct
         DefineSymbolMacro (name, expansion, NONE)
       | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
 
-    datatype defmodule_clause = DocstringClause of string
+    datatype defmodule_clause = ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
+                              | ExportClause of Symbol.symbol_name list
+                              | DocstringClause of string
 
     fun transformDefmodule ((RCST.Symbol name)::clauses) =
         let val clauses = map parseClause clauses
