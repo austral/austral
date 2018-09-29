@@ -38,7 +38,7 @@ structure AST :> AST = struct
                      | Definstance of name * typespec * docstring * method_def list
                      | Deftype of name * Type.param list * typespec * docstring
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
-                     | Deftemplate of name * docstring * template_case list
+                     | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Module.module
                      | InModule of Symbol.symbol_name
@@ -46,7 +46,6 @@ structure AST :> AST = struct
          and method = Method of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and disjunction_case = DisjCase of name * typespec option
-         and template_case = TemplateCase of Macro.match * Macro.template
 
     fun au name =
         Symbol.mkSymbol (Ident.mkIdentEx "austral",
