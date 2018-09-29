@@ -23,6 +23,7 @@ signature RCST = sig
                   | StringConstant of CST.escaped_string
                   | Symbol of Symbol.symbol
                   | Keyword of Symbol.symbol_name
+                  | Splice of rcst
                   | List of rcst list
 
     (* Given the current module and a CST tree, resolve all nicknames in the CST

@@ -23,6 +23,7 @@ structure RCST :> RCST = struct
                   | StringConstant of CST.escaped_string
                   | Symbol of Symbol.symbol
                   | Keyword of Symbol.symbol_name
+                  | Splice of rcst
                   | List of rcst list
 
     local
