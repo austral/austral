@@ -39,7 +39,7 @@ structure BorealTest = struct
         is (fn () => let fun andPass _ = Pass
                      in
                        (andPass (Parser.parseString input)) handle => Fail "Parse successful, should have failed"
-                     end
+                     end)
            input
 
     fun isFailure value msg =
