@@ -34,7 +34,7 @@ structure AST :> AST = struct
                      | Defclass
                      | Definstance
                      | Deftype of Symbol.symbol * Type.param list * Type.typespec * docstring
-                     | Defdisjunction
+                     | Defdisjunction of Symbol.symbol * Type.param list * docstring
                      | Defmacro
                      | DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring
                      | Defmodule of Module.module
