@@ -33,7 +33,10 @@ structure Compiler :> COMPILER = struct
                                  SOME m => m
                                | _ => raise Fail "No module with this name"
         in
-            raise Fail "Not implemented yet"
+            let val resolved = Util.valOf (RCST.resolve menv currModule form)
+            in
+                raise Fail "Not implemented yet"
+            end
         end
 
     fun compileForms c (head::tail) = compileForms (compileForm c head) tail
