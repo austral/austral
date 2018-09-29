@@ -179,4 +179,7 @@ structure AST :> AST = struct
       | transformDefSymbolMacro [RCST.Symbol name, expansion] =
         DefineSymbolMacro (name, expansion, NONE)
       | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
+    and transformInModule [RCST.Keyword moduleName] =
+        InModule moduleName
+      | transformInModule _ = raise Fail "Bad in-module form"
 end
