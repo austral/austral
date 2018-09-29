@@ -25,14 +25,14 @@ structure Type :> TYPE = struct
                       | Integer of signedness * width
                       | Float of float_type
                       | NamedType of Symbol.symbol
-                      | TypeCons of Symbol.symbol * (gtypespec list)
+                      | TypeCons of Symbol.symbol * (typespec list)
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64
          and float_type = Single
                         | Double
 
-    datatype typedef = TypeAlias of param list * gtypespec
-                     | Datatype of param list * gtypespec
+    datatype typedef = TypeAlias of param list * typespec
+                     | Datatype of param list * typespec
 
     type tenv = (Symbol.symbol, typedef) Map.map
 end
