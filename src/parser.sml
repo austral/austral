@@ -135,7 +135,7 @@ structure Parser :> PARSER = struct
                 (Result v) => (case v of
                                    (CST.List l) => l
                                  | _ => raise ParserException "Failed to parse file: compiler error")
-              | (Failure f) => Failure f
+              | (Failure f) => raise ParserException f
         end
     end
 end
