@@ -112,7 +112,7 @@ structure Parser :> PARSER = struct
                                                      (between ws
                                                               (many (seqL sexpParser ws))
                                                               (pchar #")")))
-                and spliceParser = seqR (pchar #",") sexpParser
+                and spliceParser = pmap CST.Splice (seqR (pchar #",") sexpParser)
             in
                 r := defineSexpParser listParser sexpParser;
                 (listParser, spliceParser)
