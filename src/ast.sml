@@ -35,7 +35,7 @@ structure AST :> AST = struct
 
     datatype top_ast = Defun of name * param list * typespec * docstring * ast
                      | Defclass of name * symbol * docstring * method list
-                     | Definstance
+                     | Definstance of name * typespec * docstring * method_def list
                      | Deftype of name * Type.param list * typespec * docstring
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
                      | Defmacro
@@ -44,6 +44,7 @@ structure AST :> AST = struct
                      | InModule of Symbol.symbol_name
          and param = Param of name * typespec
          and method = Method of name * param list * typespec * docstring
+         and method_def = MethodDef of name * param list * typespec * docstring * ast
          and disjunction_case = DisjCase of name * typespec option
 
     fun au name =

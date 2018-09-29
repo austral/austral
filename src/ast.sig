@@ -44,6 +44,7 @@ signature AST = sig
                      | InModule of Symbol.symbol_name
          and param = Param of name * typespec
          and method = Method of name * param list * typespec * docstring
+         and method_def = MethodDef of name * param list * typespec * docstring * ast
          and disjunction_case = DisjCase of name * typespec option
 
     val transform : RCST.rcst -> ast
