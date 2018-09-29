@@ -23,7 +23,7 @@ structure AST :> AST = struct
                  | StringConstant of CST.escaped_string
                  | Symbol of Symbol.symbol
                  | Keyword of Symbol.symbol_name
-                 | Let of binding list * ast
+                 | Let of binding * ast
                  | The of RCST.rcst * ast
                  | Operator of Symbol.symbol * ast list
          and binding = Binding of Symbol.symbol * ast
