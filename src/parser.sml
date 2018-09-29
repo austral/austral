@@ -120,7 +120,7 @@ structure Parser :> PARSER = struct
     val sexpParser = defineSexpParser listParser
 
     (* Interface *)
-    
+
     exception ParserException of string
 
     fun parseString s =
