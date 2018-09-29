@@ -137,5 +137,4 @@ structure Parser :> PARSER = struct
                                  | _ => raise ParserException "Failed to parse file: compiler error")
               | (Failure f) => raise ParserException f
         end
-    end
 end
