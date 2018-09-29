@@ -54,6 +54,7 @@ structure RCST :> RCST = struct
                                                                      (Symbol.symbolName s)
       | innResolve menv m (CST.UnqualifiedSymbol s) = resolveUnqualified menv m s
       | innResolve _ _ (CST.Keyword n) = Keyword n
+      | innResolve menv m (CST.Splice e) = Splice (innResolve menv m e)
       | innResolve menv m (CST.List l) = List (map (fn e => innResolve menv m e) l)
     and resolveQualified menv module (modName: Symbol.module_name) (symName: Symbol.symbol_name) =
         (case (Module.envGet menv modName) of
