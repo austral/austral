@@ -28,4 +28,6 @@ structure Macro :> MACRO = struct
     datatype template = Template of RCST.rcst
 
     datatype macro_case = MacroCase of match * template
+
+    datatype macro = Symbol.symbol * string option * macro_case list
 end
