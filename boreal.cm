@@ -37,7 +37,7 @@ is
 
   src/tast.sig
   src/tast.sml
-  
+
   src/compiler.sig
 
   $/basis.cm
