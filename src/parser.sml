@@ -114,7 +114,7 @@ structure Parser :> PARSER = struct
                                                               (pchar #")")))
                 and spliceParser = pmap CST.Splice (seqR (pchar #",") sexpParser)
             in
-                r := defineSexpParser listParser sexpParser;
+                r := defineSexpParser listParser spliceParser;
                 (listParser, spliceParser)
             end
         end
