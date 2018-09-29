@@ -70,10 +70,10 @@ structure AST :> AST = struct
         Let0 ((var, transform0 v), Operation ("progn", map transform0 body))
       | transformLet0 ((List ((List [Symbol var, v])::rest))::body) e =
         (* A let with at least one binding *)
-        let val exp = RCST.List [RCST.Symbol "let",
+        let val exp = RCST.List [RCST.Symbol (au "let"),
                                  RCST.List [RCST.List [RCST.Symbol var,
                                                        v]],
-                                 RCST.List ((RCST.Symbol "let")::(RCST.List rest)::body)]
+                                 RCST.List ((RCST.Symbol (au "let"))::(RCST.List rest)::body)]
         in
             transform0 exp
         end
