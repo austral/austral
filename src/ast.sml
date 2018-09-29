@@ -191,6 +191,18 @@ structure AST :> AST = struct
         raise Fail "defclass not implemented"
       | transformDefclass _ = raise Fail "Bad defclass form"
 
+    fun transformDefinstance ((RCST.Symbol name)::arg::body) =
+        raise Fail "definstance not implemented"
+      | transformDefinstance _ = raise Fail "Bad definstance form"
+
+    fun transformDeftype ((RCST.Symbol name)::arg::body) =
+        raise Fail "deftype not implemented"
+      | transformDeftype _ = raise Fail "Bad deftype form"
+
+    fun transformDefdisjunction ((RCST.Symbol name)::arg::body) =
+        raise Fail "defdisjunction not implemented"
+      | transformDefdisjunction _ = raise Fail "Bad defdisjunction form"
+
     fun transformDefSymbolMacro [RCST.Symbol name, expansion, RCST.StringConstant docstring] =
         DefineSymbolMacro (name, expansion, SOME (CST.escapedToString docstring))
       | transformDefSymbolMacro [RCST.Symbol name, expansion] =
@@ -254,7 +266,6 @@ structure AST :> AST = struct
       | parseDocstringClause _ =
         raise Fail "Bad docstring clause"
 
-
     fun transformInModule [RCST.Keyword moduleName] =
         InModule moduleName
       | transformInModule _ =
@@ -269,6 +280,12 @@ structure AST :> AST = struct
             transformDefun args
         else if f = au "defclass" then
             transformDefclass args
+        else if f = au "definstance" then
+            transformDefinstance args
+        else if f = au "defitype" then
+            transformDeftype args
+        else if f = au "defdisjunction" then
+            transformDefdisjunction args
         else if f = au "define-symbol-macro" then
             transformDefSymbolMacro args
         else if f = au "defmodule" then
