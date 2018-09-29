@@ -41,6 +41,7 @@ structure AST :> AST = struct
                      | Defmodule of Module.module
                      | InModule of Symbol.symbol_name
          and param = DefunParam of Symbol.symbol * Type.typespec
+         and method = Method of name * param list * Type.typespec * docstring
          and disjunction_case = DisjCase of Symbol.symbol * Type.typespec option
 
     fun au name =
