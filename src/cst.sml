@@ -26,6 +26,7 @@ structure CST : CST = struct
                  | QualifiedSymbol of Symbol.symbol
                  | UnqualifiedSymbol of Symbol.symbol_name
                  | Keyword of Symbol.symbol_name
+                 | Splice of cst
                  | List of cst list
 
     fun escapeString s =
