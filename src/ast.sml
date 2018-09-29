@@ -67,7 +67,7 @@ structure AST :> AST = struct
             Operation0 (f, map transform0 args)
     and transformLet0 ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) e =
         (* A let with a single binding *)
-        Let0 ((var, transform0 v), Operation0 ("progn", map transform0 body))
+        Let0 ((var, transform0 v), Operation0 (au "progn", map transform0 body))
       | transformLet0 ((RCST.List ((RCST.List [RCST.Symbol var, v])::rest))::body) e =
         (* A let with at least one binding *)
         let val exp = RCST.List [RCST.Symbol (au "let"),
