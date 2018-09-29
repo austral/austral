@@ -66,6 +66,7 @@ structure Module : MODULE = struct
         let val australExports = ["defun",
                                   "deftype",
                                   "defdatatype",
+                                  "let",
                                   "the"]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
