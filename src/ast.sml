@@ -45,7 +45,7 @@ structure AST :> AST = struct
                    | Keyword0 of Symbol.symbol_name
                    | Let0 of (Symbol.symbol * ast0) * ast0
                    | The0 of RCST.rcst * ast0
-                   | Operator0 of Symbol.symbol * ast0 list
+                   | Operation0 of Symbol.symbol * ast0 list
 
     fun transform0 (RCST.IntConstant i) = IntConstant0 i
       | transform0 (RCST.FloatConstant f) = FloatConstant0 f
