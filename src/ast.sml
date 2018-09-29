@@ -213,6 +213,8 @@ structure AST :> AST = struct
         in
             ImportFromClause (modName, map parseImportElem args)
         end
+      | parseImportClause _ =
+        raise Fail "Bad :import-from clause"
     and parseExportClause args =
         let fun parseExportElem (RCST.Keyword k) = k
               | parseExportElem _ = raise Fail "Bad export clause"
