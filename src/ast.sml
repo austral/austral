@@ -187,8 +187,32 @@ structure AST :> AST = struct
         end
       | transformDefun _ = raise Fail "Bad defun form"
 
-    fun transformDefclass ((RCST.Symbol name)::(RCST.List [arg])::body) =
-        raise Fail "defclass not implemented"
+    fun transformDefclass ((RCST.Symbol name)::(RCST.List [RCST.Symbol param])::body) =
+        let fun parseBody [RCST.StringConstant s, RCST.List methods] =
+                (SOME (CST.escapedToString s), parseMethods methods)
+              | parseBody [RCST.List methods] = (NONE, parseMethods methods)
+              | parseBody _ = raise Fail "Bad defclass form"
+            and parseMethods l = map parseMethod l
+            and parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt, RCST.StringConstant s]) =
+                Method (name,
+                        map parseParam params,
+                        Type.parseTypespec rt,
+                        SOME (CST.escapedToString s))
+              | parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt]) =
+                Method (name,
+                        map parseParam params,
+                        Type.parseTypespec rt,
+                        NONE)
+              | parseMethod _ = raise Fail "Bad method definition"
+            and parseParam (RCST.List [RCST.Symbol name, ty]) =
+                Param (name, Type.parseTypespec ty)
+              | parseParam _ = raise Fail "Bad method parameter"
+        in
+            let val (docstring, methods) = parseBody body
+            in
+                Defclass (name, param, docstring, methods)
+            end
+        end
       | transformDefclass _ = raise Fail "Bad defclass form"
 
     fun transformDefinstance ((RCST.Symbol name)::(RCST.List [arg])::body) =
