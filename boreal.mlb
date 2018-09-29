@@ -28,6 +28,9 @@ src/parser.sml
 src/rcst.sig
 src/rcst.sml
 
+src/macro.sig
+src/macro.sml
+
 src/ast.sig
 src/ast.sml
 
