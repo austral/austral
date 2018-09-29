@@ -26,14 +26,14 @@ structure Module : MODULE = struct
 
     datatype exports = Exports of symbol_name Set.set
 
-    datatype module = Module of module_name * nicknames * imports * exports
+    datatype module = Module of module_name * nicknames * imports * exports * string option
 
     datatype menv = MEnv of (module_name, module) Map.map
 
-    fun moduleName (Module (n, _, _, _)) = n
-    fun moduleNicknames (Module (_, ns, _, _)) = ns
-    fun moduleExports (Module (_, _, _, Exports e)) = e
-    fun moduleImports (Module (_, _, Imports i, _)) = i
+    fun moduleName (Module (n, _, _, _, _)) = n
+    fun moduleNicknames (Module (_, ns, _, _, _)) = ns
+    fun moduleExports (Module (_, _, _, Exports e, _)) = e
+    fun moduleImports (Module (_, _, Imports i, _, _)) = i
 
     val emptyEnv = MEnv (Map.empty)
 
@@ -71,7 +71,8 @@ structure Module : MODULE = struct
             let val australMod = Module (Ident.mkIdentEx "austral",
                                          Map.empty,
                                          Imports Map.empty,
-                                         Exports (Set.fromList (map Ident.mkIdentEx australExports)))
+                                         Exports (Set.fromList (map Ident.mkIdentEx australExports)),
+                                         NONE)
             in
                 let val australUserMod = Module (Ident.mkIdentEx "austral-user",
                                                  Map.empty,
@@ -79,7 +80,8 @@ structure Module : MODULE = struct
                                                  Imports (Map.fromList (map (fn n => (Ident.mkIdentEx n,
                                                                                       Ident.mkIdentEx "austral"))
                                                                             australExports)),
-                                                 Exports Set.empty)
+                                                 Exports Set.empty,
+                                                 NONE)
                 in
                     addModule (addModule emptyEnv australMod) australUserMod
                 end

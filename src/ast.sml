@@ -33,7 +33,7 @@ structure AST :> AST = struct
     datatype top_ast = Defun
                      | Defclass
                      | Definstance
-                     | Deftype
+                     | Deftype of Symbol.symbol * Type.param list * Type.gtypespec * docstring
                      | Defdisjunction
                      | Defmacro
                      | DefineSymbolMacro of Symbol.symbol * RCST.rcst * docstring

@@ -23,7 +23,7 @@ signature MODULE = sig
     type nicknames = (module_name, module_name) Map.map
     datatype imports = Imports of (symbol_name, module_name) Map.map
     datatype exports = Exports of symbol_name Set.set
-    datatype module = Module of module_name * nicknames * imports * exports
+    datatype module = Module of module_name * nicknames * imports * exports * string option
     type menv
 
     val moduleName : module -> module_name
