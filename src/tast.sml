@@ -98,34 +98,34 @@ structure TAst :> TAST = struct
       | augment (AST.IntConstant i) _ = IntConstant (i, defaultIntType)
       | augment (AST.StringConstant s) _ = StringConstant s
       | augment (AST.Variable name) c =
-          (case (Map.get (ctxBindings c) name) of
-               SOME bind => Variable (name, bindType bind)
-             | NONE => raise Fail ("No such variable"))
+        (case (Map.get (ctxBindings c) name) of
+             SOME bind => Variable (name, bindType bind)
+           | NONE => raise Fail ("No such variable"))
       | augment (AST.Cond (test, cons, alt)) c =
-          let val test' = augment test c
-              and cons' = augment cons c
-              and alt'  = augment alt c
-          in
-              if (typeOf test') <> Type.Bool then
-                  raise Fail "The test in an `if` must be of boolean type"
-              else
-                  if (typeOf cons') <> (typeOf alt') then
-                      raise Fail "The consequent and the alternate must have the same type"
-                  else
-                      Cond (test', cons', alt')
-          end
-        | augment (AST.Progn exps) c =
-          Progn (map (fn a => augment a c) exps)
-        | augment (AST.Let (name, v, body)) c =
-          let val v' = augment v c
-          in
-              let val s' = Map.iadd (ctxBindings c)
-                                    (name, (Binding (typeOf v', Mutable)))
-              in
-                  Let (name,
-                       v',
-                       augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
-              end
-          end
+        let val test' = augment test c
+            and cons' = augment cons c
+            and alt'  = augment alt c
+        in
+            if (typeOf test') <> Type.Bool then
+                raise Fail "The test in an `if` must be of boolean type"
+            else
+                if (typeOf cons') <> (typeOf alt') then
+                    raise Fail "The consequent and the alternate must have the same type"
+                else
+                    Cond (test', cons', alt')
+        end
+      | augment (AST.Progn exps) c =
+        Progn (map (fn a => augment a c) exps)
+      | augment (AST.Let (name, v, body)) c =
+        let val v' = augment v c
+        in
+            let val s' = Map.iadd (ctxBindings c)
+                                  (name, (Binding (typeOf v', Mutable)))
+            in
+                Let (name,
+                     v',
+                     augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
+            end
+        end
       | augment _ _ = raise Fail "Not implemented yet"
 end
