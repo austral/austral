@@ -151,6 +151,8 @@ structure TAst :> TAST = struct
                                  end
                   | _ => raise Fail "store: first argument must be a pointer"
             end
+          | augment (AST.The _) _ =
+            raise Fail "`the` not implemented"
           | augment (AST.Progn exps) c =
             Progn (map (fn a => augment a c) exps)
           | augment _ _ = raise Fail "Not implemented yet"
