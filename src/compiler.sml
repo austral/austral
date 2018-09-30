@@ -31,16 +31,19 @@ structure Compiler :> COMPILER = struct
     fun unitForms (FileUnit path) = Parser.parseFile path
       | unitForms (ReplUnit string) = [Parser.parseString string]
 
-    fun declareForm (Compiler (menv, currModuleName)) form =
-        let val currModule = case Module.envGet menv currModuleName of
-                                 SOME m => m
-                               | _ => raise Fail "No module with this name"
+    fun declareForm compiler form =
+        let val (Compiler (menv, currModuleName)) = compiler
         in
-            let val resolved = Util.valOf (RCST.resolve menv currModule form)
+            let val currModule = case Module.envGet menv currModuleName of
+                                     SOME m => m
+                                   | _ => raise Fail "No module with this name"
             in
-                let val topnode = AST.transformTop resolved
+                let val resolved = Util.valOf (RCST.resolve menv currModule form)
                 in
-                    raise Fail "Not implemented yet"
+                    let val topnode = AST.transformTop resolved
+                    in
+                        raise Fail "Not implemented yet"
+                    end
                 end
             end
         end
