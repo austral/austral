@@ -40,7 +40,7 @@ structure MIR :> MIR = struct
 
     datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * block_ast * ast
 
-    local
+    (*local
         open CppAst
     in
         val unitConstant = BoolConstant false
@@ -223,7 +223,7 @@ structure MIR :> MIR = struct
                      Var res)
                 end
             end
-    end
+    end*)
 
     fun transformTop _ =
         raise Fail "derp"
