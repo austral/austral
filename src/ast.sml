@@ -36,108 +36,6 @@ structure AST :> AST = struct
                  | Operation of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
 
-    (* Transform RCST to the expression AST *)
-
-    (* Intermediate AST 0 *)
-    datatype ast0 = IntConstant0 of string
-                  | FloatConstant0 of string
-                  | StringConstant0 of CST.escaped_string
-                  | Symbol0 of Symbol.symbol
-                  | Let0 of Symbol.symbol * ast0 * ast0
-                  | The0 of RCST.rcst * ast0
-                  | Operation0 of Symbol.symbol * ast0 list
-
-    fun transform0 (RCST.IntConstant i) = IntConstant0 i
-      | transform0 (RCST.FloatConstant f) = FloatConstant0 f
-      | transform0 (RCST.StringConstant s) = StringConstant0 s
-      | transform0 (RCST.Symbol s) = Symbol0 s
-      | transform0 (RCST.Keyword s) = raise Fail "Keywords not allowed in expressions"
-      | transform0 (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
-      | transform0 (RCST.List l) = transformList0 l
-    and transformList0 ((RCST.Symbol f)::args) = transformOp0 f args
-      | transformList0 _ = raise Fail "Invalid list form"
-    and transformOp0 f args =
-        if f = au "let" then
-            transformLet0 args
-        else if f = au "the" then
-            case args of
-                [ty, exp] => The0 (ty, transform0 exp)
-              | _ => raise Fail "Invalid `the` form"
-        else
-            Operation0 (f, map transform0 args)
-    and transformLet0 ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) =
-        (* A let with a single binding *)
-        Let0 (var, transform0 v, Operation0 (au "progn", map transform0 body))
-      | transformLet0 ((RCST.List ((RCST.List [RCST.Symbol var, v])::rest))::body) =
-        (* A let with at least one binding *)
-        let val exp = RCST.List [RCST.Symbol (au "let"),
-                                 RCST.List [RCST.List [RCST.Symbol var,
-                                                       v]],
-                                 RCST.List ((RCST.Symbol (au "let"))::(RCST.List rest)::body)]
-        in
-            transform0 exp
-        end
-      | transformLet0 ((RCST.List nil)::body) =
-        (* A let with no bindings *)
-        Operation0 (au "progn", map transform0 body)
-      | transformLet0 _ = raise Fail "Invalid let form"
-
-    (* Alpha renaming *)
-
-    val count = ref 0
-
-    fun freshVar sym =
-        let
-        in
-            count := !count + 1;
-            Symbol.Var (sym, !count)
-        end
-
-    fun resetCount () =
-        count := 0
-
-    type stack = (Symbol.symbol * Symbol.variable) list
-
-    fun lookup ((n,v)::xs) s = if (n = s) then
-                                   v
-                               else
-                                   lookup xs s
-      | lookup nil s = raise Fail ("No such variable: '"
-                                   ^ (Ident.identString (Symbol.symbolName s))
-                                   ^ "'")
-
-    fun alphaRename _ (IntConstant0 s) = IntConstant s
-      | alphaRename _ (FloatConstant0 f) = FloatConstant f
-      | alphaRename _ (StringConstant0 s) = StringConstant s
-      | alphaRename s (Symbol0 name) = Variable (lookup s name)
-      | alphaRename s (Let0 (var, value, body)) =
-        let val fresh = freshVar var
-          in
-              let val s' = (var, fresh) :: s
-              in
-                  let val body' = alphaRename s' body
-                  in
-                      Let (Binding (fresh, alphaRename s value), body')
-                  end
-              end
-        end
-      | alphaRename s (The0 (ty, exp)) = The (ty, alphaRename s exp)
-      | alphaRename s (Operation0 (f, args)) =
-        let val args' = map (alphaRename s) args
-        in
-            if f = au "progn" then
-                Progn args'
-            else
-                Operation (f, args')
-        end
-
-    fun transform rcst =
-        let
-        in
-            resetCount ();
-            alphaRename [] (transform0 rcst)
-        end
-
     (* Toplevel AST *)
 
     type name = Symbol.symbol
@@ -161,6 +59,23 @@ structure AST :> AST = struct
                               | ExportClause of Symbol.symbol_name list
                               | DocstringClause of string
 
+
+    (* Transform alpha-renamed AST to this AST *)
+
+    fun transform (Alpha.IntConstant i) =
+        IntConstant i
+      | transform (Alpha.FloatConstant f) =
+        FloatConstant f
+      | transform (Alpha.StringConstant s) =
+        StringConstant s
+      | transform (Alpha.Variable v) =
+        Variable v
+      | transform (Alpha.The (ty, exp)) =
+        The (ty, transform exp)
+      | transform (Alpha.Progn exps) =
+        Progn (map transform exps)
+      | transform (Alpha.Operation (f, args)) =
+        Operation (f, map transform args)
 
     (* Parse toplevel forms into the toplevel AST *)
 
