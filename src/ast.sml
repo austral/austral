@@ -233,7 +233,7 @@ structure AST :> AST = struct
                 Deftype (name,
                          map parseParam params,
                          docstring,
-                         ty)
+                         Type.parseTypespec ty)
             end
         end
       | transformDeftype _ = raise Fail "Bad deftype form"
