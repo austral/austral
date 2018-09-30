@@ -102,23 +102,32 @@ structure CppAst :> CPP_AST = struct
       | renderType (Pointer t) = (renderType t) ^ "*"
       | renderType (TypeCons (n, args)) = n ^ "<" ^ (sepBy ", " (map renderType args)) ^ ">"
 
-    fun renderExp (ConstBool true) = "true"
-      | renderExp (ConstBool false) = "false"
-      | renderExp (ConstInt i) = (if i < 0 then "-" else "") ^ (Int.toString (abs i))
+    fun renderExp (ConstBool true) =
+        "true"
+      | renderExp (ConstBool false) =
+        "false"
+      | renderExp (ConstInt i) =
+        (if i < 0 then "-" else "") ^ (Int.toString (abs i))
       | renderExp (ConstString s) =
         let fun tr #"\"" = "\\\""
               | tr c = str c
         in
             "\"" ^ (String.translate tr s) ^ "\""
         end
-      | renderExp ConstNull = "NULL"
-      | renderExp (Var s) = (s)
+      | renderExp ConstNull =
+        "NULL"
+      | renderExp (Var s) =
+        s
       | renderExp (Binop (oper, a, b)) =
         "(" ^ (renderExp a) ^ " " ^ (binopStr oper) ^ " " ^ (renderExp b) ^ ")"
-      | renderExp (Cast (ty, a)) = "((" ^ (renderType ty) ^ ")(" ^ (renderExp a) ^ "))"
-      | renderExp (Deref e) = "*" ^ (renderExp e)
-      | renderExp (AddressOf e) = "&" ^ (renderExp e)
-      | renderExp (SizeOf t) = "sizeof(" ^ (renderType t) ^ ")"
+      | renderExp (Cast (ty, a)) =
+        "((" ^ (renderType ty) ^ ")(" ^ (renderExp a) ^ "))"
+      | renderExp (Deref e) =
+        "*" ^ (renderExp e)
+      | renderExp (AddressOf e) =
+        "&" ^ (renderExp e)
+      | renderExp (SizeOf t) =
+        "sizeof(" ^ (renderType t) ^ ")"
       | renderExp (CreateTuple exps) =
         "std::make_tuple(" ^ (sepBy ", " (map renderExp exps)) ^ ")"
       | renderExp (AccessTuple (exp, i)) =
@@ -135,15 +144,26 @@ structure CppAst :> CPP_AST = struct
         ^ (slot)
       | renderExp (Funcall (f, args)) =
         "(" ^ f ^ "(" ^ (sepBy "," (map renderExp args)) ^ "))"
-      | renderExp (Adjacent l) = String.concatWith " " (map renderExp l)
-      | renderExp (Raw s) = s
+      | renderExp (Adjacent l) =
+        String.concatWith " " (map renderExp l)
+      | renderExp (Raw s) =
+        s
 
-    fun renderBlock' d (Sequence l) = sepBy "\n" (map (renderBlock' d) l)
-      | renderBlock' d (Block l) = "{\n" ^ (sepBy "\n" (map (renderBlock' d) l)) ^ "\n" ^ (pad (unindent d)) ^ "}"
-      | renderBlock' d (Declare (t, n)) = (pad d) ^ (renderType t) ^ " " ^ (n) ^ ";"
-      | renderBlock' d (Assign (var, v)) = (pad d) ^ (renderExp var) ^ " = " ^ (renderExp v) ^ ";"
-      | renderBlock' d (Cond (t, c, a)) = (pad d) ^ "if (" ^ (renderExp t) ^ ") " ^ (renderBlock' (indent d) c)
-                                          ^ " else " ^ (renderBlock' (indent d) a)
+    fun renderBlock' d (Sequence l) =
+        sepBy "\n" (map (renderBlock' d) l)
+      | renderBlock' d (Block l) =
+        "{\n" ^ (sepBy "\n" (map (renderBlock' d) l)) ^ "\n" ^ (pad (unindent d)) ^ "}"
+      | renderBlock' d (Declare (t, n)) =
+        (pad d) ^ (renderType t) ^ " " ^ (n) ^ ";"
+      | renderBlock' d (Assign (var, v)) =
+        (pad d) ^ (renderExp var) ^ " = " ^ (renderExp v) ^ ";"
+      | renderBlock' d (Cond (t, c, a)) =
+        let val cond = renderExp t
+            and tblock = renderBlock' (indent d) c
+            and fblock = renderBlock' (indent d) a
+        in
+            (pad d) ^ "if (" ^ cond ^ ") " ^ tblock ^ " else " ^ fblock
+        end
       | renderBlock' d (While (t, b)) =
         (pad d) ^ "while (" ^ (renderExp t) ^ ") {\n" ^ (renderBlock' (indent d) b) ^ "\n" ^ (pad d) ^ "}"
       | renderBlock' d (VoidFuncall (f, args)) =
@@ -151,7 +171,8 @@ structure CppAst :> CPP_AST = struct
     and renderRes (SOME res) = (res) ^ " = "
       | renderRes NONE = ""
 
-    fun renderBlock b = renderBlock' (indent 0) b
+    fun renderBlock b =
+        renderBlock' (indent 0) b
 
     fun renderTop (FunctionDef (name, params, rt, body, retval)) =
         let val params' = sepBy "," (map renderParam params)
