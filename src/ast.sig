@@ -23,7 +23,7 @@ signature AST = sig
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable
                  | Let of binding * ast
-                 | The of RCST.rcst * ast
+                 | The of Type.typespec * ast
                  | Progn of ast list
                  | Operation of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
@@ -49,7 +49,7 @@ signature AST = sig
                               | ExportClause of Symbol.symbol_name list
                               | DocstringClause of string
 
-    val transform : RCST.rcst -> ast
+    val transform : Alpha.ast -> ast
 
     val transformTop : RCST.rcst -> top_ast
 end
