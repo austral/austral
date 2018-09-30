@@ -85,7 +85,7 @@ structure Compiler :> COMPILER = struct
         ([], c)
 
     fun compileForm _ _ =
-        raise Fail "Not implemented yet"
+        raise Fail "compileForm Not implemented yet"
 
     fun compilationPass c (head::tail) =
         compilationPass (compileForm c head) tail
