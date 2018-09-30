@@ -112,5 +112,11 @@ structure HIR :> HIR = struct
 
     (* Transform top-level AST *)
 
-    fun transformTop _ = raise Fail "derp"
+    fun transformTop (AST.Defun (name, params, rt, _, body)) =
+        DefunConcrete (escapeSymbol name,
+                       map (fn (n, t) => (escapeSymbol n, t)) params,
+                       rt,
+                       transform body)
+      | transformTop _ =
+        raise Fail "transformTop not implemented for this case"
 end
