@@ -31,6 +31,9 @@ structure Compiler :> COMPILER = struct
     fun unitForms (FileUnit path) = Parser.parseFile path
       | unitForms (ReplUnit string) = [Parser.parseString string]
 
+    local
+        open AST
+    in
     fun declareForm compiler form =
         let val (Compiler (menv, currModuleName)) = compiler
         in
@@ -48,6 +51,7 @@ structure Compiler :> COMPILER = struct
             end
         end
     and declareTopForm c _ = raise Fail "Not implemented yet"
+    end
 
     fun declarationPass c (head::tail) =
         let val (node, c') = declareForm c head
