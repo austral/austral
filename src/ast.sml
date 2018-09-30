@@ -140,7 +140,7 @@ structure AST :> AST = struct
     datatype top_ast = Defun of name * param list * typespec * docstring * ast
                      | Defclass of name * symbol * docstring * method list
                      | Definstance of name * typespec * docstring * method_def list
-                     | Deftype of name * Type.param list * typespec * docstring
+                     | Deftype of name * Type.param list * docstring * typespec
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
@@ -188,7 +188,7 @@ structure AST :> AST = struct
       | transformDefun _ = raise Fail "Bad defun form"
 
     fun transformDefclass ((RCST.Symbol name)::(RCST.List [RCST.Symbol param])::body) =
-        let fun parseBody [RCST.StringConstant s, RCST.List methods] =
+        let fun parseBody [RCST.StringConstant s, RCST.List methods]  =
                 (SOME (CST.escapedToString s), parseMethods methods)
               | parseBody [RCST.List methods] = (NONE, parseMethods methods)
               | parseBody _ = raise Fail "Bad defclass form"
@@ -220,7 +220,22 @@ structure AST :> AST = struct
       | transformDefinstance _ = raise Fail "Bad definstance form"
 
     fun transformDeftype ((RCST.Symbol name)::(RCST.List params)::body) =
-        raise Fail "deftype not implemented"
+        let fun parseBody [RCST.StringConstant s, def] =
+                (SOME (CST.escapedToString s), def)
+              | parseBody [def] =
+                (NONE, def)
+              | parseBody _ = raise Fail "Bad deftype form"
+            and parseParam (RCST.Symbol s) = Type.TypeParam s
+              | parseParam _ = raise Fail "Bad type parameter"
+        in
+            let val (docstring, ty) = parseBody body
+            in
+                Deftype (name,
+                         map parseParam params,
+                         docstring,
+                         ty)
+            end
+        end
       | transformDeftype _ = raise Fail "Bad deftype form"
 
     fun transformDefdisjunction ((RCST.Symbol name)::(RCST.List params)::body) =
