@@ -128,6 +128,8 @@ structure TAst :> TAST = struct
             TupleCreate (map (fn e => augment e c) exps)
           | augment (AST.TupleProj (exp, i)) c =
             TupleProj (augment exp c, i)
+          | augment (AST.Allocate v) c =
+            Allocate (augment v c)
           | augment (AST.Load e) c =
             let val e' = augment e c
             in
