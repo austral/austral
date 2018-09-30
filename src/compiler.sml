@@ -18,9 +18,10 @@
 *)
 
 structure Compiler :> COMPILER = struct
-    datatype compiler = Compiler of Module.menv * Symbol.module_name
+    datatype compiler = Compiler of Module.menv * Function.fenv * Symbol.module_name
 
     val emptyCompiler = Compiler (Module.defaultMenv,
+                                  Function.emptyFenv,
                                   Ident.mkIdentEx "austral-user")
 
     type pathname = string
@@ -35,7 +36,7 @@ structure Compiler :> COMPILER = struct
         open AST
     in
     fun declareForm compiler form =
-        let val (Compiler (menv, currModuleName)) = compiler
+        let val (Compiler (menv, _, currModuleName)) = compiler
         in
             let val currModule = case Module.envGet menv currModuleName of
                                      SOME m => m
@@ -50,15 +51,23 @@ structure Compiler :> COMPILER = struct
                 end
             end
         end
-    and declareTopForm c (InModule moduleName) =
+    and declareTopForm c (Defun (f, ast)) =
+        (* Add a concrete function to the compiler fenv *)
+        let val (Compiler (menv, fenv, currModuleName)) = c
+        in
+            case (Function.addFunction fenv f) of
+                SOME fenv' => Compiler (menv, fenv', currModuleName)
+              | NONE => raise Fail "Repeat function"
+        end
+      | declareTopForm c (InModule moduleName) =
         (* Switch current module *)
-        let val (Compiler (menv, currModuleName)) = c
+        let val (Compiler (menv, fenv, currModuleName)) = c
         in
             let val newModule = case Module.envGet menv moduleName of
                                     SOME m => m
                                   | NONE => raise Fail "in-module: no module with this name"
             in
-                Compiler (menv, moduleName)
+                Compiler (menv, fenv, moduleName)
             end
         end
       | declareTopForm _ _ = raise Fail "Not implemented yet"
