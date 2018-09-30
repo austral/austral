@@ -32,4 +32,8 @@ structure Function :> FUNCTION = struct
 
     datatype instance = Instance of name * typespec * docstring * method_def list
          and method_def = MethodDef of name * param list * typespec * docstring * RCST.rcst
+
+    datatype fenv = FunctionEnv of (name, func) Map.map * typeclass list * instance list
+
+    val emptyFenv = FunctionEnv (Map.empty, [], [])
 end
