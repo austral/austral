@@ -51,9 +51,13 @@ structure Compiler :> COMPILER = struct
                 end
             end
         end
-    and declareTopForm c (Defun (f, ast)) =
+    and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
         (* Add a concrete function to the compiler fenv *)
         let val (Compiler (menv, fenv, currModuleName)) = c
+            and f = Function.Function (name,
+                                       map (fn (n, t) => Function.Param (n, t)) params,
+                                       rt,
+                                       docstring)
         in
             case (Function.addFunction fenv f) of
                 SOME fenv' => Compiler (menv, fenv', currModuleName)

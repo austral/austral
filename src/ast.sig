@@ -32,7 +32,7 @@ signature AST = sig
     type symbol = Symbol.symbol
     type typespec = Type.typespec
 
-    datatype top_ast = Defun of Function.func * ast
+    datatype top_ast = Defun of name * (name * typespec) list * typespec * docstring * ast
                      | Defclass of Function.typeclass
                      | Definstance of Function.instance
                      | Deftype of name * Type.param list * docstring * typespec
