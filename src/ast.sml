@@ -79,8 +79,13 @@ structure AST :> AST = struct
     and transformOp f args =
         if f = au "progn" then
             Progn args
+        else if f = au "if" then
+            transformCond args
         else
             Operation (f, args)
+    and transformCond [test, cons, alt] =
+        Cond (test, cons, alt)
+      | transformCond _ = raise Fail "Invalid `if` form"
 
     (* Parse toplevel forms into the toplevel AST *)
 
