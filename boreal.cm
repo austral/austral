@@ -35,6 +35,9 @@ is
   src/type.sig
   src/type.sml
 
+  src/function.sig
+  src/function.sml
+
   src/ast.sig
   src/ast.sml
 
