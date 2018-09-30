@@ -49,6 +49,9 @@ src/ast.sml
 src/tast.sig
 src/tast.sml
 
+src/hir.sig
+src/hir.sml
+
 src/compiler.sig
 src/compiler.sml
 
