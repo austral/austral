@@ -91,45 +91,66 @@ structure TAst :> TAST = struct
         open Type
     in
         val defaultIntType = Integer (Signed, Int32)
-    end
 
-    fun augment AST.UnitConstant _ = UnitConstant
-      | augment (AST.BoolConstant b) _ = BoolConstant b
-      | augment (AST.IntConstant i) _ = IntConstant (i, defaultIntType)
-      | augment (AST.StringConstant s) _ = StringConstant s
-      | augment (AST.Variable name) c =
-        (case (Map.get (ctxBindings c) name) of
-             SOME bind => Variable (name, bindType bind)
-           | NONE => raise Fail ("No such variable"))
-      | augment (AST.Let (name, v, body)) c =
-        let val v' = augment v c
-        in
-            let val s' = Map.iadd (ctxBindings c)
-                                  (name, (Binding (typeOf v', Mutable)))
+        fun augment AST.UnitConstant _ = UnitConstant
+          | augment (AST.BoolConstant b) _ = BoolConstant b
+          | augment (AST.IntConstant i) _ = IntConstant (i, defaultIntType)
+          | augment (AST.StringConstant s) _ = StringConstant s
+          | augment (AST.Variable name) c =
+            (case (Map.get (ctxBindings c) name) of
+                 SOME bind => Variable (name, bindType bind)
+               | NONE => raise Fail ("No such variable"))
+          | augment (AST.Let (name, v, body)) c =
+            let val v' = augment v c
             in
-                Let (name,
-                     v',
-                     augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
+                let val s' = Map.iadd (ctxBindings c)
+                                      (name, (Binding (typeOf v', Mutable)))
+                in
+                    Let (name,
+                         v',
+                         augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
+                end
             end
-        end
-      | augment (AST.Cond (test, cons, alt)) c =
-        let val test' = augment test c
-            and cons' = augment cons c
-            and alt'  = augment alt c
-        in
-            if (typeOf test') <> Type.Bool then
-                raise Fail "The test in an `if` must be of boolean type"
-            else
-                if (typeOf cons') <> (typeOf alt') then
-                    raise Fail "The consequent and the alternate must have the same type"
+          | augment (AST.Cond (test, cons, alt)) c =
+            let val test' = augment test c
+                and cons' = augment cons c
+                and alt'  = augment alt c
+            in
+                if (typeOf test') <> Bool then
+                    raise Fail "The test in an `if` must be of boolean type"
                 else
-                    Cond (test', cons', alt')
-        end
-      | augment (AST.TupleCreate exps) c =
-        TupleCreate (map (fn e => augment e c) exps)
-      | augment (AST.TupleProj (exp, i)) c =
-        TupleProj (augment exp c, i)
-      | augment (AST.Progn exps) c =
-        Progn (map (fn a => augment a c) exps)
-      | augment _ _ = raise Fail "Not implemented yet"
+                    if (typeOf cons') <> (typeOf alt') then
+                        raise Fail "The consequent and the alternate must have the same type"
+                    else
+                        Cond (test', cons', alt')
+            end
+          | augment (AST.TupleCreate exps) c =
+            TupleCreate (map (fn e => augment e c) exps)
+          | augment (AST.TupleProj (exp, i)) c =
+            TupleProj (augment exp c, i)
+          | augment (AST.Load e) c =
+            let val e' = augment e c
+            in
+                case (typeOf e') of
+                    Pointer t => Load e'
+                  | _ => raise Fail "load: not a pointer"
+            end
+          | augment (AST.Store (p, v)) c =
+            let val p' = augment p c
+                and v' = augment v c
+            in
+                case (typeOf p') of
+                    Pointer t => let val ty = typeOf v'
+                                 in
+                                     if ty = t then
+                                         Store (p', v')
+                                     else
+                                         raise Fail "store: type mismatch"
+                                 end
+                  | _ => raise Fail "store: first argument must be a pointer"
+            end
+          | augment (AST.Progn exps) c =
+            Progn (map (fn a => augment a c) exps)
+          | augment _ _ = raise Fail "Not implemented yet"
+    end
 end
