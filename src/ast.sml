@@ -32,6 +32,7 @@ structure AST :> AST = struct
                  | Variable of Symbol.variable
                  | Let of binding * ast
                  | The of RCST.rcst * ast
+                 | Progn of ast list
                  | Operation of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
 
