@@ -46,11 +46,11 @@ structure Compiler :> COMPILER = struct
         end
 
     fun declarationPass c (head::tail) =
-        let val (rcst, c') = declareForm c head
+        let val (node, c') = declareForm c head
         in
-            let val (forms, c'') = declarationPass c' tail
+            let val (nodes, c'') = declarationPass c' tail
             in
-                (rcst :: forms, c'')
+                (node :: nodes, c'')
             end
         end
       | declarationPass c nil =
