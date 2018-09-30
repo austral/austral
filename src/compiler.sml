@@ -28,7 +28,10 @@ structure Compiler :> COMPILER = struct
     datatype compilation_unit = FileUnit of pathname
                               | ReplUnit of string
 
-    fun compileForm (Compiler (menv, currModuleName)) form =
+    fun unitForms (FileUnit path) = Parser.parseFile path
+      | unitForms (ReplUnit string) = [Parser.parseString string]
+
+    fun declareForm (Compiler (menv, currModuleName)) form =
         let val currModule = case Module.envGet menv currModuleName of
                                  SOME m => m
                                | _ => raise Fail "No module with this name"
@@ -39,11 +42,8 @@ structure Compiler :> COMPILER = struct
             end
         end
 
-    fun compileForms c (head::tail) = compileForms (compileForm c head) tail
-      | compileForms c nil = c
-
-    fun unitForms (FileUnit path) = Parser.parseFile path
-      | unitForms (ReplUnit string) = [Parser.parseString string]
+    fun declarationPass c (head::tail) = declarationPass (declareForm c head) tail
+      | declarationPass c nil = c
 
     fun compileUnit c u =
         compileForms c (unitForms u)
