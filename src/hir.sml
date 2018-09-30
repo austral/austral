@@ -46,14 +46,25 @@ structure HIR :> HIR = struct
             escapeString (Ident.identString i)
         and escapeString s =
             String.concat (map escapeChar (String.explode s))
-        and escapeChar #"+" = "_p"
-          | escapeChar #"-" = "__"
-          | escapeChar #"*" = "_m"
-          | escapeChar #"/" = "_d"
-          | escapeChar #">" = "_g"
-          | escapeChar #"<" = "_l"
-          | escapeChar #"=" = "_e"
-          | escapeChar #"'" = "_q"
+        and escapeChar #"!" = "_ba"
+          | escapeChar #"%" = "_pe"
+          | escapeChar #"&" = "_am"
+          | escapeChar #"$" = "_do"
+          | escapeChar #"#" = "_po"
+          | escapeChar #"+" = "_pl"
+          | escapeChar #"-" = "_da"
+          | escapeChar #"*" = "_mu"
+          | escapeChar #"/" = "_di"
+          | escapeChar #"<" = "_lt"
+          | escapeChar #"=" = "_eq"
+          | escapeChar #">" = "_gt"
+          | escapeChar #"?" = "_in"
+          | escapeChar #"@" = "_at"
+          | escapeChar #"\\" = "_bs"
+          | escapeChar #"~" = "_ti"
+          | escapeChar #"^" = "_ca"
+          | escapeChar #"|" = "_pi"
+          | escapeChar #"'" = "_qu"
           | escapeChar c = str c
     end
 
