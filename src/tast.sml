@@ -61,11 +61,15 @@ structure TAst :> TAST = struct
           | typeOf (Funcall (_, _, t)) = t
     end
 
+    (* Bindings *)
+
     datatype binding = Binding of ty * mutability
          and mutability = Immutable
                         | Mutable
 
     type bindings = (Ident.ident, binding) Map.map
+
+    (* Context data for the augment function *)
 
     datatype context = Context of bindings * Type.tenv * Function.fenv
 
@@ -74,4 +78,11 @@ structure TAst :> TAST = struct
     fun ctxBindings (Context (b, _, _)) = b
     fun ctxTenv (Context (_, t, _)) = t
     fun ctxFenv (Context (_, _, f)) = f
+
+    (* Augment AST with type information *)
+
+    (*fun augment AST.ConstUnit = TConstUnit
+      | augment (ConstBool b) _ = TConstBool b
+      | augment (ConstInt i) _ = TConstInt (i, defaultIntType)
+      | augment (ConstString s) _ = TConstString s*)
 end
