@@ -26,7 +26,9 @@ structure AST :> AST = struct
 
     (* Expression AST *)
 
-    datatype ast = IntConstant of string
+    datatype ast = UnitConstant
+                 | BoolConstant of bool
+                 | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable

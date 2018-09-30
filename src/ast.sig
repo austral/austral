@@ -18,7 +18,9 @@
 *)
 
 signature AST = sig
-    datatype ast = IntConstant of string
+    datatype ast = UnitConstant
+                 | BoolConstant of bool
+                 | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable
