@@ -18,4 +18,20 @@
 *)
 
 structure TAst :> TAST = struct
+    type ty = Type.ty
+
+    datatype ast = IntConstant of string * ty
+                 | FloatConstant of string * typ
+                 | StringConstant of CST.escaped_string
+                 | Variable of Symbol.variable * ty
+                 | Let of Symbol.variable * ty * ast * ast
+                 | Cond of ast * ast * ast * ty
+                 | TupleCreate of ast list
+                 | TupleProj of ast * int
+                 | Allocate of ast
+                 | Load of ast
+                 | Store of ast * ast
+                 | The of ty * ast
+                 | Progn of ast list
+                 | Funcall of Symbol.symbol * ast list * ty
 end
