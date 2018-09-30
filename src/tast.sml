@@ -91,10 +91,12 @@ structure TAst :> TAST = struct
         open Type
     in
         val defaultIntType = Integer (Signed, Int32)
+        val defaultFloatType = Float Double
 
         fun augment AST.UnitConstant _ = UnitConstant
           | augment (AST.BoolConstant b) _ = BoolConstant b
           | augment (AST.IntConstant i) _ = IntConstant (i, defaultIntType)
+          | augment (AST.FloatConstant f) _ = FloatConstant (f, defaultFloatType)
           | augment (AST.StringConstant s) _ = StringConstant s
           | augment (AST.Variable name) c =
             (case (Map.get (ctxBindings c) name) of
