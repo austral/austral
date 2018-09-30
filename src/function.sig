@@ -24,4 +24,9 @@ signature FUNCTION = sig
 
     datatype func = Function of name * param list * typespec * docstring
          and param = Param of name * typespec
+
+    type param_name = Symbol.symbol
+
+    datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
+         and method_decl = MethodDecl of name * param list * typespec * docstring
 end
