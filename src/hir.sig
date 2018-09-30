@@ -38,4 +38,7 @@ signature HIR = sig
     datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * ast
 
     val escapeSymbol : Symbol.symbol -> string
+
+    val transform : AST.ast -> ast
+    val transformTop : AST.top_ast -> top_ast
 end
