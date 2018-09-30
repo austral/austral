@@ -68,6 +68,9 @@ structure HIR :> HIR = struct
           | escapeChar #"|" = "_pi"
           | escapeChar #"'" = "_qu"
           | escapeChar c = str c
+
+        fun escapeVariable (Symbol.Variable (sym, i)) =
+            (escapeSymbol sym) ^ "_" ^ (Int.toString i)
     end
 
     (* Toplevel AST *)
