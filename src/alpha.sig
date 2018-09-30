@@ -18,4 +18,13 @@
 *)
 
 signature ALPHA = sig
+    datatype ast = IntConstant of string
+                 | FloatConstant of string
+                 | StringConstant of CST.escaped_string
+                 | Variable of Symbol.variable
+                 | Let of binding * ast
+                 | The of Type.typespec * ast
+                 | Progn of ast list
+                 | Operation of Symbol.symbol * ast list
+         and binding = Binding of Symbol.variable * ast
 end
