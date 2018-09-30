@@ -33,5 +33,9 @@ signature HIR = sig
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list
 
+    type typespec = Type.typespec
+
+    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * ast
+
     val escapeSymbol : Symbol.symbol -> string
 end

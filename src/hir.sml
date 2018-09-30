@@ -18,6 +18,8 @@
 *)
 
 structure HIR :> HIR = struct
+    (* Expression AST *)
+
     datatype ast = IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
@@ -68,4 +70,9 @@ structure HIR :> HIR = struct
           | escapeChar c = str c
     end
 
+    (* Toplevel AST *)
+
+    type typespec = Type.typespec
+
+    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * ast
 end
