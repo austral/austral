@@ -37,6 +37,12 @@ src/type.sml
 src/function.sig
 src/function.sml
 
+src/oast.sig
+src/oast.sml
+
+src/alpha.sig
+src/alpha.sml
+
 src/ast.sig
 src/ast.sml
 
