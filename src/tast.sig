@@ -26,7 +26,7 @@ signature TAST = sig
                  | FloatConstant of string * ty
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable * ty
-                 | Let of Symbol.variable * ty * ast * ast
+                 | Let of Symbol.variable * ast * ast
                  | Cond of ast * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int

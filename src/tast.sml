@@ -26,7 +26,7 @@ structure TAst :> TAST = struct
                  | FloatConstant of string * ty
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable * ty
-                 | Let of Symbol.variable * ty * ast * ast
+                 | Let of Symbol.variable * ast * ast
                  | Cond of ast * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
@@ -46,7 +46,7 @@ structure TAst :> TAST = struct
           | typeOf (FloatConstant (_, t)) = t
           | typeOf (StringConstant _) = raise Fail "not impemented"
           | typeOf (Variable (_, t)) = t
-          | typeOf (Let (_, _, _, b)) = typeOf b
+          | typeOf (Let (_, _, b)) = typeOf b
           | typeOf (Cond (_, tb, _)) = typeOf tb
           | typeOf (TupleCreate exps) = Tuple (map typeOf exps)
           | typeOf (TupleProj (tup, idx)) =
@@ -101,5 +101,31 @@ structure TAst :> TAST = struct
           (case (Map.get (ctxBindings c) name) of
                SOME bind => Variable (name, bindType bind)
              | NONE => raise Fail ("No such variable"))
+      | augment (AST.Cond (test, cons, alt)) c =
+          let val test' = augment test c
+              and cons' = augment cons c
+              and alt'  = augment alt c
+          in
+              if (typeOf test') <> Type.Bool then
+                  raise Fail "The test in an `if` must be of boolean type"
+              else
+                  if (typeOf cons') <> (typeOf alt') then
+                      raise Fail "The consequent and the alternate must have the same type"
+                  else
+                      Cond (test', cons', alt')
+          end
+        | augment (AST.Progn exps) c =
+          Progn (map (fn a => augment a c) exps)
+        | augment (AST.Let (name, v, body)) c =
+          let val v' = augment v c
+          in
+              let val s' = Map.iadd (ctxBindings c)
+                                    (name, (Binding (typeOf v', Mutable)))
+              in
+                  Let (name,
+                       v',
+                       augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
+              end
+          end
       | augment _ _ = raise Fail "Not implemented yet"
 end
