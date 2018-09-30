@@ -33,7 +33,7 @@ structure HIR :> HIR = struct
                  | Store of ast * ast
                  | Cast of Type.typespec * ast
                  | Progn of ast list
-                 | Funcall of Symbol.symbol * ast list
+                 | Funcall of string * ast list
 
     local
         open Symbol
