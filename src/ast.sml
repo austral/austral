@@ -31,6 +31,7 @@ structure AST :> AST = struct
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable
                  | Let of Symbol.variable * ast * ast
+                 | Cond of ast * ast * ast
                  | The of Type.typespec * ast
                  | Progn of ast list
                  | Operation of Symbol.symbol * ast list
