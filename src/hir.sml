@@ -92,7 +92,7 @@ structure HIR :> HIR = struct
       | transform (AST.Let (var, value, body)) =
         Let (escapeVariable var, transform value, transform body)
       | transform (AST.Cond (test, cons, alt)) =
-        Cond (transfomr test, transform cons, transform alt)
+        Cond (transform test, transform cons, transform alt)
       | transform (AST.TupleCreate exps) =
         TupleCreate (map transform exps)
       | transform (AST.TupleProj (tup, idx)) =
