@@ -68,4 +68,10 @@ structure TAst :> TAST = struct
     type bindings = (Ident.ident, binding) Map.map
 
     datatype context = Context of bindings * Type.tenv * Function.fenv
+
+    fun mkContext b t f = Context (b, t, f)
+
+    fun ctxBindings (Context (b, _, _)) = b
+    fun ctxTenv (Context (_, t, _)) = t
+    fun ctxFenv (Context (_, _, f)) = f
 end
