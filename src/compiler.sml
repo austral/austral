@@ -53,6 +53,19 @@ structure Compiler :> COMPILER = struct
       | declarationPass c nil =
         ([], c)
 
+    fun compileForm _ _ =
+        raise Fail "Not implemented yet"
+
+    fun compilationPass c (head::tail) =
+        let val (rcst, c') = compileForm c head
+        in
+            let val (forms, c'') = compilationPass c' tail
+            in
+                (rcst :: forms, c'')
+            end
+        end
+      | compilationPass c nil =
+        ([], c)
 
     fun compileUnit c u =
         compileForms c (unitForms u)
