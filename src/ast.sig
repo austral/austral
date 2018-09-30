@@ -34,7 +34,7 @@ signature AST = sig
 
     datatype top_ast = Defun of Function.func * ast
                      | Defclass of Function.typeclass
-                     | Definstance of name * typespec * docstring * method_def list
+                     | Definstance of Function.instance
                      | Deftype of name * Type.param list * docstring * typespec
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
                      | Deftemplate of Macro.template
