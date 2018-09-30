@@ -18,15 +18,4 @@
 *)
 
 signature TAST = sig
-    datatype ast = IntConstant of string
-                 | FloatConstant of string
-                 | StringConstant of CST.escaped_string
-                 | Symbol of Symbol.symbol
-                 | Keyword of Symbol.symbol_name
-                 | Let of binding list * ast
-                 | The of Type.typespec * ast
-                 | Operator of Symbol.symbol * ast list
-         and binding = Binding of Symbol.symbol * ast
-
-    val transform : AST.ast -> ast
 end
