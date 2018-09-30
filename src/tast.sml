@@ -85,10 +85,15 @@ structure TAst :> TAST = struct
 
     (* Augment AST with type information *)
 
-    fun augment _ _ = raise Fail "derp"
+    local
+        open Type
+    in
+        val defaultIntType = Integer (Signed, Int32)
+    end
 
-    (*fun augment AST.ConstUnit = TConstUnit
-      | augment (ConstBool b) _ = TConstBool b
-      | augment (ConstInt i) _ = TConstInt (i, defaultIntType)
-      | augment (ConstString s) _ = TConstString s*)
+    fun augment AST.UnitConstant _ = UnitConstant
+      | augment (AST.BoolConstant b) _ = BoolConstant b
+      | augment (AST.IntConstant i) _ = IntConstant (i, defaultIntType)
+      | augment (AST.StringConstant s) _ = StringConstant s
+      | augment _ _ = raise Fail "Not implemented yet"
 end
