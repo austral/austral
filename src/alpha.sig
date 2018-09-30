@@ -24,7 +24,6 @@ signature ALPHA = sig
                  | Variable of Symbol.variable
                  | Let of Symbol.variable * ast * ast
                  | The of Type.typespec * ast
-                 | Progn of ast list
                  | Operation of Symbol.symbol * ast list
 
     val transform : OAST.ast -> ast

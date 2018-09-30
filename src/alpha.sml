@@ -32,7 +32,6 @@ structure Alpha :> ALPHA = struct
                  | Variable of Symbol.variable
                  | Let of Symbol.variable * ast * ast
                  | The of Type.typespec * ast
-                 | Progn of ast list
                  | Operation of Symbol.symbol * ast list
 
     (* Fresh variables *)
@@ -85,13 +84,7 @@ structure Alpha :> ALPHA = struct
       | alphaRename s (OAST.The (ty, exp)) =
         The (ty, alphaRename s exp)
       | alphaRename s (OAST.Operation (f, args)) =
-        let val args' = map (alphaRename s) args
-        in
-            if f = au "progn" then
-                Progn args'
-            else
-                Operation (f, args')
-        end
+        Operation (f, map (alphaRename s) args)
 
     fun transform oast =
         let
