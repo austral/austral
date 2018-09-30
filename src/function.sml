@@ -39,4 +39,12 @@ structure Function :> FUNCTION = struct
     datatype fenv = FunctionEnv of (name, func) Map.map * typeclass list * instance list
 
     val emptyFenv = FunctionEnv (Map.empty, [], [])
+
+    fun addFunction (FunctionEnv (fm, ts, is)) f =
+        let val (Function (name, _, _, _)) = f
+        in
+            case Map.get fm name of
+                SOME _ => NONE
+              | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), ts, is))
+        end
 end
