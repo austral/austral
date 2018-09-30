@@ -86,11 +86,38 @@ structure AST :> AST = struct
             Progn args
         else if f = au "if" then
             transformCond args
+        else if f = au "tuple" then
+            TupleCreate (args)
+        else if f = au "proj" then
+            transformProj args
+        else if f = au "allocate" then
+            transformAlloc args
+        else if f = au "load" then
+            transformLoad args
+        else if f = au "store" then
+            transformStore args
         else
             Operation (f, args)
     and transformCond [test, cons, alt] =
         Cond (test, cons, alt)
-      | transformCond _ = raise Fail "Invalid `if` form"
+      | transformCond _ =
+        raise Fail "Invalid `if` form"
+    and transformProj [ast, IntConstant i] =
+        TupleProj (ast, Option.valOf (Int.fromString i))
+      | transformProj _ =
+        raise Fail "Bad `proj` form"
+    and transformAlloc [v] =
+        Allocate v
+      | transformAlloc _ =
+        raise Fail "Bad `allocate` form"
+    and transformLoad [ptr] =
+        Load ptr
+      | transformLoad _ =
+        raise Fail "Bad `load` form"
+    and transformStore [ptr, v] =
+        Store (ptr, v)
+      | transformStore _ =
+        raise Fail "Bad `store` form"
 
     (* Parse toplevel forms into the toplevel AST *)
 
