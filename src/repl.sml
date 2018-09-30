@@ -38,6 +38,7 @@ structure Repl :> REPL = struct
                       let val c' = Compiler.compileUnit c unit
                       in
                           print "Compiled";
+                          print "\n\n";
                           repl' c'
                       end
                   end handle Fail s => print ("Error: " ^ s ^ "\n");
