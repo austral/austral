@@ -47,4 +47,7 @@ is
   src/compiler.sig
   src/compiler.sml
 
+  src/repl.sig
+  src/repl.sml
+
   $/basis.cm
