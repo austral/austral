@@ -35,46 +35,46 @@ structure Compiler :> COMPILER = struct
     local
         open AST
     in
-    fun declareForm compiler form =
-        let val (Compiler (menv, _, currModuleName)) = compiler
-        in
-            let val currModule = case Module.envGet menv currModuleName of
-                                     SOME m => m
-                                   | _ => raise Fail "No module with this name"
+        fun declareForm compiler form =
+            let val (Compiler (menv, _, currModuleName)) = compiler
             in
-                let val resolved = Util.valOf (RCST.resolve menv currModule form)
+                let val currModule = case Module.envGet menv currModuleName of
+                                         SOME m => m
+                                       | _ => raise Fail "No module with this name"
                 in
-                    let val topnode = AST.transformTop resolved
+                    let val resolved = Util.valOf (RCST.resolve menv currModule form)
                     in
-                        (topnode, declareTopForm compiler topnode)
+                        let val topnode = AST.transformTop resolved
+                        in
+                            (topnode, declareTopForm compiler topnode)
+                        end
                     end
                 end
             end
-        end
-    and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
-        (* Add a concrete function to the compiler fenv *)
-        let val (Compiler (menv, fenv, currModuleName)) = c
-            and f = Function.Function (name,
-                                       map (fn (n, t) => Function.Param (n, t)) params,
-                                       rt,
-                                       docstring)
-        in
-            case (Function.addFunction fenv f) of
-                SOME fenv' => Compiler (menv, fenv', currModuleName)
-              | NONE => raise Fail "Repeat function"
-        end
-      | declareTopForm c (InModule moduleName) =
-        (* Switch current module *)
-        let val (Compiler (menv, fenv, currModuleName)) = c
-        in
-            let val newModule = case Module.envGet menv moduleName of
-                                    SOME m => m
-                                  | NONE => raise Fail "in-module: no module with this name"
+        and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
+            (* Add a concrete function to the compiler fenv *)
+            let val (Compiler (menv, fenv, currModuleName)) = c
+                and f = Function.Function (name,
+                                           map (fn (n, t) => Function.Param (n, t)) params,
+                                           rt,
+                                           docstring)
             in
-                Compiler (menv, fenv, moduleName)
+                case (Function.addFunction fenv f) of
+                    SOME fenv' => Compiler (menv, fenv', currModuleName)
+                  | NONE => raise Fail "Repeat function"
             end
-        end
-      | declareTopForm _ _ = raise Fail "Not implemented yet"
+          | declareTopForm c (InModule moduleName) =
+            (* Switch current module *)
+            let val (Compiler (menv, fenv, currModuleName)) = c
+            in
+                let val newModule = case Module.envGet menv moduleName of
+                                        SOME m => m
+                                      | NONE => raise Fail "in-module: no module with this name"
+                in
+                    Compiler (menv, fenv, moduleName)
+                end
+            end
+          | declareTopForm _ _ = raise Fail "Not implemented yet"
     end
 
     fun declarationPass c (head::tail) =
@@ -88,8 +88,15 @@ structure Compiler :> COMPILER = struct
       | declarationPass c nil =
         ([], c)
 
-    fun compileForm _ _ =
-        raise Fail "compileForm Not implemented yet"
+    local
+        open AST
+    in
+        fun compileForm c (InModule _) =
+            (* We don't have to do anything here *)
+            c
+          | compileForm _ _ =
+            raise Fail "compileForm Not implemented yet"
+    end
 
     fun compilationPass c (head::tail) =
         compilationPass (compileForm c head) tail
