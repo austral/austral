@@ -32,4 +32,29 @@ structure HIR :> HIR = struct
                  | Cast of Type.typespec * ast
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list
+
+    local
+        open Symbol
+    in
+        fun escapeSymbol symbol =
+            let val module = symbolModuleName symbol
+                and name = symbolName symbol
+            in
+                (escapeIdent module) ^ "___" ^ (escapeIdent name)
+            end
+        and escapeIdent i =
+            escapeString (Ident.identString i)
+        and escapeString s =
+            String.concat (map escapeChar (String.explode s))
+        and escapeChar #"+" = "_p"
+          | escapeChar #"-" = "__"
+          | escapeChar #"*" = "_m"
+          | escapeChar #"/" = "_d"
+          | escapeChar #">" = "_g"
+          | escapeChar #"<" = "_l"
+          | escapeChar #"=" = "_e"
+          | escapeChar #"'" = "_q"
+          | escapeChar c = str c
+    end
+
 end
