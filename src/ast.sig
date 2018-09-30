@@ -24,6 +24,11 @@ signature AST = sig
                  | Variable of Symbol.variable
                  | Let of Symbol.variable * ast * ast
                  | Cond of ast * ast * ast
+                 | TupleCreate of ast list
+                 | TupleProj of ast * int
+                 | Allocate of ast
+                 | Load of ast
+                 | Store of ast * ast
                  | The of Type.typespec * ast
                  | Progn of ast list
                  | Operation of Symbol.symbol * ast list
