@@ -31,5 +31,5 @@ structure Function :> FUNCTION = struct
          and method_decl = MethodDecl of name * param list * typespec * docstring
 
     datatype instance = Instance of name * typespec * docstring * method_def list
-         and method_def = MethodDef of name * param list * typespec * docstring
+         and method_def = MethodDef of name * param list * typespec * docstring * RCST.rcst
 end
