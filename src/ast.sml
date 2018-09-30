@@ -146,8 +146,6 @@ structure AST :> AST = struct
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of defmodule_clause list
                      | InModule of Symbol.symbol_name
-         and method = Method of name * param list * typespec * docstring
-         and method_def = MethodDef of name * param list * typespec * docstring * ast
          and disjunction_case = DisjCase of name * typespec option
          and defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
                               | UseClause of Symbol.module_name list
