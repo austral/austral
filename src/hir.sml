@@ -75,4 +75,12 @@ structure HIR :> HIR = struct
     type typespec = Type.typespec
 
     datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * ast
+
+    (* Transform expression AST *)
+
+    fun transform _ = raise Fail "derp"
+
+    (* Transform top-level AST *)
+
+    fun transformTop _ = raise Fail "derp"
 end
