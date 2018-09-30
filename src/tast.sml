@@ -40,7 +40,9 @@ structure TAst :> TAST = struct
     local
         open Type
     in
-        fun typeOf (IntConstant (_, t)) = t
+        fun typeOf UnitConstant = Unit
+          | typeOf (BoolConstant _) = Bool
+          | typeOf (IntConstant (_, t)) = t
           | typeOf (FloatConstant (_, t)) = t
           | typeOf (StringConstant _) = raise Fail "not impemented"
           | typeOf (Variable (_, t)) = t
