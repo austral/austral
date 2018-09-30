@@ -83,6 +83,8 @@ structure TAst :> TAST = struct
 
     (* Augment AST with type information *)
 
+    fun augment _ _ = raise Fail "derp"
+
     (*fun augment AST.ConstUnit = TConstUnit
       | augment (ConstBool b) _ = TConstBool b
       | augment (ConstInt i) _ = TConstInt (i, defaultIntType)
