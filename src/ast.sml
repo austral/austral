@@ -30,11 +30,10 @@ structure AST :> AST = struct
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable
-                 | Let of binding * ast
+                 | Let of Symbol.variable * ast * ast
                  | The of Type.typespec * ast
                  | Progn of ast list
                  | Operation of Symbol.symbol * ast list
-         and binding = Binding of Symbol.variable * ast
 
     (* Toplevel AST *)
 
@@ -70,6 +69,8 @@ structure AST :> AST = struct
         StringConstant s
       | transform (Alpha.Variable v) =
         Variable v
+      | transform (Alpha.Let (var, value, body)) =
+        Let (var, transform value, transform body)
       | transform (Alpha.The (ty, exp)) =
         The (ty, transform exp)
       | transform (Alpha.Progn exps) =
