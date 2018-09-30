@@ -18,7 +18,19 @@
 *)
 
 signature TYPE = sig
+    type name = Symbol.symbol
+
     datatype param = TypeParam of Symbol.symbol
+
+    datatype ty = Unit
+                | Bool
+                | Integer of signedness * width
+                | Float of float_type
+                | Disjunction of name * ty list * variant list
+         and signedness = Unsigned | Signed
+         and width = Int8 | Int16 | Int32 | Int64
+         and float_type = Single | Double
+         and variant = Variant of name * ty
 
     type typespec
     type typedef
