@@ -23,7 +23,7 @@ signature OAST = sig
                  | StringConstant of CST.escaped_string
                  | Symbol of Symbol.symbol
                  | Let of Symbol.symbol * ast * ast
-                 | The of RCST.rcst * ast
+                 | The of Type.typespec * ast
                  | Operation of Symbol.symbol * ast list
 
     val transform : RCST.rcst -> ast

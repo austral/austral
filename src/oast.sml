@@ -31,7 +31,7 @@ structure OAst :> OAST = struct
                  | StringConstant of CST.escaped_string
                  | Symbol of Symbol.symbol
                  | Let of Symbol.symbol * ast * ast
-                 | The of RCST.rcst * ast
+                 | The of Type.typespec * ast
                  | Operation of Symbol.symbol * ast list
 
     (* Functions *)
@@ -50,7 +50,7 @@ structure OAst :> OAST = struct
             transformLet args
         else if f = au "the" then
             case args of
-                [ty, exp] => The (ty, transform exp)
+                [ty, exp] => The (Type.parseTypespec ty, transform exp)
               | _ => raise Fail "Invalid `the` form"
         else
             Operation (f, map transform args)
