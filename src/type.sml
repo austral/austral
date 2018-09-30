@@ -45,7 +45,7 @@ structure Type :> TYPE = struct
         let fun au name =
                 Symbol.mkSymbol (Ident.mkIdentEx "austral",
                                  Ident.mkIdentEx name)
-            and toMap l = Map.fromList (map (fn (n, t) => (au n, BuiltInType (n, t))) l)
+            and toMap l = Map.fromList (map (fn (n, t) => (au n, BuiltInType (au n, t))) l)
         in
             toMap [("unit",    Unit),
                    ("boolean", Bool),
