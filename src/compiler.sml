@@ -50,7 +50,8 @@ structure Compiler :> COMPILER = struct
                 end
             end
         end
-    and declareTopForm c _ = raise Fail "Not implemented yet"
+    and declareTopForm c (InModule moduleName) = raise Fail "derp"
+      | declareTopForm _ _ = raise Fail "Not implemented yet"
     end
 
     fun declarationPass c (head::tail) =
