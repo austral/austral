@@ -32,4 +32,8 @@ signature FUNCTION = sig
 
     datatype instance = Instance of name * typespec * docstring * method_def list
          and method_def = MethodDef of name * param list * typespec * docstring * RCST.rcst
+
+    type fenv
+
+    val emptyFenv : fenv
 end
