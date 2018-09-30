@@ -78,7 +78,34 @@ structure HIR :> HIR = struct
 
     (* Transform expression AST *)
 
-    fun transform _ = raise Fail "derp"
+    fun transform (AST.IntConstant i) =
+        IntConstant i
+      | transform (AST.FloatConstant f) =
+        FloatConstant f
+      | transform (AST.StringConstant s) =
+        StringConstant s
+      | transform (AST.Variable v) =
+        Variable (escapeSymbol v)
+      | transform (AST.Let (var, value, body)) =
+        Let (escapeSymbol var, transform value, transform body)
+      | transform (AST.Cond (test, cons, alt)) =
+        Cond (transfomr test, transform cons, transform alt)
+      | transform (AST.TupleCreate exps) =
+        TupleCreate (map transform exps)
+      | transform (AST.TupleProj (tup, idx)) =
+        TupleProj (transform tup, idx)
+      | transform (AST.Allocate v) =
+        Allocate (transform v)
+      | transform (AST.Load ptr) =
+        Load (transform ptr)
+      | transform (AST.Store (ptr, v)) =
+        Store (transform ptr, transform v)
+      | transform (AST.The (ty, exp)) =
+        Cast (ty, transform exp)
+      | transform (AST.Progn exps) =
+        Progn (map transform exps)
+      | transform (AST.Funcall (f, args)) =
+        Funcall (escapeSymbol f, map transform args)
 
     (* Transform top-level AST *)
 
