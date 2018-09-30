@@ -27,4 +27,6 @@ signature ALPHA = sig
                  | Progn of ast list
                  | Operation of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
+
+    val transform : OAST.ast -> ast
 end
