@@ -66,6 +66,8 @@ structure Module : MODULE = struct
         let val australExports = ["defun",
                                   "deftype",
                                   "defdatatype",
+                                  "defmodule",
+                                  "in-module",
                                   "let",
                                   "the"]
         in
