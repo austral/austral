@@ -25,7 +25,7 @@ signature TAST = sig
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable * ty
                  | Let of Symbol.variable * ty * ast * ast
-                 | Cond of ast * ast * ast * ty
+                 | Cond of ast * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast
@@ -34,4 +34,17 @@ signature TAST = sig
                  | The of ty * ast
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
+
+    val typeOf : ast -> ty
+
+    datatype binding = Binding of ty * mutability
+         and mutability = Immutable
+                        | Mutable
+
+    type bindings = (Ident.ident, binding) Map.map
+
+    type context
+    val mkContext : bindings -> Type.tenv -> Function.fenv -> context
+
+    val augment : AST.ast -> context -> ast
 end
