@@ -155,6 +155,7 @@ structure TAst :> TAST = struct
             raise Fail "`the` not implemented"
           | augment (AST.Progn exps) c =
             Progn (map (fn a => augment a c) exps)
-          | augment _ _ = raise Fail "Not implemented yet"
+          | augment (AST.Funcall _) _ =
+            raise Fail "funcall not implemented"
     end
 end
