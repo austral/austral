@@ -18,4 +18,18 @@
 *)
 
 structure HIR :> HIR = struct
+    datatype ast = IntConstant of string
+                 | FloatConstant of string
+                 | StringConstant of CST.escaped_string
+                 | Variable of string
+                 | Let of string * ast * ast
+                 | Cond of ast * ast * ast
+                 | TupleCreate of ast list
+                 | TupleProj of ast * int
+                 | Allocate of ast
+                 | Load of ast
+                 | Store of ast * ast
+                 | Cast of Type.typespec * ast
+                 | Progn of ast list
+                 | Funcall of Symbol.symbol * ast list
 end
