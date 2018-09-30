@@ -38,6 +38,7 @@ structure CppAst :> CPP_AST = struct
                      | AccessTuple of exp_ast * int
                      | StructInitializer of string * (string * exp_ast) list
                      | StructAccess of exp_ast * string
+                     | Funcall of string * exp_ast list
                      | Adjacent of exp_ast list
                      | Raw of string
          and binop = Add
@@ -57,7 +58,7 @@ structure CppAst :> CPP_AST = struct
                        | Assign of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
                        | While of exp_ast * block_ast
-                       | Funcall of string option * string * exp_ast list
+                       | VoidFuncall of string * exp_ast list
 
     datatype top_ast = FunctionDef of string * param list * typespec * block_ast * exp_ast
                      | StructDef of string * slot list
@@ -132,6 +133,8 @@ structure CppAst :> CPP_AST = struct
         (renderExp r)
         ^ "."
         ^ (slot)
+      | renderExp (Funcall (f, args)) =
+        "(" ^ f ^ "(" ^ (sepBy "," (map renderExp args)) ^ "))"
       | renderExp (Adjacent l) = String.concatWith " " (map renderExp l)
       | renderExp (Raw s) = s
 
@@ -143,8 +146,8 @@ structure CppAst :> CPP_AST = struct
                                           ^ " else " ^ (renderBlock' (indent d) a)
       | renderBlock' d (While (t, b)) =
         (pad d) ^ "while (" ^ (renderExp t) ^ ") {\n" ^ (renderBlock' (indent d) b) ^ "\n" ^ (pad d) ^ "}"
-      | renderBlock' d (Funcall (res, f, args)) =
-        (pad d) ^ (renderRes res) ^ (f) ^ "(" ^ (sepBy "," (map renderExp args)) ^ ");"
+      | renderBlock' d (VoidFuncall (f, args)) =
+        (pad d) ^ f ^ "(" ^ (sepBy "," (map renderExp args)) ^ ");"
     and renderRes (SOME res) = (res) ^ " = "
       | renderRes NONE = ""
 

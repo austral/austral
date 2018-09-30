@@ -36,6 +36,7 @@ signature CPP_AST = sig
                      | AccessTuple of exp_ast * int
                      | StructInitializer of string * (string * exp_ast) list
                      | StructAccess of exp_ast * string
+                     | Funcall of string * exp_ast list
                      | Adjacent of exp_ast list
                      | Raw of string
          and binop = Add
@@ -55,7 +56,7 @@ signature CPP_AST = sig
                        | Assign of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
                        | While of exp_ast * block_ast
-                       | Funcall of string option * string * exp_ast list
+                       | VoidFuncall of string * exp_ast list
 
     datatype top_ast = FunctionDef of string * param list * typespec * block_ast * exp_ast
                      | StructDef of string * slot list
