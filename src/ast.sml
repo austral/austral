@@ -138,7 +138,7 @@ structure AST :> AST = struct
     type typespec = Type.typespec
 
     datatype top_ast = Defun of Function.func * ast
-                     | Defclass of name * symbol * docstring * method list
+                     | Defclass of Function.typeclass
                      | Definstance of name * typespec * docstring * method_def list
                      | Deftype of name * Type.param list * docstring * typespec
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
@@ -194,23 +194,23 @@ structure AST :> AST = struct
               | parseBody _ = raise Fail "Bad defclass form"
             and parseMethods l = map parseMethod l
             and parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt, RCST.StringConstant s]) =
-                Method (name,
-                        map parseParam params,
-                        Type.parseTypespec rt,
-                        SOME (CST.escapedToString s))
+                Function.MethodDecl (name,
+                                     map parseParam params,
+                                     Type.parseTypespec rt,
+                                     SOME (CST.escapedToString s))
               | parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt]) =
-                Method (name,
-                        map parseParam params,
-                        Type.parseTypespec rt,
-                        NONE)
+                Function.MethodDecl (name,
+                                     map parseParam params,
+                                     Type.parseTypespec rt,
+                                     NONE)
               | parseMethod _ = raise Fail "Bad method definition"
             and parseParam (RCST.List [RCST.Symbol name, ty]) =
-                Param (name, Type.parseTypespec ty)
+                Function.Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad method parameter"
         in
             let val (docstring, methods) = parseBody body
             in
-                Defclass (name, param, docstring, methods)
+                Defclass (Function.Typeclass (name, param, docstring, methods))
             end
         end
       | transformDefclass _ = raise Fail "Bad defclass form"

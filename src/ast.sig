@@ -33,7 +33,7 @@ signature AST = sig
     type typespec = Type.typespec
 
     datatype top_ast = Defun of Function.func * ast
-                     | Defclass of name * symbol * docstring * method list
+                     | Defclass of Function.typeclass
                      | Definstance of name * typespec * docstring * method_def list
                      | Deftype of name * Type.param list * docstring * typespec
                      | Defdisjunction of name * Type.param list * disjunction_case list * docstring
