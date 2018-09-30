@@ -29,7 +29,11 @@ signature COMPILER = sig
 
     val unitForms : compilation_unit -> CST.cst list
 
+    val declareForm : compiler -> CST.cst -> compiler
+    val declarationPass : compiler -> CST.cst list -> compiler
+
     val compileForm : compiler -> CST.cst -> compiler
-    val compileForms : compiler -> CST.cst list -> compiler
+    val compilationPass : compiler -> CST.cst list -> compiler
+
     val compileUnit : compiler -> compilation_unit -> compiler
 end
