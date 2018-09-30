@@ -69,7 +69,7 @@ structure HIR :> HIR = struct
           | escapeChar #"'" = "_qu"
           | escapeChar c = str c
 
-        fun escapeVariable (Symbol.Variable (sym, i)) =
+        fun escapeVariable (Symbol.Var (sym, i)) =
             (escapeSymbol sym) ^ "_" ^ (Int.toString i)
     end
 
