@@ -36,7 +36,7 @@ structure MIR :> MIR = struct
 
     type typespec = Type.typespec
 
-    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * ast
+    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * block_ast list
 
     fun transform _ =
         raise Fail "derp"
