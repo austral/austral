@@ -18,21 +18,26 @@
 *)
 
 structure Type :> TYPE = struct
-    datatype param = TypeParam of Symbol.symbol
+    type name = Symbol.symbol
 
-    datatype typespec = Unit
-                      | Bool
-                      | Integer of signedness * width
-                      | Float of float_type
-                      | NamedType of Symbol.symbol
-                      | TypeCons of Symbol.symbol * (typespec list)
+    datatype param = TypeParam of name
+
+    datatype ty = Unit
+                | Bool
+                | Integer of signedness * width
+                | Float of float_type
+                | Disjunction of name * ty list * variant list
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64
-         and float_type = Single
-                        | Double
+         and float_type = Single | Double
+         and variant = Variant of name * ty
 
-    datatype typedef = TypeAlias of param list * typespec
-                     | Datatype of param list * typespec
+    datatype typespec = NamedType of Symbol.symbol
+                      | TypeCons of Symbol.symbol * (typespec list)
+
+    datatype typedef = BuiltInType of name * ty
+                     | TypeAlias of name * param list * typespec
+                     | Datatype of name * param list * variant list
 
     type tenv = (Symbol.symbol, typedef) Map.map
 
@@ -40,7 +45,7 @@ structure Type :> TYPE = struct
         let fun au name =
                 Symbol.mkSymbol (Ident.mkIdentEx "austral",
                                  Ident.mkIdentEx name)
-            and toMap l = Map.fromList (map (fn (n, t) => (au n, TypeAlias ([], t))) l)
+            and toMap l = Map.fromList (map (fn (n, t) => (au n, BuiltInType (n, t))) l)
         in
             toMap [("unit",    Unit),
                    ("boolean", Bool),
