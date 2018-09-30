@@ -40,7 +40,7 @@ structure HIR :> HIR = struct
             let val module = symbolModuleName symbol
                 and name = symbolName symbol
             in
-                (escapeIdent module) ^ "___" ^ (escapeIdent name)
+                "_A" ^ (escapeIdent module) ^ "___" ^ (escapeIdent name)
             end
         and escapeIdent i =
             escapeString (Ident.identString i)
