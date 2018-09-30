@@ -68,5 +68,8 @@ structure Compiler :> COMPILER = struct
         ([], c)
 
     fun compileUnit c u =
-        compileForms c (unitForms u)
+        let val (forms, c') = (declarationPass c (unitForms u))
+        in
+            compilationPass c' forms
+        end
 end
