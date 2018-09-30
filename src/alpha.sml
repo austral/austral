@@ -18,6 +18,14 @@
 *)
 
 structure Alpha :> ALPHA = struct
+    (* Utils *)
+
+    fun au name =
+        Symbol.mkSymbol (Ident.mkIdentEx "austral",
+                         Ident.mkIdentEx name)
+
+    (* AST *)
+
     datatype ast = IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
@@ -27,4 +35,69 @@ structure Alpha :> ALPHA = struct
                  | Progn of ast list
                  | Operation of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
+
+    (* Fresh variables *)
+
+    val count = ref 0
+
+    fun freshVar sym =
+        let
+        in
+            count := !count + 1;
+            Symbol.Var (sym, !count)
+        end
+
+    fun resetCount () =
+        count := 0
+
+    (* The stack *)
+
+    type stack = (Symbol.symbol * Symbol.variable) list
+
+    fun lookup ((n,v)::xs) s = if (n = s) then
+                                   v
+                               else
+                                   lookup xs s
+      | lookup nil s = raise Fail ("No such variable: '"
+                                   ^ (Ident.identString (Symbol.symbolName s))
+                                   ^ "'")
+
+    (* Alpha renaming *)
+
+    fun alphaRename _ (OAST.IntConstant s) =
+        IntConstant s
+      | alphaRename _ (OAST.FloatConstant f) =
+        FloatConstant f
+      | alphaRename _ (OAST.StringConstant s) =
+        StringConstant s
+      | alphaRename s (OAST.Symbol name) =
+        Variable (lookup s name)
+      | alphaRename s (OAST.Let (var, value, body)) =
+        let val fresh = freshVar var
+          in
+              let val s' = (var, fresh) :: s
+              in
+                  let val body' = alphaRename s' body
+                  in
+                      Let (Binding (fresh, alphaRename s value), body')
+                  end
+              end
+        end
+      | alphaRename s (OAST.The (ty, exp)) =
+        The (ty, alphaRename s exp)
+      | alphaRename s (OAST.Operation (f, args)) =
+        let val args' = map (alphaRename s) args
+        in
+            if f = au "progn" then
+                Progn args'
+            else
+                Operation (f, args')
+        end
+
+    fun transform oast =
+        let
+        in
+            resetCount ();
+            alphaRename [] oast
+        end
 end
