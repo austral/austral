@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure OAst :> OAST = struct
+structure OAST :> OAST = struct
     (* Utils *)
 
     fun au name =
