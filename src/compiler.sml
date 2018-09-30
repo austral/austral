@@ -42,11 +42,12 @@ structure Compiler :> COMPILER = struct
                 in
                     let val topnode = AST.transformTop resolved
                     in
-                        raise Fail "Not implemented yet"
+                        (topnode, declareTopForm compiler topnode)
                     end
                 end
             end
         end
+    and declareTopForm c _ = raise Fail "Not implemented yet"
 
     fun declarationPass c (head::tail) =
         let val (node, c') = declareForm c head
