@@ -137,7 +137,7 @@ structure AST :> AST = struct
     type symbol = Symbol.symbol
     type typespec = Type.typespec
 
-    datatype top_ast = Defun of Function.func
+    datatype top_ast = Defun of Function.func * ast
                      | Defclass of name * symbol * docstring * method list
                      | Definstance of name * typespec * docstring * method_def list
                      | Deftype of name * Type.param list * docstring * typespec
@@ -163,7 +163,7 @@ structure AST :> AST = struct
         let fun parseParams (RCST.List l) = map parseParam l
               | parseParams _ = raise Fail "defun parameter list must be a list"
             and parseParam (RCST.List [RCST.Symbol name, ty]) =
-                Param (name, Type.parseTypespec ty)
+                Function.Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad defun parameter"
             and parseBody ((RCST.StringConstant s)::head::tail) =
                 (* When the first element of the body is a string constant, and
@@ -178,10 +178,10 @@ structure AST :> AST = struct
         in
             let val (docstring, body') = parseBody body
             in
-                Defun (name,
-                       parseParams params,
-                       Type.parseTypespec rt,
-                       docstring,
+                Defun (Function.Function (name,
+                                          parseParams params,
+                                          Type.parseTypespec rt,
+                                          docstring),
                        body')
             end
         end
