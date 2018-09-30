@@ -43,7 +43,7 @@ signature TAST = sig
          and mutability = Immutable
                         | Mutable
 
-    type bindings = (Ident.ident, binding) Map.map
+    type bindings = (Symbol.variable, binding) Map.map
 
     type context
     val mkContext : bindings -> Type.tenv -> Function.fenv -> context

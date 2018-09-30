@@ -71,7 +71,9 @@ structure TAst :> TAST = struct
          and mutability = Immutable
                         | Mutable
 
-    type bindings = (Ident.ident, binding) Map.map
+    fun bindType (Binding (t, _)) = t
+
+    type bindings = (Symbol.variable, binding) Map.map
 
     (* Context data for the augment function *)
 
@@ -95,5 +97,9 @@ structure TAst :> TAST = struct
       | augment (AST.BoolConstant b) _ = BoolConstant b
       | augment (AST.IntConstant i) _ = IntConstant (i, defaultIntType)
       | augment (AST.StringConstant s) _ = StringConstant s
+      | augment (AST.Variable name) c =
+          (case (Map.get (ctxBindings c) name) of
+               SOME bind => Variable (name, bindType bind)
+             | NONE => raise Fail ("No such variable"))
       | augment _ _ = raise Fail "Not implemented yet"
 end
