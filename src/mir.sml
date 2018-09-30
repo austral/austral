@@ -40,6 +40,8 @@ structure MIR :> MIR = struct
 
     datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * block_ast * ast
 
+    fun transform _ = raise Fail "derp"
+
     (*local
         open CppAst
     in
