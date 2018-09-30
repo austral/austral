@@ -21,7 +21,7 @@ structure TAst :> TAST = struct
     type ty = Type.ty
 
     datatype ast = IntConstant of string * ty
-                 | FloatConstant of string * typ
+                 | FloatConstant of string * ty
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable * ty
                  | Let of Symbol.variable * ty * ast * ast
