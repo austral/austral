@@ -18,4 +18,10 @@
 *)
 
 signature FUNCTION = sig
+    type name = Symbol.symbol
+    type typespec = Type.typespec
+    type docstring = string option
+
+    datatype func = Function of name * param list * typespec * docstring
+         and param = Param of name * typespec
 end
