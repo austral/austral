@@ -32,4 +32,6 @@ signature HIR = sig
                  | Cast of Type.typespec * ast
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list
+
+    val escapeSymbol : Symbol.symbol -> string
 end
