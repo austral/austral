@@ -31,7 +31,7 @@ signature AST = sig
                  | Store of ast * ast
                  | The of Type.typespec * ast
                  | Progn of ast list
-                 | Operation of Symbol.symbol * ast list
+                 | Funcall of Symbol.symbol * ast list
 
     type name = Symbol.symbol
     type docstring = string option

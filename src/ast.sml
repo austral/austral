@@ -39,7 +39,7 @@ structure AST :> AST = struct
                  | Store of ast * ast
                  | The of Type.typespec * ast
                  | Progn of ast list
-                 | Operation of Symbol.symbol * ast list
+                 | Funcall of Symbol.symbol * ast list
 
     (* Toplevel AST *)
 
@@ -97,7 +97,7 @@ structure AST :> AST = struct
         else if f = au "store" then
             transformStore args
         else
-            Operation (f, args)
+            Funcall (f, args)
     and transformCond [test, cons, alt] =
         Cond (test, cons, alt)
       | transformCond _ =
