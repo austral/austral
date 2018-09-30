@@ -101,6 +101,17 @@ structure TAst :> TAST = struct
         (case (Map.get (ctxBindings c) name) of
              SOME bind => Variable (name, bindType bind)
            | NONE => raise Fail ("No such variable"))
+      | augment (AST.Let (name, v, body)) c =
+        let val v' = augment v c
+        in
+            let val s' = Map.iadd (ctxBindings c)
+                                  (name, (Binding (typeOf v', Mutable)))
+            in
+                Let (name,
+                     v',
+                     augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
+            end
+        end
       | augment (AST.Cond (test, cons, alt)) c =
         let val test' = augment test c
             and cons' = augment cons c
@@ -114,18 +125,11 @@ structure TAst :> TAST = struct
                 else
                     Cond (test', cons', alt')
         end
+      | augment (AST.TupleCreate exps) c =
+        TupleCreate (map (fn e => augment e c) exps)
+      | augment (AST.TupleProj (exp, i)) c =
+        TupleProj (augment exp c, i)
       | augment (AST.Progn exps) c =
         Progn (map (fn a => augment a c) exps)
-      | augment (AST.Let (name, v, body)) c =
-        let val v' = augment v c
-        in
-            let val s' = Map.iadd (ctxBindings c)
-                                  (name, (Binding (typeOf v', Mutable)))
-            in
-                Let (name,
-                     v',
-                     augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
-            end
-        end
       | augment _ _ = raise Fail "Not implemented yet"
 end
