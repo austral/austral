@@ -74,10 +74,13 @@ structure AST :> AST = struct
         Let (var, transform value, transform body)
       | transform (Alpha.The (ty, exp)) =
         The (ty, transform exp)
-      | transform (Alpha.Progn exps) =
-        Progn (map transform exps)
       | transform (Alpha.Operation (f, args)) =
-        Operation (f, map transform args)
+        transformOp f (map transform args)
+    and transformOp f args =
+        if f = au "progn" then
+            Progn args
+        else
+            Operation (f, args)
 
     (* Parse toplevel forms into the toplevel AST *)
 
