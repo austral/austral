@@ -26,6 +26,7 @@ structure Type :> TYPE = struct
                 | Bool
                 | Integer of signedness * width
                 | Float of float_type
+                | Tuple of ty list
                 | Pointer of ty
                 | Disjunction of name * ty list * variant list
          and signedness = Unsigned | Signed
