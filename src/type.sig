@@ -18,7 +18,8 @@
 *)
 
 signature TYPE = sig
-    type param
+    datatype param = TypeParam of Symbol.symbol
+
     type typespec
     type typedef
     type tenv
