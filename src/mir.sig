@@ -36,7 +36,7 @@ signature MIR = sig
 
     type typespec = Type.typespec
 
-    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * block_ast list
+    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * block_ast * ast
 
     val transform : AST.ast -> ast
     val transformTop : AST.top_ast -> top_ast
