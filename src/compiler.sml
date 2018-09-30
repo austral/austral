@@ -42,8 +42,17 @@ structure Compiler :> COMPILER = struct
             end
         end
 
-    fun declarationPass c (head::tail) = declarationPass (declareForm c head) tail
-      | declarationPass c nil = c
+    fun declarationPass c (head::tail) =
+        let val (rcst, c') = declareForm c head
+        in
+            let val (forms, c'') = declarationPass c' tail
+            in
+                (rcst :: forms, c'')
+            end
+        end
+      | declarationPass c nil =
+        ([], c)
+
 
     fun compileUnit c u =
         compileForms c (unitForms u)
