@@ -30,7 +30,10 @@ signature FUNCTION = sig
     datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
          and method_decl = MethodDecl of name * param list * typespec * docstring
 
-    datatype instance = Instance of name * typespec * docstring * method_def list
+    datatype instance = Instance of name * instance_arg * docstring * method_def list
+         and instance_arg = ConcreteType of typespec
+                          | TypeCons of name * tyvar Set.set
+         and tyvar = TypeVar of name
          and method_def = MethodDef of name * param list * typespec * docstring * RCST.rcst
 
     type fenv
