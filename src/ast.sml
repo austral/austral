@@ -31,7 +31,7 @@ structure AST :> AST = struct
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable
                  | Let of binding * ast
-                 | The of RCST.rcst * ast
+                 | The of Type.typespec * ast
                  | Progn of ast list
                  | Operation of Symbol.symbol * ast list
          and binding = Binding of Symbol.variable * ast
@@ -85,14 +85,16 @@ structure AST :> AST = struct
             and parseParam (RCST.List [RCST.Symbol name, ty]) =
                 (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad defun parameter"
+            and transformExp rcst =
+                transform (Alpha.transform (OAST.transform rcst))
             and parseBody ((RCST.StringConstant s)::head::tail) =
                 (* When the first element of the body is a string constant, and
                    the remainder of the form is non-empty, we take the string
                    constant to be the docstring. Otherwise, we parse the string
                    constant as a regular expression *)
-                (SOME (CST.escapedToString s), transform (implicitProgn (head::tail)))
+                (SOME (CST.escapedToString s), transformExp (implicitProgn (head::tail)))
               | parseBody body =
-                (NONE, transform (implicitProgn body))
+                (NONE, transformExp (implicitProgn body))
             and implicitProgn l =
                 (RCST.List ((RCST.Symbol (au "progn"))::l))
         in
