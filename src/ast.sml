@@ -69,7 +69,11 @@ structure AST :> AST = struct
 
     (* Transform alpha-renamed AST to this AST *)
 
-    fun transform (Alpha.IntConstant i) =
+    fun transform Alpha.UnitConstant =
+        UnitConstant
+      | transform (Alpha.BoolConstant b) =
+        BoolConstant b
+      | transform (Alpha.IntConstant i) =
         IntConstant i
       | transform (Alpha.FloatConstant f) =
         FloatConstant f
