@@ -18,4 +18,56 @@
 *)
 
 structure OAst :> OAST = struct
+    (* Utils *)
+
+    fun au name =
+        Symbol.mkSymbol (Ident.mkIdentEx "austral",
+                         Ident.mkIdentEx name)
+
+    (* Types *)
+
+    datatype ast = IntConstant of string
+                 | FloatConstant of string
+                 | StringConstant of CST.escaped_string
+                 | Symbol of Symbol.symbol
+                 | Let of Symbol.symbol * ast * ast
+                 | The of RCST.rcst * ast
+                 | Operation of Symbol.symbol * ast list
+
+    (* Functions *)
+
+    fun transform (RCST.IntConstant i) = IntConstant i
+      | transform (RCST.FloatConstant f) = FloatConstant f
+      | transform (RCST.StringConstant s) = StringConstant s
+      | transform (RCST.Symbol s) = Symbol s
+      | transform (RCST.Keyword s) = raise Fail "Keywords not allowed in expressions"
+      | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
+      | transform (RCST.List l) = transformList l
+    and transformList ((RCST.Symbol f)::args) = transformOp f args
+      | transformList _ = raise Fail "Invalid list form"
+    and transformOp f args =
+        if f = au "let" then
+            transformLet args
+        else if f = au "the" then
+            case args of
+                [ty, exp] => The (ty, transform exp)
+              | _ => raise Fail "Invalid `the` form"
+        else
+            Operation (f, map transform args)
+    and transformLet ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) =
+        (* A let with a single binding *)
+        Let (var, transform v, Operation (au "progn", map transform body))
+      | transformLet ((RCST.List ((RCST.List [RCST.Symbol var, v])::rest))::body) =
+        (* A let with at least one binding *)
+        let val exp = RCST.List [RCST.Symbol (au "let"),
+                                 RCST.List [RCST.List [RCST.Symbol var,
+                                                       v]],
+                                 RCST.List ((RCST.Symbol (au "let"))::(RCST.List rest)::body)]
+        in
+            transform exp
+        end
+      | transformLet ((RCST.List nil)::body) =
+        (* A let with no bindings *)
+        Operation (au "progn", map transform body)
+      | transformLet _ = raise Fail "Invalid let form"
 end

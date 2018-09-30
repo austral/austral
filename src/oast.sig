@@ -18,4 +18,13 @@
 *)
 
 signature OAST = sig
+    datatype ast = IntConstant of string
+                 | FloatConstant of string
+                 | StringConstant of CST.escaped_string
+                 | Symbol of Symbol.symbol
+                 | Let of Symbol.symbol * ast * ast
+                 | The of RCST.rcst * ast
+                 | Operation of Symbol.symbol * ast list
+
+    val transform : RCST.rcst -> ast
 end
