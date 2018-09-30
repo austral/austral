@@ -18,45 +18,45 @@
 *)
 
 structure Repl :> REPL = struct
-  fun readUntilBlank () =
-    case (TextIO.inputLine TextIO.stdIn) of
-        (SOME s) => if s = "\n" then
-                        ""
-                    else
-                        (s ^ (readUntilBlank ()))
-      | NONE => OS.Process.terminate OS.Process.success
+    fun readUntilBlank () =
+        case (TextIO.inputLine TextIO.stdIn) of
+            (SOME s) => if s = "\n" then
+                            ""
+                        else
+                            (s ^ (readUntilBlank ()))
+          | NONE => OS.Process.terminate OS.Process.success
 
-  local
-      open Module
-      open Compiler
-  in
-      fun prompt compiler =
-          let val name = moduleName (currentModule compiler)
-          in
-              (Ident.identString name) ^ "> "
-          end
-  end
-
-  fun repl () =
-    let fun repl' c =
-          let
-          in
-              print (prompt c);
-              let val input = readUntilBlank ()
-              in
-                  let val unit = Compiler.ReplUnit input
-                  in
-                      let val c' = Compiler.compileUnit c unit
-                      in
-                          print "Compiled";
-                          print "\n\n";
-                          repl' c'
-                      end
-                  end handle Fail s => print ("Error: " ^ s ^ "\n");
-              repl' c
-              end
-          end
+    local
+        open Module
+        open Compiler
     in
-        repl' Compiler.emptyCompiler
+    fun prompt compiler =
+        let val name = moduleName (currentModule compiler)
+        in
+            (Ident.identString name) ^ "> "
+        end
     end
+
+    fun repl () =
+        let fun repl' c =
+                let
+                in
+                    print (prompt c);
+                    let val input = readUntilBlank ()
+                    in
+                        let val unit = Compiler.ReplUnit input
+                        in
+                            let val c' = Compiler.compileUnit c unit
+                            in
+                                print "Compiled";
+                                print "\n\n";
+                                repl' c'
+                            end
+                        end handle Fail s => print ("Error: " ^ s ^ "\n");
+                        repl' c
+                    end
+                end
+        in
+            repl' Compiler.emptyCompiler
+        end
 end
