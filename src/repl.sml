@@ -26,11 +26,22 @@ structure Repl :> REPL = struct
                         (s ^ (readUntilBlank ()))
       | NONE => OS.Process.terminate OS.Process.success
 
+  local
+      open Module
+      open Compiler
+  in
+      fun prompt compiler =
+          let val name = moduleName (currentModule compiler)
+          in
+              (Ident.identString name) ^ "> "
+          end
+  end
+
   fun repl () =
     let fun repl' c =
           let
           in
-              print "> ";
+              print (prompt c);
               let val input = readUntilBlank ()
               in
                   let val unit = Compiler.ReplUnit input

@@ -24,6 +24,9 @@ structure Compiler :> COMPILER = struct
                                   Function.emptyFenv,
                                   Ident.mkIdentEx "austral-user")
 
+    fun currentModule (Compiler (menv, _, modName)) =
+        Option.valOf (Module.envGet menv modName)
+
     type pathname = string
 
     datatype compilation_unit = FileUnit of pathname

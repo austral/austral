@@ -22,6 +22,8 @@ signature COMPILER = sig
 
     val emptyCompiler : compiler
 
+    val currentModule : compiler -> Module.module
+
     type pathname = string
 
     datatype compilation_unit = FileUnit of pathname
