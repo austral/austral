@@ -88,9 +88,9 @@ structure HIR :> HIR = struct
       | transform (AST.StringConstant s) =
         StringConstant s
       | transform (AST.Variable v) =
-        Variable (escapeSymbol v)
+        Variable (escapeVariable v)
       | transform (AST.Let (var, value, body)) =
-        Let (escapeSymbol var, transform value, transform body)
+        Let (escapeVariable var, transform value, transform body)
       | transform (AST.Cond (test, cons, alt)) =
         Cond (transfomr test, transform cons, transform alt)
       | transform (AST.TupleCreate exps) =
