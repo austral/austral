@@ -38,7 +38,10 @@ structure Compiler :> COMPILER = struct
         in
             let val resolved = Util.valOf (RCST.resolve menv currModule form)
             in
-                raise Fail "Not implemented yet"
+                let topnode = AST.transformTop resolved
+                in
+                    raise Fail "Not implemented yet"
+                end
             end
         end
 
