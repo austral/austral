@@ -25,7 +25,7 @@ structure TAst :> TAST = struct
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable * ty
                  | Let of Symbol.variable * ty * ast * ast
-                 | Cond of ast * ast * ast * ty
+                 | Cond of ast * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast
@@ -34,4 +34,38 @@ structure TAst :> TAST = struct
                  | The of ty * ast
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
+
+    local
+        open Type
+    in
+        fun typeOf (IntConstant (_, t)) = t
+          | typeOf (FloatConstant (_, t)) = t
+          | typeOf (StringConstant _) = raise Fail "not impemented"
+          | typeOf (Variable (_, t)) = t
+          | typeOf (Let (_, _, _, b)) = typeOf b
+          | typeOf (Cond (_, tb, _)) = typeOf tb
+          | typeOf (TupleCreate exps) = Tuple (map typeOf exps)
+          | typeOf (TupleProj (tup, idx)) =
+            (case typeOf tup of
+                 Tuple tys => List.nth (tys, idx)
+               | _ => raise Fail "Not a tuple")
+          | typeOf (Allocate v) = Pointer (typeOf v)
+          | typeOf (Load p) =
+            (case typeOf p of
+                 (Pointer t) => t
+               | _ => raise Fail "Not a pointer")
+          | typeOf (Store (p, _)) = typeOf p
+          | typeOf (The (t, _)) = t
+          | typeOf (Progn (x::xs)) = typeOf (List.last (x::xs))
+          | typeOf (Progn nil) = Unit
+          | typeOf (Funcall (_, _, t)) = t
+    end
+
+    datatype binding = Binding of ty * mutability
+         and mutability = Immutable
+                        | Mutable
+
+    type bindings = (Ident.ident, binding) Map.map
+
+    datatype context = Context of bindings * Type.tenv * Function.fenv
 end
