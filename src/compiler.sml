@@ -50,7 +50,17 @@ structure Compiler :> COMPILER = struct
                 end
             end
         end
-    and declareTopForm c (InModule moduleName) = raise Fail "derp"
+    and declareTopForm c (InModule moduleName) =
+        (* Switch current module *)
+        let val (Compiler (menv, currModuleName)) = c
+        in
+            let val newModule = case Module.envGet menv moduleName of
+                                    SOME m => m
+                                  | NONE => raise Fail "in-module: no module with this name"
+            in
+                Compiler (menv, moduleName)
+            end
+        end
       | declareTopForm _ _ = raise Fail "Not implemented yet"
     end
 
