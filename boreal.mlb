@@ -52,6 +52,9 @@ src/tast.sml
 src/hir.sig
 src/hir.sml
 
+src/cpp-ast.sig
+src/cpp-ast.sml
+
 src/compiler.sig
 src/compiler.sml
 
