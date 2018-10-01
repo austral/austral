@@ -39,6 +39,7 @@ signature TYPE = sig
     type tenv
 
     val defaultTenv : tenv
+    val addTypeAlias : tenv -> (name * param Set.set * typespec) -> tenv option
 
     val parseTypespec : RCST.rcst -> typespec
 end
