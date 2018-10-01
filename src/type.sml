@@ -35,8 +35,8 @@ structure Type :> TYPE = struct
          and float_type = Single | Double
          and variant = Variant of name * ty
 
-    datatype typespec = NamedType of Symbol.symbol
-                      | TypeCons of Symbol.symbol * (typespec list)
+    datatype typespec = NamedType of name
+                      | TypeCons of name * (typespec list)
 
     type 'a set = 'a Set.set
 
@@ -81,4 +81,5 @@ structure Type :> TYPE = struct
       | parseTypespec _ = raise Fail "Invalid type specifier"
     and parseTypespecList ((RCST.Symbol f)::args) = TypeCons (f, map parseTypespec args)
       | parseTypespecList _ = raise Fail "Invalid type constructor"
+
 end
