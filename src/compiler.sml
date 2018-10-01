@@ -47,9 +47,7 @@ structure Compiler :> COMPILER = struct
         fun declareForm compiler form =
             let val (Compiler (menv, _, currModuleName)) = compiler
             in
-                let val currModule = case Module.envGet menv currModuleName of
-                                         SOME m => m
-                                       | _ => raise Fail "No module with this name"
+                let val currModule = currentModule compiler
                 in
                     let val resolved = Util.valOf (RCST.resolve menv currModule form)
                     in
