@@ -40,7 +40,7 @@ signature TYPE = sig
     type 'a set = 'a Set.set
 
     datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * param set * typespec
+                     | TypeAlias of name * param set * ty
                      | Datatype of name * param set * variant list
 
     type tenv
