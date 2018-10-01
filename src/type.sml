@@ -81,17 +81,31 @@ structure Type :> TYPE = struct
     and parseTypespecList ((RCST.Symbol f)::args) = TypeCons (f, map parseTypespec args)
       | parseTypespecList _ = raise Fail "Invalid type constructor"
 
-    fun resolve tenv (NamedType name) =
+    (* Given a type specifier, and a map of type parameter names to type
+       specifiers, replace all instances of the type parameters with their
+       associated type specifiers *)
+    fun replace m (TypeCons (name, tyargs)) =
+        case (Map.get m name) of
+            SOME tyspec => if tyargs <> Set.empty then
+                               raise Fail "Type parameter cannot be a constructor"
+                           else
+                               tyspec
+          | NONE => TypeCons (name, map (replace m) tyargs)
+
+
+    fun resolve tenv (TypeCons (name, tyargs)) =
         (case (getTypedef tenv name) of
              SOME (BuiltInType (_, ty)) => ty
            | SOME (TypeAlias (_, p, tys)) =>
-             if p <> Set.empty then
-                 raise Fail "Error: bare named type cannot identify a "
+             (* The name refers to an alias to another type specifier. Ensure
+             the type constructor has as many arguments as the type alias has
+             parameters *)
+             if (Set.size tyargs) <> (Set.size p) then
+                 raise Fail "Type constructor arity error"
              else
-                 resolve tenv tys
-           | SOME (DataType (_, p, ty)) =>
-             if p <> Set.empty then
-                 raise Fail "Type mismatch: a named type cannot alias a parameterized type alias"
-             else
-                 ty
+                 (* Replace parameters in the type specifier with arguments from
+                    the type constructor and resolve the resulting type
+                    specifier
+                 *)
+                 resolve tenv (replace tys tyargs)
 end

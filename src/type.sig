@@ -50,6 +50,6 @@ signature TYPE = sig
     val addTypeAlias : tenv -> (name * param set * typespec) -> tenv option
 
     val parseTypespec : RCST.rcst -> typespec
-    val replace : typespec -> (param, typespec) Map.map -> typespec
+    val replace : typespec -> (name, typespec) Map.map -> typespec
     val resolve : tenv -> typespec -> ty
 end
