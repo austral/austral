@@ -37,6 +37,8 @@ structure Type :> TYPE = struct
     datatype typespec = NamedType of Symbol.symbol
                       | TypeCons of Symbol.symbol * (typespec list)
 
+    type 'a set = 'a Set.set
+
     datatype typedef = BuiltInType of name * ty
                      | TypeAlias of name * param set * typespec
                      | Datatype of name * param set * variant list
@@ -47,7 +49,9 @@ structure Type :> TYPE = struct
         let fun au name =
                 Symbol.mkSymbol (Ident.mkIdentEx "austral",
                                  Ident.mkIdentEx name)
-            and toMap l = Map.fromList (map (fn (n, t) => (au n, BuiltInType (au n, t))) l)
+            and toMap l = Map.fromList (map (fn (n, t) =>
+                                                (au n, BuiltInType (au n, t)))
+                                            l)
         in
             toMap [("unit",    Unit),
                    ("boolean", Bool),
