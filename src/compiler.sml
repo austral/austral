@@ -24,6 +24,12 @@ structure Compiler :> COMPILER = struct
                                   Function.emptyFenv,
                                   Ident.mkIdentEx "austral-user")
 
+    fun compilerMenv (Compiler (menv, _, _)) =
+        menv
+
+    fun compilerFenv (Compiler (_, fenv, _)) =
+        fenv
+
     fun currentModule (Compiler (menv, _, modName)) =
         Option.valOf (Module.envGet menv modName)
 
