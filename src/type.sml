@@ -68,6 +68,9 @@ structure Type :> TYPE = struct
                    ("f64",     Float Double)]
         end
 
+    fun getTypedef tenv name =
+        Map.get tenv name
+
     fun addTypeAlias tenv (name, params, def) =
         case (Map.get tenv name) of
             SOME _ => NONE (* Another type with this name exists *)
