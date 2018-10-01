@@ -36,7 +36,7 @@ signature TYPE = sig
 
     type typespec
 
-    type set = Set.set
+    type 'a set = 'a Set.set
 
     datatype typedef = BuiltInType of name * ty
                      | TypeAlias of name * param set * typespec

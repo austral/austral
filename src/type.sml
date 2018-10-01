@@ -38,8 +38,8 @@ structure Type :> TYPE = struct
                       | TypeCons of Symbol.symbol * (typespec list)
 
     datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * param list * typespec
-                     | Datatype of name * param list * variant list
+                     | TypeAlias of name * param set * typespec
+                     | Datatype of name * param set * variant list
 
     type tenv = (Symbol.symbol, typedef) Map.map
 
@@ -62,6 +62,9 @@ structure Type :> TYPE = struct
                    ("f32",     Float Single),
                    ("f64",     Float Double)]
         end
+
+    fun addTypeAlias tenv (name, params, def) =
+
 
     fun parseTypespec (RCST.Symbol s) = NamedType s
       | parseTypespec (RCST.List l) = parseTypespecList l
