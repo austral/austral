@@ -36,14 +36,16 @@ signature TYPE = sig
 
     type typespec
 
+    type set = Set.set
+
     datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * param list * typespec
-                     | Datatype of name * param list * variant list
+                     | TypeAlias of name * param set * typespec
+                     | Datatype of name * param set * variant list
 
     type tenv
 
     val defaultTenv : tenv
-    val addTypeAlias : tenv -> (name * param Set.set * typespec) -> tenv option
+    val addTypeAlias : tenv -> (name * param set * typespec) -> tenv option
 
     val parseTypespec : RCST.rcst -> typespec
 end
