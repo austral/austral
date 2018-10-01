@@ -35,8 +35,7 @@ structure Type :> TYPE = struct
          and float_type = Single | Double
          and variant = Variant of name * ty
 
-    datatype typespec = NamedType of name
-                      | TypeCons of name * (typespec list)
+    datatype typespec = TypeCons of name * (typespec list)
 
     type 'a set = 'a Set.set
 
@@ -84,5 +83,15 @@ structure Type :> TYPE = struct
 
     fun resolve tenv (NamedType name) =
         (case (getTypedef tenv name) of
-
+             SOME (BuiltInType (_, ty)) => ty
+           | SOME (TypeAlias (_, p, tys)) =>
+             if p <> Set.empty then
+                 raise Fail "Error: bare named type cannot identify a "
+             else
+                 resolve tenv tys
+           | SOME (DataType (_, p, ty)) =>
+             if p <> Set.empty then
+                 raise Fail "Type mismatch: a named type cannot alias a parameterized type alias"
+             else
+                 ty
 end
