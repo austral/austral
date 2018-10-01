@@ -35,7 +35,11 @@ signature TYPE = sig
          and variant = Variant of name * ty
 
     type typespec
-    type typedef
+
+    datatype typedef = BuiltInType of name * ty
+                     | TypeAlias of name * param list * typespec
+                     | Datatype of name * param list * variant list
+
     type tenv
 
     val defaultTenv : tenv
