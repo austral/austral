@@ -45,17 +45,13 @@ structure Compiler :> COMPILER = struct
         open AST
     in
         fun declareForm compiler form =
-            let val (Compiler (menv, _, currModuleName)) = compiler
+            let val resolved = Util.valOf (RCST.resolve (compilerMenv compiler)
+                                                        (currentModule compiler)
+                                                        form)
             in
-                let val currModule = currentModule compiler
+                let val topnode = AST.transformTop resolved
                 in
-                    let val resolved = Util.valOf (RCST.resolve menv currModule form)
-                    in
-                        let val topnode = AST.transformTop resolved
-                        in
-                            (topnode, declareTopForm compiler topnode)
-                        end
-                    end
+                    (topnode, declareTopForm compiler topnode)
                 end
             end
         and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
