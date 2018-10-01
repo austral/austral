@@ -41,7 +41,7 @@ structure Type :> TYPE = struct
     type 'a set = 'a Set.set
 
     datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * param set * ty
+                     | TypeAlias of name * param set * typespec
                      | Datatype of name * param set * variant list
 
     type tenv = (Symbol.symbol, typedef) Map.map
@@ -81,5 +81,8 @@ structure Type :> TYPE = struct
       | parseTypespec _ = raise Fail "Invalid type specifier"
     and parseTypespecList ((RCST.Symbol f)::args) = TypeCons (f, map parseTypespec args)
       | parseTypespecList _ = raise Fail "Invalid type constructor"
+
+    fun resolve tenv (NamedType name) =
+        (case (getTypedef tenv name) of
 
 end
