@@ -18,19 +18,20 @@
 *)
 
 structure Compiler :> COMPILER = struct
-    datatype compiler = Compiler of Module.menv * Function.fenv * Symbol.module_name
+    datatype compiler = Compiler of Module.menv * Type.tenv * Function.fenv * Symbol.module_name
 
     val emptyCompiler = Compiler (Module.defaultMenv,
+                                  Type.defaultTenv,
                                   Function.emptyFenv,
                                   Ident.mkIdentEx "austral-user")
 
-    fun compilerMenv (Compiler (menv, _, _)) =
+    fun compilerMenv (Compiler (menv, _, _, _)) =
         menv
 
-    fun compilerFenv (Compiler (_, fenv, _)) =
+    fun compilerFenv (Compiler (_, _, fenv, _)) =
         fenv
 
-    fun currentModule (Compiler (menv, _, modName)) =
+    fun currentModule (Compiler (menv, _, _, modName)) =
         Option.valOf (Module.envGet menv modName)
 
     type pathname = string
@@ -56,27 +57,27 @@ structure Compiler :> COMPILER = struct
             end
         and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
             (* Add a concrete function to the compiler fenv *)
-            let val (Compiler (menv, fenv, currModuleName)) = c
+            let val (Compiler (menv, tenv, fenv, currModuleName)) = c
                 and f = Function.Function (name,
                                            map (fn (n, t) => Function.Param (n, t)) params,
                                            rt,
                                            docstring)
             in
                 case (Function.addFunction fenv f) of
-                    SOME fenv' => Compiler (menv, fenv', currModuleName)
+                    SOME fenv' => Compiler (menv, tenv, fenv', currModuleName)
                   | NONE => raise Fail "Repeat function"
             end
           | declareTopForm c (Deftype (name, params, docstring, def)) =
             raise Fail "deftype not implemented"
           | declareTopForm c (InModule moduleName) =
             (* Switch current module *)
-            let val (Compiler (menv, fenv, currModuleName)) = c
+            let val (Compiler (menv, tenv, fenv, currModuleName)) = c
             in
                 let val newModule = case Module.envGet menv moduleName of
                                         SOME m => m
                                       | NONE => raise Fail "in-module: no module with this name"
                 in
-                    Compiler (menv, fenv, moduleName)
+                    Compiler (menv, tenv, fenv, moduleName)
                 end
             end
           | declareTopForm _ _ = raise Fail "Not implemented yet"
