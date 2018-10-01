@@ -20,7 +20,7 @@
 signature TYPE = sig
     type name = Symbol.symbol
 
-    datatype param = TypeParam of Symbol.symbol
+    datatype param = TypeParam of name
 
     datatype ty = Unit
                 | Bool
