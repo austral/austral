@@ -68,6 +68,9 @@ structure Type :> TYPE = struct
         end
 
     fun addTypeAlias tenv (name, params, def) =
+        case (Map.get name tenv) of
+            SOME _ => NONE (* Another type with this name exists *)
+          | NONE => SOME (Map.iadd (name, TypeAlias (name, params, def)) tenv)
 
 
     fun parseTypespec (RCST.Symbol s) = NamedType s
