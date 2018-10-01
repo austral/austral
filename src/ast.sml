@@ -195,8 +195,8 @@ structure AST :> AST = struct
               | parseBody [def] =
                 (NONE, def)
               | parseBody _ = raise Fail "Bad deftype form"
-            and parseParam (RCST.Symbol s) = Type.TypeParam s
-              | parseParam _ = raise Fail "Bad type parameter"
+            and parseParam (RCST.Symbol s) = s
+              | parseParam _ = raise Fail "Type parameter must be a symbol"
         in
             let val (docstring, ty) = parseBody body
             in

@@ -66,6 +66,8 @@ structure Compiler :> COMPILER = struct
                     SOME fenv' => Compiler (menv, fenv', currModuleName)
                   | NONE => raise Fail "Repeat function"
             end
+          | declareTopForm c (Deftype (name, params, docstring, def)) =
+            raise Fail "deftype not implemented"
           | declareTopForm c (InModule moduleName) =
             (* Switch current module *)
             let val (Compiler (menv, fenv, currModuleName)) = c
