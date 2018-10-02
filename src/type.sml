@@ -42,7 +42,7 @@ structure Type :> TYPE = struct
     datatype typedef = BuiltInType of name * ty
                      | TypeAlias of name * typarams * typespec
                      | Datatype of name * typarams * variant_spec list
-         and variant_spec = VariantSpec of name * typespec
+         and variant_spec = VariantSpec of name * typespec option
 
     type tenv = (Symbol.symbol, typedef) Map.map
 
@@ -86,6 +86,13 @@ structure Type :> TYPE = struct
         Map.fromList (Util.mapidx (fn (p, idx) => (p, List.nth (args, idx)))
                                   (OrderedSet.toList params))
 
+    fun bothEmpty list set =
+        let val ll = List.length list
+            and sl = OrderedSet.size set
+        in
+            (ll = 0) andalso (sl = 0)
+        end
+
     (* Given a type specifier, and a map of type parameter names to type
        specifiers, replace all instances of the type parameters with their
        associated type specifiers *)
@@ -96,13 +103,6 @@ structure Type :> TYPE = struct
                            else
                                tyspec
           | NONE => TypeCons (name, map (replace m) tyargs)
-
-    fun bothEmpty list set =
-        let val ll = List.length list
-            and sl = OrderedSet.size set
-        in
-            (ll = 0) andalso (sl = 0)
-        end
 
     (* Given a type environment and a type constructor, resolve it to an actual type *)
     fun resolve tenv (TypeCons (name, tyargs)) =
@@ -119,7 +119,7 @@ structure Type :> TYPE = struct
                     the type constructor and resolve the resulting type
                     specifier *)
                  resolve tenv (replace (replaceArgs p tyargs) tys)
-           | SOME (Datatype (_, p, tyargs)) =>
+           | SOME (Datatype (n, p, variants)) =>
              (* The name refers to an algebraic data type. Ensure the type
                 constructor has as many arguments as the type alias has
                 parameters *)
@@ -129,6 +129,19 @@ structure Type :> TYPE = struct
                  (* Replace parameters in the type specifier with arguments from
                     the type constructor and resolve the resulting type
                     specifier *)
-                 raise Fail "NOT DONE YET"
+                 replaceData tenv
+                             (replaceArgs p tyargs)
+                             tyargs
+                             (n, p, variants)
            | NONE => raise Fail "No such type")
+    and replaceData tenv m tyargs (name, typarams, variants) =
+        let fun replaceVariant (VariantSpec (n, SOME tys)) =
+                Variant (n, SOME (resolve tenv (replace m tys)))
+              | replaceVariant (VariantSpec (n, NONE)) =
+                Variant (n, NONE)
+        in
+            Disjunction (name,
+                         map (resolve tenv) tyargs,
+                         map replaceVariant variants)
+        end
 end
