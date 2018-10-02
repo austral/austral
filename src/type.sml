@@ -41,7 +41,8 @@ structure Type :> TYPE = struct
 
     datatype typedef = BuiltInType of name * ty
                      | TypeAlias of name * typarams * typespec
-                     | Datatype of name * typarams * variant list
+                     | Datatype of name * typarams * variant_spec list
+         and variant_spec = VariantSpec of name * typespec
 
     type tenv = (Symbol.symbol, typedef) Map.map
 
