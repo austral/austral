@@ -72,6 +72,8 @@ structure CppAst :> CPP_AST = struct
     in
         fun sepBy sep strings = trimWhitespace (String.concatWith sep strings)
         and trimWhitespace s = string (dropl (fn c => c = #"\n") (full s))
+
+        fun commaSep strings = sepBy ", " strings
     end
 
     fun pad n =
