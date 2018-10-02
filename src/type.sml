@@ -103,6 +103,7 @@ structure Type :> TYPE = struct
             (ll = 0) andalso (sl = 0)
         end
 
+    (* Given a type environment and a type constructor, resolve it to an actual type *)
     fun resolve tenv (TypeCons (name, tyargs)) =
         (case (getTypedef tenv name) of
              SOME (BuiltInType (_, ty)) => ty
