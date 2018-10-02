@@ -46,25 +46,29 @@ structure AST :> AST = struct
     (* Toplevel AST *)
 
     type name = Symbol.symbol
+    type param_name = name
     type docstring = string option
     type symbol = Symbol.symbol
     type typespec = Type.typespec
 
-    datatype top_ast = Defun of name * (name * typespec) list * typespec * docstring * ast
-                     | Defclass of Function.typeclass
-                     | Definstance of Function.instance
+    datatype top_ast = Defun of name * param list * typespec * docstring * ast
+                     | Defclass of name * param_name * docstring * method_decl list
+                     | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * name list * docstring * typespec
                      | Defdisjunction of name * name list * docstring * Type.variant_spec list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of defmodule_clause list
                      | InModule of Symbol.symbol_name
+         and param = Param of name * typespec
+         and method_decl = MethodDecl of name * param list * typespec * docstring
+         and method_def = MethodDef of name * param list * typespec * docstring * ast
+         and instance_arg = InstanceArg of name * name Set.set
          and defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
                               | UseClause of Symbol.module_name list
                               | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
                               | ExportClause of Symbol.symbol_name list
                               | DocstringClause of string
-
 
     (* Transform alpha-renamed AST to this AST *)
 
@@ -130,7 +134,7 @@ structure AST :> AST = struct
         let fun parseParams (RCST.List l) = map parseParam l
               | parseParams _ = raise Fail "defun parameter list must be a list"
             and parseParam (RCST.List [RCST.Symbol name, ty]) =
-                (name, Type.parseTypespec ty)
+                Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad defun parameter"
             and transformExp rcst =
                 transform (Alpha.transform (OAST.transform rcst))
@@ -163,23 +167,23 @@ structure AST :> AST = struct
               | parseBody _ = raise Fail "Bad defclass form"
             and parseMethods l = map parseMethod l
             and parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt, RCST.StringConstant s]) =
-                Function.MethodDecl (name,
-                                     map parseParam params,
-                                     Type.parseTypespec rt,
-                                     SOME (CST.escapedToString s))
+                MethodDecl (name,
+                            map parseParam params,
+                            Type.parseTypespec rt,
+                            SOME (CST.escapedToString s))
               | parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt]) =
-                Function.MethodDecl (name,
-                                     map parseParam params,
-                                     Type.parseTypespec rt,
-                                     NONE)
+                MethodDecl (name,
+                            map parseParam params,
+                            Type.parseTypespec rt,
+                            NONE)
               | parseMethod _ = raise Fail "Bad method definition"
             and parseParam (RCST.List [RCST.Symbol name, ty]) =
-                Function.Param (name, Type.parseTypespec ty)
+                Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad method parameter"
         in
             let val (docstring, methods) = parseBody body
             in
-                Defclass (Function.Typeclass (name, param, docstring, methods))
+                Defclass (name, param, docstring, methods)
             end
         end
       | transformDefclass _ = raise Fail "Bad defclass form"
