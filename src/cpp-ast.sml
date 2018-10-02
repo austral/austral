@@ -39,7 +39,6 @@ structure CppAst :> CPP_AST = struct
                      | StructInitializer of string * (string * exp_ast) list
                      | StructAccess of exp_ast * string
                      | Funcall of string * exp_ast list
-                     | Adjacent of exp_ast list
                      | Raw of string
          and binop = Add
                    | Sub
