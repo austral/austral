@@ -20,8 +20,6 @@
 structure CppAst :> CPP_AST = struct
     (* Types *)
 
-    datatype typaram = TypeParam of string
-
     datatype typespec = NamedType of string
                       | Pointer of typespec
                       | TypeCons of string * typespec list
@@ -61,11 +59,11 @@ structure CppAst :> CPP_AST = struct
                        | While of exp_ast * block_ast
                        | VoidFuncall of string * exp_ast list
 
-    datatype top_ast = FunctionDef of string * param list * typespec * block_ast * exp_ast
-                     | StructDef of string * slot list
+    datatype top_ast = FunctionDef of string * typaram list * param list * typespec * block_ast * exp_ast
+                     | StructDef of string * typaram list * slot list
+         and typaram = TypeParam of string
          and param = Param of string * typespec
          and slot = Slot of string * typespec
-
 
     (* Rendering utilities *)
 
