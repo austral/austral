@@ -20,22 +20,21 @@
 signature FUNCTION = sig
     type name = Symbol.symbol
     type ty = Type.ty
-    type typespec = Type.typespec
     type docstring = string option
 
     datatype func = Function of name * param list * ty * docstring
-         and param = Param of name * typespec
+         and param = Param of name * ty
 
     type param_name = Symbol.symbol
 
     datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
-         and method_decl = MethodDecl of name * param list * typespec * docstring
+         and method_decl = MethodDecl of name * param list * ty * docstring
 
     datatype instance = Instance of name * instance_arg * docstring * method_def list
-         and instance_arg = ConcreteType of typespec
+         and instance_arg = ConcreteType of ty
                           | TypeCons of name * tyvar Set.set
          and tyvar = TypeVar of name
-         and method_def = MethodDef of name * param list * typespec * docstring * RCST.rcst
+         and method_def = MethodDef of name * param list * ty * docstring * RCST.rcst
 
     type fenv
 
