@@ -37,17 +37,17 @@ signature TYPE = sig
 
     type typespec
 
-    type 'a set = 'a Set.set
+    type typarams = param OrderedSet.set
 
     datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * param set * typespec
-                     | Datatype of name * param set * variant list
+                     | TypeAlias of name * typarams * typespec
+                     | Datatype of name * typarams * variant list
 
     type tenv
 
     val defaultTenv : tenv
     val getTypedef : tenv -> name -> typedef option
-    val addTypeAlias : tenv -> (name * param set * typespec) -> tenv option
+    val addTypeAlias : tenv -> (name * typarams * typespec) -> tenv option
 
     val parseTypespec : RCST.rcst -> typespec
     val replace : (name, typespec) Map.map -> typespec -> typespec
