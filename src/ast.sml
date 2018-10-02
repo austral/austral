@@ -54,12 +54,11 @@ structure AST :> AST = struct
                      | Defclass of Function.typeclass
                      | Definstance of Function.instance
                      | Deftype of name * name list * docstring * typespec
-                     | Defdisjunction of name * Type.param list * disjunction_case list * docstring
+                     | Defdisjunction of name * name list * docstring * Type.variant_spec list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of defmodule_clause list
                      | InModule of Symbol.symbol_name
-         and disjunction_case = DisjCase of name * typespec option
          and defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
                               | UseClause of Symbol.module_name list
                               | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)

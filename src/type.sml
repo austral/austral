@@ -76,6 +76,11 @@ structure Type :> TYPE = struct
             SOME _ => NONE (* Another type with this name exists *)
           | NONE => SOME (Map.iadd tenv (name, TypeAlias (name, params, def)))
 
+    fun addDisjunction tenv (name, params, variants) =
+        case (Map.get tenv name) of
+            SOME _ => NONE (* Another type with this name exists *)
+          | NONE => SOME (Map.iadd tenv (name, Datatype (name, params, variants)))
+
     fun parseTypespec (RCST.Symbol s) = TypeCons (s, [])
       | parseTypespec (RCST.List l) = parseTypespecList l
       | parseTypespec _ = raise Fail "Invalid type specifier"
