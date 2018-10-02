@@ -143,8 +143,6 @@ structure CppAst :> CPP_AST = struct
         ^ (slot)
       | renderExp (Funcall (f, args)) =
         "(" ^ f ^ "(" ^ (sepBy "," (map renderExp args)) ^ "))"
-      | renderExp (Adjacent l) =
-        String.concatWith " " (map renderExp l)
       | renderExp (Raw s) =
         s
 
