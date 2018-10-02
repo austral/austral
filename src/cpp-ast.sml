@@ -179,16 +179,24 @@ structure CppAst :> CPP_AST = struct
     fun renderBlock b =
         renderBlock' (indent 0) b
 
-    fun renderTop (FunctionDef (name, params, rt, body, retval)) =
-        let val params' = commaSep (map renderParam params)
+    fun renderTop (FunctionDef (name, typarams, params, rt, body, retval)) =
+        let val typarams' = if typarams = nil then
+                                ""
+                            else
+                                "<" ^ (commaSep (map (fn (TypeParam s) => s) typarams)) ^ ">"
+            and params' = commaSep (map renderParam params)
             and rt' = renderType rt
             and name' = name
             and body' = (renderBlock body) ^ "\n  return " ^ (renderExp retval) ^ ";"
         in
             rt' ^ " " ^ name' ^ "(" ^ params' ^ ") {\n" ^ body' ^ "\n}"
         end
-      | renderTop (StructDef (name, slots)) =
+      | renderTop (StructDef (name, typarams, slots)) =
         let val name' = name
+            and typarams' = if typarams = nil then
+                                ""
+                            else
+                                "<" ^ (commaSep (map (fn (TypeParam s) => s) typarams)) ^ ">"
             and slots' = String.concatWith " " (map renderSlot slots)
         in
             "typedef struct { " ^ slots' ^ " } " ^ name' ^ ";\n"
