@@ -61,6 +61,9 @@ src/mir.sml
 src/cpp-ast.sig
 src/cpp-ast.sml
 
+src/cpp-backend.sig
+src/cpp-backend.sml
+
 src/compiler.sig
 src/compiler.sml
 
