@@ -59,6 +59,7 @@ signature CPP_AST = sig
 
     datatype top_ast = FunctionDef of string * typaram list * param list * typespec * block_ast * exp_ast
                      | StructDef of string * typaram list * slot list
+                     | ToplevelProgn of top_ast list
          and typaram = TypeParam of string
          and param = Param of string * typespec
          and slot = Slot of string * typespec
