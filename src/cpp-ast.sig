@@ -36,7 +36,7 @@ signature CPP_AST = sig
                      | AccessTuple of exp_ast * int
                      | StructInitializer of string * (string * exp_ast) list
                      | StructAccess of exp_ast * string
-                     | Funcall of string * exp_ast list
+                     | Funcall of string * typespec list * exp_ast list
                      | Raw of string
          and binop = Add
                    | Sub
