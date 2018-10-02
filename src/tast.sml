@@ -153,8 +153,11 @@ structure TAst :> TAST = struct
                                  end
                   | _ => raise Fail "store: first argument must be a pointer"
             end
-          | augment (AST.The _) _ =
-            raise Fail "`the` not implemented"
+          | augment (AST.The (typespec, exp)) c =
+            let val tenv = ctxTenv c
+            in
+                The (resolve tenv typespec, augment exp c)
+            end
           | augment (AST.Progn exps) c =
             Progn (map (fn a => augment a c) exps)
           | augment (AST.Funcall _) _ =
