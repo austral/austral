@@ -33,7 +33,7 @@ structure Type :> TYPE = struct
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64
          and float_type = Single | Double
-         and variant = Variant of name * ty
+         and variant = Variant of name * ty option
 
     datatype typespec = TypeCons of name * (typespec list)
 
