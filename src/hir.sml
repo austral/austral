@@ -22,18 +22,19 @@ structure HIR :> HIR = struct
 
     (* Expression AST *)
 
-    datatype ast = IntConstant of string
+    datatype ast = BoolConstant of bool
+                 | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
                  | Variable of string
-                 | Let of string * ast * ast
+                 | Let of string * ty * ast * ast
                  | Cond of ast * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast
                  | Load of ast
                  | Store of ast * ast
-                 | Cast of Type.typespec * ast
+                 | Cast of ty * ast
                  | Progn of ast list
                  | Funcall of string * ast list
 
@@ -77,48 +78,40 @@ structure HIR :> HIR = struct
 
     (* Toplevel AST *)
 
-    type typespec = Type.typespec
-
-    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * ast
-
     (* Transform expression AST *)
 
-    fun transform (AST.IntConstant i) =
+    fun transform TAst.UnitConstant =
+        BoolConstant false
+      | transform (TAst.BoolConstant b) =
+        BoolConstant b
+      | transform (TAst.IntConstant (i, _)) =
         IntConstant i
-      | transform (AST.FloatConstant f) =
+      | transform (TAst.FloatConstant (f, _)) =
         FloatConstant f
-      | transform (AST.StringConstant s) =
+      | transform (TAst.StringConstant s) =
         StringConstant s
-      | transform (AST.Variable v) =
+      | transform (TAst.Variable (v, _)) =
         Variable (escapeVariable v)
-      | transform (AST.Let (var, value, body)) =
-        Let (escapeVariable var, transform value, transform body)
-      | transform (AST.Cond (test, cons, alt)) =
+      | transform (TAst.Let (var, value, body)) =
+        Let (escapeVariable var, TAst.typeOf value, transform value, transform body)
+      | transform (TAst.Cond (test, cons, alt)) =
         Cond (transform test, transform cons, transform alt)
-      | transform (AST.TupleCreate exps) =
+      | transform (TAst.TupleCreate exps) =
         TupleCreate (map transform exps)
-      | transform (AST.TupleProj (tup, idx)) =
+      | transform (TAst.TupleProj (tup, idx)) =
         TupleProj (transform tup, idx)
-      | transform (AST.Allocate v) =
+      | transform (TAst.Allocate v) =
         Allocate (transform v)
-      | transform (AST.Load ptr) =
+      | transform (TAst.Load ptr) =
         Load (transform ptr)
-      | transform (AST.Store (ptr, v)) =
+      | transform (TAst.Store (ptr, v)) =
         Store (transform ptr, transform v)
-      | transform (AST.The (ty, exp)) =
+      | transform (TAst.The (ty, exp)) =
         Cast (ty, transform exp)
-      | transform (AST.Progn exps) =
+      | transform (TAst.Progn exps) =
         Progn (map transform exps)
-      | transform (AST.Funcall (f, args)) =
+      | transform (TAst.Funcall (f, args, _)) =
         Funcall (escapeSymbol f, map transform args)
 
     (* Transform top-level AST *)
-
-    fun transformTop (AST.Defun (name, params, rt, _, body)) =
-        DefunConcrete (escapeSymbol name,
-                       map (fn (n, t) => (escapeSymbol n, t)) params,
-                       rt,
-                       transform body)
-      | transformTop _ =
-        raise Fail "transformTop not implemented for this case"
 end

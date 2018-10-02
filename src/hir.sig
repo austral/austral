@@ -20,28 +20,24 @@
 signature HIR = sig
     type ty = Type.ty
 
-    datatype ast = IntConstant of string
+    datatype ast = BoolConstant of bool
+                 | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
                  | Variable of string
-                 | Let of string * ast * ast
+                 | Let of string * ty * ast * ast
                  | Cond of ast * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast
                  | Load of ast
                  | Store of ast * ast
-                 | Cast of Type.typespec * ast
+                 | Cast of ty * ast
                  | Progn of ast list
                  | Funcall of string * ast list
-
-    type typespec = Type.typespec
-
-    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * ast
 
     val escapeSymbol : Symbol.symbol -> string
     val escapeVariable : Symbol.variable -> string
 
-    val transform : AST.ast -> ast
-    val transformTop : AST.top_ast -> top_ast
+    val transform : TAst.ast -> ast
 end
