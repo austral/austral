@@ -7,6 +7,9 @@ src/util.sml
 src/set.sig
 src/set.sml
 
+src/ordered-set.sig
+src/ordered-set.sml
+
 src/map.sig
 src/map.sml
 
