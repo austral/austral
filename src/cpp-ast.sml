@@ -141,8 +141,14 @@ structure CppAst :> CPP_AST = struct
         (renderExp r)
         ^ "."
         ^ (slot)
-      | renderExp (Funcall (f, args)) =
-        "(" ^ f ^ "(" ^ (sepBy "," (map renderExp args)) ^ "))"
+      | renderExp (Funcall (f, tyargs, args)) =
+        let val tyargs' = if tyargs = nil then
+                              ""
+                          else
+                              "<" ^ (sepBy ", " (map renderType tyargs)) ^ ">"
+        in
+            "(" ^ f ^ tyargs' ^ "(" ^ (sepBy "," (map renderExp args)) ^ "))"
+        end
       | renderExp (Raw s) =
         s
 
