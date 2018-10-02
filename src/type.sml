@@ -110,17 +110,25 @@ structure Type :> TYPE = struct
              SOME (BuiltInType (_, ty)) => ty
            | SOME (TypeAlias (_, p, tys)) =>
              (* The name refers to an alias to another type specifier. Ensure
-             the type constructor has as many arguments as the type alias has
-             parameters *)
+                the type constructor has as many arguments as the type alias has
+                parameters *)
              if ((OrderedSet.size p) <> (List.length tyargs)) then
                  raise Fail "Type constructor arity error"
              else
                  (* Replace parameters in the type specifier with arguments from
                     the type constructor and resolve the resulting type
-                    specifier
-                 *)
+                    specifier *)
                  resolve tenv (replace (replaceArgs p tyargs) tys)
            | SOME (Datatype (_, p, tyargs)) =>
-             raise Fail "derp"
+             (* The name refers to an algebraic data type. Ensure the type
+                constructor has as many arguments as the type alias has
+                parameters *)
+             if ((OrderedSet.size p) <> (List.length tyargs)) then
+                 raise Fail "Type constructor arity error"
+             else
+                 (* Replace parameters in the type specifier with arguments from
+                    the type constructor and resolve the resulting type
+                    specifier *)
+                 raise Fail "NOT DONE YET"
            | NONE => raise Fail "No such type")
 end
