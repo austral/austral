@@ -27,4 +27,7 @@ signature UTIL = sig
     val readFileToString : path -> string
 
     val member : ''a -> ''a list -> bool
+    val position : ''a -> ''a list -> int option
+
+    val mapidx : (('a * int) -> 'b) -> 'a list -> 'b list
 end

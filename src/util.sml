@@ -38,4 +38,19 @@ structure Util :> UTIL = struct
 
     fun member x nil = false
       | member x (y::ys) = (x = y) orelse member x ys
+
+    fun position elem list =
+        let fun index' nil _ = NONE
+              | index' (head::tail) p = if head = elem then
+                                            SOME p else
+                                        index' tail (p+1)
+        in
+            index' list 0
+        end
+
+    fun mapidx f list =
+        let val indices = List.tabulate (List.length list, fn x => x)
+        in
+            ListPair.map f (list, indices)
+        end
 end
