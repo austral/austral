@@ -58,14 +58,16 @@ structure Compiler :> COMPILER = struct
         and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
             (* Add a concrete function to the compiler fenv *)
             let val (Compiler (menv, tenv, fenv, currModuleName)) = c
-                and f = Function.Function (name,
-                                           map (fn (n, t) => Function.Param (n, t)) params,
-                                           rt,
-                                           docstring)
             in
-                case (Function.addFunction fenv f) of
-                    SOME fenv' => Compiler (menv, tenv, fenv', currModuleName)
-                  | NONE => raise Fail "Repeat function"
+                let val f = Function.Function (name,
+                                               map (fn (n, t) => Function.Param (n, t)) params,
+                                               Type.resolve tenv rt,
+                                               docstring)
+                in
+                    case (Function.addFunction fenv f) of
+                        SOME fenv' => Compiler (menv, tenv, fenv', currModuleName)
+                      | NONE => raise Fail "Repeat function"
+                end
             end
           | declareTopForm c (Deftype (name, params, docstring, def)) =
             let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
