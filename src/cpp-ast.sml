@@ -101,7 +101,7 @@ structure CppAst :> CPP_AST = struct
 
     fun renderType (NamedType n) = n
       | renderType (Pointer t) = (renderType t) ^ "*"
-      | renderType (TypeCons (n, args)) = n ^ "<" ^ (sepBy ", " (map renderType args)) ^ ">"
+      | renderType (TypeCons (n, args)) = n ^ "<" ^ (commaSep (map renderType args)) ^ ">"
 
     fun renderExp (ConstBool true) =
         "true"
@@ -130,7 +130,7 @@ structure CppAst :> CPP_AST = struct
       | renderExp (SizeOf t) =
         "sizeof(" ^ (renderType t) ^ ")"
       | renderExp (CreateTuple exps) =
-        "std::make_tuple(" ^ (sepBy ", " (map renderExp exps)) ^ ")"
+        "std::make_tuple(" ^ (commaSep (map renderExp exps)) ^ ")"
       | renderExp (AccessTuple (exp, i)) =
         "std::get<" ^ (Int.toString i) ^ ">(" ^ (renderExp exp) ^ ")"
       | renderExp (StructInitializer (name, inits)) =
@@ -147,9 +147,9 @@ structure CppAst :> CPP_AST = struct
         let val tyargs' = if tyargs = nil then
                               ""
                           else
-                              "<" ^ (sepBy ", " (map renderType tyargs)) ^ ">"
+                              "<" ^ (commaSep (map renderType tyargs)) ^ ">"
         in
-            "(" ^ f ^ tyargs' ^ "(" ^ (sepBy "," (map renderExp args)) ^ "))"
+            "(" ^ f ^ tyargs' ^ "(" ^ (commaSep (map renderExp args)) ^ "))"
         end
       | renderExp (Raw s) =
         s
@@ -172,7 +172,7 @@ structure CppAst :> CPP_AST = struct
       | renderBlock' d (While (t, b)) =
         (pad d) ^ "while (" ^ (renderExp t) ^ ") {\n" ^ (renderBlock' (indent d) b) ^ "\n" ^ (pad d) ^ "}"
       | renderBlock' d (VoidFuncall (f, args)) =
-        (pad d) ^ f ^ "(" ^ (sepBy "," (map renderExp args)) ^ ");"
+        (pad d) ^ f ^ "(" ^ (commaSep (map renderExp args)) ^ ");"
     and renderRes (SOME res) = (res) ^ " = "
       | renderRes NONE = ""
 
@@ -180,7 +180,7 @@ structure CppAst :> CPP_AST = struct
         renderBlock' (indent 0) b
 
     fun renderTop (FunctionDef (name, params, rt, body, retval)) =
-        let val params' = sepBy "," (map renderParam params)
+        let val params' = commaSep (map renderParam params)
             and rt' = renderType rt
             and name' = name
             and body' = (renderBlock body) ^ "\n  return " ^ (renderExp retval) ^ ";"
