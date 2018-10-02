@@ -32,7 +32,7 @@ structure Function :> FUNCTION = struct
 
     datatype instance = Instance of name * instance_arg * docstring * method_def list
          and instance_arg = ConcreteType of ty
-                          | TypeCons of name * tyvar Set.set
+                          | TypeCons of name * tyvar OrderedSet.set
          and tyvar = TypeVar of name
          and method_def = MethodDef of name * param list * ty * docstring * RCST.rcst
 
