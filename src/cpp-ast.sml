@@ -202,6 +202,8 @@ structure CppAst :> CPP_AST = struct
         in
             "typedef struct { " ^ slots' ^ " } " ^ name' ^ ";\n"
         end
+      | renderTop (ToplevelProgn nodes) =
+        sepBy "\n\n" (map renderTop nodes)
 
     and renderParam (Param (n, t)) =
         (renderType t) ^ " " ^ n
