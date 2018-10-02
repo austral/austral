@@ -60,7 +60,8 @@ structure Compiler :> COMPILER = struct
             let val (Compiler (menv, tenv, fenv, currModuleName)) = c
             in
                 let val f = Function.Function (name,
-                                               map (fn (n, t) => Function.Param (n, t)) params,
+                                               map (fn (Param (n, t)) => Function.Param (n, Type.resolve tenv t))
+                                                   params,
                                                Type.resolve tenv rt,
                                                docstring)
                 in
