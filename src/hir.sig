@@ -18,6 +18,8 @@
 *)
 
 signature HIR = sig
+    type ty = Type.ty
+
     datatype ast = IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string

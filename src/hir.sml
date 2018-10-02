@@ -18,6 +18,8 @@
 *)
 
 structure HIR :> HIR = struct
+    type ty = Type.ty
+
     (* Expression AST *)
 
     datatype ast = IntConstant of string
