@@ -37,11 +37,11 @@ structure Type :> TYPE = struct
 
     datatype typespec = TypeCons of name * (typespec list)
 
-    type 'a set = 'a Set.set
+    type typarams = param OrderedSet.set
 
     datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * param set * typespec
-                     | Datatype of name * param set * variant list
+                     | TypeAlias of name * typarams * typespec
+                     | Datatype of name * typarams * variant list
 
     type tenv = (Symbol.symbol, typedef) Map.map
 
