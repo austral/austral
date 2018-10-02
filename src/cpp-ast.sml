@@ -20,6 +20,8 @@
 structure CppAst :> CPP_AST = struct
     (* Types *)
 
+    datatype typaram = TypeParam of string
+
     datatype typespec = NamedType of string
                       | Pointer of typespec
                       | TypeCons of string * typespec list

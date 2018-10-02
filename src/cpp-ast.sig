@@ -18,6 +18,8 @@
 *)
 
 signature CPP_AST = sig
+    datatype typaram = TypeParam of string
+
     datatype typespec = NamedType of string
                       | Pointer of typespec
                       | TypeCons of string * typespec list
