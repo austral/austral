@@ -1,8 +1,6 @@
 TODO:
 
 - Parse RCST toplevel nodes into top-level AST nodes
-- Handle type declarations
-- Handle datatype declarations
 - Error on repeat type variables in an instance declaration
 - Type checking
 - Error on phantom type parameters in a type alias
@@ -28,3 +26,5 @@ DONE:
 - Parse RCST nodes into AST nodes
 - Alpha renaming
 - Define the toplevel AST datatype
+- Handle type declarations
+- Handle datatype declarations
