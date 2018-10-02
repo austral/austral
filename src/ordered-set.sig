@@ -34,6 +34,7 @@ signature ORDERED_SET = sig
   val size : ''a set -> int
   (* positions start at 1 *)
   val positionOf : ''a set -> ''a -> int option
+  val nth : ''a set -> int -> ''a
 
   val filter : ''a set -> (''a -> bool) -> ''a set
 

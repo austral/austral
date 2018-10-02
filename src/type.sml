@@ -75,23 +75,33 @@ structure Type :> TYPE = struct
             SOME _ => NONE (* Another type with this name exists *)
           | NONE => SOME (Map.iadd tenv (name, TypeAlias (name, params, def)))
 
-    fun parseTypespec (RCST.Symbol s) = NamedType s
+    fun parseTypespec (RCST.Symbol s) = TypeCons (s, [])
       | parseTypespec (RCST.List l) = parseTypespecList l
       | parseTypespec _ = raise Fail "Invalid type specifier"
     and parseTypespecList ((RCST.Symbol f)::args) = TypeCons (f, map parseTypespec args)
       | parseTypespecList _ = raise Fail "Invalid type constructor"
 
+    fun replaceArgs params args =
+        Map.fromList (Util.mapidx (fn (p, idx) => (p, List.nth (args, idx)))
+                                  (OrderedSet.toList params))
+
     (* Given a type specifier, and a map of type parameter names to type
        specifiers, replace all instances of the type parameters with their
        associated type specifiers *)
     fun replace m (TypeCons (name, tyargs)) =
-        case (Map.get m name) of
-            SOME tyspec => if tyargs <> Set.empty then
+        case (Map.get m (TypeParam name)) of
+            SOME tyspec => if (List.length tyargs) > 0 then
                                raise Fail "Type parameter cannot be a constructor"
                            else
                                tyspec
           | NONE => TypeCons (name, map (replace m) tyargs)
 
+    fun bothEmpty list set =
+        let val ll = List.length list
+            and sl = OrderedSet.size set
+        in
+            (ll = 0) andalso (sl = 0)
+        end
 
     fun resolve tenv (TypeCons (name, tyargs)) =
         (case (getTypedef tenv name) of
@@ -100,12 +110,15 @@ structure Type :> TYPE = struct
              (* The name refers to an alias to another type specifier. Ensure
              the type constructor has as many arguments as the type alias has
              parameters *)
-             if (Set.size tyargs) <> (Set.size p) then
+             if ((OrderedSet.size p) <> (List.length tyargs)) then
                  raise Fail "Type constructor arity error"
              else
                  (* Replace parameters in the type specifier with arguments from
                     the type constructor and resolve the resulting type
                     specifier
                  *)
-                 resolve tenv (replace tys tyargs)
+                 resolve tenv (replace (replaceArgs p tyargs) tys)
+           | SOME (Datatype (_, p, tyargs)) =>
+             raise Fail "derp"
+           | NONE => raise Fail "No such type")
 end

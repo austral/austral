@@ -53,6 +53,9 @@ structure OrderedSet :> ORDERED_SET = struct
         SOME p => SOME ((List.length l) - p)
       | _ => NONE
 
+  fun nth (Set l) idx =
+      List.nth (l, idx - 1)
+
   fun filter (Set l) f = Set (List.filter f l)
 
   fun fromList (x::xs) = add (fromList xs) x
