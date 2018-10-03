@@ -179,4 +179,6 @@ structure TAst :> TAST = struct
                 0
             end
         end
+      | augmentTop c _ =
+        raise Fail "augmentTop Not implemented"
 end
