@@ -38,11 +38,29 @@ structure TAst :> TAST = struct
                  | Funcall of Symbol.symbol * ast list * ty
 
     type name = Symbol.symbol
+    type param_name = name
     type docstring = string option
+    type symbol = Symbol.symbol
+    type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * ty * docstring * ast
+                     | Defclass of name * param_name * docstring * method_decl list
+                     | Definstance of name * instance_arg * docstring * method_def list
+                     | Deftype of name * name list * docstring * ty
+                     | Defdisjunction of name * name list * docstring * Type.variant list
+                     | Deftemplate of Macro.template
+                     | DefineSymbolMacro of name * RCST.rcst * docstring
+                     | Defmodule of defmodule_clause list
                      | InModule of Symbol.symbol_name
          and param = Param of name * ty
+         and method_decl = MethodDecl of name * param list * ty * docstring
+         and method_def = MethodDef of name * param list * ty * docstring * ast
+         and instance_arg = InstanceArg of name * name Set.set
+         and defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
+                              | UseClause of Symbol.module_name list
+                              | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
+                              | ExportClause of Symbol.symbol_name list
+                              | DocstringClause of string
 
     local
         open Type
