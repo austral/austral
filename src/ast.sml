@@ -257,19 +257,19 @@ structure AST :> AST = struct
         let fun parseNickElem (RCST.List [RCST.Keyword nick, RCST.Keyword modName]) = (nick, modName)
               | parseNickElem _ = raise Fail "Bad :nicknames clause"
         in
-            NicknamesClause (map parseNickElem args)
+            Module.NicknamesClause (map parseNickElem args)
         end
     and parseUseClause args =
         let fun parseUseElem (RCST.Keyword k) = k
               | parseUseElem _ = raise Fail "Bad :use clause"
         in
-            UseClause (map parseUseElem args)
+            Module.UseClause (map parseUseElem args)
         end
     and parseImportClause ((RCST.Keyword modName)::args) =
         let fun parseImportElem (RCST.Keyword k) = k
               | parseImportElem _ = raise Fail "Bad :import-from clause"
         in
-            ImportFromClause (modName, map parseImportElem args)
+            Module.ImportFromClause (modName, map parseImportElem args)
         end
       | parseImportClause _ =
         raise Fail "Bad :import-from clause"
@@ -277,7 +277,7 @@ structure AST :> AST = struct
         let fun parseExportElem (RCST.Keyword k) = k
               | parseExportElem _ = raise Fail "Bad export clause"
         in
-            ExportClause (map parseExportElem args)
+            Module.ExportClause (map parseExportElem args)
         end
     and parseDocstringClause [RCST.StringConstant s] =
         Module.DocstringClause (CST.escapedToString s)
