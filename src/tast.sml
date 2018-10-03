@@ -190,31 +190,25 @@ structure TAst :> TAST = struct
     end
 
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
-        let fun mapParam (AST.Param (n, ts)) =
-                Param (n, Type.resolve tenv ts)
+        let val params' = map (mapParam tenv) params
         in
-            let val params' = map mapParam params
-            in
-                Defun (name,
-                       params',
-                       Type.resolve tenv ty,
-                       docstring,
-                       augment ast (Context (Map.empty, tenv, fenv)))
-            end
+            Defun (name,
+                   params',
+                   Type.resolve tenv ty,
+                   docstring,
+                   augment ast (Context (Map.empty, tenv, fenv)))
         end
       | augmentTop (AST.Defclass (name, param_name, docstring, methods)) tenv fenv =
-        let fun mapParam (AST.Param (n, ts)) =
-                Param (n, Type.resolve tenv ts)
+        let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
+                MethodDecl (name,
+                            map (mapParam tenv) params,
+                            Type.resolve tenv tys,
+                            docstring)
         in
-            let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
-                    MethodDecl (name,
-                                map mapParam params,
-                                Type.resolve tenv tys,
-                                docstring)
-            in
-                Defclass (name, param_name, docstring, map augmentMethod methods)
-            end
+            Defclass (name, param_name, docstring, map augmentMethod methods)
         end
       | augmentTop _ _ _ =
         raise Fail "augmentTop Not implemented"
+    and mapParam tenv (AST.Param (n, ts)) =
+        Param (n, Type.resolve tenv ts)
 end
