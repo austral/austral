@@ -79,7 +79,13 @@ structure Module : MODULE = struct
                 "unit",
                 "boolean",
                 "u8",
-                "i8"
+                "i8",
+                "u16",
+                "i16",
+                "u32",
+                "i32",
+                "f32",
+                "f64"
             ]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
