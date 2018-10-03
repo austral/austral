@@ -37,6 +37,9 @@ structure TAst :> TAST = struct
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
 
+    datatype top_ast = Defun of name * param list * ty * docstring * ast
+         and param = Param of name * ty
+
     local
         open Type
     in
