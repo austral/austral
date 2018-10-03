@@ -63,18 +63,24 @@ structure Module : MODULE = struct
         Set.isIn (moduleExports m) s
 
     val defaultMenv =
-        let val australExports = ["progn",
-                                  "let",
-                                  "if",
-                                  "the",
-                                  "allocate",
-                                  "load",
-                                  "store",
-                                  "defun",
-                                  "deftype",
-                                  "defdatatype",
-                                  "defmodule",
-                                  "in-module"]
+        let val australExports = [
+                "progn",
+                "let",
+                "if",
+                "the",
+                "allocate",
+                "load",
+                "store",
+                "defun",
+                "deftype",
+                "defdatatype",
+                "defmodule",
+                "in-module",
+                "unit",
+                "boolean",
+                "u8",
+                "i8"
+            ]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
                                          Map.empty,
