@@ -54,5 +54,6 @@ signature TAST = sig
     type context
 
     val augment : AST.ast -> context -> ast
-    val augmentTop : AST.top_ast -> context -> top_ast
+
+    val augmentTop : AST.top_ast -> Type.tenv -> Function.fenv -> top_ast
 end
