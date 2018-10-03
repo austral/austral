@@ -29,4 +29,8 @@ signature ALPHA = sig
                  | Operation of Symbol.symbol * ast list
 
     val transform : OAST.ast -> ast
+
+    type params = Symbol.symbol Set.set
+
+    val alphaRename : OAST.ast -> params -> ast
 end
