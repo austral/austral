@@ -28,6 +28,9 @@ structure Compiler :> COMPILER = struct
     fun compilerMenv (Compiler (menv, _, _, _)) =
         menv
 
+    fun compilerTenv (Compiler (_, tenv, _, _)) =
+        tenv
+
     fun compilerFenv (Compiler (_, _, fenv, _)) =
         fenv
 
@@ -43,7 +46,7 @@ structure Compiler :> COMPILER = struct
       | unitForms (ReplUnit string) = [Parser.parseString string]
 
     local
-        open AST
+        open TAst
     in
         fun declareForm compiler form =
             let val resolved = Util.valOf (RCST.resolve (compilerMenv compiler)
@@ -52,7 +55,12 @@ structure Compiler :> COMPILER = struct
             in
                 let val topnode = AST.transformTop resolved
                 in
-                    (topnode, declareTopForm compiler topnode)
+                    let val typedNode = TAst.augmentTop topnode
+                                                        (compilerTenv compiler)
+                                                        (compilerFenv compiler)
+                    in
+                        (typedNode, declareTopForm compiler typedNode)
+                    end
                 end
             end
         and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
@@ -60,9 +68,9 @@ structure Compiler :> COMPILER = struct
             let val (Compiler (menv, tenv, fenv, currModuleName)) = c
             in
                 let val f = Function.Function (name,
-                                               map (fn (Param (n, t)) => Function.Param (n, Type.resolve tenv t))
+                                               map (fn (Param (n, t)) => Function.Param (n, t))
                                                    params,
-                                               Type.resolve tenv rt,
+                                               rt,
                                                docstring)
                 in
                     case (Function.addFunction fenv f) of
@@ -70,7 +78,7 @@ structure Compiler :> COMPILER = struct
                       | NONE => raise Fail "Repeat function"
                 end
             end
-          | declareTopForm c (Deftype (name, params, docstring, def)) =
+(*          | declareTopForm c (Deftype (name, params, docstring, def)) =
             let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
                 and (Compiler (menv, tenv, fenv, module)) = c
             in
@@ -96,7 +104,7 @@ structure Compiler :> COMPILER = struct
                 in
                     Compiler (menv, tenv, fenv, moduleName)
                 end
-            end
+            end*)
           | declareTopForm _ _ = raise Fail "Not implemented yet"
     end
 
@@ -112,7 +120,7 @@ structure Compiler :> COMPILER = struct
         ([], c)
 
     local
-        open AST
+        open TAst
     in
         fun compileForm c (InModule _) =
             (* We don't have to do anything here *)
