@@ -56,11 +56,6 @@ signature TAST = sig
          and method_decl = MethodDecl of name * param list * ty * docstring
          and method_def = MethodDef of name * param list * ty * docstring * ast
          and instance_arg = InstanceArg of name * name Set.set
-         and defmodule_clause = NicknamesClause of (Symbol.symbol_name * Symbol.module_name) list
-                              | UseClause of Symbol.module_name list
-                              | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
-                              | ExportClause of Symbol.symbol_name list
-                              | DocstringClause of string
     val typeOf : ast -> ty
 
     datatype binding = Binding of ty * mutability
