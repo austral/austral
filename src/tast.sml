@@ -207,6 +207,8 @@ structure TAst :> TAST = struct
         in
             Defclass (name, param_name, docstring, map augmentMethod methods)
         end
+      | augmentTop (AST.InModule name) _ _ =
+        InModule name
       | augmentTop _ _ _ =
         raise Fail "augmentTop Not implemented"
     and mapParam tenv (AST.Param (n, ts)) =
