@@ -207,6 +207,8 @@ structure TAst :> TAST = struct
         in
             Defclass (name, param_name, docstring, map augmentMethod methods)
         end
+      | augmentTop (AST.Defmodule clauses) _ _ =
+        Defmodule clauses
       | augmentTop (AST.InModule name) _ _ =
         InModule name
       | augmentTop _ _ _ =
