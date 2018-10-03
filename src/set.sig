@@ -26,4 +26,5 @@ signature SET = sig
     val size : ''a set -> int
 
     val fromList : ''a list -> ''a set
+    val toList : ''a set -> ''a list
 end
