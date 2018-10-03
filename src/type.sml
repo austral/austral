@@ -138,7 +138,7 @@ structure Type :> TYPE = struct
                              (replaceArgs p tyargs)
                              tyargs
                              (n, p, variants)
-           | NONE => raise Fail "No such type")
+           | NONE => raise Fail ("No type named " ^ (Symbol.toString name)))
     and replaceData tenv m tyargs (name, typarams, variants) =
         let fun replaceVariant (VariantSpec (n, SOME tys)) =
                 Variant (n, SOME (resolve tenv (replace m tys)))
