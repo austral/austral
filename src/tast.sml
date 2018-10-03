@@ -170,13 +170,17 @@ structure TAst :> TAST = struct
             raise Fail "funcall not implemented"
     end
 
-    fun augmentTop c (AST.Defun (name, params, ty, docstring, ast)) =
+    fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) c =
         let fun mapParam (AST.Param (n, ts)) =
                 Param (n, Type.resolve (ctxTenv c) ts)
         in
             let val params' = map mapParam params
             in
-                0
+                Defun (name,
+                       params',
+                       resolve (ctxTenv c) ty,
+                       docstring,
+                       augment ast c)
             end
         end
       | augmentTop c _ =
