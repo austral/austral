@@ -202,6 +202,8 @@ structure TAst :> TAST = struct
         in
             Defclass (name, param_name, docstring, map augmentMethod methods)
         end
+      | augmentTop (AST.DefineSymbolMacro (name, exp, docstring)) _ _ =
+        DefineSymbolMacro (name, exp, docstring)
       | augmentTop (AST.Defmodule clauses) _ _ =
         Defmodule clauses
       | augmentTop (AST.InModule name) _ _ =
