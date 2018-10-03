@@ -50,7 +50,7 @@ structure TAst :> TAST = struct
                      | Defdisjunction of name * name list * docstring * Type.variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
-                     | Defmodule of defmodule_clause list
+                     | Defmodule of Module.defmodule_clause list
                      | InModule of Symbol.symbol_name
          and param = Param of name * ty
          and method_decl = MethodDecl of name * param list * ty * docstring
