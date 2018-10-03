@@ -28,8 +28,6 @@ signature ALPHA = sig
                  | The of Type.typespec * ast
                  | Operation of Symbol.symbol * ast list
 
-    val transform : OAST.ast -> ast
-
     type params = Symbol.symbol Set.set
 
     val alphaRename : OAST.ast -> params -> ast
