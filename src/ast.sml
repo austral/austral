@@ -280,7 +280,7 @@ structure AST :> AST = struct
             ExportClause (map parseExportElem args)
         end
     and parseDocstringClause [RCST.StringConstant s] =
-        DocstringClause (CST.escapedToString s)
+        Module.DocstringClause (CST.escapedToString s)
       | parseDocstringClause _ =
         raise Fail "Bad docstring clause"
 
