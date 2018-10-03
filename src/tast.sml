@@ -178,7 +178,7 @@ structure TAst :> TAST = struct
             in
                 Defun (name,
                        params',
-                       resolve (ctxTenv c) ty,
+                       Type.resolve (ctxTenv c) ty,
                        docstring,
                        augment ast c)
             end
