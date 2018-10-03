@@ -95,10 +95,20 @@ structure Alpha :> ALPHA = struct
       | alphaRename s (OAST.Operation (f, args)) =
         Operation (f, map (alphaRename s) args)
 
-    fun transform oast =
+    (* Public interface *)
+
+    type params = Symbol.symbol Set.set
+
+    fun transform oast params =
         let
         in
             resetCount ();
-            alphaRename [] oast
+            alphaRename (paramsToStack params) oast
         end
+    and paramsToStack set =
+        makeStack (Set.toList set)
+    and makeStack (head::tail) =
+        (head, freshVar head) :: (makeStack tail)
+      | makeStack nil =
+        nil
 end

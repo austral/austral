@@ -30,5 +30,5 @@ signature ALPHA = sig
 
     type params = Symbol.symbol Set.set
 
-    val alphaRename : OAST.ast -> params -> ast
+    val transform : OAST.ast -> params -> ast
 end
