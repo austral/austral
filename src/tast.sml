@@ -39,7 +39,10 @@ structure TAst :> TAST = struct
 
     type name = string
 
-    datatype top_ast = Defun of name * param list * ty * ast
+    type name = string
+    type docstring = string option
+
+    datatype top_ast = Defun of name * param list * ty * docstring * ast
          and param = Param of name * ty
 
     local

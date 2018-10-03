@@ -38,8 +38,9 @@ signature TAST = sig
                  | Funcall of Symbol.symbol * ast list * ty
 
     type name = string
+    type docstring = string option
 
-    datatype top_ast = Defun of name * param list * ty * ast
+    datatype top_ast = Defun of name * param list * ty * docstring * ast
          and param = Param of name * ty
 
     val typeOf : ast -> ty
