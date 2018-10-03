@@ -136,26 +136,33 @@ structure AST :> AST = struct
             and parseParam (RCST.List [RCST.Symbol name, ty]) =
                 Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad defun parameter"
-            and transformExp rcst =
-                transform (Alpha.transform (OAST.transform rcst))
+            and transformExp params rcst =
+                let val params' = Set.fromList (map (fn (Param (n, _)) => n) params)
+                in
+                    transform (Alpha.transform (OAST.transform rcst) params')
+                end
             and parseBody ((RCST.StringConstant s)::head::tail) =
                 (* When the first element of the body is a string constant, and
                    the remainder of the form is non-empty, we take the string
                    constant to be the docstring. Otherwise, we parse the string
                    constant as a regular expression *)
-                (SOME (CST.escapedToString s), transformExp (implicitProgn (head::tail)))
+                (SOME (CST.escapedToString s), implicitProgn (head::tail))
               | parseBody body =
-                (NONE, transformExp (implicitProgn body))
+                (NONE, implicitProgn body)
             and implicitProgn l =
                 (RCST.List ((RCST.Symbol (au "progn"))::l))
         in
             let val (docstring, body') = parseBody body
+                and params' = parseParams params
             in
-                Defun (name,
-                       parseParams params,
-                       Type.parseTypespec rt,
-                       docstring,
-                       body')
+                let val body'' = transformExp params' body'
+                in
+                    Defun (name,
+                           params',
+                           Type.parseTypespec rt,
+                           docstring,
+                           body'')
+                end
             end
         end
       | transformDefun _ = raise Fail "Bad defun form"
