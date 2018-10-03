@@ -202,6 +202,14 @@ structure TAst :> TAST = struct
         in
             Defclass (name, param_name, docstring, map augmentMethod methods)
         end
+      | augmentTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
+        let fun mapVariant (Type.VariantSpec (name, SOME tys)) =
+                Type.Variant (name, SOME (Type.resolve tenv tys))
+              | mapVariant (Type.VariantSpec (name, NONE)) =
+                Type.Variant (name, NONE)
+        in
+            Defdisjunction (name, params, docstring, map mapVariant variants)
+        end
       | augmentTop (AST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
       | augmentTop (AST.DefineSymbolMacro (name, exp, docstring)) _ _ =
