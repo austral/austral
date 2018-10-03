@@ -52,7 +52,6 @@ signature TAST = sig
     type bindings = (Symbol.variable, binding) Map.map
 
     type context
-    val mkContext : bindings -> Type.tenv -> Function.fenv -> context
 
     val augment : AST.ast -> context -> ast
     val augmentTop : AST.top_ast -> context -> top_ast
