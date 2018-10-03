@@ -35,5 +35,5 @@ structure Set :> SET = struct
     fun fromList (x::xs) = add (fromList xs) x
       | fromList nil = empty
 
-    fun toList (Set l) = l
+    fun toList l = l
 end
