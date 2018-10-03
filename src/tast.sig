@@ -43,6 +43,8 @@ signature TAST = sig
     datatype top_ast = Defun of name * param list * ty * docstring * ast
          and param = Param of name * ty
 
+    val typeOf : ast -> ty
+
     datatype binding = Binding of ty * mutability
          and mutability = Immutable
                         | Mutable
