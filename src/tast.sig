@@ -37,7 +37,9 @@ signature TAST = sig
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
 
-    datatype top_ast = Defun of name * param list * ty * docstring * ast
+    type name = string
+
+    datatype top_ast = Defun of name * param list * ty * ast
          and param = Param of name * ty
 
     val typeOf : ast -> ty
