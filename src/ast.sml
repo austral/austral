@@ -145,7 +145,7 @@ structure AST :> AST = struct
                 (* When the first element of the body is a string constant, and
                    the remainder of the form is non-empty, we take the string
                    constant to be the docstring. Otherwise, we parse the string
-                   constant as a regular expression *)
+                   constant as an ordinary expression expression *)
                 (SOME (CST.escapedToString s), implicitProgn (head::tail))
               | parseBody body =
                 (NONE, implicitProgn body)
