@@ -41,6 +41,7 @@ structure TAst :> TAST = struct
     type docstring = string option
 
     datatype top_ast = Defun of name * param list * ty * docstring * ast
+                     | InModule of Symbol.symbol_name
          and param = Param of name * ty
 
     local
