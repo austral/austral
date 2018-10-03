@@ -37,7 +37,7 @@ signature TAST = sig
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
 
-    type name = string
+    type name = Symbol.symbol
     type docstring = string option
 
     datatype top_ast = Defun of name * param list * ty * docstring * ast

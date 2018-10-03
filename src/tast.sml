@@ -37,9 +37,7 @@ structure TAst :> TAST = struct
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
 
-    type name = string
-
-    type name = string
+    type name = Symbol.symbol
     type docstring = string option
 
     datatype top_ast = Defun of name * param list * ty * docstring * ast
@@ -171,4 +169,14 @@ structure TAst :> TAST = struct
           | augment (AST.Funcall _) _ =
             raise Fail "funcall not implemented"
     end
+
+    fun augmentTop c (AST.Defun (name, params, ty, docstring, ast)) =
+        let fun mapParam (AST.Param (n, ts)) =
+                Param (n, Type.resolve (ctxTenv c) ts)
+        in
+            let val params' = map mapParam params
+            in
+                0
+            end
+        end
 end
