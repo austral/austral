@@ -41,6 +41,7 @@ signature HIR = sig
     datatype top_ast = Defun of name * param list * ty * ast
                      | Deftype of name * name list * ty
                      | Defdisjunction of name * name list * Type.variant list
+                     | ToplevelProgn of top_ast list
          and param = Param of name * ty
 
     val escapeSymbol : Symbol.symbol -> string
