@@ -124,12 +124,12 @@ structure HIR :> HIR = struct
     (* Transform top-level AST *)
 
     fun transformTop (TAst.Defun (name, params, rt, _, body)) =
-        [Defun (escapeSymbol name,
-                map (fn (TAst.Param (n, t)) => Param (escapeSymbol n, t)) params,
-                rt,
-                transform body)]
+        Defun (escapeSymbol name,
+               map (fn (TAst.Param (n, t)) => Param (escapeSymbol n, t)) params,
+               rt,
+               transform body)
       | transformTop (TAst.Defclass _) =
-        []
+        ToplevelProgn []
       | transformTop (TAst.Definstance _) =
         raise Fail "definstance to HIR not implemented"
       | transformTop (TAst.Deftype (name, params, _, ty)) =
@@ -137,11 +137,11 @@ structure HIR :> HIR = struct
       | transformTop (TAst.Defdisjunction (name, params, _, variants)) =
         raise Fail "Defdisjunction to HIR not implemented"
       | transformTop (TAst.Deftemplate _) =
-        []
+        ToplevelProgn []
       | transformTop (TAst.DefineSymbolMacro _) =
-        []
+        ToplevelProgn []
       | transformTop (TAst.Defmodule _) =
-        []
+        ToplevelProgn []
       | transformTop (TAst.InModule _) =
-        []
+        ToplevelProgn []
 end
