@@ -82,4 +82,6 @@ structure MIR :> MIR = struct
       | transformType (Type.Integer (s, w)) = transformIntType s w
 
     fun transformExp _ = raise Fail "derp not implemented yet"
+
+    fun transformTop _ = raise Fail "derp not implemented yet"
 end
