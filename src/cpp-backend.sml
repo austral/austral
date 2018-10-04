@@ -18,4 +18,8 @@
 *)
 
 structure CppBackend :> CPP_BACKEND = struct
+    open CppAst
+
+    fun transformTop _ =
+        raise Fail "herp derp transformTop not implemented"
 end
