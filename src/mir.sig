@@ -20,13 +20,13 @@
 signature MIR = sig
     datatype ty = Bool
                 | UInt8
-                | Int8
+                | SInt8
                 | UInt16
-                | Int16
+                | SInt16
                 | UInt32
-                | Int32
+                | SInt32
                 | UInt64
-                | Int64
+                | SInt64
                 | NamedType of string
                 | Pointer of ty
                 | Tuple of ty list
