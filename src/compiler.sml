@@ -122,11 +122,11 @@ structure Compiler :> COMPILER = struct
     local
         open TAst
     in
-        fun compileForm c (InModule _) =
-            (* We don't have to do anything here *)
-            c
-          | compileForm _ _ =
-            raise Fail "compileForm Not implemented yet"
+        fun compileForm c topNode =
+            let val hirTop = HIR.transformTop topNode
+            in
+                c
+            end
     end
 
     fun compilationPass c (head::tail) =
