@@ -28,7 +28,7 @@ structure HIR :> HIR = struct
                  | StringConstant of CST.escaped_string
                  | Variable of string
                  | Let of string * ty * ast * ast
-                 | Cond of ast * ast * ast
+                 | Cond of ast * ast * ast * ty
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast
