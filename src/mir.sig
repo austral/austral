@@ -61,6 +61,6 @@ signature MIR = sig
          and slot = Slot of name * ty
 
     val transformTy : Type.ty -> ty
-    val transformExp : HIR.ast -> (HIR.block_ast list * HIR.exp_ast)
+    val transformExp : HIR.ast -> (block_ast list * exp_ast)
     val transformTop : HIR.top_ast -> top_ast
 end
