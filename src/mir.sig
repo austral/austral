@@ -27,7 +27,7 @@ signature MIR = sig
                 | SInt32
                 | UInt64
                 | SInt64
-                | SingeFloat
+                | SingleFloat
                 | DoubleFloat
                 | NamedType of string
                 | Pointer of ty
