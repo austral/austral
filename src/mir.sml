@@ -27,6 +27,8 @@ structure MIR :> MIR = struct
                 | SInt32
                 | UInt64
                 | SInt64
+                | SingeFloat
+                | DoubleFloat
                 | NamedType of string
                 | Pointer of ty
                 | Tuple of ty list
