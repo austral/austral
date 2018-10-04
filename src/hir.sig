@@ -48,5 +48,5 @@ signature HIR = sig
     val escapeVariable : Symbol.variable -> string
 
     val transform : TAst.ast -> ast
-    val transformTop : TAst.top_ast -> top_ast list
+    val transformTop : TAst.top_ast -> top_ast
 end
