@@ -18,4 +18,35 @@
 *)
 
 structure MIR :> MIR = struct
+    datatype ty = NamedType of string
+                | Pointer of ty
+                | TypeCons of string * ty list
+
+    datatype exp_ast = BoolConstant of bool
+                     | IntConstant of string
+                     | FloatConstant of string
+                     | NullConstant
+                     | Variable of string
+                     | Cast of ty * exp_ast
+                     | Load of exp_ast
+                     | AddressOf of exp_ast
+                     | SizeOf of ty
+                     | CreateTuple of exp_ast list
+                     | AccessTuple of exp_ast * int
+                     | Funcall of string * ty list * exp_ast list
+
+    datatype block_ast = Sequence of block_ast list
+                       | Block of block_ast list
+                       | Declare of ty * string * exp_ast
+                       | Assign of exp_ast * exp_ast
+                       | Store of exp_ast * exp_ast
+                       | Cond of exp_ast * block_ast * block_ast
+
+    type name = string
+
+    datatype top_ast = Defun of name * typaram list * param list * ty * block_ast * exp_ast
+                     | ToplevelProgn of top_ast list
+         and typaram = TypeParam of name
+         and param = Param of name * ty
+         and slot = Slot of name * ty
 end
