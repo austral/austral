@@ -36,6 +36,14 @@ signature HIR = sig
                  | Progn of ast list
                  | Funcall of string * ast list
 
+    type name = string
+    type param_name = name
+
+    datatype top_ast = Defun of name * param list * ty * ast
+                     | Deftype of name * name list * * ty
+                     | Defdisjunction of name * name list * Type.variant list
+         and param = Param of name * ty
+
     val escapeSymbol : Symbol.symbol -> string
     val escapeVariable : Symbol.variable -> string
 
