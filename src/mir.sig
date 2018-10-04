@@ -49,4 +49,8 @@ signature MIR = sig
          and typaram = TypeParam of name
          and param = Param of name * ty
          and slot = Slot of name * ty
+
+    val transformTy : Type.ty -> ty
+    val transformExp : HIR.ast -> (HIR.block_ast list, HIR.exp_ast)
+    val transformTop : HIR.top_ast -> top_ast
 end
