@@ -18,28 +18,4 @@
 *)
 
 signature MIR = sig
-    datatype ast = UnitConstant
-                 | BoolConstant of bool
-                 | IntConstant of string
-                 | FloatConstant of string
-                 | StringConstant of CST.escaped_string
-                 | Variable of string
-                 | TupleCreate of ast list
-                 | TupleProj of ast * int
-                 | Allocate of ast
-                 | Load of ast
-                 | Store of ast * ast
-                 | Cast of Type.typespec * ast
-                 | Funcall of string * ast list
-
-    datatype block_ast = Let of string * ast * ast
-                       | Cond of ast * ast * ast
-                       | Progn of ast list
-
-    type typespec = Type.typespec
-
-    datatype top_ast = DefunConcrete of string * (string * typespec) list * typespec * block_ast * ast
-
-    val transform : AST.ast -> (block_ast * ast)
-    val transformTop : AST.top_ast -> top_ast
 end
