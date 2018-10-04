@@ -27,7 +27,7 @@ structure MIR :> MIR = struct
                 | SInt32
                 | UInt64
                 | SInt64
-                | SingeFloat
+                | SingleFloat
                 | DoubleFloat
                 | NamedType of string
                 | Pointer of ty
@@ -80,6 +80,8 @@ structure MIR :> MIR = struct
     fun transformType Type.Unit = Bool
       | transformType Type.Bool = Bool
       | transformType (Type.Integer (s, w)) = transformIntType s w
+      | transformType (Type.Float Type.Single) = SingleFloat
+      | transformType (Type.Float Type.Double) = DoubleFloat
 
     fun transformExp _ = raise Fail "derp not implemented yet"
 
