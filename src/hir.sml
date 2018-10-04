@@ -70,6 +70,7 @@ structure HIR :> HIR = struct
           | escapeChar #"^" = "_ca"
           | escapeChar #"|" = "_pi"
           | escapeChar #"'" = "_qu"
+          | escapeChar #"." = "_pe"
           | escapeChar c = str c
 
         fun escapeVariable (Symbol.Var (sym, i)) =
