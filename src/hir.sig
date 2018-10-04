@@ -37,7 +37,6 @@ signature HIR = sig
                  | Funcall of string * ast list
 
     type name = string
-    type param_name = name
 
     datatype top_ast = Defun of name * param list * ty * ast
                      | Deftype of name * name list * * ty
