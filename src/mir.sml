@@ -82,6 +82,10 @@ structure MIR :> MIR = struct
       | transformType (Type.Integer (s, w)) = transformIntType s w
       | transformType (Type.Float Type.Single) = SingleFloat
       | transformType (Type.Float Type.Double) = DoubleFloat
+      | transformType (Type.Tuple tys) = Tuple (map transformType tys)
+      | transformType (Type.Pointer ty) = Pointer (transformType ty)
+      | transformType (Type.Disjunction _) = raise Fail "Derpy"
+      | transformType (Type.TypeVariable _) = raise Fail "derp"
 
     fun transformExp _ = raise Fail "derp not implemented yet"
 
