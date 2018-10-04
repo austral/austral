@@ -128,6 +128,20 @@ structure HIR :> HIR = struct
                 map (fn (TAst.Param (n, t)) => Param (escapeSymbol n, t)) params,
                 rt,
                 transform body)]
-      | transformTop _ =
-        raise Fail "herp derp"
+      | transformTop (TAst.Defclass _) =
+        []
+      | transformTop (TAst.Definstance _) =
+        raise Fail "definstance to HIR not implemented"
+      | transformTop (TAst.Deftype (name, params, _, ty)) =
+        raise Fail "deftype to HIR not implemented"
+      | transformTop (TAst.Defdisjunction (name, params, _, variants)) =
+        raise Fail "Defdisjunction to HIR not implemented"
+      | transformTop (TAst.Deftemplate _) =
+        []
+      | transformTop (TAst.DefineSymbolMacro _) =
+        []
+      | transformTop (TAst.Defmodule _) =
+        []
+      | transformTop (TAst.InModule _) =
+        []
 end
