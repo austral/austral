@@ -125,7 +125,7 @@ structure HIR :> HIR = struct
 
     fun transformTop (TAst.Defun (name, params, rt, _, body)) =
         [Defun (name,
-                map (fn (TAst.Param (n, t) => Param (n, t))) params,
+                map (fn (TAst.Param (n, t)) => Param (n, t)) params,
                 rt,
                 transform body)]
       | transformTop _ =
