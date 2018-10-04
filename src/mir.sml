@@ -19,6 +19,14 @@
 
 structure MIR :> MIR = struct
     datatype ty = Bool
+                | UInt8
+                | Int8
+                | UInt16
+                | Int16
+                | UInt32
+                | Int32
+                | UInt64
+                | Int64
                 | NamedType of string
                 | Pointer of ty
                 | Tuple of ty list
@@ -51,4 +59,18 @@ structure MIR :> MIR = struct
          and typaram = TypeParam of name
          and param = Param of name * ty
          and slot = Slot of name * ty
+
+    (* Transformations *)
+
+    local
+        open Type
+    in
+        fun transformIntType Unsigned Int8 = "
+    end
+
+
+
+    fun transformType Type.Unit = Bool
+      | transformType Type.Bool = Bool
+      | transformType (Type.Int (s, w)) = transformIntType s w
 end
