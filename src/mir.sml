@@ -20,13 +20,13 @@
 structure MIR :> MIR = struct
     datatype ty = Bool
                 | UInt8
-                | Int8
+                | SInt8
                 | UInt16
-                | Int16
+                | SInt16
                 | UInt32
-                | Int32
+                | SInt32
                 | UInt64
-                | Int64
+                | SInt64
                 | NamedType of string
                 | Pointer of ty
                 | Tuple of ty list
@@ -65,12 +65,17 @@ structure MIR :> MIR = struct
     local
         open Type
     in
-        fun transformIntType Unsigned Int8 = "
+        fun transformIntType Unsigned Int8 = UInt8
+          | transformIntType Signed   Int8 = SInt8
+          | transformIntType Unsigned Int16 = UInt16
+          | transformIntType Signed   Int16 = SInt16
+          | transformIntType Unsigned Int32 = UInt32
+          | transformIntType Signed   Int32 = SInt32
+          | transformIntType Unsigned Int64 = UInt64
+          | transformIntType Signed   Int64 = SInt64
     end
-
-
 
     fun transformType Type.Unit = Bool
       | transformType Type.Bool = Bool
-      | transformType (Type.Int (s, w)) = transformIntType s w
+      | transformType (Type.Integer (s, w)) = transformIntType s w
 end
