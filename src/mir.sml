@@ -18,8 +18,10 @@
 *)
 
 structure MIR :> MIR = struct
-    datatype ty = NamedType of string
+    datatype ty = Bool
+                | NamedType of string
                 | Pointer of ty
+                | Tuple of ty list
                 | TypeCons of string * ty list
 
     datatype exp_ast = BoolConstant of bool
