@@ -122,4 +122,12 @@ structure HIR :> HIR = struct
         Funcall (escapeSymbol f, map transform args)
 
     (* Transform top-level AST *)
+
+    fun transformTop (TAst.Defun (name, params, rt, _, body)) =
+        [Defun (name,
+                map (fn (TAst.Param (n, t) => Param (n, t))) params,
+                rt,
+                transform body)]
+      | transformTop _ =
+        raise Fail "herp derp"
 end
