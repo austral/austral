@@ -80,7 +80,7 @@ structure CppBackend :> CPP_BACKEND = struct
       | transformExp (MIR.Funcall (name, tyargs, args)) =
         Funcall (name,
                  map transformType tyargs,
-                 transformExp args)
+                 map transformExp args)
 
     fun transformTop _ =
         raise Fail "Not implemented yet"
