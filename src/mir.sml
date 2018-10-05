@@ -151,7 +151,7 @@ structure MIR :> MIR = struct
       | transformExp (HIR.Allocate exp) =
         raise Fail "allocate not implemented"
       | transformExp (HIR.Load ptr) =
-        let val (ptrBlock, ptrExp) = transform ptr
+        let val (ptrBlock, ptrExp) = transformExp ptr
         in
             (ptrBlock, Load ptrExp)
         end
@@ -159,7 +159,7 @@ structure MIR :> MIR = struct
         let val (ptrBlock, ptrExp) = transformExp ptr
             and (valBlock, valExp) = transformExp value
         in
-            (ptrBlock @ valBlock @ [Store (ptrExp, valExp)],
+            (Progn [ptrBlock, valBlock, Store (ptrExp, valExp)],
              ptrExp)
         end
       | transformExp _ =
