@@ -89,7 +89,7 @@ structure MIR :> MIR = struct
       | transformType (Type.TypeVariable name) = TypeVariable (HIR.escapeSymbol name)
 
     fun transformExp (HIR.BoolConstant b) =
-        ([], BoolConstant b)
+        (Progn [], BoolConstant b)
       | transformExp _ =
         raise Fail "not implemented"
 
