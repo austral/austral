@@ -74,7 +74,7 @@ structure CppBackend :> CPP_BACKEND = struct
       | transformExp (MIR.TupleCreate exps) =
         Funcall ("std::make_tuple", [], map transformExp exps)
       | transformExp (MIR.TupleProj (tup, idx)) =
-        Funcall ("std::get", [Int.toString idx], transformExp tup)
+        Funcall ("std::get", [NamedType (Int.toString idx)], transformExp tup)
       | transformExp (MIR.Funcall (name, tyargs, args)) =
         Funcall (name, map transformType tyargs, transformExp args)
 
