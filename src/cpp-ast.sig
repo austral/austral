@@ -22,10 +22,10 @@ signature CPP_AST = sig
                 | Pointer of ty
                 | TypeCons of string * ty list
 
-    datatype exp_ast = ConstBool of bool
-                     | ConstInt of int
-                     | ConstString of string
-                     | ConstNull
+    datatype exp_ast = BoolConstant of bool
+                     | IntConstant of int
+                     | StringConstant of string
+                     | NullConstant
                      | Var of string
                      | Binop of binop * exp_ast * exp_ast
                      | Cast of ty * exp_ast
