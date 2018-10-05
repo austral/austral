@@ -26,7 +26,7 @@ signature CPP_AST = sig
                      | IntConstant of int
                      | StringConstant of string
                      | NullConstant
-                     | Var of string
+                     | Variable of string
                      | Binop of binop * exp_ast * exp_ast
                      | Cast of ty * exp_ast
                      | Deref of exp_ast
