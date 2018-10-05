@@ -20,7 +20,7 @@
 signature CPP_AST = sig
     datatype ty = NamedType of string
                 | Pointer of ty
-                | TypeConxs of string * ty list
+                | TypeCons of string * ty list
 
     datatype exp_ast = ConstBool of bool
                      | ConstInt of int
