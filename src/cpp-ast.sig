@@ -18,9 +18,9 @@
 *)
 
 signature CPP_AST = sig
-    datatype typespec = NamedType of string
-                      | Pointer of typespec
-                      | TypeCons of string * typespec list
+    datatype ty = NamedType of string
+                | Pointer of ty
+                | TypeConxs of string * ty list
 
     datatype exp_ast = ConstBool of bool
                      | ConstInt of int
@@ -28,15 +28,15 @@ signature CPP_AST = sig
                      | ConstNull
                      | Var of string
                      | Binop of binop * exp_ast * exp_ast
-                     | Cast of typespec * exp_ast
+                     | Cast of ty * exp_ast
                      | Deref of exp_ast
                      | AddressOf of exp_ast
-                     | SizeOf of typespec
+                     | SizeOf of ty
                      | CreateTuple of exp_ast list
                      | AccessTuple of exp_ast * int
                      | StructInitializer of string * (string * exp_ast) list
                      | StructAccess of exp_ast * string
-                     | Funcall of string * typespec list * exp_ast list
+                     | Funcall of string * ty list * exp_ast list
                      | Raw of string
          and binop = Add
                    | Sub
@@ -51,18 +51,18 @@ signature CPP_AST = sig
 
     datatype block_ast = Sequence of block_ast list
                        | Block of block_ast list
-                       | Declare of typespec * string
+                       | Declare of ty * string
                        | Assign of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
                        | While of exp_ast * block_ast
                        | VoidFuncall of string * exp_ast list
 
-    datatype top_ast = FunctionDef of string * typaram list * param list * typespec * block_ast * exp_ast
+    datatype top_ast = FunctionDef of string * typaram list * param list * ty * block_ast * exp_ast
                      | StructDef of string * typaram list * slot list
                      | ToplevelProgn of top_ast list
          and typaram = TypeParam of string
-         and param = Param of string * typespec
-         and slot = Slot of string * typespec
+         and param = Param of string * ty
+         and slot = Slot of string * ty
 
     val renderTop : top_ast -> string
 end
