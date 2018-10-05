@@ -89,7 +89,10 @@ structure MIR :> MIR = struct
                                                                      map transformType args)
       | transformType (Type.TypeVariable name) = TypeVariable (HIR.escapeSymbol name)
 
-    fun transformExp _ = raise Fail "derp not implemented yet"
+    fun transformExp (HIR.BoolConstant b) =
+        ([], BoolConstant b)
+      | transformExp _ =
+        raise Fail "not implemented"
 
     fun transformTop (HIR.Defun (name, params, ty, body)) =
         let fun mapParam (HIR.Param (name, ty)) =
