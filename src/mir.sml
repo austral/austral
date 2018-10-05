@@ -103,5 +103,7 @@ structure MIR :> MIR = struct
                        transformType ty,
                        bodyBlock,
                        bodyExp)
+            end
         end
+
 end
