@@ -63,6 +63,17 @@ structure MIR :> MIR = struct
          and param = Param of name * ty
          and slot = Slot of name * ty
 
+    (* Fresh variables *)
+
+    val count = ref 0
+
+    fun freshVar () =
+        let
+        in
+            count := !count + 1;
+            "auto_" ^ (Int.toString (!count))
+        end
+
     (* Transformations *)
 
     local
@@ -102,7 +113,7 @@ structure MIR :> MIR = struct
       | transformExp (HIR.Cond (test, cons, alt, ty)) =
         let val ty' = transformType ty
         in
-            raise Fail "derp"
+            (Progn [Declare
         end
       | transformExp _ =
         raise Fail "not implemented"
