@@ -48,7 +48,8 @@ structure Repl :> REPL = struct
                         in
                             let val c' = Compiler.compileUnit c unit
                             in
-                                print "Compiled";
+                                print "Code:\n";
+                                print (Compiler.compilerCode c');
                                 print "\n\n";
                                 repl' c'
                             end
