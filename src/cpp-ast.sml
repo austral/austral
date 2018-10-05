@@ -34,8 +34,6 @@ structure CppAst :> CPP_AST = struct
                      | Deref of exp_ast
                      | AddressOf of exp_ast
                      | SizeOf of ty
-                     | CreateTuple of exp_ast list
-                     | AccessTuple of exp_ast * int
                      | StructInitializer of string * (string * exp_ast) list
                      | StructAccess of exp_ast * string
                      | Funcall of string * ty list * exp_ast list
