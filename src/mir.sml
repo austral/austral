@@ -112,8 +112,26 @@ structure MIR :> MIR = struct
         (Progn [], Variable name)
       | transformExp (HIR.Cond (test, cons, alt, ty)) =
         let val ty' = transformType ty
+            and result = freshVar ()
         in
-            (Progn [Declare
+            let val (testBlock, testExp) = transform test
+                and (consBlock, consExp) = transform cons
+                and (altBlock, altExp) = transform alt
+            in
+                (Progn [testBlock,
+                        Declare (result, ty'),
+                        Cond (testExp,
+                              Progn [
+                                  consBlock,
+                                  Assign (result, consExp)
+                              ],
+                              Progn [
+                                  altBlock,
+                                  Assign (result, altExp)
+                             ])
+                       ],
+                 Variable result)
+            end
         end
       | transformExp _ =
         raise Fail "not implemented"
