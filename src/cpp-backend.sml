@@ -78,7 +78,9 @@ structure CppBackend :> CPP_BACKEND = struct
                  [NamedType (Int.toString idx)],
                  [transformExp tup])
       | transformExp (MIR.Funcall (name, tyargs, args)) =
-        Funcall (name, map transformType tyargs, transformExp args)
+        Funcall (name,
+                 map transformType tyargs,
+                 transformExp args)
 
     fun transformTop _ =
         raise Fail "Not implemented yet"
