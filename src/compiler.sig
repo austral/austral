@@ -24,6 +24,7 @@ signature COMPILER = sig
     val emptyCompiler : compiler
 
     val currentModule : compiler -> Module.module
+    val compilerCode : compiler -> code
 
     type pathname = string
 
