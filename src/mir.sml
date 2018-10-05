@@ -86,7 +86,7 @@ structure MIR :> MIR = struct
       | transformType (Type.Tuple tys) = Tuple (map transformType tys)
       | transformType (Type.Pointer ty) = Pointer (transformType ty)
       | transformType (Type.Disjunction _) = raise Fail "Derpy"
-      | transformType (Type.TypeVariable n) = TypeVariable n
+      | transformType (Type.TypeVariable n) = TypeVariable (HIR.escapeSymbol n)
 
     fun transformExp _ = raise Fail "derp not implemented yet"
 
