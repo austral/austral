@@ -84,6 +84,9 @@ structure CppBackend :> CPP_BACKEND = struct
                  map transformType tyargs,
                  map transformExp args)
 
+    fun transformBlock _ =
+        raise Fail "derp"
+
     fun transformTop (MIR.Defun (name, typarams, params, rt, body, retval)) =
         FunctionDef (name,
                      map (fn (MIR.TypeParam t) => TypeParam (transformType t)) typarams,
