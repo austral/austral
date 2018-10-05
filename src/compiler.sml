@@ -40,6 +40,9 @@ structure Compiler :> COMPILER = struct
     fun currentModule (Compiler (menv, _, _, modName, _)) =
         Option.valOf (Module.envGet menv modName)
 
+    fun compilerCode (Compiler (_, _, _, _, code)) =
+        code
+
     type pathname = string
 
     datatype compilation_unit = FileUnit of pathname
