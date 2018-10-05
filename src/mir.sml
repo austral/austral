@@ -95,7 +95,7 @@ structure MIR :> MIR = struct
         let fun mapParam (HIR.Param (name, ty)) =
                 Param (name, transformType ty)
         in
-            let val (bodyBlock, bodyExp) = transform body
+            let val (bodyBlock, bodyExp) = transformExp body
             in
                 Defun (name,
                        [],
