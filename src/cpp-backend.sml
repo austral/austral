@@ -32,4 +32,6 @@ structure CppBackend :> CPP_BACKEND = struct
       | transformType MIR.SingleFloat = NamedType "float"
       | transformType MIR.DoubleFloat = NamedType "double"
       | transformType (MIR.NamedType name) = NamedType name
+      | transformType (MIR.Pointer ty) = Pointer (transformType ty)
+      | transformType (MIR.Tuple tys) = TypeCons "std::tuple" (map transformType tys)
 end
