@@ -114,9 +114,9 @@ structure MIR :> MIR = struct
         let val ty' = transformType ty
             and result = freshVar ()
         in
-            let val (testBlock, testExp) = transform test
-                and (consBlock, consExp) = transform cons
-                and (altBlock, altExp) = transform alt
+            let val (testBlock, testExp) = transformExp test
+                and (consBlock, consExp) = transformExp cons
+                and (altBlock, altExp) = transformExp alt
             in
                 (Progn [testBlock,
                         Declare (result, ty'),
