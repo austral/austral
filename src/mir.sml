@@ -97,6 +97,13 @@ structure MIR :> MIR = struct
         (Progn [], FloatConstant f)
       | transformExp (HIR.StringConstant s) =
         (Progn [], StringConstant s)
+      | transformExp (HIR.Variable name) =
+        (Progn [], Variable name)
+      | transformExp (HIR.Cond (test, cons, alt, ty)) =
+        let val ty' = transformType ty
+        in
+            raise Fail "derp"
+        end
       | transformExp _ =
         raise Fail "not implemented"
 
