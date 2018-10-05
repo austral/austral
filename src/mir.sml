@@ -110,6 +110,16 @@ structure MIR :> MIR = struct
         (Progn [], StringConstant s)
       | transformExp (HIR.Variable name) =
         (Progn [], Variable name)
+      | transformExp (HIR.Let (name, ty, value, body)) =
+        let val (valueBlock, valueExp) = transformExp value
+            and (bodyBlock, bodyExp) = transformExp body
+        in
+            (Progn [valueBlock,
+                    Declare (name, transformType ty),
+                    Assign (Variable name, valueExp),
+                    bodyBlock],
+             bodyExp)
+        end
       | transformExp (HIR.Cond (test, cons, alt, ty)) =
         let val ty' = transformType ty
             and result = freshVar ()
