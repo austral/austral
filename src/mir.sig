@@ -52,7 +52,7 @@ signature MIR = sig
                      | Funcall of string * ty list * exp_ast list
 
     datatype block_ast = Progn of block_ast list
-                       | Declare of ty * string * exp_ast
+                       | Declare of ty * string
                        | Assign of exp_ast * exp_ast
                        | Store of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
