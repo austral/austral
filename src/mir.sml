@@ -168,7 +168,7 @@ structure MIR :> MIR = struct
             (expBlock, Cast (transformType ty, exp'))
         end
       | transformExp _ =
-        raise Fail "not implemented"
+        raise Fail "HIR->MIR not implemented"
 
     fun transformTop (HIR.Defun (name, params, ty, body)) =
         let fun mapParam (HIR.Param (name, ty)) =
