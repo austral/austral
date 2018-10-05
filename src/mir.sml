@@ -134,7 +134,15 @@ structure MIR :> MIR = struct
             end
         end
       | transformExp (HIR.TupleCreate exps) =
-        TupleCreate (map transformExp exps)
+        let val exps' = map transformExp exps
+        in
+            let fun pairBlocks (b, _) = b
+                and pairExp (_, e) = e
+            in
+                (Progn (map pairBlocks exps'),
+                 TupleCreate (map pairExp exps'))
+            end
+        end
       | transformExp _ =
         raise Fail "not implemented"
 
