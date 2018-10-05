@@ -105,5 +105,6 @@ structure MIR :> MIR = struct
                        bodyExp)
             end
         end
-
+      | transformTop _ =
+        raise Fail "not implemented"
 end
