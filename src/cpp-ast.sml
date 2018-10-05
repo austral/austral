@@ -109,7 +109,7 @@ structure CppAst :> CPP_AST = struct
         "true"
       | renderExp (BoolConstant false) =
         "false"
-      | renderExp (ConstInt i) =
+      | renderExp (IntConstant i) =
         (if i < 0 then "-" else "") ^ (Int.toString (abs i))
       | renderExp (ConstString s) =
         let fun tr #"\"" = "\\\""
