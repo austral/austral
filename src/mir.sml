@@ -40,6 +40,7 @@ structure MIR :> MIR = struct
     datatype exp_ast = BoolConstant of bool
                      | IntConstant of string
                      | FloatConstant of string
+                     | StringConstant of CST.escaped_string
                      | NullConstant
                      | Variable of string
                      | Cast of ty * exp_ast
