@@ -111,7 +111,7 @@ structure CppAst :> CPP_AST = struct
         "false"
       | renderExp (IntConstant i) =
         (if i < 0 then "-" else "") ^ (Int.toString (abs i))
-      | renderExp (ConstString s) =
+      | renderExp (StringConstant s) =
         let fun tr #"\"" = "\\\""
               | tr c = str c
         in
@@ -119,7 +119,7 @@ structure CppAst :> CPP_AST = struct
         end
       | renderExp ConstNull =
         "NULL"
-      | renderExp (Var s) =
+      | renderExp (Variable s) =
         s
       | renderExp (Binop (oper, a, b)) =
         "(" ^ (renderExp a) ^ " " ^ (binopStr oper) ^ " " ^ (renderExp b) ^ ")"
@@ -131,10 +131,6 @@ structure CppAst :> CPP_AST = struct
         "&" ^ (renderExp e)
       | renderExp (SizeOf t) =
         "sizeof(" ^ (renderType t) ^ ")"
-      | renderExp (CreateTuple exps) =
-        "std::make_tuple(" ^ (commaSep (map renderExp exps)) ^ ")"
-      | renderExp (AccessTuple (exp, i)) =
-        "std::get<" ^ (Int.toString i) ^ ">(" ^ (renderExp exp) ^ ")"
       | renderExp (StructInitializer (name, inits)) =
         "(("
         ^ (name)
