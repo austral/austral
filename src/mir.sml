@@ -91,5 +91,17 @@ structure MIR :> MIR = struct
 
     fun transformExp _ = raise Fail "derp not implemented yet"
 
-    fun transformTop _ = raise Fail "derp not implemented yet"
+    fun transformTop (HIR.Defun (name, params, ty, body)) =
+        let fun mapParam (HIR.Param (name, ty)) =
+                Param (name, transformType ty)
+        in
+            let val (bodyBlock, bodyExp) = transform body
+            in
+                Defun (name,
+                       [],
+                       map mapParam params,
+                       transformType ty,
+                       bodyBlock,
+                       bodyExp)
+        end
 end
