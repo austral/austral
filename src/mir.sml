@@ -87,7 +87,7 @@ structure MIR :> MIR = struct
       | transformType (Type.Pointer ty) = Pointer (transformType ty)
       | transformType (Type.Disjunction (name, args, _)) = TypeCons (HIR.escapeSymbol name,
                                                                      map transformType args)
-      | transformType (Type.TypeVariable n) = TypeVariable (HIR.escapeSymbol n)
+      | transformType (Type.TypeVariable name) = TypeVariable (HIR.escapeSymbol name)
 
     fun transformExp _ = raise Fail "derp not implemented yet"
 
