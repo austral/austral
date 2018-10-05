@@ -18,6 +18,7 @@
 *)
 
 signature COMPILER = sig
+    type code = string
     type compiler
 
     val emptyCompiler : compiler
