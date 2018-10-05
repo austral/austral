@@ -59,6 +59,8 @@ structure CppBackend :> CPP_BACKEND = struct
         IntConstant i
       | transformExp (MIR.FloatConstant f) =
         FloatConstant f
+      | transformExp (MIR.StringConstant s) =
+        StringConstant s
       | transformExp MIR.NullConstant =
         NullConstant
       | transformExp (MIR.Variable n) =
