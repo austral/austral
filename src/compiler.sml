@@ -20,13 +20,13 @@
 structure Compiler :> COMPILER = struct
     type code = string
 
-    datatype compiler = Compiler of Module.menv * Type.tenv * Function.fenv * Symbol.module_name * code list
+    datatype compiler = Compiler of Module.menv * Type.tenv * Function.fenv * Symbol.module_name * code
 
     val emptyCompiler = Compiler (Module.defaultMenv,
                                   Type.defaultTenv,
                                   Function.emptyFenv,
                                   Ident.mkIdentEx "austral-user",
-                                  [])
+                                  "")
 
     fun compilerMenv (Compiler (menv, _, _, _, _)) =
         menv
@@ -138,7 +138,7 @@ structure Compiler :> COMPILER = struct
                         let val cppStr = CppAst.renderTop cpp
                             and (Compiler (menv, tenv, fenv, currMod, code)) = c
                         in
-                            Compiler (menv, tenv, fenv, currMod, code @ [cppStr])
+                            Compiler (menv, tenv, fenv, currMod, code ^ "\n\n" ^ cppStr)
                         end
                     end
                 end
