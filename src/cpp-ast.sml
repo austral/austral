@@ -100,9 +100,12 @@ structure CppAst :> CPP_AST = struct
       | binopStr GreaterThanEq = ">="
       | binopStr LessThanEq = "<="
 
-    fun renderType (NamedType n) = n
-      | renderType (Pointer t) = (renderType t) ^ "*"
-      | renderType (TypeCons (n, args)) = n ^ "<" ^ (commaSep (map renderType args)) ^ ">"
+    fun renderType (NamedType n) =
+        n
+      | renderType (Pointer t) =
+        (renderType t) ^ "*"
+      | renderType (TypeCons (n, args)) =
+        n ^ "<" ^ (commaSep (map renderType args)) ^ ">"
 
     fun renderExp (ConstBool true) =
         "true"
