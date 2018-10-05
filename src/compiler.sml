@@ -125,7 +125,10 @@ structure Compiler :> COMPILER = struct
         fun compileForm c topNode =
             let val hirTop = HIR.transformTop topNode
             in
-                c
+                let val mir = MIR.transformTop hirTop
+                in
+                    c
+                end
             end
     end
 
