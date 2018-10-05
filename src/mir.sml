@@ -162,6 +162,11 @@ structure MIR :> MIR = struct
             (Progn [ptrBlock, valBlock, Store (ptrExp, valExp)],
              ptrExp)
         end
+      | transformExp (HIR.Cast (ty, exp)) =
+        let val (expBlock, exp') = transformExp exp
+        in
+            (expBlock, Cast (transformType ty, exp'))
+        end
       | transformExp _ =
         raise Fail "not implemented"
 
