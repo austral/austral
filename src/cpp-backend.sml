@@ -84,8 +84,16 @@ structure CppBackend :> CPP_BACKEND = struct
                  map transformType tyargs,
                  map transformExp args)
 
-    fun transformBlock _ =
-        raise Fail "derp"
+    fun transformBlock (MIR.Progn nodes) =
+        Progn (map transformBlock nodes)
+      | transformBlock (MIR.Declare (ty, name)) =
+        Declare (transformType ty, name)
+      | transformBlock (MIR.Assign (dest, source)) =
+        Assign (transformExp dest, transformExp source)
+      | transformBlock (MIR.Cond (test, cons, alt)) =
+        Cond (transformExp test,
+              transformBlock cons,
+              transformBlock alt)
 
     fun transformTop (MIR.Defun (name, typarams, params, rt, body, retval)) =
         FunctionDef (name,
