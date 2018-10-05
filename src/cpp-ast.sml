@@ -25,7 +25,7 @@ structure CppAst :> CPP_AST = struct
                 | TypeCons of string * ty list
 
     datatype exp_ast = BoolConstant of bool
-                     | IntConstant of int
+                     | IntConstant of string
                      | StringConstant of string
                      | NullConstant
                      | Variable of string
@@ -110,7 +110,7 @@ structure CppAst :> CPP_AST = struct
       | renderExp (BoolConstant false) =
         "false"
       | renderExp (IntConstant i) =
-        (if i < 0 then "-" else "") ^ (Int.toString (abs i))
+        i
       | renderExp (StringConstant s) =
         let fun tr #"\"" = "\\\""
               | tr c = str c

@@ -23,7 +23,7 @@ signature CPP_AST = sig
                 | TypeCons of string * ty list
 
     datatype exp_ast = BoolConstant of bool
-                     | IntConstant of int
+                     | IntConstant of string
                      | StringConstant of string
                      | NullConstant
                      | Variable of string
