@@ -53,8 +53,30 @@ structure CppBackend :> CPP_BACKEND = struct
       | transformType (MIR.TypeVariable name) =
         NamedType name
 
-    fun transformExp _ =
-        raise Fail "Not implemented yet"
+    fun transformExp (MIR.BoolConstant b) =
+        BoolConstant b
+      | transformExp (MIR.IntConstant i) =
+        IntConstant i
+      | transformExp (MIR.FloatConstant f) =
+        FloatConstant f
+      | transformExp MIR.NullConstant =
+        NullConstant
+      | transformExp (MIR.Variable n) =
+        Variable n
+      | transformExp (MIR.Cast (ty, exp)) =
+        Cast (transformType ty, transformExp exp)
+      | transformExp (MIR.Load ptr) =
+        Deref (transformExp ptr)
+      | transformExp (MIR.AddressOf exp) =
+        AddressOf (transformExp exp)
+      | transformExp (MIR.SizeOf ty) =
+        SizeOf (transformType ty)
+      | transformExp (MIR.TupleCreate exps) =
+        Funcall ("std::make_tuple", [], map transformExp exps)
+      | transformExp (MIR.TupleProj (tup, idx)) =
+        Funcall ("std::get", [Int.toString idx], transformExp tup)
+      | transformExp (MIR.Funcall (name, tyargs, args)) =
+        Funcall (name, map transformType tyargs, transformExp args)
 
     fun transformTop _ =
         raise Fail "Not implemented yet"
