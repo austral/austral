@@ -94,6 +94,8 @@ structure MIR :> MIR = struct
         (Progn [], IntConstant i)
       | transformExp (HIR.FloatConstant f) =
         (Progn [], FloatConstant f)
+      | transformExp (HIR.StringConstant s) =
+        (Progn [], StringConstant s)
       | transformExp _ =
         raise Fail "not implemented"
 
