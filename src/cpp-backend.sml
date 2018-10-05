@@ -90,6 +90,9 @@ structure CppBackend :> CPP_BACKEND = struct
         Declare (transformType ty, name)
       | transformBlock (MIR.Assign (dest, source)) =
         Assign (transformExp dest, transformExp source)
+      | transformBlock (MIR.Store (ptr, exp)) =
+        Assign (Deref (transformExp ptr),
+                transformExp exp)
       | transformBlock (MIR.Cond (test, cons, alt)) =
         Cond (transformExp test,
               transformBlock cons,
