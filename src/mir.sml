@@ -148,6 +148,20 @@ structure MIR :> MIR = struct
         in
             (tupBlock, TupleProj (tupExp, idx))
         end
+      | transformExp (HIR.Allocate exp) =
+        raise Fail "allocate not implemented"
+      | transformExp (HIR.Load ptr) =
+        let val (ptrBlock, ptrExp) = transform ptr
+        in
+            (ptrBlock, Load ptrExp)
+        end
+      | transformExp (HIR.Store (ptr, value)) =
+        let val (ptrBlock, ptrExp) = transform ptr
+            and (valBlock, valExp) = transform value
+        in
+            (ptrBlock @ valBlock @ [Store (ptrExp, valExp)],
+             ptrExp)
+        end
       | transformExp _ =
         raise Fail "not implemented"
 
