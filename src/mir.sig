@@ -50,8 +50,7 @@ signature MIR = sig
                      | AccessTuple of exp_ast * int
                      | Funcall of string * ty list * exp_ast list
 
-    datatype block_ast = Sequence of block_ast list
-                       | Block of block_ast list
+    datatype block_ast = Progn of block_ast list
                        | Declare of ty * string * exp_ast
                        | Assign of exp_ast * exp_ast
                        | Store of exp_ast * exp_ast
