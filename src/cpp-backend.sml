@@ -60,7 +60,7 @@ structure CppBackend :> CPP_BACKEND = struct
       | transformExp (MIR.FloatConstant f) =
         FloatConstant f
       | transformExp (MIR.StringConstant s) =
-        StringConstant s
+        StringConstant (CST.escapedToString s)
       | transformExp MIR.NullConstant =
         NullConstant
       | transformExp (MIR.Variable n) =
