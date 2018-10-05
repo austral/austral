@@ -167,8 +167,10 @@ structure MIR :> MIR = struct
         in
             (expBlock, Cast (transformType ty, exp'))
         end
-      | transformExp _ =
-        raise Fail "HIR->MIR not implemented"
+      | transformExp (HIR.Progn exps) =
+        raise Fail "HIR->MIR progn not implemented"
+      | transformExp (HIR.Funcall _) =
+        raise Fail "HIR->MIR funcall not implemented"
 
     fun transformTop (HIR.Defun (name, params, ty, body)) =
         let fun mapParam (HIR.Param (name, ty)) =
