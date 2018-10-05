@@ -52,4 +52,10 @@ structure CppBackend :> CPP_BACKEND = struct
         TypeCons (name, map transformType tys)
       | transformType (MIR.TypeVariable name) =
         NamedType name
+
+    fun transformExp _ =
+        raise Fail "Not implemented yet"
+
+    fun transformTop _ =
+        raise Fail "Not implemented yet"
 end
