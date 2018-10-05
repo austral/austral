@@ -110,6 +110,8 @@ structure CppAst :> CPP_AST = struct
         "true"
       | renderExp (BoolConstant false) =
         "false"
+      | renderExp (FloatConstant f) =
+        f
       | renderExp (IntConstant i) =
         i
       | renderExp (StringConstant s) =
