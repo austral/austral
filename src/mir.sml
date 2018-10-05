@@ -156,8 +156,8 @@ structure MIR :> MIR = struct
             (ptrBlock, Load ptrExp)
         end
       | transformExp (HIR.Store (ptr, value)) =
-        let val (ptrBlock, ptrExp) = transform ptr
-            and (valBlock, valExp) = transform value
+        let val (ptrBlock, ptrExp) = transformExp ptr
+            and (valBlock, valExp) = transformExp value
         in
             (ptrBlock @ valBlock @ [Store (ptrExp, valExp)],
              ptrExp)
