@@ -18,23 +18,26 @@
 *)
 
 structure Compiler :> COMPILER = struct
-    datatype compiler = Compiler of Module.menv * Type.tenv * Function.fenv * Symbol.module_name
+    type code = string
+
+    datatype compiler = Compiler of Module.menv * Type.tenv * Function.fenv * Symbol.module_name * code list
 
     val emptyCompiler = Compiler (Module.defaultMenv,
                                   Type.defaultTenv,
                                   Function.emptyFenv,
-                                  Ident.mkIdentEx "austral-user")
+                                  Ident.mkIdentEx "austral-user",
+                                  [])
 
-    fun compilerMenv (Compiler (menv, _, _, _)) =
+    fun compilerMenv (Compiler (menv, _, _, _, _)) =
         menv
 
-    fun compilerTenv (Compiler (_, tenv, _, _)) =
+    fun compilerTenv (Compiler (_, tenv, _, _, _)) =
         tenv
 
-    fun compilerFenv (Compiler (_, _, fenv, _)) =
+    fun compilerFenv (Compiler (_, _, fenv, _, _)) =
         fenv
 
-    fun currentModule (Compiler (menv, _, _, modName)) =
+    fun currentModule (Compiler (menv, _, _, modName, _)) =
         Option.valOf (Module.envGet menv modName)
 
     type pathname = string
