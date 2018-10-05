@@ -117,7 +117,7 @@ structure CppAst :> CPP_AST = struct
         in
             "\"" ^ (String.translate tr s) ^ "\""
         end
-      | renderExp ConstNull =
+      | renderExp NullConstant =
         "NULL"
       | renderExp (Variable s) =
         s
