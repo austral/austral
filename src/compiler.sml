@@ -127,7 +127,10 @@ structure Compiler :> COMPILER = struct
             in
                 let val mir = MIR.transformTop hirTop
                 in
-                    c
+                    let val cpp = CppBackend.transformTop mir
+                    in
+                        c
+                    end
                 end
             end
     end
