@@ -143,6 +143,11 @@ structure MIR :> MIR = struct
                  TupleCreate (map pairExp exps'))
             end
         end
+      | transformExp (HIR.TupleProj (tup, idx)) =
+        let val (tupBlock, tupExp) = transformExp tup
+        in
+            (tupBlock, TupleProj (tupExp, idx))
+        end
       | transformExp _ =
         raise Fail "not implemented"
 
