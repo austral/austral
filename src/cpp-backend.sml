@@ -89,7 +89,7 @@ structure CppBackend :> CPP_BACKEND = struct
 
     fun transformTop (MIR.Defun (name, typarams, params, rt, body, retval)) =
         FunctionDef (name,
-                     map (fn (MIR.TypeParam t) => TypeParam (transformType t)) typarams,
+                     map (fn (MIR.TypeParam n) => TypeParam n) typarams,
                      map (fn (MIR.Param (n, t)) => Param (n, transformType t)) params,
                      transformType rt,
                      transformBlock body,
