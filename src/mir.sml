@@ -18,6 +18,8 @@
 *)
 
 structure MIR :> MIR = struct
+    type name = string
+
     datatype ty = Bool
                 | UInt8
                 | SInt8
@@ -29,10 +31,11 @@ structure MIR :> MIR = struct
                 | SInt64
                 | SingleFloat
                 | DoubleFloat
-                | NamedType of string
+                | NamedType of name
                 | Pointer of ty
                 | Tuple of ty list
-                | TypeCons of string * ty list
+                | TypeCons of name * ty list
+                | TypeVariable of name
 
     datatype exp_ast = BoolConstant of bool
                      | IntConstant of string
@@ -53,8 +56,6 @@ structure MIR :> MIR = struct
                        | Assign of exp_ast * exp_ast
                        | Store of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
-
-    type name = string
 
     datatype top_ast = Defun of name * typaram list * param list * ty * block_ast * exp_ast
                      | ToplevelProgn of top_ast list
