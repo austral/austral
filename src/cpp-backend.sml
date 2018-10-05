@@ -94,6 +94,6 @@ structure CppBackend :> CPP_BACKEND = struct
                      transformType rt,
                      transformBlock body,
                      transformExp retval)
-      | transformTop (MIR.ToplevenProgn nodes) =
+      | transformTop (MIR.ToplevelProgn nodes) =
         ToplevelProgn (map transformTop nodes)
 end
