@@ -132,7 +132,11 @@ structure Compiler :> COMPILER = struct
                 in
                     let val cpp = CppBackend.transformTop mir
                     in
-                        c
+                        let val cppStr = CppAst.renderTop cpp
+                            and (Compiler (menv, tenv, fenv, currMod, code)) = c
+                        in
+                            Compiler (menv, tenv, fenv, currMod, code @ [cppStr])
+                        end
                     end
                 end
             end
