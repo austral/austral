@@ -105,9 +105,9 @@ structure CppAst :> CPP_AST = struct
       | renderType (TypeCons (n, args)) =
         n ^ "<" ^ (commaSep (map renderType args)) ^ ">"
 
-    fun renderExp (ConstBool true) =
+    fun renderExp (BoolConstant true) =
         "true"
-      | renderExp (ConstBool false) =
+      | renderExp (BoolConstant false) =
         "false"
       | renderExp (ConstInt i) =
         (if i < 0 then "-" else "") ^ (Int.toString (abs i))
