@@ -86,7 +86,7 @@ structure CppBackend :> CPP_BACKEND = struct
 
     fun transformBlock (MIR.Progn nodes) =
         Sequence (map transformBlock nodes)
-      | transformBlock (MIR.Declare (ty, name)) =
+      | transformBlock (MIR.Declare (name, ty)) =
         Declare (transformType ty, name)
       | transformBlock (MIR.Assign (dest, source)) =
         Assign (transformExp dest, transformExp source)
