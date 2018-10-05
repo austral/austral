@@ -178,7 +178,18 @@ structure MIR :> MIR = struct
             (expBlock, Cast (transformType ty, exp'))
         end
       | transformExp (HIR.Progn exps) =
-        raise Fail "HIR->MIR progn not implemented"
+        if List.length exps > 0 then
+            let val exps' = map transformExp exps
+            in
+                let fun pairBlocks (b, _) = b
+                    and pairExp (_, e) = e
+                in
+                    (Progn (map pairBlocks exps'),
+                     pairExp (List.last exps'))
+                end
+            end
+        else
+            (Progn [], BoolConstant false)
       | transformExp (HIR.Funcall _) =
         raise Fail "HIR->MIR funcall not implemented"
 
