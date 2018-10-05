@@ -123,11 +123,11 @@ structure MIR :> MIR = struct
                         Cond (testExp,
                               Progn [
                                   consBlock,
-                                  Assign (result, consExp)
+                                  Assign (Variable result, consExp)
                               ],
                               Progn [
                                   altBlock,
-                                  Assign (result, altExp)
+                                  Assign (Variable result, altExp)
                              ])
                        ],
                  Variable result)
