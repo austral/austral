@@ -26,6 +26,7 @@ structure CppAst :> CPP_AST = struct
 
     datatype exp_ast = BoolConstant of bool
                      | IntConstant of string
+                     | FloatConstant of string
                      | StringConstant of string
                      | NullConstant
                      | Variable of string

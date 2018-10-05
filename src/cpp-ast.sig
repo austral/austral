@@ -24,6 +24,7 @@ signature CPP_AST = sig
 
     datatype exp_ast = BoolConstant of bool
                      | IntConstant of string
+                     | FloatConstant of string
                      | StringConstant of string
                      | NullConstant
                      | Variable of string
