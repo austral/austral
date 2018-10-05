@@ -68,7 +68,7 @@ structure Compiler :> COMPILER = struct
             end
         and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
             (* Add a concrete function to the compiler fenv *)
-            let val (Compiler (menv, tenv, fenv, currModuleName)) = c
+            let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
             in
                 let val f = Function.Function (name,
                                                map (fn (Param (n, t)) => Function.Param (n, t))
@@ -77,7 +77,7 @@ structure Compiler :> COMPILER = struct
                                                docstring)
                 in
                     case (Function.addFunction fenv f) of
-                        SOME fenv' => Compiler (menv, tenv, fenv', currModuleName)
+                        SOME fenv' => Compiler (menv, tenv, fenv', currModuleName, code)
                       | NONE => raise Fail "Repeat function"
                 end
             end
