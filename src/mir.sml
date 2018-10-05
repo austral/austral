@@ -90,6 +90,10 @@ structure MIR :> MIR = struct
 
     fun transformExp (HIR.BoolConstant b) =
         (Progn [], BoolConstant b)
+      | transformExp (HIR.IntConstant i) =
+        (Progn [], IntConstant i)
+      | transformExp (HIR.FloatConstant f) =
+        (Progn [], FloatConstant f)
       | transformExp _ =
         raise Fail "not implemented"
 
