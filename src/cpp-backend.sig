@@ -18,5 +18,6 @@
 *)
 
 signature CPP_BACKEND = sig
-    val transformTop : HIR.top_ast -> CppAst.top_ast
+    val transformExp : MIR.exp_ast -> CppAst.exp_ast
+    val transformTop : MIR.top_ast -> CppAst.top_ast
 end
