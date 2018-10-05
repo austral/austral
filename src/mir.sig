@@ -47,7 +47,7 @@ signature MIR = sig
                      | Load of exp_ast
                      | AddressOf of exp_ast
                      | SizeOf of ty
-                     | CreateTuple of exp_ast list
+                     | TupleCreate of exp_ast list
                      | AccessTuple of exp_ast * int
                      | Funcall of string * ty list * exp_ast list
 

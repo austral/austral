@@ -47,7 +47,7 @@ structure MIR :> MIR = struct
                      | Load of exp_ast
                      | AddressOf of exp_ast
                      | SizeOf of ty
-                     | CreateTuple of exp_ast list
+                     | TupleCreate of exp_ast list
                      | AccessTuple of exp_ast * int
                      | Funcall of string * ty list * exp_ast list
 
@@ -133,6 +133,8 @@ structure MIR :> MIR = struct
                  Variable result)
             end
         end
+      | transformExp (HIR.TupleCreate exps) =
+        TupleCreate (map transformExp exps)
       | transformExp _ =
         raise Fail "not implemented"
 
