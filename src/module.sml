@@ -122,7 +122,10 @@ structure Module : MODULE = struct
             and exports = resolveExports clauses
             and docstring = resolveDocstring clauses
         in
-            raise Fail "clauses->defmodule not implemented yet"
+            let val module = Module (name, nicknames, imports, exports, docstring)
+            in
+                raise Fail "clauses->defmodule not implemented yet"
+            end
         end
     and resolveNicknames clauses menv =
         raise Fail "not done yet"
