@@ -90,14 +90,6 @@ structure Type :> TYPE = struct
         Map.fromList (Util.mapidx (fn (p, idx) => (p, List.nth (args, idx)))
                                   (OrderedSet.toList params))
 
-    (* Return whether the given list and ordered set are both empty *)
-    fun bothEmpty list set =
-        let val ll = List.length list
-            and sl = OrderedSet.size set
-        in
-            (ll = 0) andalso (sl = 0)
-        end
-
     (* Return whether the given set and the given list have the same size *)
     fun sameSize set list =
         (OrderedSet.size set) = (List.length list)
@@ -125,8 +117,9 @@ structure Type :> TYPE = struct
 
     fun resolve tenv (TypeCons (name, tyargs)) =
         (case (getTypedef tenv name) of
-             SOME (BuiltInType (_, ty)) => ty
-           | SOME (TypeAlias (_, params, tys)) =>
+             SOME (BuiltInType (_, ty)) =>
+             ty
+           | SOME (TypeAlias (_, params, ty)) =>
              (* The name refers to an alias of another type. Ensure the type
                 constructor has as many arguments as the type alias has
                 parameters *)
