@@ -115,6 +115,10 @@ structure Type :> TYPE = struct
       | replaceVars _ ty =
         ty
 
+    fun replacements typarams tyargs =
+        Map.fromList (Util.mapidx (fn (p, idx) => (p, List.nth (tyargs, idx)))
+                                  (OrderedSet.toList typarams))
+
     (* Given a type specifier, and a map of type parameter names to type
        specifiers, replace all instances of the type parameters with their
        associated type specifiers *)
