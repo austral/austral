@@ -126,7 +126,7 @@ structure Type :> TYPE = struct
     fun resolve tenv (TypeCons (name, tyargs)) =
         (case (getTypedef tenv name) of
              SOME (BuiltInType (_, ty)) => ty
-           | SOME (TypeAlias (_, p, tys)) =>
+           | SOME (TypeAlias (_, params, tys)) =>
              (* The name refers to an alias to another type specifier. Ensure
                 the type constructor has as many arguments as the type alias has
                 parameters *)
