@@ -123,7 +123,7 @@ structure CppAst :> CPP_AST = struct
             let val variants' = map renderVariant variants
             in
                 "union { "
-                ^ (sepBy "; " slots')
+                ^ (sepBy "; " variants')
                 ^ " }"
             end
         end
