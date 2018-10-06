@@ -161,7 +161,7 @@ structure MIR :> MIR = struct
       | transformExp (HIR.Allocate (exp, ty)) =
         let val pointer = freshVar ()
             and ty' = transformType ty
-            and (expBlock, exp') = transform exp
+            and (expBlock, exp') = transformExp exp
         in
             (Progn [expBlock,
                     Declare (pointer, Pointer ty'),
