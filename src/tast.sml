@@ -212,7 +212,7 @@ structure TAst :> TAST = struct
         in
             Definstance (name, InstanceArg (arg, set), docstring, map mapDef defs)
         end
-      | augmentTop (AST.Deftype (name, params, docstring, tys)) tenv _ =
+      | augmentTop (AST.Deftype (name, params, docstring, tys)) _ _ =
         Deftype (name, params, docstring, tys)
       | augmentTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
         let fun mapVariant (Type.VariantSpec (name, SOME tys)) =
