@@ -51,14 +51,18 @@ signature TYPE = sig
     val addDisjunction : tenv -> (name * typarams * variant list) -> tenv option
 
     (* Given a map of type variable names to types, and a type, replace all type
-       variables in the given type with the given names with the replacements *)
+       variables in the given type with the given names with the
+       replacements. If a type variable present in the type has no replacement
+       in the map, an exception is thrown *)
     val replaceVars : (name, ty) Map.map -> ty -> ty
 
-    (* Given an ordered set of type parameters, and a list of types, return a map of type parameter names to types *)
+    (* Given an ordered set of type parameters, and a list of types, return a
+       map of type parameter names to types *)
     val replacements : typarams -> ty list -> (name, ty) Map.map
 
-    val parseTypespec : RCST.rcst -> typespec
-    val replaceArgs : typarams -> typespec list -> (param, typespec) Map.map
-    val replace : (param, typespec) Map.map -> typespec -> typespec
+
+    (* Given a type environment and a type specifier, resolve the type specifier to a type *)
     val resolve : tenv -> typespec -> ty
+
+    val parseTypespec : RCST.rcst -> typespec
 end
