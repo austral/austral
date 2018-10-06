@@ -256,7 +256,7 @@ structure AST :> AST = struct
     fun transformDefmodule ((RCST.Symbol name)::clauses) =
         let val clauses = map parseClause clauses
         in
-            raise Fail "defmodule not implemented"
+            Defmodule clauses
         end
       | transformDefmodule _ =
         raise Fail "Bad defmodule form"
