@@ -214,7 +214,19 @@ structure AST :> AST = struct
       | transformDeftype _ = raise Fail "Bad deftype form"
 
     fun transformDefdisjunction ((RCST.Symbol name)::(RCST.List params)::body) =
-        raise Fail "defdisjunction not implemented"
+        let fun parseBody [RCST.StringConstant s, def] =
+                (SOME (CST.escapedToString s), def)
+              | parseBody [def] =
+                (NONE, def)
+              | parseBody _ = raise Fail "Bad deftype form"
+            and parseParam (RCST.Symbol s) = s
+              | parseParam _ = raise Fail "Type parameter must be a symbol"
+        in
+            let val (docstring, ty) = parseBody body
+            in
+                raise Fail "Derp"
+            end
+        end
       | transformDefdisjunction _ = raise Fail "Bad defdisjunction form"
 
     fun transformDeftemplate ((RCST.Symbol name)::body) =
