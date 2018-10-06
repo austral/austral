@@ -40,9 +40,8 @@ structure Type :> TYPE = struct
     type typarams = param OrderedSet.set
 
     datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * typarams * typespec
-                     | Datatype of name * typarams * variant_spec list
-         and variant_spec = VariantSpec of name * typespec option
+                     | TypeAlias of name * typarams * ty
+                     | Datatype of name * typarams * variant list
 
     type tenv = (Symbol.symbol, typedef) Map.map
 
