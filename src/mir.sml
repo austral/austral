@@ -199,8 +199,16 @@ structure MIR :> MIR = struct
             end
         else
             (Progn [], BoolConstant false)
-      | transformExp (HIR.Funcall _) =
-        raise Fail "HIR->MIR funcall not implemented"
+      | transformExp (HIR.Funcall (name, args)) =
+        let val args' = map transformExp args
+        in
+            let fun pairBlocks (b, _) = b
+                and pairExp (_, e) = e
+            in
+                (Progn (map pairBlocks args'),
+                 Funcall (name, [], map pairExp args'))
+            end
+        end
 
     fun transformTop (HIR.Defun (name, params, ty, body)) =
         let fun mapParam (HIR.Param (name, ty)) =
