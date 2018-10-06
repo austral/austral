@@ -183,12 +183,12 @@ structure TAst :> TAST = struct
             let val fenv = ctxFenv c
             in
                 case Function.envGet fenv name of
-                    SOME f => augmentFuncall f
+                    SOME f => augmentFuncall f args
                   | NONE => raise Fail "No function with this name"
             end
-        and augmentFuncall (Function.CallableFunc f) =
+        and augmentFuncall (Function.CallableFunc f) args =
             raise Fail "not done yet"
-          | augmentFuncall Function.CallableMethod =
+          | augmentFuncall Function.CallableMethod args =
             raise Fail "not done"
     end
 
