@@ -138,7 +138,9 @@ structure HIR :> HIR = struct
                  map escapeSymbol params,
                  ty)
       | transformTop (TAst.Defdisjunction (name, params, _, variants)) =
-        raise Fail "Defdisjunction to HIR not implemented"
+        Defdisjunction (escapeSymbol name,
+                        map escapeSymbol params,
+                        variants)
       | transformTop (TAst.Deftemplate _) =
         ToplevelProgn []
       | transformTop (TAst.DefineSymbolMacro _) =
