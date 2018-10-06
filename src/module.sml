@@ -156,16 +156,10 @@ structure Module : MODULE = struct
         in
             let val imports = List.concat (List.mapPartial transformClause clauses)
             in
-                let
+                let val imports': (symbol_name * module_name) list =
+                        List.concat (map splitImports imports)
                 in
-                    let val imports': (symbol_name * module_name) list =
-                            List.concat (map splitImports imports)
-                    in
-                        let
-                        in
-                            Imports (processImports imports' Map.empty)
-                        end
-                    end
+                    Imports (processImports imports' Map.empty)
                 end
             end
         end
