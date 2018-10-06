@@ -2,10 +2,13 @@ TODO:
 
 - Parse RCST toplevel nodes into top-level AST nodes
 - Parse defmodule declarations into a proper module instance
+
 - Error on repeat type variables in an instance declaration
-- Type checking
 - Error on phantom type parameters in a type alias
 - Parse nested comments
+
+- Macro match
+- Macroexpansion
 
 DONE:
 
@@ -29,3 +32,4 @@ DONE:
 - Handle type declarations
 - Handle datatype declarations
 - C++ backend
+- Type checking
