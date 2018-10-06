@@ -84,14 +84,14 @@ structure Compiler :> COMPILER = struct
                       | NONE => raise Fail "Repeat function"
                 end
             end
-          | declareTopForm c (Deftype (name, params, docstring, def)) =
+          (*| declareTopForm c (Deftype (name, params, docstring, def)) =
             let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
                 and (Compiler (menv, tenv, fenv, module, code)) = c
             in
                 case (Type.addTypeAlias tenv (name, params', def)) of
                     SOME tenv' => Compiler (menv, tenv', fenv, module, code)
                   | NONE => raise Fail "Duplicate type definition"
-            end
+            end*)
           (*| declareTopForm c (Defdisjunction (name, params, docstring, variants)) =
             let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
                 and (Compiler (menv, tenv, fenv, module)) = c
