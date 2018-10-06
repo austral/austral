@@ -186,8 +186,11 @@ structure TAst :> TAST = struct
                     SOME f => augmentFuncall f args
                   | NONE => raise Fail "No function with this name"
             end
-        and augmentFuncall (Function.CallableFunc f) args =
-            raise Fail "not done yet"
+        and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args =
+            if (List.length params) = (List.length args) then
+                raise Fail "not done yet"
+            else
+                raise Fail "Funcall arity error"
           | augmentFuncall Function.CallableMethod args =
             raise Fail "not done"
     end
