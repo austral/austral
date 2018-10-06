@@ -53,6 +53,8 @@ structure Function :> FUNCTION = struct
     fun envGet menv name =
         let val (FunctionEnv (funs, classes, instances)) = menv
         in
-            Map.get funs name
+            case Map.get funs name of
+                SOME f => SOME (CallableFunc f)
+              | NONE => NONE
         end
 end
