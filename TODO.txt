@@ -1,16 +1,16 @@
 TODO:
 
+- Compile function calls
 - Compile typeclass instances to a list of HIR generic functions
 - Parse definstance declarations
 - Parse deftemplate declarations
-- Compile function calls
+- Tuple bind
 
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
 - Parse nested comments
 - Show symbol names in error messages
 - Better error messages
-- Tuple bind
 - Linearity
 
 - Macro match
