@@ -37,10 +37,9 @@ signature HIR = sig
                  | Funcall of string * ast list
 
     type name = string
-    type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * ty * ast
-                     | Deftype of name * name list * typespec
+                     | Deftype of name * name list * ty
                      | Defdisjunction of name * name list * Type.variant list
                      | ToplevelProgn of top_ast list
          and param = Param of name * ty
