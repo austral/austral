@@ -143,7 +143,7 @@ structure Module : MODULE = struct
         in
             let val pairs = List.concat (List.mapPartial transformClause clauses)
             in
-                raise Fail "not done yet"
+                processNicknames pairs Map.empty
             end
         end
     and resolveImports clauses menv =
