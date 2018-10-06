@@ -35,7 +35,7 @@ signature TYPE = sig
          and float_type = Single | Double
          and variant = Variant of name * ty option
 
-    type typespec
+    datatype typespec = TypeCons of name * (typespec list)
 
     type typarams = param OrderedSet.set
 
