@@ -117,14 +117,14 @@ structure Module : MODULE = struct
                               | DocstringClause of string
 
     fun resolveModule menv name clauses =
-        let val nicknames = resolveNicknames clauses
+        let val nicknames = resolveNicknames clauses menv
             and imports = resolveImports clauses menv
             and exports = resolveExports clauses
             and docstring = resolveDocstring clauses
         in
             raise Fail "clauses->defmodule not implemented yet"
         end
-    and resolveNicknames clauses =
+    and resolveNicknames clauses menv =
         raise Fail "not done yet"
     and resolveImports clauses menv =
         (* Given a module name, return a pair (moduleName, exports) *)
