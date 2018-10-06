@@ -48,10 +48,16 @@ structure CppBackend :> CPP_BACKEND = struct
         Pointer (transformType ty)
       | transformType (MIR.Tuple tys) =
         TypeCons ("std::tuple", (map transformType tys))
+      | transformType (MIR.Struct slots) =
+        Struct (map transformSlot slots)
+      | transformType (MIR.Union slots) =
+        Union (map transformSlot slots)
       | transformType (MIR.TypeCons (name, tys)) =
         TypeCons (name, map transformType tys)
       | transformType (MIR.TypeVariable name) =
         NamedType name
+    and transformSlot (MIR.Slot (name, ty)) =
+        (transformType ty, name)
 
     fun transformExp (MIR.BoolConstant b) =
         BoolConstant b
