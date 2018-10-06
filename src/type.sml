@@ -143,7 +143,7 @@ structure Type :> TYPE = struct
              if sameSize params tyargs then
                  (* Replace parameters in the type with arguments from
                     the type constructor *)
-                 let m = replacements params tyargs
+                 let val m = replacements params tyargs
                  in
                      Disjunction (n,
                                   tyargs,
