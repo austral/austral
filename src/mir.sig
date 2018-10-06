@@ -34,6 +34,7 @@ signature MIR = sig
                 | NamedType of name
                 | Pointer of ty
                 | Tuple of ty list
+                | Union of ty list
                 | TypeCons of name * ty list
                 | TypeVariable of name
 
