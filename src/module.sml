@@ -128,12 +128,15 @@ structure Module : MODULE = struct
                 (case envGet menv moduleName of
                      SOME m => (moduleName, Set.toList (moduleExports m))
                    | NONE => raise Fail "Not module with this name")
+            and transformClause (ImportFromClause i) = SOME [i]
+              | transformClause (UseClause moduleNames) = SOME (map useToImports moduleNames)
+              | transformClause _ = NONE
         in
-            let fun transformClause (ImportFromClause i) = SOME [i]
-                  | transformClause (UseClause moduleNames) = SOME (map useToImports moduleNames)
-                  | transformClause _ = NONE
+            let val imports = List.concat (List.mapPartial transformClause clauses)
             in
-                let val imports = List.concat (List.mapPartial transformClause clauses)
+                let fun processImports (modName, syms) m =
+
+                        raise Fail "derp"
                 in
                     raise Fail "Stub"
                 end
