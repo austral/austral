@@ -138,6 +138,21 @@ structure Module : MODULE = struct
                symbols, return a list of (symbolName, moduleName) pairs *)
             and splitImports (module, syms) =
                 map (fn s => (s, module)) syms
+            (* See below *)
+            and processImports (head::tail) m =
+                let val m' = processImport head m
+                in
+                    processImports tail m'
+                end
+              | processImports nil m =
+                m
+            (* Given a pair of a symbol name and module name, and a map of of
+               these pairs, either add the pair to the map or signal an error if a
+               duplicate import is being attempted *)
+            and processImport (symbolName, moduleName) m =
+                (case Map.get m symbolName of
+                     SOME moduleName' => raise Fail "Duplicate import"
+                   | NONE => Map.iadd m (symbolName, moduleName))
         in
             let val imports = List.concat (List.mapPartial transformClause clauses)
             in
@@ -146,17 +161,7 @@ structure Module : MODULE = struct
                     let val imports': (symbol_name * module_name) list =
                             List.concat (map splitImports imports)
                     in
-                        let fun processImports (head::tail) m =
-                                let val m' = processImport head m
-                                in
-                                    processImports tail m'
-                                end
-                              | processImports nil m =
-                                m
-                            and processImport (symbolName, moduleName) m =
-                                (case Map.get m symbolName of
-                                     SOME moduleName' => raise Fail "Duplicate import"
-                                   | NONE => Map.iadd m (symbolName, moduleName))
+                        let
                         in
                             Imports (processImports imports' Map.empty)
                         end
