@@ -230,9 +230,6 @@ structure CppAst :> CPP_AST = struct
         end
       | renderTop (ToplevelProgn nodes) =
         sepBy "\n\n" (map renderTop nodes)
-
     and renderParam (Param (n, t)) =
         (renderType t) ^ " " ^ n
-    and renderSlot (Slot (n, t)) =
-        (renderType t) ^ " " ^ (n) ^ ";"
 end
