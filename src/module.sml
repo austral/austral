@@ -135,9 +135,9 @@ structure Module : MODULE = struct
             let val imports = List.concat (List.mapPartial transformClause clauses)
             in
                 let fun splitImports (module, syms) =
-                        map (fn s => (module, s)) syms
+                        map (fn s => (s, module)) syms
                 in
-                    let val imports': (module_name * symbol_name) list =
+                    let val imports': (symbol_name * module_name) list =
                             List.concat (map splitImports imports)
                     in
                         let fun processImports (head::tail) m =
@@ -147,10 +147,12 @@ structure Module : MODULE = struct
                                 end
                               | processImports nil m =
                                 m
-                            and processImport (moduleName, symbolName) m =
-                                raise Fail "Derp"
+                            and processImport (symbolName, moduleName) m =
+                                (case Map.get m symbolName of
+                                     SOME moduleName' => raise Fail "Duplicate import"
+                                   | NONE => Map.iadd m (symbolName, moduleName))
                         in
-                            raise Fail "Stub"
+                            Imports (processImports imports' Map.empty)
                         end
                     end
                 end
