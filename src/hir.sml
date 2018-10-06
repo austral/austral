@@ -134,7 +134,9 @@ structure HIR :> HIR = struct
       | transformTop (TAst.Definstance _) =
         raise Fail "definstance to HIR not implemented"
       | transformTop (TAst.Deftype (name, params, _, ty)) =
-        raise Fail "deftype to HIR not implemented"
+        Deftype (escapeSymbol name,
+                 map escapeSymbol params,
+                 ty)
       | transformTop (TAst.Defdisjunction (name, params, _, variants)) =
         raise Fail "Defdisjunction to HIR not implemented"
       | transformTop (TAst.Deftemplate _) =
