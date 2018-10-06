@@ -41,7 +41,6 @@ signature TAST = sig
     type param_name = name
     type docstring = string option
     type symbol = Symbol.symbol
-    type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * ty * docstring * ast
                      | Defclass of name * param_name * docstring * method_decl list
