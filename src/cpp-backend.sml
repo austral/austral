@@ -111,6 +111,10 @@ structure CppBackend :> CPP_BACKEND = struct
                      transformType rt,
                      transformBlock body,
                      transformExp retval)
+      | transformTop (MIR.Deftype (name, params, ty)) =
+        TypeDef (name,
+                 map (fn (MIR.TypeParam n) => TypeParam n) params,
+                 transformType ty)
       | transformTop (MIR.ToplevelProgn nodes) =
         ToplevelProgn (map transformTop nodes)
 end
