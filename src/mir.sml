@@ -231,7 +231,7 @@ structure MIR :> MIR = struct
       | transformTop (HIR.Deftype (name, params, ty)) =
         Deftype (name,
                  params,
-                 ty)
+                 transformType ty)
       | transformTop _ =
         raise Fail "HIR->MIR top not implemented"
 end
