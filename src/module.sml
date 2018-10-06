@@ -134,11 +134,14 @@ structure Module : MODULE = struct
         in
             let val imports = List.concat (List.mapPartial transformClause clauses)
             in
-                let fun processImports (modName, syms) m =
-
-                        raise Fail "derp"
+                let fun splitImports (module, syms) =
+                        map (fn s => (module, s)) syms
                 in
-                    raise Fail "Stub"
+                    let val imports': (module_name * symbol_name) list =
+                            List.concat (map splitImports imports)
+                    in
+                        raise Fail "Stub"
+                    end
                 end
             end
         end
