@@ -46,4 +46,10 @@ structure Function :> FUNCTION = struct
                 SOME _ => NONE
               | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), ts, is))
         end
+
+    datatype callable = CallableFunc of func
+                      | CallableMethod
+
+    fun envGet menv name =
+        raise Fail "derp"
 end
