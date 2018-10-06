@@ -112,7 +112,7 @@ structure CppAst :> CPP_AST = struct
             in
                 "struct { "
                 ^ (sepBy "; " slots')
-                ^ " }"
+                ^ "; }"
             end
         end
       | renderType (Union variants) =
@@ -123,7 +123,7 @@ structure CppAst :> CPP_AST = struct
             in
                 "union { "
                 ^ (sepBy "; " variants')
-                ^ " }"
+                ^ "; }"
             end
         end
       | renderType (TypeCons (n, args)) =
