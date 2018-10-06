@@ -48,7 +48,7 @@ signature TYPE = sig
     val defaultTenv : tenv
     val getTypedef : tenv -> name -> typedef option
     val addTypeAlias : tenv -> (name * typarams * ty) -> tenv option
-    val addDisjunction : tenv -> (name * typarams * variant_spec list) -> tenv option
+    val addDisjunction : tenv -> (name * typarams * variant list) -> tenv option
 
     val parseTypespec : RCST.rcst -> typespec
     val replaceArgs : typarams -> typespec list -> (param, typespec) Map.map
