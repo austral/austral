@@ -2,7 +2,6 @@ TODO:
 
 - Compile typeclass instances to a list of HIR generic functions
 - Parse definstance declarations
-- Parse defmodule declarations into a proper module instance
 - Parse deftemplate declarations
 - Compile function calls
 
@@ -38,3 +37,4 @@ DONE:
 - Type checking
 - Compile type aliases
 - Compile disjunctions
+- Parse defmodule declarations into a proper module instance
