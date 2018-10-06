@@ -51,7 +51,7 @@ structure Function :> FUNCTION = struct
                       | CallableMethod
 
     fun envGet menv name =
-        let (FunctionEnv (funs, classes, instances)) = menv
+        let val (FunctionEnv (funs, classes, instances)) = menv
         in
             Map.get funs name
         end
