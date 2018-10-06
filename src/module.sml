@@ -74,6 +74,8 @@ structure Module : MODULE = struct
                 "defun",
                 "deftype",
                 "defdisjunction",
+                "deftemplate",
+                "define-symbol-macro",
                 "defmodule",
                 "in-module",
                 "unit",
