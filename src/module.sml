@@ -140,7 +140,18 @@ structure Module : MODULE = struct
                     let val imports': (module_name * symbol_name) list =
                             List.concat (map splitImports imports)
                     in
-                        raise Fail "Stub"
+                        let fun processImports (head::tail) m =
+                                let val m' = processImport head m
+                                in
+                                    processImport tail m'
+                                end
+                              | processImports nil m =
+                                m
+                            and processImport (moduleName, symbolName) m =
+                                raise Fail "Derp"
+                        in
+                            raise Fail "Stub"
+                        end
                     end
                 end
             end
