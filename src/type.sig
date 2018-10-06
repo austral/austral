@@ -52,7 +52,7 @@ signature TYPE = sig
 
     (* Given a type, and a map of names to types, replace all type variables
        with the given names with the replacements *)
-    val replaceVars : ty -> (name, ty) Map.map -> ty
+    val replaceVars : (name, ty) Map.map -> ty -> ty
 
     val parseTypespec : RCST.rcst -> typespec
     val replaceArgs : typarams -> typespec list -> (param, typespec) Map.map
