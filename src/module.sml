@@ -125,7 +125,14 @@ structure Module : MODULE = struct
             Module (name, nicknames, imports, exports, docstring)
         end
     and resolveNicknames clauses menv =
-        raise Fail "not done yet"
+        let fun transformClause (NicknamesClause pairs) = SOME pairs
+              | transformClause _ = NONE
+        in
+            let pairs = List.concat (List.mapPartial transformClause clauses)
+            in
+                raise Fail "not done yet"
+            end
+        end
     and resolveImports clauses menv =
         (* Given a module name, return a pair (moduleName, exports) *)
         let fun useToImports moduleName =
