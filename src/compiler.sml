@@ -101,7 +101,7 @@ structure Compiler :> COMPILER = struct
                   | NONE => raise Fail "Duplicate type definition"
             end
           | declareTopForm c (Defmodule (name, clauses)) =
-            let val (Compiler (menv, tenv, fenv, module, code)) = c
+            let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
             in
                 let val module = Module.resolveModule menv name clauses
                 in
@@ -109,7 +109,7 @@ structure Compiler :> COMPILER = struct
                         SOME _ => raise Fail "Duplicate module definition"
                       | NONE => let val menv' = Module.addModule menv module
                                 in
-                                    Compiler (menv', tenv, fenv, module, code)
+                                    Compiler (menv', tenv, fenv, moduleName, code)
                                 end
                 end
             end
