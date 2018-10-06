@@ -116,6 +116,17 @@ structure CppAst :> CPP_AST = struct
                 ^ " }"
             end
         end
+      | renderType (Union variants) =
+        let fun renderVariant (ty, name) =
+                (renderType ty) ^ " " ^ name
+        in
+            let val variants' = map renderVariant variants
+            in
+                "union { "
+                ^ (sepBy "; " slots')
+                ^ " }"
+            end
+        end
       | renderType (TypeCons (n, args)) =
         n ^ "<" ^ (commaSep (map renderType args)) ^ ">"
 
