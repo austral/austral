@@ -45,7 +45,7 @@ signature TAST = sig
     datatype top_ast = Defun of name * param list * ty * docstring * ast
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
-                     | Deftype of name * name list * docstring * typ
+                     | Deftype of name * name list * docstring * ty
                      | Defdisjunction of name * name list * docstring * Type.variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
