@@ -105,6 +105,17 @@ structure CppAst :> CPP_AST = struct
         n
       | renderType (Pointer t) =
         (renderType t) ^ "*"
+      | renderType (Struct slots) =
+        let fun renderSlot (ty, name) =
+                (renderType ty) ^ " " ^ name
+        in
+            let val slots' = map renderSlot slots
+            in
+                "struct { "
+                ^ (sepBy "; " slots')
+                ^ " }"
+            end
+        end
       | renderType (TypeCons (n, args)) =
         n ^ "<" ^ (commaSep (map renderType args)) ^ ">"
 
