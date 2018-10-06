@@ -221,10 +221,17 @@ structure AST :> AST = struct
               | parseBody _ = raise Fail "Bad deftype form"
             and parseParam (RCST.Symbol s) = s
               | parseParam _ = raise Fail "Type parameter must be a symbol"
+            and parseVariants (RCST.List l) =
+                map parseVariants l
+              | parseVariants _ =
+                raise Fail "defdisjunction body must be a list of variants"
         in
-            let val (docstring, ty) = parseBody body
+            let val (docstring, variants) = parseBody body
             in
-                raise Fail "Derp"
+                Defdisjunction (name,
+                                map parseParam params,
+                                docstring,
+                                parseVariants variants)
             end
         end
       | transformDefdisjunction _ = raise Fail "Bad defdisjunction form"
