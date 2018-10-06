@@ -117,5 +117,17 @@ structure Module : MODULE = struct
                               | DocstringClause of string
 
     fun resolveModule menv name clauses =
-        raise Fail "clauses->defmodule not implemented yet"
+        let val docstring = resolveDocstring clauses
+        in
+            raise Fail "clauses->defmodule not implemented yet"
+        end
+    and resolveDocstring clauses =
+        let fun transformClause (DocstringClause s) = SOME s
+              | transformClause _ = NONE
+        in
+            case List.mapPartial transformClause clauses of
+                (x::xs::xs') => raise Fail "Only a single :documentation clause is allowed in a defmodule form"
+              | [s] => SOME s
+              | _ => NONE
+        end
 end
