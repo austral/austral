@@ -101,9 +101,17 @@ structure Compiler :> COMPILER = struct
                   | NONE => raise Fail "Duplicate type definition"
             end
           | declareTopForm c (Defmodule (name, clauses)) =
-            let val module = Module.resolveModule (compilerMenv c) name clauses
+            let val (Compiler (menv, tenv, fenv, module, code)) = c
             in
-                raise Fail "defmodule not implemented yet"
+                let val module = Module.resolveModule menv name clauses
+                in
+                    case Module.envGet menv name of
+                        SOME _ => raise Fail "Duplicate module definition"
+                      | NONE => let val menv' = Module.addModule menv module
+                                in
+                                    Compiler (menv', tenv, fenv, module, code)
+                                end
+                end
             end
           | declareTopForm c (InModule moduleName) =
             (* Switch current module *)
