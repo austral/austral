@@ -6,7 +6,6 @@ TODO:
 - Type checking
 - Error on phantom type parameters in a type alias
 - Parse nested comments
-- C++ backend
 
 DONE:
 
@@ -29,3 +28,4 @@ DONE:
 - Define the toplevel AST datatype
 - Handle type declarations
 - Handle datatype declarations
+- C++ backend
