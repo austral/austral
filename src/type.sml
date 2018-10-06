@@ -98,6 +98,10 @@ structure Type :> TYPE = struct
             (ll = 0) andalso (sl = 0)
         end
 
+    (* Return whether the given set and the given list have the same size *)
+    fun sameSize set list =
+        (OrderedSet.size set) = (List.length list)
+
     fun replaceVars m (TypeVariable name) =
         (case (Map.get m name) of
              SOME ty => ty
@@ -119,18 +123,6 @@ structure Type :> TYPE = struct
         Map.fromList (Util.mapidx (fn (p, idx) => (p, List.nth (tyargs, idx)))
                                   (OrderedSet.toList typarams))
 
-    (* Given a type specifier, and a map of type parameter names to type
-       specifiers, replace all instances of the type parameters with their
-       associated type specifiers *)
-    fun replace m (TypeCons (name, tyargs)) =
-        case (Map.get m (TypeParam name)) of
-            SOME tyspec => if (List.length tyargs) > 0 then
-                               raise Fail "Type parameter cannot be a constructor"
-                           else
-                               tyspec
-          | NONE => TypeCons (name, map (replace m) tyargs)
-
-    (* Given a type environment and a type constructor, resolve it to an actual type *)
     fun resolve tenv (TypeCons (name, tyargs)) =
         (case (getTypedef tenv name) of
              SOME (BuiltInType (_, ty)) => ty
