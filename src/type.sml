@@ -90,6 +90,7 @@ structure Type :> TYPE = struct
         Map.fromList (Util.mapidx (fn (p, idx) => (p, List.nth (args, idx)))
                                   (OrderedSet.toList params))
 
+    (* Return whether the given list and ordered set are both empty *)
     fun bothEmpty list set =
         let val ll = List.length list
             and sl = OrderedSet.size set
