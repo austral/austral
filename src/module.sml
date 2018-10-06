@@ -134,11 +134,14 @@ structure Module : MODULE = struct
             and transformClause (ImportFromClause i) = SOME [i]
               | transformClause (UseClause moduleNames) = SOME (map useToImports moduleNames)
               | transformClause _ = NONE
+            (* Given the pair from an import-from clause of module name and
+               symbols, return a list of (symbolName, moduleName) pairs *)
+            and splitImports (module, syms) =
+                map (fn s => (s, module)) syms
         in
             let val imports = List.concat (List.mapPartial transformClause clauses)
             in
-                let fun splitImports (module, syms) =
-                        map (fn s => (s, module)) syms
+                let
                 in
                     let val imports': (symbol_name * module_name) list =
                             List.concat (map splitImports imports)
