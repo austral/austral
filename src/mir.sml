@@ -67,6 +67,13 @@ structure MIR :> MIR = struct
                      | ToplevelProgn of top_ast list
          and param = Param of name * ty
 
+    (* Utilities for dealing with unions *)
+
+    (* Given the position of a variant in a disjunction, return the
+       corresponding union's slot name *)
+    fun unionSlotName i =
+        "_" ^ (Int.toString i)
+
     (* Fresh variables *)
 
     val count = ref 0
@@ -232,8 +239,17 @@ structure MIR :> MIR = struct
         Deftype (name,
                  params,
                  transformType ty)
+      | transformTop (HIR.Defdisjunction (name, params, variants)) =
+        Deftype (name,
+                 params,
+                 Struct [
+                     Slot ("_tag", UInt8),
+                     Slot ("_data", Union (Util.mapidx transformVariant variants))
+                 ])
       | transformTop (HIR.ToplevelProgn nodes) =
         ToplevelProgn (map transformTop nodes)
-      | transformTop _ =
-        raise Fail "HIR->MIR top not implemented"
+    and transformVariant (Type.Variant (name, SOME ty), idx) =
+        Slot (unionSlotName idx, transformType ty)
+      | transformVariant (Type.Variant (name, NONE), idx) =
+        Slot (unionSlotName idx, Bool)
 end
