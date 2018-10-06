@@ -44,5 +44,5 @@ signature FUNCTION = sig
     datatype callable = CallableFunc of func
                       | CallableMethod
 
-    val envGet : fenv -> name -> callable
+    val envGet : fenv -> name -> callable option
 end
