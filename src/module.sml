@@ -117,7 +117,8 @@ structure Module : MODULE = struct
                               | DocstringClause of string
 
     fun resolveModule menv name clauses =
-        let val imports = resolveImports clauses menv
+        let val nicknames = resolveNicknames clauses
+            and imports = resolveImports clauses menv
             and exports = resolveExports clauses
             and docstring = resolveDocstring clauses
         in
