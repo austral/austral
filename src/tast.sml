@@ -189,7 +189,7 @@ structure TAst :> TAST = struct
         and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args c =
             if (List.length params) = (List.length args) then
                 Funcall (name,
-                         ListPair.map (augmentParam c) params args,
+                         ListPair.map (augmentParam c) (params, args),
                          ty)
             else
                 raise Fail "Funcall arity error"
