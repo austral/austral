@@ -124,6 +124,8 @@ structure Module : MODULE = struct
         in
             raise Fail "clauses->defmodule not implemented yet"
         end
+    and resolveNicknames clauses =
+        raise Fail "not done yet"
     and resolveImports clauses menv =
         (* Given a module name, return a pair (moduleName, exports) *)
         let fun useToImports moduleName =
