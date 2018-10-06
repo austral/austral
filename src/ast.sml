@@ -226,7 +226,7 @@ structure AST :> AST = struct
               | parseVariants _ =
                 raise Fail "defdisjunction body must be a list of variants"
             and parseVariant (RCST.List [RCST.Symbol name, tyspec]) =
-                TypeVariantSpec (name, SOME (Type.parseTypespec tyspec))
+                Type.VariantSpec (name, SOME (Type.parseTypespec tyspec))
               | parseVariant (RCST.List [RCST.Symbol name]) =
                 Type.VariantSpec (name, NONE)
         in
