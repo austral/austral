@@ -92,14 +92,14 @@ structure Compiler :> COMPILER = struct
                     SOME tenv' => Compiler (menv, tenv', fenv, module, code)
                   | NONE => raise Fail "Duplicate type definition"
             end*)
-          (*| declareTopForm c (Defdisjunction (name, params, docstring, variants)) =
+          | declareTopForm c (Defdisjunction (name, params, docstring, variants)) =
             let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
                 and (Compiler (menv, tenv, fenv, module)) = c
             in
                 case (Type.addDisjunction tenv (name, params', variants)) of
                     SOME tenv' => Compiler (menv, tenv', fenv, module)
                   | NONE => raise Fail "Duplicate type definition"
-            end*)
+            end
           | declareTopForm c (InModule moduleName) =
             (* Switch current module *)
             let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
