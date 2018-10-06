@@ -34,9 +34,11 @@ signature MIR = sig
                 | NamedType of name
                 | Pointer of ty
                 | Tuple of ty list
+                | Struct of slot list
                 | Union of ty list
                 | TypeCons of name * ty list
                 | TypeVariable of name
+         and slot = Slot of name * ty
 
     datatype exp_ast = BoolConstant of bool
                      | IntConstant of string
@@ -62,7 +64,6 @@ signature MIR = sig
                      | ToplevelProgn of top_ast list
          and typaram = TypeParam of name
          and param = Param of name * ty
-         and slot = Slot of name * ty
 
     val transformType : Type.ty -> ty
     val transformExp : HIR.ast -> (block_ast * exp_ast)
