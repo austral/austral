@@ -214,9 +214,9 @@ structure TAst :> TAST = struct
       | augmentTop (AST.Deftype (name, params, docstring, tys)) tenv _ =
         Deftype (name, params, docstring, Type.resolve tenv tys)
       | augmentTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
-        let fun mapVariant (Type.VariantSpec (name, SOME tys)) =
+        let fun mapVariant (AST.Variant (name, SOME tys)) =
                 Type.Variant (name, SOME (Type.resolve tenv tys))
-              | mapVariant (Type.VariantSpec (name, NONE)) =
+              | mapVariant (AST.Variant (name, NONE)) =
                 Type.Variant (name, NONE)
         in
             Defdisjunction (name, params, docstring, map mapVariant variants)
