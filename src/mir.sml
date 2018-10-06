@@ -227,6 +227,10 @@ structure MIR :> MIR = struct
                        bodyExp)
             end
         end
+      | transformTop (HIR.Deftype (name, params, typespec)) =
+        Deftype (name,
+                 map (fn (HIR.TypeParam n) => TypeParam ) params,
+                 typespec)
       | transformTop _ =
-        raise Fail "not implemented"
+        raise Fail "HIR->MIR top not implemented"
 end
