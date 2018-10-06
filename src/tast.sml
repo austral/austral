@@ -186,6 +186,10 @@ structure TAst :> TAST = struct
                     SOME f => augmentFuncall f
                   | NONE => raise Fail "No function with this name"
             end
+        and augmentFuncall (Function.CallableFunc f) =
+            raise Fail "not done yet"
+          | augmentFuncall Function.CallableMethod =
+            raise Fail "not done"
     end
 
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
