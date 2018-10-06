@@ -108,6 +108,7 @@ structure Type :> TYPE = struct
         let fun replaceVariant (Variant (name, SOME ty)) =
                 Variant (name, SOME (replaceVars m ty))
               | replaceVariant (Variant (name, NONE)) =
+                Variant (name, NONE)
         in
             Disjunction (name, args, map replaceVariant variants)
         end
