@@ -51,5 +51,8 @@ structure Function :> FUNCTION = struct
                       | CallableMethod
 
     fun envGet menv name =
-        raise Fail "derp"
+        let (FunctionEnv (funs, classes, instances)) = menv
+        in
+            Map.get funs name
+        end
 end
