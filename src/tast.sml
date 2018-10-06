@@ -179,8 +179,13 @@ structure TAst :> TAST = struct
             end
           | augment (AST.Progn exps) c =
             Progn (map (fn a => augment a c) exps)
-          | augment (AST.Funcall _) _ =
-            raise Fail "funcall not implemented"
+          | augment (AST.Funcall (name, args)) c =
+            let val fenv = ctxFenv c
+            in
+                case Function.envGet fenv name of
+                    SOME f => augmentFuncall f
+                  | NONE => raise Fail "No function with this name"
+            end
     end
 
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
