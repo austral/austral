@@ -198,11 +198,15 @@ structure TAst :> TAST = struct
         and augmentParam (Function.Param (name, ty), arg) =
             let val arg' = augment arg c
             in
-                if typesMatch ty (typeOf arg') then
+                if typeMatch ty (typeOf arg') then
                     arg'
                 else
                     raise Fail "Funcall type doesn't match"
             end
+        and typeMatch (Type.TypeVariable t) (Type.TypeVariable _) =
+            true
+          | typeMatch t u =
+            t = u
     end
 
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
