@@ -55,7 +55,7 @@ structure AST :> AST = struct
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * name list * docstring * typespec
-                     | Defdisjunction of name * name list * docstring * Type.variant_spec list
+                     | Defdisjunction of name * name list * docstring * variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Module.defmodule_clause list
@@ -64,6 +64,7 @@ structure AST :> AST = struct
          and method_decl = MethodDecl of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and instance_arg = InstanceArg of name * name Set.set
+         and variant = Variant of name * typespec option
 
     (* Transform alpha-renamed AST to this AST *)
 
