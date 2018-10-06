@@ -128,7 +128,7 @@ structure Module : MODULE = struct
         let fun transformClause (NicknamesClause pairs) = SOME pairs
               | transformClause _ = NONE
         in
-            let pairs = List.concat (List.mapPartial transformClause clauses)
+            let val pairs = List.concat (List.mapPartial transformClause clauses)
             in
                 raise Fail "not done yet"
             end
