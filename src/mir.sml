@@ -158,8 +158,17 @@ structure MIR :> MIR = struct
         in
             (tupBlock, TupleProj (tupExp, idx))
         end
-      | transformExp (HIR.Allocate exp) =
-        raise Fail "allocate not implemented"
+      | transformExp (HIR.Allocate (exp, ty)) =
+        let val pointer = freshVar ()
+            and ty' = transformType ty
+            and (expBlock, exp') = transform exp
+        in
+            (Progn [expBlock,
+                    Declare (pointer, Pointer ty'),
+                    Assign (Variable pointer, Funcall "malloc" [SizeOf ty']),
+                    Store (Variable pointer, exp')],
+             Variable pointer)
+        end
       | transformExp (HIR.Load ptr) =
         let val (ptrBlock, ptrExp) = transformExp ptr
         in
