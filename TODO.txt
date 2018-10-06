@@ -1,7 +1,10 @@
 TODO:
 
-- Parse RCST toplevel nodes into top-level AST nodes
+- Compile typeclass instances to a list of HIR generic functions
+- Parse definstance declarations
 - Parse defmodule declarations into a proper module instance
+- Parse deftemplate declarations
+- Compile function calls
 
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
