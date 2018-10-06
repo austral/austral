@@ -225,6 +225,10 @@ structure AST :> AST = struct
                 map parseVariants l
               | parseVariants _ =
                 raise Fail "defdisjunction body must be a list of variants"
+            and parseVariant (RCST.List [RCST.Sybol name, tyspec]) =
+                TypeVariantSpec (name, SOME (Type.parseTypespec tyspec))
+              | parseVariant (RCST.List [RCST.Symbol name]) =
+                Type.VariantSpec (name, NONE)
         in
             let val (docstring, variants) = parseBody body
             in
