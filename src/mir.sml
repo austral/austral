@@ -60,6 +60,8 @@ structure MIR :> MIR = struct
                        | Store of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
 
+    type typaram = name
+
     datatype top_ast = Defun of name * typaram list * param list * ty * block_ast * exp_ast
                      | Deftype of name * typaram list * ty
                      | ToplevelProgn of top_ast list
