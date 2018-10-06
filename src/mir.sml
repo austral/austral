@@ -165,7 +165,7 @@ structure MIR :> MIR = struct
         in
             (Progn [expBlock,
                     Declare (pointer, Pointer ty'),
-                    Assign (Variable pointer, Funcall "malloc" [SizeOf ty']),
+                    Assign (Variable pointer, Funcall ("malloc", [], [SizeOf ty'])),
                     Store (Variable pointer, exp')],
              Variable pointer)
         end
