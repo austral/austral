@@ -127,6 +127,19 @@ structure Module : MODULE = struct
     and resolveNicknames clauses menv =
         let fun transformClause (NicknamesClause pairs) = SOME pairs
               | transformClause _ = NONE
+            and processNicknames (head::tail) m =
+                let val m' = processNickname head m
+                in
+                    processNicknames tail m'
+                end
+              | processNicknames nil m =
+                m
+            and processNickname (symbolName, moduleName) m =
+                case envGet menv moduleName of
+                    SOME _ => (case Map.get m symbolName of
+                                   SOME _ => raise Fail "Duplicate nickname"
+                                 | _ => Map.iadd m (symbolName, moduleName))
+                  | NONE => raise Fail "Bad nickname: module does not exist"
         in
             let val pairs = List.concat (List.mapPartial transformClause clauses)
             in
