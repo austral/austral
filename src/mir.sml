@@ -35,7 +35,7 @@ structure MIR :> MIR = struct
                 | Pointer of ty
                 | Tuple of ty list
                 | Struct of slot list
-                | Union of ty list
+                | Union of slot list
                 | TypeCons of name * ty list
                 | TypeVariable of name
          and slot = Slot of name * ty
