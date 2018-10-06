@@ -229,6 +229,8 @@ structure AST :> AST = struct
                 Type.VariantSpec (name, SOME (Type.parseTypespec tyspec))
               | parseVariant (RCST.List [RCST.Symbol name]) =
                 Type.VariantSpec (name, NONE)
+              | parseVariant _ =
+                raise Fail "defdisjunction: bad variant definition"
         in
             let val (docstring, variants) = parseBody body
             in
