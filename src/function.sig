@@ -40,4 +40,9 @@ signature FUNCTION = sig
     val emptyFenv : fenv
 
     val addFunction : fenv -> func -> fenv option
+
+    datatype callable = CallableFunc of func
+                      | CallableMethod
+
+    val envGet : fenv -> name -> callable
 end
