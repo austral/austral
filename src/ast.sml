@@ -222,7 +222,7 @@ structure AST :> AST = struct
             and parseParam (RCST.Symbol s) = s
               | parseParam _ = raise Fail "Type parameter must be a symbol"
             and parseVariants (RCST.List l) =
-                map parseVariants l
+                map parseVariant l
               | parseVariants _ =
                 raise Fail "defdisjunction body must be a list of variants"
             and parseVariant (RCST.List [RCST.Symbol name, tyspec]) =
