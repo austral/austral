@@ -183,16 +183,26 @@ structure TAst :> TAST = struct
             let val fenv = ctxFenv c
             in
                 case Function.envGet fenv name of
-                    SOME f => augmentFuncall f args
+                    SOME f => augmentFuncall f args c
                   | NONE => raise Fail "No function with this name"
             end
-        and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args =
+        and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args c =
             if (List.length params) = (List.length args) then
-                raise Fail "not done yet"
+                Funcall (name,
+                         ListPair.map (augmentParam c) params args,
+                         ty)
             else
                 raise Fail "Funcall arity error"
           | augmentFuncall Function.CallableMethod args =
             raise Fail "not done"
+        and augmentParam (Function.Param (name, ty), arg) =
+            let val arg' = augment arg c
+            in
+                if typesMatch ty (typeOf arg') then
+                    arg'
+                else
+                    raise Fail "Funcall type doesn't match"
+            end
     end
 
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
