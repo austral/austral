@@ -126,13 +126,17 @@ structure Module : MODULE = struct
     and resolveImports clauses menv =
         let fun useToImports moduleName =
                 (case envGet menv moduleName of
-                     SOME m => ImportFromClause (moduleName, Set.toList (moduleExports m))
+                     SOME m => (moduleName, Set.toList (moduleExports m))
                    | NONE => raise Fail "Not module with this name")
         in
-            let fun useClauseToImports (UseClause moduleNames) =
-                    map useToImports moduleNames
+            let fun transformClause (ImportFromClause i) = SOME [i]
+                  | transformClause (UseClause moduleNames) = SOME (map useToImports moduleNames)
+                  | transformClause _ = NONE
             in
-                raise Fail "Stub"
+                let val imports = List.concat (List.mapPartial transformClause clauses)
+                in
+                    raise Fail "Stub"
+                end
             end
         end
     and resolveExports clauses =
