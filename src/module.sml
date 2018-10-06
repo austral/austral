@@ -143,7 +143,7 @@ structure Module : MODULE = struct
                         let fun processImports (head::tail) m =
                                 let val m' = processImport head m
                                 in
-                                    processImport tail m'
+                                    processImports tail m'
                                 end
                               | processImports nil m =
                                 m
