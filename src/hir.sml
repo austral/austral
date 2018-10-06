@@ -110,7 +110,7 @@ structure HIR :> HIR = struct
       | transform (TAst.TupleProj (tup, idx)) =
         TupleProj (transform tup, idx)
       | transform (TAst.Allocate v) =
-        Allocate (transform v)
+        Allocate (transform v, TAst.typeOf v)
       | transform (TAst.Load ptr) =
         Load (transform ptr)
       | transform (TAst.Store (ptr, v)) =
