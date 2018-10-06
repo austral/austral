@@ -54,6 +54,9 @@ signature TYPE = sig
        variables in the given type with the given names with the replacements *)
     val replaceVars : (name, ty) Map.map -> ty -> ty
 
+    (* Given an ordered set of type parameters, and a list of types, return a map of type parameter names to types *)
+    val replacements : typarams -> ty list -> (name, ty) Map.map
+
     val parseTypespec : RCST.rcst -> typespec
     val replaceArgs : typarams -> typespec list -> (param, typespec) Map.map
     val replace : (param, typespec) Map.map -> typespec -> typespec
