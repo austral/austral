@@ -73,7 +73,7 @@ structure Module : MODULE = struct
                 "store",
                 "defun",
                 "deftype",
-                "defdatatype",
+                "defdisjunction",
                 "defmodule",
                 "in-module",
                 "unit",
