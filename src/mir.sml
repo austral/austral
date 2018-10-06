@@ -232,6 +232,8 @@ structure MIR :> MIR = struct
         Deftype (name,
                  params,
                  transformType ty)
+      | transformTop (HIR.ToplevelProgn nodes) =
+        ToplevelProgn (map transformTop nodes)
       | transformTop _ =
         raise Fail "HIR->MIR top not implemented"
 end
