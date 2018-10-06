@@ -193,7 +193,7 @@ structure TAst :> TAST = struct
                          ty)
             else
                 raise Fail "Funcall arity error"
-          | augmentFuncall Function.CallableMethod args =
+          | augmentFuncall Function.CallableMethod args c =
             raise Fail "not done"
         and augmentParam c (Function.Param (name, ty), arg) =
             let val arg' = augment arg c
