@@ -115,4 +115,7 @@ structure Module : MODULE = struct
                               | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
                               | ExportClause of Symbol.symbol_name list
                               | DocstringClause of string
+
+    fun resolveModule menv name clauses =
+        raise Fail "clauses->defmodule not implemented yet"
 end
