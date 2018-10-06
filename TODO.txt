@@ -1,6 +1,5 @@
 TODO:
 
-- Compile disjunctions
 - Parse RCST toplevel nodes into top-level AST nodes
 - Parse defmodule declarations into a proper module instance
 
@@ -35,3 +34,4 @@ DONE:
 - C++ backend
 - Type checking
 - Compile type aliases
+- Compile disjunctions
