@@ -127,39 +127,34 @@ structure Type :> TYPE = struct
         (case (getTypedef tenv name) of
              SOME (BuiltInType (_, ty)) => ty
            | SOME (TypeAlias (_, params, tys)) =>
-             (* The name refers to an alias to another type specifier. Ensure
-                the type constructor has as many arguments as the type alias has
+             (* The name refers to an alias of another type. Ensure the type
+                constructor has as many arguments as the type alias has
                 parameters *)
-             if ((OrderedSet.size p) <> (List.length tyargs)) then
-                 raise Fail "Type constructor arity error"
+             if sameSize params tyargs then
+                 (* Replace parameters in the aliased type with arguments from
+                    the type constructor *)
+                 replaceVars (replacements params tyargs) ty
              else
-                 (* Replace parameters in the type specifier with arguments from
-                    the type constructor and resolve the resulting type
-                    specifier *)
-                 resolve tenv (replace (replaceArgs p tyargs) tys)
-           | SOME (Datatype (n, p, variants)) =>
+                 raise Fail "Type constructor arity error"
+           | SOME (Datatype (n, params, variants)) =>
              (* The name refers to an algebraic data type. Ensure the type
                 constructor has as many arguments as the type alias has
                 parameters *)
-             if ((OrderedSet.size p) <> (List.length tyargs)) then
-                 raise Fail "Type constructor arity error"
+             if sameSize params tyargs then
+                 (* Replace parameters in the type with arguments from
+                    the type constructor *)
+                 let m = replacements params tyargs
+                 in
+                     Disjunction (n,
+                                  tyargs,
+                                  map (replaceVariant m) variants)
+                 end
              else
-                 (* Replace parameters in the type specifier with arguments from
-                    the type constructor and resolve the resulting type
-                    specifier *)
-                 replaceData tenv
-                             (replaceArgs p tyargs)
-                             tyargs
-                             (n, p, variants)
-           | NONE => raise Fail ("No type named " ^ (Symbol.toString name)))
-    and replaceData tenv m tyargs (name, typarams, variants) =
-        let fun replaceVariant (VariantSpec (n, SOME tys)) =
-                Variant (n, SOME (resolve tenv (replace m tys)))
-              | replaceVariant (VariantSpec (n, NONE)) =
-                Variant (n, NONE)
-        in
-            Disjunction (name,
-                         map (resolve tenv) tyargs,
-                         map replaceVariant variants)
-        end
+                 raise Fail "Type constructor arity error"
+           | NONE =>
+             raise Fail ("No type named " ^ (Symbol.toString name)))
+    and replaceVariant m (Variant (name, SOME ty)) =
+        Variant (name, SOME (replaceVars m ty))
+      | replaceVariant _ (Variant (name, NONE)) =
+        Variant (name, NONE)
 end
