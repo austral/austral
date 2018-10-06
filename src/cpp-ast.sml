@@ -215,15 +215,18 @@ structure CppAst :> CPP_AST = struct
         in
             rt' ^ " " ^ name' ^ "(" ^ params' ^ ") {\n" ^ body' ^ "\n}"
         end
-      | renderTop (StructDef (name, typarams, slots)) =
-        let val name' = name
-            and typarams' = if typarams = nil then
+      | renderTop (TypeDef (name, typarams, ty)) =
+        let val typarams' = if typarams = nil then
                                 ""
                             else
                                 "<" ^ (commaSep (map (fn (TypeParam s) => s) typarams)) ^ ">"
-            and slots' = String.concatWith " " (map renderSlot slots)
         in
-            "typedef struct { " ^ slots' ^ " } " ^ name' ^ ";\n"
+            typarams'
+            ^ "\ntypedef "
+            ^ (renderType ty)
+            ^ " "
+            ^ name
+            ^ ";\n"
         end
       | renderTop (ToplevelProgn nodes) =
         sepBy "\n\n" (map renderTop nodes)
