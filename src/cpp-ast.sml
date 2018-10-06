@@ -61,11 +61,10 @@ structure CppAst :> CPP_AST = struct
                        | VoidFuncall of string * exp_ast list
 
     datatype top_ast = FunctionDef of string * typaram list * param list * ty * block_ast * exp_ast
-                     | StructDef of string * typaram list * slot list
+                     | TypeDef of string * typaram list * ty
                      | ToplevelProgn of top_ast list
          and typaram = TypeParam of string
          and param = Param of string * ty
-         and slot = Slot of string * ty
 
     (* Rendering utilities *)
 
