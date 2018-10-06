@@ -50,6 +50,10 @@ signature TYPE = sig
     val addTypeAlias : tenv -> (name * typarams * ty) -> tenv option
     val addDisjunction : tenv -> (name * typarams * variant list) -> tenv option
 
+    (* Given a type, and a map of names to types, replace all type variables
+       with the given names with the replacements *)
+    val replaceVars : ty -> (name, ty) Map.map
+
     val parseTypespec : RCST.rcst -> typespec
     val replaceArgs : typarams -> typespec list -> (param, typespec) Map.map
     val replace : (param, typespec) Map.map -> typespec -> typespec
