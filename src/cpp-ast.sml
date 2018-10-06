@@ -22,6 +22,8 @@ structure CppAst :> CPP_AST = struct
 
     datatype ty = NamedType of string
                 | Pointer of ty
+                | Struct of (ty * string) list
+                | Union of (ty * string) list
                 | TypeCons of string * ty list
 
     datatype exp_ast = BoolConstant of bool
