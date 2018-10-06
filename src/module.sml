@@ -117,11 +117,14 @@ structure Module : MODULE = struct
                               | DocstringClause of string
 
     fun resolveModule menv name clauses =
-        let val exports = resolveExports clauses
+        let val imports = resolveImports clauses
+            and exports = resolveExports clauses
             and docstring = resolveDocstring clauses
         in
             raise Fail "clauses->defmodule not implemented yet"
         end
+    and resolveImports clauses =
+        raise Fail "Stub"
     and resolveExports clauses =
         let fun transformClause (ExportClause symbols) = SOME symbols
               | transformClause _ = NONE
