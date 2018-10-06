@@ -60,4 +60,6 @@ signature MODULE = sig
                               | ImportFromClause of Symbol.module_name * (Symbol.symbol_name list)
                               | ExportClause of Symbol.symbol_name list
                               | DocstringClause of string
+
+    val resolve : menv * name * defmodule_clause list -> module
 end
