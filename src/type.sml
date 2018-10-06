@@ -98,6 +98,22 @@ structure Type :> TYPE = struct
             (ll = 0) andalso (sl = 0)
         end
 
+    fun replaceVars m (TypeVariable name) =
+        (case (Map.get m name) of
+             SOME ty => ty
+           | NONE => raise Fail "Type parameter not present in replacements")
+      | replaceVars m (Tuple tys) =
+        Tuple (map (replaceVars m) tys)
+      | replaceVars m (Disjunction (name, args, variants)) =
+        let fun replaceVariant (Variant (name, SOME ty)) =
+                Variant (name, SOME (replaceVars m ty))
+              | replaceVariant (Variant (name, NONE)) =
+        in
+            Disjunction (name, args, map replaceVariant variants)
+        end
+      | replaceVars _ ty =
+        ty
+
     (* Given a type specifier, and a map of type parameter names to type
        specifiers, replace all instances of the type parameters with their
        associated type specifiers *)
