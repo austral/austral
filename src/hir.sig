@@ -29,7 +29,7 @@ signature HIR = sig
                  | Cond of ast * ast * ast * ty
                  | TupleCreate of ast list
                  | TupleProj of ast * int
-                 | Allocate of ast
+                 | Allocate of ast * ty
                  | Load of ast
                  | Store of ast * ast
                  | Cast of ty * ast
