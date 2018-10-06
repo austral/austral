@@ -124,10 +124,13 @@ structure Module : MODULE = struct
             raise Fail "clauses->defmodule not implemented yet"
         end
     and resolveImports clauses menv =
+        (* Given a module name, return a pair (moduleName, exports) *)
         let fun useToImports moduleName =
                 (case envGet menv moduleName of
                      SOME m => (moduleName, Set.toList (moduleExports m))
                    | NONE => raise Fail "Not module with this name")
+            (* map use clauses to a list of import clauses, import clauses to
+               themselves, and drop everything else *)
             and transformClause (ImportFromClause i) = SOME [i]
               | transformClause (UseClause moduleNames) = SOME (map useToImports moduleNames)
               | transformClause _ = NONE
