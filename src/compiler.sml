@@ -101,7 +101,7 @@ structure Compiler :> COMPILER = struct
                   | NONE => raise Fail "Duplicate type definition"
             end
           | declareTopForm c (Defmodule (name, clauses)) =
-            let val module = Module.resolveModule (ctxMenv c) name clauses
+            let val module = Module.resolveModule (compilerMenv c) name clauses
             in
                 raise Fail "defmodule not implemented yet"
             end
