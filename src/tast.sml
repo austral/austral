@@ -68,7 +68,13 @@ structure TAst :> TAST = struct
           | typeOf (Variable (_, t)) = t
           | typeOf (Let (_, _, b)) = typeOf b
           | typeOf (Cond (_, tb, _)) = typeOf tb
-          | typeOf (ArithOp (_, _, lhs, _)) = typeOf lhs
+          | typeOf (ArithOp (kind, _, lhs, _)) =
+            (* The type of most arithmetic operations is the type of the
+               arguments, except for checked operations, where the result is a
+               tuple of the resulting value and a boolean indicating overflow *)
+            (case kind of
+                 Arith.Checked => Tuple [typeOf lhs, Bool]
+               | _ => typeOf lhs)
           | typeOf (TupleCreate exps) = Tuple (map typeOf exps)
           | typeOf (TupleProj (tup, idx)) =
             (case typeOf tup of
