@@ -1,8 +1,5 @@
 TODO:
 
-- Modular arithmetic
-- Checked arithmetic
-- Saturation arithmetic
 - Boolean functions
 - Bitwise operators
 
@@ -48,3 +45,6 @@ DONE:
 - Compile disjunctions
 - Parse defmodule declarations into a proper module instance
 - Compile function calls
+- Modular arithmetic
+- Checked arithmetic
+- Saturation arithmetic
