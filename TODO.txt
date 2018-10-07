@@ -1,6 +1,8 @@
 TODO:
 
 - Modular arithmetic
+- Checked arithmetic
+- Saturation arithmetic
 - Boolean functions
 - Bitwise operators
 
