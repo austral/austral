@@ -88,9 +88,15 @@ structure Compiler :> COMPILER = struct
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
             and (Compiler (menv, tenv, fenv, module, code)) = c
         in
-            case (Type.addDisjunction tenv (name, params', variants)) of
-                SOME tenv' => Compiler (menv, tenv', fenv, module, code)
-              | NONE => raise Fail "Duplicate type definition"
+            let fun mapVariant (AST.Variant (name, SOME tys)) =
+                    Type.Variant (name, SOME (Type.resolve tenv tys))
+                  | mapVariant (AST.Variant (name, NONE)) =
+                    Type.Variant (name, NONE)
+            in
+                case (Type.addDisjunction tenv (name, params', map mapVariant variants)) of
+                    SOME tenv' => Compiler (menv, tenv', fenv, module, code)
+                  | NONE => raise Fail "Duplicate type definition"
+            end
         end
       | declareTopForm c (AST.Defmodule (name, clauses)) =
         let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
