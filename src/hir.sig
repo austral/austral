@@ -27,6 +27,8 @@ signature HIR = sig
                  | Variable of string
                  | Let of string * ty * ast * ast
                  | Cond of ast * ast * ast * ty
+                 | IntArithOp of Arith.oper * ast * ast
+                 | FloatArithOp of Arith.oper * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast * ty
