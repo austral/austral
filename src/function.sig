@@ -37,7 +37,7 @@ signature FUNCTION = sig
 
     type fenv
 
-    val emptyFenv : fenv
+    val defaultFenv : fenv
 
     val addFunction : fenv -> func -> fenv option
 
