@@ -1,6 +1,5 @@
 TODO:
 
-- Fix function declaration types
 - Boolean functions
 - Bitwise operators
 
@@ -49,3 +48,4 @@ DONE:
 - Modular arithmetic
 - Checked arithmetic
 - Saturation arithmetic
+- Fix function declaration types
