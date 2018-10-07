@@ -119,6 +119,15 @@ structure AST :> AST = struct
             transformArith Arith.Saturation Arith.Mul args
         else if f = au "^/" then
             transformArith Arith.Saturation Arith.Div args
+        (* Float arithmetic *)
+        else if f = au ".+" then
+            transformArith Arith.Float Arith.Add args
+        else if f = au ".-" then
+            transformArith Arith.Float Arith.Sub args
+        else if f = au ".*" then
+            transformArith Arith.Float Arith.Mul args
+        else if f = au "./" then
+            transformArith Arith.Float Arith.Div args
         (* Tuple operations *)
         else if f = au "tuple" then
             TupleCreate (args)
