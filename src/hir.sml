@@ -108,11 +108,15 @@ structure HIR :> HIR = struct
       | transform (TAst.Cond (test, cons, alt)) =
         Cond (transform test, transform cons, transform alt, TAst.typeOf cons)
       | transform (TAst.ArithOp (kind, oper, lhs, rhs)) =
-        (case kind of
-             Arith.Modular => IntArithOp (oper, lhs, rhs)
-           | Arith.Checked => transformCheckedArithOp oper lhs rhs
-           | Arith.Saturation => transformSaturationArithOp oper lhs rhs
-           | Arith.Float => FloatArithOp (oper, lhs, rhs))
+        let val lhs' = transform lhs
+            and rhs' = transform rhs
+        in
+            case kind of
+                Arith.Modular => IntArithOp (oper, lhs', rhs')
+              | Arith.Checked => transformCheckedArithOp oper lhs' rhs'
+              | Arith.Saturation => transformSaturationArithOp oper lhs' rhs'
+              | Arith.Float => FloatArithOp (oper, lhs', rhs')
+        end
       | transform (TAst.TupleCreate exps) =
         TupleCreate (map transform exps)
       | transform (TAst.TupleProj (tup, idx)) =
@@ -130,11 +134,9 @@ structure HIR :> HIR = struct
       | transform (TAst.Funcall (f, args, _)) =
         Funcall (escapeSymbol f, map transform args)
     and transformCheckedArithOp oper lhs rhs =
-        Funcall ("austral_checked_" ^ arithOpName oper,
-                 [transform lhs, transform rhs])
+        Funcall ("austral_checked_" ^ arithOpName oper, [lhs, rhs])
     and transformSaturationArithOp oper lhs rhs =
-        Funcall ("austral_saturation_" ^ arithOpName oper,
-                 [transform lhs, transform rhs])
+        Funcall ("austral_saturation_" ^ arithOpName oper, [lhs, rhs])
     and arithOpName (Arith.Add) = "add"
       | arithOpName (Arith.Sub) = "sub"
       | arithOpName (Arith.Mul) = "mul"
