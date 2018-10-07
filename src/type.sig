@@ -35,6 +35,9 @@ signature TYPE = sig
          and float_type = Single | Double
          and variant = Variant of name * ty option
 
+    val isFloat : ty -> bool
+    val isInteger : ty -> bool
+
     datatype typespec = TypeCons of name * (typespec list)
 
     type typarams = param OrderedSet.set
