@@ -92,6 +92,7 @@ structure AST :> AST = struct
             Progn args
         else if f = au "if" then
             transformCond args
+        (* Modular arithmetic *)
         else if f = au "+" then
             transformArith Arith.Modular Arith.Add args
         else if f = au "-" then
@@ -100,6 +101,7 @@ structure AST :> AST = struct
             transformArith Arith.Modular Arith.Mul args
         else if f = au "/" then
             transformArith Arith.Modular Arith.Div args
+        (* Checked arithmetic *)
         else if f = au "&+" then
             transformArith Arith.Checked Arith.Add args
         else if f = au "&-" then
@@ -108,10 +110,21 @@ structure AST :> AST = struct
             transformArith Arith.Checked Arith.Mul args
         else if f = au "&/" then
             transformArith Arith.Checked Arith.Div args
+        (* Saturation arithmetic *)
+        else if f = au "^+" then
+            transformArith Arith.Saturation Arith.Add args
+        else if f = au "^-" then
+            transformArith Arith.Saturation Arith.Sub args
+        else if f = au "^*" then
+            transformArith Arith.Saturation Arith.Mul args
+        else if f = au "^/" then
+            transformArith Arith.Saturation Arith.Div args
+        (* Tuple operations *)
         else if f = au "tuple" then
             TupleCreate (args)
         else if f = au "proj" then
             transformProj args
+        (* Pointers *)
         else if f = au "allocate" then
             transformAlloc args
         else if f = au "load" then
