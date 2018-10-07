@@ -27,6 +27,7 @@ structure OAST :> OAST = struct
     (* Types *)
 
     datatype ast = UnitConstant
+                 | BoolConstant of bool
                  | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
