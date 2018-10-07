@@ -100,6 +100,14 @@ structure AST :> AST = struct
             transformArith Arith.Modular Arith.Mul args
         else if f = au "/" then
             transformArith Arith.Modular Arith.Div args
+        else if f = au "&+" then
+            transformArith Arith.Checked Arith.Add args
+        else if f = au "&-" then
+            transformArith Arith.Checked Arith.Sub args
+        else if f = au "&*" then
+            transformArith Arith.Checked Arith.Mul args
+        else if f = au "&/" then
+            transformArith Arith.Checked Arith.Div args
         else if f = au "tuple" then
             TupleCreate (args)
         else if f = au "proj" then
