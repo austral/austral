@@ -129,6 +129,16 @@ structure HIR :> HIR = struct
         Progn (map transform exps)
       | transform (TAst.Funcall (f, args, _)) =
         Funcall (escapeSymbol f, map transform args)
+    and transformCheckedArithOp oper lhs rhs =
+        Funcall ("austral_checked_" ^ arithOpName oper,
+                 [transform lhs, transform rhs])
+    and transformSaturationArithOp oper lhs rhs =
+        Funcall ("austral_saturation_" ^ arithOpName oper,
+                 [transform lhs, transform rhs])
+    and arithOpName (Arith.Add) = "add"
+      | arithOpName (Arith.Sub) = "sub"
+      | arithOpName (Arith.Mul) = "mul"
+      | arithOpName (Arith.Div) = "div"
 
     (* Transform top-level AST *)
 
