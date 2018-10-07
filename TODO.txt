@@ -1,6 +1,5 @@
 TODO:
 
-- true, false and nil
 - Boolean function not
 - Macro and
 - Macro or
@@ -54,3 +53,4 @@ DONE:
 - Checked arithmetic
 - Saturation arithmetic
 - Fix function declaration types
+- true, false and nil
