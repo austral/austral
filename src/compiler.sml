@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Compiler :> COMPILER = struct
+structure Compiler : COMPILER = struct
     type code = string
 
     datatype compiler = Compiler of Module.menv * Type.tenv * Function.fenv * Symbol.module_name * code
