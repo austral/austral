@@ -1,6 +1,11 @@
 TODO:
 
-- Boolean functions
+- true, false and nil
+- Boolean function not
+- Macro and
+- Macro or
+- Function and*
+- Function or*
 - Bitwise operators
 
 - Compile typeclass instances to a list of HIR generic functions
