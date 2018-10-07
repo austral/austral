@@ -38,6 +38,9 @@ structure Type :> TYPE = struct
     fun isInteger (Integer _) = true
       | isInteger _ = false
 
+    fun isFloat (Float _) = true
+      | isFloat _ = false
+
     datatype typespec = TypeCons of name * (typespec list)
 
     type typarams = param OrderedSet.set
