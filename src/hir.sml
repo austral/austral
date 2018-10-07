@@ -29,6 +29,8 @@ structure HIR :> HIR = struct
                  | Variable of string
                  | Let of string * ty * ast * ast
                  | Cond of ast * ast * ast * ty
+                 | IntArithOp of Arith.oper * ast * ast
+                 | FloatArithOp of Arith.oper * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast * ty
@@ -105,6 +107,12 @@ structure HIR :> HIR = struct
         Let (escapeVariable var, TAst.typeOf value, transform value, transform body)
       | transform (TAst.Cond (test, cons, alt)) =
         Cond (transform test, transform cons, transform alt, TAst.typeOf cons)
+      | transform (TAst.ArithOp (kind, oper, lhs, rhs)) =
+        (case kind of
+             Arith.Modular => IntArithOp (oper, lhs, rhs)
+           | Arith.Checked => transformCheckedArithOp oper lhs rhs
+           | Arith.Saturation => transformSaturationArithOP oper lhs rhs
+           | Arith.Float => FloatArithOp (oper, lhs, rhs))
       | transform (TAst.TupleCreate exps) =
         TupleCreate (map transform exps)
       | transform (TAst.TupleProj (tup, idx)) =
