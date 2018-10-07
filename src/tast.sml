@@ -166,6 +166,7 @@ structure TAst :> TAST = struct
                                      raise Fail "Argument must be an integer"
                     else
                         raise Fail "Both arguments to an arithmetic operator must be of the same type"
+                end
             end
           | augment (AST.TupleCreate exps) c =
             TupleCreate (map (fn e => augment e c) exps)
