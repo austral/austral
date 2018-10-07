@@ -64,7 +64,9 @@ structure Alpha :> ALPHA = struct
 
     (* Alpha renaming *)
 
-    fun alphaRename _ (OAST.IntConstant s) =
+    fun alphaRename _ OAST.UnitConstant =
+        UnitConstant
+      | alphaRename _ (OAST.IntConstant s) =
         IntConstant s
       | alphaRename _ (OAST.FloatConstant f) =
         FloatConstant f
