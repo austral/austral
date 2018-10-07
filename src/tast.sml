@@ -147,7 +147,7 @@ structure TAst :> TAST = struct
                     else
                         Cond (test', cons', alt')
             end
-          | augment (AST.ArithOp (kind, oper, lhs, rhs)) =
+          | augment (AST.ArithOp (kind, oper, lhs, rhs)) c =
             let val lhs' = augment lhs c
                 and rhs' = augment rhs c
             in
