@@ -18,10 +18,10 @@
 *)
 
 structure Arith :> ARITH = struct
-    datatype op = Add
-                | Sub
-                | Mul
-                | Div
+    datatype oper = Add
+                  | Sub
+                  | Mul
+                  | Div
 
     datatype kind = Modular
                   | Checked
