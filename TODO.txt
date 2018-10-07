@@ -1,5 +1,6 @@
 TODO:
 
+- Fix function declaration types
 - Boolean functions
 - Bitwise operators
 
