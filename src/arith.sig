@@ -18,4 +18,13 @@
 *)
 
 signature ARITH = sig
+    datatype op = Add
+                | Sub
+                | Mul
+                | Div
+
+    datatype kind = Modular
+                  | Checked
+                  | Saturation
+                  | Float
 end
