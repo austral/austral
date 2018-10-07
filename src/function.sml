@@ -43,7 +43,7 @@ structure Function :> FUNCTION = struct
                                  Ident.mkIdentEx name)
         in
             let val notFn = Function (au "not",
-                                      [Param (au "arg", Type.Bool)],
+                                      [Param (au "v", Type.Bool)],
                                       Type.Bool,
                                       NONE)
             in
