@@ -35,7 +35,7 @@ signature FUNCTION = sig
          and tyvar = TypeVar of name
          and method_def = MethodDef of name * param list * ty * docstring * RCST.rcst
 
-    type fenv
+    datatype fenv = FunctionEnv of (name, func) Map.map * typeclass list * instance list
 
     val defaultFenv : fenv
 
