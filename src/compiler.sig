@@ -34,9 +34,9 @@ signature COMPILER = sig
     val unitForms : compilation_unit -> CST.cst list
 
     val declareForm : compiler -> CST.cst -> (TAst.top_ast * compiler)
-    val declarationPass : compiler -> CST.cst list -> (TAst.top_ast list * compiler)
+    val declarationPass : compiler -> CST.cst list -> (AST.top_ast list * compiler)
 
-    val compileForm : compiler -> TAst.top_ast -> compiler
+    val compileForm : compiler -> AST.top_ast -> compiler
     val compilationPass : compiler -> TAst.top_ast list -> compiler
 
     val compileUnit : compiler -> compilation_unit -> compiler
