@@ -31,6 +31,7 @@ structure CppAst :> CPP_AST = struct
                      | FloatConstant of string
                      | StringConstant of string
                      | NullConstant
+                     | Negation of exp_ast
                      | Variable of string
                      | Binop of binop * exp_ast * exp_ast
                      | Cast of ty * exp_ast
@@ -145,6 +146,8 @@ structure CppAst :> CPP_AST = struct
         end
       | renderExp NullConstant =
         "NULL"
+      | renderExp (Negation exp) =
+        "!" ^ (renderExp exp)
       | renderExp (Variable s) =
         s
       | renderExp (Binop (oper, a, b)) =

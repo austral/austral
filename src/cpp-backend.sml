@@ -69,6 +69,8 @@ structure CppBackend :> CPP_BACKEND = struct
         StringConstant (CST.escapedToString s)
       | transformExp MIR.NullConstant =
         NullConstant
+      | transformExp (MIR.Negation v) =
+        Negation (transformExp v)
       | transformExp (MIR.Variable n) =
         Variable n
       | transformExp (MIR.IntArithOp (oper, lhs, rhs)) =

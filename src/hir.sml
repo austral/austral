@@ -26,6 +26,7 @@ structure HIR :> HIR = struct
                  | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
+                 | Negation of ast
                  | Variable of string
                  | Let of string * ty * ast * ast
                  | Cond of ast * ast * ast * ty
@@ -132,7 +133,7 @@ structure HIR :> HIR = struct
       | transform (TAst.Progn exps) =
         Progn (map transform exps)
       | transform (TAst.Funcall (f, args, _)) =
-        Funcall (escapeSymbol f, map transform args)
+        transformFuncall f (map transform args)
     and transformCheckedArithOp oper lhs rhs =
         Funcall ("austral_checked_" ^ arithOpName oper, [lhs, rhs])
     and transformSaturationArithOp oper lhs rhs =
@@ -141,6 +142,21 @@ structure HIR :> HIR = struct
       | arithOpName (Arith.Sub) = "sub"
       | arithOpName (Arith.Mul) = "mul"
       | arithOpName (Arith.Div) = "div"
+    and transformFuncall s args =
+        let fun au name =
+                Symbol.mkSymbol (Ident.mkIdentEx "austral",
+                                 Ident.mkIdentEx name)
+        in
+            (* If the function is a builtin, it will be compiled to something
+               particular, or to a funcall with a special name. Otherwise, it's
+               a user-defined function, so just escape the symbol. *)
+            if s = au "not" then
+                case args of
+                    [v] => Negation v
+                  | _ => raise Fail "not: bad arguments"
+            else
+                Funcall (escapeSymbol s, args)
+        end
 
     (* Transform top-level AST *)
 

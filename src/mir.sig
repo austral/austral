@@ -45,6 +45,7 @@ signature MIR = sig
                      | FloatConstant of string
                      | StringConstant of CST.escaped_string
                      | NullConstant
+                     | Negation of exp_ast
                      | Variable of string
                      | IntArithOp of Arith.oper * exp_ast * exp_ast
                      | FloatArithOp of Arith.oper * exp_ast * exp_ast

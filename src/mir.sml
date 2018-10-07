@@ -44,6 +44,7 @@ structure MIR :> MIR = struct
                      | IntConstant of string
                      | FloatConstant of string
                      | StringConstant of CST.escaped_string
+                     | Negation of exp_ast
                      | NullConstant
                      | Variable of string
                      | IntArithOp of Arith.oper * exp_ast * exp_ast
@@ -121,6 +122,11 @@ structure MIR :> MIR = struct
         (Progn [], FloatConstant f)
       | transformExp (HIR.StringConstant s) =
         (Progn [], StringConstant s)
+      | transformExp (HIR.Negation v) =
+        let val (valueBlock, valueExp) = transformExp v
+        in
+            (valueBlock, Negation valueExp)
+        end
       | transformExp (HIR.Variable name) =
         (Progn [], Variable name)
       | transformExp (HIR.Let (name, ty, value, body)) =
