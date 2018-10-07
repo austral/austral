@@ -71,6 +71,14 @@ structure CppBackend :> CPP_BACKEND = struct
         NullConstant
       | transformExp (MIR.Variable n) =
         Variable n
+      | transformExp (MIR.IntArithOp (oper, lhs, rhs)) =
+        Binop (transformOper oper,
+               transformExp lhs,
+               transformExp rhs)
+      | transformExp (MIR.FloatArithOp (oper, lhs, rhs)) =
+        Binop (transformOper oper,
+               transformExp lhs,
+               transformExp rhs)
       | transformExp (MIR.Cast (ty, exp)) =
         Cast (transformType ty, transformExp exp)
       | transformExp (MIR.Load ptr) =
@@ -89,6 +97,10 @@ structure CppBackend :> CPP_BACKEND = struct
         Funcall (name,
                  map transformType tyargs,
                  map transformExp args)
+    and transformOper Arith.Add = Add
+      | transformOper Arith.Sub = Sub
+      | transformOper Arith.Mul = Mul
+      | transformOper Arith.Div = Div
 
     fun transformBlock (MIR.Progn nodes) =
         Sequence (map transformBlock nodes)
