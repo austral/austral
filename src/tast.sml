@@ -68,6 +68,7 @@ structure TAst :> TAST = struct
           | typeOf (Variable (_, t)) = t
           | typeOf (Let (_, _, b)) = typeOf b
           | typeOf (Cond (_, tb, _)) = typeOf tb
+          | typeOf (ArithOp (_, _, lhs, _)) = typeOf lhs
           | typeOf (TupleCreate exps) = Tuple (map typeOf exps)
           | typeOf (TupleProj (tup, idx)) =
             (case typeOf tup of
