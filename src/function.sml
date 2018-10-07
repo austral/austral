@@ -41,13 +41,20 @@ structure Function :> FUNCTION = struct
         let fun au name =
                 Symbol.mkSymbol (Ident.mkIdentEx "austral",
                                  Ident.mkIdentEx name)
+            and funcName (Function (name, _, _, _)) =
+                name
         in
             let val notFn = Function (au "not",
                                       [Param (au "v", Type.Bool)],
                                       Type.Bool,
                                       NONE)
             in
-                FunctionEnv (Map.empty, [], [])
+                let val builtins = [notFn]
+                in
+                    FunctionEnv (Map.fromList (map (fn f => (funcName f, f)) builtins),
+                                 [],
+                                 [])
+                end
             end
         end
 
