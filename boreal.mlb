@@ -16,6 +16,9 @@ src/map.sml
 src/ident.sig
 src/ident.sml
 
+src/arith.sig
+src/arith.sml
+
 src/symbol.sig
 src/symbol.sml
 
