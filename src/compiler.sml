@@ -24,7 +24,7 @@ structure Compiler :> COMPILER = struct
 
     val emptyCompiler = Compiler (Module.defaultMenv,
                                   Type.defaultTenv,
-                                  Function.emptyFenv,
+                                  Function.defaultFenv,
                                   Ident.mkIdentEx "austral-user",
                                   "")
 
