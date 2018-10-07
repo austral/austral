@@ -28,6 +28,7 @@ structure TAst :> TAST = struct
                  | Variable of Symbol.variable * ty
                  | Let of Symbol.variable * ast * ast
                  | Cond of ast * ast * ast
+                 | ArithOp of Arith.oper * Arith.kind * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast
