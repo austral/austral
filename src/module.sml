@@ -120,7 +120,7 @@ structure Module : MODULE = struct
                                                                             australExports)),
                                                  Exports Set.empty,
                                                  NONE)
-                    and australKernelMod = Module (Ident.mkIDentEx "austral-kernel",
+                    and australKernelMod = Module (Ident.mkIdentEx "austral-kernel",
                                                    Map.empty,
                                                    Imports Map.empty,
                                                    Exports Set.empty,
