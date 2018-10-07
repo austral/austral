@@ -37,7 +37,7 @@ structure Function :> FUNCTION = struct
 
     datatype fenv = FunctionEnv of (name, func) Map.map * typeclass list * instance list
 
-    val emptyFenv = FunctionEnv (Map.empty, [], [])
+    val defaultFenv = FunctionEnv (Map.empty, [], [])
 
     fun addFunction (FunctionEnv (fm, ts, is)) f =
         let val (Function (name, _, _, _)) = f
