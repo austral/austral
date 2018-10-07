@@ -1,6 +1,8 @@
 TODO:
 
-- Compile function calls
+- Modular arithmetic
+- Bitwise operators
+
 - Compile typeclass instances to a list of HIR generic functions
 - Parse definstance declarations
 - Parse deftemplate declarations
@@ -42,3 +44,4 @@ DONE:
 - Compile type aliases
 - Compile disjunctions
 - Parse defmodule declarations into a proper module instance
+- Compile function calls
