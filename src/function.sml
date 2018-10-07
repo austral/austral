@@ -37,7 +37,19 @@ structure Function :> FUNCTION = struct
 
     datatype fenv = FunctionEnv of (name, func) Map.map * typeclass list * instance list
 
-    val defaultFenv = FunctionEnv (Map.empty, [], [])
+    val defaultFenv =
+        let fun au name =
+                Symbol.mkSymbol (Ident.mkIdentEx "austral",
+                                 Ident.mkIdentEx name)
+        in
+            let val notFn = Function (au "not",
+                                      [Param (au "arg", Type.Bool)],
+                                      Type.Bool,
+                                      NONE)
+            in
+                FunctionEnv (Map.empty, [], [])
+            end
+        end
 
     fun addFunction (FunctionEnv (fm, ts, is)) f =
         let val (Function (name, _, _, _)) = f
