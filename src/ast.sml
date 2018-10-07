@@ -92,6 +92,8 @@ structure AST :> AST = struct
             Progn args
         else if f = au "if" then
             transformCond args
+        else if f = au "+" then
+            transformArith Arith.Modular Arith.Add args
         else if f = au "tuple" then
             TupleCreate (args)
         else if f = au "proj" then
@@ -108,6 +110,10 @@ structure AST :> AST = struct
         Cond (test, cons, alt)
       | transformCond _ =
         raise Fail "Invalid `if` form"
+    and transformArith kind oper [lhs, rhs] =
+        ArithOp (kind, oper, lhs, rhs)
+      | transformArith kind oper _ =
+        raise Fail "Bad arithmetic operator"
     and transformProj [ast, IntConstant i] =
         TupleProj (ast, Option.valOf (Int.fromString i))
       | transformProj _ =
