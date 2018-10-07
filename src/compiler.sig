@@ -37,7 +37,7 @@ signature COMPILER = sig
     val declarationPass : compiler -> CST.cst list -> (AST.top_ast list * compiler)
 
     val compileForm : compiler -> AST.top_ast -> compiler
-    val compilationPass : compiler -> TAst.top_ast list -> compiler
+    val compilationPass : compiler -> AST.top_ast list -> compiler
 
     val compileUnit : compiler -> compilation_unit -> compiler
 end
