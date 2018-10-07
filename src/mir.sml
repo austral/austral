@@ -46,6 +46,8 @@ structure MIR :> MIR = struct
                      | StringConstant of CST.escaped_string
                      | NullConstant
                      | Variable of string
+                     | IntArithOp of Arith.oper * ast * ast
+                     | FloatArithOp of Arith.oper * ast * ast
                      | Cast of ty * exp_ast
                      | Load of exp_ast
                      | AddressOf of exp_ast
