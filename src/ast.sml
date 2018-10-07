@@ -94,6 +94,12 @@ structure AST :> AST = struct
             transformCond args
         else if f = au "+" then
             transformArith Arith.Modular Arith.Add args
+        else if f = au "-" then
+            transformArith Arith.Modular Arith.Sub args
+        else if f = au "*" then
+            transformArith Arith.Modular Arith.Mul args
+        else if f = au "/" then
+            transformArith Arith.Modular Arith.Div args
         else if f = au "tuple" then
             TupleCreate (args)
         else if f = au "proj" then
