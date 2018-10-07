@@ -111,7 +111,7 @@ structure HIR :> HIR = struct
         (case kind of
              Arith.Modular => IntArithOp (oper, lhs, rhs)
            | Arith.Checked => transformCheckedArithOp oper lhs rhs
-           | Arith.Saturation => transformSaturationArithOP oper lhs rhs
+           | Arith.Saturation => transformSaturationArithOp oper lhs rhs
            | Arith.Float => FloatArithOp (oper, lhs, rhs))
       | transform (TAst.TupleCreate exps) =
         TupleCreate (map transform exps)
