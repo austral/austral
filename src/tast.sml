@@ -147,6 +147,26 @@ structure TAst :> TAST = struct
                     else
                         Cond (test', cons', alt')
             end
+          | augment (AST.ArithOp (kind, oper, lhs, rhs)) =
+            let val lhs' = augment lhs c
+                and rhs' = augment rhs c
+            in
+                let val lhsTy = typeOf lhs'
+                    and rhsTy = typeOf rhs'
+                in
+                    if rhsTy = lhsTy then
+                        case kind of
+                            Arith.Float => if Type.isFloat lhsTy then
+                                               ArithOp (kind, oper, lhs', rhs')
+                                           else
+                                               raise Fail "Argument must be a float"
+                          | _ => if Type.isInteger lhsTy then
+                                     ArithOp (kind, oper, lhs', rhs')
+                                 else
+                                     raise Fail "Argument must be an integer"
+                    else
+                        raise Fail "Both arguments to an arithmetic operator must be of the same type"
+            end
           | augment (AST.TupleCreate exps) c =
             TupleCreate (map (fn e => augment e c) exps)
           | augment (AST.TupleProj (exp, i)) c =
