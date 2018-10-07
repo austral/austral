@@ -41,7 +41,15 @@ structure OAST :> OAST = struct
     fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
       | transform (RCST.StringConstant s) = StringConstant s
-      | transform (RCST.Symbol s) = Symbol s
+      | transform (RCST.Symbol s) =
+        if s = au "nil" then
+            UnitConstant
+        else if s = au "false" then
+            BoolConstant false
+        else if s = au "true" then
+            BoolConstant true
+        else
+            Symbol s
       | transform (RCST.Keyword s) = raise Fail "Keywords not allowed in expressions"
       | transform (RCST.Splice _) = raise Fail "Splices not allowed in expressions"
       | transform (RCST.List l) = transformList l
