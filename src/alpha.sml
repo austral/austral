@@ -66,6 +66,8 @@ structure Alpha :> ALPHA = struct
 
     fun alphaRename _ OAST.UnitConstant =
         UnitConstant
+      | alphaRename _ (OAST.BoolConstant b) =
+        BoolConstant b
       | alphaRename _ (OAST.IntConstant s) =
         IntConstant s
       | alphaRename _ (OAST.FloatConstant f) =
