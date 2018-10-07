@@ -18,7 +18,8 @@
 *)
 
 signature OAST = sig
-    datatype ast = IntConstant of string
+    datatype ast = UnitConstant
+                 | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
                  | Symbol of Symbol.symbol
