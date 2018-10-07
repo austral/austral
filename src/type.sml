@@ -35,6 +35,9 @@ structure Type :> TYPE = struct
          and float_type = Single | Double
          and variant = Variant of name * ty option
 
+    fun isInteger (Integer _) = true
+      | isInteger _ = false
+
     datatype typespec = TypeCons of name * (typespec list)
 
     type typarams = param OrderedSet.set
