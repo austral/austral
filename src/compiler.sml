@@ -51,81 +51,72 @@ structure Compiler :> COMPILER = struct
     fun unitForms (FileUnit path) = Parser.parseFile path
       | unitForms (ReplUnit string) = [Parser.parseString string]
 
-    local
-        open TAst
-    in
-        fun declareForm compiler form =
-            let val resolved = Util.valOf (RCST.resolve (compilerMenv compiler)
-                                                        (currentModule compiler)
-                                                        form)
+    fun declareForm compiler form =
+        let val resolved = Util.valOf (RCST.resolve (compilerMenv compiler)
+                                                    (currentModule compiler)
+                                                    form)
+        in
+            let val topNode = AST.transformTop resolved
             in
-                let val topnode = AST.transformTop resolved
-                in
-                    let val typedNode = TAst.augmentTop topnode
-                                                        (compilerTenv compiler)
-                                                        (compilerFenv compiler)
-                    in
-                        (typedNode, declareTopForm compiler typedNode)
-                    end
-                end
+                (topNode, declareTopForm compiler topNode)
             end
-        and declareTopForm c (Defun (name, params, rt, docstring, ast)) =
-            (* Add a concrete function to the compiler fenv *)
-            let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
+        end
+    and declareTopForm c (AST.Defun (name, params, rt, docstring, ast)) =
+        (* Add a concrete function to the compiler fenv *)
+        let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
+        in
+            let val f = Function.Function (name,
+                                           map (fn (AST.Param (n, t)) => Function.Param (n, Type.resolve tenv t))
+                                               params,
+                                           Type.resolve tenv rt,
+                                           docstring)
             in
-                let val f = Function.Function (name,
-                                               map (fn (Param (n, t)) => Function.Param (n, t))
-                                                   params,
-                                               rt,
-                                               docstring)
-                in
-                    case (Function.addFunction fenv f) of
-                        SOME fenv' => Compiler (menv, tenv, fenv', currModuleName, code)
-                      | NONE => raise Fail "Repeat function"
-                end
+                case (Function.addFunction fenv f) of
+                    SOME fenv' => Compiler (menv, tenv, fenv', currModuleName, code)
+                  | NONE => raise Fail "Repeat function"
             end
-          | declareTopForm c (Deftype (name, params, docstring, def)) =
-            let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
-                and (Compiler (menv, tenv, fenv, module, code)) = c
+        end
+      | declareTopForm c (AST.Deftype (name, params, docstring, def)) =
+        let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
+            and (Compiler (menv, tenv, fenv, module, code)) = c
+        in
+            case (Type.addTypeAlias tenv (name, params', Type.resolve tenv def)) of
+                SOME tenv' => Compiler (menv, tenv', fenv, module, code)
+              | NONE => raise Fail "Duplicate type definition"
+        end
+      | declareTopForm c (AST.Defdisjunction (name, params, docstring, variants)) =
+        let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
+            and (Compiler (menv, tenv, fenv, module, code)) = c
+        in
+            case (Type.addDisjunction tenv (name, params', variants)) of
+                SOME tenv' => Compiler (menv, tenv', fenv, module, code)
+              | NONE => raise Fail "Duplicate type definition"
+        end
+      | declareTopForm c (AST.Defmodule (name, clauses)) =
+        let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
+        in
+            let val module = Module.resolveModule menv name clauses
             in
-                case (Type.addTypeAlias tenv (name, params', def)) of
-                    SOME tenv' => Compiler (menv, tenv', fenv, module, code)
-                  | NONE => raise Fail "Duplicate type definition"
+                case Module.envGet menv name of
+                    SOME _ => raise Fail "Duplicate module definition"
+                  | NONE => let val menv' = Module.addModule menv module
+                            in
+                                Compiler (menv', tenv, fenv, moduleName, code)
+                            end
             end
-          | declareTopForm c (Defdisjunction (name, params, docstring, variants)) =
-            let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
-                and (Compiler (menv, tenv, fenv, module, code)) = c
+        end
+      | declareTopForm c (AST.InModule moduleName) =
+        (* Switch current module *)
+        let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
+        in
+            let val newModule = case Module.envGet menv moduleName of
+                                    SOME m => m
+                                  | NONE => raise Fail "in-module: no module with this name"
             in
-                case (Type.addDisjunction tenv (name, params', variants)) of
-                    SOME tenv' => Compiler (menv, tenv', fenv, module, code)
-                  | NONE => raise Fail "Duplicate type definition"
+                Compiler (menv, tenv, fenv, moduleName, code)
             end
-          | declareTopForm c (Defmodule (name, clauses)) =
-            let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
-            in
-                let val module = Module.resolveModule menv name clauses
-                in
-                    case Module.envGet menv name of
-                        SOME _ => raise Fail "Duplicate module definition"
-                      | NONE => let val menv' = Module.addModule menv module
-                                in
-                                    Compiler (menv', tenv, fenv, moduleName, code)
-                                end
-                end
-            end
-          | declareTopForm c (InModule moduleName) =
-            (* Switch current module *)
-            let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
-            in
-                let val newModule = case Module.envGet menv moduleName of
-                                        SOME m => m
-                                      | NONE => raise Fail "in-module: no module with this name"
-                in
-                    Compiler (menv, tenv, fenv, moduleName, code)
-                end
-            end
-          | declareTopForm _ _ = raise Fail "Not implemented yet"
-    end
+        end
+      | declareTopForm _ _ = raise Fail "Not implemented yet"
 
     fun declarationPass c (head::tail) =
         let val (node, c') = declareForm c head
@@ -141,8 +132,12 @@ structure Compiler :> COMPILER = struct
     local
         open TAst
     in
-        fun compileForm c topNode =
-            let val hirTop = HIR.transformTop topNode
+    fun compileForm c topNode =
+        let val typedNode = TAst.augmentTop topNode
+                                            (compilerTenv c)
+                                            (compilerFenv c)
+        in
+            let val hirTop = HIR.transformTop typedNode
             in
                 let val mir = MIR.transformTop hirTop
                 in
@@ -156,6 +151,7 @@ structure Compiler :> COMPILER = struct
                     end
                 end
             end
+        end
     end
 
     fun compilationPass c (head::tail) =
