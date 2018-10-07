@@ -1,6 +1,7 @@
 TODO:
 
 - Modular arithmetic
+- Boolean functions
 - Bitwise operators
 
 - Compile typeclass instances to a list of HIR generic functions
