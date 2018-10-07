@@ -46,8 +46,8 @@ structure MIR :> MIR = struct
                      | StringConstant of CST.escaped_string
                      | NullConstant
                      | Variable of string
-                     | IntArithOp of Arith.oper * ast * ast
-                     | FloatArithOp of Arith.oper * ast * ast
+                     | IntArithOp of Arith.oper * exp_ast * exp_ast
+                     | FloatArithOp of Arith.oper * exp_ast * exp_ast
                      | Cast of ty * exp_ast
                      | Load of exp_ast
                      | AddressOf of exp_ast
@@ -155,6 +155,20 @@ structure MIR :> MIR = struct
                        ],
                  Variable result)
             end
+        end
+      | transformExp (HIR.IntArithOp (oper, lhs, rhs)) =
+        let val (lhsBlock, lhsExp) = transformExp lhs
+            and (rhsBlock, rhsExp) = transformExp rhs
+        in
+            (Progn [lhsBlock, rhsBlock],
+             IntArithOp (oper, lhsExp, rhsExp))
+        end
+      | transformExp (HIR.FloatArithOp (oper, lhs, rhs)) =
+        let val (lhsBlock, lhsExp) = transformExp lhs
+            and (rhsBlock, rhsExp) = transformExp rhs
+        in
+            (Progn [lhsBlock, rhsBlock],
+             FloatArithOp (oper, lhsExp, rhsExp))
         end
       | transformExp (HIR.TupleCreate exps) =
         let val exps' = map transformExp exps
