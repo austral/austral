@@ -1,6 +1,5 @@
 TODO:
 
-- Compile prelude.hpp into an SML file with the prelude embedded into a string
 - Macro and
 - Macro or
 - Function and*
@@ -55,3 +54,4 @@ DONE:
 - Fix function declaration types
 - true, false and nil
 - Boolean function not
+- Compile prelude.hpp into an SML file with the prelude embedded into a string
