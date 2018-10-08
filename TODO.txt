@@ -11,6 +11,9 @@ TODO:
 - Parse deftemplate declarations
 - Tuple bind
 
+- Austral prelude
+- Prelude: equality and comparison instances
+
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
 - Parse nested comments
