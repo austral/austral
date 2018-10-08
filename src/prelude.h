@@ -6,13 +6,13 @@
 #if __has_builtin(__builtin_add_overflow)
 
 std::tuple<uint8_t, bool> austral_checked_add(uint8_t lhs, uint8_t rhs) {
-  unsigned char result = 0;
+  uint8_t result = 0;
   bool overflowed = __builtin_add_overflow(lhs, rhs, &result);
   return std::make_tuple(result, overflowed);
 }
 
 std::tuple<int8_t, bool> austral_checked_add(int8_t lhs, int8_t rhs) {
-  signed char result = 0;
+  int8_t result = 0;
   bool overflowed = __builtin_add_overflow(lhs, rhs, &result);
   return std::make_tuple(result, overflowed);
 }
