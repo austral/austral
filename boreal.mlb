@@ -67,6 +67,8 @@ src/cpp-ast.sml
 src/cpp-backend.sig
 src/cpp-backend.sml
 
+src/cpp-prelude.sml
+
 src/compiler.sig
 src/compiler.sml
 
