@@ -1,5 +1,6 @@
 TODO:
 
+- Compile prelude.hpp into an SML file with the prelude embedded into a string
 - Macro and
 - Macro or
 - Function and*
