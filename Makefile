@@ -12,7 +12,7 @@ TEST_BIN := boreal-test
 
 BIN = boreal
 
-SRC := src/*.sig src/*.sml src/CppPrelude.sml
+SRC := src/*.sig src/*.sml src/cpp-prelude.sml
 TEST_SRC := test/*.sml
 
 VENDOR_DIR := vendor
@@ -33,8 +33,8 @@ $(MLUNIT): $(VENDOR_DIR)
 $(PARSIMONY): $(VENDOR_DIR)
 	git clone $(PARSIMONY_URL) $(PARSIMONY)
 
-src/CppPrelude.sml: src/prelude.hpp prelude.awk
-	awk -f prelude.awk src/prelude.hpp > src/CppPrelude.sml
+src/cpp-prelude.sml: src/prelude.hpp prelude.awk
+	awk -f prelude.awk src/prelude.hpp > src/cpp-preludesml
 
 compile: $(SRC) $(DEPS)
 	$(SML) $(SMLFLAGS) -m $(CM_FILE)
