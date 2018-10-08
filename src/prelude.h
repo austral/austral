@@ -17,6 +17,18 @@ std::tuple<int8_t, bool> austral_checked_add(int8_t lhs, int8_t rhs) {
   return std::make_tuple(result, overflowed);
 }
 
+std::tuple<uint16_t, bool> austral_checked_add(uint16_t lhs, uint16_t rhs) {
+  uint16_t result = 0;
+  bool overflowed = __builtin_add_overflow(lhs, rhs, &result);
+  return std::make_tuple(result, overflowed);
+}
+
+std::tuple<int16_t, bool> austral_checked_add(int16_t lhs, int16_t rhs) {
+  int16_t result = 0;
+  bool overflowed = __builtin_add_overflow(lhs, rhs, &result);
+  return std::make_tuple(result, overflowed);
+}
+
 #else
 #error "Checked arithmetic intrinstics not found"
 #endif
