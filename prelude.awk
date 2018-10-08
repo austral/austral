@@ -6,6 +6,9 @@ BEGIN {
 
 {
     gsub(/\"/, "\\\"");
+    # The following might be necessary for Windows users performing newline
+    # conversion
+    gsub(/\r/, "");
     printf "%s\\n", $0
 }
 
