@@ -27,6 +27,13 @@ std::tuple<T, bool> austral_checked_mul(T lhs, T rhs) {
   return std::make_tuple(result, overflowed);
 }
 
+template<typename T>
+std::tuple<T, bool> austral_checked_div(T lhs, T rhs) {
+  T result = 0;
+  bool overflowed = __builtin_div_overflow(lhs, rhs, &result);
+  return std::make_tuple(result, overflowed);
+}
+
 #else
 #error "Checked arithmetic intrinstics not found"
 #endif
