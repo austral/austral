@@ -66,7 +66,11 @@ structure Cli :> CLI = struct
 
     and compileFiles files output =
         let val compiler = Compiler.emptyCompiler
+            and units = map (fn f => Compiler.FileUnit f) files
         in
-            raise Fail "Not implemented yet"
+            let val c' = Compiler.compileUnits compiler units
+            in
+                Util.writeStringToFile output (Compiler.compilerCode c')
+            end
         end
 end
