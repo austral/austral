@@ -18,4 +18,8 @@
 *)
 
 signature CLI = sig
+    type arg = string
+    type args = arg list
+
+    val getArg : args -> string -> arg option
 end

@@ -18,4 +18,18 @@
 *)
 
 structure Cli :> CLI = struct
+    type arg = string
+    type args = arg list
+
+    fun getArgs args name =
+        let val prefix = "--" ^ name ^ "="
+        in
+            List.mapPartial (fn s => Util.afterPrefix s prefix)
+                            args
+        end
+
+    fun getArg args name =
+        case (getArgs args name) of
+            (first::rest) => SOME first
+          | _ => NONE
 end
