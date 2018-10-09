@@ -5,7 +5,7 @@ MLTON := mlton
 
 CM_FILE := boreal.cm
 MLB_FILE := boreal.mlb
-MLB_EXE_FILE := boreal.mlb
+MLB_EXE_FILE := boreal-exe.mlb
 
 CM_TEST_FILE := boreal-test.cm
 MLB_TEST_FILE := boreal-test.mlb
