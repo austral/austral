@@ -32,4 +32,7 @@ structure Cli :> CLI = struct
         case (getArgs args name) of
             (first::rest) => SOME first
           | _ => NONE
+
+    fun getPosArgs args =
+        List.filter (fn arg => not (String.isPrefix "--" arg)) args
 end
