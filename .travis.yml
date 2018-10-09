@@ -2,7 +2,7 @@ language: generic
 sudo: false
 
 install:
-  - sudo apt-get install -y make smlnj mlton clang++
+  - sudo apt-get install -y make smlnj mlton clang
 
 script:
   - make boreal
