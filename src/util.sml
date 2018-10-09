@@ -53,4 +53,14 @@ structure Util :> UTIL = struct
         in
             ListPair.map f (list, indices)
         end
+
+    type prefix = string
+
+    fun afterPrefix string prefix =
+        if (String.isPrefix prefix string) then
+            SOME (String.extract (string,
+                                  (String.size prefix),
+                                  NONE))
+        else
+            NONE
 end
