@@ -170,4 +170,9 @@ structure Compiler : COMPILER = struct
         in
             compilationPass c' forms
         end
+
+    fun compileUnits c (head::tail) =
+        compileUnits (compileUnit c head) tail
+      | compileUnits c nil =
+        c
 end
