@@ -44,6 +44,5 @@ signature COMPILER = sig
     val compilationPass : compiler -> AST.top_ast list -> compiler
 
     val compileUnit : compiler -> compilation_unit -> compiler
-
     val compileUnits : compiler -> compilation_unit list -> compiler
 end
