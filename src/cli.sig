@@ -24,4 +24,6 @@ signature CLI = sig
     val getArg : args -> string -> arg option
 
     val getPosArgs : args -> args
+
+    val entrypoint : args -> unit
 end
