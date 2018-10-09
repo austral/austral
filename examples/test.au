@@ -1,0 +1,4 @@
+;; -*- mode: lisp -*-
+
+(defun test () i32
+  0)
