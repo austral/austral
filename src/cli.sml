@@ -49,6 +49,8 @@ structure Cli :> CLI = struct
     fun getPosArgs args =
         List.filter (fn arg => not (String.isPrefix "--" arg)) args
 
+    (* Entrypoint functions *)
+
     fun entrypoint ["repl"] =
         Repl.repl ()
       | entrypoint args =
