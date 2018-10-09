@@ -70,7 +70,8 @@ structure Cli :> CLI = struct
         in
             let val c' = Compiler.compileUnits compiler units
             in
-                Util.writeStringToFile output (Compiler.compilerCode c')
+                Util.writeStringToFile output (Compiler.compilerCode c');
+                ()
             end
         end
 end
