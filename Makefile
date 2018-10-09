@@ -42,7 +42,7 @@ compile: $(SRC) $(DEPS)
 	$(SML) $(SMLFLAGS) -m $(CM_FILE)
 
 $(BIN): $(SRC) $(DEPS)
-	$(MLTON) $(MLB_EXE_FILE) -o $(BIN)
+	$(MLTON) $(MLB_EXE_FILE) -output $(BIN)
 
 .PHONY: test
 test: $(SRC) $(TEST_SRC) $(DEPS)
