@@ -60,7 +60,7 @@ structure Cli :> CLI = struct
             case files of
                 nil => die "No input files"
               | _ => (case output of
-                          SOME output' => compileFiles files output
+                          SOME output' => compileFiles files output'
                         | NONE => die "Must provide a value to --output, for example, --output=file.cpp")
         end
 
@@ -70,8 +70,7 @@ structure Cli :> CLI = struct
         in
             let val c' = Compiler.compileUnits compiler units
             in
-                Util.writeStringToFile output (Compiler.compilerCode c');
-                ()
+                Util.writeStringToFile output (Compiler.compilerCode c')
             end
         end
 end
