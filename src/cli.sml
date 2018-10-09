@@ -35,4 +35,18 @@ structure Cli :> CLI = struct
 
     fun getPosArgs args =
         List.filter (fn arg => not (String.isPrefix "--" arg)) args
+
+    fun println str = print (str ^ "\n")
+
+    fun die str =
+        let
+        in
+            println str;
+            OS.Process.terminate OS.Process.failure
+        end
+
+    fun entrypoint ["repl"] =
+        Repl.repl ()
+      | entrypoint _ =
+        die "Bad usage"
 end
