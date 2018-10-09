@@ -8,3 +8,4 @@ script:
   - make boreal
   - rm -rf vendor
   - make mlton-test
+  - ./boreal examples/test.au --output=test.cpp
