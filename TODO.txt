@@ -1,7 +1,5 @@
 TODO:
 
-- CLI interface
-- Start REPL from CLI
 - Compile files from CLI
 
 - Macro and
@@ -62,3 +60,5 @@ DONE:
 - true, false and nil
 - Boolean function not
 - Compile prelude.hpp into an SML file with the prelude embedded into a string
+- CLI interface
+- Start REPL from CLI
