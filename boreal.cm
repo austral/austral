@@ -76,4 +76,7 @@ is
   src/repl.sig
   src/repl.sml
 
+  src/cli.sig
+  src/cli.sml
+
   $/basis.cm
