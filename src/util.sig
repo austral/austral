@@ -30,4 +30,10 @@ signature UTIL = sig
     val position : ''a -> ''a list -> int option
 
     val mapidx : (('a * int) -> 'b) -> 'a list -> 'b list
+
+    type prefix = string
+
+    (* If string starts with prefix, return the remainder of string. Otherwise
+       return NONE. *)
+    val afterPrefix : string -> prefix -> string option
 end
