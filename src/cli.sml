@@ -47,6 +47,14 @@ structure Cli :> CLI = struct
 
     fun entrypoint ["repl"] =
         Repl.repl ()
-      | entrypoint _ =
-        die "Bad usage"
+      | entrypoint args =
+        let val files = getPosArgs args
+            and output = getArg args "output"
+        in
+            case files of
+                nil => die "No input files"
+              | _ => (case output of
+                          SOME output' => compileFiles files output
+                        | NONE => die "Must provide a value to --output, for example, --output=file.cpp")
+        end
 end
