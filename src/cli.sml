@@ -63,4 +63,10 @@ structure Cli :> CLI = struct
                           SOME output' => compileFiles files output
                         | NONE => die "Must provide a value to --output, for example, --output=file.cpp")
         end
+
+    and compileFiles files output =
+        let val compiler = Compiler.emptyCompiler
+        in
+            raise Fail "Not implemented yet"
+        end
 end
