@@ -183,7 +183,7 @@ structure AST :> AST = struct
               | parseBody body =
                 (NONE, implicitProgn body)
             and implicitProgn l =
-                (RCST.List ((RCST.Symbol (au "progn"))::l))
+                (RCST.List ((RCST.Symbol (Symbol.au "progn"))::l))
         in
             let val (docstring, body') = parseBody body
                 and params' = parseParams params
