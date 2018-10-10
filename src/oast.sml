@@ -32,6 +32,8 @@ structure OAST :> OAST = struct
 
     (* Functions *)
 
+    val au = Symbol.au
+
     fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
       | transform (RCST.StringConstant s) = StringConstant s
