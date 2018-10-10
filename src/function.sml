@@ -38,14 +38,11 @@ structure Function :> FUNCTION = struct
     datatype fenv = FunctionEnv of (name, func) Map.map * typeclass list * instance list
 
     val defaultFenv =
-        let fun au name =
-                Symbol.mkSymbol (Ident.mkIdentEx "austral",
-                                 Ident.mkIdentEx name)
-            and funcName (Function (name, _, _, _)) =
+        let fun funcName (Function (name, _, _, _)) =
                 name
         in
-            let val notFn = Function (au "not",
-                                      [Param (au "v", Type.Bool)],
+            let val notFn = Function (Symbol.au "not",
+                                      [Param (Symbol.au "v", Type.Bool)],
                                       Type.Bool,
                                       NONE)
             in
