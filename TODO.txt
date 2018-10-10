@@ -1,5 +1,7 @@
 TODO:
 
+- Builtin integer/float comparison functions
+
 - Macro and
 - Macro or
 - Function and*
