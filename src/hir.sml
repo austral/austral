@@ -143,9 +143,7 @@ structure HIR :> HIR = struct
       | arithOpName (Arith.Mul) = "mul"
       | arithOpName (Arith.Div) = "div"
     and transformFuncall s args =
-        let fun au name =
-                Symbol.mkSymbol (Ident.mkIdentEx "austral",
-                                 Ident.mkIdentEx name)
+        let val au = Symbol.au
         in
             (* If the function is a builtin, it will be compiled to something
                particular, or to a funcall with a special name. Otherwise, it's
