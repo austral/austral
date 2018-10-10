@@ -18,12 +18,6 @@
 *)
 
 structure AST :> AST = struct
-    (* Utils *)
-
-    fun au name =
-        Symbol.mkSymbol (Ident.mkIdentEx "austral",
-                         Ident.mkIdentEx name)
-
     (* Expression AST *)
 
     datatype ast = UnitConstant
