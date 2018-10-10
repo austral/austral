@@ -81,6 +81,10 @@ structure CppBackend :> CPP_BACKEND = struct
         Binop (transformOper oper,
                transformExp lhs,
                transformExp rhs)
+      | transformExp (MIR.ComparisonOp (oper, lhs, rhs)) =
+        Binop (transformCompOp oper,
+               transformExp lhs,
+               transformExp rhs)
       | transformExp (MIR.Cast (ty, exp)) =
         Cast (transformType ty, transformExp exp)
       | transformExp (MIR.Load ptr) =
@@ -103,6 +107,12 @@ structure CppBackend :> CPP_BACKEND = struct
       | transformOper Arith.Sub = Sub
       | transformOper Arith.Mul = Mul
       | transformOper Arith.Div = Div
+    and transformCompOp MIR.EqualTo = EqualTo
+      | transformCompOp MIR.NotEqualTo = NotEqualTo
+      | transformCompOp MIR.GreaterThan = GreaterThan
+      | transformCompOp MIR.LessThan = LessThan
+      | transformCompOp MIR.GreaterThanEq = GreaterThanEq
+      | transformCompOp MIR.LessThanEq = LessThanEq
 
     fun transformBlock (MIR.Progn nodes) =
         Sequence (map transformBlock nodes)
