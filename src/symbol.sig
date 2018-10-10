@@ -29,4 +29,8 @@ signature SYMBOL = sig
     val toString : symbol -> string
 
     datatype variable = Var of symbol * int
+
+    (* Symbol utilities *)
+
+    val au : string -> symbol
 end
