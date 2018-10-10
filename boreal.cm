@@ -20,6 +20,9 @@ is
   src/arith.sig
   src/arith.sml
 
+  src/builtin.sig
+  src/builtin.sml
+
   src/symbol.sig
   src/symbol.sml
 
