@@ -111,6 +111,13 @@ structure Module : MODULE = struct
                 "f32",
                 "f64"
             ]
+            and kernelExports = [
+                "eq",
+                "<",
+                "<=",
+                ">",
+                ">="
+            ]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
                                          Map.empty,
@@ -129,7 +136,7 @@ structure Module : MODULE = struct
                     and australKernelMod = Module (Ident.mkIdentEx "austral-kernel",
                                                    Map.empty,
                                                    Imports Map.empty,
-                                                   Exports Set.empty,
+                                                   Exports (Set.fromList (map Ident.mkIdentEx kernelExports)),
                                                    NONE)
                 in
                     addModule (addModule (addModule emptyEnv
