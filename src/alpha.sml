@@ -18,12 +18,6 @@
 *)
 
 structure Alpha :> ALPHA = struct
-    (* Utils *)
-
-    fun au name =
-        Symbol.mkSymbol (Ident.mkIdentEx "austral",
-                         Ident.mkIdentEx name)
-
     (* AST *)
 
     datatype ast = UnitConstant
