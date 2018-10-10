@@ -243,4 +243,10 @@ structure Module : MODULE = struct
               | [s] => SOME s
               | _ => NONE
         end
+
+    (* Symbol utilities *)
+
+    fun au name =
+        Symbol.mkSymbol (Ident.mkIdentEx "austral",
+                         Ident.mkIdentEx name)
 end
