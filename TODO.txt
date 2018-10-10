@@ -1,7 +1,5 @@
 TODO:
 
-- Compile files from CLI
-
 - Macro and
 - Macro or
 - Function and*
@@ -62,3 +60,4 @@ DONE:
 - Compile prelude.hpp into an SML file with the prelude embedded into a string
 - CLI interface
 - Start REPL from CLI
+- Compile files from CLI
