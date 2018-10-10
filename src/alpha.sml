@@ -69,14 +69,17 @@ structure Alpha :> ALPHA = struct
       | alphaRename _ (OAST.StringConstant s) =
         StringConstant s
       | alphaRename s (OAST.Symbol name) =
-        if name = au "nil" then
-            UnitConstant
-        else if name = au "true" then
-            BoolConstant true
-        else if name = au "false" then
-            BoolConstant false
-        else
-            Variable (lookup s name)
+        let val au = Symbol.au
+        in
+            if name = au "nil" then
+                UnitConstant
+            else if name = au "true" then
+                BoolConstant true
+            else if name = au "false" then
+                BoolConstant false
+            else
+                Variable (lookup s name)
+        end
       | alphaRename s (OAST.Let (var, value, body)) =
         let val fresh = freshVar var
           in
