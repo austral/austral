@@ -18,12 +18,6 @@
 *)
 
 structure OAST :> OAST = struct
-    (* Utils *)
-
-    fun au name =
-        Symbol.mkSymbol (Ident.mkIdentEx "austral",
-                         Ident.mkIdentEx name)
-
     (* Types *)
 
     datatype ast = UnitConstant
