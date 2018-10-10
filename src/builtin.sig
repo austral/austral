@@ -18,4 +18,10 @@
 *)
 
 signature BUILTIN = sig
+    datatype comp_op = EqualTo
+                     | NotEqualTo
+                     | GreaterThan
+                     | LessThan
+                     | GreaterThanEq
+                     | LessThanEq
 end
