@@ -151,12 +151,15 @@ structure HIR :> HIR = struct
                particular, or to a funcall with a special name. Otherwise, it's
                a user-defined function, so just escape the symbol. *)
             if s = au "not" then
-                case args of
-                    [v] => Negation v
-                  | _ => raise Fail "not: bad arguments"
+                transformNegation args
             else
                 Funcall (escapeSymbol s, args)
         end
+
+    and transformNegation [v] =
+        Negation v
+      | transformNegation _ =
+        raise Fail "not: bad arguments"
 
     (* Transform top-level AST *)
 
