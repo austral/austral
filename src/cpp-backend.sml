@@ -81,6 +81,10 @@ structure CppBackend :> CPP_BACKEND = struct
         Binop (transformOper oper,
                transformExp lhs,
                transformExp rhs)
+      | transformExp (MIR.ComparisonOp (oper, lhs, rhs)) =
+        Binop (transformCompOp oper,
+               transformExp lhs,
+               transformExp rhs)
       | transformExp (MIR.Cast (ty, exp)) =
         Cast (transformType ty, transformExp exp)
       | transformExp (MIR.Load ptr) =
