@@ -64,4 +64,8 @@ signature MODULE = sig
     (* Given a module environment, a module name, and a list of defmodule
        clauses, compile these into a proper module, signalling any errors *)
     val resolveModule : menv -> module_name -> defmodule_clause list -> module
+
+    (* Symbol utilities *)
+
+    val au : string -> symbol
 end
