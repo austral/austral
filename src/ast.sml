@@ -360,24 +360,27 @@ structure AST :> AST = struct
     and transformTopList ((RCST.Symbol f)::args) = transformT f args
       | transformTopList _ = raise Fail "Invalid toplevel form"
     and transformT f args =
-        if f = au "defun" then
-            transformDefun args
-        else if f = au "defclass" then
-            transformDefclass args
-        else if f = au "definstance" then
-            transformDefinstance args
-        else if f = au "deftype" then
-            transformDeftype args
-        else if f = au "defdisjunction" then
-            transformDefdisjunction args
-        else if f = au "deftemplate" then
-            transformDeftemplate args
-        else if f = au "define-symbol-macro" then
-            transformDefSymbolMacro args
-        else if f = au "defmodule" then
-            transformDefmodule args
-        else if f = au "in-module" then
-            transformInModule args
-        else
-            raise Fail "Unknown toplevel form"
+        let val au = Symbol.au
+        in
+            if f = au "defun" then
+                transformDefun args
+            else if f = au "defclass" then
+                transformDefclass args
+            else if f = au "definstance" then
+                transformDefinstance args
+            else if f = au "deftype" then
+                transformDeftype args
+            else if f = au "defdisjunction" then
+                transformDefdisjunction args
+            else if f = au "deftemplate" then
+                transformDeftemplate args
+            else if f = au "define-symbol-macro" then
+                transformDefSymbolMacro args
+            else if f = au "defmodule" then
+                transformDefmodule args
+            else if f = au "in-module" then
+                transformInModule args
+            else
+                raise Fail "Unknown toplevel form"
+        end
 end
