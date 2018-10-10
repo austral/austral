@@ -52,11 +52,9 @@ structure Type :> TYPE = struct
     type tenv = (Symbol.symbol, typedef) Map.map
 
     val defaultTenv =
-        let fun au name =
-                Symbol.mkSymbol (Ident.mkIdentEx "austral",
-                                 Ident.mkIdentEx name)
-            and toMap l = Map.fromList (map (fn (n, t) =>
-                                                (au n, BuiltInType (au n, t)))
+        let fun toMap l = Map.fromList (map (fn (n, t) =>
+                                                (Symbol.au n,
+                                                 BuiltInType (Symbol.au n, t)))
                                             l)
         in
             toMap [("unit",    Unit),
