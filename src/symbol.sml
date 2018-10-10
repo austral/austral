@@ -31,4 +31,10 @@ structure Symbol : SYMBOL = struct
         (Ident.identString m) ^ "::" ^ (Ident.identString n)
 
     datatype variable = Var of symbol * int
+
+    (* Symbol utilities *)
+
+    fun au name =
+        mkSymbol (Ident.mkIdentEx "austral",
+                  Ident.mkIdentEx name)
 end
