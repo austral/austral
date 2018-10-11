@@ -28,6 +28,15 @@ signature ALPHA = sig
                  | The of Type.typespec * ast
                  | Operation of Symbol.symbol * ast list
 
+    type symbol = Symbol.symbol
+    type variable = Symbol.variable
+    type docstring = string option
+    type typespec = Type.typespec
+
+    datatype top_ast = Defun of symbol * param list * typespec * docstring * ast
+                     | ToplevelForm of symbol * OAST.ast list
+         and param = Param of variable * typespec
+
     type params = Symbol.symbol Set.set
 
     val transform : OAST.ast -> params -> ast
