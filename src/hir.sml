@@ -145,12 +145,15 @@ structure HIR :> HIR = struct
       | arithOpName (Arith.Div) = "div"
     and transformFuncall s args =
         let val au = Symbol.au
+            and auKer = Symbol.auKer
         in
             (* If the function is a builtin, it will be compiled to something
                particular, or to a funcall with a special name. Otherwise, it's
                a user-defined function, so just escape the symbol. *)
             if s = au "not" then
                 transformNegation args
+            else if s = auKer "eq" then
+                transformCompOp Builtin.EqualTo args
             else
                 Funcall (escapeSymbol s, args)
         end
