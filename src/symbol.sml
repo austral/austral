@@ -37,4 +37,8 @@ structure Symbol : SYMBOL = struct
     fun au name =
         mkSymbol (Ident.mkIdentEx "austral",
                   Ident.mkIdentEx name)
+
+    fun auKer name =
+        mkSymbol (Ident.mkIdentEx "austral-kernel",
+                  Ident.mkIdentEx name)
 end
