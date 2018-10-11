@@ -33,4 +33,5 @@ signature SYMBOL = sig
     (* Symbol utilities *)
 
     val au : string -> symbol
+    val auKer : string -> symbol
 end
