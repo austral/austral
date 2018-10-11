@@ -65,3 +65,4 @@ DONE:
 - Start REPL from CLI
 - Compile files from CLI
 - Builtin integer/float comparison functions
+- Alpha top_ast
