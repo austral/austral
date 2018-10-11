@@ -28,10 +28,10 @@ signature ALPHA = sig
                  | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
-                 | Variable of Symbol.variable
-                 | Let of Symbol.variable * ast * ast
-                 | The of Type.typespec * ast
-                 | Operation of Symbol.symbol * ast list
+                 | Variable of variable
+                 | Let of variable * ast * ast
+                 | The of typespec * ast
+                 | Operation of symbol * ast list
 
     datatype top_ast = Defun of symbol * param list * typespec * docstring * ast
                      | ToplevelForm of symbol * OAST.ast list
