@@ -29,6 +29,7 @@ signature TAST = sig
                  | Let of Symbol.variable * ast * ast
                  | Cond of ast * ast * ast
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
+                 | ComparisonOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast
