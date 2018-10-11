@@ -164,7 +164,7 @@ structure HIR :> HIR = struct
         raise Fail "not: bad arguments"
 
     and transformCompOp oper [lhs, rhs] =
-        ComparisonOp (oper, transform lhs, transform rhs)
+        ComparisonOp (oper, lhs, rhs)
       | transformCompOp _ _ =
         raise Fail "Comparison builtin: wrong number of arguments"
 
