@@ -30,6 +30,7 @@ signature HIR = sig
                  | Cond of ast * ast * ast * ty
                  | IntArithOp of Arith.oper * ast * ast
                  | FloatArithOp of Arith.oper * ast * ast
+                 | ComparisonOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | Allocate of ast * ty
