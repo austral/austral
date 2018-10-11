@@ -19,11 +19,11 @@ src/ident.sml
 src/arith.sig
 src/arith.sml
 
-src/builtin.sig
-src/builtin.sml
-
 src/symbol.sig
 src/symbol.sml
+
+src/builtin.sig
+src/builtin.sml
 
 src/module.sig
 src/module.sml
