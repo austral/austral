@@ -128,7 +128,7 @@ structure TAst :> TAST = struct
           | augment (AST.Variable name) c =
             (case (Map.get (ctxBindings c) name) of
                  SOME bind => Variable (name, bindType bind)
-               | NONE => raise Fail ("No such variable"))
+               | NONE => raise Fail ("No such variable: " ^ (Symbol.toString name)))
           | augment (AST.Let (name, v, body)) c =
             let val v' = augment v c
             in
