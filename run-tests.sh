@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
+make clean
 make boreal
-rm -rf vendor
 make test
 
 echo "test.au"
