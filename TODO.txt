@@ -1,7 +1,5 @@
 TODO:
 
-- Builtin integer/float comparison functions
-
 - Macro and
 - Macro or
 - Function and*
@@ -63,3 +61,4 @@ DONE:
 - CLI interface
 - Start REPL from CLI
 - Compile files from CLI
+- Builtin integer/float comparison functions
