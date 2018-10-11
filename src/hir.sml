@@ -156,6 +156,8 @@ structure HIR :> HIR = struct
                 transformCompOp Builtin.EqualTo args
             else if s = auKer "<" then
                 transformCompOp Builtin.LessThan args
+            else if s = auKer "<=" then
+                transformCompOp Builtin.LessThanEq args
             else
                 Funcall (escapeSymbol s, args)
         end
