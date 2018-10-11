@@ -103,10 +103,12 @@ structure CppBackend :> CPP_BACKEND = struct
         Funcall (name,
                  map transformType tyargs,
                  map transformExp args)
+
     and transformOper Arith.Add = Add
       | transformOper Arith.Sub = Sub
       | transformOper Arith.Mul = Mul
       | transformOper Arith.Div = Div
+
     and transformCompOp MIR.EqualTo = EqualTo
       | transformCompOp MIR.NotEqualTo = NotEqualTo
       | transformCompOp MIR.GreaterThan = GreaterThan
