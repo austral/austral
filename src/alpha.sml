@@ -52,7 +52,7 @@ structure Alpha :> ALPHA = struct
                                    v
                                else
                                    lookup xs s
-      | lookup nil s = raise Fail ("No such variable: '"
+      | lookup nil s = raise Fail ("Alpha renaming: no such variable: '"
                                    ^ (Ident.identString (Symbol.symbolName s))
                                    ^ "'")
 
