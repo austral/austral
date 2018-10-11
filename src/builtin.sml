@@ -24,4 +24,20 @@ structure Builtin :> BUILTIN = struct
                      | LessThan
                      | GreaterThanEq
                      | LessThanEq
+
+    val builtinFuncs =
+        let val auKer = Symbol.auKer
+            and funs = [
+                "eq",
+                "<",
+                "<=",
+                ">",
+                ">="
+            ]
+        in
+            map auKer funs
+        end
+
+    fun isBuiltin name =
+        Option.isSome (Util.position name builtinFuncs)
 end
