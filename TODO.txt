@@ -1,5 +1,8 @@
 TODO:
 
+- Turn params from symbols to variables
+- Fix parameter lookup
+
 - Macro and
 - Macro or
 - Function and*
