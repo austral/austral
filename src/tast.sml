@@ -210,9 +210,12 @@ structure TAst :> TAST = struct
             Progn (map (fn a => augment a c) exps)
           | augment (AST.Funcall (name, args)) c =
             let val fenv = ctxFenv c
+                and auKer = Symbol.auKer
             in
                 if Builtin.isBuiltin name then
-                    Funcall (name, map (fn e => augment e c) args)
+                    Funcall (name,
+                             map (fn e => augment e c) args,
+                             Bool)
                 else
                     case Function.envGet fenv name of
                         SOME f => augmentFuncall f args c
