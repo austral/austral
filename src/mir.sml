@@ -177,6 +177,13 @@ structure MIR :> MIR = struct
             (Progn [lhsBlock, rhsBlock],
              FloatArithOp (oper, lhsExp, rhsExp))
         end
+      | transformExp (HIR.ComparisonOp (oper, lhs, rhs)) =
+        let val (lhsBlock, lhsExp) = transformExp lhs
+            and (rhsBlock, rhsExp) = transformExp rhs
+        in
+            (Progn [lhsBlock, rhsBlock],
+             ComparisonOp (oper, lhsExp, rhsExp))
+        end
       | transformExp (HIR.TupleCreate exps) =
         let val exps' = map transformExp exps
         in
