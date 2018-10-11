@@ -109,12 +109,12 @@ structure CppBackend :> CPP_BACKEND = struct
       | transformOper Arith.Mul = Mul
       | transformOper Arith.Div = Div
 
-    and transformCompOp MIR.EqualTo = EqualTo
-      | transformCompOp MIR.NotEqualTo = NotEqualTo
-      | transformCompOp MIR.GreaterThan = GreaterThan
-      | transformCompOp MIR.LessThan = LessThan
-      | transformCompOp MIR.GreaterThanEq = GreaterThanEq
-      | transformCompOp MIR.LessThanEq = LessThanEq
+    and transformCompOp Builtin.EqualTo = EqualTo
+      | transformCompOp Builtin.NotEqualTo = NotEqualTo
+      | transformCompOp Builtin.GreaterThan = GreaterThan
+      | transformCompOp Builtin.LessThan = LessThan
+      | transformCompOp Builtin.GreaterThanEq = GreaterThanEq
+      | transformCompOp Builtin.LessThanEq = LessThanEq
 
     fun transformBlock (MIR.Progn nodes) =
         Sequence (map transformBlock nodes)
