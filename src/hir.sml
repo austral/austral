@@ -163,6 +163,11 @@ structure HIR :> HIR = struct
       | transformNegation _ =
         raise Fail "not: bad arguments"
 
+    and transformCompOp oper [lhs, rhs] =
+        ComparisonOp (oper, transform lhs, transform rhs)
+      | transformCompOp _ _ =
+        raise Fail "Comparison builtin: wrong number of arguments
+
     (* Transform top-level AST *)
 
     fun transformTop (TAst.Defun (name, params, rt, _, body)) =
