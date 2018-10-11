@@ -166,7 +166,7 @@ structure HIR :> HIR = struct
     and transformCompOp oper [lhs, rhs] =
         ComparisonOp (oper, transform lhs, transform rhs)
       | transformCompOp _ _ =
-        raise Fail "Comparison builtin: wrong number of arguments
+        raise Fail "Comparison builtin: wrong number of arguments"
 
     (* Transform top-level AST *)
 
