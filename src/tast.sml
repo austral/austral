@@ -213,9 +213,10 @@ structure TAst :> TAST = struct
             in
                 if Builtin.isBuiltin name then
                     Funcall (name, map (fn e => augment e c) args)
-                case Function.envGet fenv name of
-                    SOME f => augmentFuncall f args c
-                  | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
+                else
+                    case Function.envGet fenv name of
+                        SOME f => augmentFuncall f args c
+                      | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
             end
         and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args c =
             if (List.length params) = (List.length args) then
