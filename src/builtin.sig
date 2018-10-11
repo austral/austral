@@ -24,4 +24,6 @@ signature BUILTIN = sig
                      | LessThan
                      | GreaterThanEq
                      | LessThanEq
+
+    val isBuiltin : Symbol.symbol -> bool
 end
