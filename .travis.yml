@@ -5,7 +5,4 @@ install:
   - sudo apt-get install -y make smlnj mlton clang
 
 script:
-  - make boreal
-  - rm -rf vendor
-  - make mlton-test
-  - ./boreal test/valid/test.au --output=test.cpp
+  - ./run-tests.sh
