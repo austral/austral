@@ -211,6 +211,8 @@ structure TAst :> TAST = struct
           | augment (AST.Funcall (name, args)) c =
             let val fenv = ctxFenv c
             in
+                if Builtin.isBuiltin name then
+                    Funcall (name, map (fn e => augment e c) args)
                 case Function.envGet fenv name of
                     SOME f => augmentFuncall f args c
                   | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
