@@ -54,4 +54,5 @@ signature ALPHA = sig
     type params = Symbol.symbol Set.set
 
     val transform : OAST.ast -> params -> ast
+    val transformTop : OAST.top_ast -> top_ast
 end
