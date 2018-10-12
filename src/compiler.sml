@@ -56,7 +56,7 @@ structure Compiler : COMPILER = struct
                                                     (currentModule compiler)
                                                     form)
         in
-            let val topNode = AST.transformTop resolved
+            let val topNode = AST.transformTop (Alpha.transformTop (OAST.transformTop resolved))
             in
                 (topNode, declareTopForm compiler topNode)
             end
