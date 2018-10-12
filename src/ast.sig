@@ -58,6 +58,5 @@ signature AST = sig
          and variant = Variant of name * typespec option
 
     val transform : Alpha.ast -> ast
-
-    val transformTop : RCST.rcst -> top_ast
+    val transformTop : Alpha.top_ast -> top_ast
 end
