@@ -155,8 +155,8 @@ structure Alpha :> ALPHA = struct
                       methods)
       | transformTop (OAST.DefineSymbolMacro mac) =
         DefineSymbolMacro mac
-      | transformTop (OAST.Defmodule mod) =
-        Defmodule mod
+      | transformTop (OAST.Defmodule module) =
+        Defmodule module
       | transformTop (OAST.InModule name) =
         InModule name
       | transformTop _ =
