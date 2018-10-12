@@ -188,7 +188,7 @@ structure AST :> AST = struct
                                         mapParams params,
                                         rt,
                                         docstring,
-                                        transformWithParams body params))
+                                        transform body))
                          methods)
       | transformTop (Alpha.Deftype tydef) =
         Deftype tydef
