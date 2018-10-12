@@ -30,6 +30,7 @@ signature SYMBOL = sig
 
     datatype variable = Var of symbol * int
 
+    val varSymbol : variable -> symbol
     val varToString : variable -> string
 
     (* Symbol utilities *)

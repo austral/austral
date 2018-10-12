@@ -181,14 +181,14 @@ structure Alpha :> ALPHA = struct
       | transformTop' (OAST.InModule name) =
         InModule name
 
-    and mapParams params =
+    and mapParams (params: OAST.param list): param list =
         map (fn (OAST.Param (name, ty)) => Param (freshVar name, ty))
             params
 
-    and paramsToStack (list: OAST.param list): stack =
+    and paramsToStack (list: param list): stack =
         makeStack list
-    and makeStack ((OAST.Param (n, _))::tail) =
-        (n, freshVar n) :: (makeStack tail)
+    and makeStack ((Param (n, _))::tail) =
+        (Symbol.varSymbol n, n) :: (makeStack tail)
       | makeStack nil =
         nil
 end

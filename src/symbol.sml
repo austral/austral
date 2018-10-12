@@ -32,6 +32,9 @@ structure Symbol : SYMBOL = struct
 
     datatype variable = Var of symbol * int
 
+    fun varSymbol (Var (s, _)) =
+        s
+
     fun varToString (Var (n, _)) =
         toString n
 
