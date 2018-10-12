@@ -123,18 +123,12 @@ structure Alpha :> ALPHA = struct
 
     (* Public interface *)
 
-    type params = Symbol.symbol Set.set
-
     fun transform oast params =
-        let
-        in
-            resetCount ();
-            alphaRename (paramsToStack params) oast
-        end
-    and paramsToStack set =
-        makeStack (Set.toList set)
-    and makeStack (head::tail) =
-        (head, freshVar head) :: (makeStack tail)
+        alphaRename (paramsToStack params) oast
+    and paramsToStack (list: OAST.param list): stack =
+        makeStack list
+    and makeStack ((OAST.Param (n, _))::tail) =
+        (n, freshVar n) :: (makeStack tail)
       | makeStack nil =
         nil
 
@@ -147,12 +141,12 @@ structure Alpha :> ALPHA = struct
             transformTop' ast
         end
 
-    fun transformTop' (OAST.Defun (name, params, rt, docstring, ast)) =
+    and transformTop' (OAST.Defun (name, params, rt, docstring, ast)) =
         Defun (name,
                mapParams params,
                rt,
                docstring,
-               transformWithParams ast params)
+               transform ast (paramsToStack params))
       | transformTop' (OAST.Defclass (name, param, docstring, methods)) =
         Defclass (name,
                   param,
@@ -169,7 +163,7 @@ structure Alpha :> ALPHA = struct
                                         mapParams params,
                                         rt,
                                         docstring,
-                                        transformWithParams body params))
+                                        transform body (paramsToStack params)))
                          methods)
       | transformTop' (OAST.Deftype tydef) =
         Deftype tydef
@@ -189,7 +183,4 @@ structure Alpha :> ALPHA = struct
 
     and mapParams params =
         map (fn (OAST.Param (name, ty)) => Param (name, ty)) params
-
-    and transformWithParams ast params =
-        transform ast (Set.fromList (map (fn (OAST.Param (name, _)) => name) params))
 end
