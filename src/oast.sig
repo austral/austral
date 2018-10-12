@@ -18,7 +18,7 @@
 *)
 
 signature OAST = sig
-    type symbol = Symbol.symbol
+    type symbol = Symbol.symbolp
     type typespec = Type.typespec
 
     datatype ast = UnitConstant
@@ -28,7 +28,7 @@ signature OAST = sig
                  | StringConstant of CST.escaped_string
                  | Symbol of symbol
                  | Let of symbol * ast * ast
-                 | The of Type.typespec * ast
+                 | The of typespec * ast
                  | Operation of symbol * ast list
 
     type docstring = string option

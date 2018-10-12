@@ -30,7 +30,7 @@ structure OAST :> OAST = struct
                  | StringConstant of CST.escaped_string
                  | Symbol of symbol
                  | Let of symbol * ast * ast
-                 | The of Type.typespec * ast
+                 | The of typespec * ast
                  | Operation of symbol * ast list
 
     type docstring = string option
