@@ -140,6 +140,13 @@ structure Alpha :> ALPHA = struct
 
     (* Transform the OAST top-level AST to this top-level AST *)
 
+    fun transformTop ast =
+        let
+        in
+            resetCount ();
+            transformTop' ast
+        end
+
     fun transformTop' (OAST.Defun (name, params, rt, docstring, ast)) =
         Defun (name,
                mapParams params,
