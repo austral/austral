@@ -145,7 +145,7 @@ structure Alpha :> ALPHA = struct
                mapParams params,
                rt,
                docstring,
-               transform ast (Set.fromList (map (fn (OAST.Param (name, _)) => name) params)))
+               transformWithParams ast params)
       | transformTop (OAST.Defclass (name, param, docstring, methods)) =
         Defclass (name,
                   param,
@@ -153,6 +153,16 @@ structure Alpha :> ALPHA = struct
                   map (fn (OAST.MethodDecl (name, params, rt, docstring)) =>
                           MethodDecl (name, mapParams params, rt, docstring))
                       methods)
+      | transformTop (OAST.Definstance (name, OAST.InstanceArg arg, docstring, methods)) =
+        Definstance (name,
+                     InstanceArg arg,
+                     docstring,
+                     map (fn (OAST.MethodDef (name, params, rt, docstring, body)) =>
+                             MethodDef (name,
+                                        mapParams params,
+                                        rt,
+                                        transformWithParams body params))
+                         methods)
       | transformTop (OAST.Deftype tydef) =
         Deftype tydef
       | transformTop (OAST.Defdisjunction (name, typarams, docstring, variants)) =
@@ -173,4 +183,7 @@ structure Alpha :> ALPHA = struct
 
     and mapParams params =
         map (fn (OAST.Param (name, ty)) => Param (name, ty)) params
+
+    and transformWithParams ast params =
+        transform ast (Set.fromList (map (fn (OAST.Param (name, _)) => name) params))
 end
