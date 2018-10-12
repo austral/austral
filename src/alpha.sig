@@ -51,8 +51,7 @@ signature ALPHA = sig
          and instance_arg = InstanceArg of name * name Set.set
          and variant = Variant of name * typespec option
 
-    type params = Symbol.symbol Set.set
-
-    val transform : OAST.ast -> params -> ast
+    type stack
+    val transform : OAST.ast -> stack -> ast
     val transformTop : OAST.top_ast -> top_ast
 end
