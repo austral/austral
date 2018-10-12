@@ -172,8 +172,39 @@ structure AST :> AST = struct
                typespec,
                docstring,
                transform ast)
-      | transformTop _ =
-        raise Fail "derp"
+      | transformTop (Alpha.Defclass (name, param, docstring, methods)) =
+        Defclass (name,
+                  param,
+                  docstring,
+                  map (fn (Alpha.MethodDecl (name, params, rt, docstring)) =>
+                          MethodDecl (name, mapParams params, rt, docstring))
+                      methods)
+      | transformTop (Alpha.Definstance (name, Alpha.InstanceArg arg, docstring, methods)) =
+        Definstance (name,
+                     InstanceArg arg,
+                     docstring,
+                     map (fn (Alpha.MethodDef (name, params, rt, docstring, body)) =>
+                             MethodDef (name,
+                                        mapParams params,
+                                        rt,
+                                        docstring,
+                                        transformWithParams body params))
+                         methods)
+      | transformTop (Alpha.Deftype tydef) =
+        Deftype tydef
+      | transformTop (Alpha.Defdisjunction (name, typarams, docstring, variants)) =
+        Defdisjunction (name,
+                        typarams,
+                        docstring,
+                        map (fn (Alpha.Variant v) => Variant v) variants)
+      | transformTop (Alpha.Deftemplate template) =
+        Deftemplate template
+      | transformTop (Alpha.DefineSymbolMacro mac) =
+        DefineSymbolMacro mac
+      | transformTop (Alpha.Defmodule module) =
+        Defmodule module
+      | transformTop (Alpha.InModule name) =
+        InModule name
 
     and mapParams params =
         map (fn (Alpha.Param (name, ty)) => Param (name, ty)) params
