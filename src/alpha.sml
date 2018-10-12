@@ -123,14 +123,8 @@ structure Alpha :> ALPHA = struct
 
     (* Public interface *)
 
-    fun transform oast params =
-        alphaRename (paramsToStack params) oast
-    and paramsToStack (list: OAST.param list): stack =
-        makeStack list
-    and makeStack ((OAST.Param (n, _))::tail) =
-        (n, freshVar n) :: (makeStack tail)
-      | makeStack nil =
-        nil
+    fun transform oast stack =
+        alphaRename stack oast
 
     (* Transform the OAST top-level AST to this top-level AST *)
 
@@ -142,11 +136,14 @@ structure Alpha :> ALPHA = struct
         end
 
     and transformTop' (OAST.Defun (name, params, rt, docstring, ast)) =
-        Defun (name,
-               mapParams params,
-               rt,
-               docstring,
-               transform ast params)
+        let val params' = mapParams params
+        in
+            Defun (name,
+                   params',
+                   rt,
+                   docstring,
+                   transform ast params')
+        end
       | transformTop' (OAST.Defclass (name, param, docstring, methods)) =
         Defclass (name,
                   param,
@@ -159,11 +156,14 @@ structure Alpha :> ALPHA = struct
                      InstanceArg arg,
                      docstring,
                      map (fn (OAST.MethodDef (name, params, rt, docstring, body)) =>
-                             MethodDef (name,
-                                        mapParams params,
-                                        rt,
-                                        docstring,
-                                        transform body params))
+                             let val params' = mapParams params
+                             in
+                                 MethodDef (name,
+                                            params',
+                                            rt,
+                                            docstring,
+                                            transform body params')
+                             end)
                          methods)
       | transformTop' (OAST.Deftype tydef) =
         Deftype tydef
@@ -182,5 +182,13 @@ structure Alpha :> ALPHA = struct
         InModule name
 
     and mapParams params =
-        map (fn (OAST.Param (name, ty)) => Param (name, ty)) params
+        map (fn (OAST.Param (name, ty)) => Param (freshVar name, ty))
+            params
+
+    and paramsToStack (list: OAST.param list): stack =
+        makeStack list
+    and makeStack ((OAST.Param (n, _))::tail) =
+        (n, freshVar n) :: (makeStack tail)
+      | makeStack nil =
+        nil
 end
