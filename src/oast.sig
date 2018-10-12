@@ -18,17 +18,17 @@
 *)
 
 signature OAST = sig
-    type name = Symbol.symbol
+    type symbol = Symbol.symbol
 
     datatype ast = UnitConstant
                  | BoolConstant of bool
                  | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
-                 | Symbol of Symbol.symbol
-                 | Let of Symbol.symbol * ast * ast
+                 | Symbol of symbol
+                 | Let of symbol * ast * ast
                  | The of Type.typespec * ast
-                 | Operation of Symbol.symbol * ast list
+                 | Operation of symbol * ast list
 
     val transform : RCST.rcst -> ast
 end
