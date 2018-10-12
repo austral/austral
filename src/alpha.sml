@@ -146,7 +146,7 @@ structure Alpha :> ALPHA = struct
                mapParams params,
                rt,
                docstring,
-               transform ast (paramsToStack params))
+               transform ast params)
       | transformTop' (OAST.Defclass (name, param, docstring, methods)) =
         Defclass (name,
                   param,
@@ -163,7 +163,7 @@ structure Alpha :> ALPHA = struct
                                         mapParams params,
                                         rt,
                                         docstring,
-                                        transform body (paramsToStack params)))
+                                        transform body params)))
                          methods)
       | transformTop' (OAST.Deftype tydef) =
         Deftype tydef
