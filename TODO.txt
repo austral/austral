@@ -1,8 +1,6 @@
 TODO:
 
-- Update AST.transformTop to use Alpha.top_ast instead of RCST
 
-- Fix parameter lookup
 
 - Macro and
 - Macro or
@@ -71,3 +69,4 @@ DONE:
 - RCST->OAST top_ast
 - OAST top_ast -> Alpha top_ast
 - Turn params from symbols to variables
+- Update AST.transformTop to use Alpha.top_ast instead of RCST
