@@ -66,7 +66,8 @@ structure Compiler : COMPILER = struct
         let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
         in
             let val f = Function.Function (name,
-                                           map (fn (AST.Param (n, t)) => Function.Param (n, Type.resolve tenv t))
+                                           map (fn (AST.Param (n, t)) => Function.Param (Symbol.varSymbol n,
+                                                                                         Type.resolve tenv t))
                                                params,
                                            Type.resolve tenv rt,
                                            docstring)
