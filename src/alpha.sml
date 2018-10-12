@@ -163,7 +163,7 @@ structure Alpha :> ALPHA = struct
                                         mapParams params,
                                         rt,
                                         docstring,
-                                        transform body params)))
+                                        transform body params))
                          methods)
       | transformTop' (OAST.Deftype tydef) =
         Deftype tydef
