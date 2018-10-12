@@ -161,6 +161,7 @@ structure Alpha :> ALPHA = struct
                              MethodDef (name,
                                         mapParams params,
                                         rt,
+                                        docstring,
                                         transformWithParams body params))
                          methods)
       | transformTop (OAST.Deftype tydef) =
