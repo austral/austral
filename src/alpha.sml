@@ -49,7 +49,7 @@ structure Alpha :> ALPHA = struct
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
                      | InModule of Symbol.symbol_name
-         and param = Param of name * typespec
+         and param = Param of variable * typespec
          and method_decl = MethodDecl of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and instance_arg = InstanceArg of name * name Set.set
@@ -140,20 +140,20 @@ structure Alpha :> ALPHA = struct
 
     (* Transform the OAST top-level AST to this top-level AST *)
 
-    fun transformTop (OAST.Defun (name, params, rt, docstring, ast)) =
+    fun transformTop' (OAST.Defun (name, params, rt, docstring, ast)) =
         Defun (name,
                mapParams params,
                rt,
                docstring,
                transformWithParams ast params)
-      | transformTop (OAST.Defclass (name, param, docstring, methods)) =
+      | transformTop' (OAST.Defclass (name, param, docstring, methods)) =
         Defclass (name,
                   param,
                   docstring,
                   map (fn (OAST.MethodDecl (name, params, rt, docstring)) =>
                           MethodDecl (name, mapParams params, rt, docstring))
                       methods)
-      | transformTop (OAST.Definstance (name, OAST.InstanceArg arg, docstring, methods)) =
+      | transformTop' (OAST.Definstance (name, OAST.InstanceArg arg, docstring, methods)) =
         Definstance (name,
                      InstanceArg arg,
                      docstring,
@@ -164,20 +164,20 @@ structure Alpha :> ALPHA = struct
                                         docstring,
                                         transformWithParams body params))
                          methods)
-      | transformTop (OAST.Deftype tydef) =
+      | transformTop' (OAST.Deftype tydef) =
         Deftype tydef
-      | transformTop (OAST.Defdisjunction (name, typarams, docstring, variants)) =
+      | transformTop' (OAST.Defdisjunction (name, typarams, docstring, variants)) =
         Defdisjunction (name,
                         typarams,
                         docstring,
                         map (fn (OAST.Variant v) => Variant v) variants)
-      | transformTop (OAST.Deftemplate template) =
+      | transformTop' (OAST.Deftemplate template) =
         Deftemplate template
-      | transformTop (OAST.DefineSymbolMacro mac) =
+      | transformTop' (OAST.DefineSymbolMacro mac) =
         DefineSymbolMacro mac
-      | transformTop (OAST.Defmodule module) =
+      | transformTop' (OAST.Defmodule module) =
         Defmodule module
-      | transformTop (OAST.InModule name) =
+      | transformTop' (OAST.InModule name) =
         InModule name
 
     and mapParams params =
