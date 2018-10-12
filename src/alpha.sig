@@ -45,7 +45,7 @@ signature ALPHA = sig
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
                      | InModule of Symbol.symbol_name
-         and param = Param of name * typespec
+         and param = Param of variable * typespec
          and method_decl = MethodDecl of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and instance_arg = InstanceArg of name * name Set.set
