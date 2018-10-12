@@ -9,4 +9,5 @@ echo "test.au"
 clang++ -shared -fPIC -std=c++11 test/valid/test.cpp
 
 echo "fib.au"
-#./boreal test/valid/fib.au --output=test/valid/fib.cpp
+./boreal test/valid/fib.au --output=test/valid/fib.cpp
+clang++ -shared -fPIC -std=c++11 test/valid/fib.cpp
