@@ -18,6 +18,8 @@
 *)
 
 structure OAST :> OAST = struct
+    type name = Symbol.symbol
+
     (* Types *)
 
     datatype ast = UnitConstant

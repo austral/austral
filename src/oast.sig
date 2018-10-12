@@ -18,6 +18,8 @@
 *)
 
 signature OAST = sig
+    type name = Symbol.symbol
+
     datatype ast = UnitConstant
                  | BoolConstant of bool
                  | IntConstant of string
