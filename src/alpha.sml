@@ -153,6 +153,8 @@ structure Alpha :> ALPHA = struct
                   map (fn (OAST.MethodDecl (name, params, rt, docstring)) =>
                           MethodDecl (name, mapParams params, rt, docstring))
                       methods)
+      | transformTop (OAST.Deftype tydef) =
+        Deftype tydef
       | transformTop (OAST.Defdisjunction (name, typarams, docstring, variants)) =
         Defdisjunction (name,
                         typarams,
