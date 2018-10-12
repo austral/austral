@@ -142,7 +142,7 @@ structure Alpha :> ALPHA = struct
                    params',
                    rt,
                    docstring,
-                   transform ast params')
+                   transform ast (paramsToStack params'))
         end
       | transformTop' (OAST.Defclass (name, param, docstring, methods)) =
         Defclass (name,
