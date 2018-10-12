@@ -257,7 +257,7 @@ structure TAst :> TAST = struct
                    params',
                    Type.resolve tenv ty,
                    docstring,
-                   augment ast (Context (Map.empty, tenv, fenv)))
+                   augment ast (funcContext params tenv fenv))
         end
       | augmentTop (AST.Defclass (name, param_name, docstring, methods)) tenv fenv =
         let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
@@ -274,7 +274,7 @@ structure TAst :> TAST = struct
                            map (mapParam tenv) params,
                            Type.resolve tenv tys,
                            docstring,
-                           augment ast (Context (Map.empty, tenv, fenv)))
+                           augment ast (funcContext params tenv fenv))
         in
             Definstance (name, InstanceArg (arg, set), docstring, map mapDef defs)
         end
