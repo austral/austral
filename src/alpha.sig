@@ -20,7 +20,6 @@
 signature ALPHA = sig
     type symbol = Symbol.symbol
     type variable = Symbol.variable
-    type docstring = string option
     type typespec = Type.typespec
 
     datatype ast = UnitConstant
@@ -32,6 +31,9 @@ signature ALPHA = sig
                  | Let of variable * ast * ast
                  | The of typespec * ast
                  | Operation of symbol * ast list
+
+    type name = symbol
+    type docstring = string option
 
     datatype top_ast = Defun of symbol * param list * typespec * docstring * ast
                      | ToplevelForm of symbol * OAST.ast list

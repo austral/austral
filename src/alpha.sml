@@ -20,7 +20,6 @@
 structure Alpha :> ALPHA = struct
     type symbol = Symbol.symbol
     type variable = Symbol.variable
-    type docstring = string option
     type typespec = Type.typespec
 
     (* AST *)
@@ -36,6 +35,9 @@ structure Alpha :> ALPHA = struct
                  | Operation of symbol * ast list
 
     (* Toplevel AST *)
+
+    type name = symbol
+    type docstring = string option
 
     datatype top_ast = Defun of symbol * param list * typespec * docstring * ast
                      | ToplevelForm of symbol * OAST.ast list
