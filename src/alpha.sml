@@ -154,7 +154,7 @@ structure Alpha :> ALPHA = struct
                           MethodDecl (name, mapParams params, rt, docstring))
                       methods)
       | transformTop (OAST.DefineSymbolMacro mac) =
-        DefinSymbolMacro mac
+        DefineSymbolMacro mac
       | transformTop (OAST.Defmodule (name, clauses)) =
         Defmodule (name, clauses)
       | transformTop (OAST.InModule name) =
