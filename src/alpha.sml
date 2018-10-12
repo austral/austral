@@ -137,4 +137,15 @@ structure Alpha :> ALPHA = struct
         (head, freshVar head) :: (makeStack tail)
       | makeStack nil =
         nil
+
+    (* Transform the OAST top-level AST to this top-level AST *)
+
+    fun transformTop (OAST.Defun (name, params, rt, docstring, ast)) =
+        Defun (name,
+               map (fn (OAST.Param (name, ty)) => Param (name, ty)) params,
+               rt,
+               docstring,
+               transform ast (Set.fromList (map (fn (OAST.Param (name, _)) => name) params)))
+      | transformTop _ =
+        raise Fail "derp"
 end
