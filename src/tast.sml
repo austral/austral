@@ -278,7 +278,7 @@ structure TAst :> TAST = struct
                            map (mapParam tenv) params,
                            Type.resolve tenv tys,
                            docstring,
-                           augment ast (funcContext params tenv fenv))
+                           augment ast (funcContext params' tenv fenv))
         in
             Definstance (name, InstanceArg (arg, set), docstring, map mapDef defs)
         end
