@@ -35,6 +35,9 @@ structure OAST :> OAST = struct
 
     type docstring = string option
 
+    datatype top_ast = Defun of symbol * param list * typespec * docstring * ast
+         and param = Param of symbol * typespec
+
     (* Functions *)
 
     val au = Symbol.au

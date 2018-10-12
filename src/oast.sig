@@ -18,7 +18,7 @@
 *)
 
 signature OAST = sig
-    type symbol = Symbol.symbol
+    type symbol = Symbol.symbolo
     type typespec = Type.typespec
 
     datatype ast = UnitConstant
@@ -32,6 +32,9 @@ signature OAST = sig
                  | Operation of symbol * ast list
 
     type docstring = string option
+
+    datatype top_ast = Defun of symbol * param list * typespec * docstring * ast
+         and param = Param of symbol * typespec
 
     val transform : RCST.rcst -> ast
 end
