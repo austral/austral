@@ -19,6 +19,7 @@
 
 signature OAST = sig
     type symbol = Symbol.symbol
+    type typespec = Type.typespec
 
     datatype ast = UnitConstant
                  | BoolConstant of bool

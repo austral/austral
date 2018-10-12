@@ -19,6 +19,7 @@
 
 structure OAST :> OAST = struct
     type symbol = Symbol.symbol
+    type typespec = Type.typespec
 
     (* Types *)
 
