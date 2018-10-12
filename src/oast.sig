@@ -18,7 +18,7 @@
 *)
 
 signature OAST = sig
-    type symbol = Symbol.symbolo
+    type symbol = Symbol.symbol
     type typespec = Type.typespec
 
     datatype ast = UnitConstant
