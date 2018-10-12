@@ -127,8 +127,8 @@ structure CppBackend :> CPP_BACKEND = struct
                 transformExp exp)
       | transformBlock (MIR.Cond (test, cons, alt)) =
         Cond (transformExp test,
-              transformBlock cons,
-              transformBlock alt)
+              Block [transformBlock cons],
+              Block [transformBlock alt])
 
     fun transformTop (MIR.Defun (name, typarams, params, rt, body, retval)) =
         FunctionDef (name,
