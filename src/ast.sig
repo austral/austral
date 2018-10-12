@@ -40,6 +40,7 @@ signature AST = sig
     type param_name = name
     type docstring = string option
     type symbol = Symbol.symbol
+    type variable = Symbol.variable
     type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * typespec * docstring * ast
@@ -51,7 +52,7 @@ signature AST = sig
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
                      | InModule of Symbol.symbol_name
-         and param = Param of name * typespec
+         and param = Param of variable * typespec
          and method_decl = MethodDecl of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and instance_arg = InstanceArg of name * name Set.set
