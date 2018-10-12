@@ -142,10 +142,20 @@ structure Alpha :> ALPHA = struct
 
     fun transformTop (OAST.Defun (name, params, rt, docstring, ast)) =
         Defun (name,
-               map (fn (OAST.Param (name, ty)) => Param (name, ty)) params,
+               mapParams params,
                rt,
                docstring,
                transform ast (Set.fromList (map (fn (OAST.Param (name, _)) => name) params)))
+      | transformTop (OAST.Defclass (name, param, docstring, methods)) =
+        Defclass (name,
+                  param,
+                  docstring,
+                  map (fn (OAST.MethodDecl (name, params, rt, docstring)) =>
+                          MethodDecl (name, mapParams params, rt, docstring))
+                      methods)
       | transformTop _ =
         raise Fail "derp"
+
+    and mapParams params =
+        map (fn (OAST.Param (name, ty)) => Param (name, ty)) params
 end
