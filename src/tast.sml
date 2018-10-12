@@ -247,6 +247,9 @@ structure TAst :> TAST = struct
             t = u
     end
 
+    fun funcContext params =
+        Context (Map.empty, tenv, fenv)
+
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
         let val params' = map (mapParam tenv) params
         in
