@@ -19,6 +19,7 @@
 
 signature OAST = sig
     type symbol = Symbol.symbol
+    type name = symbol
     type typespec = Type.typespec
 
     datatype ast = UnitConstant
@@ -27,14 +28,27 @@ signature OAST = sig
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
                  | Symbol of symbol
-                 | Let of symbol * ast * ast
+                 | Let of name * ast * ast
                  | The of typespec * ast
-                 | Operation of symbol * ast list
+                 | Operation of name * ast list
 
     type docstring = string option
+    type param_name = symbol
 
-    datatype top_ast = Defun of symbol * param list * typespec * docstring * ast
-         and param = Param of symbol * typespec
+    datatype top_ast = Defun of name * param list * typespec * docstring * ast
+                     | Defclass of name * param_name * docstring * method_decl list
+                     | Definstance of name * instance_arg * docstring * method_def list
+                     | Deftype of name * name list * docstring * typespec
+                     | Defdisjunction of name * name list * docstring * variant list
+                     | Deftemplate of Macro.template
+                     | DefineSymbolMacro of name * RCST.rcst * docstring
+                     | Defmodule of Symbol.module_name * Module.defmodule_clause list
+                     | InModule of Symbol.symbol_name
+         and param = Param of name * typespec
+         and method_decl = MethodDecl of name * param list * typespec * docstring
+         and method_def = MethodDef of name * param list * typespec * docstring * ast
+         and instance_arg = InstanceArg of name * name Set.set
+         and variant = Variant of name * typespec option
 
     val transform : RCST.rcst -> ast
 end
