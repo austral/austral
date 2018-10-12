@@ -180,7 +180,7 @@ structure HIR :> HIR = struct
 
     fun transformTop (TAst.Defun (name, params, rt, _, body)) =
         Defun (escapeSymbol name,
-               map (fn (TAst.Param (n, t)) => Param (escapeSymbol n, t)) params,
+               map (fn (TAst.Param (n, t)) => Param (escapeVariable n, t)) params,
                rt,
                transform body)
       | transformTop (TAst.Defclass _) =
