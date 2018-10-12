@@ -248,7 +248,11 @@ structure TAst :> TAST = struct
     end
 
     fun funcContext params tenv fenv =
-        Context (Map.empty, tenv, fenv)
+        let val bindings = Map.fromList (map (fn (Param (var, ty)) => (var, Binding (ty, Immutable)))
+                                             params)
+        in
+            Context (bindings, tenv, fenv)
+        end
 
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
         let val params' = map (mapParam tenv) params
