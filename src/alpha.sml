@@ -179,8 +179,6 @@ structure Alpha :> ALPHA = struct
         Defmodule module
       | transformTop (OAST.InModule name) =
         InModule name
-      | transformTop _ =
-        raise Fail "derp"
 
     and mapParams params =
         map (fn (OAST.Param (name, ty)) => Param (name, ty)) params
