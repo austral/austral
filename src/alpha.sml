@@ -162,7 +162,7 @@ structure Alpha :> ALPHA = struct
                                             params',
                                             rt,
                                             docstring,
-                                            transform body params')
+                                            transform body (paramsToStack params'))
                              end)
                          methods)
       | transformTop' (OAST.Deftype tydef) =
