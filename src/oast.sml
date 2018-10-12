@@ -32,6 +32,8 @@ structure OAST :> OAST = struct
                  | The of Type.typespec * ast
                  | Operation of symbol * ast list
 
+    type docstring = string option
+
     (* Functions *)
 
     val au = Symbol.au

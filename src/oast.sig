@@ -30,5 +30,7 @@ signature OAST = sig
                  | The of Type.typespec * ast
                  | Operation of symbol * ast list
 
+    type docstring = string option
+
     val transform : RCST.rcst -> ast
 end
