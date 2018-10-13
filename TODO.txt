@@ -1,6 +1,5 @@
 TODO:
 
-- Parse definstance declarations
 - Parse deftemplate declarations
 - Compile typeclass instances to a list of HIR generic functions
 
@@ -68,3 +67,4 @@ DONE:
 - Turn params from symbols to variables
 - Update AST.transformTop to use Alpha.top_ast instead of RCST
 - Fix parameter lookup
+- Parse definstance declarations
