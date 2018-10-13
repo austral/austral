@@ -101,25 +101,6 @@ structure OAST :> OAST = struct
 
     (* Parse toplevel forms into the toplevel AST *)
 
-    fun transformDeftype ((RCST.Symbol name)::(RCST.List params)::body) =
-        let fun parseBody [RCST.StringConstant s, def] =
-                (SOME (CST.escapedToString s), def)
-              | parseBody [def] =
-                (NONE, def)
-              | parseBody _ = raise Fail "Bad deftype form"
-            and parseParam (RCST.Symbol s) = s
-              | parseParam _ = raise Fail "Type parameter must be a symbol"
-        in
-            let val (docstring, ty) = parseBody body
-            in
-                Deftype (name,
-                         map parseParam params,
-                         docstring,
-                         Type.parseTypespec ty)
-            end
-        end
-      | transformDeftype _ = raise Fail "Bad deftype form"
-
     fun transformDefdisjunction ((RCST.Symbol name)::(RCST.List params)::body) =
         let fun parseBody [RCST.StringConstant s, def] =
                 (SOME (CST.escapedToString s), def)
@@ -318,4 +299,23 @@ structure OAST :> OAST = struct
     and transformDefinstance ((RCST.Symbol name)::(RCST.List [arg])::body) =
         raise Fail "definstance not implemented"
       | transformDefinstance _ = raise Fail "Bad definstance form"
+
+    and transformDeftype ((RCST.Symbol name)::(RCST.List params)::body) =
+        let fun parseBody [RCST.StringConstant s, def] =
+                (SOME (CST.escapedToString s), def)
+              | parseBody [def] =
+                (NONE, def)
+              | parseBody _ = raise Fail "Bad deftype form"
+            and parseParam (RCST.Symbol s) = s
+              | parseParam _ = raise Fail "Type parameter must be a symbol"
+        in
+            let val (docstring, ty) = parseBody body
+            in
+                Deftype (name,
+                         map parseParam params,
+                         docstring,
+                         Type.parseTypespec ty)
+            end
+        end
+      | transformDeftype _ = raise Fail "Bad deftype form"
 end
