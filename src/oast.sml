@@ -233,7 +233,7 @@ structure OAST :> OAST = struct
               | parseParam _ = raise Fail "Bad method parameter"
             and parseMethodBody ((RCST.StringConstant s)::head::tail) =
                 (SOME (CST.escapedToString s), implicitProgn (head::tail))
-              | parseBody body =
+              | parseMethodBody body =
                 (NONE, implicitProgn body)
             and implicitProgn l =
                 (RCST.List ((RCST.Symbol (Symbol.au "progn"))::l))
