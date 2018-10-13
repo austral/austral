@@ -213,7 +213,9 @@ structure OAST :> OAST = struct
                 (SOME (CST.escapedToString s), parseMethods methods)
               | parseBody [RCST.List methods] = (NONE, parseMethods methods)
               | parseBody _ = raise Fail "Bad definstance form"
-            and parseMethods _ =
+            and parseMethods list =
+                map parseMethod list
+            and parseMethod _ =
                 raise Fail "not done yet"
         in
             let val (docstring, methods) = parseBody body
