@@ -1,18 +1,8 @@
 TODO:
 
-- Macro and
-- Macro or
-- Function and*
-- Function or*
-- Bitwise operators
-
-- Compile typeclass instances to a list of HIR generic functions
 - Parse definstance declarations
 - Parse deftemplate declarations
-- Tuple bind
-
-- Austral prelude
-- Prelude: equality and comparison instances
+- Compile typeclass instances to a list of HIR generic functions
 
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
@@ -23,6 +13,15 @@ TODO:
 
 - Macro match
 - Macroexpansion
+- Macro and
+- Macro or
+- Function and*
+- Function or*
+- Bitwise operators
+
+- Tuple bind
+- Austral prelude
+- Prelude: equality and comparison instances
 
 DONE:
 
