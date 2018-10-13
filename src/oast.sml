@@ -195,8 +195,20 @@ structure OAST :> OAST = struct
         end
       | transformDefclass _ = raise Fail "Bad defclass form"
 
-    and transformDefinstance ((RCST.Symbol name)::(RCST.List [arg])::body) =
-        raise Fail "definstance not implemented"
+    and transformDefinstance ((RCST.Symbol name)::(RCST.List args)::body) =
+        let fun parseArgs _ =
+                raise Fail "not done yet"
+            and parseBody _ =
+                raise Fail "not done yet"
+        in
+            let val (docstring, methods) = parseBody body
+            in
+                Definstance (name,
+                             parseArgs args,
+                             docstring,
+                             methods)
+            end
+        end
       | transformDefinstance _ = raise Fail "Bad definstance form"
 
     and transformDeftype ((RCST.Symbol name)::(RCST.List params)::body) =
