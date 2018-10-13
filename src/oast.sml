@@ -207,7 +207,7 @@ structure OAST :> OAST = struct
                       | mapSym _ =
                         raise Fail "definstance: type variable must be a symbol"
                 in
-                    map mapSym list
+                    Set.fromList (map mapSym list)
                 end
             and parseBody _ =
                 raise Fail "not done yet"
