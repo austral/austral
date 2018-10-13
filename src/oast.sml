@@ -139,6 +139,7 @@ structure OAST :> OAST = struct
             and transformExp params rcst =
                 let val params' = Set.fromList (map (fn (Param (n, _)) => n) params)
                 in
+                    (* FIXME: why? *)
                     transform rcst
                 end
             and parseBody ((RCST.StringConstant s)::head::tail) =
