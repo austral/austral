@@ -196,8 +196,19 @@ structure OAST :> OAST = struct
       | transformDefclass _ = raise Fail "Bad defclass form"
 
     and transformDefinstance ((RCST.Symbol name)::(RCST.List args)::body) =
-        let fun parseArgs _ =
-                raise Fail "not done yet"
+        let fun parseArgs ((RCST.Symbol tyname)::rest) =
+                InstanceArg (tyname,
+                             parseTyVars rest)
+              | parseArgs _ =
+                raise Fail "definstance: bad instance argument"
+            and parseTyVars list =
+                let fun mapSym (RCST.Symbol s) =
+                        s
+                      | mapSym _ =
+                        raise Fail "definstance: type variable must be a symbol"
+                in
+                    map mapSym list
+                end
             and parseBody _ =
                 raise Fail "not done yet"
         in
