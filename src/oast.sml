@@ -101,10 +101,6 @@ structure OAST :> OAST = struct
 
     (* Parse toplevel forms into the toplevel AST *)
 
-    fun transformDefinstance ((RCST.Symbol name)::(RCST.List [arg])::body) =
-        raise Fail "definstance not implemented"
-      | transformDefinstance _ = raise Fail "Bad definstance form"
-
     fun transformDeftype ((RCST.Symbol name)::(RCST.List params)::body) =
         let fun parseBody [RCST.StringConstant s, def] =
                 (SOME (CST.escapedToString s), def)
@@ -318,4 +314,8 @@ structure OAST :> OAST = struct
             end
         end
       | transformDefclass _ = raise Fail "Bad defclass form"
+
+    and transformDefinstance ((RCST.Symbol name)::(RCST.List [arg])::body) =
+        raise Fail "definstance not implemented"
+      | transformDefinstance _ = raise Fail "Bad definstance form"
 end
