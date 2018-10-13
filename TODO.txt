@@ -1,6 +1,5 @@
 TODO:
 
-- Parse deftemplate declarations
 - Compile typeclass instances to a list of HIR generic functions
 
 - Error on repeat type variables in an instance declaration
@@ -10,6 +9,7 @@ TODO:
 - Better error messages
 - Linearity
 
+- Parse deftemplate declarations
 - Macro match
 - Macroexpansion
 - Macro and
