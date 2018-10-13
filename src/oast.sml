@@ -218,7 +218,7 @@ structure OAST :> OAST = struct
                 map parseMethod list
             and parseMethod (RCST.List ((RCST.Symbol name)::params::rt::body)) =
                 let val params' = map parseParam params
-                    and (docstring, body') = parseBody body
+                    and (docstring, body') = parseMethodBody body
                 in
                     MethodDef (name,
                                params',
@@ -231,7 +231,7 @@ structure OAST :> OAST = struct
             and parseParam (RCST.List [RCST.Symbol name, ty]) =
                 Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad method parameter"
-            and parseBody ((RCST.StringConstant s)::head::tail) =
+            and parseMethodBody ((RCST.StringConstant s)::head::tail) =
                 (SOME (CST.escapedToString s), implicitProgn (head::tail))
               | parseBody body =
                 (NONE, implicitProgn body)
