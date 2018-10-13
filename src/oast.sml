@@ -101,12 +101,6 @@ structure OAST :> OAST = struct
 
     (* Parse toplevel forms into the toplevel AST *)
 
-    fun transformDefSymbolMacro [RCST.Symbol name, expansion, RCST.StringConstant docstring] =
-        DefineSymbolMacro (name, expansion, SOME (CST.escapedToString docstring))
-      | transformDefSymbolMacro [RCST.Symbol name, expansion] =
-        DefineSymbolMacro (name, expansion, NONE)
-      | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
-
     fun transformDefmodule ((RCST.Symbol name)::clauses) =
         let val clauses = map parseClause clauses
         in
@@ -318,4 +312,10 @@ structure OAST :> OAST = struct
     and transformDeftemplate ((RCST.Symbol name)::body) =
         raise Fail "deftemplate not implemented"
       | transformDeftemplate _ = raise Fail "Bad deftemplate form"
+
+    and transformDefSymbolMacro [RCST.Symbol name, expansion, RCST.StringConstant docstring] =
+        DefineSymbolMacro (name, expansion, SOME (CST.escapedToString docstring))
+      | transformDefSymbolMacro [RCST.Symbol name, expansion] =
+        DefineSymbolMacro (name, expansion, NONE)
+      | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
 end
