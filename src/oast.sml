@@ -101,43 +101,6 @@ structure OAST :> OAST = struct
 
     (* Parse toplevel forms into the toplevel AST *)
 
-    fun transformDefun ((RCST.Symbol name)::params::rt::body) =
-        let fun parseParams (RCST.List l) = map parseParam l
-              | parseParams _ = raise Fail "defun parameter list must be a list"
-            and parseParam (RCST.List [RCST.Symbol name, ty]) =
-                Param (name, Type.parseTypespec ty)
-              | parseParam _ = raise Fail "Bad defun parameter"
-            and transformExp params rcst =
-                let val params' = Set.fromList (map (fn (Param (n, _)) => n) params)
-                in
-                    transform rcst
-                end
-            and parseBody ((RCST.StringConstant s)::head::tail) =
-                (* When the first element of the body is a string constant, and
-                   the remainder of the form is non-empty, we take the string
-                   constant to be the docstring. Otherwise, we parse the string
-                   constant as an ordinary expression expression *)
-                (SOME (CST.escapedToString s), implicitProgn (head::tail))
-              | parseBody body =
-                (NONE, implicitProgn body)
-            and implicitProgn l =
-                (RCST.List ((RCST.Symbol (Symbol.au "progn"))::l))
-        in
-            let val (docstring, body') = parseBody body
-                and params' = parseParams params
-            in
-                let val body'' = transformExp params' body'
-                in
-                    Defun (name,
-                           params',
-                           Type.parseTypespec rt,
-                           docstring,
-                           body'')
-                end
-            end
-        end
-      | transformDefun _ = raise Fail "Bad defun form"
-
     fun transformDefclass ((RCST.Symbol name)::(RCST.List [RCST.Symbol param])::body) =
         let fun parseBody [RCST.StringConstant s, RCST.List methods]  =
                 (SOME (CST.escapedToString s), parseMethods methods)
@@ -318,4 +281,41 @@ structure OAST :> OAST = struct
             else
                 raise Fail "Unknown toplevel form"
         end
+
+    and transformDefun ((RCST.Symbol name)::params::rt::body) =
+        let fun parseParams (RCST.List l) = map parseParam l
+              | parseParams _ = raise Fail "defun parameter list must be a list"
+            and parseParam (RCST.List [RCST.Symbol name, ty]) =
+                Param (name, Type.parseTypespec ty)
+              | parseParam _ = raise Fail "Bad defun parameter"
+            and transformExp params rcst =
+                let val params' = Set.fromList (map (fn (Param (n, _)) => n) params)
+                in
+                    transform rcst
+                end
+            and parseBody ((RCST.StringConstant s)::head::tail) =
+                (* When the first element of the body is a string constant, and
+                   the remainder of the form is non-empty, we take the string
+                   constant to be the docstring. Otherwise, we parse the string
+                   constant as an ordinary expression expression *)
+                (SOME (CST.escapedToString s), implicitProgn (head::tail))
+              | parseBody body =
+                (NONE, implicitProgn body)
+            and implicitProgn l =
+                (RCST.List ((RCST.Symbol (Symbol.au "progn"))::l))
+        in
+            let val (docstring, body') = parseBody body
+                and params' = parseParams params
+            in
+                let val body'' = transformExp params' body'
+                in
+                    Defun (name,
+                           params',
+                           Type.parseTypespec rt,
+                           docstring,
+                           body'')
+                end
+            end
+        end
+      | transformDefun _ = raise Fail "Bad defun form"
 end
