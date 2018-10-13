@@ -223,7 +223,7 @@ structure OAST :> OAST = struct
                                params',
                                Type.parseTypespec rt,
                                docstring,
-                               transformExp params' body')
+                               transform body')
                 end
               | parseMethod _ =
                 raise Fail "definstance: bad method form"
