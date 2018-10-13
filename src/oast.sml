@@ -313,7 +313,7 @@ structure OAST :> OAST = struct
         Module.DocstringClause (CST.escapedToString s)
       | parseDocstringClause _ =
         raise Fail "Bad docstring clause"
-    fun transformInModule [RCST.Keyword moduleName] =
+    and transformInModule [RCST.Keyword moduleName] =
         InModule moduleName
       | transformInModule _ =
         raise Fail "Bad in-module form"
