@@ -101,10 +101,6 @@ structure OAST :> OAST = struct
 
     (* Parse toplevel forms into the toplevel AST *)
 
-    fun transformDeftemplate ((RCST.Symbol name)::body) =
-        raise Fail "deftemplate not implemented"
-      | transformDeftemplate _ = raise Fail "Bad deftemplate form"
-
     fun transformDefSymbolMacro [RCST.Symbol name, expansion, RCST.StringConstant docstring] =
         DefineSymbolMacro (name, expansion, SOME (CST.escapedToString docstring))
       | transformDefSymbolMacro [RCST.Symbol name, expansion] =
@@ -318,4 +314,8 @@ structure OAST :> OAST = struct
             end
         end
       | transformDefdisjunction _ = raise Fail "Bad defdisjunction form"
+
+    and transformDeftemplate ((RCST.Symbol name)::body) =
+        raise Fail "deftemplate not implemented"
+      | transformDeftemplate _ = raise Fail "Bad deftemplate form"
 end
