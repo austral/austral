@@ -101,34 +101,6 @@ structure OAST :> OAST = struct
 
     (* Parse toplevel forms into the toplevel AST *)
 
-    fun transformDefclass ((RCST.Symbol name)::(RCST.List [RCST.Symbol param])::body) =
-        let fun parseBody [RCST.StringConstant s, RCST.List methods]  =
-                (SOME (CST.escapedToString s), parseMethods methods)
-              | parseBody [RCST.List methods] = (NONE, parseMethods methods)
-              | parseBody _ = raise Fail "Bad defclass form"
-            and parseMethods l = map parseMethod l
-            and parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt, RCST.StringConstant s]) =
-                MethodDecl (name,
-                            map parseParam params,
-                            Type.parseTypespec rt,
-                            SOME (CST.escapedToString s))
-              | parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt]) =
-                MethodDecl (name,
-                            map parseParam params,
-                            Type.parseTypespec rt,
-                            NONE)
-              | parseMethod _ = raise Fail "Bad method definition"
-            and parseParam (RCST.List [RCST.Symbol name, ty]) =
-                Param (name, Type.parseTypespec ty)
-              | parseParam _ = raise Fail "Bad method parameter"
-        in
-            let val (docstring, methods) = parseBody body
-            in
-                Defclass (name, param, docstring, methods)
-            end
-        end
-      | transformDefclass _ = raise Fail "Bad defclass form"
-
     fun transformDefinstance ((RCST.Symbol name)::(RCST.List [arg])::body) =
         raise Fail "definstance not implemented"
       | transformDefinstance _ = raise Fail "Bad definstance form"
@@ -318,4 +290,32 @@ structure OAST :> OAST = struct
             end
         end
       | transformDefun _ = raise Fail "Bad defun form"
+
+    and transformDefclass ((RCST.Symbol name)::(RCST.List [RCST.Symbol param])::body) =
+        let fun parseBody [RCST.StringConstant s, RCST.List methods]  =
+                (SOME (CST.escapedToString s), parseMethods methods)
+              | parseBody [RCST.List methods] = (NONE, parseMethods methods)
+              | parseBody _ = raise Fail "Bad defclass form"
+            and parseMethods l = map parseMethod l
+            and parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt, RCST.StringConstant s]) =
+                MethodDecl (name,
+                            map parseParam params,
+                            Type.parseTypespec rt,
+                            SOME (CST.escapedToString s))
+              | parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt]) =
+                MethodDecl (name,
+                            map parseParam params,
+                            Type.parseTypespec rt,
+                            NONE)
+              | parseMethod _ = raise Fail "Bad method definition"
+            and parseParam (RCST.List [RCST.Symbol name, ty]) =
+                Param (name, Type.parseTypespec ty)
+              | parseParam _ = raise Fail "Bad method parameter"
+        in
+            let val (docstring, methods) = parseBody body
+            in
+                Defclass (name, param, docstring, methods)
+            end
+        end
+      | transformDefclass _ = raise Fail "Bad defclass form"
 end
