@@ -101,67 +101,6 @@ structure OAST :> OAST = struct
 
     (* Parse toplevel forms into the toplevel AST *)
 
-    fun transformDefmodule ((RCST.Symbol name)::clauses) =
-        let val clauses = map parseClause clauses
-        in
-            Defmodule (Symbol.symbolName name, clauses)
-        end
-      | transformDefmodule _ =
-        raise Fail "Bad defmodule form"
-    and parseClause (RCST.List ((RCST.Keyword name)::rest)) =
-        parseClauseInner name rest
-      | parseClause _ = raise Fail "Bad defmodule clause"
-    and parseClauseInner name args =
-        let fun key s = Ident.mkIdentEx s
-        in
-            if name = key "nicknames" then
-                parseNicknamesClause args
-            else if name = key "use" then
-                parseUseClause args
-            else if name = key "import-from" then
-                parseImportClause args
-            else if name = key "export" then
-                parseExportClause args
-            else if name = key "documentation" then
-                parseDocstringClause args
-            else
-                raise Fail "Unknown export clause"
-        end
-    and parseNicknamesClause args =
-        let fun parseNickElem (RCST.List [RCST.Keyword nick, RCST.Keyword modName]) = (nick, modName)
-              | parseNickElem _ = raise Fail "Bad :nicknames clause"
-        in
-            Module.NicknamesClause (map parseNickElem args)
-        end
-    and parseUseClause args =
-        let fun parseUseElem (RCST.Keyword k) = k
-              | parseUseElem _ = raise Fail "Bad :use clause"
-        in
-            Module.UseClause (map parseUseElem args)
-        end
-    and parseImportClause ((RCST.Keyword modName)::args) =
-        let fun parseImportElem (RCST.Keyword k) = k
-              | parseImportElem _ = raise Fail "Bad :import-from clause"
-        in
-            Module.ImportFromClause (modName, map parseImportElem args)
-        end
-      | parseImportClause _ =
-        raise Fail "Bad :import-from clause"
-    and parseExportClause args =
-        let fun parseExportElem (RCST.Keyword k) = k
-              | parseExportElem _ = raise Fail "Bad export clause"
-        in
-            Module.ExportClause (map parseExportElem args)
-        end
-    and parseDocstringClause [RCST.StringConstant s] =
-        Module.DocstringClause (CST.escapedToString s)
-      | parseDocstringClause _ =
-        raise Fail "Bad docstring clause"
-    fun transformInModule [RCST.Keyword moduleName] =
-        InModule moduleName
-      | transformInModule _ =
-        raise Fail "Bad in-module form"
-
     fun transformTop (RCST.List l) = transformTopList l
       | transformTop _ = raise Fail "Invalid toplevel form"
     and transformTopList ((RCST.Symbol f)::args) = transformT f args
@@ -317,4 +256,65 @@ structure OAST :> OAST = struct
       | transformDefSymbolMacro [RCST.Symbol name, expansion] =
         DefineSymbolMacro (name, expansion, NONE)
       | transformDefSymbolMacro _ = raise Fail "Bad define-symbol-macro form"
+
+    and transformDefmodule ((RCST.Symbol name)::clauses) =
+        let val clauses = map parseClause clauses
+        in
+            Defmodule (Symbol.symbolName name, clauses)
+        end
+      | transformDefmodule _ =
+        raise Fail "Bad defmodule form"
+    and parseClause (RCST.List ((RCST.Keyword name)::rest)) =
+        parseClauseInner name rest
+      | parseClause _ = raise Fail "Bad defmodule clause"
+    and parseClauseInner name args =
+        let fun key s = Ident.mkIdentEx s
+        in
+            if name = key "nicknames" then
+                parseNicknamesClause args
+            else if name = key "use" then
+                parseUseClause args
+            else if name = key "import-from" then
+                parseImportClause args
+            else if name = key "export" then
+                parseExportClause args
+            else if name = key "documentation" then
+                parseDocstringClause args
+            else
+                raise Fail "Unknown export clause"
+        end
+    and parseNicknamesClause args =
+        let fun parseNickElem (RCST.List [RCST.Keyword nick, RCST.Keyword modName]) = (nick, modName)
+              | parseNickElem _ = raise Fail "Bad :nicknames clause"
+        in
+            Module.NicknamesClause (map parseNickElem args)
+        end
+    and parseUseClause args =
+        let fun parseUseElem (RCST.Keyword k) = k
+              | parseUseElem _ = raise Fail "Bad :use clause"
+        in
+            Module.UseClause (map parseUseElem args)
+        end
+    and parseImportClause ((RCST.Keyword modName)::args) =
+        let fun parseImportElem (RCST.Keyword k) = k
+              | parseImportElem _ = raise Fail "Bad :import-from clause"
+        in
+            Module.ImportFromClause (modName, map parseImportElem args)
+        end
+      | parseImportClause _ =
+        raise Fail "Bad :import-from clause"
+    and parseExportClause args =
+        let fun parseExportElem (RCST.Keyword k) = k
+              | parseExportElem _ = raise Fail "Bad export clause"
+        in
+            Module.ExportClause (map parseExportElem args)
+        end
+    and parseDocstringClause [RCST.StringConstant s] =
+        Module.DocstringClause (CST.escapedToString s)
+      | parseDocstringClause _ =
+        raise Fail "Bad docstring clause"
+    fun transformInModule [RCST.Keyword moduleName] =
+        InModule moduleName
+      | transformInModule _ =
+        raise Fail "Bad in-module form"
 end
