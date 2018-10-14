@@ -121,7 +121,7 @@ structure Type :> TYPE = struct
 
     fun resolve tenv params (TypeCons (name, tyargs)) =
         (case List.find (fn (TypeParam name') => name = name') params of
-             SOME p => p
+             SOME (TypeParam name') => TypeVariable name'
            | NONE =>
              let val tyargs' = map (resolve tenv) tyargs
              in
