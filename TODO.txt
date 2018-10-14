@@ -1,5 +1,7 @@
 TODO:
 
+- resolve should have an extra argument with the type parameter environment
+  (e.g., in a generic function definition, the set of defined type parameters)
 - handle definstance declarations
 
 DONE:
@@ -52,9 +54,6 @@ DONE:
 - handle defclass declarations
 
 LONG-TERM TODO:
-
-- resolve should have an extra argument with the type parameter environment
-  (e.g., in a generic function definition, the set of defined type parameters)
 
 - Add support for an --entrypoint flag to define the main() function
 
