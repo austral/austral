@@ -114,7 +114,7 @@ structure Compiler : COMPILER = struct
       | declareTopForm c (AST.DefineSymbolMacro _) =
         let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
         in
-            Compiler (menv, tenv, macenv, fenv, moduleName, code)
+            Compiler (menv, macenv, tenv, fenv, moduleName, code)
         end
       | declareTopForm c (AST.Defmodule (name, clauses)) =
         let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
