@@ -1,5 +1,8 @@
 TODO:
 
+- Define static array type
+- Implement static-array-length
+- Implement static-array-index
 - declaration AST between AST and TAST
 - better handling of type parameters throughout the codebase
 - OrderedSet.toUnordered
