@@ -110,8 +110,28 @@ structure Compiler : COMPILER = struct
                 end
             end
         end
-      | declareTopForm c (AST.Definstance _) =
-        raise Fail "declare definstance not implemented"
+      | declareTopForm c (AST.Definstance (name, InstanceArg (arg, typarams), docstring, methods)) =
+        let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
+        in
+            let fun resolveMethod (AST.MethodDef (name, params, rt, docstring, body)) =
+                    Function.MethodDecl (name,
+                                         map (mapParam typarams) params,
+                                         Type.resolve tenv typarams rt,
+                                         docstring)
+                and mapParam typarams (AST.Param (name, typespec)) =
+                    (Function.Param (Symbol.varSymbol name,
+                                     Type.resolve tenv typarams typespec))
+            in
+                let val ins = Function.Instance (name,
+                                                 Function.InstanceArg (name, params),
+                                                 docstring,
+                                                 map resolveMethod methods)
+                in
+                    case Function.addInstance fenv ins of
+                        SOME fenv' => Compiler (menv, macenv, tenv, fenv', module, code)
+                      | _ => raise Fail "Bad instance definition"
+                end
+            end
       | declareTopForm c (AST.Deftype (name, params, docstring, def)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
             (* FIXME: this is fucked *)
