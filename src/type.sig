@@ -66,7 +66,7 @@ signature TYPE = sig
 
     (* Given a type environment, a type specifier, and a set of generic type
        parameters, resolve the type specifier to a type *)
-    val resolve : tenv -> typespec -> ty
+    val resolve : tenv -> param Set.set -> typespec -> ty
 
     val parseTypespec : RCST.rcst -> typespec
 end
