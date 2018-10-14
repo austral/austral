@@ -38,6 +38,10 @@ LONG-TERM TODO:
 - Implement defcfun
 - Runtime support for saturation arithmetic
 
+- Implement static-array constructor
+- Lift static array constructors to global constants
+- Verify if an expression is a valid static array element
+
 DONE:
 
 - Utils
