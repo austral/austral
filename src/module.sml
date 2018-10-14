@@ -90,6 +90,8 @@ structure Module : MODULE = struct
                 ".-",
                 ".*",
                 "./",
+                "tuple",
+                "proj",
                 "allocate",
                 "load",
                 "store",
