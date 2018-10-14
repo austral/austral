@@ -277,10 +277,13 @@ structure TAst :> TAST = struct
       | augmentTop (AST.Definstance (name, AST.InstanceArg (arg, set), docstring, defs)) tenv fenv =
         let fun mapDef (AST.MethodDef (name, params, tys, docstring, ast)) =
                 let val params' = map (mapParam tenv) params
+                    and typarams = Set.fromList
+                                       (map (fn name => Type.TypeParam name)
+                                            (Set.toList set))
                 in
                     MethodDef (name,
                                params',
-                               Type.resolve tenv tys,
+                               Type.resolve tenv typarams tys,
                                docstring,
                                augment ast (funcContext params' tenv fenv))
                 end
