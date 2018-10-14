@@ -249,11 +249,11 @@ structure TAst :> TAST = struct
             t = u
     end
 
-    fun funcContext params tenv fenv =
+    fun funcContext params typarams tenv fenv =
         let val bindings = Map.fromList (map (fn (Param (var, ty)) => (var, Binding (ty, Immutable)))
                                              params)
         in
-            Context (bindings, tenv, fenv)
+            Context (bindings, typarams, tenv, fenv)
         end
 
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
@@ -261,9 +261,9 @@ structure TAst :> TAST = struct
         in
             Defun (name,
                    params',
-                   Type.resolve tenv (Set.fromList params') ty,
+                   Type.resolve tenv Set.empty ty,
                    docstring,
-                   augment ast (funcContext params' tenv fenv))
+                   augment ast (funcContext params' Set.empty tenv fenv))
         end
       | augmentTop (AST.Defclass (name, param_name, docstring, methods)) tenv fenv =
         let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
