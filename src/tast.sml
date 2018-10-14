@@ -261,7 +261,7 @@ structure TAst :> TAST = struct
         in
             Defun (name,
                    params',
-                   Type.resolve tenv ty,
+                   Type.resolve tenv (Set.fromList params') ty,
                    docstring,
                    augment ast (funcContext params' tenv fenv))
         end
