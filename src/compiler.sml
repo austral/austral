@@ -97,7 +97,7 @@ structure Compiler : COMPILER = struct
                                          Type.resolve tenv rt,
                                          docstring)
                 and mapParam (AST.Param (name, typespec)) =
-                    (Function.Param (name, Type.resolve tenv typespec))
+                    (Function.Param (Symbol.varSymbol name, Type.resolve tenv typespec))
             in
                 let val tc = resolveTypeclass tcDef
                 in
