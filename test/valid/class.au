@@ -1,0 +1,4 @@
+;; -*- mode: lisp -*-
+
+(defclass identity (tau)
+  ((identity ((value tau)) tau)))
