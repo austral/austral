@@ -34,7 +34,7 @@ structure Compiler : COMPILER = struct
                                   Ident.mkIdentEx "austral-user",
                                   CppPrelude.prelude)
 
-    fun compilerMenv (Compiler (menv, _, _, _, _)) =
+    fun compilerMenv (Compiler (menv, _, _, _, _, _)) =
         menv
 
     fun compilerTenv (Compiler (_, tenv, _, _, _)) =
