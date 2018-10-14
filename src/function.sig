@@ -39,6 +39,8 @@ signature FUNCTION = sig
 
     val defaultFenv : fenv
 
+    val findTypeclassByMethod : fenv -> name -> typeclass option
+
     val addFunction : fenv -> func -> fenv option
     val addTypeclass : fenv -> typeclass -> fenv option
 
