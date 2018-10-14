@@ -152,7 +152,7 @@ structure Module : MODULE = struct
                                                     NONE)
                 in
                     let fun envFromModules (head::tail) =
-                            addModule (envFromMovules tail) head
+                            addModule (envFromModules tail) head
                           | envFromModules nil =
                             emptyEnv
                     in
