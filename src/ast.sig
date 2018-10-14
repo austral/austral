@@ -29,6 +29,7 @@ signature AST = sig
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
+                 | StaticArrayLength of ast
                  | Allocate of ast
                  | Load of ast
                  | Store of ast * ast
