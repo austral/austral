@@ -4,6 +4,8 @@ TODO:
   (e.g., in a generic function definition, the set of defined type parameters)
 - handle definstance declarations
 
+- declaration AST between AST and TAST
+
 DONE:
 
 - Utils
