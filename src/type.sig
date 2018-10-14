@@ -64,8 +64,8 @@ signature TYPE = sig
     val replacements : typarams -> ty list -> (name, ty) Map.map
 
 
-    (* Given a type environment, a type specifier, and a set of generic type
-       parameters, resolve the type specifier to a type *)
+    (* Given a type environment, a set of generic type parameters, and a type
+       specifier, resolve the type specifier to a type *)
     val resolve : tenv -> param Set.set -> typespec -> ty
 
     val parseTypespec : RCST.rcst -> typespec
