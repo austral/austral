@@ -69,7 +69,7 @@ structure Compiler : COMPILER = struct
         end
     and declareTopForm c (AST.Defun (name, params, rt, docstring, ast)) =
         (* Add a concrete function to the compiler fenv *)
-        let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
         in
             let val f = Function.Function (name,
                                            map (fn (AST.Param (n, t)) => Function.Param (Symbol.varSymbol n,
@@ -79,7 +79,7 @@ structure Compiler : COMPILER = struct
                                            docstring)
             in
                 case (Function.addFunction fenv f) of
-                    SOME fenv' => Compiler (menv, tenv, fenv', currModuleName, code)
+                    SOME fenv' => Compiler (menv, macenv, tenv, fenv', currModuleName, code)
                   | NONE => raise Fail "Repeat function"
             end
         end
