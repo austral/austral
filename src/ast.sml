@@ -161,7 +161,9 @@ structure AST :> AST = struct
         raise Fail "Bad `proj` form"
 
     and transformSArrayLength [arr] =
-        StaticArrayLength (transform arr)
+        StaticArrayLength arr
+      | transformSArrayLength _ =
+        raise Fail "Bad static-array-length form"
 
     and transformAlloc [v] =
         Allocate v
