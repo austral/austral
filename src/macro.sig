@@ -39,5 +39,7 @@ signature MACRO = sig
 
     val getSymbolMacro : macroenv -> Symbol.symbol -> symbol_macro option
 
+    val addSymbolMacro : macroenv -> symbol_macro -> macroenv
+
     val macroexpandSymbolMacros : macroenv -> RCST.rcst -> RCST.rcst
 end
