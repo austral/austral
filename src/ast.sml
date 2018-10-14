@@ -131,6 +131,9 @@ structure AST :> AST = struct
                 TupleCreate (args)
             else if f = au "proj" then
                 transformProj args
+           (* Arrays *)
+            else if f = au "static-array-length" then
+                transformSArrayLength args
            (* Pointers *)
             else if f = au "allocate" then
                 transformAlloc args
