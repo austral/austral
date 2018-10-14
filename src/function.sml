@@ -31,8 +31,7 @@ structure Function :> FUNCTION = struct
          and method_decl = MethodDecl of name * param list * ty * docstring
 
     datatype instance = Instance of name * instance_arg * docstring * method_def list
-         and instance_arg = InstanceArg of name * tyvar OrderedSet.set
-         and tyvar = TypeVar of name
+         and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring * RCST.rcst
 
     datatype fenv = FunctionEnv of (name, func) Map.map * typeclass list * instance list
