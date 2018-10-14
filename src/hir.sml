@@ -208,6 +208,9 @@ structure HIR :> HIR = struct
       | transformTop (TAst.InModule _) =
         ToplevelProgn []
 
-    and transformMethod _ =
-        raise Fail "Not implemented yet"
+    and transformMethod (TAst.MethodDef (name, params, rt, _, ast)) =
+        Defun (escapeSymbol name,
+               map (fn (TAst.Param (n, t)) => Param (escapeVariable n, t)) params,
+               rt,
+               transform body)
 end
