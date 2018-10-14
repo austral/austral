@@ -90,7 +90,9 @@ structure Compiler : COMPILER = struct
             let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
                 and tc = resolveTypeclass tcDef
             in
-                raise Fail "not implemented"
+                case Function.addTypeclass fenv tc of
+                    SOME fenv' => Compiler (menv, macenv, tenv, fenv', module, code)
+                  | _ => raise Fail "Duplicate typeclass definition"
             end
         end
       | declareTopForm c (AST.Definstance _) =
