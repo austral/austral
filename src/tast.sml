@@ -105,7 +105,7 @@ structure TAst :> TAST = struct
 
     (* Context data for the augment function *)
 
-    datatype context = Context of bindings * Type.tenv * params Set.set * Function.fenv
+    datatype context = Context of bindings * Type.tenv * Type.param Set.set * Function.fenv
 
     fun mkContext b t p f = Context (b, t, p, f)
 
