@@ -299,12 +299,18 @@ structure TAst :> TAST = struct
                      Type.resolve tenv params' tys)
         end
       | augmentTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
-        let fun mapVariant (AST.Variant (name, SOME tys)) =
-                Type.Variant (name, SOME (Type.resolve tenv tys))
-              | mapVariant (AST.Variant (name, NONE)) =
-                Type.Variant (name, NONE)
+        let val params' = Set.fromList (map (fn name => Type.TypeParam name) params)
         in
-            Defdisjunction (name, params, docstring, map mapVariant variants)
+            let fun mapVariant (AST.Variant (name, SOME tys)) =
+                    Type.Variant (name, SOME (Type.resolve tenv params' tys))
+                  | mapVariant (AST.Variant (name, NONE)) =
+                    Type.Variant (name, NONE)
+            in
+                Defdisjunction (name,
+                                params,
+                                docstring,
+                                map mapVariant variants)
+            end
         end
       | augmentTop (AST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
