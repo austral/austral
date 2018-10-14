@@ -123,7 +123,7 @@ structure Type :> TYPE = struct
         (case List.find (fn (TypeParam name') => name = name') params of
              SOME (TypeParam name') => TypeVariable name'
            | NONE =>
-             let val tyargs' = map (resolve tenv) tyargs
+             let val tyargs' = map (resolve tenv params) tyargs
              in
                  (case (getTypedef tenv name) of
                       SOME (BuiltInType (_, ty)) =>
