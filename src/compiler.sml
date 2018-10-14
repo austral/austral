@@ -89,8 +89,11 @@ structure Compiler : COMPILER = struct
                                     paramName,
                                     docstring,
                                     map resolveMethod methods)
-            and resolveMethod _ =
-                raise Fail "derp"
+            and resolveMethod (AST.MethodDecl (name, params, rt, docstring)) =
+                Function.MethodDecl (name,
+                                     map mapParam params,
+                                     Type.resolve tenv rt,
+                                     docstring)
         in
             let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
                 and tc = resolveTypeclass tcDef
