@@ -40,6 +40,7 @@ signature TYPE = sig
     val isFloat : ty -> bool
 
     datatype typespec = TypeCons of name * (typespec list)
+                      | TyIntArg of int
 
     type typarams = param OrderedSet.set
 

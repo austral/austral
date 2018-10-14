@@ -43,6 +43,7 @@ structure Type :> TYPE = struct
       | isFloat _ = false
 
     datatype typespec = TypeCons of name * (typespec list)
+                      | TyIntArg of int
 
     type typarams = param OrderedSet.set
 
@@ -85,7 +86,9 @@ structure Type :> TYPE = struct
             SOME _ => NONE (* Another type with this name exists *)
           | NONE => SOME (Map.iadd tenv (name, Datatype (name, params, variants)))
 
-    fun parseTypespec (RCST.Symbol s) = TypeCons (s, [])
+    fun parseTypespec (RCST.IntConstant i) =
+        TyIntArg (Option.valOf (Int.fromString i))
+      | parseTypespec (RCST.Symbol s) = TypeCons (s, [])
       | parseTypespec (RCST.List l) = parseTypespecList l
       | parseTypespec _ = raise Fail "Invalid type specifier"
     and parseTypespecList ((RCST.Symbol f)::args) =
@@ -158,6 +161,8 @@ structure Type :> TYPE = struct
                     | NONE =>
                       raise Fail ("No type named " ^ (Symbol.toString name)))
              end)
+      | resolve _ _ (TyIntArg _) =
+        raise Fail "Invalid type spec"
     and replaceVariant m (Variant (name, SOME ty)) =
         Variant (name, SOME (replaceVars m ty))
       | replaceVariant _ (Variant (name, NONE)) =
