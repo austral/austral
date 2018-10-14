@@ -97,7 +97,7 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (AST.Defdisjunction (name, params, docstring, variants)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
-            and (Compiler (menv, tenv, fenv, module, code)) = c
+            and (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
             let fun mapVariant (AST.Variant (name, SOME tys)) =
                     Type.Variant (name, SOME (Type.resolve tenv tys))
@@ -105,7 +105,7 @@ structure Compiler : COMPILER = struct
                     Type.Variant (name, NONE)
             in
                 case (Type.addDisjunction tenv (name, params', map mapVariant variants)) of
-                    SOME tenv' => Compiler (menv, tenv', fenv, module, code)
+                    SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
                   | NONE => raise Fail "Duplicate type definition"
             end
         end
