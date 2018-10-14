@@ -37,7 +37,7 @@ structure Compiler : COMPILER = struct
     fun compilerMenv (Compiler (menv, _, _, _, _, _)) =
         menv
 
-    fun compilerTenv (Compiler (_, tenv, _, _, _)) =
+    fun compilerTenv (Compiler (_, _, tenv, _, _, _)) =
         tenv
 
     fun compilerFenv (Compiler (_, _, fenv, _, _)) =
