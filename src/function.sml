@@ -37,6 +37,9 @@ structure Function :> FUNCTION = struct
 
     datatype fenv = FunctionEnv of (name, func) Map.map * typeclass list * instance list
 
+    fun typeclassName (Typeclass (name, _, _, _)) =
+        name
+
     val defaultFenv =
         let fun funcName (Function (name, _, _, _)) =
                 name
@@ -78,6 +81,14 @@ structure Function :> FUNCTION = struct
                 SOME _ => NONE
               | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), ts, is))
         end
+
+    fun addTypeclass fenv tc =
+        (case findTypeclassByName fenv (typeclassName tc) of
+             SOME _ => NONE
+           | _ => let val (FunctionEnv (fm, ts, is)) = fenv
+                  in
+                      SOME (FunctionEnv (fm, tc :: ts, is))
+                  end)
 
     datatype callable = CallableFunc of func
                       | CallableMethod
