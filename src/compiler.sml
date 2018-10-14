@@ -103,6 +103,8 @@ structure Compiler : COMPILER = struct
                   | NONE => raise Fail "Duplicate type definition"
             end
         end
+      | declareTopForm c (AST.Deftemplate _) =
+        raise Fail "declare deftemplate not implemented"
       | declareTopForm c (AST.Defmodule (name, clauses)) =
         let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
         in
