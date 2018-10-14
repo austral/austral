@@ -106,7 +106,10 @@ structure Compiler : COMPILER = struct
       | declareTopForm c (AST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
       | declareTopForm c (AST.DefineSymbolMacro _) =
-        raise Fail "declare define-symbol-macro not implemented"
+        let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
+        in
+            Compiler (menv, tenv, fenv, moduleName code)
+        end
       | declareTopForm c (AST.Defmodule (name, clauses)) =
         let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
         in

@@ -48,7 +48,7 @@ structure Macro :> MACRO = struct
 
     fun addSymbolMacro (MacroEnv (t, sm)) mac =
         (case Map.add sm (symbolMacroName mac, mac) of
-             SOME sm' => MacroEnv (t, sm')
+             SOME sm' => SOME (MacroEnv (t, sm'))
            | NONE => NONE)
 
     (* Macroexpansion *)
