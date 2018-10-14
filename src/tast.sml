@@ -320,6 +320,6 @@ structure TAst :> TAST = struct
         Defmodule clauses
       | augmentTop (AST.InModule name) _ _ =
         InModule name
-    and mapParam tenv (AST.Param (n, ts)) =
-        Param (n, Type.resolve tenv ts)
+    and mapParam tenv params (AST.Param (n, ts)) =
+        Param (n, Type.resolve tenv params ts)
 end
