@@ -20,7 +20,7 @@
 signature COMPILER = sig
     type code = string
 
-    datatype compiler = Compiler of Module.menv * Type.tenv * Function.fenv * Symbol.module_name * code
+    datatype compiler = Compiler of Module.menv * Macro.macroenv * Type.tenv * Function.fenv * Symbol.module_name * code
 
     val emptyCompiler : compiler
 

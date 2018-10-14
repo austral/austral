@@ -167,9 +167,9 @@ structure Compiler : COMPILER = struct
                     let val cpp = CppBackend.transformTop mir
                     in
                         let val cppStr = CppAst.renderTop cpp
-                            and (Compiler (menv, tenv, fenv, currMod, code)) = c
+                            and (Compiler (menv, macenv, tenv, fenv, currMod, code)) = c
                         in
-                            Compiler (menv, tenv, fenv, currMod, code ^ "\n\n" ^ cppStr)
+                            Compiler (menv, macenv, tenv, fenv, currMod, code ^ "\n\n" ^ cppStr)
                         end
                     end
                 end
