@@ -97,7 +97,7 @@ structure Function :> FUNCTION = struct
         (case findTypeclassByName fenv (instanceName tc) of
              SOME _ => let val (FunctionEnv (fm, ts, is)) = fenv
                        in
-                           SOME (FunctionEnv (fm, tc, ins :: is))
+                           SOME (FunctionEnv (fm, ts, ins :: is))
                        end
            | _ => NONE)
 
