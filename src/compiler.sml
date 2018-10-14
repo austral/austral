@@ -110,7 +110,7 @@ structure Compiler : COMPILER = struct
                 end
             end
         end
-      | declareTopForm c (AST.Definstance (name, InstanceArg (arg, typarams), docstring, methods)) =
+      | declareTopForm c (AST.Definstance (name, AST.InstanceArg (arg, typarams), docstring, methods)) =
         let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
             let fun resolveMethod (AST.MethodDef (name, params, rt, docstring, body)) =
