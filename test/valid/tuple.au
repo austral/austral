@@ -1,0 +1,5 @@
+;; -*- mode: lisp -*-
+
+(defun test () i32
+  (let ((tup (tuple 10 10)))
+    (proj tup 0)))
