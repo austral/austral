@@ -65,7 +65,9 @@ structure TAst :> TAST = struct
           | typeOf (BoolConstant _) = Bool
           | typeOf (IntConstant (_, t)) = t
           | typeOf (FloatConstant (_, t)) = t
-          | typeOf (StringConstant _) = raise Fail "not impemented"
+          | typeOf (StringConstant s) =
+            StaticArray (Integer (Unsigned, Int8),
+                         String.size (CST.escapedToString s))
           | typeOf (Variable (_, t)) = t
           | typeOf (Let (_, _, b)) = typeOf b
           | typeOf (Cond (_, tb, _)) = typeOf tb
