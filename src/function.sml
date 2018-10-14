@@ -40,7 +40,7 @@ structure Function :> FUNCTION = struct
     fun typeclassName (Typeclass (name, _, _, _)) =
         name
 
-    fun instanceName (Instace (name, _, _, _)) =
+    fun instanceName (Instance (name, _, _, _)) =
         name
 
     val defaultFenv =
