@@ -40,6 +40,7 @@ signature FUNCTION = sig
     val defaultFenv : fenv
 
     val addFunction : fenv -> func -> fenv option
+    val addTypeclass : fenv -> typeclass -> fenv option
 
     datatype callable = CallableFunc of func
                       | CallableMethod
