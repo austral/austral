@@ -90,12 +90,15 @@ structure Compiler : COMPILER = struct
                     Function.Typeclass (name,
                                         paramName,
                                         docstring,
-                                        map resolveMethod methods)
-                and resolveMethod (AST.MethodDecl (name, params, rt, docstring)) =
-                    Function.MethodDecl (name,
-                                         map mapParam params,
-                                         Type.resolve tenv rt,
-                                         docstring)
+                                        map (resolveMethod paramName) methods)
+                and resolveMethod paramName (AST.MethodDecl (name, params, rt, docstring)) =
+                    let val typarams = Set.singleton (Type.TypeParam paramName)
+                    in
+                        Function.MethodDecl (name,
+                                             map mapParam params,
+                                             Type.resolve tenv typarams rt,
+                                             docstring)
+                    end
                 and mapParam (AST.Param (name, typespec)) =
                     (Function.Param (Symbol.varSymbol name, Type.resolve tenv typespec))
             in
