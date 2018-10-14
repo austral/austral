@@ -55,6 +55,13 @@ structure Function :> FUNCTION = struct
             end
         end
 
+    fun findTypeclassByName (FunctionEnv (_, ts, _)) name =
+        let fun isValidTC (Typeclass (name', _, _, _)) =
+                name = name'
+        in
+            List.find isValidTC ts
+        end
+
     fun findTypeclassByMethod (FunctionEnv (_, ts, _)) name =
         let fun isValidTC (Typeclass (_, _, _, methods)) =
                 Option.isSome (List.find isValidMethod methods)
