@@ -46,6 +46,8 @@ structure CppBackend :> CPP_BACKEND = struct
         NamedType name
       | transformType (MIR.Pointer ty) =
         Pointer (transformType ty)
+      | transformType (MIR.Array (ty, idx)) =
+        Array (transformType ty, idx)
       | transformType (MIR.Tuple tys) =
         TypeCons ("std::tuple", (map transformType tys))
       | transformType (MIR.Struct slots) =
