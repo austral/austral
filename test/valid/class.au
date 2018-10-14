@@ -3,6 +3,6 @@
 (defclass identity (tau)
   ((identity ((value tau)) tau)))
 
-;(definstance identity (i32)
-;  ((identity ((value i32)) i32
-;     value)))
+(definstance identity (i32)
+  ((identity ((value i32)) i32
+     value)))
