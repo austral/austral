@@ -4,6 +4,35 @@ TODO:
 - better handling of type parameters throughout the codebase
 - OrderedSet.toUnordered
 
+LONG-TERM TODO:
+
+- Add support for an --entrypoint flag to define the main() function
+
+- Generic functions
+
+- Error on repeat type variables in an instance declaration
+- Error on phantom type parameters in a type alias
+- Parse nested comments
+- Show symbol names in error messages
+- Better error messages
+- Linearity
+
+- Parse deftemplate declarations
+- handle defmacro declarations
+- Macro match
+- Macroexpansion
+- Macro and
+- Macro or
+- Function and*
+- Function or*
+- Bitwise operators
+
+- Tuple bind
+- Austral prelude
+- Prelude: equality and comparison instances
+
+- Implement defcfun
+
 DONE:
 
 - Utils
@@ -55,32 +84,3 @@ DONE:
 - resolve should have an extra argument with the type parameter environment
   (e.g., in a generic function definition, the set of defined type parameters)
 - handle definstance declarations
-
-LONG-TERM TODO:
-
-- Add support for an --entrypoint flag to define the main() function
-
-- Generic functions
-
-- Error on repeat type variables in an instance declaration
-- Error on phantom type parameters in a type alias
-- Parse nested comments
-- Show symbol names in error messages
-- Better error messages
-- Linearity
-
-- Parse deftemplate declarations
-- handle defmacro declarations
-- Macro match
-- Macroexpansion
-- Macro and
-- Macro or
-- Function and*
-- Function or*
-- Bitwise operators
-
-- Tuple bind
-- Austral prelude
-- Prelude: equality and comparison instances
-
-- Implement defcfun
