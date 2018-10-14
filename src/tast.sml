@@ -105,13 +105,14 @@ structure TAst :> TAST = struct
 
     (* Context data for the augment function *)
 
-    datatype context = Context of bindings * Type.tenv * Function.fenv
+    datatype context = Context of bindings * Type.tenv * Type.param Set.set * Function.fenv
 
-    fun mkContext b t f = Context (b, t, f)
+    fun mkContext b t p f = Context (b, t, p, f)
 
-    fun ctxBindings (Context (b, _, _)) = b
-    fun ctxTenv (Context (_, t, _)) = t
-    fun ctxFenv (Context (_, _, f)) = f
+    fun ctxBindings (Context (b, _, _, _)) = b
+    fun ctxTenv (Context (_, t, _, _)) = t
+    fun ctxTyParams (Context (_, _, ps, _)) = ps
+    fun ctxFenv (Context (_, _, _, f)) = f
 
     (* Augment AST with type information *)
 
@@ -138,7 +139,7 @@ structure TAst :> TAST = struct
                 in
                     Let (name,
                          v',
-                         augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
+                         augment body (mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)))
                 end
             end
           | augment (AST.Cond (test, cons, alt)) c =
@@ -205,7 +206,8 @@ structure TAst :> TAST = struct
           | augment (AST.The (typespec, exp)) c =
             let val tenv = ctxTenv c
             in
-                The (resolve tenv typespec, augment exp c)
+                The (resolve tenv (ctxTyParams c) typespec,
+                     augment exp c)
             end
           | augment (AST.Progn exps) c =
             Progn (map (fn a => augment a c) exps)
@@ -247,53 +249,73 @@ structure TAst :> TAST = struct
             t = u
     end
 
-    fun funcContext params tenv fenv =
+    fun funcContext params typarams tenv fenv =
         let val bindings = Map.fromList (map (fn (Param (var, ty)) => (var, Binding (ty, Immutable)))
                                              params)
         in
-            Context (bindings, tenv, fenv)
+            Context (bindings, tenv, typarams, fenv)
         end
 
     fun augmentTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
-        let val params' = map (mapParam tenv) params
+        let val params' = map (mapParam tenv Set.empty) params
         in
             Defun (name,
                    params',
-                   Type.resolve tenv ty,
+                   Type.resolve tenv Set.empty ty,
                    docstring,
-                   augment ast (funcContext params' tenv fenv))
+                   augment ast (funcContext params' Set.empty tenv fenv))
         end
-      | augmentTop (AST.Defclass (name, param_name, docstring, methods)) tenv fenv =
-        let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
-                MethodDecl (name,
-                            map (mapParam tenv) params,
-                            Type.resolve tenv tys,
-                            docstring)
+      | augmentTop (AST.Defclass (name, paramName, docstring, methods)) tenv fenv =
+        let val typarams = Set.singleton (Type.TypeParam paramName)
         in
-            Defclass (name, param_name, docstring, map augmentMethod methods)
+            let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
+                    MethodDecl (name,
+                                map (mapParam tenv typarams) params,
+                                Type.resolve tenv typarams tys,
+                                docstring)
+            in
+                Defclass (name, paramName, docstring, map augmentMethod methods)
+            end
         end
       | augmentTop (AST.Definstance (name, AST.InstanceArg (arg, set), docstring, defs)) tenv fenv =
         let fun mapDef (AST.MethodDef (name, params, tys, docstring, ast)) =
-                let val params' = map (mapParam tenv) params
+                let val typarams = Set.fromList
+                                       (map (fn name => Type.TypeParam name)
+                                            (Set.toList set))
                 in
-                    MethodDef (name,
-                               params',
-                               Type.resolve tenv tys,
-                               docstring,
-                               augment ast (funcContext params' tenv fenv))
+                    let val params' = map (mapParam tenv typarams) params
+                    in
+                        MethodDef (name,
+                                   params',
+                                   Type.resolve tenv typarams tys,
+                                   docstring,
+                                   augment ast (funcContext params' typarams tenv fenv))
+                    end
                 end
         in
             Definstance (name, InstanceArg (arg, set), docstring, map mapDef defs)
         end
       | augmentTop (AST.Deftype (name, params, docstring, tys)) tenv _ =
-        Deftype (name, params, docstring, Type.resolve tenv tys)
-      | augmentTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
-        let fun mapVariant (AST.Variant (name, SOME tys)) =
-                Type.Variant (name, SOME (Type.resolve tenv tys))
-              | mapVariant (AST.Variant (name, NONE)) =
-                Type.Variant (name, NONE)
+        let val params' = Set.fromList (map (fn name => Type.TypeParam name) params)
         in
-            Defdisjunction (name, params, docstring, map mapVariant variants)
+            Deftype (name,
+                     params,
+                     docstring,
+                     Type.resolve tenv params' tys)
+        end
+      | augmentTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
+        let val params' = Set.fromList (map (fn name => Type.TypeParam name) params)
+        in
+            let fun mapVariant (AST.Variant (name, SOME tys)) =
+                    Type.Variant (name, SOME (Type.resolve tenv params' tys))
+                  | mapVariant (AST.Variant (name, NONE)) =
+                    Type.Variant (name, NONE)
+            in
+                Defdisjunction (name,
+                                params,
+                                docstring,
+                                map mapVariant variants)
+            end
         end
       | augmentTop (AST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
@@ -303,6 +325,6 @@ structure TAst :> TAST = struct
         Defmodule clauses
       | augmentTop (AST.InModule name) _ _ =
         InModule name
-    and mapParam tenv (AST.Param (n, ts)) =
-        Param (n, Type.resolve tenv ts)
+    and mapParam tenv params (AST.Param (n, ts)) =
+        Param (n, Type.resolve tenv params ts)
 end

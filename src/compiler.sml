@@ -73,9 +73,9 @@ structure Compiler : COMPILER = struct
         in
             let val f = Function.Function (name,
                                            map (fn (AST.Param (n, t)) => Function.Param (Symbol.varSymbol n,
-                                                                                         Type.resolve tenv t))
+                                                                                         Type.resolve tenv Set.empty t))
                                                params,
-                                           Type.resolve tenv rt,
+                                           Type.resolve tenv Set.empty rt,
                                            docstring)
             in
                 case (Function.addFunction fenv f) of
@@ -87,17 +87,20 @@ structure Compiler : COMPILER = struct
         let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
             let fun resolveTypeclass (name, paramName, docstring, methods) =
-                    Function.Typeclass (name,
-                                        paramName,
-                                        docstring,
-                                        map resolveMethod methods)
-                and resolveMethod (AST.MethodDecl (name, params, rt, docstring)) =
+                    let val typarams = Set.singleton (Type.TypeParam paramName)
+                    in
+                        Function.Typeclass (name,
+                                            paramName,
+                                            docstring,
+                                            map (resolveMethod typarams) methods)
+                    end
+                and resolveMethod typarams (AST.MethodDecl (name, params, rt, docstring)) =
                     Function.MethodDecl (name,
-                                         map mapParam params,
-                                         Type.resolve tenv rt,
+                                         map (mapParam typarams) params,
+                                         Type.resolve tenv typarams rt,
                                          docstring)
-                and mapParam (AST.Param (name, typespec)) =
-                    (Function.Param (Symbol.varSymbol name, Type.resolve tenv typespec))
+                and mapParam typarams (AST.Param (name, typespec)) =
+                    (Function.Param (Symbol.varSymbol name, Type.resolve tenv typarams typespec))
             in
                 let val tc = resolveTypeclass tcDef
                 in
@@ -111,18 +114,22 @@ structure Compiler : COMPILER = struct
         raise Fail "declare definstance not implemented"
       | declareTopForm c (AST.Deftype (name, params, docstring, def)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
+            (* FIXME: this is fucked *)
+            and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
             and (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
-            case (Type.addTypeAlias tenv (name, params', Type.resolve tenv def)) of
+            case (Type.addTypeAlias tenv (name, params', Type.resolve tenv unorderedParams' def)) of
                 SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
               | NONE => raise Fail "Duplicate type definition"
         end
       | declareTopForm c (AST.Defdisjunction (name, params, docstring, variants)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
+            (* FIXME: this is fucked *)
+            and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
             and (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
             let fun mapVariant (AST.Variant (name, SOME tys)) =
-                    Type.Variant (name, SOME (Type.resolve tenv tys))
+                    Type.Variant (name, SOME (Type.resolve tenv unorderedParams' tys))
                   | mapVariant (AST.Variant (name, NONE)) =
                     Type.Variant (name, NONE)
             in
