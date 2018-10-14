@@ -84,23 +84,25 @@ structure Compiler : COMPILER = struct
             end
         end
       | declareTopForm c (AST.Defclass tcDef) =
-        let fun resolveTypeclass (name, paramName, docstring, methods) =
-                Function.Typeclass (name,
-                                    paramName,
-                                    docstring,
-                                    map resolveMethod methods)
-            and resolveMethod (AST.MethodDecl (name, params, rt, docstring)) =
-                Function.MethodDecl (name,
-                                     map mapParam params,
-                                     Type.resolve tenv rt,
-                                     docstring)
+        let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
-            let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
-                and tc = resolveTypeclass tcDef
+            let fun resolveTypeclass (name, paramName, docstring, methods) =
+                    Function.Typeclass (name,
+                                        paramName,
+                                        docstring,
+                                        map resolveMethod methods)
+                and resolveMethod (AST.MethodDecl (name, params, rt, docstring)) =
+                    Function.MethodDecl (name,
+                                         map mapParam params,
+                                         Type.resolve tenv rt,
+                                         docstring)
             in
-                case Function.addTypeclass fenv tc of
-                    SOME fenv' => Compiler (menv, macenv, tenv, fenv', module, code)
-                  | _ => raise Fail "Duplicate typeclass definition"
+                let val tc = resolveTypeclass tcDef
+                in
+                    case Function.addTypeclass fenv tc of
+                        SOME fenv' => Compiler (menv, macenv, tenv, fenv', module, code)
+                      | _ => raise Fail "Duplicate typeclass definition"
+                end
             end
         end
       | declareTopForm c (AST.Definstance _) =
