@@ -73,9 +73,9 @@ structure Compiler : COMPILER = struct
         in
             let val f = Function.Function (name,
                                            map (fn (AST.Param (n, t)) => Function.Param (Symbol.varSymbol n,
-                                                                                         Type.resolve tenv t))
+                                                                                         Type.resolve tenv Set.empty t))
                                                params,
-                                           Type.resolve tenv rt,
+                                           Type.resolve tenv Set.empty rt,
                                            docstring)
             in
                 case (Function.addFunction fenv f) of
