@@ -5,6 +5,8 @@ TODO:
 - resolve should have an extra argument with the type parameter environment
   (e.g., in a generic function definition, the set of defined type parameters)
 
+- Add support for an --entrypoint flag to define the main() function
+
 - Generic functions
 
 - Error on repeat type variables in an instance declaration
