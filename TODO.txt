@@ -86,3 +86,4 @@ DONE:
 - resolve should have an extra argument with the type parameter environment
   (e.g., in a generic function definition, the set of defined type parameters)
 - handle definstance declarations
+- Define austral.ext.cffi module
