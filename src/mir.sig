@@ -33,6 +33,7 @@ signature MIR = sig
                 | DoubleFloat
                 | NamedType of name
                 | Pointer of ty
+                | Array of ty * int
                 | Tuple of ty list
                 | Struct of slot list
                 | Union of slot list
