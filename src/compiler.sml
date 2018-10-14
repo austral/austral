@@ -87,20 +87,20 @@ structure Compiler : COMPILER = struct
         let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
             let fun resolveTypeclass (name, paramName, docstring, methods) =
-                    Function.Typeclass (name,
-                                        paramName,
-                                        docstring,
-                                        map (resolveMethod paramName) methods)
-                and resolveMethod paramName (AST.MethodDecl (name, params, rt, docstring)) =
                     let val typarams = Set.singleton (Type.TypeParam paramName)
                     in
-                        Function.MethodDecl (name,
-                                             map mapParam params,
-                                             Type.resolve tenv typarams rt,
-                                             docstring)
+                        Function.Typeclass (name,
+                                            paramName,
+                                            docstring,
+                                            map (resolveMethod typarams) methods)
                     end
-                and mapParam (AST.Param (name, typespec)) =
-                    (Function.Param (Symbol.varSymbol name, Type.resolve tenv typespec))
+                and resolveMethod typarams (AST.MethodDecl (name, params, rt, docstring)) =
+                    Function.MethodDecl (name,
+                                         map (mapParam typarams) params,
+                                         Type.resolve tenv typarams rt,
+                                         docstring)
+                and mapParam typarams (AST.Param (name, typespec)) =
+                    (Function.Param (Symbol.varSymbol name, Type.resolve tenv typarams typespec))
             in
                 let val tc = resolveTypeclass tcDef
                 in
