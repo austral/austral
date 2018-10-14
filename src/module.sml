@@ -145,6 +145,11 @@ structure Module : MODULE = struct
                                                    Imports Map.empty,
                                                    Exports (Set.fromList (map Ident.mkIdentEx kernelExports)),
                                                    NONE)
+                    and australExtCffiMod = Module (Ident.mkIdent-ex "austral.ext.cffi",
+                                                    Map.empty,
+                                                    Imports Map.empty,
+                                                    Exports (Set.fromList (map Ident.mkIdentEx cffiExports)),
+                                                    NONE)
                 in
                     addModule (addModule (addModule emptyEnv
                                                     australMod)
