@@ -185,7 +185,7 @@ structure TAst :> TAST = struct
             let val arr' = augment arr c
             in
                 case typeOf arr' of
-                    (StaticArray (_, len)) => IntConstant (len, sizeType)
+                    (StaticArray (_, len)) => IntConstant (Int.toString len, sizeType)
                   | _ => raise Fail "Argument to static-array-length not a static array"
 
             end
