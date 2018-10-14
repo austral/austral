@@ -2,6 +2,7 @@ TODO:
 
 - Implement foreign-funcall
 - Implement static-array-index
+- Compile string literals as static array constructors
 - declaration AST between AST and TAST
 - better handling of type parameters throughout the codebase
 - OrderedSet.toUnordered
