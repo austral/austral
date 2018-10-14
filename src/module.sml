@@ -156,10 +156,12 @@ structure Module : MODULE = struct
                           | envFromModules nil =
                             emptyEnv
                     in
-                        addModule (addModule (addModule emptyEnv
-                                                        australMod)
-                                             australUserMod)
-                                  australKernelMod
+                        envFromModules [
+                            australMod,
+                            australUserMod,
+                            australKernelMod,
+                            australExtCffiMod
+                        ]
                     end
                 end
             end
