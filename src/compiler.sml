@@ -123,7 +123,6 @@ structure Compiler : COMPILER = struct
                 Compiler (menv, tenv, fenv, moduleName, code)
             end
         end
-      | declareTopForm _ _ = raise Fail "Not implemented yet"
 
     fun declarationPass c (head::tail) =
         let val (node, c') = declareForm c head
