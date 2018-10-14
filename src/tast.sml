@@ -285,7 +285,7 @@ structure TAst :> TAST = struct
                                params',
                                Type.resolve tenv typarams tys,
                                docstring,
-                               augment ast (funcContext params' tenv fenv))
+                               augment ast (funcContext params' typarams tenv fenv))
                 end
         in
             Definstance (name, InstanceArg (arg, set), docstring, map mapDef defs)
