@@ -85,7 +85,12 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (AST.Defclass tcDef) =
         let fun resolveTypeclass (name, paramName, docstring, methods) =
-                raise Fail "Not done"
+                Function.Typeclass (name,
+                                    paramName,
+                                    docstring,
+                                    map resolveMethod methods)
+            and resolveMethod _ =
+                raise Fail "derp"
         in
             let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
                 and tc = resolveTypeclass tcDef
