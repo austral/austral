@@ -144,26 +144,32 @@ structure AST :> AST = struct
             else
                 Funcall (f, args)
         end
+
     and transformCond [test, cons, alt] =
         Cond (test, cons, alt)
       | transformCond _ =
         raise Fail "Invalid `if` form"
+
     and transformArith kind oper [lhs, rhs] =
         ArithOp (kind, oper, lhs, rhs)
       | transformArith kind oper _ =
         raise Fail "Bad arithmetic operator"
+
     and transformProj [ast, IntConstant i] =
         TupleProj (ast, Option.valOf (Int.fromString i))
       | transformProj _ =
         raise Fail "Bad `proj` form"
+
     and transformAlloc [v] =
         Allocate v
       | transformAlloc _ =
         raise Fail "Bad `allocate` form"
+
     and transformLoad [ptr] =
         Load ptr
       | transformLoad _ =
         raise Fail "Bad `load` form"
+
     and transformStore [ptr, v] =
         Store (ptr, v)
       | transformStore _ =
