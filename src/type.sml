@@ -119,40 +119,43 @@ structure Type :> TYPE = struct
         Map.fromList (Util.mapidx (fn (TypeParam p, idx) => (p, List.nth (tyargs, idx)))
                                   (OrderedSet.toList typarams))
 
-    fun resolve tenv (TypeCons (name, tyargs)) =
-        let val tyargs' = map (resolve tenv) tyargs
-        in
-            (case (getTypedef tenv name) of
-                 SOME (BuiltInType (_, ty)) =>
-                 ty
-               | SOME (TypeAlias (_, params, ty)) =>
-                 (* The name refers to an alias of another type. Ensure the type
-                    constructor has as many arguments as the type alias has
-                    parameters *)
-                 if sameSize params tyargs' then
-                     (* Replace parameters in the aliased type with arguments from
-                        the type constructor *)
-                     replaceVars (replacements params tyargs') ty
-                 else
-                     raise Fail "Type constructor arity error"
-               | SOME (Datatype (_, params, variants)) =>
-                 (* The name refers to an algebraic data type. Ensure the type
-                    constructor has as many arguments as the type alias has
-                    parameters *)
-                 if sameSize params tyargs' then
-                     (* Replace parameters in the type with arguments from
-                        the type constructor *)
-                     let val m = replacements params tyargs'
-                     in
-                         Disjunction (name,
-                                      tyargs',
-                                      map (replaceVariant m) variants)
-                     end
-                 else
-                     raise Fail "Type constructor arity error"
-               | NONE =>
-                 raise Fail ("No type named " ^ (Symbol.toString name)))
-        end
+    fun resolve tenv params (TypeCons (name, tyargs)) =
+        (case List.find (fn (TypeParam (name', _)) = name = name') params of
+             SOME p => p
+           | NONE =>
+             let val tyargs' = map (resolve tenv) tyargs
+             in
+                 (case (getTypedef tenv name) of
+                      SOME (BuiltInType (_, ty)) =>
+                      ty
+                    | SOME (TypeAlias (_, params, ty)) =>
+                      (* The name refers to an alias of another type. Ensure the type
+                        constructor has as many arguments as the type alias has
+                        parameters *)
+                      if sameSize params tyargs' then
+                          (* Replace parameters in the aliased type with arguments from
+                            the type constructor *)
+                          replaceVars (replacements params tyargs') ty
+                      else
+                          raise Fail "Type constructor arity error"
+                    | SOME (Datatype (_, params, variants)) =>
+                      (* The name refers to an algebraic data type. Ensure the type
+                        constructor has as many arguments as the type alias has
+                        parameters *)
+                      if sameSize params tyargs' then
+                          (* Replace parameters in the type with arguments from
+                            the type constructor *)
+                          let val m = replacements params tyargs'
+                          in
+                              Disjunction (name,
+                                           tyargs',
+                                           map (replaceVariant m) variants)
+                          end
+                      else
+                          raise Fail "Type constructor arity error"
+                    | NONE =>
+                      raise Fail ("No type named " ^ (Symbol.toString name)))
+             end)
     and replaceVariant m (Variant (name, SOME ty)) =
         Variant (name, SOME (replaceVars m ty))
       | replaceVariant _ (Variant (name, NONE)) =
