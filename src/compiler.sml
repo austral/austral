@@ -21,6 +21,7 @@ structure Compiler : COMPILER = struct
     type code = string
 
     datatype compiler = Compiler of Module.menv
+                                    * Macro.macroenv
                                     * Type.tenv
                                     * Function.fenv
                                     * Symbol.module_name
