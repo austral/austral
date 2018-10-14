@@ -59,3 +59,4 @@ clean:
 	rm -rf $(VENDOR_DIR)
 	rm $(BIN)
 	rm $(TEST_BIN)
+	rm test/valid/*.cpp
