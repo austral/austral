@@ -191,7 +191,6 @@ structure HIR :> HIR = struct
         (* The compilation strategy for instances is each method is compiled to
            a standalone generic function *)
         ToplevelProgn (map transformMethod methods)
-        raise Fail "definstance to HIR not implemented"
       | transformTop (TAst.Deftype (name, params, _, ty)) =
         Deftype (escapeSymbol name,
                  map escapeSymbol params,
