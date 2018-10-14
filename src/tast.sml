@@ -206,7 +206,7 @@ structure TAst :> TAST = struct
           | augment (AST.The (typespec, exp)) c =
             let val tenv = ctxTenv c
             in
-                The (resolve tenv typespec, augment exp c)
+                The (resolve tenv (ctxTyParams c) typespec, augment exp c)
             end
           | augment (AST.Progn exps) c =
             Progn (map (fn a => augment a c) exps)
