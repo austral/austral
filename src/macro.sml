@@ -33,6 +33,7 @@ structure Macro :> MACRO = struct
 
     datatype symbol_macro = SymbolMacro of Symbol.symbol * RCST.rcst * string option
 
+    fun symbolMacroName (SymbolMacro (name, _, _)) = name
     fun symbolMacroExpansion (SymbolMacro (_, exp, _)) = exp
 
     type template_map = (Symbol.symbol, template) Map.map
@@ -44,6 +45,9 @@ structure Macro :> MACRO = struct
 
     fun getSymbolMacro (MacroEnv (_, mm)) s =
         Map.get mm s
+
+    fun addSymbolMacro (MacroEnv (t, sm)) mac =
+        MacroEnv (t, Map.iadd sm (symbolMacroName mac, mac))
 
     (* Macroexpansion *)
 
