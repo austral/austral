@@ -20,7 +20,11 @@
 structure Compiler : COMPILER = struct
     type code = string
 
-    datatype compiler = Compiler of Module.menv * Type.tenv * Function.fenv * Symbol.module_name * code
+    datatype compiler = Compiler of Module.menv
+                                    * Type.tenv
+                                    * Function.fenv
+                                    * Symbol.module_name
+                                    * code
 
     val emptyCompiler = Compiler (Module.defaultMenv,
                                   Type.defaultTenv,
