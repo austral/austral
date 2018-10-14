@@ -151,10 +151,16 @@ structure Module : MODULE = struct
                                                     Exports (Set.fromList (map Ident.mkIdentEx cffiExports)),
                                                     NONE)
                 in
-                    addModule (addModule (addModule emptyEnv
-                                                    australMod)
-                                         australUserMod)
-                              australKernelMod
+                    let fun envFromModules (head::tail) =
+                            addModule (envFromMovules tail) head
+                          | envFromModules nil =
+                            emptyEnv
+                    in
+                        addModule (addModule (addModule emptyEnv
+                                                        australMod)
+                                             australUserMod)
+                                  australKernelMod
+                    end
                 end
             end
         end
