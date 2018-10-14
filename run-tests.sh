@@ -15,3 +15,7 @@ clang++ -shared -fPIC -std=c++11 test/valid/fib.cpp
 echo "tuple.au"
 ./boreal test/valid/tuple.au --output=test/valid/tuple.cpp
 clang++ -shared -fPIC -std=c++11 test/valid/tuple.cpp
+
+echo "class.au"
+#./boreal test/valid/class.au --output=test/valid/class.cpp
+#clang++ -shared -fPIC -std=c++11 test/valid/class.cpp
