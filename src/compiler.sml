@@ -111,10 +111,12 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (AST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
-      | declareTopForm c (AST.DefineSymbolMacro _) =
+      | declareTopForm c (AST.DefineSymbolMacro mac) =
         let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, moduleName, code)
+            case Macro.addSymbolMacro macenv (Macro.SymbolMacro mac) of
+                SOME macenv' => Compiler (menv, macenv', tenv, fenv, moduleName, code)
+              | _ => raise Fail "Duplicate symbol macro definition"
         end
       | declareTopForm c (AST.Defmodule (name, clauses)) =
         let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
