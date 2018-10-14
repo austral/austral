@@ -9,6 +9,7 @@ TODO:
 
 LONG-TERM TODO:
 
+- Static array constructors
 - Add support for an --entrypoint flag to define the main() function
 
 - Generic functions
