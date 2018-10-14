@@ -28,6 +28,7 @@ structure Compiler : COMPILER = struct
                                     * code
 
     val emptyCompiler = Compiler (Module.defaultMenv,
+                                  Macro.emptyMacroEnv,
                                   Type.defaultTenv,
                                   Function.defaultFenv,
                                   Ident.mkIdentEx "austral-user",
