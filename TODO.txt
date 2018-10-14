@@ -54,6 +54,7 @@ DONE:
 - handle defclass declarations
 - resolve should have an extra argument with the type parameter environment
   (e.g., in a generic function definition, the set of defined type parameters)
+- handle definstance declarations
 
 LONG-TERM TODO:
 
@@ -83,4 +84,3 @@ LONG-TERM TODO:
 - Prelude: equality and comparison instances
 
 - Implement defcfun
-- handle definstance declarations
