@@ -83,8 +83,16 @@ structure Compiler : COMPILER = struct
                   | NONE => raise Fail "Repeat function"
             end
         end
-      | declareTopForm c (AST.Defclass _) =
-        raise Fail "declare defclass not implemented"
+      | declareTopForm c (AST.Defclass tcDef) =
+        let fun resolveTypeclass (name, paramName, docstring, methods) =
+                raise Fail "Not done"
+        in
+            let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
+                and tc = resolveTypeclass tcDef
+            in
+                raise Fail "not implemented"
+            end
+        end
       | declareTopForm c (AST.Definstance _) =
         raise Fail "declare definstance not implemented"
       | declareTopForm c (AST.Deftype (name, params, docstring, def)) =
