@@ -40,7 +40,7 @@ structure Compiler : COMPILER = struct
     fun compilerTenv (Compiler (_, _, tenv, _, _, _)) =
         tenv
 
-    fun compilerFenv (Compiler (_, _, fenv, _, _)) =
+    fun compilerFenv (Compiler (_, _, _, fenv, _, _)) =
         fenv
 
     fun currentModule (Compiler (menv, _, _, modName, _)) =
