@@ -269,7 +269,7 @@ structure TAst :> TAST = struct
         let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
                 MethodDecl (name,
                             map (mapParam tenv) params,
-                            Type.resolve tenv (Set.singleton (Type.Param paramName)) tys,
+                            Type.resolve tenv (Set.singleton (Type.TypeParam paramName)) tys,
                             docstring)
         in
             Defclass (name, param_name, docstring, map augmentMethod methods)
