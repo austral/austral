@@ -1,7 +1,5 @@
 TODO:
 
-- handle definstance declarations
-
 - declaration AST between AST and TAST
 
 DONE:
@@ -83,3 +81,4 @@ LONG-TERM TODO:
 - Prelude: equality and comparison instances
 
 - Implement defcfun
+- handle definstance declarations
