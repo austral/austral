@@ -139,7 +139,7 @@ structure TAst :> TAST = struct
                 in
                     Let (name,
                          v',
-                         augment body (mkContext s' (ctxTenv c) (ctxFenv c)))
+                         augment body (mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)))
                 end
             end
           | augment (AST.Cond (test, cons, alt)) c =
