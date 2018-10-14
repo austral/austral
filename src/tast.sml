@@ -180,6 +180,14 @@ structure TAst :> TAST = struct
             TupleCreate (map (fn e => augment e c) exps)
           | augment (AST.TupleProj (exp, i)) c =
             TupleProj (augment exp c, i)
+          | augment (AST.StaticArrayLength arr) c =
+            let val arr' = augment arr c
+            in
+                case typeOf arr' of
+                    (StaticArray (_, len)) => IntConstant (len, sizeType)
+                  | _ => raise Fail "Argument to static-array-length not a static array"
+
+            end
           | augment (AST.Allocate v) c =
             Allocate (augment v c)
           | augment (AST.Load e) c =
