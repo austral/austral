@@ -112,9 +112,9 @@ structure Compiler : COMPILER = struct
       | declareTopForm c (AST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
       | declareTopForm c (AST.DefineSymbolMacro _) =
-        let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
         in
-            Compiler (menv, tenv, fenv, moduleName, code)
+            Compiler (menv, tenv, macenv, fenv, moduleName, code)
         end
       | declareTopForm c (AST.Defmodule (name, clauses)) =
         let val (Compiler (menv, tenv, fenv, moduleName, code)) = c
