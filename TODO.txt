@@ -32,6 +32,7 @@ LONG-TERM TODO:
 - Prelude: equality and comparison instances
 
 - Implement defcfun
+- Implement foreign-funcall
 - Runtime support for saturation arithmetic
 
 DONE:
