@@ -124,10 +124,12 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (AST.Defdisjunction (name, params, docstring, variants)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
+            (* FIXME: this is fucked *)
+            and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
             and (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
             let fun mapVariant (AST.Variant (name, SOME tys)) =
-                    Type.Variant (name, SOME (Type.resolve tenv tys))
+                    Type.Variant (name, SOME (Type.resolve tenv unorderedParams' tys))
                   | mapVariant (AST.Variant (name, NONE)) =
                     Type.Variant (name, NONE)
             in
