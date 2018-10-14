@@ -120,7 +120,7 @@ structure Type :> TYPE = struct
                                   (OrderedSet.toList typarams))
 
     fun resolve tenv params (TypeCons (name, tyargs)) =
-        (case List.find (fn (TypeParam (name', _)) => name = name') params of
+        (case List.find (fn (TypeParam name') => name = name') params of
              SOME p => p
            | NONE =>
              let val tyargs' = map (resolve tenv) tyargs
