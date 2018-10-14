@@ -132,6 +132,7 @@ structure Compiler : COMPILER = struct
                       | _ => raise Fail "Bad instance definition"
                 end
             end
+        end
       | declareTopForm c (AST.Deftype (name, params, docstring, def)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
             (* FIXME: this is fucked *)
