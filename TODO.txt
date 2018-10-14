@@ -1,6 +1,5 @@
 TODO:
 
-- handle defclass declarations
 - handle definstance declarations
 
 DONE:
@@ -50,6 +49,7 @@ DONE:
 - Fix parameter lookup
 - Parse definstance declarations
 - Compile typeclass instances to a list of HIR generic functions
+- handle defclass declarations
 
 LONG-TERM TODO:
 
