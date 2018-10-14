@@ -294,9 +294,9 @@ structure TAst :> TAST = struct
         let val params' = Set.fromList (map (fn name => Type.TypeParam name) params)
         in
             Deftype (name,
-                     params',
+                     params,
                      docstring,
-                     Type.resolve tenv (Set.fromList params) tys)
+                     Type.resolve tenv params' tys)
         end
       | augmentTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
         let fun mapVariant (AST.Variant (name, SOME tys)) =
