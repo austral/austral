@@ -115,10 +115,10 @@ structure Compiler : COMPILER = struct
             and typarams = map (fn n => Type.TypeParam n) (Set.toList typarams)
         in
             let fun resolveMethod (AST.MethodDef (name, params, rt, docstring, body)) =
-                    Function.MethodDecl (name,
-                                         map (mapParam (Set.fromList typarams)) params,
-                                         Type.resolve tenv (Set.fromList typarams) rt,
-                                         docstring)
+                    Function.MethodDef (name,
+                                        map (mapParam (Set.fromList typarams)) params,
+                                        Type.resolve tenv (Set.fromList typarams) rt,
+                                        docstring)
                 and mapParam typarams (AST.Param (name, typespec)) =
                     (Function.Param (Symbol.varSymbol name,
                                      Type.resolve tenv typarams typespec))
