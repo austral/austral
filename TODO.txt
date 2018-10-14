@@ -2,8 +2,6 @@ TODO:
 
 - handle defclass declarations
 - handle definstance declarations
-- handle defmacro declarations
-- Compile typeclass instances to a list of HIR generic functions
 
 DONE:
 
@@ -51,6 +49,7 @@ DONE:
 - Update AST.transformTop to use Alpha.top_ast instead of RCST
 - Fix parameter lookup
 - Parse definstance declarations
+- Compile typeclass instances to a list of HIR generic functions
 
 LONG-TERM TODO:
 
@@ -69,6 +68,7 @@ LONG-TERM TODO:
 - Linearity
 
 - Parse deftemplate declarations
+- handle defmacro declarations
 - Macro match
 - Macroexpansion
 - Macro and
