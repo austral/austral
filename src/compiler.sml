@@ -114,9 +114,11 @@ structure Compiler : COMPILER = struct
         raise Fail "declare definstance not implemented"
       | declareTopForm c (AST.Deftype (name, params, docstring, def)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
+            (* FIXME: this is fucked *)
+            and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
             and (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
-            case (Type.addTypeAlias tenv (name, params', Type.resolve tenv def)) of
+            case (Type.addTypeAlias tenv (name, params', Type.resolve tenv unorderedParams' def)) of
                 SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
               | NONE => raise Fail "Duplicate type definition"
         end
