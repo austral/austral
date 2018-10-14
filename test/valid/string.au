@@ -1,0 +1,4 @@
+;; -*- mode: lisp -*-
+
+(defun main () i32
+  (the i32 (static-array-length "test")))
