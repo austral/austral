@@ -92,6 +92,7 @@ structure Module : MODULE = struct
                 "./",
                 "tuple",
                 "proj",
+                "static-array-length",
                 "allocate",
                 "load",
                 "store",
