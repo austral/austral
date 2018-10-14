@@ -90,6 +90,14 @@ structure Function :> FUNCTION = struct
                       SOME (FunctionEnv (fm, tc :: ts, is))
                   end)
 
+    fun addInstance fenv ins =
+        (case findTypeclassByName fenv (instanceName tc) of
+             SOME _ => let val (FunctionEnv (fm, ts, is)) = fenv
+                       in
+                           SOME (FunctionEnv (fm, tc, ins :: is))
+                       end
+           | _ => NONE)
+
     datatype callable = CallableFunc of func
                       | CallableMethod
 
