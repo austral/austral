@@ -1,6 +1,7 @@
 TODO:
 
 - declaration AST between AST and TAST
+- better handling of type parameters throughout the codebase
 
 DONE:
 
