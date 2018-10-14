@@ -131,13 +131,13 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (AST.InModule moduleName) =
         (* Switch current module *)
-        let val (Compiler (menv, tenv, fenv, currModuleName, code)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
         in
             let val newModule = case Module.envGet menv moduleName of
                                     SOME m => m
                                   | NONE => raise Fail "in-module: no module with this name"
             in
-                Compiler (menv, tenv, fenv, moduleName, code)
+                Compiler (menv, macenv, tenv, fenv, moduleName, code)
             end
         end
 
