@@ -184,6 +184,8 @@ structure HIR :> HIR = struct
                rt,
                transform body)
       | transformTop (TAst.Defclass _) =
+        (* Defclass declarations don't need to be compiled, all the actual work
+           is done in instance declarations *)
         ToplevelProgn []
       | transformTop (TAst.Definstance _) =
         raise Fail "definstance to HIR not implemented"
