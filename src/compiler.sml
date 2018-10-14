@@ -79,6 +79,8 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (AST.Defclass _) =
         raise Fail "declare defclass not implemented"
+      | declareTopForm c (AST.Definstance _) =
+        raise Fail "declare definstance not implemented"
       | declareTopForm c (AST.Deftype (name, params, docstring, def)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
             and (Compiler (menv, tenv, fenv, module, code)) = c
