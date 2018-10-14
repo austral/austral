@@ -1,6 +1,5 @@
 TODO:
 
-- Parse static-array type specifier
 - Implement static-array-length
 - Implement static-array-index
 - declaration AST between AST and TAST
@@ -95,3 +94,4 @@ DONE:
 - handle definstance declarations
 - Define austral.ext.cffi module
 - Define static array type
+- Parse static-array type specifier
