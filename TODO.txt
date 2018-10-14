@@ -79,3 +79,5 @@ LONG-TERM TODO:
 - Tuple bind
 - Austral prelude
 - Prelude: equality and comparison instances
+
+- Implement defcfun
