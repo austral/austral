@@ -121,8 +121,8 @@ structure Module : MODULE = struct
                 "<=",
                 ">",
                 ">="
-            ],
-            cffiExports = [
+            ]
+            and cffiExports = [
                 "foreign-funcall"
             ]
         in
