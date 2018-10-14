@@ -113,7 +113,8 @@ structure Module : MODULE = struct
                 "u32",
                 "i32",
                 "f32",
-                "f64"
+                "f64",
+                "static-array"
             ]
             and kernelExports = [
                 "eq",
