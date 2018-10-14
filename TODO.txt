@@ -1,5 +1,8 @@
 TODO:
 
+- handle defclass declarations
+- handle definstance declarations
+- handle defmacro declarations
 - Compile typeclass instances to a list of HIR generic functions
 
 - resolve should have an extra argument with the type parameter environment
