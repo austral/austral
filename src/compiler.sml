@@ -124,7 +124,7 @@ structure Compiler : COMPILER = struct
                                      Type.resolve tenv typarams typespec))
             in
                 let val ins = Function.Instance (name,
-                                                 Function.InstanceArg (name, typarams),
+                                                 Function.InstanceArg (name, OrderedSet.fromList typarams),
                                                  docstring,
                                                  map resolveMethod methods)
                 in
