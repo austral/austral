@@ -187,9 +187,10 @@ structure HIR :> HIR = struct
         (* Defclass declarations don't need to be compiled, all the actual work
            is done in instance declarations *)
         ToplevelProgn []
-      | transformTop (TAst.Definstance _) =
+      | transformTop (TAst.Definstance (_, _, _, methods)) =
         (* The compilation strategy for instances is each method is compiled to
            a standalone generic function *)
+        ToplevelProgn (map transformMethod methods)
         raise Fail "definstance to HIR not implemented"
       | transformTop (TAst.Deftype (name, params, _, ty)) =
         Deftype (escapeSymbol name,
@@ -207,4 +208,7 @@ structure HIR :> HIR = struct
         ToplevelProgn []
       | transformTop (TAst.InModule _) =
         ToplevelProgn []
+
+    and transformMethod _ =
+        raise Fail "Not implemented yet"
 end
