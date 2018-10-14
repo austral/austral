@@ -107,11 +107,11 @@ structure TAst :> TAST = struct
 
     datatype context = Context of bindings * Type.tenv * params Set.set * Function.fenv
 
-    fun mkContext b t f = Context (b, t, f)
+    fun mkContext b t p f = Context (b, t, p, f)
 
-    fun ctxBindings (Context (b, _, _)) = b
-    fun ctxTenv (Context (_, t, _)) = t
-    fun ctxFenv (Context (_, _, f)) = f
+    fun ctxBindings (Context (b, _, _, _)) = b
+    fun ctxTenv (Context (_, t, _, _)) = t
+    fun ctxFenv (Context (_, _, _, f)) = f
 
     (* Augment AST with type information *)
 
