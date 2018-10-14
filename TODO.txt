@@ -5,33 +5,6 @@ TODO:
 - handle defmacro declarations
 - Compile typeclass instances to a list of HIR generic functions
 
-- resolve should have an extra argument with the type parameter environment
-  (e.g., in a generic function definition, the set of defined type parameters)
-
-- Add support for an --entrypoint flag to define the main() function
-
-- Generic functions
-
-- Error on repeat type variables in an instance declaration
-- Error on phantom type parameters in a type alias
-- Parse nested comments
-- Show symbol names in error messages
-- Better error messages
-- Linearity
-
-- Parse deftemplate declarations
-- Macro match
-- Macroexpansion
-- Macro and
-- Macro or
-- Function and*
-- Function or*
-- Bitwise operators
-
-- Tuple bind
-- Austral prelude
-- Prelude: equality and comparison instances
-
 DONE:
 
 - Utils
@@ -78,3 +51,32 @@ DONE:
 - Update AST.transformTop to use Alpha.top_ast instead of RCST
 - Fix parameter lookup
 - Parse definstance declarations
+
+LONG-TERM TODO:
+
+- resolve should have an extra argument with the type parameter environment
+  (e.g., in a generic function definition, the set of defined type parameters)
+
+- Add support for an --entrypoint flag to define the main() function
+
+- Generic functions
+
+- Error on repeat type variables in an instance declaration
+- Error on phantom type parameters in a type alias
+- Parse nested comments
+- Show symbol names in error messages
+- Better error messages
+- Linearity
+
+- Parse deftemplate declarations
+- Macro match
+- Macroexpansion
+- Macro and
+- Macro or
+- Function and*
+- Function or*
+- Bitwise operators
+
+- Tuple bind
+- Austral prelude
+- Prelude: equality and comparison instances
