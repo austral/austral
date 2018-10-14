@@ -111,6 +111,7 @@ structure TAst :> TAST = struct
 
     fun ctxBindings (Context (b, _, _, _)) = b
     fun ctxTenv (Context (_, t, _, _)) = t
+    fun ctxTyParams (Context (_, _, ps, _)) = ps
     fun ctxFenv (Context (_, _, _, f)) = f
 
     (* Augment AST with type information *)
