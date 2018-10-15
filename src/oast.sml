@@ -219,8 +219,10 @@ structure OAST :> OAST = struct
                 end
             and parseBody ((RCST.StringConstant s)::methods)  =
                 (SOME (CST.escapedToString s), parseMethods methods)
-              | parseBody [RCST.List methods] = (NONE, parseMethods methods)
-              | parseBody _ = raise Fail "Bad definstance form"
+              | parseBody methods =
+                (NONE, parseMethods methods)
+              | parseBody _ =
+                raise Fail "Bad definstance form"
             and parseMethods list =
                 map parseMethod list
             and parseMethod (RCST.List ((RCST.Symbol name)::(RCST.List params)::rt::body)) =
