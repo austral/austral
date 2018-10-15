@@ -26,15 +26,6 @@ DEPS := $(MLUNIT) $(PARSIMONY)
 
 all: compile
 
-$(VENDOR_DIR):
-	mkdir -p $(VENDOR_DIR)
-
-$(MLUNIT): $(VENDOR_DIR)
-	git clone $(MLUNIT_URL) $(MLUNIT)
-
-$(PARSIMONY): $(VENDOR_DIR)
-	git clone $(PARSIMONY_URL) $(PARSIMONY)
-
 $(CPP_PRELUDE_ML): src/prelude.hpp prelude.awk
 	awk -f prelude.awk src/prelude.hpp > $(CPP_PRELUDE_ML)
 
