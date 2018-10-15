@@ -37,4 +37,5 @@ signature SYMBOL = sig
 
     val au : string -> symbol
     val auKer : string -> symbol
+    val auCffi : string -> symbol
 end
