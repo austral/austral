@@ -83,6 +83,8 @@ structure Compiler : COMPILER = struct
                   | NONE => raise Fail "Repeat function"
             end
         end
+      | declareTopForm c (AST.Defgeneric _) =
+        raise Fail "defgeneric not implemented"
       | declareTopForm c (AST.Defclass tcDef) =
         let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
