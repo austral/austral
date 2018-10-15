@@ -1,5 +1,4 @@
 .cm
-vendor/
 boreal
 boreal-test
 src/cpp-prelude.sml
