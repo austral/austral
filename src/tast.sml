@@ -19,6 +19,7 @@
 
 structure TAst :> TAST = struct
     type ty = Type.ty
+    type typespec = Type.typespec
 
     datatype ast = UnitConstant
                  | BoolConstant of bool
