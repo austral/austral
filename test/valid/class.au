@@ -1,6 +1,7 @@
 ;; -*- mode: lisp -*-
 
 (defclass identity (tau)
+  "Identity typeclass"
   (identity ((value tau)) tau))
 
 (definstance identity (i32)
