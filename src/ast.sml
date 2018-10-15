@@ -18,6 +18,8 @@
 *)
 
 structure AST :> AST = struct
+    type typespec = Type.typespec
+
     (* Expression AST *)
 
     datatype ast = UnitConstant
@@ -47,7 +49,6 @@ structure AST :> AST = struct
     type docstring = string option
     type symbol = Symbol.symbol
     type variable = Symbol.variable
-    type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * typespec * docstring * ast
                      | Defclass of name * param_name * docstring * method_decl list
