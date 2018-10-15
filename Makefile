@@ -40,6 +40,6 @@ mlton-test: $(TEST_BIN)
 	./$(TEST_BIN)
 
 clean:
-	rm $(BIN)
-	rm $(TEST_BIN)
+	if [ -f boreal ]; then rm $(BIN); fi
+	if [ -f boreal ]; then rm $(TEST_BIN); fi
 	rm test/valid/*.cpp
