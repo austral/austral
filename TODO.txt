@@ -3,7 +3,6 @@ TODO:
 - Implement static-array-index
 - declaration AST between AST and TAST
 - better handling of type parameters throughout the codebase
-- OrderedSet.toUnordered
 
 LONG-TERM TODO:
 
@@ -102,3 +101,4 @@ DONE:
 - Implement static-array-length
 - Compile string literals as static array constructors
 - Implement foreign-funcall
+- OrderedSet.toUnordered
