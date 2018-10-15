@@ -148,8 +148,16 @@ structure Alpha :> ALPHA = struct
                    docstring,
                    transform ast (paramsToStack params'))
         end
-      | transformTop' (OAST.Defgeneric _) =
-        raise Fail "defgeneric not implemented yet"
+      | transformTop' (OAST.Defgeneric (name, typarams, params, rt, docstring, ast)) =
+        let val params' = mapParams params
+        in
+            Defun (name,
+                   typarams,
+                   params',
+                   rt,
+                   docstring,
+                   transform ast (paramsToStack params'))
+        end
       | transformTop' (OAST.Defclass (name, param, docstring, methods)) =
         Defclass (name,
                   param,
