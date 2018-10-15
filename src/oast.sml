@@ -81,6 +81,12 @@ structure OAST :> OAST = struct
             case args of
                 [ty, exp] => The (Type.parseTypespec ty, transform exp)
               | _ => raise Fail "Invalid `the` form"
+        else if f = Symbol.auCffi "foreign-funcall" then
+            (case args of
+                 ((RCST.StringConstant name)::rt::args) => ForeignFuncall (CST.escapedToString name,
+                                                                           Type.parseTypespec rt,
+                                                                           map transform args)
+               | _ => raise Fail "Invalid `foreign-funcall` form")
         else
             Operation (f, map transform args)
     and transformLet ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) =
