@@ -222,6 +222,13 @@ structure TAst :> TAST = struct
                 The (resolve tenv (ctxTyParams c) typespec,
                      augment exp c)
             end
+          | augment (AST.ForeignFuncall (name, typespec, args)) c =
+            let val tenv = ctxTenv c
+            in
+                ForeignFuncall (name,
+                                resolve tenv (ctxTyParams c) typespec,
+                                map (fn a => augment a c) args)
+            end
           | augment (AST.Progn exps) c =
             Progn (map (fn a => augment a c) exps)
           | augment (AST.Funcall (name, args)) c =
