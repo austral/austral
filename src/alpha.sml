@@ -147,6 +147,8 @@ structure Alpha :> ALPHA = struct
                    docstring,
                    transform ast (paramsToStack params'))
         end
+      | transformTop' (OAST.Defgeneric _) =
+        raise Fail "defgeneric not implemented yet"
       | transformTop' (OAST.Defclass (name, param, docstring, methods)) =
         Defclass (name,
                   param,
