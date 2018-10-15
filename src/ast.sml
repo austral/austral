@@ -193,6 +193,13 @@ structure AST :> AST = struct
                typespec,
                docstring,
                transform ast)
+      | transformTop (Alpha.Defgeneric (name, typarams, params, typespec, docstring, ast)) =
+        Defgeneric (name,
+                    typarams,
+                    mapParams params,
+                    typespec,
+                    docstring,
+                    transform ast)
       | transformTop (Alpha.Defclass (name, param, docstring, methods)) =
         Defclass (name,
                   param,
