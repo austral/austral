@@ -19,7 +19,6 @@
 
 structure TAst :> TAST = struct
     type ty = Type.ty
-    type typespec = Type.typespec
 
     datatype ast = UnitConstant
                  | BoolConstant of bool
@@ -36,7 +35,7 @@ structure TAst :> TAST = struct
                  | Load of ast
                  | Store of ast * ast
                  | The of ty * ast
-                 | ForeignFuncall of string * typespec * ast list
+                 | ForeignFuncall of string * ty * ast list
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
 
