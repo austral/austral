@@ -180,7 +180,8 @@ structure OAST :> OAST = struct
                 (SOME (CST.escapedToString s), parseMethods methods)
               | parseBody methods =
                 (NONE, parseMethods methods)
-              | parseBody _ = raise Fail "Bad defclass form"
+              | parseBody _ =
+                raise Fail "Bad defclass form"
             and parseMethods l = map parseMethod l
             and parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt, RCST.StringConstant s]) =
                 MethodDecl (name,
