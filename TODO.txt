@@ -13,6 +13,11 @@ LONG-TERM TODO:
 
 - Generic functions
 
+- Implement austral.ext.cffi:malloc
+- Implement austral.ext.cffi:null-pointer
+- Implement austral.ext.cffi:null?
+- Implement austral.ext.cffi:free
+
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
 - Parse nested comments
