@@ -18,6 +18,8 @@
 *)
 
 structure AST :> AST = struct
+    type typespec = Type.typespec
+
     (* Expression AST *)
 
     datatype ast = UnitConstant
@@ -36,6 +38,7 @@ structure AST :> AST = struct
                  | Load of ast
                  | Store of ast * ast
                  | The of Type.typespec * ast
+                 | ForeignFuncall of string * typespec * ast list
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list
 
@@ -46,7 +49,6 @@ structure AST :> AST = struct
     type docstring = string option
     type symbol = Symbol.symbol
     type variable = Symbol.variable
-    type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * typespec * docstring * ast
                      | Defclass of name * param_name * docstring * method_decl list
@@ -81,6 +83,8 @@ structure AST :> AST = struct
         Let (var, transform value, transform body)
       | transform (Alpha.The (ty, exp)) =
         The (ty, transform exp)
+      | transform (Alpha.ForeignFuncall (name, rt, args)) =
+        ForeignFuncall (name, rt, map transform args)
       | transform (Alpha.Operation (f, args)) =
         transformOp f (map transform args)
     and transformOp f args =

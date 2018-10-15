@@ -35,6 +35,7 @@ structure TAst :> TAST = struct
                  | Load of ast
                  | Store of ast * ast
                  | The of ty * ast
+                 | ForeignFuncall of string * ty * ast list
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
 
@@ -90,6 +91,7 @@ structure TAst :> TAST = struct
                | _ => raise Fail "Not a pointer")
           | typeOf (Store (p, _)) = typeOf p
           | typeOf (The (t, _)) = t
+          | typeOf (ForeignFuncall (_, rt, _)) = rt
           | typeOf (Progn (x::xs)) = typeOf (List.last (x::xs))
           | typeOf (Progn nil) = Unit
           | typeOf (Funcall (_, _, t)) = t
@@ -219,6 +221,13 @@ structure TAst :> TAST = struct
             in
                 The (resolve tenv (ctxTyParams c) typespec,
                      augment exp c)
+            end
+          | augment (AST.ForeignFuncall (name, typespec, args)) c =
+            let val tenv = ctxTenv c
+            in
+                ForeignFuncall (name,
+                                resolve tenv (ctxTyParams c) typespec,
+                                map (fn a => augment a c) args)
             end
           | augment (AST.Progn exps) c =
             Progn (map (fn a => augment a c) exps)

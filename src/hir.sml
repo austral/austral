@@ -131,6 +131,8 @@ structure HIR :> HIR = struct
         Store (transform ptr, transform v)
       | transform (TAst.The (ty, exp)) =
         Cast (ty, transform exp)
+      | transform (TAst.ForeignFuncall (name, rt, args)) =
+        Cast (rt, Funcall (name, map transform args))
       | transform (TAst.Progn exps) =
         Progn (map transform exps)
       | transform (TAst.Funcall (f, args, _)) =

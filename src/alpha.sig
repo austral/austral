@@ -30,6 +30,7 @@ signature ALPHA = sig
                  | Variable of variable
                  | Let of variable * ast * ast
                  | The of typespec * ast
+                 | ForeignFuncall of string * typespec * ast list
                  | Operation of symbol * ast list
 
     type name = symbol
