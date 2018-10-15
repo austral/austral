@@ -2,7 +2,6 @@
 set -e
 set -o pipefail
 
-make clean
 make boreal
 make test
 
