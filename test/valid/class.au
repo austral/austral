@@ -1,8 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (defclass identity (tau)
-  ((identity ((value tau)) tau)))
+  (identity ((value tau)) tau))
 
 (definstance identity (i32)
-  ((identity ((value i32)) i32
-     value)))
+  (identity ((value i32)) i32
+    value))
