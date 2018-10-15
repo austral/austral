@@ -36,6 +36,7 @@ structure TAst :> TAST = struct
                  | Load of ast
                  | Store of ast * ast
                  | The of ty * ast
+                 | ForeignFuncall of string * typespec * ast list
                  | Progn of ast list
                  | Funcall of Symbol.symbol * ast list * ty
 
