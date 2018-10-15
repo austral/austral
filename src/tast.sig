@@ -19,6 +19,7 @@
 
 signature TAST = sig
     type ty = Type.ty
+    type typespec = Type.typespec
 
     datatype ast = UnitConstant
                  | BoolConstant of bool
