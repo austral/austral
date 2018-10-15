@@ -217,7 +217,7 @@ structure OAST :> OAST = struct
                 in
                     Set.fromList (map mapSym list)
                 end
-            and parseBody [RCST.StringConstant s, RCST.List methods]  =
+            and parseBody ((RCST.StringConstant s)::methods)  =
                 (SOME (CST.escapedToString s), parseMethods methods)
               | parseBody [RCST.List methods] = (NONE, parseMethods methods)
               | parseBody _ = raise Fail "Bad definstance form"
