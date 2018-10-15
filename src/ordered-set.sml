@@ -62,7 +62,4 @@ structure OrderedSet :> ORDERED_SET = struct
     | fromList nil = empty
 
   fun toList (Set l) = l
-
-  fun toUnordered (Set l) =
-      Set.fromList l
 end
