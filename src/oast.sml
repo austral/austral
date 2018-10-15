@@ -178,7 +178,8 @@ structure OAST :> OAST = struct
     and transformDefclass ((RCST.Symbol name)::(RCST.List [RCST.Symbol param])::body) =
         let fun parseBody ((RCST.StringConstant s)::methods)  =
                 (SOME (CST.escapedToString s), parseMethods methods)
-              | parseBody [RCST.List methods] = (NONE, parseMethods methods)
+              | parseBody methods =
+                (NONE, parseMethods methods)
               | parseBody _ = raise Fail "Bad defclass form"
             and parseMethods l = map parseMethod l
             and parseMethod (RCST.List [RCST.Symbol name, RCST.List params, rt, RCST.StringConstant s]) =
