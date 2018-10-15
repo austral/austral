@@ -18,6 +18,8 @@
 *)
 
 signature AST = sig
+    type typespec = Type.typespec
+
     datatype ast = UnitConstant
                  | BoolConstant of bool
                  | IntConstant of string
@@ -43,7 +45,6 @@ signature AST = sig
     type docstring = string option
     type symbol = Symbol.symbol
     type variable = Symbol.variable
-    type typespec = Type.typespec
 
     datatype top_ast = Defun of name * param list * typespec * docstring * ast
                      | Defclass of name * param_name * docstring * method_decl list
