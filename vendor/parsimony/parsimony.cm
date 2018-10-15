@@ -1,0 +1,12 @@
+Library
+  signature PARSIMONY_INPUT
+  signature PARSIMONY
+  structure ParsimonyStringInput
+  functor Parsimony
+is
+  src/input.sig
+  src/string_input.sml
+  src/parsimony.sig
+  src/parsimony.fun
+
+  $/basis.cm

@@ -1,0 +1,13 @@
+local
+  $(SML_LIB)/basis/basis.mlb
+
+  src/input.sig
+  src/string_input.sml
+  src/parsimony.sig
+  src/parsimony.fun
+in
+  signature PARSIMONY_INPUT
+  signature PARSIMONY
+  structure ParsimonyStringInput
+  functor Parsimony
+end

@@ -1,0 +1,8 @@
+local
+  $(SML_LIB)/basis/basis.mlb
+  src/mlunit.sig
+  src/mlunit.sml
+in
+  signature ML_UNIT
+  structure MLUnit
+end

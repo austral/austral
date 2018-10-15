@@ -1,0 +1,4 @@
+$(SML_LIB)/basis/basis.mlb
+$(LIBS_PATH)/mlunit/mlunit.mlb
+parsimony.mlb
+test/test.sml
