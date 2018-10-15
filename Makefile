@@ -17,13 +17,6 @@ CPP_PRELUDE_ML := src/cpp-prelude.sml
 SRC := src/*.sig src/*.sml $(CPP_PRELUDE_ML)
 TEST_SRC := test/*.sml
 
-VENDOR_DIR := vendor
-MLUNIT := $(VENDOR_DIR)/mlunit
-MLUNIT_URL := https://github.com/eudoxia0/mlunit.git
-PARSIMONY := $(VENDOR_DIR)/parsimony
-PARSIMONY_URL := https://github.com/eudoxia0/parsimony.git
-DEPS := $(MLUNIT) $(PARSIMONY)
-
 all: compile
 
 $(CPP_PRELUDE_ML): src/prelude.hpp prelude.awk
