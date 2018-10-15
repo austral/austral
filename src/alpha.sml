@@ -119,6 +119,8 @@ structure Alpha :> ALPHA = struct
         end
       | alphaRename s (OAST.The (ty, exp)) =
         The (ty, alphaRename s exp)
+      | alphaRename s (OAST.ForeignFuncall (name, rt, args)) =
+        ForeignFuncall (name, rt, map (alphaRename s) args)
       | alphaRename s (OAST.Operation (f, args)) =
         Operation (f, map (alphaRename s) args)
 
