@@ -1,12 +1,11 @@
 TODO:
 
+- Generic functions
 - Implement static-array-index
 - declaration AST between AST and TAST
 - better handling of type parameters throughout the codebase
 
 LONG-TERM TODO:
-
-- Generic functions
 
 - Implement austral.ext.cffi:malloc
 - Implement austral.ext.cffi:null-pointer
