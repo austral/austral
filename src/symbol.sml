@@ -45,7 +45,7 @@ structure Symbol : SYMBOL = struct
                   Ident.mkIdentEx name)
 
     fun auKer name =
-        mkSymbol (Ident.mkIdentEx "austral-kernel",
+        mkSymbol (Ident.mkIdentEx "austral.kernel",
                   Ident.mkIdentEx name)
 
     fun auCffi name =
