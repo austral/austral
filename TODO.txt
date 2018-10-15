@@ -6,15 +6,15 @@ TODO:
 
 LONG-TERM TODO:
 
-- Static array constructors
-- Add support for an --entrypoint flag to define the main() function
-
 - Generic functions
 
 - Implement austral.ext.cffi:malloc
 - Implement austral.ext.cffi:null-pointer
 - Implement austral.ext.cffi:null?
 - Implement austral.ext.cffi:free
+
+- Static array constructors
+- Add support for an --entrypoint flag to define the main() function
 
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
