@@ -47,6 +47,7 @@ signature AST = sig
     type variable = Symbol.variable
 
     datatype top_ast = Defun of name * param list * typespec * docstring * ast
+                     | Defgeneric of name * param_name list * param list * typespec * docstring * ast
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * name list * docstring * typespec
