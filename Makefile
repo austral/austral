@@ -29,17 +29,17 @@ all: compile
 $(CPP_PRELUDE_ML): src/prelude.hpp prelude.awk
 	awk -f prelude.awk src/prelude.hpp > $(CPP_PRELUDE_ML)
 
-compile: $(SRC) $(DEPS)
+compile: $(SRC)
 	$(SML) $(SMLFLAGS) -m $(CM_FILE)
 
-$(BIN): $(SRC) $(DEPS)
+$(BIN): $(SRC)
 	$(MLTON) -output $(BIN) $(MLB_EXE_FILE)
 
 .PHONY: test
-test: $(SRC) $(TEST_SRC) $(DEPS)
+test: $(SRC) $(TEST_SRC)
 	$(SML) $(SMLFLAGS) -m $(CM_TEST_FILE)
 
-$(TEST_BIN): $(SRC) $(TEST_SRC) $(DEPS)
+$(TEST_BIN): $(SRC) $(TEST_SRC)
 	$(MLTON) $(MLB_TEST_FILE)
 
 .PHONY: mlton-test
@@ -47,7 +47,6 @@ mlton-test: $(TEST_BIN)
 	./$(TEST_BIN)
 
 clean:
-	rm -rf $(VENDOR_DIR)
 	rm $(BIN)
 	rm $(TEST_BIN)
 	rm test/valid/*.cpp
