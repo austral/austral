@@ -30,6 +30,7 @@ signature OAST = sig
                  | Symbol of symbol
                  | Let of name * ast * ast
                  | The of typespec * ast
+                 | ForeignFuncall of string * typespec * ast list
                  | Operation of name * ast list
 
     type docstring = string option
