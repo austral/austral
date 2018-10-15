@@ -285,6 +285,8 @@ structure TAst :> TAST = struct
                    docstring,
                    augment ast (funcContext params' Set.empty tenv fenv))
         end
+      | augmentTop (AST.Defgeneric _) tenv fenv =
+        raise Fail "defgeneric not implemented"
       | augmentTop (AST.Defclass (name, paramName, docstring, methods)) tenv fenv =
         let val typarams = Set.singleton (Type.TypeParam paramName)
         in
