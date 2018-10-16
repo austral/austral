@@ -43,6 +43,7 @@ signature FUNCTION = sig
     val findTypeclassByMethod : fenv -> name -> typeclass option
 
     val addFunction : fenv -> func -> fenv option
+    val addGenericFunction : fenv -> gfunc -> fenv option
     val addTypeclass : fenv -> typeclass -> fenv option
     val addInstance : fenv -> instance -> fenv option
 
