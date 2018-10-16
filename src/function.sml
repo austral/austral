@@ -59,13 +59,14 @@ structure Function :> FUNCTION = struct
                 let val builtins = [notFn]
                 in
                     FunctionEnv (Map.fromList (map (fn f => (funcName f, f)) builtins),
+                                 Map.empty,
                                  [],
                                  [])
                 end
             end
         end
 
-    fun findTypeclassByName (FunctionEnv (_, ts, _)) name =
+    fun findTypeclassByName (FunctionEnv (_, _, ts, _)) name =
         let fun isValidTC (Typeclass (name', _, _, _)) =
                 name = name'
         in
