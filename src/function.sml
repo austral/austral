@@ -30,6 +30,9 @@ structure Function :> FUNCTION = struct
 
     datatype gfunc = GenericFunction of name * Type.typarams * param list * ty * docstring
 
+    fun gFunctionName (GenericFunction (name, _, _, _, _, _)) =
+        name
+
     type param_name = Symbol.symbol
 
     datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
