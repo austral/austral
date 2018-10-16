@@ -101,6 +101,19 @@ structure Function :> FUNCTION = struct
                   | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), gm, ts, is))
         end
 
+    fun addGenericFunction (FunctionEnv (fm, gm, ts, is)) gf =
+        let val name = gFunctionName gf
+        in
+            (* If there's a function with this name, fail *)
+            case Map.get fm name of
+                SOME _ => NONE
+              | NONE =>
+                (* If there's a gfunc with this name also fail *)
+                case Map.get gm name of
+                    SOME _ => NONE
+                  | NONE => SOME (FunctionEnv (fm, Map.iadd gm (name, gf), ts, is))
+        end
+
     fun addTypeclass fenv tc =
         (case findTypeclassByName fenv (typeclassName tc) of
              SOME _ => NONE
