@@ -89,7 +89,7 @@ structure Function :> FUNCTION = struct
         end
 
     fun addFunction (FunctionEnv (fm, gm, ts, is)) f =
-        let val (Function (name, _, _, _)) = f
+        let val name = functionName f
         in
             (* If there's a function with this name, fail *)
             case Map.get fm name of
