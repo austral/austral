@@ -85,6 +85,7 @@ structure Function :> FUNCTION = struct
     fun addFunction (FunctionEnv (fm, gm, ts, is)) f =
         let val (Function (name, _, _, _)) = f
         in
+            (* If there's a function with this name, fail *)
             case Map.get fm name of
                 SOME _ => NONE
               | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), gm, ts, is))
