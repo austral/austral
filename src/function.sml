@@ -25,6 +25,9 @@ structure Function :> FUNCTION = struct
     datatype func = Function of name * param list * ty * docstring
          and param = Param of name * ty
 
+    fun functionName (Function (name, _, _, _)) =
+        name
+
     datatype gfunc = GenericFunction of name * Type.typarams * param list * ty * docstring
 
     type param_name = Symbol.symbol
