@@ -55,6 +55,9 @@ src/alpha.sml
 src/ast.sig
 src/ast.sml
 
+src/dast.sig
+src/dast.sml
+
 src/tast.sig
 src/tast.sml
 
