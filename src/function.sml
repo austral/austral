@@ -82,12 +82,12 @@ structure Function :> FUNCTION = struct
             List.find isValidTC ts
         end
 
-    fun addFunction (FunctionEnv (fm, ts, is)) f =
+    fun addFunction (FunctionEnv (fm, gm, ts, is)) f =
         let val (Function (name, _, _, _)) = f
         in
             case Map.get fm name of
                 SOME _ => NONE
-              | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), ts, is))
+              | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), gm, ts, is))
         end
 
     fun addTypeclass fenv tc =
