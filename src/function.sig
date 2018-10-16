@@ -36,9 +36,7 @@ signature FUNCTION = sig
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
 
-    datatype fenv = FunctionEnv of (name, func) Map.map
-                                   * typeclass list
-                                   * instance list
+    type fenv
 
     val defaultFenv : fenv
 
