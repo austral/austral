@@ -37,6 +37,7 @@ structure Function :> FUNCTION = struct
          and method_def = MethodDef of name * param list * ty * docstring
 
     datatype fenv = FunctionEnv of (name, func) Map.map
+                                   * (name, gfunc) Map.map
                                    * typeclass list
                                    * instance list
 
