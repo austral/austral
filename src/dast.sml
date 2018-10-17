@@ -54,7 +54,7 @@ structure DAST :> DAST = struct
       | transformTop (AST.Defgeneric _) tenv fenv =
         raise Fail "defgeneric not implemented"
       | transformTop (AST.Defclass (name, paramName, docstring, methods)) tenv fenv =
-        let val typarams = Set.singleton (Type.TypeParam paramName)
+        let val typarams = OrderedSet.singleton (Type.TypeParam paramName)
         in
             let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
                     MethodDecl (name,
