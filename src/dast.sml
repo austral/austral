@@ -80,7 +80,10 @@ structure DAST :> DAST = struct
                     end
                 end
         in
-            Definstance (name, InstanceArg (arg, typarams), docstring, map mapDef defs)
+            Definstance (name,
+                         InstanceArg (arg, typarams),
+                         docstring,
+                         map mapDef defs)
         end
       | transformTop (AST.Deftype (name, params, docstring, tys)) tenv _ =
         let val params' = Set.fromList (map (fn name => Type.TypeParam name) params)
