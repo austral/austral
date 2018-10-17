@@ -89,7 +89,7 @@ structure DAST :> DAST = struct
             end
         end
       | transformTop (AST.Deftype (name, params, docstring, tys)) tenv _ =
-        let val params' = Set.fromList (map (fn name => Type.TypeParam name) params)
+        let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
         in
             Deftype (name,
                      params,
