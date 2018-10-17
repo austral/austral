@@ -120,5 +120,8 @@ structure DAST :> DAST = struct
         InModule name
 
     and mapParam (tenv: tenv) (params: Type.typarams) (AST.Param (n, ts)) =
-        Param (n, Type.resolve tenv (OrderedSet.toUnordered params) ts)
+        let val params' = OrderedSet.toUnordered params
+        in
+            Param (n, Type.resolve tenv params' ts)
+        end
 end
