@@ -40,4 +40,6 @@ signature ORDERED_SET = sig
 
   val fromList : ''a list -> ''a set
   val toList : ''a set -> ''a list
+
+  val toUnordered : ''a set -> ''a Set.set
 end
