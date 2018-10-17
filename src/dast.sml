@@ -66,8 +66,8 @@ structure DAST :> DAST = struct
             end
         end
       | transformTop (AST.Definstance (name, AST.InstanceArg (arg, typarams), docstring, defs)) tenv fenv =
-        let val typarams' = Set.fromList (map (fn name => Type.TypeParam name)
-                                              typarams)
+        let val typarams' = OrderedSet.fromList (map (fn name => Type.TypeParam name)
+                                                     typarams)
         in
             let fun mapDef (AST.MethodDef (name, params, tys, docstring, ast)) =
                     let val params' = map (mapParam tenv typarams') params
