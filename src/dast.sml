@@ -67,9 +67,8 @@ structure DAST :> DAST = struct
         end
       | transformTop (AST.Definstance (name, AST.InstanceArg (arg, set), docstring, defs)) tenv fenv =
         let fun mapDef (AST.MethodDef (name, params, tys, docstring, ast)) =
-                let val typarams = Set.fromList
-                                       (map (fn name => Type.TypeParam name)
-                                            (Set.toList set))
+                let val typarams = map (fn name => Type.TypeParam name)
+                                       set
                 in
                     let val params' = map (mapParam tenv typarams) params
                     in
