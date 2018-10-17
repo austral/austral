@@ -115,6 +115,7 @@ structure DAST :> DAST = struct
         Defmodule clauses
       | transformTop (AST.InModule name) _ _ =
         InModule name
+
     and mapParam tenv params (AST.Param (n, ts)) =
         Param (n, Type.resolve tenv (OrderedSet.toUnordered params) ts)
 end
