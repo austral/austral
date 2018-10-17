@@ -145,7 +145,7 @@ structure OAST :> OAST = struct
                 Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad defun parameter"
             and transformExp params rcst =
-                let val params' = map (fn (Param (n, _)) => n) params
+                let val params' = Set.fromList (map (fn (Param (n, _)) => n) params)
                 in
                     (* FIXME: why? *)
                     transform rcst
@@ -216,7 +216,7 @@ structure OAST :> OAST = struct
                       | mapSym _ =
                         raise Fail "definstance: type variable must be a symbol"
                 in
-                    Set.fromList (map mapSym list)
+                    map mapSym list
                 end
             and parseBody ((RCST.StringConstant s)::methods)  =
                 (SOME (CST.escapedToString s), parseMethods methods)
