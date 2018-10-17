@@ -49,7 +49,7 @@ structure DAST :> DAST = struct
                    params',
                    Type.resolve tenv Set.empty ty,
                    docstring,
-                   augment ast (funcContext params' Set.empty tenv fenv))
+                   ast)
         end
       | transformTop (AST.Defgeneric _) tenv fenv =
         raise Fail "defgeneric not implemented"
