@@ -293,7 +293,7 @@ structure TAst :> TAST = struct
         in
             Defclass (name, paramName, docstring, map augmentMethod methods)
         end
-      | augmentTop (DAST.Definstance (name, DAST.InstanceArg (arg, set), docstring, defs)) tenv fenv =
+      | augmentTop (DAST.Definstance (name, DAST.InstanceArg (arg, typarams), docstring, defs)) tenv fenv =
         let fun mapDef (DAST.MethodDef (name, params, ty, docstring, ast)) =
                 MethodDef (name,
                            params,
@@ -301,7 +301,7 @@ structure TAst :> TAST = struct
                            docstring,
                            augment ast (funcContext params typarams tenv fenv))
         in
-            Definstance (name, InstanceArg (arg, set), docstring, map mapDef defs)
+            Definstance (name, InstanceArg (arg, typarams), docstring, map mapDef defs)
         end
       | augmentTop (DAST.Deftype (name, params, docstring, ty)) tenv _ =
             Deftype (name,
