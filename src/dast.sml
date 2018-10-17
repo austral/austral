@@ -95,7 +95,7 @@ structure DAST :> DAST = struct
         let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
         in
             Deftype (name,
-                     params,
+                     params',
                      docstring,
                      Type.resolve tenv (OrderedSet.toUnordered params') tys)
         end
