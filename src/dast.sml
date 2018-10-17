@@ -81,7 +81,7 @@ structure DAST :> DAST = struct
                 end
         in
             Definstance (name,
-                         InstanceArg (arg, typarams),
+                         InstanceArg (arg, typarams'),
                          docstring,
                          map mapDef defs)
         end
