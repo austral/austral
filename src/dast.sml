@@ -70,7 +70,7 @@ structure DAST :> DAST = struct
                 let val typarams' = Set.fromList (map (fn name => Type.TypeParam name)
                                                       typarams)
                 in
-                    let val params' = map (mapParam tenv typarams) params
+                    let val params' = map (mapParam tenv typarams') params
                     in
                         MethodDef (name,
                                    params',
