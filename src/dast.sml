@@ -42,8 +42,11 @@ structure DAST :> DAST = struct
     type tenv = Type.tenv
     type fenv = Function.fenv
 
+    fun mapParam tenv typarams (AST.Param (name, spec)) =
+        Param (name, Type.resolve tenv (OrderedSet.toUnordered typarams) spec)
+
     fun transformTop (AST.Defun (name, params, ty, docstring, ast)) tenv fenv =
-        let val params' = map (mapParam tenv Set.empty) params
+        let val params' = map (mapParam tenv OrderedSet.empty) params
         in
             Defun (name,
                    params',
@@ -118,10 +121,4 @@ structure DAST :> DAST = struct
         Defmodule clauses
       | transformTop (AST.InModule name) _ _ =
         InModule name
-
-    and mapParam (tenv: tenv) (params: Type.typarams) (AST.Param (n, ts)) =
-        let val params' = OrderedSet.toUnordered params
-        in
-            Param (n, Type.resolve tenv params' ts)
-        end
 end
