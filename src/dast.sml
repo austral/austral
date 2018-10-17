@@ -29,7 +29,7 @@ structure DAST :> DAST = struct
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
-                     | Defdisjunction of name * name list * docstring * Type.variant list
+                     | Defdisjunction of name * Type.typarams * docstring * Type.variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
