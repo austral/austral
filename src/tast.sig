@@ -57,7 +57,7 @@ signature TAST = sig
          and param = Param of variable * ty
          and method_decl = MethodDecl of name * param list * ty * docstring
          and method_def = MethodDef of name * param list * ty * docstring * ast
-         and instance_arg = InstanceArg of name * name Set.set
+         and instance_arg = InstanceArg of name * Type.typarams
 
     val typeOf : ast -> ty
 
