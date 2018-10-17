@@ -72,15 +72,14 @@ structure Compiler : COMPILER = struct
                 end
             end
         end
-    and declareTopForm c (AST.Defun (name, params, rt, docstring, ast)) =
+    and declareTopForm c (DAST.Defun (name, params, rt, docstring, ast)) =
         (* Add a concrete function to the compiler fenv *)
         let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
         in
             let val f = Function.Function (name,
-                                           map (fn (AST.Param (n, t)) => Function.Param (Symbol.varSymbol n,
-                                                                                         Type.resolve tenv Set.empty t))
+                                           map (fn (DAST.Param (n, t)) => Function.Param (Symbol.varSymbol n, t))
                                                params,
-                                           Type.resolve tenv Set.empty rt,
+                                           rt,
                                            docstring)
             in
                 case (Function.addFunction fenv f) of
