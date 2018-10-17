@@ -64,7 +64,12 @@ structure Compiler : COMPILER = struct
         in
             let val topNode = AST.transformTop (Alpha.transformTop (OAST.transformTop resolved))
             in
-                (topNode, declareTopForm compiler topNode)
+                let val dastNode = DAST.transformTop topNode
+                                                     (compilerTenv compiler)
+                                                     (compilerFenv compiler)
+                in
+                    (dastNode, declareTopForm compiler dastNode)
+                end
             end
         end
     and declareTopForm c (AST.Defun (name, params, rt, docstring, ast)) =
