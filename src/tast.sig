@@ -71,5 +71,5 @@ signature TAST = sig
 
     val augment : AST.ast -> context -> ast
 
-    val augmentTop : AST.top_ast -> Type.tenv -> Function.fenv -> top_ast
+    val augmentTop : DAST.top_ast -> Type.tenv -> Function.fenv -> top_ast
 end
