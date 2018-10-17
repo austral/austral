@@ -94,7 +94,7 @@ structure DAST :> DAST = struct
             Deftype (name,
                      params,
                      docstring,
-                     Type.resolve tenv params' tys)
+                     Type.resolve tenv (OrderedSet.toUnordered params') tys)
         end
       | transformTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
         let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
