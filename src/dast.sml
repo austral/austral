@@ -100,7 +100,7 @@ structure DAST :> DAST = struct
         let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
         in
             let fun mapVariant (AST.Variant (name, SOME tys)) =
-                    Type.Variant (name, SOME (Type.resolve tenv params' tys))
+                    Type.Variant (name, SOME (Type.resolve tenv (OrderedSet.toUnordered params') tys))
                   | mapVariant (AST.Variant (name, NONE)) =
                     Type.Variant (name, NONE)
             in
