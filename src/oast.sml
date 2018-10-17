@@ -145,7 +145,7 @@ structure OAST :> OAST = struct
                 Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad defun parameter"
             and transformExp params rcst =
-                let val params' = Set.fromList (map (fn (Param (n, _)) => n) params)
+                let val params' = map (fn (Param (n, _)) => n) params
                 in
                     (* FIXME: why? *)
                     transform rcst
