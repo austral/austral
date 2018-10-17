@@ -42,5 +42,5 @@ signature DAST = sig
     type tenv = Type.tenv
     type fenv = Function.fenv
 
-    val transformtTop : AST.top_ast -> tenv -> fenv -> top_ast
+    val transformTop : AST.top_ast -> tenv -> fenv -> top_ast
 end
