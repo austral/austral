@@ -287,7 +287,7 @@ structure TAst :> TAST = struct
                mapParams params,
                ty,
                docstring,
-               augment ast (funcContext params OrderedSet.empty tenv fenv))
+               augment ast (funcContext params Set.empty tenv fenv))
       (*| augmentTop (DAST.Defgeneric _) tenv fenv =
         raise Fail "defgeneric not implemented"*)
       | augmentTop (DAST.Defclass (name, paramName, docstring, methods)) tenv fenv =
@@ -305,7 +305,7 @@ structure TAst :> TAST = struct
                            params,
                            ty,
                            docstring,
-                           augment ast (funcContext params typarams tenv fenv))
+                           augment ast (funcContext params (OrderedSet.toUnordered typarams) tenv fenv))
         in
             Definstance (name, InstanceArg (arg, typarams), docstring, map mapDef defs)
         end
