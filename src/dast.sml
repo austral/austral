@@ -65,10 +65,10 @@ structure DAST :> DAST = struct
                 Defclass (name, paramName, docstring, map augmentMethod methods)
             end
         end
-      | transformTop (AST.Definstance (name, AST.InstanceArg (arg, set), docstring, defs)) tenv fenv =
+      | transformTop (AST.Definstance (name, AST.InstanceArg (arg, typarams), docstring, defs)) tenv fenv =
         let fun mapDef (AST.MethodDef (name, params, tys, docstring, ast)) =
                 let val typarams = map (fn name => Type.TypeParam name)
-                                       set
+                                       typarams
                 in
                     let val params' = map (mapParam tenv typarams) params
                     in
