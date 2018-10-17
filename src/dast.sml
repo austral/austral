@@ -59,7 +59,7 @@ structure DAST :> DAST = struct
             let fun augmentMethod (AST.MethodDecl (name, params, tys, docstring)) =
                     MethodDecl (name,
                                 map (mapParam tenv typarams) params,
-                                Type.resolve tenv typarams tys,
+                                Type.resolve tenv (OrderedSet.toUnordered typarams) tys,
                                 docstring)
             in
                 Defclass (name, paramName, docstring, map augmentMethod methods)
