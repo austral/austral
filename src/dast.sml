@@ -77,7 +77,7 @@ structure DAST :> DAST = struct
                     in
                         MethodDef (name,
                                    params',
-                                   Type.resolve tenv typarams' tys,
+                                   Type.resolve tenv (OrderedSet.toUnordered typarams') tys,
                                    docstring,
                                    ast)
                     end
