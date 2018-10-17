@@ -123,8 +123,8 @@ structure TAst :> TAST = struct
     local
         open Type
     in
-       val defaultIntType = Integer (Signed, Int32)
-       val sizeType = Integer (Unsigned, Int64)
+        val defaultIntType = Integer (Signed, Int32)
+        val sizeType = Integer (Unsigned, Int64)
         val defaultFloatType = Float Double
 
         fun augment AST.UnitConstant _ = UnitConstant
