@@ -62,7 +62,10 @@ structure DAST :> DAST = struct
                                 Type.resolve tenv (OrderedSet.toUnordered typarams) tys,
                                 docstring)
             in
-                Defclass (name, paramName, docstring, map augmentMethod methods)
+                Defclass (name,
+                          paramName,
+                          docstring,
+                          map augmentMethod methods)
             end
         end
       | transformTop (AST.Definstance (name, AST.InstanceArg (arg, typarams), docstring, defs)) tenv fenv =
