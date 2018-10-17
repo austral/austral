@@ -302,7 +302,7 @@ structure TAst :> TAST = struct
       | augmentTop (DAST.Definstance (name, DAST.InstanceArg (arg, typarams), docstring, defs)) tenv fenv =
         let fun mapDef (DAST.MethodDef (name, params, ty, docstring, ast)) =
                 MethodDef (name,
-                           params,
+                           mapParams params,
                            ty,
                            docstring,
                            augment ast (funcContext params (OrderedSet.toUnordered typarams) tenv fenv))
@@ -315,13 +315,10 @@ structure TAst :> TAST = struct
                      docstring,
                      ty)
       | augmentTop (DAST.Defdisjunction (name, params, docstring, variants)) tenv _ =
-        let val params' = Set.fromList (map (fn name => Type.TypeParam name) params)
-        in
-            Defdisjunction (name,
-                            params,
-                            docstring,
-                            variants)
-        end
+        Defdisjunction (name,
+                        params,
+                        docstring,
+                        variants)
       | augmentTop (DAST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
       | augmentTop (DAST.DefineSymbolMacro (name, exp, docstring)) _ _ =
