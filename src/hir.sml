@@ -195,7 +195,8 @@ structure HIR :> HIR = struct
         ToplevelProgn (map transformMethod methods)
       | transformTop (TAst.Deftype (name, params, _, ty)) =
         Deftype (escapeSymbol name,
-                 map (fn (Type.TypeParam n) => escapeSymbol n) params,
+                 map (fn (Type.TypeParam n) => escapeSymbol n)
+                     (OrderedSet.toList params),
                  ty)
       | transformTop (TAst.Defdisjunction (name, params, _, variants)) =
         Defdisjunction (escapeSymbol name,
