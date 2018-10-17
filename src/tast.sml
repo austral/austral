@@ -270,7 +270,7 @@ structure TAst :> TAST = struct
     end
 
     fun funcContext params typarams tenv fenv =
-        let val bindings = Map.fromList (map (fn (Param (var, ty)) => (var, Binding (ty, Immutable)))
+        let val bindings = Map.fromList (map (fn (DAST.Param (var, ty)) => (var, Binding (ty, Immutable)))
                                              params)
         in
             Context (bindings, tenv, typarams, fenv)
