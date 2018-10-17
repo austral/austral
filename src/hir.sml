@@ -200,7 +200,8 @@ structure HIR :> HIR = struct
                  ty)
       | transformTop (TAst.Defdisjunction (name, params, _, variants)) =
         Defdisjunction (escapeSymbol name,
-                        map escapeSymbol params,
+                        map (fn (Type.TypeParam n) => escapeSymbol n)
+                            (OrderedSet.toList params),
                         variants)
       | transformTop (TAst.Deftemplate _) =
         ToplevelProgn []
