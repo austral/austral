@@ -77,7 +77,7 @@ structure DAST :> DAST = struct
                                    params',
                                    Type.resolve tenv typarams tys,
                                    docstring,
-                                   augment ast (funcContext params' typarams tenv fenv))
+                                   ast)
                     end
                 end
         in
