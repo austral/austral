@@ -108,7 +108,7 @@ structure DAST :> DAST = struct
                     Type.Variant (name, NONE)
             in
                 Defdisjunction (name,
-                                params,
+                                params',
                                 docstring,
                                 map mapVariant variants)
             end
