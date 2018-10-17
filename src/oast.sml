@@ -158,7 +158,7 @@ structure OAST :> OAST = struct
             let val (docstring, body') = parseBody body
                 and params' = parseParams params
             in
-                let val body'' = transformExp body'
+                let val body'' = transform body'
                 in
                     Defun (name,
                            params',
