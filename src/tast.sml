@@ -276,18 +276,24 @@ structure TAst :> TAST = struct
             Context (bindings, tenv, typarams, fenv)
         end
 
+    fun mapParam (DAST.Param (n, ty)) =
+        Param (n, ty)
+
+    fun mapParams ps =
+        map mapParam ps
+
     fun augmentTop (DAST.Defun (name, params, ty, docstring, ast)) tenv fenv =
         Defun (name,
-               params,
+               mapParams params,
                ty,
                docstring,
-               augment ast (funcContext params Set.empty tenv fenv))
+               augment ast (funcContext params OrderedSet.empty tenv fenv))
       (*| augmentTop (DAST.Defgeneric _) tenv fenv =
         raise Fail "defgeneric not implemented"*)
       | augmentTop (DAST.Defclass (name, paramName, docstring, methods)) tenv fenv =
         let fun augmentMethod (DAST.MethodDecl (name, params, ty, docstring)) =
                 MethodDecl (name,
-                            params,
+                            mapParams params,
                             ty,
                             docstring)
         in
