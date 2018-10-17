@@ -144,12 +144,6 @@ structure OAST :> OAST = struct
             and parseParam (RCST.List [RCST.Symbol name, ty]) =
                 Param (name, Type.parseTypespec ty)
               | parseParam _ = raise Fail "Bad defun parameter"
-            and transformExp params rcst =
-                let val params' = Set.fromList (map (fn (Param (n, _)) => n) params)
-                in
-                    (* FIXME: why? *)
-                    transform rcst
-                end
             and parseBody ((RCST.StringConstant s)::head::tail) =
                 (* When the first element of the body is a string constant, and
                    the remainder of the form is non-empty, we take the string
@@ -164,7 +158,7 @@ structure OAST :> OAST = struct
             let val (docstring, body') = parseBody body
                 and params' = parseParams params
             in
-                let val body'' = transformExp params' body'
+                let val body'' = transformExp body'
                 in
                     Defun (name,
                            params',
