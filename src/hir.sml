@@ -86,6 +86,7 @@ structure HIR :> HIR = struct
     type name = string
 
     datatype top_ast = Defun of name * param list * ty * ast
+                     | Defgeneric of name * name list * param list * ty * ast
                      | Deftype of name * name list * ty
                      | Defdisjunction of name * name list * Type.variant list
                      | ToplevelProgn of top_ast list
