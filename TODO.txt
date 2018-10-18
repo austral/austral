@@ -1,13 +1,16 @@
 TODO:
 
+- Add Austral prelude file and script to embed it into a string
+- Implement size-of
+- Implement austral.ext.cffi:malloc (generic function, prelude)
+- Implement austral.ext.cffi:free (generic function, prelude)
+- Implement austral.ext.cffi:null-pointer (built-in)
+- Implement austral.ext.cffi:null? (generic function, prelude)
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
 
 LONG-TERM TODO:
 
-- Implement austral.ext.cffi:malloc
-- Implement austral.ext.cffi:null-pointer
-- Implement austral.ext.cffi:null?
 - Implement austral.ext.cffi:free
 
 - Static array constructors
