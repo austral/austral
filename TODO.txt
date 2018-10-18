@@ -2,6 +2,7 @@ TODO:
 
 - Generic functions
 - Implement static-array-index
+- Compile definstance methods to generic, not concrete, functions
 
 LONG-TERM TODO:
 
