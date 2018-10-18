@@ -126,7 +126,11 @@ structure Module : MODULE = struct
                 ">="
             ]
             and cffiExports = [
-                "foreign-funcall"
+                "foreign-funcall",
+                "malloc",
+                "free",
+                "null-pointer",
+                "null?"
             ]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
