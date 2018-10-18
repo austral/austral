@@ -169,7 +169,7 @@ structure Compiler : COMPILER = struct
                 SOME macenv' => Compiler (menv, macenv', tenv, fenv, moduleName, code)
               | _ => raise Fail "Duplicate symbol macro definition"
         end
-      | declareTopForm c (AST.Defmodule (name, clauses)) =
+      | declareTopForm c (DAST.Defmodule (name, clauses)) =
         let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
         in
             let val module = Module.resolveModule menv name clauses
