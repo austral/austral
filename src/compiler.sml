@@ -130,7 +130,7 @@ structure Compiler : COMPILER = struct
                                      ty))
             in
                 let val ins = Function.Instance (name,
-                                                 Function.InstanceArg (name, OrderedSet.fromList typarams),
+                                                 Function.InstanceArg (name, typarams),
                                                  docstring,
                                                  map resolveMethod methods)
                 in
