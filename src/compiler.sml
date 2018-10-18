@@ -141,12 +141,9 @@ structure Compiler : COMPILER = struct
             end
         end
       | declareTopForm c (DAST.Deftype (name, params, docstring, ty)) =
-        let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
-            (* FIXME: this is fucked *)
-            and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
-            and (Compiler (menv, macenv, tenv, fenv, module, code)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
-            case (Type.addTypeAlias tenv (name, params', ty)) of
+            case (Type.addTypeAlias tenv (name, params, ty)) of
                 SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
               | NONE => raise Fail "Duplicate type definition"
         end
