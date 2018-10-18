@@ -2,7 +2,6 @@ TODO:
 
 - Generic functions
 - Implement static-array-index
-- better handling of type parameters throughout the codebase
 
 LONG-TERM TODO:
 
@@ -101,3 +100,4 @@ DONE:
 - Implement foreign-funcall
 - OrderedSet.toUnordered
 - declaration AST between AST and TAST
+- better handling of type parameters throughout the codebase
