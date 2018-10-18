@@ -119,7 +119,6 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (DAST.Definstance (name, DAST.InstanceArg (arg, typarams), docstring, methods)) =
         let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
-            and typarams = map (fn n => Type.TypeParam n) (Set.toList typarams)
         in
             let fun resolveMethod (DAST.MethodDef (name, params, rt, docstring, body)) =
                     Function.MethodDef (name,
