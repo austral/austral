@@ -102,10 +102,10 @@ structure Compiler : COMPILER = struct
                     end
                 and resolveMethod typarams (DAST.MethodDecl (name, params, rt, docstring)) =
                     Function.MethodDecl (name,
-                                         map (mapParam typarams) params,
+                                         map mapParam params,
                                          rt,
                                          docstring)
-                and mapParam typarams (DAST.Param (name, ty)) =
+                and mapParam (DAST.Param (name, ty)) =
                     Function.Param (Symbol.varSymbol name,
                                     ty)
             in
@@ -122,10 +122,10 @@ structure Compiler : COMPILER = struct
         in
             let fun resolveMethod (DAST.MethodDef (name, params, rt, docstring, body)) =
                     Function.MethodDef (name,
-                                        map (mapParam typarams) params,
+                                        map mapParam params,
                                         rt,
                                         docstring)
-                and mapParam typarams (DAST.Param (name, ty)) =
+                and mapParam (DAST.Param (name, ty)) =
                     (Function.Param (Symbol.varSymbol name,
                                      ty))
             in
