@@ -213,13 +213,13 @@ structure CppAst :> CPP_AST = struct
         let val typarams' = if typarams = nil then
                                 ""
                             else
-                                "<" ^ (commaSep (map (fn (TypeParam s) => s) typarams)) ^ ">"
+                                "template <" ^ (commaSep (map (fn (TypeParam s) => "typename " ^ s) typarams)) ^ ">"
             and params' = commaSep (map renderParam params)
             and rt' = renderType rt
             and name' = name
             and body' = (renderBlock body) ^ "\n  return " ^ (renderExp retval) ^ ";"
         in
-            rt' ^ " " ^ name' ^ "(" ^ params' ^ ") {\n" ^ body' ^ "\n}"
+            typarams' ^ "\n" ^ rt' ^ " " ^ name' ^ "(" ^ params' ^ ") {\n" ^ body' ^ "\n}"
         end
       | renderTop (TypeDef (name, typarams, ty)) =
         let val typarams' = if typarams = nil then
