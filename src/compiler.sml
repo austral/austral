@@ -124,7 +124,7 @@ structure Compiler : COMPILER = struct
             let fun resolveMethod (DAST.MethodDef (name, params, rt, docstring, body)) =
                     Function.MethodDef (name,
                                         map (mapParam (Set.fromList typarams)) params,
-                                        Type.resolve tenv (Set.fromList typarams) rt,
+                                        rt,
                                         docstring)
                 and mapParam typarams (DAST.Param (name, typespec)) =
                     (Function.Param (Symbol.varSymbol name,
