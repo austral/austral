@@ -162,7 +162,7 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (DAST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
-      | declareTopForm c (AST.DefineSymbolMacro mac) =
+      | declareTopForm c (DAST.DefineSymbolMacro mac) =
         let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
         in
             case Macro.addSymbolMacro macenv (Macro.SymbolMacro mac) of
