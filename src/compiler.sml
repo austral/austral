@@ -88,7 +88,21 @@ structure Compiler : COMPILER = struct
             end
         end
       | declareTopForm c (DAST.Defgeneric (name, typarams, params, rt, docstring, ast)) =
-        raise Fail "defgeneric not implemented"
+        (* Add a generic function to the compiler fenv *)
+        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
+        in
+            let val gf = Function.GenericFunction (name,
+                                                   typarams,
+                                                   map (fn (DAST.Param (n, t)) => Function.Param (Symbol.varSymbol n, t))
+                                                       params,
+                                                   rt,
+                                                   docstring)
+            in
+                case (Function.addGenericFunction fenv gf) of
+                    SOME fenv' => Compiler (menv, macenv, tenv, fenv', currModuleName, code)
+                  | NONE => raise Fail "Repeat function"
+            end
+        end
       | declareTopForm c (DAST.Defclass tcDef) =
         let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in

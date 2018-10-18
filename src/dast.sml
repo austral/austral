@@ -57,14 +57,16 @@ structure DAST :> DAST = struct
         end
       | transformTop (AST.Defgeneric (name, typarams, params, ty, docstring, ast)) tenv fenv =
         let val typarams' = OrderedSet.fromList (map (fn name => Type.TypeParam name) typarams)
-            and params' = map (mapParam tenv OrderedSet.empty) params
         in
-            Defgeneric (name,
-                        typarams',
-                        params',
-                        Type.resolve tenv Set.empty ty,
-                        docstring,
-                        ast)
+            let val params' = map (mapParam tenv typarams') params
+            in
+                Defgeneric (name,
+                            typarams',
+                            params',
+                            Type.resolve tenv (OrderedSet.toUnordered typarams') ty,
+                            docstring,
+                            ast)
+            end
         end
       | transformTop (AST.Defclass (name, paramName, docstring, methods)) tenv fenv =
         let val typarams = OrderedSet.singleton (Type.TypeParam paramName)
