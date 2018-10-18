@@ -182,7 +182,7 @@ structure Compiler : COMPILER = struct
                             end
             end
         end
-      | declareTopForm c (AST.InModule moduleName) =
+      | declareTopForm c (DAST.InModule moduleName) =
         (* Switch current module *)
         let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
         in
