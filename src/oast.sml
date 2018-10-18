@@ -118,6 +118,8 @@ structure OAST :> OAST = struct
         in
             if f = au "defun" then
                 transformDefun args
+            else if f = au "defgeneric" then
+                transformDefgeneric args
             else if f = au "defclass" then
                 transformDefclass args
             else if f = au "definstance" then
@@ -169,6 +171,42 @@ structure OAST :> OAST = struct
             end
         end
       | transformDefun _ = raise Fail "Bad defun form"
+
+    and transformDefgeneric ((RCST.Symbol name)::typarams::params::rt::body) =
+        let fun parseParams (RCST.List l) = map parseParam l
+              | parseParams _ = raise Fail "defun parameter list must be a list"
+            and parseParam (RCST.List [RCST.Symbol name, ty]) =
+                Param (name, Type.parseTypespec ty)
+              | parseParam _ = raise Fail "Bad defun parameter"
+            and parseTypeParams (RCST.List l) =
+                map parseTypeParam l
+              | parseTypeParams _ =
+                raise Fail "defgeneric type parameter list must be a list"
+            and parseTypeParam (RCST.Symbol s) = s
+              | parseTypeParam _ = raise Fail "Type parameter must be a symbol"
+            and parseBody ((RCST.StringConstant s)::head::tail) =
+                (SOME (CST.escapedToString s), implicitProgn (head::tail))
+              | parseBody body =
+                (NONE, implicitProgn body)
+            and implicitProgn l =
+                (RCST.List ((RCST.Symbol (Symbol.au "progn"))::l))
+        in
+            let val (docstring, body') = parseBody body
+                and params' = parseParams params
+            in
+                let val body'' = transform body'
+                in
+                    Defgeneric (name,
+                                parseTypeParams typarams,
+                                params',
+                                Type.parseTypespec rt,
+                                docstring,
+                                body'')
+                end
+            end
+        end
+      | transformDefgeneric _ =
+        raise Fail "Bad defgeneric form"
 
     and transformDefclass ((RCST.Symbol name)::(RCST.List [RCST.Symbol param])::body) =
         let fun parseBody ((RCST.StringConstant s)::methods)  =
