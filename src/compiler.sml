@@ -105,8 +105,9 @@ structure Compiler : COMPILER = struct
                                          map (mapParam typarams) params,
                                          rt,
                                          docstring)
-                and mapParam typarams (DAST.Param (name, typespec)) =
-                    (Function.Param (Symbol.varSymbol name, Type.resolve tenv typarams typespec))
+                and mapParam typarams (DAST.Param (name, ty)) =
+                    Function.Param (Symbol.varSymbol name,
+                                    ty)
             in
                 let val tc = resolveTypeclass tcDef
                 in
