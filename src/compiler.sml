@@ -126,9 +126,9 @@ structure Compiler : COMPILER = struct
                                         map (mapParam (Set.fromList typarams)) params,
                                         rt,
                                         docstring)
-                and mapParam typarams (DAST.Param (name, typespec)) =
+                and mapParam typarams (DAST.Param (name, ty)) =
                     (Function.Param (Symbol.varSymbol name,
-                                     Type.resolve tenv typarams typespec))
+                                     ty))
             in
                 let val ins = Function.Instance (name,
                                                  Function.InstanceArg (name, OrderedSet.fromList typarams),
