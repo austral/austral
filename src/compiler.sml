@@ -148,12 +148,9 @@ structure Compiler : COMPILER = struct
               | NONE => raise Fail "Duplicate type definition"
         end
       | declareTopForm c (DAST.Defdisjunction (name, params, docstring, variants)) =
-        let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
-            (* FIXME: this is fucked *)
-            and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
-            and (Compiler (menv, macenv, tenv, fenv, module, code)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
-            case (Type.addDisjunction tenv (name, params', variants)) of
+            case (Type.addDisjunction tenv (name, params, variants)) of
                 SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
               | NONE => raise Fail "Duplicate type definition"
         end
