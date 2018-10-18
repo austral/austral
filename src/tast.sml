@@ -288,8 +288,13 @@ structure TAst :> TAST = struct
                ty,
                docstring,
                augment ast (funcContext params Set.empty tenv fenv))
-      (*| augmentTop (DAST.Defgeneric _) tenv fenv =
-        raise Fail "defgeneric not implemented"*)
+      | augmentTop (DAST.Defgeneric (name, typarams, params, ty, docstring, ast)) tenv fenv =
+        Defgeneric (name,
+                    typarams,
+                    mapParams params,
+                    ty,
+                    docstring,
+                    augment ast (funcContext params (OrderedSet.toUnordered typarams) tenv fenv))
       | augmentTop (DAST.Defclass (name, paramName, docstring, methods)) tenv fenv =
         let fun augmentMethod (DAST.MethodDecl (name, params, ty, docstring)) =
                 MethodDecl (name,
