@@ -140,7 +140,7 @@ structure Compiler : COMPILER = struct
                 end
             end
         end
-      | declareTopForm c (AST.Deftype (name, params, docstring, def)) =
+      | declareTopForm c (DAST.Deftype (name, params, docstring, def)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
             (* FIXME: this is fucked *)
             and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
@@ -150,7 +150,7 @@ structure Compiler : COMPILER = struct
                 SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
               | NONE => raise Fail "Duplicate type definition"
         end
-      | declareTopForm c (AST.Defdisjunction (name, params, docstring, variants)) =
+      | declareTopForm c (DAST.Defdisjunction (name, params, docstring, variants)) =
         let val params' = OrderedSet.fromList (map (fn s => Type.TypeParam s) params)
             (* FIXME: this is fucked *)
             and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
