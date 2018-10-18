@@ -89,7 +89,7 @@ structure Compiler : COMPILER = struct
         end
       (*| declareTopForm c (AST.Defgeneric _) =
         raise Fail "defgeneric not implemented"*)
-      | declareTopForm c (AST.Defclass tcDef) =
+      | declareTopForm c (DAST.Defclass tcDef) =
         let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
             let fun resolveTypeclass (name, paramName, docstring, methods) =
@@ -100,12 +100,12 @@ structure Compiler : COMPILER = struct
                                             docstring,
                                             map (resolveMethod typarams) methods)
                     end
-                and resolveMethod typarams (AST.MethodDecl (name, params, rt, docstring)) =
+                and resolveMethod typarams (DAST.MethodDecl (name, params, rt, docstring)) =
                     Function.MethodDecl (name,
                                          map (mapParam typarams) params,
                                          Type.resolve tenv typarams rt,
                                          docstring)
-                and mapParam typarams (AST.Param (name, typespec)) =
+                and mapParam typarams (DAST.Param (name, typespec)) =
                     (Function.Param (Symbol.varSymbol name, Type.resolve tenv typarams typespec))
             in
                 let val tc = resolveTypeclass tcDef
@@ -116,7 +116,7 @@ structure Compiler : COMPILER = struct
                 end
             end
         end
-      | declareTopForm c (AST.Definstance (name, AST.InstanceArg (arg, typarams), docstring, methods)) =
+      | declareTopForm c (DAST.Definstance (name, DAST.InstanceArg (arg, typarams), docstring, methods)) =
         let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
             and typarams = map (fn n => Type.TypeParam n) (Set.toList typarams)
         in
