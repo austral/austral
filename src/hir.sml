@@ -183,9 +183,15 @@ structure HIR :> HIR = struct
 
     fun transformTop (TAst.Defun (name, params, rt, _, body)) =
         Defun (escapeSymbol name,
-               map (fn (TAst.Param (n, t)) => Param (escapeVariable n, t)) params,
+               mapParams params,
                rt,
                transform body)
+      | transformTop (TAst.Defgeneric (name, typarams, params, rt, _, body)) =
+        Defgeneric (escapeSymbol name,
+                    mapTypeParams typarams,
+                    mapParams params,
+                    rt,
+                    transform body)
       | transformTop (TAst.Defclass _) =
         (* Defclass declarations don't need to be compiled, all the actual work
            is done in instance declarations *)
@@ -210,6 +216,10 @@ structure HIR :> HIR = struct
         ToplevelProgn []
       | transformTop (TAst.InModule _) =
         ToplevelProgn []
+
+      and mapParams params =
+          map (fn (TAst.Param (n, t)) => Param (escapeVariable n, t))
+              params
 
     and mapTypeParams typarams =
         map (fn (Type.TypeParam n) => escapeSymbol n)
