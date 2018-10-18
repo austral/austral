@@ -254,18 +254,24 @@ structure MIR :> MIR = struct
         end
 
     fun transformTop (HIR.Defun (name, params, ty, body)) =
-        let fun mapParam (HIR.Param (name, ty)) =
-                Param (name, transformType ty)
+        let val (bodyBlock, bodyExp) = transformExp body
         in
-            let val (bodyBlock, bodyExp) = transformExp body
-            in
-                Defun (name,
-                       [],
-                       map mapParam params,
-                       transformType ty,
-                       bodyBlock,
-                       bodyExp)
-            end
+            Defun (name,
+                   [],
+                   mapParams params,
+                   transformType ty,
+                   bodyBlock,
+                   bodyExp)
+        end
+      | transformTop (HIR.Defgeneric (name, typarams, params, ty, body)) =
+        let val (bodyBlock, bodyExp) = transformExp body
+        in
+            Defun (name,
+                   typarams,
+                   mapParams params,
+                   transformType ty,
+                   bodyBlock,
+                   bodyExp)
         end
       | transformTop (HIR.Deftype (name, params, ty)) =
         Deftype (name,
@@ -280,6 +286,11 @@ structure MIR :> MIR = struct
                  ])
       | transformTop (HIR.ToplevelProgn nodes) =
         ToplevelProgn (map transformTop nodes)
+
+    and mapParams params =
+        map (fn (HIR.Param (name, ty)) => Param (name, transformType ty))
+            params
+
     and transformVariant (Type.Variant (name, SOME ty), idx) =
         Slot (unionSlotName idx, transformType ty)
       | transformVariant (Type.Variant (name, NONE), idx) =
