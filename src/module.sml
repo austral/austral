@@ -97,6 +97,7 @@ structure Module : MODULE = struct
                 "load",
                 "store",
                 "defun",
+                "defgeneric",
                 "deftype",
                 "defdisjunction",
                 "defclass",
