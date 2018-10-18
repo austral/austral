@@ -156,17 +156,11 @@ structure Compiler : COMPILER = struct
             and unorderedParams' = Set.fromList (map (fn s => Type.TypeParam s) params)
             and (Compiler (menv, macenv, tenv, fenv, module, code)) = c
         in
-            let fun mapVariant (AST.Variant (name, SOME tys)) =
-                    Type.Variant (name, SOME (Type.resolve tenv unorderedParams' tys))
-                  | mapVariant (AST.Variant (name, NONE)) =
-                    Type.Variant (name, NONE)
-            in
-                case (Type.addDisjunction tenv (name, params', map mapVariant variants)) of
-                    SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
-                  | NONE => raise Fail "Duplicate type definition"
-            end
+            case (Type.addDisjunction tenv (name, params', variants)) of
+                SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
+              | NONE => raise Fail "Duplicate type definition"
         end
-      | declareTopForm c (AST.Deftemplate _) =
+      | declareTopForm c (DAST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
       | declareTopForm c (AST.DefineSymbolMacro mac) =
         let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
