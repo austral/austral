@@ -103,7 +103,7 @@ structure Compiler : COMPILER = struct
                 and resolveMethod typarams (DAST.MethodDecl (name, params, rt, docstring)) =
                     Function.MethodDecl (name,
                                          map (mapParam typarams) params,
-                                         Type.resolve tenv typarams rt,
+                                         rt,
                                          docstring)
                 and mapParam typarams (DAST.Param (name, typespec)) =
                     (Function.Param (Symbol.varSymbol name, Type.resolve tenv typarams typespec))
