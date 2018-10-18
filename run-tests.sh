@@ -31,4 +31,4 @@ clang++ -shared -fPIC -std=c++11 test/valid/hello-world.cpp
 
 echo "generic.au"
 ./boreal test/valid/generic.au --output=test/valid/generic.cpp
-#clang++ -shared -fPIC -std=c++11 test/valid/generic.cpp
+clang++ -shared -fPIC -std=c++11 test/valid/generic.cpp
