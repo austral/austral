@@ -98,9 +98,9 @@ structure Compiler : COMPILER = struct
                         Function.Typeclass (name,
                                             paramName,
                                             docstring,
-                                            map (resolveMethod typarams) methods)
+                                            map resolveMethod methods)
                     end
-                and resolveMethod typarams (DAST.MethodDecl (name, params, rt, docstring)) =
+                and resolveMethod (DAST.MethodDecl (name, params, rt, docstring)) =
                     Function.MethodDecl (name,
                                          map mapParam params,
                                          rt,
