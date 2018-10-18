@@ -122,7 +122,7 @@ structure Compiler : COMPILER = struct
         in
             let fun resolveMethod (DAST.MethodDef (name, params, rt, docstring, body)) =
                     Function.MethodDef (name,
-                                        map (mapParam (Set.fromList typarams)) params,
+                                        map (mapParam typarams) params,
                                         rt,
                                         docstring)
                 and mapParam typarams (DAST.Param (name, ty)) =
