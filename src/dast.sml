@@ -55,8 +55,17 @@ structure DAST :> DAST = struct
                    docstring,
                    ast)
         end
-      | transformTop (AST.Defgeneric _) tenv fenv =
-        raise Fail "defgeneric not implemented"
+      | transformTop (AST.Defgeneric (name, typarams, params, ty, docstring, ast)) tenv fenv =
+        let val typarams' = OrderedSet.fromList (map (fn name => Type.TypeParam name) typarams)
+            and params' = map (mapParam tenv OrderedSet.empty) params
+        in
+            Defgeneric (name,
+                        typarams',
+                        params',
+                        Type.resolve tenv Set.empty ty,
+                        docstring,
+                        ast)
+        end
       | transformTop (AST.Defclass (name, paramName, docstring, methods)) tenv fenv =
         let val typarams = OrderedSet.singleton (Type.TypeParam paramName)
         in
