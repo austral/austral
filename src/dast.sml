@@ -26,6 +26,7 @@ structure DAST :> DAST = struct
     type ast = AST.ast
 
     datatype top_ast = Defun of name * param list * ty * docstring * ast
+                     | Defgeneric of name * Type.typarams * param list * ty * docstring * ast
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
