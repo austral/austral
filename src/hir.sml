@@ -199,6 +199,7 @@ structure HIR :> HIR = struct
       | transformTop (TAst.Definstance (_, _, _, methods)) =
         (* The compilation strategy for instances is each method is compiled to
            a standalone generic function *)
+        (* FIXME: definstance methods should be compiled to generic functions *)
         ToplevelProgn (map transformMethod methods)
       | transformTop (TAst.Deftype (name, params, _, ty)) =
         Deftype (escapeSymbol name,
