@@ -74,7 +74,7 @@ is
   src/cpp-backend.sig
   src/cpp-backend.sml
 
-  src/cpp-prelude.sml
+  src/cpp-runtime.sml
 
   src/compiler.sig
   src/compiler.sml
