@@ -253,4 +253,7 @@ structure Compiler : COMPILER = struct
         compileUnits (compileUnit c head) tail
       | compileUnits c nil =
         c
+
+    fun compileEntrypoint c name =
+        c
 end
