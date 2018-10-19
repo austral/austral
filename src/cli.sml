@@ -73,7 +73,7 @@ structure Cli :> CLI = struct
             in
                 let val c'' = case entrypoint of
                                   SOME name => Compiler.compileEntrypoint c' name
-                                | NONE => c
+                                | NONE => c'
                 in
                     Util.writeStringToFile output (Compiler.compilerCode c')
                 end
