@@ -201,6 +201,8 @@ structure CppAst :> CPP_AST = struct
         end
       | renderBlock' d (While (t, b)) =
         (pad d) ^ "while (" ^ (renderExp t) ^ ") {\n" ^ (renderBlock' (indent d) b) ^ "\n" ^ (pad d) ^ "}"
+      | renderBlock' d (StandaloneExp e) =
+        (pad d) ^ (renderExp e)
 
     and renderRes (SOME res) = (res) ^ " = "
       | renderRes NONE = ""
