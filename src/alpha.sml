@@ -33,6 +33,7 @@ structure Alpha :> ALPHA = struct
                  | Let of variable * ast * ast
                  | The of typespec * ast
                  | ForeignFuncall of string * typespec * ast list
+                 | SizeOf of typespec
                  | Operation of symbol * ast list
 
     (* Toplevel AST *)
