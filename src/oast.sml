@@ -111,7 +111,7 @@ structure OAST :> OAST = struct
         ForeignFuncall (CST.escapedToString name,
                         Type.parseTypespec rt,
                         map transform args)
-      | transformForeignFuncall _ = raise Fail "Invalid `foreign-funcall` form")
+      | transformForeignFuncall _ = raise Fail "Invalid `foreign-funcall` form"
 
     and transformSizeOf [tys] =
         SizeOf (Type.parseTypespec tys)
