@@ -261,7 +261,16 @@ structure MIR :> MIR = struct
         in
             let fun pairExp (_, e) = e
             in
-                (Progn (map (fn (b, e) => Progn [b, StandaloneExp e]) args'),
+                (Progn (map (fn (b, e) =>
+                                (* If the expression is a function call, we want
+                                   to render it as a standalone expression to
+                                   ensure it is executed for its
+                                   side-effects. Otherwise just render the block
+                                   *)
+                                case e of
+                                    (Funcall _) => Progn [b, StandaloneExp e]
+                                  | _ => b)
+                            args'),
                  Funcall (name, [], map pairExp args'))
             end
         end
