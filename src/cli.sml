@@ -71,7 +71,12 @@ structure Cli :> CLI = struct
         in
             let val c' = Compiler.compileUnits compiler units
             in
-                Util.writeStringToFile output (Compiler.compilerCode c')
+                let val c'' = case entrypoint of
+                                  SOME name => Compiler.compileEntrypoint c' name
+                                | NONE => c
+                in
+                    Util.writeStringToFile output (Compiler.compilerCode c')
+                end
             end
         end
 end
