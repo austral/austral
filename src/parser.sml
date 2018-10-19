@@ -131,13 +131,13 @@ structure Parser :> PARSER = struct
           | f => raise ParserException ("Bad parse: " ^ (explain f))
 
     fun parseString s =
-        suceedOrDie (run sexpParser (ParsimonyStringInput.fromString s))
+        succeedOrDie (run sexpParser (ParsimonyStringInput.fromString s))
 
     fun parseFile path =
         let val code = "(" ^ (Util.readFileToString path) ^ ")"
         in
             case (parseString code) of
                 (CST.List l) => l
-              | _ => raise ParserException "Failed to parse file: compiler error"
+              | _ => raise ParserException ("Bad parse: " ^ (explain f))
         end
 end
