@@ -247,8 +247,7 @@ structure MIR :> MIR = struct
         if List.length exps > 0 then
             let val exps' = map transformExp exps
             in
-                let fun pairBlocks (b, _) = b
-                    and pairExp (_, e) = e
+                let fun pairExp (_, e) = e
                 in
                     (Progn (map pairBlocks exps'),
                      pairExp (List.last exps'))
@@ -261,19 +260,21 @@ structure MIR :> MIR = struct
         in
             let fun pairExp (_, e) = e
             in
-                (Progn (map (fn (b, e) =>
-                                (* If the expression is a function call, we want
-                                   to render it as a standalone expression to
-                                   ensure it is executed for its
-                                   side-effects. Otherwise just render the block
-                                   *)
-                                case e of
-                                    (Funcall _) => Progn [b, StandaloneExp e]
-                                  | _ => b)
-                            args'),
+                (Progn (prognBlocks args'),
                  Funcall (name, [], map pairExp args'))
             end
         end
+
+    and prognBlocks args =
+        map (fn (b, e) =>
+                (* If the expression is a function call, we want to render it as
+                   a standalone expression to ensure it is executed for its
+                   side-effects. Otherwise just render the block
+                 *)
+                case e of
+                    (Funcall _) => Progn [b, StandaloneExp e]
+                  | _ => b)
+            args
 
     fun transformTop (HIR.Defun (name, params, ty, body)) =
         let val (bodyBlock, bodyExp) = transformExp body
