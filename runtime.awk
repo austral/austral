@@ -1,4 +1,4 @@
-BEGIN { 
+BEGIN {
     ORS = ""
     print "structure CppPrelude = struct\n\
     val prelude = \""
