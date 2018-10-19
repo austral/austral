@@ -1,6 +1,7 @@
 TODO:
 
-- Fix function calls being thrown out in the all-but-last body of progn (MIR, HIR)
+- Count appearances of type variables in types
+- Predicate to determine if a function is return-type polymorphic
 - Add Austral prelude file and script to embed it into a string
 - Implement austral.ext.cffi:malloc (generic function, prelude)
 - Implement austral.ext.cffi:free (generic function, prelude)
@@ -108,3 +109,4 @@ DONE:
 - Implement austral.ext.cffi:size-of
 - Handle foreign functions that return void in foreign-funcall
 - Add austral.ext.cffi:foreign-pointer type
+- Fix function calls being thrown out in the all-but-last body of progn (MIR, HIR)
