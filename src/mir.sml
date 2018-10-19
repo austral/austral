@@ -105,19 +105,28 @@ structure MIR :> MIR = struct
           | transformIntType Signed   Int64 = SInt64
     end
 
-    fun transformType Type.Unit = Bool
-      | transformType Type.Bool = Bool
-      | transformType (Type.Integer (s, w)) = transformIntType s w
-      | transformType (Type.Float Type.Single) = SingleFloat
-      | transformType (Type.Float Type.Double) = DoubleFloat
-      | transformType (Type.Tuple tys) = Tuple (map transformType tys)
-      | transformType (Type.Pointer ty) = Pointer (transformType ty)
+    fun transformType Type.Unit =
+        Bool
+      | transformType Type.Bool =
+        Bool
+      | transformType (Type.Integer (s, w)) =
+        transformIntType s w
+      | transformType (Type.Float Type.Single) =
+        SingleFloat
+      | transformType (Type.Float Type.Double) =
+        DoubleFloat
+      | transformType (Type.Tuple tys) =
+        Tuple (map transformType tys)
+      | transformType (Type.Pointer ty) =
+        Pointer (transformType ty)
       | transformType (Type.ForeignPointer ty) =
         Pointer (transformType ty)
-      | transformType (Type.StaticArray (ty, idx)) = Array (transformType ty, idx)
-      | transformType (Type.Disjunction (name, args, _)) = TypeCons (HIR.escapeSymbol name,
-                                                                     map transformType args)
-      | transformType (Type.TypeVariable name) = TypeVariable (HIR.escapeSymbol name)
+      | transformType (Type.StaticArray (ty, idx)) =
+        Array (transformType ty, idx)
+      | transformType (Type.Disjunction (name, args, _)) =
+        TypeCons (HIR.escapeSymbol name, map transformType args)
+      | transformType (Type.TypeVariable name) =
+        TypeVariable (HIR.escapeSymbol name)
 
     fun transformExp (HIR.BoolConstant b) =
         (Progn [], BoolConstant b)
