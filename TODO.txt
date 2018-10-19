@@ -1,6 +1,6 @@
 TODO:
 
-- Add austral.ext.cffi:cpointer type
+- Add austral.ext.cffi:foreign-pointer type
 - Add Austral prelude file and script to embed it into a string
 - Implement austral.ext.cffi:malloc (generic function, prelude)
 - Implement austral.ext.cffi:free (generic function, prelude)
