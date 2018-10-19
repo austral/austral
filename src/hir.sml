@@ -135,6 +135,8 @@ structure HIR :> HIR = struct
         Cast (ty, transform exp)
       | transform (TAst.ForeignFuncall (name, rt, args)) =
         Cast (rt, Funcall (name, map transform args))
+      | transform (TAst.SizeOf ty) =
+        SizeOf ty
       | transform (TAst.Progn exps) =
         Progn (map transform exps)
       | transform (TAst.Funcall (f, args, _)) =
