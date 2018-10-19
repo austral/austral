@@ -60,7 +60,6 @@ structure CppAst :> CPP_AST = struct
                        | Assign of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
                        | While of exp_ast * block_ast
-                       | VoidFuncall of string * exp_ast list
 
     datatype top_ast = FunctionDef of string * typaram list * param list * ty * block_ast * exp_ast
                      | TypeDef of string * typaram list * ty
