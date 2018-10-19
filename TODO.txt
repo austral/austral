@@ -1,5 +1,6 @@
 TODO:
 
+- Fix function calls being thrown out in the all-but-last body of progn (MIR, HIR)
 - Add Austral prelude file and script to embed it into a string
 - Implement austral.ext.cffi:malloc (generic function, prelude)
 - Implement austral.ext.cffi:free (generic function, prelude)
