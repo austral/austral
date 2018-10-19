@@ -130,6 +130,10 @@ structure Parser :> PARSER = struct
             (Success (r, _)) => r
           | f => raise ParserException ("Bad parse: " ^ (explain f))
 
+    fun parseQualifiedSymbol string =
+        succeedOrDie (run qualifiedSymbolParser
+                          (ParsimonyStringInput.fromString string))
+
     fun parseString s =
         succeedOrDie (run sexpParser (ParsimonyStringInput.fromString s))
 
