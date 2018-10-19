@@ -87,6 +87,8 @@ structure AST :> AST = struct
         The (ty, transform exp)
       | transform (Alpha.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map transform args)
+      | transform (Alpha.SizeOf tys) =
+        SizeOf tys
       | transform (Alpha.Operation (f, args)) =
         transformOp f (map transform args)
     and transformOp f args =
