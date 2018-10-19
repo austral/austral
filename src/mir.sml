@@ -249,7 +249,7 @@ structure MIR :> MIR = struct
             in
                 let fun pairExp (_, e) = e
                 in
-                    (Progn (map pairBlocks exps'),
+                    (Progn (prognBlocks exps'),
                      pairExp (List.last exps'))
                 end
             end
