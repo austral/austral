@@ -50,4 +50,6 @@ signature COMPILER = sig
 
     val compileUnit : compiler -> compilation_unit -> compiler
     val compileUnits : compiler -> compilation_unit list -> compiler
+
+    val compileEntrypoint : compiler -> string -> compiler
 end
