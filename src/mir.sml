@@ -230,7 +230,7 @@ structure MIR :> MIR = struct
             (expBlock, Cast (transformType ty, exp'))
         end
       | transformExp (HIR.SizeOf ty) =
-        SizeOf (transformType ty)
+        (Progn [], SizeOf (transformType ty))
       | transformExp (HIR.Progn exps) =
         if List.length exps > 0 then
             let val exps' = map transformExp exps
