@@ -39,6 +39,7 @@ structure HIR :> HIR = struct
                  | Load of ast
                  | Store of ast * ast
                  | Cast of ty * ast
+                 | SizeOf of ty
                  | Progn of ast list
                  | Funcall of string * ast list
 
