@@ -33,6 +33,7 @@ structure OAST :> OAST = struct
                  | Let of name * ast * ast
                  | The of typespec * ast
                  | ForeignFuncall of string * typespec * ast list
+                 | SizeOf of typespec
                  | Operation of name * ast list
 
     type docstring = string option
