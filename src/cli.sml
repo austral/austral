@@ -61,11 +61,11 @@ structure Cli :> CLI = struct
             case files of
                 nil => die "No input files"
               | _ => (case output of
-                          SOME output' => compileFiles files output'
+                          SOME output' => compileFiles files output' entrypoint
                         | NONE => die "Must provide a value to --output, for example, --output=file.cpp")
         end
 
-    and compileFiles files output =
+    and compileFiles files output entrypoint =
         let val compiler = Compiler.emptyCompiler
             and units = map (fn f => Compiler.FileUnit f) files
         in
