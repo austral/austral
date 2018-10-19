@@ -13,14 +13,14 @@ TEST_BIN := boreal-test
 
 BIN = boreal
 
-CPP_PRELUDE_ML := src/cpp-prelude.sml
+CPP_RUNTIME_ML := src/cpp-runtime.sml
 SRC := src/*.sig src/*.sml $(CPP_PRELUDE_ML)
 TEST_SRC := test/*.sml
 
 all: compile
 
-$(CPP_PRELUDE_ML): src/prelude.hpp prelude.awk
-	awk -f prelude.awk src/prelude.hpp > $(CPP_PRELUDE_ML)
+$(CPP_PRELUDE_ML): src/runtime.hpp runtime.awk
+	awk -f runtime.awk src/runtime.hpp > $(CPP_PRELUDE_ML)
 
 compile: $(SRC)
 	$(SML) $(SMLFLAGS) -m $(CM_FILE)
