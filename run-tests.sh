@@ -38,5 +38,5 @@ echo "size-of.au"
 clang++ -shared -fPIC -std=c++11 test/valid/size-of.cpp
 
 echo "cffi.au"
-./boreal test/valid/cffi.au --output=test/valid/cffi.cpp
-clang++ -shared -fPIC -std=c++11 test/valid/cffi.cpp --entrypoint=cffi-test:main
+./boreal test/valid/cffi.au --output=test/valid/cffi.cpp --entrypoint=cffi-test:main
+clang++ -shared -fPIC -std=c++11 test/valid/cffi.cpp
