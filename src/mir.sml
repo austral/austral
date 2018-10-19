@@ -261,7 +261,7 @@ structure MIR :> MIR = struct
         in
             let fun pairExp (_, e) = e
             in
-                (Progn (map (fn (b, e) => Progn [b, e]) args'),
+                (Progn (map (fn (b, e) => Progn [b, StandaloneExp e]) args'),
                  Funcall (name, [], map pairExp args'))
             end
         end
