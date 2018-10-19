@@ -1,0 +1,11 @@
+;; -*- mode: lisp -*-
+(defmodule cffi-test
+  (:use :austral)
+  (:import-from :austral.ext.cffi
+                :foreign-funcall
+                :foreign-pointer))
+(in-module :cffi-test)
+
+(defun main () i32
+  (let ((pointer (foreign-funcall "malloc" (foreign-pointer i32) 4)))
+    (the i32 0)))
