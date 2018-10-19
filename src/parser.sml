@@ -138,6 +138,6 @@ structure Parser :> PARSER = struct
         in
             case (parseString code) of
                 (CST.List l) => l
-              | _ => raise ParserException ("Bad parse: " ^ (explain f))
+              | f => raise ParserException ("Bad parse: " ^ (explain f))
         end
 end
