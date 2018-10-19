@@ -99,7 +99,7 @@ structure Parser :> PARSER = struct
         seqR ws (choice [floatParser,
                          integerParser,
                          quotedString,
-                         pmap QualifiedSymbol qualifiedSymbolParser,
+                         pmap CST.QualifiedSymbol qualifiedSymbolParser,
                          keywordParser,
                          unqualifiedSymbolParser,
                          listParser,
