@@ -256,10 +256,14 @@ structure Compiler : COMPILER = struct
 
     fun compileEntrypoint c name =
         let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
+            and sym = Parser.parseQualifiedSymbol name
         in
-            let val newCode = code ^ "\n\nint main() {\n  return " ^ name ^ "();\n}\n"
+            let val name = HIR.escapeSymbol sym
             in
-                Compiler (menv, macenv, tenv, fenv, currModuleName, newCode)
+                let val newCode = code ^ "\n\nint main() {\n  return " ^ name ^ "();\n}\n"
+                in
+                    Compiler (menv, macenv, tenv, fenv, currModuleName, newCode)
+                end
             end
         end
 end
