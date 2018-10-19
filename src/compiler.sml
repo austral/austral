@@ -255,5 +255,11 @@ structure Compiler : COMPILER = struct
         c
 
     fun compileEntrypoint c name =
-        c
+        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
+        in
+            let val newCode = code ^ "\n\nint main() {\n  return " ^ name ^ "();\n}\n"
+            in
+                Compiler (menv, macenv, tenv, fenv, currModuleName, newCode)
+            end
+        end
 end
