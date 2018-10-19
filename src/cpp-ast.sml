@@ -200,8 +200,7 @@ structure CppAst :> CPP_AST = struct
         end
       | renderBlock' d (While (t, b)) =
         (pad d) ^ "while (" ^ (renderExp t) ^ ") {\n" ^ (renderBlock' (indent d) b) ^ "\n" ^ (pad d) ^ "}"
-      | renderBlock' d (VoidFuncall (f, args)) =
-        (pad d) ^ f ^ "(" ^ (commaSep (map renderExp args)) ^ ");"
+
     and renderRes (SOME res) = (res) ^ " = "
       | renderRes NONE = ""
 
