@@ -1,5 +1,7 @@
 TODO:
 
+- Use `the` only to verify types match
+- Define an integer-cast thing to cast integers or some such
 - Count appearances of type variables in types
 - Predicate to determine if a function is return-type polymorphic
 - Add Austral prelude file and script to embed it into a string
