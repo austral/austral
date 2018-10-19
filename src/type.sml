@@ -128,6 +128,8 @@ structure Type :> TYPE = struct
     fun resolve tenv params (TypeCons (name, tyargs)) =
         if name = Symbol.au "static-array" then
             resolveStaticArray tenv params tyargs
+        else if name = Symbol.auCffi "foreign-pointer" then
+            resolveForeignPointer tenv params tyargs
         else
             if Set.isIn params (TypeParam name) then
                 TypeVariable name
@@ -172,6 +174,11 @@ structure Type :> TYPE = struct
         StaticArray (resolve tenv params typespec, len)
       | resolveStaticArray _ _ _ =
         raise Fail "Bad static-array type specifier"
+
+    and resolveForeignPointer tenv params [typespec] =
+        ForeignPointer (resolve tenv params typespec)
+      | resolveForeignPointer _ _ _ =
+        raise Fail "Bad foreign-pointer type specifier"
 
     and replaceVariant m (Variant (name, SOME ty)) =
         Variant (name, SOME (replaceVars m ty))
