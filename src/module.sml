@@ -114,6 +114,8 @@ structure Module : MODULE = struct
                 "i16",
                 "u32",
                 "i32",
+                "u64",
+                "i64",
                 "f32",
                 "f64",
                 "static-array"
