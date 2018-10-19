@@ -31,6 +31,7 @@ signature ALPHA = sig
                  | Let of variable * ast * ast
                  | The of typespec * ast
                  | ForeignFuncall of string * typespec * ast list
+                 | SizeOf of typespec
                  | Operation of symbol * ast list
 
     type name = symbol
