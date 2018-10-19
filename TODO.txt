@@ -106,3 +106,4 @@ DONE:
 - better handling of type parameters throughout the codebase
 - Generic functions
 - Implement austral.ext.cffi:size-of
+- Handle foreign functions that return void in foreign-funcall
