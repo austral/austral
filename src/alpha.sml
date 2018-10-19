@@ -123,6 +123,8 @@ structure Alpha :> ALPHA = struct
         The (ty, alphaRename s exp)
       | alphaRename s (OAST.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map (alphaRename s) args)
+      | alphaRename s (OAST.SizeOf ty) =
+        SizeOf ty
       | alphaRename s (OAST.Operation (f, args)) =
         Operation (f, map (alphaRename s) args)
 
