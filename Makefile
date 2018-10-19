@@ -21,8 +21,8 @@ TEST_SRC := test/*.sml
 
 all: compile
 
-$(CPP_RUNTIME_ML): src/runtime.hpp $(CPP_RUNTIME_SCRIPT)
-	awk -f $(CPP_RUNTIME_SCRIPT) src/runtime.hpp > $(CPP_RUNTIME_ML)
+$(CPP_RUNTIME_ML): $(CPP_RUNTIME_SRC) $(CPP_RUNTIME_SCRIPT)
+	awk -f $(CPP_RUNTIME_SCRIPT) $(CPP_RUNTIME_SRC) > $(CPP_RUNTIME_ML)
 
 compile: $(SRC)
 	$(SML) $(SMLFLAGS) -m $(CM_FILE)
