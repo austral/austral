@@ -56,6 +56,7 @@ structure Cli :> CLI = struct
       | entrypoint args =
         let val files = getPosArgs args
             and output = getArg args "output"
+            and entrypoint = getArg args "entrypoint"
         in
             case files of
                 nil => die "No input files"
