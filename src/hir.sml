@@ -134,7 +134,16 @@ structure HIR :> HIR = struct
       | transform (TAst.The (ty, exp)) =
         Cast (ty, transform exp)
       | transform (TAst.ForeignFuncall (name, rt, args)) =
-        Cast (rt, Funcall (name, map transform args))
+        (* If the function return type is unit, we're calling a function that
+           returns void. In which case use a progn to first call the function,
+           and then return the bool constant false *)
+        let val call = Funcall (name, map transform args)
+        in
+            if rt = Type.Unit then
+                Progn [call, BoolConstant false]
+            else
+                Cast (rt, call)
+        end
       | transform (TAst.SizeOf ty) =
         SizeOf ty
       | transform (TAst.Progn exps) =
