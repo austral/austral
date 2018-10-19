@@ -1,4 +1,4 @@
-)SML := sml
+SML := sml
 SMLFLAGS := -Cprint.depth=30
 
 MLTON := mlton
