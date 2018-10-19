@@ -8,5 +8,5 @@
 
 (defun main () i32
   (let ((n 30))
-    (austral.ext.cffi:foreign-funcall "printf" i32 "fib(%i) = %i\n" n (fib n))
-    (the i32 0)))
+    (let ((bytes (austral.ext.cffi:foreign-funcall "printf" i32 "fib(%i) = %i" n (fib n))))
+      (the i32 0))))
