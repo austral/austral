@@ -201,10 +201,9 @@ structure MIR :> MIR = struct
       | transformExp (HIR.TupleCreate exps) =
         let val exps' = map transformExp exps
         in
-            let fun pairBlocks (b, _) = b
-                and pairExp (_, e) = e
+            let fun pairExp (_, e) = e
             in
-                (Progn (map pairBlocks exps'),
+                (Progn (prognBlocks exps'),
                  TupleCreate (map pairExp exps'))
             end
         end
