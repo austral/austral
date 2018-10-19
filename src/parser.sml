@@ -125,6 +125,11 @@ structure Parser :> PARSER = struct
 
     exception ParserException of string
 
+    fun succeedOrDie result =
+        case result of
+            (Success (r, _)) => r
+          | f => raise ParserException ("Bad parse: " ^ (explain f))
+
     fun parseString s =
         case (run sexpParser (ParsimonyStringInput.fromString s)) of
             (Success (r, _)) => r
