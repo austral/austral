@@ -8,4 +8,5 @@
 
 (defun main () i32
   (let ((pointer (foreign-funcall "malloc" (foreign-pointer i32) 4)))
+    (foreign-funcall "free" unit pointer)
     (the i32 0)))
