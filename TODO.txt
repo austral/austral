@@ -1,6 +1,5 @@
 TODO:
 
-- Add austral.ext.cffi:foreign-pointer type
 - Add Austral prelude file and script to embed it into a string
 - Implement austral.ext.cffi:malloc (generic function, prelude)
 - Implement austral.ext.cffi:free (generic function, prelude)
@@ -107,3 +106,4 @@ DONE:
 - Generic functions
 - Implement austral.ext.cffi:size-of
 - Handle foreign functions that return void in foreign-funcall
+- Add austral.ext.cffi:foreign-pointer type
