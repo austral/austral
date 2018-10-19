@@ -112,6 +112,8 @@ structure MIR :> MIR = struct
       | transformType (Type.Float Type.Double) = DoubleFloat
       | transformType (Type.Tuple tys) = Tuple (map transformType tys)
       | transformType (Type.Pointer ty) = Pointer (transformType ty)
+      | transformType (Type.ForeignPointer ty) =
+        Pointer (transformType ty)
       | transformType (Type.StaticArray (ty, idx)) = Array (transformType ty, idx)
       | transformType (Type.Disjunction (name, args, _)) = TypeCons (HIR.escapeSymbol name,
                                                                      map transformType args)
