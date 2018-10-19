@@ -89,8 +89,11 @@ structure OAST :> OAST = struct
                                                                            Type.parseTypespec rt,
                                                                            map transform args)
                | _ => raise Fail "Invalid `foreign-funcall` form")
+        else if f = Symbol.auCffi "size-of" then
+            transformSizeOf args
         else
             Operation (f, map transform args)
+
     and transformLet ((RCST.List [RCST.List [RCST.Symbol var, v]])::body) =
         (* A let with a single binding *)
         Let (var, transform v, Operation (au "progn", map transform body))
@@ -107,6 +110,11 @@ structure OAST :> OAST = struct
         (* A let with no bindings *)
         Operation (au "progn", map transform body)
       | transformLet _ = raise Fail "Invalid let form"
+
+    and transformSizeOf [tys] =
+        SizeOf (Type.parseTypespec tys)
+      | transformSizeOf _ =
+        raise Fail "Bad `size-of` form"
 
     (* Parse toplevel forms into the toplevel AST *)
 
