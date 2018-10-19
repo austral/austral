@@ -1,4 +1,4 @@
-SML := sml
+)SML := sml
 SMLFLAGS := -Cprint.depth=30
 
 MLTON := mlton
@@ -46,3 +46,4 @@ clean:
 	if [ -f $(TEST_BIN) ]; then rm $(TEST_BIN); fi
 	if [ -f $(TEST_BIN) ]; then rm $(CPP_RUNTIME_ML); fi
 	rm test/valid/*.cpp
+	rm test/valid/*.bin
