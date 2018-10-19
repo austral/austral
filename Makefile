@@ -42,5 +42,5 @@ mlton-test: $(TEST_BIN)
 clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(TEST_BIN) ]; then rm $(TEST_BIN); fi
-	rm $(CPP_RUNTIME_ML)
+	if [ -f $(TEST_BIN) ]; then rm $(CPP_RUNTIME_ML); fi
 	rm test/valid/*.cpp
