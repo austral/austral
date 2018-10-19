@@ -60,7 +60,7 @@ structure CppAst :> CPP_AST = struct
                        | Assign of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
                        | While of exp_ast * block_ast
-                       | VoidFuncall of string * exp_ast list
+                       | StandaloneExp of exp_ast
 
     datatype top_ast = FunctionDef of string * typaram list * param list * ty * block_ast * exp_ast
                      | TypeDef of string * typaram list * ty
@@ -201,8 +201,9 @@ structure CppAst :> CPP_AST = struct
         end
       | renderBlock' d (While (t, b)) =
         (pad d) ^ "while (" ^ (renderExp t) ^ ") {\n" ^ (renderBlock' (indent d) b) ^ "\n" ^ (pad d) ^ "}"
-      | renderBlock' d (VoidFuncall (f, args)) =
-        (pad d) ^ f ^ "(" ^ (commaSep (map renderExp args)) ^ ");"
+      | renderBlock' d (StandaloneExp e) =
+        (pad d) ^ (renderExp e) ^ ";"
+
     and renderRes (SOME res) = (res) ^ " = "
       | renderRes NONE = ""
 

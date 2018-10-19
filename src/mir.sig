@@ -64,6 +64,7 @@ signature MIR = sig
                        | Assign of exp_ast * exp_ast
                        | Store of exp_ast * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
+                       | StandaloneExp of exp_ast
 
     type typaram = name
 
