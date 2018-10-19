@@ -18,6 +18,8 @@
 *)
 
 signature PARSER = sig
+    val parseQualifiedSymbol : string -> Symbol.symbol
+
     val parseString : string -> CST.cst
     val parseFile : string -> CST.cst list
 end
