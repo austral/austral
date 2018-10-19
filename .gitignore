@@ -3,3 +3,4 @@ boreal
 boreal-test
 src/cpp-runtime.sml
 test/valid/*.cpp
+test/valid/*.bin
