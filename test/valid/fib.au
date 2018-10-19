@@ -5,3 +5,8 @@
       n
       (+ (fib (- n 1))
          (fib (- n 2)))))
+
+(defun main () i32
+  (let ((n 30))
+    (austral.ext.cffi:foreign-funcall "printf" i32 "fib(%i) = %i\n" n (fib n))
+    (the i32 0)))
