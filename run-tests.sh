@@ -32,3 +32,7 @@ clang++ -shared -fPIC -std=c++11 test/valid/hello-world.cpp
 echo "generic.au"
 ./boreal test/valid/generic.au --output=test/valid/generic.cpp
 clang++ -shared -fPIC -std=c++11 test/valid/generic.cpp
+
+echo "size-of.au"
+./boreal test/valid/size-of.au --output=test/valid/size-of.cpp
+clang++ -shared -fPIC -std=c++11 test/valid/size-of.cpp
