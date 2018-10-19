@@ -75,7 +75,7 @@ structure Cli :> CLI = struct
                                   SOME name => Compiler.compileEntrypoint c' name
                                 | NONE => c'
                 in
-                    Util.writeStringToFile output (Compiler.compilerCode c')
+                    Util.writeStringToFile output (Compiler.compilerCode c'')
                 end
             end
         end
