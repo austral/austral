@@ -75,7 +75,7 @@ structure Parser :> PARSER = struct
 
     val unqualifiedSymbolParser = pmap CST.UnqualifiedSymbol symbolNameParser
 
-    val qualifiedSymbolParser = pmap (CST.QualifiedSymbol o Symbol.mkSymbol)
+    val qualifiedSymbolParser = pmap Symbol.mkSymbol
                                      (seq symbolNameParser
                                           (seqR (pchar #":") symbolNameParser))
 
@@ -99,7 +99,7 @@ structure Parser :> PARSER = struct
         seqR ws (choice [floatParser,
                          integerParser,
                          quotedString,
-                         qualifiedSymbolParser,
+                         pmap QualifiedSymbol qualifiedSymbolParser,
                          keywordParser,
                          unqualifiedSymbolParser,
                          listParser,
