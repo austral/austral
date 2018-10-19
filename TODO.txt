@@ -12,8 +12,6 @@ TODO:
 
 LONG-TERM TODO:
 
-- Implement austral.ext.cffi:free
-
 - Static array constructors
 - Add support for an --entrypoint flag to define the main() function
 
