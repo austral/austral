@@ -1,7 +1,7 @@
 TODO:
 
 - Add Austral prelude file and script to embed it into a string
-- Implement size-of
+- Implement austral.ext.cffi:size-of
 - Implement austral.ext.cffi:malloc (generic function, prelude)
 - Implement austral.ext.cffi:free (generic function, prelude)
 - Implement austral.ext.cffi:null-pointer (built-in)
