@@ -38,7 +38,7 @@ signature TAST = sig
                  | ForeignFuncall of string * ty * ast list
                  | SizeOf of ty
                  | Seq of ast * ast
-                 | Funcall of Symbol.symbol * ast list * ty
+                 | Funcall of Symbol.symbol * ty list * ast list * ty
 
     type name = Symbol.symbol
     type param_name = name
