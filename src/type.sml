@@ -55,7 +55,7 @@ structure Type :> TYPE = struct
         Set.union (Set.unionList (map tyVars tys))
                   (Set.unionList (map variantVars variants))
       | tyVars (TypeVariable name) =
-        TypeParam name
+        Set.singleton (TypeParam name)
 
     and variantVars (Variant (_, SOME ty)) =
         tyVars ty
