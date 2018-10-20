@@ -1,6 +1,7 @@
 TODO:
 
 - Replace progns with seqs
+- Fully linearize the intermediate representation early on
 - Use `the` only to verify types match
 - Define an integer-cast thing to cast integers or some such
 - Count appearances of type variables in types
