@@ -1,6 +1,5 @@
 TODO:
 
-- Define an integer-cast thing to cast integers or some such
 - Count appearances of type variables in types
 - Predicate to determine if a function is return-type polymorphic
 - Add Austral prelude file and script to embed it into a string
@@ -23,6 +22,9 @@ LONG-TERM TODO:
 - Better error messages
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
+
+
+- Define an integer-cast thing to cast integers or some such
 
 - Parse deftemplate declarations
 - handle defmacro declarations
