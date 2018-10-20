@@ -43,10 +43,13 @@ structure Function :> FUNCTION = struct
          and method_def = MethodDef of name * param list * ty * docstring
 
     fun isRTP (GenericFunction (_, _, params, rt, _)) =
-        let val argVars = Set.unionList (map (fn (Param (name, ty)) => Type.tyVars ty) params)
+        let val paramVars = Set.unionList (map (fn (Param (name, ty)) => Type.tyVars ty) params)
             and rtVars = Type.tyVars rt
         in
-            false
+            (* The set difference of the paramVars and the rtVars is the set of
+               all type variables that are in the rtVars but not in the
+               paramVars. If this set is non-empty, return true. *)
+            (Set.size (Set.difference paramVars rtVars)) > 0
         end
 
     datatype fenv = FunctionEnv of (name, func) Map.map
