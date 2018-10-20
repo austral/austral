@@ -47,4 +47,7 @@ structure Map :> MAP = struct
         Set.fromList (map (fn (k, v) => k) l)
 
     fun fromList l = iaddList empty l
+
+    fun mergeMaps (Map a) (Map b) =
+        Map (a @ b)
 end
