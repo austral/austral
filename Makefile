@@ -57,3 +57,4 @@ clean:
 	if [ -f $(TEST_BIN) ]; then rm $(CPP_RUNTIME_ML); fi
 	rm test/valid/*.cpp
 	rm test/valid/*.bin
+	rm $(DOCS_SRC)
