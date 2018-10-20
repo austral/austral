@@ -265,15 +265,12 @@ structure TAst :> TAST = struct
         and augmentFuncall (Function.CallableFunc f) args c =
             augmentConcreteFuncall f args c
           | augmentFuncall (Function.CallableGFunc gf) args c =
-            let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
-            in
-                if Function.isRTP gf then
-                    raise Fail ("Error in call to function "
-                                ^ (Symbol.toString name)
-                                ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
-                else
-                    augmentGenericFuncall name params args rt c
-            end
+            if Function.isRTP gf then
+                raise Fail ("Error in call to function "
+                            ^ (Symbol.toString name)
+                            ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
+            else
+                augmentGenericFuncall gf args c
           | augmentFuncall Function.CallableMethod args c =
             augmentMethodCall args c
 
@@ -285,7 +282,7 @@ structure TAst :> TAST = struct
             else
                 raise Fail "Funcall arity error"
 
-        and augmentGenericFuncall name params args rt c =
+        and augmentGenericFuncall (Function.GenericFunction (name, typarams, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
                 Funcall (name,
                          ListPair.map (augmentParam c) (params, args),
