@@ -269,6 +269,8 @@ structure TAst :> TAST = struct
                          rt)
             else
                 raise Fail "Funcall arity error"
+          | augmentFuncall (Function.CallableGFunc (Function.GenericFunction (name, typarams, params, rt, _))) args c =
+            raise Fail "generic function calls not implemented yet"
           | augmentFuncall Function.CallableMethod args c =
             raise Fail "method calls not implemented yet"
 
