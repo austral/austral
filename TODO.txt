@@ -5,6 +5,7 @@ TODO:
 - Implement austral.ext.cffi:null? (generic function, prelude)
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
+- `the` for float constants
 
 LONG-TERM TODO:
 
