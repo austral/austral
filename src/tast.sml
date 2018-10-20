@@ -262,7 +262,7 @@ structure TAst :> TAST = struct
                       | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
             end
 
-        and augmentFuncall (Function.CallableFunc f) args c =
+        and augmentFuncall (Function.CallableFunc f) args c _ =
             augmentConcreteFuncall f args c
           | augmentFuncall (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
