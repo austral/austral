@@ -40,10 +40,10 @@ structure Set :> SET = struct
                             empty
                             l
 
-  fun difference b a =
-      List.filter (fn belem => not (exists a belem)) b
-
     fun isIn set elem = Util.member elem set
+
+    fun difference b a =
+        List.filter (fn belem => not (isIn a belem)) b
 
     fun size set = List.length set
 
