@@ -69,9 +69,7 @@ structure TypeMatch = struct
          | (Failure f) => Failure f)
     | matchType (Disjunction (n, args, _)) (Disjunction (n', args', _)) =
       if n = n' then
-          case matchType t t' of
-              (Bindings l) => Bindings l
-            | (Failure f) => Failure f
+          matchTypeLists args args'
       else
           Failure "Disjunction names don't match"
     | matchType (TypeVariable n) t =
