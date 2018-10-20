@@ -29,6 +29,8 @@ signature SET = sig
     val union : ''a set -> ''a set -> ''a set
     val unionList : ''a set list -> ''a set
 
+    val difference : ''a set -> ''a set -> ''a set
+
     val isIn : ''a set -> ''a -> bool
     val size : ''a set -> int
 
