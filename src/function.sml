@@ -149,6 +149,8 @@ structure Function :> FUNCTION = struct
         in
             case Map.get funs name of
                 SOME f => SOME (CallableFunc f)
-              | NONE => NONE
+              | NONE => case Map.get gfuncs name of
+                            SOME gf => SOME (CallableGFunc gf)
+                          | NONE => NONE
         end
 end
