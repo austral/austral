@@ -4,7 +4,8 @@
   (:import-from :austral.ext.cffi
                 :foreign-funcall
                 :foreign-pointer
-                :malloc))
+                :malloc
+                :free))
 (in-module :cffi-test)
 
 (defun main () i32
@@ -12,6 +13,6 @@
   (let ((pointer (foreign-funcall "malloc" (foreign-pointer i32) 4)))
     (foreign-funcall "free" unit pointer))
   ;; Use built-in methods
-  (let ((pointer (malloc 4)))
-    )
+  (let ((pointer (the (foreign-pointer i32) (malloc 4))))
+    (free pointer))
   (the i32 0))
