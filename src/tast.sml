@@ -96,7 +96,7 @@ structure TAst :> TAST = struct
           | typeOf (SizeOf _) =
             Integer (Unsigned, Int64)
           | typeOf (ForeignFuncall (_, rt, _)) = rt
-          | typeOf (Progn (x::xs)) = typeOf (List.last (x::xs))
+          | typeOf (Seq (_, v)) = typeOf v
           | typeOf (Progn nil) = Unit
           | typeOf (Funcall (_, _, t)) = t
     end
