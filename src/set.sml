@@ -40,8 +40,8 @@ structure Set :> SET = struct
                             empty
                             l
 
-  fun difference (Set blist) a =
-      List.filter (fn belem => not (exists a belem)) blist
+  fun difference b a =
+      List.filter (fn belem => not (exists a belem)) b
 
     fun isIn set elem = Util.member elem set
 
