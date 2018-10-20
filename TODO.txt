@@ -1,7 +1,5 @@
 TODO:
 
-- Fix that bug where function calls in progns arent made for some reason (wrap
-  every funcall in a let? how does that infere with linearity?)
 - Use `the` only to verify types match
 - Define an integer-cast thing to cast integers or some such
 - Count appearances of type variables in types
@@ -113,3 +111,4 @@ DONE:
 - Add austral.ext.cffi:foreign-pointer type
 - Fix function calls being thrown out in the all-but-last body of progn (MIR, HIR)
 - Fix escaped strings
+- Fix that bug where function calls in progns arent made for some reason
