@@ -22,6 +22,8 @@ structure Prelude :> PRELUDE = struct
         "(in-module :austral)",
         "(defgeneric austral.ext.cffi:malloc (tau) ((size u64)) (austral.ext.cffi:foreign-pointer tau)\
         \  (austral.ext.cffi:foreign-funcall \"malloc\" (austral.ext.cffi:foreign-pointer tau) size))",
+        "(defgeneric austral.ext.cffi:free (tau) ((pointer (austral.ext.cffi:foreign-pointer tau))) unit\
+        \  (austral.ext.cffi:foreign-funcall \"free\" unit pointer))",
         "(in-module :austral-user)"
     ]
 end
