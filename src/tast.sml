@@ -292,6 +292,7 @@ structure TAst :> TAST = struct
         and augmentGenericFuncall (Function.GenericFunction (name, typarams, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
                 Funcall (name,
+                         [], (* We don't need to supply type parameters for non-RTP functions *)
                          ListPair.map (augmentParam c) (params, args),
                          rt)
             else
