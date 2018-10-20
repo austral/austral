@@ -18,4 +18,7 @@
 *)
 
 structure Prelude :> PRELUDE = struct
+    val prelude = [
+        "(in-module :austral)"
+    ]
 end
