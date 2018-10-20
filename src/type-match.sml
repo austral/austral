@@ -49,9 +49,7 @@ structure TypeMatch = struct
       else
           Failure "float subtypes dont match"
     | matchType (Tuple tys) (Tuple tys') =
-      List.foldl (fn (a, b) => mergeBindings a b)
-                 emptyBindings
-                 (ListPair.map (fn (a, b) => matchType a b) (tys, tys'))
+      matchTypeList tys tys'
     | matchType (Pointer t) (Pointer t') =
       (case matchType t t' of
            (Bindings l) => Bindings l
@@ -67,8 +65,20 @@ structure TypeMatch = struct
                            else
                                Failure "Static array length doesn't match"
          | (Failure f) => Failure f)
+    | matchType (Disjunction (n, args, _)) (Disjunction (n', args', _)) =
+      if n = n' then
+          case matchType t t' of
+              (Bindings l) => Bindings l
+            | (Failure f) => Failure f
+      else
+          Failure "Disjunction names don't match"
     | matchType (TypeVariable n) t =
       Bindings [Bind (n, t)]
     | matchType _ _ =
       Failure "NOT IMPLEMENTED"
+
+  and matchTypeLists tys tys' =
+      List.foldl (fn (a, b) => mergeBindings a b)
+                 emptyBindings
+                 (ListPair.map (fn (a, b) => matchType a b) (tys, tys'))
 end
