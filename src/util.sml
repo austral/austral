@@ -61,10 +61,10 @@ structure Util :> UTIL = struct
             ListPair.map f (list, indices)
         end
 
-    fun butlast (first::second::rest) =
-        first :: second :: (butlast rest)
-      | butlast (x::nil) =
+    fun butlast (x::nil) =
         nil
+      | butlast (first::rest) =
+        first :: (butlast rest)
       | butlast nil =
         raise Fail "butlast called with an empty list"
 
