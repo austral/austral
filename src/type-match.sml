@@ -31,7 +31,19 @@ structure TypeMatch = struct
           and bsKeys' = Map.keys bs'
       in
           (* Ensure the bindings don't have conflicting elements! *)
-          Bindings (l @ l')
+          let val common = Set.intersection bsKeys bsKeys'
+          in
+              if List.all (fn key =>
+                              let val a = Option.valOf (Map.get bs key)
+                                  and b = Option.valOf (Map.get bs' key)
+                              in
+                                  a = b
+                              end)
+                          (Set.toList common) then
+                  Bindings (Map.mergeMaps bs bs')
+              else
+                  Failure "Conflicting type variables"
+          end
       end
     | mergeBindings (Bindings _) (Failure f) =
       Failure f
