@@ -249,6 +249,9 @@ structure TAst :> TAST = struct
             Seq (augment a c,
                  augment b c)
           | augment (AST.Funcall (name, args)) c =
+            augmentFuncall name args c NONE
+
+        and augmentFuncall name args c the_context =
             let val fenv = ctxFenv c
                 and auKer = Symbol.auKer
             in
@@ -258,13 +261,13 @@ structure TAst :> TAST = struct
                              Bool)
                 else
                     case Function.envGet fenv name of
-                        SOME f => augmentFuncall f args c NONE
+                        SOME f => augmentCallable f args c the_context
                       | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
             end
 
-        and augmentFuncall (Function.CallableFunc f) args c _ =
+        and augmentCallable (Function.CallableFunc f) args c _ =
             augmentConcreteFuncall f args c
-          | augmentFuncall (Function.CallableGFunc gf) args c the_context =
+          | augmentCallable (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
                 case the_context of
                     SOME ty => raise Fail "not implemented yet"
@@ -273,7 +276,7 @@ structure TAst :> TAST = struct
                                         ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
             else
                 augmentGenericFuncall gf args c
-          | augmentFuncall Function.CallableMethod args c _ =
+          | augmentCallable Function.CallableMethod args c _ =
             augmentMethodCall args c
 
         and augmentConcreteFuncall (Function.Function (name, params, rt, _)) args c =
