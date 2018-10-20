@@ -259,6 +259,9 @@ structure MIR :> MIR = struct
             end
         end
 
+    and prognBlocks args =
+        map (fn (b, _) => b) args
+
     fun transformTop (HIR.Defun (name, params, ty, body)) =
         let val (bodyBlock, bodyExp) = transformExp body
         in
