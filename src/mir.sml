@@ -259,23 +259,6 @@ structure MIR :> MIR = struct
             end
         end
 
-    and prognBlocks args =
-        if List.length args = 0 then
-            []
-        else
-            (map (fn (b, e) =>
-                     (* If the expression is a function call, we want to render it
-                        as a standalone expression to ensure it is executed for its
-                        side-effects. Otherwise just render the block
-                      *)
-                     case e of
-                         (Funcall _) => Progn [b, StandaloneExp e]
-                       (* FIXME: the line below is dumb. what other cases am i missing?: *)
-                       | (Cast (ty, Funcall f)) => Progn [b, StandaloneExp (Cast (ty, Funcall f))]
-                       | _ => b)
-                 (Util.butlast args))
-            @ [(fn (b, _) => b) (List.last args)]
-
     fun transformTop (HIR.Defun (name, params, ty, body)) =
         let val (bodyBlock, bodyExp) = transformExp body
         in
