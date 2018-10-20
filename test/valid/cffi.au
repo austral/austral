@@ -13,6 +13,6 @@
   (let ((pointer (foreign-funcall "malloc" (foreign-pointer i32) 4)))
     (foreign-funcall "free" unit pointer))
   ;; Use built-in methods
-  (let ((pointer (the (foreign-pointer i32) (malloc 4))))
+  (let ((pointer (the (foreign-pointer i32) (malloc (the u64 4)))))
     (free pointer))
   (the i32 0))
