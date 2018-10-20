@@ -1,8 +1,5 @@
 TODO:
 
-- Bind standalone expressions to unused variables to suppress warnings
-- Warn when not using the result value of a progn (any expression with type other than unit)
-- Fully linearize the intermediate representation early on
 - Use `the` only to verify types match
 - Define an integer-cast thing to cast integers or some such
 - Count appearances of type variables in types
@@ -48,6 +45,9 @@ LONG-TERM TODO:
 - Implement static-array constructor
 - Lift static array constructors to global constants
 - Verify if an expression is a valid static array element
+- Bind standalone expressions to unused variables to suppress warnings
+- Warn when not using the result value of a progn (any expression with type other than unit)
+- Fully linearize the intermediate representation early on
 
 DONE:
 
