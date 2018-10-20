@@ -57,5 +57,9 @@ structure CST : CST = struct
         String.concat (map unescapeChar (String.explode s))
 
     and unescapeChar #"\n" = "\\n"
+      | unescapeChar #"\r" = "\\r"
+      | unescapeChar #"\t" = "\\t"
+      | unescapeChar #"\"" = "\\\""
+      | unescapeChar #"\\" = "\\\\"
       | unescapeChar c = String.str c
 end
