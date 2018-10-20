@@ -269,8 +269,14 @@ structure TAst :> TAST = struct
                          rt)
             else
                 raise Fail "Funcall arity error"
-          | augmentFuncall (Function.CallableGFunc (Function.GenericFunction (name, typarams, params, rt, _))) args c =
-            raise Fail "generic function calls not implemented yet"
+          | augmentFuncall (Function.CallableGFunc gf) args c =
+            if Function.isRTP gf then
+                raise Fail "Generic functions that are return-type polymorphic must be called in the context of a `the` form."
+            else
+                let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
+                in
+                    raise Fail "generic function calls not implemented yet"
+                end
           | augmentFuncall Function.CallableMethod args c =
             raise Fail "method calls not implemented yet"
 
