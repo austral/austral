@@ -266,9 +266,11 @@ structure TAst :> TAST = struct
             augmentConcreteFuncall f args c
           | augmentFuncall (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
-                raise Fail ("Error in call to function "
-                            ^ (Symbol.toString (Function.gFunctionName gf))
-                            ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
+                case the_context of
+                    SOME ty => raise Fail "not implemented yet"
+                  | NONE => raise Fail ("Error in call to function "
+                                        ^ (Symbol.toString (Function.gFunctionName gf))
+                                        ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
             else
                 augmentGenericFuncall gf args c
           | augmentFuncall Function.CallableMethod args c _ =
