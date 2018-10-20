@@ -31,6 +31,16 @@ structure Set :> SET = struct
         else
             elem :: set
 
+    fun addList set (x::xs) = add (addList set xs) x
+      | addList set nil = set
+
+    fun union a b = addList (addList empty a) b
+
+    fun unionList l = foldl (fn (a, b) => union a b)
+                            empty
+                            l
+
+
     fun isIn set elem = Util.member elem set
 
     fun size set = List.length set
