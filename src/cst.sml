@@ -56,7 +56,7 @@ structure CST : CST = struct
     fun escapedToString (EscapedString s) =
         s
 
-    fun unscapeString (EscapedString s) =
+    fun unescapeString (EscapedString s) =
         String.concat (map unescapeChar (String.explode s))
 
     and unescapeChar #"\n" = "\\n"
