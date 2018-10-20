@@ -230,6 +230,7 @@ structure TAst :> TAST = struct
                                                    The (ty, exp')
                                                else
                                                    raise Fail "Bad types for `the`"
+                      | (AST.Funcall (name, args)) => augmentFuncall name args c (SOME ty)
                       | e => if ty = typeOf exp' then
                                  The (ty, exp')
                              else
