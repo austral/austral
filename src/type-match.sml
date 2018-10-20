@@ -60,6 +60,13 @@ structure TypeMatch = struct
       (case matchType t t' of
            (Bindings l) => Bindings l
          | (Failure f) => Failure f)
+    | matchType (StaticArray (t, l)) (StaticArray (t', l')) =
+      (case matchType t t' of
+           (Bindings l) => if l = l' then
+                               Bindings l
+                           else
+                               Failure "Static array length doesn't match"
+         | (Failure f) => Failure f)
     | matchType _ _ =
       Failure "NOT IMPLEMENTED"
 end
