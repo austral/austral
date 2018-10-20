@@ -36,6 +36,8 @@ signature FUNCTION = sig
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
 
+    val isRTP : gfunc -> bool
+
     type fenv
 
     val defaultFenv : fenv
