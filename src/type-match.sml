@@ -75,7 +75,7 @@ structure TypeMatch = struct
     | matchType (TypeVariable n) t =
       Bindings [Bind (n, t)]
     | matchType _ _ =
-      Failure "NOT IMPLEMENTED"
+      Failure "Type mismatch"
 
   and matchTypeLists tys tys' =
       List.foldl (fn (a, b) => mergeBindings a b)
