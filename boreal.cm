@@ -44,6 +44,9 @@ is
   src/type.sig
   src/type.sml
 
+  src/type-match.sig
+  src/type-match.sml
+
   src/function.sig
   src/function.sml
 
