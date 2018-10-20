@@ -267,7 +267,7 @@ structure TAst :> TAST = struct
           | augmentFuncall (Function.CallableGFunc gf) args c =
             if Function.isRTP gf then
                 raise Fail ("Error in call to function "
-                            ^ (Symbol.toString (Function.gFunctionName name))
+                            ^ (Symbol.toString (Function.gFunctionName gf))
                             ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
             else
                 augmentGenericFuncall gf args c
