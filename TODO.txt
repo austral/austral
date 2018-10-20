@@ -23,7 +23,7 @@ LONG-TERM TODO:
 - Parse nested comments
 - Show symbol names in error messages
 - Better error messages
-- Linearity
+- Linearity: extract all bindings out of an expression
 
 - Parse deftemplate declarations
 - handle defmacro declarations
