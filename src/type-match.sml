@@ -40,7 +40,7 @@ structure TypeMatch = struct
     | matchType Unit Unit = emptyBindings
     | matchType (Integer (s, w)) (Integer (s', w')) =
       if (s = s') andalso (w = w') then
-          emptyAssign
+          emptyBindings
       else
           Failure "int subtypes dont match"
     | matchType (Float f) (Float f') =
