@@ -46,10 +46,10 @@ structure Function :> FUNCTION = struct
         let val paramVars = Set.unionList (map (fn (Param (name, ty)) => Type.tyVars ty) params)
             and rtVars = Type.tyVars rt
         in
-            (* The set difference of the paramVars and the rtVars is the set of
+            (* The set difference of the rtVars and paramVars is the set of
                all type variables that are in the rtVars but not in the
                paramVars. If this set is non-empty, return true. *)
-            (Set.size (Set.difference paramVars rtVars)) > 0
+            (Set.size (Set.difference rtVars paramVars)) > 0
         end
 
     datatype fenv = FunctionEnv of (name, func) Map.map
