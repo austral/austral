@@ -31,4 +31,5 @@ signature CST = sig
 
     val escapeString : string -> escaped_string
     val escapedToString : escaped_string -> string
+    val unescapeString : escape_string -> string
 end
