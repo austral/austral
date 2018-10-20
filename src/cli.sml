@@ -66,7 +66,7 @@ structure Cli :> CLI = struct
         end
 
     and compileFiles files output entrypoint =
-        let val compiler = Compiler.emptyCompiler
+        let val compiler = Compiler.compilePrelude Compiler.emptyCompiler
             and units = map (fn f => Compiler.FileUnit f) files
         in
             let val c' = Compiler.compileUnits compiler units
