@@ -55,6 +55,6 @@ clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(TEST_BIN) ]; then rm $(TEST_BIN); fi
 	if [ -f $(CPP_RUNTIME_ML) ]; then rm $(CPP_RUNTIME_ML); fi
+	if [ -f $(DOCS_HTML) ]; then rm $(DOCS_HTML); fi
 	rm test/valid/*.cpp
 	rm test/valid/*.bin
-	if [ -f $(DOCS_SRC) ]; then rm $(DOCS_SRC); fi
