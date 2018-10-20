@@ -45,7 +45,7 @@ structure TypeMatch = struct
           Failure "int subtypes dont match"
     | matchType (Float f) (Float f') =
       if f = f' then
-          emptyAssign
+          emptyBindings
       else
           Failure "float subtypes dont match"
     | matchType (Tuple tys) (Tuple tys') =
