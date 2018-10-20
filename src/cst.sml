@@ -53,7 +53,8 @@ structure CST : CST = struct
       | consumeWhitespace (#"\\" :: rest) = rest
       | consumeWhitespace _ = raise Fail "Bad whitespace escape sequence"
 
-
+    fun escapedToString (EscapedString s) =
+        s
 
     fun unscapeString (EscapedString s) =
         String.concat (map unescapeChar (String.explode s))
