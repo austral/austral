@@ -32,8 +32,9 @@ echo "hello-world.au"
 clang++ -shared -fPIC -std=c++11 test/valid/hello-world.cpp
 
 echo "generic.au"
-./boreal test/valid/generic.au --output=test/valid/generic.cpp
-clang++ -shared -fPIC -std=c++11 test/valid/generic.cpp
+./boreal test/valid/generic.au --output=test/valid/generic.cpp --entrypoint=austral-user:main
+clang++ -std=c++11 test/valid/generic.cpp -o test/valid/generic.bin
+./test/valid/generic.bin
 
 echo "size-of.au"
 ./boreal test/valid/size-of.au --output=test/valid/size-of.cpp
