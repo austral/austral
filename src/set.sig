@@ -29,7 +29,7 @@ signature SET = sig
     val union : ''a set -> ''a set -> ''a set
     val unionList : ''a set list -> ''a set
 
-    (* All elements in B but not in A *)
+    (* All elements in the first argument, but not in the second argument *)
     val difference : ''a set -> ''a set -> ''a set
 
     val isIn : ''a set -> ''a -> bool

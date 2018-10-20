@@ -42,6 +42,7 @@ structure Set :> SET = struct
 
     fun isIn set elem = Util.member elem set
 
+    (* All elements in B but not in A *)
     fun difference b a =
         List.filter (fn belem => not (isIn a belem)) b
 
