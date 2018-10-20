@@ -1,6 +1,5 @@
 TODO:
 
-- Call RTP generic functions in a `the` context
 - Implement austral.ext.cffi:null-pointer (built-in)
 - Implement austral.ext.cffi:null? (generic function, prelude)
 - Implement static-array-index
@@ -19,7 +18,6 @@ LONG-TERM TODO:
 - Better error messages
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
-
 
 - Define an integer-cast thing to cast integers or some such
 
@@ -122,3 +120,4 @@ DONE:
 - Find the set of type variables in a type
 - Predicate to determine if a function is return-type polymorphic
 - Call non-RTP generic functions
+- Call RTP generic functions in a `the` context
