@@ -36,6 +36,10 @@ signature FUNCTION = sig
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
 
+    (* Return whether a function is return type-polymorphic or not. That is, if
+       there are type variables in the return type that do not appear in the
+       argument list (and thus, cannot be resolved in a context-independent
+       manner without type-inference), return true. *)
     val isRTP : gfunc -> bool
 
     type fenv
