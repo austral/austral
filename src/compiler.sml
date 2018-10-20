@@ -254,6 +254,9 @@ structure Compiler : COMPILER = struct
       | compileUnits c nil =
         c
 
+    fun compilePrelude c =
+        compileUnits c (map ReplUnit Prelude.prelude)
+
     fun compileEntrypoint c name =
         let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
             and sym = Parser.parseQualifiedSymbol name
