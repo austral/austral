@@ -45,6 +45,14 @@ structure Set :> SET = struct
                             empty
                             l
 
+    fun intersection a b =
+        let val a' = List.filter (fn elem => isIn a elem) b
+            and b' = List.filter (fn elem => isIn b elem) a
+        in
+            union a' b'
+        end
+
+
     (* All elements in B but not in A *)
     fun difference b a =
         List.filter (fn belem => not (isIn a belem)) b
