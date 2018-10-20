@@ -26,6 +26,8 @@ signature SET = sig
     val add : ''a set -> ''a -> ''a set
     val addList : ''a set -> ''a list -> ''a set
 
+    val eq : ''a set -> ''a set -> bool
+
     val union : ''a set -> ''a set -> ''a set
     val unionList : ''a set list -> ''a set
 
