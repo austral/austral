@@ -61,6 +61,13 @@ structure Util :> UTIL = struct
             ListPair.map f (list, indices)
         end
 
+    fun butlast (first::second::rest) =
+        first :: second :: (butlast rest)
+      | butlast (x::nil) =
+        nil
+      | butlast nil =
+        raise Fail "butlast called with an empty list"
+
     type prefix = string
 
     fun afterPrefix string prefix =
