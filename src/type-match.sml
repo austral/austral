@@ -27,7 +27,12 @@ structure TypeMatch = struct
       Bindings Map.empty
 
   fun mergeBindings (Bindings bs) (Bindings bs') =
-      Bindings (l @ l')
+      let val bsKeys = Map.keys bs
+          and bsKeys' = Map.keys bs'
+      in
+          (* Ensure the bindings don't have conflicting elements! *)
+          Bindings (l @ l')
+      end
     | mergeBindings (Bindings _) (Failure f) =
       Failure f
     | mergeBindings (Failure f) (Bindings _) =
