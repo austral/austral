@@ -1,6 +1,5 @@
 TODO:
 
-- Replace progns with seqs
 - Fully linearize the intermediate representation early on
 - Use `the` only to verify types match
 - Define an integer-cast thing to cast integers or some such
@@ -115,3 +114,4 @@ DONE:
 - Fix function calls being thrown out in the all-but-last body of progn (MIR, HIR)
 - Fix escaped strings
 - Fix that bug where function calls in progns arent made for some reason
+- Replace progns with seqs
