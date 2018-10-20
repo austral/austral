@@ -234,8 +234,9 @@ structure TAst :> TAST = struct
                                 resolve tenv (ctxTyParams c) typespec,
                                 map (fn a => augment a c) args)
             end
-          | augment (AST.Progn exps) c =
-            Progn (map (fn a => augment a c) exps)
+          | augment (AST.Seq (a, b)) c =
+            Seq (augment a c,
+                 augment b c)
           | augment (AST.Funcall (name, args)) c =
             let val fenv = ctxFenv c
                 and auKer = Symbol.auKer
