@@ -18,7 +18,9 @@
 *)
 
 structure TypeMatch = struct
-  datatype binding = Bind of Symbol.symbol * Type.ty
+  open Type
+
+  datatype binding = Bind of Symbol.symbol * ty
 
   datatype bindings = Bindings of binding list
                     | Failure of string
