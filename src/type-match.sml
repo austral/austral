@@ -24,4 +24,17 @@ structure TypeMatch = struct
 
   datatype bindings = Bindings of binding list
                     | Failure of string
+
+  val emptyBindings = Bindings []
+
+  fun mergeBindings (Bindings l) (Bindings l') =
+      Bindings (l @ l')
+    | mergeBindings (Bindings _) (Failure f) =
+      Failure f
+    | mergeBindings (Failure f) (Bindings _) =
+      Failure f
+    | mergeBindings (Failure f) (Failure f') =
+      Failure f
+
+
 end
