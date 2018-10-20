@@ -263,7 +263,7 @@ structure TAst :> TAST = struct
             end
 
         and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args c =
-            augentConcreteFuncall name params args rt c
+            augmentConcreteFuncall name params args rt c
           | augmentFuncall (Function.CallableGFunc gf) args c =
             let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
             in
