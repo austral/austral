@@ -18,4 +18,5 @@
 *)
 
 structure TypeMatch = struct
+  datatype binding = Bind of Symbol.symbol * Type.ty
 end
