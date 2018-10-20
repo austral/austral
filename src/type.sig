@@ -40,6 +40,8 @@ signature TYPE = sig
     val isInteger : ty -> bool
     val isFloat : ty -> bool
 
+    val tyVars : ty -> param Set.set
+
     datatype typespec = TypeCons of name * (typespec list)
                       | TyIntArg of int
 
