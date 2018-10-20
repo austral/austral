@@ -274,7 +274,16 @@ structure TAst :> TAST = struct
           | augmentCallable (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
                 case the_context of
-                    SOME ty => raise Fail "not implemented yet"
+                    SOME ty => let val (Function.GenericFunction (name, typarams, params, rt, _))
+                               in
+                                   if (List.length params) = (List.length args) then
+                                       Funcall (name,
+                                                ty,
+                                                ListPair.map (augmentParam c) (params, args),
+                                                rt)
+                                   else
+                                       raise Fail "Funcall arity error"
+                               end
                   | NONE => raise Fail ("Error in call to function "
                                         ^ (Symbol.toString (Function.gFunctionName gf))
                                         ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
