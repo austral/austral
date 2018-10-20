@@ -286,7 +286,12 @@ structure TAst :> TAST = struct
                 raise Fail "Funcall arity error"
 
         and augmentGenericFuncall name params args rt c =
-            augmentConcreteFuncall name params args rt c
+            if (List.length params) = (List.length args) then
+                Funcall (name,
+                         ListPair.map (augmentParam c) (params, args),
+                         rt)
+            else
+                raise Fail "Funcall arity error"
 
         and augmentMethodCall args c =
             raise Fail "method calls not implemented yet"
