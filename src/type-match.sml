@@ -61,5 +61,5 @@ structure TypeMatch = struct
            (Bindings l) => Bindings l
          | (Failure f) => Failure f)
     | matchType _ _ =
-      false
+      Failure "NOT IMPLEMENTED"
 end
