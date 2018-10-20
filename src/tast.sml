@@ -319,7 +319,9 @@ structure TAst :> TAST = struct
                 if typeMatch ty (typeOf arg') then
                     arg'
                 else
-                    raise Fail "Funcall type doesn't match"
+                    raise Fail ("Parameter "
+                                ^ (Symbol.toString name)
+                                ^ " type doesn't match")
             end
 
         and typeMatch (Type.TypeVariable t) (Type.TypeVariable _) =
