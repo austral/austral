@@ -17,5 +17,5 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Prelude :> PRELUDE = sig
+structure Prelude :> PRELUDE = struct
 end
