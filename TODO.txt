@@ -2,6 +2,7 @@ TODO:
 
 - Count appearances of type variables in types
 - Predicate to determine if a function is return-type polymorphic
+
 - Implement austral.ext.cffi:null-pointer (built-in)
 - Implement austral.ext.cffi:null? (generic function, prelude)
 - Implement static-array-index
