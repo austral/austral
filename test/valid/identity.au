@@ -1,0 +1,4 @@
+;; -*- mode: lisp -*-
+
+(defgeneric identity (tau) ((value tau)) tau
+  value)
