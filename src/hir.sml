@@ -151,7 +151,7 @@ structure HIR :> HIR = struct
       | transform (TAst.Funcall (f, args, _)) =
         transformFuncall f (map transform args)
     and transformCheckedArithOp oper lhs rhs =
-        Funcall ("austral_checked_" ^ arithOpName oper, [lhs, rhs])
+        Funcall ("austral_checked_" ^ arithOpName oper, [], [lhs, rhs])
     and transformSaturationArithOp oper lhs rhs =
         Funcall ("austral_saturation_" ^ arithOpName oper, [lhs, rhs])
     and arithOpName (Arith.Add) = "add"
