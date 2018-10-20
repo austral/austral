@@ -36,8 +36,10 @@ structure TypeMatch = struct
     | mergeBindings (Failure f) (Failure f') =
       Failure f
 
-  fun matchType Unit Unit = emptyBindings
-    | matchType Bool Bool = emptyBindings
+  fun matchType Unit Unit =
+      emptyBindings
+    | matchType Bool Bool =
+      emptyBindings
     | matchType (Integer (s, w)) (Integer (s', w')) =
       if (s = s') andalso (w = w') then
           emptyBindings
