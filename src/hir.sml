@@ -148,17 +148,17 @@ structure HIR :> HIR = struct
         SizeOf ty
       | transform (TAst.Seq (a, b)) =
         Seq (transform a, transform b)
-      | transform (TAst.Funcall (f, args, _)) =
-        transformFuncall f (map transform args)
+      | transform (TAst.Funcall (f, tyargs, args, _)) =
+        transformFuncall f tyargs (map transform args)
     and transformCheckedArithOp oper lhs rhs =
         Funcall ("austral_checked_" ^ arithOpName oper, [], [lhs, rhs])
     and transformSaturationArithOp oper lhs rhs =
-        Funcall ("austral_saturation_" ^ arithOpName oper, [lhs, rhs])
+        Funcall ("austral_saturation_" ^ arithOpName oper, [], [lhs, rhs])
     and arithOpName (Arith.Add) = "add"
       | arithOpName (Arith.Sub) = "sub"
       | arithOpName (Arith.Mul) = "mul"
       | arithOpName (Arith.Div) = "div"
-    and transformFuncall s args =
+    and transformFuncall s tyargs args =
         let val au = Symbol.au
             and auKer = Symbol.auKer
         in
@@ -178,7 +178,7 @@ structure HIR :> HIR = struct
             else if s = auKer ">=" then
                 transformCompOp Builtin.GreaterThanEq args
             else
-                Funcall (escapeSymbol s, args)
+                Funcall (escapeSymbol s, tyargs, args)
         end
 
     and transformNegation [v] =
