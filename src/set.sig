@@ -31,6 +31,8 @@ signature SET = sig
     val union : ''a set -> ''a set -> ''a set
     val unionList : ''a set list -> ''a set
 
+    val intersection : ''a set -> ''a set -> ''a set
+
     (* All elements in the first argument, but not in the second argument *)
     val difference : ''a set -> ''a set -> ''a set
 
