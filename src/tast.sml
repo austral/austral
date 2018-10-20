@@ -258,20 +258,20 @@ structure TAst :> TAST = struct
                              Bool)
                 else
                     case Function.envGet fenv name of
-                        SOME f => augmentFuncall f args c
+                        SOME f => augmentFuncall f args c NONE
                       | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
             end
 
         and augmentFuncall (Function.CallableFunc f) args c =
             augmentConcreteFuncall f args c
-          | augmentFuncall (Function.CallableGFunc gf) args c =
+          | augmentFuncall (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
                 raise Fail ("Error in call to function "
                             ^ (Symbol.toString (Function.gFunctionName gf))
                             ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
             else
                 augmentGenericFuncall gf args c
-          | augmentFuncall Function.CallableMethod args c =
+          | augmentFuncall Function.CallableMethod args c _ =
             augmentMethodCall args c
 
         and augmentConcreteFuncall (Function.Function (name, params, rt, _)) args c =
