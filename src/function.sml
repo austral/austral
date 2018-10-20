@@ -141,6 +141,7 @@ structure Function :> FUNCTION = struct
            | _ => NONE)
 
     datatype callable = CallableFunc of func
+                      | CallableGFunc of gfunc
                       | CallableMethod
 
     fun envGet menv name =
