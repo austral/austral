@@ -23,7 +23,8 @@ structure TypeMatch = struct
   datatype bindings = Bindings of (Symbol.symbol, ty) Map.map
                     | Failure of string
 
-  val emptyBindings = Bindings []
+  val emptyBindings =
+      Bindings Map.empty
 
   fun mergeBindings (Bindings l) (Bindings l') =
       Bindings (l @ l')
