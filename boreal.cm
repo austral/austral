@@ -76,6 +76,9 @@ is
 
   src/cpp-runtime.sml
 
+  src/prelude.sig
+  src/prelude.sml
+
   src/compiler.sig
   src/compiler.sml
 
