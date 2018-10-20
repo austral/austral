@@ -1,7 +1,0 @@
-;; -*- mode: lisp -*-
-
-(defgeneric identity (tau) ((value tau)) tau
-  value)
-
-(defun main () i32
-  (identity 0))
