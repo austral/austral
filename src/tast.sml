@@ -262,8 +262,8 @@ structure TAst :> TAST = struct
                       | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
             end
 
-        and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args c =
-            augmentConcreteFuncall name params args rt c
+        and augmentFuncall (Function.CallableFunc f) args c =
+            augmentConcreteFuncall f args c
           | augmentFuncall (Function.CallableGFunc gf) args c =
             let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
             in
@@ -277,7 +277,7 @@ structure TAst :> TAST = struct
           | augmentFuncall Function.CallableMethod args c =
             augmentMethodCall args c
 
-        and augmentConcreteFuncall name params args rt c =
+        and augmentConcreteFuncall (Function.Function (name, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
                 Funcall (name,
                          ListPair.map (augmentParam c) (params, args),
