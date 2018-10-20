@@ -31,6 +31,7 @@ signature UTIL = sig
     val position : ''a -> ''a list -> int option
 
     val mapidx : (('a * int) -> 'b) -> 'a list -> 'b list
+    val butlast : 'a list -> 'a list
 
     type prefix = string
 
