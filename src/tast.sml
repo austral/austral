@@ -223,18 +223,20 @@ structure TAst :> TAST = struct
             let val tenv = ctxTenv c
             in
                 let val ty = resolve tenv (ctxTyParams c) typespec
-                    and exp' = augment exp c
                 in
                     case exp of
                         (AST.IntConstant i) => if isInteger ty then
-                                                   The (ty, exp')
+                                                   The (ty, augment exp c)
                                                else
                                                    raise Fail "Bad types for `the`"
                       | (AST.Funcall (name, args)) => augmentFuncall name args c (SOME ty)
-                      | e => if ty = typeOf exp' then
-                                 The (ty, exp')
-                             else
-                                 raise Fail "Bad types for `the`"
+                      | e => let val exp' = augment exp c
+                             in
+                                 if ty = typeOf exp' then
+                                     The (ty, exp')
+                                 else
+                                     raise Fail "Bad types for `the`"
+                             end
                 end
             end
           | augment (AST.SizeOf typespec) c =
