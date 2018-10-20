@@ -1,6 +1,5 @@
 TODO:
 
-- Count appearances of type variables in types
 - Predicate to determine if a function is return-type polymorphic
 
 - Implement austral.ext.cffi:null-pointer (built-in)
@@ -120,3 +119,4 @@ DONE:
 - Compile the prelude
 - Implement austral.ext.cffi:malloc (generic function, prelude)
 - Implement austral.ext.cffi:free (generic function, prelude)
+- Count appearances of type variables in types
