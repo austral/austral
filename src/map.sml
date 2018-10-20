@@ -44,7 +44,7 @@ structure Map :> MAP = struct
     fun size (Map m) = length m
 
     fun keys (Map l) =
-        map (fn (k, v) => k) l
+        Set.fromList (map (fn (k, v) => k) l)
 
     fun fromList l = iaddList empty l
 end
