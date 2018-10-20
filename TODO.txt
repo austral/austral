@@ -1,6 +1,5 @@
 TODO:
 
-- Call non-RTP generic functions
 - Call RTP generic functions in a `the` context
 - Implement austral.ext.cffi:null-pointer (built-in)
 - Implement austral.ext.cffi:null? (generic function, prelude)
@@ -121,3 +120,4 @@ DONE:
 - Implement austral.ext.cffi:free (generic function, prelude)
 - Find the set of type variables in a type
 - Predicate to determine if a function is return-type polymorphic
+- Call non-RTP generic functions
