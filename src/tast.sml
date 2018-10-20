@@ -261,6 +261,7 @@ structure TAst :> TAST = struct
                         SOME f => augmentFuncall f args c
                       | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
             end
+
         and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args c =
             if (List.length params) = (List.length args) then
                 Funcall (name,
@@ -270,6 +271,7 @@ structure TAst :> TAST = struct
                 raise Fail "Funcall arity error"
           | augmentFuncall Function.CallableMethod args c =
             raise Fail "method calls not implemented yet"
+
         and augmentParam c (Function.Param (name, ty), arg) =
             let val arg' = augment arg c
             in
@@ -278,6 +280,7 @@ structure TAst :> TAST = struct
                 else
                     raise Fail "Funcall type doesn't match"
             end
+
         and typeMatch (Type.TypeVariable t) (Type.TypeVariable _) =
             true
           | typeMatch (Type.TypeVariable t) u =
