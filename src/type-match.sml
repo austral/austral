@@ -37,7 +37,7 @@ structure TypeMatch = struct
       Failure f
 
   fun matchType Unit Unit = emptyBindings
-    | matchType Unit Unit = emptyBindings
+    | matchType Bool Bool = emptyBindings
     | matchType (Integer (s, w)) (Integer (s', w')) =
       if (s = s') andalso (w = w') then
           emptyBindings
