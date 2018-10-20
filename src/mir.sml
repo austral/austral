@@ -275,6 +275,8 @@ structure MIR :> MIR = struct
                       *)
                      case e of
                          (Funcall _) => Progn [b, StandaloneExp e]
+                       (* FIXME: the line below is dumb. what other cases am i missing?: *)
+                       | (Cast (ty, Funcall f)) => Progn [b, StandaloneExp (Cast (ty, Funcall f))]
                        | _ => b)
                  (Util.butlast args))
             @ [(fn (b, _) => b) (List.last args)]
