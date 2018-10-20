@@ -249,13 +249,13 @@ structure MIR :> MIR = struct
             (Progn [aBlock, StandaloneExp aExp, bBlock],
              bExp)
         end
-      | transformExp (HIR.Funcall (name, args)) =
+      | transformExp (HIR.Funcall (name, tyargs, args)) =
         let val args' = map transformExp args
         in
             let fun pairExp (_, e) = e
             in
                 (Progn (prognBlocks args'),
-                 Funcall (name, [], map pairExp args'))
+                 Funcall (name, map transformType tyargs, map pairExp args'))
             end
         end
 
