@@ -41,7 +41,7 @@ structure HIR :> HIR = struct
                  | Cast of ty * ast
                  | SizeOf of ty
                  | Seq of ast * ast
-                 | Funcall of string * ast list
+                 | Funcall of string * ty list * ast list
 
     local
         open Symbol
@@ -137,7 +137,7 @@ structure HIR :> HIR = struct
         (* If the function return type is unit, we're calling a function that
            returns void. In which case use a progn to seq call the function,
            and then return the unit constant *)
-        let val call = Funcall (name, map transform args)
+        let val call = Funcall (name, [], map transform args)
         in
             if rt = Type.Unit then
                 Seq (call, BoolConstant false)

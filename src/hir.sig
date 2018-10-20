@@ -39,7 +39,7 @@ signature HIR = sig
                  | Cast of ty * ast
                  | SizeOf of ty
                  | Seq of ast * ast
-                 | Funcall of string * ast list
+                 | Funcall of string * ty list * ast list
 
     type name = string
 
