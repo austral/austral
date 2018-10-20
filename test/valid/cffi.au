@@ -7,6 +7,7 @@
 (in-module :cffi-test)
 
 (defun main () i32
+  ;; Use foreign-funcall
   (let ((pointer (foreign-funcall "malloc" (foreign-pointer i32) 4)))
-    (foreign-funcall "free" unit pointer)
-    (the i32 0)))
+    (foreign-funcall "free" unit pointer))
+  (the i32 0))
