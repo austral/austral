@@ -68,7 +68,7 @@ structure TypeMatch = struct
                                Failure "Static array length doesn't match"
          | (Failure f) => Failure f)
     | matchType (TypeVariable n) t =
-      Bind (n, t)
+      Bindings [Bind (n, t)]
     | matchType _ _ =
       Failure "NOT IMPLEMENTED"
 end
