@@ -58,6 +58,6 @@ structure Repl :> REPL = struct
                     end
                 end
         in
-            repl' Compiler.emptyCompiler
+            repl' (Compiler.compilePrelude Compiler.emptyCompiler)
         end
 end
