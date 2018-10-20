@@ -27,6 +27,8 @@ signature FUNCTION = sig
 
     datatype gfunc = GenericFunction of name * Type.typarams * param list * ty * docstring
 
+    val gFunctionName : gfunc -> name
+
     type param_name = Symbol.symbol
 
     datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
