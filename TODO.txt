@@ -118,3 +118,4 @@ DONE:
 - Fix that bug where function calls in progns arent made for some reason
 - Replace progns with seqs
 - Use `the` only to verify types match
+- Compile the prelude
