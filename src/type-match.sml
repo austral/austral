@@ -26,7 +26,7 @@ structure TypeMatch = struct
   val emptyBindings =
       Bindings Map.empty
 
-  fun mergeBindings (Bindings l) (Bindings l') =
+  fun mergeBindings (Bindings bs) (Bindings bs') =
       Bindings (l @ l')
     | mergeBindings (Bindings _) (Failure f) =
       Failure f
