@@ -51,7 +51,7 @@ structure TypeMatch = struct
       else
           Failure "float subtypes dont match"
     | matchType (Tuple tys) (Tuple tys') =
-      matchTypeList tys tys'
+      matchTypeLists tys tys'
     | matchType (Pointer t) (Pointer t') =
       (case matchType t t' of
            (Bindings l) => Bindings l
