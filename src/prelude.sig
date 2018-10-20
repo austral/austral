@@ -18,5 +18,5 @@
 *)
 
 signature PRELUDE = sig
-    val prelude = string list
+    val prelude : string list
 end
