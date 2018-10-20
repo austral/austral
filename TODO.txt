@@ -119,4 +119,4 @@ DONE:
 - Compile the prelude
 - Implement austral.ext.cffi:malloc (generic function, prelude)
 - Implement austral.ext.cffi:free (generic function, prelude)
-- Count appearances of type variables in types
+- Find the set of type variables in a type
