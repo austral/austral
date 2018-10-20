@@ -34,13 +34,16 @@ structure Set :> SET = struct
     fun addList set (x::xs) = add (addList set xs) x
       | addList set nil = set
 
+    fun isIn set elem = Util.member elem set
+
+    fun eq a b =
+        List.all (fn aelem => isIn b aelem) a
+
     fun union a b = addList (addList empty a) b
 
     fun unionList l = foldl (fn (a, b) => union a b)
                             empty
                             l
-
-    fun isIn set elem = Util.member elem set
 
     (* All elements in B but not in A *)
     fun difference b a =
