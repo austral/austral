@@ -42,6 +42,13 @@ structure Function :> FUNCTION = struct
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
 
+    fun isRTP (GenericFunction (_, _, params, rt, _)) =
+        let val argVars = Set.unionList (map (fn (Param (name, ty)) => Type.tyVars ty) params)
+            and rtVars = Type.tyVars rt
+        in
+            false
+        end
+
     datatype fenv = FunctionEnv of (name, func) Map.map
                                    * (name, gfunc) Map.map
                                    * typeclass list
