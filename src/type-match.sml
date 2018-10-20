@@ -36,5 +36,30 @@ structure TypeMatch = struct
     | mergeBindings (Failure f) (Failure f') =
       Failure f
 
-
+  fun matchType Unit Unit = emptyBindings
+    | matchType Unit Unit = emptyBindings
+    | matchType (Integer (s, w)) (Integer (s', w')) =
+      if (s = s') andalso (w = w') then
+          emptyAssign
+      else
+          Failure "int subtypes dont match"
+    | matchType (Float f) (Float f') =
+      if f = f' then
+          emptyAssign
+      else
+          Failure "float subtypes dont match"
+    | matchType (Tuple tys) (Tuple tys') =
+      List.foldl (fn (a, b) => mergeBindings a b)
+                 emptyBindings
+                 (ListPair.map (fn (a, b) => matchType a b) (tys, tys'))
+    | matchType (Pointer t) (Pointer t') =
+      (case matchType t t' of
+           (Bindings l) => Bindings l
+         | (Failure f) => Failure f)
+    | matchType (ForeignPointer t) (ForeignPointer t') =
+      (case matchType t t' of
+           (Bindings l) => Bindings l
+         | (Failure f) => Failure f)
+    | matchType _ _ =
+      false
 end
