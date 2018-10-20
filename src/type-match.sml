@@ -20,9 +20,7 @@
 structure TypeMatch = struct
   open Type
 
-  datatype binding = Bind of Symbol.symbol * ty
-
-  datatype bindings = Bindings of binding list
+  datatype bindings = Bindings of (Symbol.symbol, ty) Map.map
                     | Failure of string
 
   val emptyBindings = Bindings []
