@@ -255,7 +255,9 @@ structure MIR :> MIR = struct
             let fun pairExp (_, e) = e
             in
                 (Progn (prognBlocks args'),
-                 Funcall (name, map transformType tyargs, map pairExp args'))
+                 Funcall (name,
+                          map transformType tyargs,
+                          map pairExp args'))
             end
         end
 
