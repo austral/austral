@@ -222,8 +222,19 @@ structure TAst :> TAST = struct
           | augment (AST.The (typespec, exp)) c =
             let val tenv = ctxTenv c
             in
-                The (resolve tenv (ctxTyParams c) typespec,
-                     augment exp c)
+                let val ty = resolve tenv (ctxTyParams c) typespec
+                    and exp' = augment exp c
+                in
+                    case exp of
+                        (AST.IntConstant i) => if isInteger ty then
+                                                   The (ty, exp')
+                                               else
+                                                   raise Fail "Bad types for `the`"
+                      | e => if ty = typeOf exp' then
+                                 The (ty, exp')
+                             else
+                                 raise Fail "Bad types for `the`"
+                end
             end
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
