@@ -49,7 +49,7 @@ mlton-test: $(TEST_BIN)
 docs: $(DOCS_HTML)
 
 $(DOCS_HTML): $(DOCS_SRC)
-	pandoc $(DOCS_SRC) -f markdown -t html -s -o $(DOCS_HTML)
+	pandoc $(DOCS_SRC) -f markdown+smart -t html -s -o $(DOCS_HTML)
 
 clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
