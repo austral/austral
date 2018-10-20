@@ -45,7 +45,7 @@ structure Type :> TYPE = struct
 
     fun tyVars Unit = Set.empty
       | tyVars Bool = Set.empty
-      | tyVars Integer _ = Set.empty
+      | tyVars (Integer _) = Set.empty
       | tyVars Float = Set.empty
       | tyVars (Tuple tys) = Set.unionList (map tyVars tys)
       | tyVars (Pointer ty) = tyVars ty
