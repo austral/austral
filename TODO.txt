@@ -1,5 +1,7 @@
 TODO:
 
+- Implement proper type/arguments matching/unification
+
 - Implement austral.ext.cffi:null-pointer (built-in)
 - Implement austral.ext.cffi:null? (generic function, prelude)
 - Implement static-array-index
