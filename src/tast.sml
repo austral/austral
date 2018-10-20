@@ -277,7 +277,12 @@ structure TAst :> TAST = struct
                                 ^ (Symbol.toString name)
                                 ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
                 else
-                    raise Fail "generic function calls not implemented yet"
+                    if (List.length params) = (List.length args) then
+                        Funcall (name,
+                                 ListPair.map (augmentParam c) (params, args),
+                                 rt)
+                    else
+                        raise Fail "Funcall arity error"
             end
           | augmentFuncall Function.CallableMethod args c =
             raise Fail "method calls not implemented yet"
