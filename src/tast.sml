@@ -280,7 +280,7 @@ structure TAst :> TAST = struct
                                        Funcall (name,
                                                 [ty], (* FIXME: we have to provide ALL parameters by extracting them from the args match *)
                                                 ListPair.map (augmentParam c) (params, args),
-                                                rt)
+                                                ty)
                                    else
                                        raise Fail "Funcall arity error"
                                end
