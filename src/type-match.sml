@@ -19,4 +19,7 @@
 
 structure TypeMatch = struct
   datatype binding = Bind of Symbol.symbol * Type.ty
+
+  datatype bindings = Bindings of binding list
+                    | Failure of string
 end
