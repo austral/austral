@@ -19,6 +19,10 @@ CPP_RUNTIME_ML := src/cpp-runtime.sml
 SRC := src/*.sig src/*.sml $(CPP_RUNTIME_ML)
 TEST_SRC := test/*.sml
 
+DOCS_DIR := docs
+DOCS_SRC := $(DOCS_DIR)/internals.md
+DOCS_HTML := $(DOCS_DIR)/internals.html
+
 all: compile
 
 $(CPP_RUNTIME_ML): $(CPP_RUNTIME_SRC) $(CPP_RUNTIME_SCRIPT)
@@ -40,6 +44,12 @@ $(TEST_BIN): $(SRC) $(TEST_SRC)
 .PHONY: mlton-test
 mlton-test: $(TEST_BIN)
 	./$(TEST_BIN)
+
+.PHONY: docs
+docs: $(DOCS_HTML)
+
+$(DOCS_HTML): $(DOCS_SRC)
+	pandoc $(DOCS_SRC) -f markdown -t html -s -o $(DOCS_HTML)
 
 clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
