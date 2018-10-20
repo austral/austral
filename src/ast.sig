@@ -38,7 +38,7 @@ signature AST = sig
                  | The of Type.typespec * ast
                  | ForeignFuncall of string * typespec * ast list
                  | SizeOf of typespec
-                 | Progn of ast list
+                 | Seq of ast * ast
                  | Funcall of Symbol.symbol * ast list
 
     type name = Symbol.symbol

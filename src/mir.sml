@@ -242,18 +242,13 @@ structure MIR :> MIR = struct
         end
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
-      | transformExp (HIR.Progn exps) =
-        if List.length exps > 0 then
-            let val exps' = map transformExp exps
-            in
-                let fun pairExp (_, e) = e
-                in
-                    (Progn (prognBlocks exps'),
-                     pairExp (List.last exps'))
-                end
-            end
-        else
-            (Progn [], BoolConstant false)
+      | transformExp (HIR.Seq (a, b)) =
+        let val (aBlock, aExp) = transformExp a
+            and (bBlock, bExp) = transformExp b
+        in
+            (Progn [aBlock, StandaloneExp aExp, bBlock],
+             bExp)
+        end
       | transformExp (HIR.Funcall (name, args)) =
         let val args' = map transformExp args
         in
@@ -265,21 +260,7 @@ structure MIR :> MIR = struct
         end
 
     and prognBlocks args =
-        if List.length args = 0 then
-            []
-        else
-            (map (fn (b, e) =>
-                     (* If the expression is a function call, we want to render it
-                        as a standalone expression to ensure it is executed for its
-                        side-effects. Otherwise just render the block
-                      *)
-                     case e of
-                         (Funcall _) => Progn [b, StandaloneExp e]
-                       (* FIXME: the line below is dumb. what other cases am i missing?: *)
-                       | (Cast (ty, Funcall f)) => Progn [b, StandaloneExp (Cast (ty, Funcall f))]
-                       | _ => b)
-                 (Util.butlast args))
-            @ [(fn (b, _) => b) (List.last args)]
+        map (fn (b, _) => b) args
 
     fun transformTop (HIR.Defun (name, params, ty, body)) =
         let val (bodyBlock, bodyExp) = transformExp body

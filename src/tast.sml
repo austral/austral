@@ -37,7 +37,7 @@ structure TAst :> TAST = struct
                  | The of ty * ast
                  | ForeignFuncall of string * ty * ast list
                  | SizeOf of ty
-                 | Progn of ast list
+                 | Seq of ast * ast
                  | Funcall of Symbol.symbol * ast list * ty
 
     type name = Symbol.symbol
@@ -96,8 +96,7 @@ structure TAst :> TAST = struct
           | typeOf (SizeOf _) =
             Integer (Unsigned, Int64)
           | typeOf (ForeignFuncall (_, rt, _)) = rt
-          | typeOf (Progn (x::xs)) = typeOf (List.last (x::xs))
-          | typeOf (Progn nil) = Unit
+          | typeOf (Seq (_, v)) = typeOf v
           | typeOf (Funcall (_, _, t)) = t
     end
 
@@ -235,8 +234,9 @@ structure TAst :> TAST = struct
                                 resolve tenv (ctxTyParams c) typespec,
                                 map (fn a => augment a c) args)
             end
-          | augment (AST.Progn exps) c =
-            Progn (map (fn a => augment a c) exps)
+          | augment (AST.Seq (a, b)) c =
+            Seq (augment a c,
+                 augment b c)
           | augment (AST.Funcall (name, args)) c =
             let val fenv = ctxFenv c
                 and auKer = Symbol.auKer

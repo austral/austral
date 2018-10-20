@@ -40,7 +40,7 @@ structure AST :> AST = struct
                  | The of Type.typespec * ast
                  | ForeignFuncall of string * typespec * ast list
                  | SizeOf of typespec
-                 | Progn of ast list
+                 | Seq of ast * ast
                  | Funcall of Symbol.symbol * ast list
 
     (* Toplevel AST *)
@@ -95,7 +95,7 @@ structure AST :> AST = struct
         let val au = Symbol.au
         in
             if f = au "progn" then
-                Progn args
+                transformProgn args
             else if f = au "if" then
                 transformCond args
             (* Modular arithmetic *)
@@ -152,6 +152,14 @@ structure AST :> AST = struct
             else
                 Funcall (f, args)
         end
+
+    and transformProgn [exp] =
+        exp
+      | transformProgn (first::rest) =
+        Seq (first, transformProgn rest)
+      | transformProgn nil =
+        (* An empty progn is just the unit constant *)
+        UnitConstant
 
     and transformCond [test, cons, alt] =
         Cond (test, cons, alt)

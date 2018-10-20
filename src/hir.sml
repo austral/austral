@@ -40,7 +40,7 @@ structure HIR :> HIR = struct
                  | Store of ast * ast
                  | Cast of ty * ast
                  | SizeOf of ty
-                 | Progn of ast list
+                 | Seq of ast * ast
                  | Funcall of string * ast list
 
     local
@@ -135,19 +135,19 @@ structure HIR :> HIR = struct
         Cast (ty, transform exp)
       | transform (TAst.ForeignFuncall (name, rt, args)) =
         (* If the function return type is unit, we're calling a function that
-           returns void. In which case use a progn to first call the function,
-           and then return the bool constant false *)
+           returns void. In which case use a progn to seq call the function,
+           and then return the unit constant *)
         let val call = Funcall (name, map transform args)
         in
             if rt = Type.Unit then
-                Progn [call, BoolConstant false]
+                Seq (call, BoolConstant false)
             else
                 Cast (rt, call)
         end
       | transform (TAst.SizeOf ty) =
         SizeOf ty
-      | transform (TAst.Progn exps) =
-        Progn (map transform exps)
+      | transform (TAst.Seq (a, b)) =
+        Seq (transform a, transform b)
       | transform (TAst.Funcall (f, args, _)) =
         transformFuncall f (map transform args)
     and transformCheckedArithOp oper lhs rhs =
