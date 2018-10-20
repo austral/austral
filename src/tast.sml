@@ -263,12 +263,7 @@ structure TAst :> TAST = struct
             end
 
         and augmentFuncall (Function.CallableFunc (Function.Function (name, params, rt, _))) args c =
-            if (List.length params) = (List.length args) then
-                Funcall (name,
-                         ListPair.map (augmentParam c) (params, args),
-                         rt)
-            else
-                raise Fail "Funcall arity error"
+            augentConcreteFuncall name params args rt c
           | augmentFuncall (Function.CallableGFunc gf) args c =
             let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
             in
@@ -286,6 +281,14 @@ structure TAst :> TAST = struct
             end
           | augmentFuncall Function.CallableMethod args c =
             raise Fail "method calls not implemented yet"
+
+        and augmentConcreteFuncall name params args rt c =
+            if (List.length params) = (List.length args) then
+                Funcall (name,
+                         ListPair.map (augmentParam c) (params, args),
+                         rt)
+            else
+                raise Fail "Funcall arity error"
 
         and augmentParam c (Function.Param (name, ty), arg) =
             let val arg' = augment arg c
