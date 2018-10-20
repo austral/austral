@@ -280,7 +280,7 @@ structure TAst :> TAST = struct
                         raise Fail "Funcall arity error"
             end
           | augmentFuncall Function.CallableMethod args c =
-            raise Fail "method calls not implemented yet"
+            augmentMethodCall args c
 
         and augmentConcreteFuncall name params args rt c =
             if (List.length params) = (List.length args) then
@@ -289,6 +289,9 @@ structure TAst :> TAST = struct
                          rt)
             else
                 raise Fail "Funcall arity error"
+
+        and augmentMethodCall args c =
+            raise Fail "method calls not implemented yet"
 
         and augmentParam c (Function.Param (name, ty), arg) =
             let val arg' = augment arg c
