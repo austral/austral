@@ -97,7 +97,7 @@ structure TAst :> TAST = struct
             Integer (Unsigned, Int64)
           | typeOf (ForeignFuncall (_, rt, _)) = rt
           | typeOf (Seq (_, v)) = typeOf v
-          | typeOf (Funcall (_, _, t)) = t
+          | typeOf (Funcall (_, _, _, t)) = t
     end
 
     (* Bindings *)
