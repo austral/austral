@@ -89,7 +89,7 @@ structure TypeMatch = struct
       else
           Failure "Disjunction names don't match"
     | matchType (TypeVariable n) t =
-      Bindings [Bind (n, t)]
+      Bindings (Map.fromList [(n, t)])
     | matchType _ _ =
       Failure "Type mismatch"
 
