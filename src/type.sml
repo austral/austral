@@ -43,6 +43,25 @@ structure Type :> TYPE = struct
     fun isFloat (Float _) = true
       | isFloat _ = false
 
+    fun tyVars Unit = Set.empty
+      | tyVars Bool = Set.empty
+      | tyVars Integer _ = Set.empty
+      | tyVars Float = Set.empty
+      | tyVars (Tuple tys) = Set.unionList (map tyVars tys)
+      | tyVars (Pointer ty) = tyVars ty
+      | tyVars (ForeignPointer ty) = tyVars ty
+      | tyVars (StaticArray (ty, _)) = tyVars ty
+      | tyVars (Disjunction (_, tys, variants)) =
+        Set.union (Set.unionList (map tyVars tys))
+                  (Set.unionList (map variantVars variants))
+      | tyVars (TypeVariable name) =
+        TypeParam name
+
+    and variantVars (Variant (_, SOME ty)) =
+        tyVars ty
+      | variantVars (Variant (_, NONE)) =
+        Set.empty
+
     datatype typespec = TypeCons of name * (typespec list)
                       | TyIntArg of int
 
