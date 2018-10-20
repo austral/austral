@@ -40,6 +40,9 @@ structure Set :> SET = struct
                             empty
                             l
 
+  fun difference (Set blist) a =
+      (* All elements in B but not in A *)
+      List.filter (fn belem => not (exists a belem)) blist
 
     fun isIn set elem = Util.member elem set
 
