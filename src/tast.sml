@@ -278,7 +278,7 @@ structure TAst :> TAST = struct
                                in
                                    if (List.length params) = (List.length args) then
                                        Funcall (name,
-                                                ty,
+                                                [ty], (* FIXME: we have to provide ALL parameters by extracting them from the args match *)
                                                 ListPair.map (augmentParam c) (params, args),
                                                 rt)
                                    else
