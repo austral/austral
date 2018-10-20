@@ -257,6 +257,7 @@ structure TAst :> TAST = struct
             in
                 if Builtin.isBuiltin name then
                     Funcall (name,
+                             [],
                              map (fn e => augment e c) args,
                              Bool)
                 else
@@ -282,6 +283,7 @@ structure TAst :> TAST = struct
         and augmentConcreteFuncall (Function.Function (name, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
                 Funcall (name,
+                         [],
                          ListPair.map (augmentParam c) (params, args),
                          rt)
             else
