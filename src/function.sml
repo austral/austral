@@ -173,7 +173,7 @@ structure Function :> FUNCTION = struct
                 let val binds'' = TypeMatch.mergeBindings (TypeMatch.Bindings binds) binds'
                 in
                     case binds'' of
-                        (TypeMatch.Bindings m) => M
+                        (TypeMatch.Bindings m) => m
                       | TypeMatch.Failure f => raise Fail ("Argument matching failure: " ^ f)
                 end
             end
