@@ -287,7 +287,7 @@ structure TAst :> TAST = struct
                                                    in
                                                        case rtpBinds of
                                                            (TypeMatch.Bindings m) =>
-                                                           let val binds' = TypeMatch.mergeBindings binds rtpBinds
+                                                           let val binds' = TypeMatch.mergeBindings (TypeMatch.Bindings binds) rtpBinds
                                                            in
                                                                Funcall (name,
                                                                         Function.typeArgs typarams binds',
