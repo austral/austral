@@ -20,7 +20,7 @@
 signature TYPE_MATCH = sig
     type ty = Type.ty
 
-    datatype bindings = Bindings of (Symbol.symbol, Type.ty) Map.map
+    datatype bindings = Bindings of (Symbol.symbol, ty) Map.map
                       | Failure of string
 
     val emptyBindings : bindings
