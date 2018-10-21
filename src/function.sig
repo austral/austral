@@ -65,4 +65,9 @@ signature FUNCTION = sig
     type parameter names to their replacement types if the match succeeds. Fails
     otherwise. *)
     val matchParams : param list -> ty list -> (name, ty) Map.map
+
+    (* Given an ordered set of type parameters, and a map of type parameter
+       names to their replacements, return a list of types by replacing each
+       type parameter in the set with its replacement. *)
+    val typeArgs : Type.typarams -> (name, ty) Map.map -> ty list
 end
