@@ -29,5 +29,5 @@ signature TYPE_MATCH = sig
 
     val matchType : ty -> ty -> bindings
 
-    val matchTypeLists : Type.ty list -> Type.ty list -> bindings
+    val matchTypeLists : ty list -> ty list -> bindings
 end
