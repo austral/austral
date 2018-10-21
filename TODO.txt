@@ -1,6 +1,6 @@
 TODO:
 
-- Construct datatype instances
+- `construct` builtin
 - Case expressions
 
 - Implement static-array-index
