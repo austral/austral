@@ -137,6 +137,8 @@ structure MIR :> MIR = struct
         (Progn [], FloatConstant f)
       | transformExp (HIR.StringConstant s) =
         (Progn [], StringConstant s)
+      | transformExp HIR.NullConstant =
+        (Progn [], NullConstant)
       | transformExp (HIR.Negation v) =
         let val (valueBlock, valueExp) = transformExp v
         in
