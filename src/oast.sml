@@ -118,7 +118,7 @@ structure OAST :> OAST = struct
 
     and transformForeignNull [tys] =
         ForeignNull (Type.parseTypespec tys)
-      | transformNullPointer _ =
+      | transformForeignNull _ =
         raise Fail "Invalid `null-pointer` form"
 
     and transformSizeOf [tys] =
