@@ -1,6 +1,7 @@
 TODO:
 
 - Construct datatype instances
+- Pattern matching
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
 - `the` for float constants
