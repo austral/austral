@@ -244,6 +244,8 @@ structure TAst :> TAST = struct
             end
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
+          | augment (AST.ForeignNull ty) =
+            ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.ForeignFuncall (name, typespec, args)) c =
             let val tenv = ctxTenv c
             in
