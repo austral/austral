@@ -24,4 +24,6 @@ signature TYPE_MATCH = sig
     val emptyBindings : bindings
 
     val mergeBindings : bindings -> bindings -> bindings
+
+    val matchType : Type.ty -> Type.ty -> bindings
 end
