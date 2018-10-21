@@ -323,13 +323,6 @@ structure TAst :> TAST = struct
                                 ^ (Symbol.toString name)
                                 ^ " type doesn't match")
             end
-
-        and typeMatch (Type.TypeVariable t) (Type.TypeVariable _) =
-            true
-          | typeMatch (Type.TypeVariable t) u =
-            true
-          | typeMatch t u =
-            t = u
     end
 
     fun funcContext params typarams tenv fenv =
