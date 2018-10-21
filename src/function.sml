@@ -165,6 +165,20 @@ structure Function :> FUNCTION = struct
             end
         end
 
+    fun matchFunc params rt argTypes rt' =
+        let val binds = matchParams params argTypes
+        in
+            let val binds' = TypeMatch.matchType rt ty
+            in
+                let val binds'' = TypeMatch.mergeBindings (TypeMatch.Bindings binds) rtpBinds'
+                in
+                    case binds'' of
+                        (TypeMatch.Bindings m) => M
+                      | TypeMatch.Failure f => raise Fail ("Argument matching failure: " ^ f)
+                end
+            end
+        end
+
     fun typeArgs params bindings =
         let fun mapParam (Type.TypeParam name) =
                 case Map.get bindings name of
