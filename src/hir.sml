@@ -145,6 +145,8 @@ structure HIR :> HIR = struct
             else
                 Cast (rt, call)
         end
+      | transform (TAst.ForeignNull ty) =
+        NullConstant
       | transform (TAst.SizeOf ty) =
         SizeOf ty
       | transform (TAst.Seq (a, b)) =
