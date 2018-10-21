@@ -1,5 +1,6 @@
 TODO:
 
+- Construct datatype instances
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
 - `the` for float constants
