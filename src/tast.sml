@@ -285,10 +285,16 @@ structure TAst :> TAST = struct
                                                in
                                                    let val rtpBinds = TypeMatch.matchType rt ty
                                                    in
-                                                       Funcall (name,
-                                                                Function.typeArgs typarams binds,
-                                                                args',
-                                                                ty)
+                                                       case rtpBinds of
+                                                           (TypeMatch.Bindings m) =>
+                                                           let val binds' = TypeMatch.mergeBindings binds rtpBinds
+                                                           in
+                                                               Funcall (name,
+                                                                        Function.typeArgs typarams binds',
+                                                                        args',
+                                                                        ty)
+                                                           end
+                                                         | _ => raise Fail "derp"
                                                    end
                                                end
                                            end
