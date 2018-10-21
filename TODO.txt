@@ -1,6 +1,5 @@
 TODO:
 
-- Implement austral.ext.cffi:null? (generic function, prelude)
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
 - `the` for float constants
@@ -123,3 +122,4 @@ DONE:
 - Austral prelude
 - Implement austral.ext.cffi:null-pointer (built-in)
 - eq builtin for pointers
+- Implement austral.ext.cffi:null? (generic function, prelude)
