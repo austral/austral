@@ -6,7 +6,8 @@
                 :foreign-pointer
                 :malloc
                 :free
-                :null-pointer))
+                :null-pointer
+                :null?))
 (in-module :cffi-test)
 
 (defun main () i32
@@ -16,5 +17,6 @@
   ;; Use built-in methods
   (let ((pointer (the (foreign-pointer i32) (malloc (the u64 4))))
         (null-pointer (null-pointer i32)))
+    (null? null-pointer)
     (free pointer))
   (the i32 0))
