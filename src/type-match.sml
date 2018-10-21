@@ -18,6 +18,8 @@
 *)
 
 structure TypeMatch = struct
+  type ty = Type.ty
+
   datatype bindings = Bindings of (Symbol.symbol, ty) Map.map
                     | Failure of string
 
