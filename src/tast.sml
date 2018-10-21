@@ -277,10 +277,19 @@ structure TAst :> TAST = struct
                     SOME ty => let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
                                in
                                    if (List.length params) = (List.length args) then
-                                       Funcall (name,
-                                                [ty], (* FIXME: we have to provide ALL parameters by extracting them from the args match *)
-                                                ListPair.map (augmentParam c) (params, args),
-                                                ty)
+                                       let val args' = map (fn a => augment a c) args
+                                       in
+                                           let val argTypes = map typeOf args'
+                                           in
+                                               let val binds = Function.matchParams params argTypes
+                                               in
+                                                   Funcall (name,
+                                                            [ty],
+                                                            args'
+                                                            ty)
+                                               end
+                                           end
+                                       end
                                    else
                                        raise Fail "Funcall arity error"
                                end
