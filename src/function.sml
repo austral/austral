@@ -153,4 +153,7 @@ structure Function :> FUNCTION = struct
                             SOME gf => SOME (CallableGFunc gf)
                           | NONE => NONE
         end
+
+    fun matchParams _ _ =
+        raise Fail "derp"
 end
