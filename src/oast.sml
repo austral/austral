@@ -117,7 +117,7 @@ structure OAST :> OAST = struct
       | transformForeignFuncall _ = raise Fail "Invalid `foreign-funcall` form"
 
     and transformNullPointer [tys] =
-        NullPointer (Type.parseTypespec tys)
+        ForeignPointer (Type.parseTypespec tys)
       | transformNullPointer _ =
         raise Fail "Invalid `null-pointer` form"
 
