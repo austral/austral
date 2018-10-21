@@ -312,17 +312,6 @@ structure TAst :> TAST = struct
 
         and augmentMethodCall args c =
             raise Fail "method calls not implemented yet"
-
-        and augmentParam c (Function.Param (name, ty), arg) =
-            let val arg' = augment arg c
-            in
-                if typeMatch ty (typeOf arg') then
-                    arg'
-                else
-                    raise Fail ("Parameter "
-                                ^ (Symbol.toString name)
-                                ^ " type doesn't match")
-            end
     end
 
     fun funcContext params typarams tenv fenv =
