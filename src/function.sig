@@ -66,6 +66,16 @@ signature FUNCTION = sig
     otherwise. *)
     val matchParams : param list -> ty list -> (name, ty) Map.map
 
+   (* Given:
+
+      1. The list of a function's parameters.
+      2. The function's return type.
+      3. A list of function arguments.
+      4. The function's asserted return type.
+
+      Return a map of type parameter names to their replacements. *)
+    val matchFunc : param list -> ty -> ty list -> ty -> (name, ty) Map.map
+
     (* Given an ordered set of type parameters, and a map of type parameter
        names to their replacements, return a list of types by replacing each
        type parameter in the set with its replacement. *)
