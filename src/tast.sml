@@ -274,7 +274,7 @@ structure TAst :> TAST = struct
           | augmentCallable (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
                 case the_context of
-                    SOME ty => let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
+                    SOME ty => let val (Function.GenericFunction (name, typarams, params, _, _)) = gf
                                in
                                    if (List.length params) = (List.length args) then
                                        let val args' = map (fn a => augment a c) args
