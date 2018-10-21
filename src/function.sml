@@ -168,7 +168,7 @@ structure Function :> FUNCTION = struct
     fun matchFunc params rt argTypes rt' =
         let val binds = matchParams params argTypes
         in
-            let val binds' = TypeMatch.matchType rt ty
+            let val binds' = TypeMatch.matchType rt rt'
             in
                 let val binds'' = TypeMatch.mergeBindings (TypeMatch.Bindings binds) rtpBinds'
                 in
