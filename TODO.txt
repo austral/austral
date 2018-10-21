@@ -31,7 +31,6 @@ LONG-TERM TODO:
 - Bitwise operators
 
 - Tuple bind
-- Austral prelude
 - Prelude: equality and comparison instances
 
 - Implement defcfun
@@ -122,3 +121,4 @@ DONE:
 - Call RTP generic functions in a `the` context
 - Implement proper type/arguments matching/unification
 - Add support for an --entrypoint flag to define the main() function
+- Austral prelude
