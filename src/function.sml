@@ -162,5 +162,6 @@ structure Function :> FUNCTION = struct
                 case binds of
                     TypeMatch.Bindings m => m
                   | TypeMatch.Failure f => raise Fail ("Argument matching failure: " ^ f)
+            end
         end
 end
