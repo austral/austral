@@ -18,8 +18,6 @@
 *)
 
 structure TypeMatch = struct
-  open Type
-
   datatype bindings = Bindings of (Symbol.symbol, ty) Map.map
                     | Failure of string
 
@@ -52,46 +50,50 @@ structure TypeMatch = struct
     | mergeBindings (Failure f) (Failure f') =
       Failure f
 
-  fun matchType Unit Unit =
-      emptyBindings
-    | matchType Bool Bool =
-      emptyBindings
-    | matchType (Integer (s, w)) (Integer (s', w')) =
-      if (s = s') andalso (w = w') then
+  local
+      open Type
+  in
+      fun matchType Unit Unit =
           emptyBindings
-      else
-          Failure "int subtypes dont match"
-    | matchType (Float f) (Float f') =
-      if f = f' then
+        | matchType Bool Bool =
           emptyBindings
-      else
-          Failure "float subtypes dont match"
-    | matchType (Tuple tys) (Tuple tys') =
-      matchTypeLists tys tys'
-    | matchType (Pointer t) (Pointer t') =
-      (case matchType t t' of
-           (Bindings l) => Bindings l
-         | (Failure f) => Failure f)
-    | matchType (ForeignPointer t) (ForeignPointer t') =
-      (case matchType t t' of
-           (Bindings l) => Bindings l
-         | (Failure f) => Failure f)
-    | matchType (StaticArray (t, len)) (StaticArray (t', len')) =
-      (case matchType t t' of
-           (Bindings l) => if len = len' then
-                               Bindings l
-                           else
-                               Failure "Static array length doesn't match"
-         | (Failure f) => Failure f)
-    | matchType (Disjunction (n, args, _)) (Disjunction (n', args', _)) =
-      if n = n' then
-          matchTypeLists args args'
-      else
-          Failure "Disjunction names don't match"
-    | matchType (TypeVariable n) t =
-      Bindings (Map.fromList [(n, t)])
-    | matchType _ _ =
-      Failure "Type mismatch"
+        | matchType (Integer (s, w)) (Integer (s', w')) =
+          if (s = s') andalso (w = w') then
+              emptyBindings
+          else
+              Failure "int subtypes dont match"
+        | matchType (Float f) (Float f') =
+          if f = f' then
+              emptyBindings
+          else
+              Failure "float subtypes dont match"
+        | matchType (Tuple tys) (Tuple tys') =
+          matchTypeLists tys tys'
+        | matchType (Pointer t) (Pointer t') =
+          (case matchType t t' of
+               (Bindings l) => Bindings l
+             | (Failure f) => Failure f)
+        | matchType (ForeignPointer t) (ForeignPointer t') =
+          (case matchType t t' of
+               (Bindings l) => Bindings l
+             | (Failure f) => Failure f)
+        | matchType (StaticArray (t, len)) (StaticArray (t', len')) =
+          (case matchType t t' of
+               (Bindings l) => if len = len' then
+                                   Bindings l
+                               else
+                                   Failure "Static array length doesn't match"
+             | (Failure f) => Failure f)
+        | matchType (Disjunction (n, args, _)) (Disjunction (n', args', _)) =
+          if n = n' then
+              matchTypeLists args args'
+          else
+              Failure "Disjunction names don't match"
+        | matchType (TypeVariable n) t =
+          Bindings (Map.fromList [(n, t)])
+        | matchType _ _ =
+          Failure "Type mismatch"
+  end
 
   and matchTypeLists tys tys' =
       List.foldl (fn (a, b) => mergeBindings a b)
