@@ -86,6 +86,8 @@ structure OAST :> OAST = struct
               | _ => raise Fail "Invalid `the` form"
         else if f = Symbol.auCffi "foreign-funcall" then
             transformForeignFuncall args
+        else if f = Symbol.auCffi "null-pointer" then
+            transformNullPointer args
         else if f = Symbol.auCffi "size-of" then
             transformSizeOf args
         else
