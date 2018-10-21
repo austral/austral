@@ -285,7 +285,7 @@ structure TAst :> TAST = struct
                                                in
                                                    Funcall (name,
                                                             Function.typeArgs typarams binds,
-                                                            args'
+                                                            args',
                                                             ty)
                                                end
                                            end
