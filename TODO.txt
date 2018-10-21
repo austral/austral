@@ -1,7 +1,5 @@
 TODO:
 
-- Implement proper type/arguments matching/unification
-
 - Implement austral.ext.cffi:null-pointer (built-in)
 - Implement austral.ext.cffi:null? (generic function, prelude)
 - Implement static-array-index
@@ -123,3 +121,4 @@ DONE:
 - Predicate to determine if a function is return-type polymorphic
 - Call non-RTP generic functions
 - Call RTP generic functions in a `the` context
+- Implement proper type/arguments matching/unification
