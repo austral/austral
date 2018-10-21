@@ -60,4 +60,9 @@ signature FUNCTION = sig
                       | CallableMethod
 
     val envGet : fenv -> name -> callable option
+
+    (* Given a list of function parameters, and a list of types, return a map of
+    type parameter names to their replacement types if the match succeeds. Fails
+    otherwise. *)
+    val matchParams : param list -> ty list -> (name, ty) Map.map
 end
