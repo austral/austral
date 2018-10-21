@@ -41,7 +41,7 @@ LONG-TERM TODO:
 - Verify if an expression is a valid static array element
 - Bind standalone expressions to unused variables to suppress warnings
 - Warn when not using the result value of a progn (any expression with type other than unit)
-- Fully linearize the intermediate representation early on
+- Fully flatten the intermediate representation early on
 
 DONE:
 
