@@ -95,10 +95,10 @@ structure TypeMatch = struct
           Bindings (Map.fromList [(n, t)])
         | matchType _ _ =
           Failure "Type mismatch"
-  end
 
-  and matchTypeLists tys tys' =
-      List.foldl (fn (a, b) => mergeBindings a b)
-                 emptyBindings
-                 (ListPair.map (fn (a, b) => matchType a b) (tys, tys'))
+      and matchTypeLists tys tys' =
+          List.foldl (fn (a, b) => mergeBindings a b)
+                     emptyBindings
+                     (ListPair.map (fn (a, b) => matchType a b) (tys, tys'))
+  end
 end
