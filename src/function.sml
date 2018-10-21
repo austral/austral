@@ -166,7 +166,7 @@ structure Function :> FUNCTION = struct
         end
 
     fun typeArgs params bindings =
-        let fun mapParam (Type.Param name) =
+        let fun mapParam (Type.TypeParam name) =
                 case Map.get bindings name of
                     SOME ty => ty
                   | NONE => raise Fail ("typeArgs: No such type: " ^ (Symbol.toString name))
