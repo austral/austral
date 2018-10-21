@@ -284,7 +284,7 @@ structure TAst :> TAST = struct
                                                let val binds = Function.matchParams params argTypes
                                                in
                                                    Funcall (name,
-                                                            [ty],
+                                                            Function.typeArgs typarams binds,
                                                             args'
                                                             ty)
                                                end
@@ -305,7 +305,7 @@ structure TAst :> TAST = struct
             if (List.length params) = (List.length args) then
                 Funcall (name,
                          [],
-                         ListPair.map (augmentParam c) (params, args),
+                         map (fn a => augment a c) args,
                          rt)
             else
                 raise Fail "Funcall arity error"
