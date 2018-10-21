@@ -22,4 +22,6 @@ signature TYPE_MATCH = sig
                       | Failure of string
 
     val emptyBindings : bindings
+
+    val mergeBindings : bindings -> bindings -> bindings
 end
