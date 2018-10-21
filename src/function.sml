@@ -164,4 +164,13 @@ structure Function :> FUNCTION = struct
                   | TypeMatch.Failure f => raise Fail ("Argument matching failure: " ^ f)
             end
         end
+
+    fun typeArgs params bindings =
+        let fun mapParam (Type.Param name) =
+                case Map.get bindings name of
+                    SOME ty => ty
+                  | NONE => raise Fail ("typeArgs: No such type: " ^ (Symbol.toString name))
+        in
+            map mapParam (OrderedSet.toList params)
+        end
 end
