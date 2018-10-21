@@ -24,6 +24,7 @@ signature HIR = sig
                  | IntConstant of string
                  | FloatConstant of string
                  | StringConstant of CST.escaped_string
+                 | NullConstant
                  | Negation of ast
                  | Variable of string
                  | Let of string * ty * ast * ast
