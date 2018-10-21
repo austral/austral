@@ -169,7 +169,7 @@ structure Function :> FUNCTION = struct
         let fun mapParam (Type.TypeParam name) =
                 case Map.get bindings name of
                     SOME ty => ty
-                  | NONE => raise Fail ("typeArgs: No such type: " ^ (Symbol.toString name))
+                  | NONE => raise Fail ("typeArgs: unbound type variable: " ^ (Symbol.toString name))
         in
             map mapParam (OrderedSet.toList params)
         end
