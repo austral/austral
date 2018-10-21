@@ -1,6 +1,5 @@
 TODO:
 
-- Implement austral.ext.cffi:null-pointer (built-in)
 - Implement austral.ext.cffi:null? (generic function, prelude)
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
@@ -122,3 +121,4 @@ DONE:
 - Implement proper type/arguments matching/unification
 - Add support for an --entrypoint flag to define the main() function
 - Austral prelude
+- Implement austral.ext.cffi:null-pointer (built-in)
