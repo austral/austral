@@ -87,7 +87,7 @@ structure OAST :> OAST = struct
         else if f = Symbol.auCffi "foreign-funcall" then
             transformForeignFuncall args
         else if f = Symbol.auCffi "null-pointer" then
-            transformNullPointer args
+            transformForeignNull args
         else if f = Symbol.auCffi "size-of" then
             transformSizeOf args
         else
