@@ -44,3 +44,8 @@ echo "cffi.au"
 ./boreal test/valid/cffi.au --output=test/valid/cffi.cpp --entrypoint=cffi-test:main
 clang++ -std=c++11 test/valid/cffi.cpp -o test/valid/cffi.bin
 ./test/valid/cffi.bin
+
+echo "compare.au"
+./boreal test/valid/compare.au --output=test/valid/compare.cpp --entrypoint=austral-user:main
+clang++ -std=c++11 test/valid/compare.cpp -o test/valid/compare.bin
+./test/valid/compare.bin
