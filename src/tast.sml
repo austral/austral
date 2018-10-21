@@ -314,7 +314,7 @@ structure TAst :> TAST = struct
             if (List.length params) = (List.length args) then
                 Funcall (name,
                          [], (* We don't need to supply type parameters for non-RTP functions *)
-                         ListPair.map (augmentParam c) (params, args),
+                         map (fn a => augment a c) args,
                          rt)
             else
                 raise Fail "Funcall arity error"
