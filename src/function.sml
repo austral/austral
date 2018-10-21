@@ -154,6 +154,13 @@ structure Function :> FUNCTION = struct
                           | NONE => NONE
         end
 
-    fun matchParams _ _ =
-        raise Fail "derp"
+    fun matchParams params types =
+        let val paramTypes = map (fn (Param (_, t)) => t) params
+        in
+            let val binds = TypeMatch.matchTypeLists paramTypes types
+            in
+                case binds of
+                    TypeMatch.Bindings m => m
+                  | TypeMatch.Failure f => raise Fail ("Argument matching failure: " ^ f)
+        end
 end
