@@ -271,9 +271,16 @@ structure TAst :> TAST = struct
                     (case getVariantByName variants name of
                          (SOME (Variant (_, tyOpt))) =>
                          (case tyOpt of
-                              (SOME ty) => (case exp of
-                                                (SOME exp') => raise Fail "not implemented"
-                                              | NONE => raise Fail "construct: missing value")
+                              (SOME caseTy) => (case exp of
+                                                    (SOME exp') =>
+                                                    let val exp'' = augment exp' c
+                                                    in
+                                                        if typeOf exp'' = caseTy then
+                                                            Construct (ty, label, exp'')
+                                                        else
+                                                            raise Fail "construct: type mismatch"
+                                                    end
+                                                  | NONE => raise Fail "construct: missing value")
                             | NONE => (case exp of
                                            (SOME _) => raise Fail "construct: superfluous value"
                                          | NONE => Construct (ty, label, NONE)))
