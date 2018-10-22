@@ -101,6 +101,14 @@ structure CppBackend :> CPP_BACKEND = struct
         Funcall ("std::get",
                  [NamedType (Int.toString idx)],
                  [transformExp tup])
+      | transformExp (MIR.Construct (ty, idx, exp)) =
+        let val ty' = transformType ty
+        in
+            case exp of
+                SOME exp' => StructInitializer (ty', [("_tag", idx),
+                                                      ("_data", transform exp')])
+              | NONE => StructInitializer (ty', [("_tag", idx)])
+        end
       | transformExp (MIR.Funcall (name, tyargs, args)) =
         Funcall (name,
                  map transformType tyargs,
