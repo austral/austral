@@ -32,7 +32,7 @@ structure OAST :> OAST = struct
                  | Symbol of symbol
                  | Let of name * ast * ast
                  | The of typespec * ast
-                 | Construct of typespec * name * ast
+                 | Construct of typespec * name * ast option
                  | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
