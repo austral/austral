@@ -276,7 +276,7 @@ structure TAst :> TAST = struct
                                                     let val exp'' = augment exp' c
                                                     in
                                                         if typeOf exp'' = caseTy then
-                                                            Construct (ty, label, exp'')
+                                                            Construct (ty, label, SOME exp'')
                                                         else
                                                             raise Fail "construct: type mismatch"
                                                     end
