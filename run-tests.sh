@@ -49,3 +49,7 @@ echo "compare.au"
 ./boreal test/valid/compare.au --output=test/valid/compare.cpp --entrypoint=austral-user:main
 clang++ -std=c++11 test/valid/compare.cpp -o test/valid/compare.bin
 ./test/valid/compare.bin
+
+echo "defdisjunction.au"
+./boreal test/valid/defdisjunction.au --output=test/valid/defdisjunction.cpp
+clang++ -shared -fPIC -std=c++11 test/valid/defdisjunction.cpp
