@@ -43,6 +43,7 @@ signature TYPE = sig
     val tyVars : ty -> param Set.set
 
     val getVariantByName : variant list -> name -> variant option
+    val posInVariant : variant list -> name -> int option
 
     datatype typespec = TypeCons of name * (typespec list)
                       | TyIntArg of int
