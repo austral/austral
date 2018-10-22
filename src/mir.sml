@@ -243,6 +243,8 @@ structure MIR :> MIR = struct
         in
             (expBlock, Cast (transformType ty, exp'))
         end
+      | transformExp (HIR.Construct (ty, label, exp)) =
+        raise Fail "not implemented"
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
       | transformExp (HIR.Seq (a, b)) =
