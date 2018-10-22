@@ -35,6 +35,7 @@ signature TAST = sig
                  | Load of ast
                  | Store of ast * ast
                  | The of ty * ast
+                 | Construct of ty * name * ast
                  | ForeignFuncall of string * ty * ast list
                  | ForeignNull of ty
                  | SizeOf of ty
