@@ -39,6 +39,7 @@ signature HIR = sig
                  | Load of ast
                  | Store of ast * ast
                  | Cast of ty * ast
+                 | Construct of ty * name * ast option
                  | SizeOf of ty
                  | Seq of ast * ast
                  | Funcall of string * ty list * ast list
