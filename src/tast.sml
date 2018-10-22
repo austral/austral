@@ -268,7 +268,7 @@ structure TAst :> TAST = struct
             in
                 case ty of
                     (Disjunction (name, tyargs, variants)) =>
-                    (case getVariantByName variants name of
+                    (case getVariantByName variants label of
                          (SOME (Variant (_, tyOpt))) =>
                          (case tyOpt of
                               (SOME caseTy) => (case exp of
