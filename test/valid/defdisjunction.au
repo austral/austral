@@ -5,7 +5,13 @@
   (green)
   (blue))
 
+(defdisjunction int-or-bool ()
+  (int-case i32)
+  (bool-case boolean))
+
 (defun test () i32
   (let ((c (austral.kernel:construct color red)))
+    )
+  (let ((c2 (austral.kernel.construct int-or-bool bool-case true)))
     )
   0)
