@@ -125,7 +125,8 @@ structure Module : MODULE = struct
                 "<",
                 "<=",
                 ">",
-                ">="
+                ">=",
+                "construct"
             ]
             and cffiExports = [
                 "foreign-pointer",
