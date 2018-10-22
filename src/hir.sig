@@ -18,6 +18,7 @@
 *)
 
 signature HIR = sig
+    type name = string
     type ty = Type.ty
 
     datatype ast = BoolConstant of bool
@@ -41,8 +42,6 @@ signature HIR = sig
                  | SizeOf of ty
                  | Seq of ast * ast
                  | Funcall of string * ty list * ast list
-
-    type name = string
 
     datatype top_ast = Defun of name * param list * ty * ast
                      | Defgeneric of name * name list * param list * ty * ast
