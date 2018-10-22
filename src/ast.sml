@@ -87,10 +87,8 @@ structure AST :> AST = struct
         Let (var, transform value, transform body)
       | transform (Alpha.The (ty, exp)) =
         The (ty, transform exp)
-      | transform (Alpha.Construct (ty, label, NONE)) =
-        Construct (ty, label, NONE)
-      | transform (Alpha.Construct (ty, label, SOME exp)) =
-        Construct (ty, label, SOME (transform exp))
+      | transform (Alpha.Construct (ty, label, exp)) =
+        Construct (ty, label, Option.map transform exp)
       | transform (Alpha.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map transform args)
       | transform (Alpha.ForeignNull ty) =
