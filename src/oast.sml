@@ -119,7 +119,7 @@ structure OAST :> OAST = struct
     and transformConstruct [ty, RCST.Symbol label] =
         Construct (Type.parseTypespec ty, label, NONE)
       | transformConstruct [ty, RCST.Symbol label, value] =
-        Construct (Type.parseTypespec ty, label, SOME value)
+        Construct (Type.parseTypespec ty, label, SOME (transform value))
       | transformConstruct _ =
         raise Fail "Invalid `construct` form"
 
