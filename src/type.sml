@@ -63,7 +63,7 @@ structure Type :> TYPE = struct
         Set.empty
 
     fun getVariantByName variants name =
-        List.filter (fn (Variant (n, _)) => n = name) variants
+        List.find (fn (Variant (n, _)) => n = name) variants
 
     datatype typespec = TypeCons of name * (typespec list)
                       | TyIntArg of int
