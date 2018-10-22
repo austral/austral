@@ -284,7 +284,11 @@ structure TAst :> TAST = struct
                             | NONE => (case exp of
                                            (SOME _) => raise Fail "construct: superfluous value"
                                          | NONE => Construct (ty, label, NONE)))
-                       | _ => raise Fail ("construct: not a valid variant name: " ^ (Symbol.toString label)))
+                       | _ => raise Fail ("construct: not a valid variant name: "
+                                          ^ (Symbol.toString label)
+                                          ^ ". Valid variant names for this type: \n  "
+                                          ^ (String.concatWith "\n  " (map (fn (Variant (name, _)) => Symbol.toString name) variants))
+                                          ^ "\n"))
                   | _ => raise Fail "construct: not a disjunction"
             end
           | augment (AST.SizeOf typespec) c =
