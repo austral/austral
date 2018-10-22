@@ -118,6 +118,10 @@ structure OAST :> OAST = struct
 
     and transformConstruct [ty, RCST.Symbol label] =
         Construct (ty, label, NONE)
+      | transformConstruct [ty, RCST.Symbol label, value] =
+        Construct (ty, label, SOME value)
+      | transformConstruct _ =
+        raise Fail "Invalid `construct` form"
 
     and transformForeignFuncall ((RCST.StringConstant name)::rt::args) =
         ForeignFuncall (CST.escapedToString name,
