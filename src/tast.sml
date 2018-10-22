@@ -18,6 +18,7 @@
 *)
 
 structure TAst :> TAST = struct
+    type name = Symbol.symbol
     type ty = Type.ty
 
     datatype ast = UnitConstant
@@ -42,7 +43,6 @@ structure TAst :> TAST = struct
                  | Seq of ast * ast
                  | Funcall of Symbol.symbol * ty list * ast list * ty
 
-    type name = Symbol.symbol
     type param_name = name
     type docstring = string option
     type symbol = Symbol.symbol
