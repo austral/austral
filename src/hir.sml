@@ -41,7 +41,7 @@ structure HIR :> HIR = struct
                  | Load of ast
                  | Store of ast * ast
                  | Cast of ty * ast
-                 | Construct of ty * name * ast option
+                 | Construct of ty * Symbol.symbol * ast option
                  | SizeOf of ty
                  | Seq of ast * ast
                  | Funcall of string * ty list * ast list
@@ -135,7 +135,7 @@ structure HIR :> HIR = struct
       | transform (TAst.The (ty, exp)) =
         Cast (ty, transform exp)
       | transform (TAst.Construct (ty, label, exp)) =
-        Construct (ty, escapeSymbol label, Option.map transform exp)
+        Construct (ty, label, Option.map transform exp)
       | transform (TAst.ForeignFuncall (name, rt, args)) =
         (* If the function return type is unit, we're calling a function that
            returns void. In which case use a progn to seq call the function,

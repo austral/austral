@@ -244,7 +244,18 @@ structure MIR :> MIR = struct
             (expBlock, Cast (transformType ty, exp'))
         end
       | transformExp (HIR.Construct (ty, label, exp)) =
-        raise Fail "not implemented"
+        let fun disjVariants (Type.Disjunction (_, _, v)) = v
+              | disjVariants _ = raise Fail "construct->MIR: internal compiler error: not a disjunction"
+        in
+            case Type.posInVariants (disjVariants ty) label of
+                (SOME idx) => (case exp of
+                                   (SOME exp') => let val (valBlock, valExp) = transformExp exp'
+                                                  in
+                                                      (valBlock, Construct (idx, SOME valExp))
+                                                  end
+                                 | NONE => (Progn [], Construct (idx, NONE)))
+              | NONE => raise Fail "construct->MIR: internal compiler error: not a valid label"
+        end
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
       | transformExp (HIR.Seq (a, b)) =
