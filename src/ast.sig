@@ -18,6 +18,7 @@
 *)
 
 signature AST = sig
+    type name = Symbol.symbol
     type typespec = Type.typespec
 
     datatype ast = UnitConstant
@@ -43,7 +44,6 @@ signature AST = sig
                  | Seq of ast * ast
                  | Funcall of Symbol.symbol * ast list
 
-    type name = Symbol.symbol
     type param_name = name
     type docstring = string option
     type symbol = Symbol.symbol
