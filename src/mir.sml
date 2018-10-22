@@ -251,9 +251,9 @@ structure MIR :> MIR = struct
                 (SOME idx) => (case exp of
                                    (SOME exp') => let val (valBlock, valExp) = transformExp exp'
                                                   in
-                                                      (valBlock, Construct (idx, SOME valExp))
+                                                      (valBlock, Construct (transformType ty, idx, SOME valExp))
                                                   end
-                                 | NONE => (Progn [], Construct (idx, NONE)))
+                                 | NONE => (Progn [], Construct (transformType ty, idx, NONE)))
               | NONE => raise Fail "construct->MIR: internal compiler error: not a valid label"
         end
       | transformExp (HIR.SizeOf ty) =
