@@ -327,17 +327,12 @@ structure OAST :> OAST = struct
       | transformDeftype _ = raise Fail "Bad deftype form"
 
     and transformDefdisjunction ((RCST.Symbol name)::(RCST.List params)::body) =
-        let fun parseBody [RCST.StringConstant s, def] =
+        let fun parseBody ((RCST.StringConstant s)::def) =
                 (SOME (CST.escapedToString s), def)
-              | parseBody [def] =
+              | parseBody def =
                 (NONE, def)
-              | parseBody _ = raise Fail "Bad deftype form"
             and parseParam (RCST.Symbol s) = s
               | parseParam _ = raise Fail "Type parameter must be a symbol"
-            and parseVariants (RCST.List l) =
-                map parseVariant l
-              | parseVariants _ =
-                raise Fail "defdisjunction body must be a list of variants"
             and parseVariant (RCST.List [RCST.Symbol name, tyspec]) =
                 Variant (name, SOME (Type.parseTypespec tyspec))
               | parseVariant (RCST.List [RCST.Symbol name]) =
@@ -350,7 +345,7 @@ structure OAST :> OAST = struct
                 Defdisjunction (name,
                                 map parseParam params,
                                 docstring,
-                                parseVariants variants)
+                                map parseVariant variants)
             end
         end
       | transformDefdisjunction _ = raise Fail "Bad defdisjunction form"
