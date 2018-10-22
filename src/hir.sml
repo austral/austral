@@ -18,6 +18,7 @@
 *)
 
 structure HIR :> HIR = struct
+    type name = string
     type ty = Type.ty
 
     (* Expression AST *)
@@ -84,8 +85,6 @@ structure HIR :> HIR = struct
     end
 
     (* Toplevel AST *)
-
-    type name = string
 
     datatype top_ast = Defun of name * param list * ty * ast
                      | Defgeneric of name * name list * param list * ty * ast
