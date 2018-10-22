@@ -276,7 +276,7 @@ structure TAst :> TAST = struct
                                               | NONE => raise Fail "construct: missing value")
                             | NONE => (case exp of
                                            (SOME _) => raise Fail "construct: superfluous value"
-                                         | NONE => raise Fail "not implemented"))
+                                         | NONE => Construct (ty, label, NONE)))
                        | _ => raise Fail "construct: not a valid variant name")
                   | _ => raise Fail "construct: not a disjunction"
             end
