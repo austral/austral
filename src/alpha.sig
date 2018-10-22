@@ -21,6 +21,7 @@ signature ALPHA = sig
     type symbol = Symbol.symbol
     type variable = Symbol.variable
     type typespec = Type.typespec
+    type name = symbol
 
     datatype ast = UnitConstant
                  | BoolConstant of bool
@@ -36,7 +37,6 @@ signature ALPHA = sig
                  | SizeOf of typespec
                  | Operation of symbol * ast list
 
-    type name = symbol
     type docstring = string option
     type param_name = symbol
 
