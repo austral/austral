@@ -39,7 +39,7 @@ structure AST :> AST = struct
                  | Load of ast
                  | Store of ast * ast
                  | The of Type.typespec * ast
-                 | Construct of typespec * name * ast
+                 | Construct of typespec * name * ast option
                  | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
