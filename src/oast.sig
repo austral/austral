@@ -30,6 +30,7 @@ signature OAST = sig
                  | Symbol of symbol
                  | Let of name * ast * ast
                  | The of typespec * ast
+                 | Construct of typespec * name * ast
                  | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
