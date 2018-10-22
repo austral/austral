@@ -82,9 +82,7 @@ structure OAST :> OAST = struct
         if f = au "let" then
             transformLet args
         else if f = au "the" then
-            case args of
-                [ty, exp] => The (Type.parseTypespec ty, transform exp)
-              | _ => raise Fail "Invalid `the` form"
+            transformThe args
         else if f = Symbol.auCffi "foreign-funcall" then
             transformForeignFuncall args
         else if f = Symbol.auCffi "null-pointer" then
@@ -110,6 +108,11 @@ structure OAST :> OAST = struct
         (* A let with no bindings *)
         Operation (au "progn", map transform body)
       | transformLet _ = raise Fail "Invalid let form"
+
+    and transformThe [ty, exp] =
+        The (Type.parseTypespec ty, transform exp)
+      | transformThe _ =
+        raise Fail "Invalid `the` form"
 
     and transformForeignFuncall ((RCST.StringConstant name)::rt::args) =
         ForeignFuncall (CST.escapedToString name,
