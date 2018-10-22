@@ -269,7 +269,14 @@ structure TAst :> TAST = struct
                 case ty of
                     (Disjunction (name, tyargs, variants)) =>
                     (case getVariantByName variants name of
-                         (SOME v) => raise Fail "not implemented"
+                         (SOME (Variant (_, tyOpt))) =>
+                         (case tyOpt of
+                              (SOME ty) => (case exp of
+                                                (SOME exp') => raise Fail "not implemented"
+                                              | NONE => raise Fail "construct: missing value")
+                            | NONE => (case exp of
+                                           (SOME _) => raise Fail "construct: superfluous value"
+                                         | NONE => raise Fail "not implemented"))
                        | _ => raise Fail "construct: not a valid variant name")
                   | _ => raise Fail "construct: not a disjunction"
             end
