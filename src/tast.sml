@@ -95,6 +95,7 @@ structure TAst :> TAST = struct
                | _ => raise Fail "Not a pointer")
           | typeOf (Store (p, _)) = typeOf p
           | typeOf (The (t, _)) = t
+          | typeOf (Construct (t, _, _)) = t
           | typeOf (SizeOf _) =
             Integer (Unsigned, Int64)
           | typeOf (ForeignFuncall (_, rt, _)) = rt
