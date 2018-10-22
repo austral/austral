@@ -106,7 +106,7 @@ structure CppBackend :> CPP_BACKEND = struct
         in
             case exp of
                 SOME exp' => StructInitializer (ty', [("_tag", idx),
-                                                      ("_data", transform exp')])
+                                                      ("_data", transformExp exp')])
               | NONE => StructInitializer (ty', [("_tag", idx)])
         end
       | transformExp (MIR.Funcall (name, tyargs, args)) =
