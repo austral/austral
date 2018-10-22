@@ -1,6 +1,6 @@
 ;; -*- mode: lisp -*-
 
 (defdisjunction color ()
-  (red)
-  (green)
-  (blue))
+  ((red)
+   (green)
+   (blue)))
