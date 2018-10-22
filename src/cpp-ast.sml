@@ -163,9 +163,9 @@ structure CppAst :> CPP_AST = struct
         "&" ^ (renderExp e)
       | renderExp (SizeOf t) =
         "sizeof(" ^ (renderType t) ^ ")"
-      | renderExp (StructInitializer (name, inits)) =
+      | renderExp (StructInitializer (ty, inits)) =
         "(("
-        ^ (name)
+        ^ (renderType ty)
         ^ ") { "
         ^ (String.concatWith ", " (map (fn (n, e) => "." ^ (n) ^ " = " ^ (renderExp e)) inits))
         ^ " })"
