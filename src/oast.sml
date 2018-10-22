@@ -116,6 +116,9 @@ structure OAST :> OAST = struct
       | transformThe _ =
         raise Fail "Invalid `the` form"
 
+    and transformConstruct [ty, RCST.Symbol label] =
+        Construct (ty, label, NONE)
+
     and transformForeignFuncall ((RCST.StringConstant name)::rt::args) =
         ForeignFuncall (CST.escapedToString name,
                         Type.parseTypespec rt,
