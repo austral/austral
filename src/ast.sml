@@ -18,6 +18,7 @@
 *)
 
 structure AST :> AST = struct
+    type name = Symbol.symbol
     type typespec = Type.typespec
 
     (* Expression AST *)
@@ -47,7 +48,6 @@ structure AST :> AST = struct
 
     (* Toplevel AST *)
 
-    type name = Symbol.symbol
     type param_name = name
     type docstring = string option
     type symbol = Symbol.symbol
