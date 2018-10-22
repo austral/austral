@@ -66,16 +66,23 @@ structure TAst :> TAST = struct
     local
         open Type
     in
-        fun typeOf UnitConstant = Unit
-          | typeOf (BoolConstant _) = Bool
-          | typeOf (IntConstant (_, t)) = t
-          | typeOf (FloatConstant (_, t)) = t
+        fun typeOf UnitConstant =
+            Unit
+          | typeOf (BoolConstant _) =
+            Bool
+          | typeOf (IntConstant (_, t)) =
+            t
+          | typeOf (FloatConstant (_, t)) =
+            t
           | typeOf (StringConstant s) =
             StaticArray (Integer (Unsigned, Int8),
                          String.size (CST.escapedToString s))
-          | typeOf (Variable (_, t)) = t
-          | typeOf (Let (_, _, b)) = typeOf b
-          | typeOf (Cond (_, tb, _)) = typeOf tb
+          | typeOf (Variable (_, t)) =
+            t
+          | typeOf (Let (_, _, b)) =
+            typeOf b
+          | typeOf (Cond (_, tb, _)) =
+            typeOf tb
           | typeOf (ArithOp (kind, _, lhs, _)) =
             (* The type of most arithmetic operations is the type of the
                arguments, except for checked operations, where the result is a
@@ -83,26 +90,34 @@ structure TAst :> TAST = struct
             (case kind of
                  Arith.Checked => Tuple [typeOf lhs, Bool]
                | _ => typeOf lhs)
-          | typeOf (TupleCreate exps) = Tuple (map typeOf exps)
+          | typeOf (TupleCreate exps) =
+            Tuple (map typeOf exps)
           | typeOf (TupleProj (tup, idx)) =
             (case typeOf tup of
                  Tuple tys => List.nth (tys, idx)
                | _ => raise Fail "Not a tuple")
-          | typeOf (Allocate v) = Pointer (typeOf v)
+          | typeOf (Allocate v) =
+            Pointer (typeOf v)
           | typeOf (Load p) =
             (case typeOf p of
                  (Pointer t) => t
                | _ => raise Fail "Not a pointer")
-          | typeOf (Store (p, _)) = typeOf p
-          | typeOf (The (t, _)) = t
-          | typeOf (Construct (t, _, _)) = t
+          | typeOf (Store (p, _)) =
+            typeOf p
+          | typeOf (The (t, _)) =
+            t
+          | typeOf (Construct (t, _, _)) =
+            t
           | typeOf (SizeOf _) =
             Integer (Unsigned, Int64)
-          | typeOf (ForeignFuncall (_, rt, _)) = rt
+          | typeOf (ForeignFuncall (_, rt, _)) =
+            rt
           | typeOf (ForeignNull ty) =
             ForeignPointer ty
-          | typeOf (Seq (_, v)) = typeOf v
-          | typeOf (Funcall (_, _, _, t)) = t
+          | typeOf (Seq (_, v)) =
+            typeOf v
+          | typeOf (Funcall (_, _, _, t)) =
+            t
     end
 
     (* Bindings *)
