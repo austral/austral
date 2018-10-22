@@ -135,7 +135,7 @@ structure HIR :> HIR = struct
       | transform (TAst.The (ty, exp)) =
         Cast (ty, transform exp)
       | transform (TAst.Construct (ty, label, exp)) =
-        raise Fail "construct not implemented"
+        Construct (ty, esacpeSymbol label, Option.map transform exp)
       | transform (TAst.ForeignFuncall (name, rt, args)) =
         (* If the function return type is unit, we're calling a function that
            returns void. In which case use a progn to seq call the function,
