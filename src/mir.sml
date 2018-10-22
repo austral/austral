@@ -57,7 +57,7 @@ structure MIR :> MIR = struct
                      | SizeOf of ty
                      | TupleCreate of exp_ast list
                      | TupleProj of exp_ast * int
-                     | Construct of int * exp_ast option
+                     | Construct of ty * int * exp_ast option
                      | Funcall of string * ty list * exp_ast list
 
     datatype block_ast = Progn of block_ast list
