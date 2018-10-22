@@ -131,7 +131,10 @@ structure CppAst :> CPP_AST = struct
             end
         end
       | renderType (TypeCons (n, args)) =
-        n ^ "<" ^ (commaSep (map renderType args)) ^ ">"
+        if args = nil then
+            n
+        else
+            n ^ "<" ^ (commaSep (map renderType args)) ^ ">"
 
     fun renderExp (BoolConstant true) =
         "true"
