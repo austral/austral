@@ -122,10 +122,8 @@ structure Alpha :> ALPHA = struct
         end
       | alphaRename s (OAST.The (ty, exp)) =
         The (ty, alphaRename s exp)
-      | alphaRename s (OAST.Construct (ty, label, NONE)) =
-        Construct (ty, label, NONE)
-      | alphaRename s (OAST.Construct (ty, label, SOME exp)) =
-        Construct (ty, label, SOME (alphaRename s exp))
+      | alphaRename s (OAST.Construct (ty, label, exp)) =
+        Construct (ty, label, Option.map (alphaRename s) exp)
       | alphaRename s (OAST.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map (alphaRename s) args)
       | alphaRename s (OAST.ForeignNull ty) =
