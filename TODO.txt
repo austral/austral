@@ -1,6 +1,5 @@
 TODO:
 
-- `construct` builtin
 - Case expressions
 
 - Implement static-array-index
@@ -126,3 +125,4 @@ DONE:
 - Implement austral.ext.cffi:null-pointer (built-in)
 - eq builtin for pointers
 - Implement austral.ext.cffi:null? (generic function, prelude)
+- `construct` builtin
