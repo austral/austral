@@ -267,7 +267,10 @@ structure TAst :> TAST = struct
             let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
             in
                 case ty of
-                    (Disjunction (name, tyargs, variants)) => raise Fail "not implemented"
+                    (Disjunction (name, tyargs, variants)) =>
+                    (case getVariantByName variants name of
+                         (SOME v) => raise Fail "not implemented"
+                       | _ => raise Fail "construct: not a valid variant name")
                   | _ => raise Fail "construct: not a disjunction"
             end
           | augment (AST.SizeOf typespec) c =
