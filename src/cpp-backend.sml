@@ -105,7 +105,7 @@ structure CppBackend :> CPP_BACKEND = struct
         let val ty' = transformType ty
         in
             case exp of
-                SOME exp' => StructInitializer (ty', [("_tag", idx),
+                SOME exp' => StructInitializer (ty', [("_tag", IntConstant idx),
                                                       ("_data", transformExp exp')])
               | NONE => StructInitializer (ty', [("_tag", idx)])
         end
