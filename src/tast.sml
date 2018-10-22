@@ -259,6 +259,8 @@ structure TAst :> TAST = struct
                              end
                 end
             end
+          | augment (AST.Construct (ty, label, exp)) =
+            raise Fail "not implemented"
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.ForeignNull typespec) c =
