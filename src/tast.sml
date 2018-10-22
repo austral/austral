@@ -259,8 +259,17 @@ structure TAst :> TAST = struct
                              end
                 end
             end
-          | augment (AST.Construct (ty, label, exp)) =
-            raise Fail "not implemented"
+          | augment (AST.Construct (typespec, label, exp)) c =
+            (* Three things: verify that the type is indeed a disjunction,
+               verify that the label is a valid variant name, and check that the
+               expression (if the variant carries a value) is of the correct
+               type. *)
+            let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
+            in
+                case ty of
+                    (Disjunction (name, tyargs, variants)) => raise Fail "not implemented"
+                  | _ => raise Fail "construct: not a disjunction"
+            end
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.ForeignNull typespec) c =
