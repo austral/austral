@@ -4,3 +4,8 @@
   (red)
   (green)
   (blue))
+
+(defun test () i32
+  (let ((c (austral.kernel:construct color red)))
+    )
+  0)
