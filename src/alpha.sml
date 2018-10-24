@@ -126,8 +126,7 @@ structure Alpha :> ALPHA = struct
         let val freshVars = map (fn name => freshVar name) vars
             and tup' = alphaRename s tup
         in
-            let val s' = ListPair.map (fn (v, fv) => (v, fv)) (vars, freshVars)
-                         @ s
+            let val s' = ListPair.zip (vars, freshVars) @ s
             in
                 let val body' = alphaRename s' body
                 in
