@@ -352,8 +352,8 @@ structure TAst :> TAST = struct
                                         ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
             else
                 augmentGenericFuncall gf args c
-          | augmentCallable Function.CallableMethod args c _ =
-            augmentMethodCall args c
+          | augmentCallable Function.CallableMethod args c the_context =
+            augmentMethodCall args c the_context
 
         and augmentConcreteFuncall (Function.Function (name, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
@@ -373,7 +373,7 @@ structure TAst :> TAST = struct
             else
                 raise Fail "Funcall arity error"
 
-        and augmentMethodCall args c =
+        and augmentMethodCall args c the_context =
             raise Fail "method calls not implemented yet"
     end
 
