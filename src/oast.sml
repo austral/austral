@@ -114,6 +114,17 @@ structure OAST :> OAST = struct
         Operation (au "progn", map transform body)
       | transformLet _ = raise Fail "Invalid let form"
 
+    and transformBind ((RCST.List binds)::tup::body) =
+        let fun parseBind (RCST.Symbol s) =
+                s
+              | parseBind _ =
+                raise Fail "Not a binding"
+        in
+          Bind (map parseBind binds,
+                transform tup,
+                Operation (au "progn", map transform body))
+        end
+
     and transformThe [ty, exp] =
         The (Type.parseTypespec ty, transform exp)
       | transformThe _ =
