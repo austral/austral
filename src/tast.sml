@@ -180,7 +180,7 @@ structure TAst :> TAST = struct
                     (Tuple tys) => if (List.length tys) = (List.length vars) then
                                        let val s' = Map.iaddList (ctxBindings c)
                                                                  (ListPair.map (fn (b, idx) => (b, Binding (List.nth (tys, idx), Immutable)))
-                                                                               (binds,
+                                                                               (vars,
                                                                                 List.tabulate (List.length binds, fn x => x)))
                                        in
                                            let val ctx' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
