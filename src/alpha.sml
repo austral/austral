@@ -115,9 +115,10 @@ structure Alpha :> ALPHA = struct
         in
             let val s' = (var, fresh) :: s
             in
-                let val body' = alphaRename s' body
+                let val value' = alphaRename s value
+                    and body' = alphaRename s' body
                 in
-                    Let (fresh, alphaRename s value, body')
+                    Let (fresh, value', body')
                 end
             end
         end
