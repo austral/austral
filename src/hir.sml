@@ -111,6 +111,8 @@ structure HIR :> HIR = struct
       | transform (TAst.Let (var, value, body)) =
         Let (escapeVariable var, TAst.typeOf value, transform value, transform body)
       | transform (TAst.Bind (vars, tup, body)) =
+        (* At the TAST->HIR boundary we map bindings to a chain of let
+           expressions where each variable is bound to a tuple projection *)
         raise Fail "bind not implemented"
       | transform (TAst.Cond (test, cons, alt)) =
         Cond (transform test, transform cons, transform alt, TAst.typeOf cons)
