@@ -179,9 +179,8 @@ structure TAst :> TAST = struct
                 case typeOf tup' of
                     (Tuple tys) => if (List.length tys) = (List.length vars) then
                                        let val s' = Map.iaddList (ctxBindings c)
-                                                                 (ListPair.map (fn (b, idx) => (b, Binding (List.nth (tys, idx), Immutable)))
-                                                                               (vars,
-                                                                                List.tabulate (List.length vars, fn x => x)))
+                                                                 (Util.mapidx (fn (b, idx) => (b, Binding (List.nth (tys, idx), Immutable)))
+                                                                              vars)
                                        in
                                            let val ctx' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                            in
