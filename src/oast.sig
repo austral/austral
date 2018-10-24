@@ -32,7 +32,7 @@ signature OAST = sig
                  | Bind of name list * ast * ast
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
-                 | Case of variant_case list
+                 | Case of ast * variant_case list
                  | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
