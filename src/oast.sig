@@ -29,6 +29,7 @@ signature OAST = sig
                  | StringConstant of CST.escaped_string
                  | Symbol of symbol
                  | Let of name * ast * ast
+                 | Bind of name list * ast * ast
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | ForeignFuncall of string * typespec * ast list
