@@ -21,6 +21,18 @@ structure HIR :> HIR = struct
     type name = string
     type ty = Type.ty
 
+    (* Generate variables *)
+
+    val count = ref 0;
+
+    fun gensym () =
+        let
+        in
+            count := !count + 1;
+            Symbol.mkSymbol (Ident.mkIdentEx "austral-user",
+                             Ident.mkIdentEx ("auto_" ^ (Int.toString (!count))))
+        end
+
     (* Expression AST *)
 
     datatype ast = BoolConstant of bool
