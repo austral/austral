@@ -120,7 +120,7 @@ structure Alpha :> ALPHA = struct
                   end
               end
         end
-      | alphaRename (OAST.Bind (vars, tup, body)) =
+      | alphaRename s (OAST.Bind (vars, tup, body)) =
         raise Fail "bind not implemented"
       | alphaRename s (OAST.The (ty, exp)) =
         The (ty, alphaRename s exp)
