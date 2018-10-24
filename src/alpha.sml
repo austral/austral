@@ -122,7 +122,10 @@ structure Alpha :> ALPHA = struct
             end
         end
       | alphaRename s (OAST.Bind (vars, tup, body)) =
-        raise Fail "bind not implemented"
+        let val freshVars = map (fn name => freshVar name) vars
+        in
+            raise Fail "bind not implemented"
+        end
       | alphaRename s (OAST.The (ty, exp)) =
         The (ty, alphaRename s exp)
       | alphaRename s (OAST.Construct (ty, label, exp)) =
