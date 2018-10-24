@@ -145,6 +145,11 @@ structure OAST :> OAST = struct
       | transformConstruct _ =
         raise Fail "Invalid `construct` form"
 
+    and transformCase (exp::rest) =
+        raise Fail "derp"
+      | transformCase _ =
+        raise Fail "Invalid `case` form"
+
     and transformForeignFuncall ((RCST.StringConstant name)::rt::args) =
         ForeignFuncall (CST.escapedToString name,
                         Type.parseTypespec rt,
