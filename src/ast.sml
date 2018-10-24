@@ -87,7 +87,7 @@ structure AST :> AST = struct
       | transform (Alpha.Let (var, value, body)) =
         Let (var, transform value, transform body)
       | transform (Alpha.Bind (vars, tup, body)) =
-        raise Fail "bind not implemented"
+        Bind (vars, transform tup, transform body)
       | transform (Alpha.The (ty, exp)) =
         The (ty, transform exp)
       | transform (Alpha.Construct (ty, label, exp)) =
