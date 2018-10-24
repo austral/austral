@@ -185,7 +185,7 @@ structure TAst :> TAST = struct
                                        in
                                            let val ctx' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                            in
-                                               Bind (binds, tup', augment body ctx')
+                                               Bind (vars, tup', augment body ctx')
                                            end
                                        end
                                    else
