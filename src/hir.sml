@@ -110,6 +110,8 @@ structure HIR :> HIR = struct
         Variable (escapeVariable v)
       | transform (TAst.Let (var, value, body)) =
         Let (escapeVariable var, TAst.typeOf value, transform value, transform body)
+      | transform (TAst.Bind (vars, tup, body)) =
+        raise Fail "bind not implemented"
       | transform (TAst.Cond (test, cons, alt)) =
         Cond (transform test, transform cons, transform alt, TAst.typeOf cons)
       | transform (TAst.ArithOp (kind, oper, lhs, rhs)) =
