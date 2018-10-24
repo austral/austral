@@ -29,8 +29,7 @@ structure HIR :> HIR = struct
         let
         in
             count := !count + 1;
-            Symbol.mkSymbol (Ident.mkIdentEx "austral-user",
-                             Ident.mkIdentEx ("auto_" ^ (Int.toString (!count))))
+            "auto_" ^ (Int.toString (!count))
         end
 
     (* Expression AST *)
@@ -143,7 +142,7 @@ structure HIR :> HIR = struct
             in
                 let val tupref = gensym ()
                 in
-                    Let (tupref,
+                    Let (Variable tupref,
                          tupTy,
                          tup',
                          transformBind vars tupref body 0)
