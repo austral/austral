@@ -126,7 +126,6 @@ structure HIR :> HIR = struct
            expressions where each variable is bound to a tuple projection *)
         let val tupTy = TAst.typeOf tup
             and tup' = transform tup
-            and vars' = map escapeVariable vars
         in
             let fun nthTupTy idx =
                     case tupTy of
@@ -146,7 +145,7 @@ structure HIR :> HIR = struct
                     Let (tupref,
                          tupTy,
                          tup',
-                         transformBind vars' tupref body 0)
+                         transformBind vars tupref body 0)
                 end
             end
         end
