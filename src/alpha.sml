@@ -129,7 +129,7 @@ structure Alpha :> ALPHA = struct
             in
                 let val body' = alphaRename s' body
                 in
-                    raise Fail "bind not implemented"
+                    Bind (freshVars, alphaRename s tup, body')
                 end
             end
         end
