@@ -32,7 +32,7 @@ structure Alpha :> ALPHA = struct
                  | StringConstant of CST.escaped_string
                  | Variable of variable
                  | Let of variable * ast * ast
-                 | Bind of name list * ast * ast
+                 | Bind of variable list * ast * ast
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | ForeignFuncall of string * typespec * ast list
