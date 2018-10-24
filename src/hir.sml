@@ -142,7 +142,7 @@ structure HIR :> HIR = struct
             in
                 let val tupref = gensym ()
                 in
-                    Let (Variable tupref,
+                    Let (tupref,
                          tupTy,
                          tup',
                          transformBind vars tupref body 0)
