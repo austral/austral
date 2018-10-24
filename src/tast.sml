@@ -170,6 +170,8 @@ structure TAst :> TAST = struct
                          augment body (mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)))
                 end
             end
+          | augment (AST.Bind (vars, tup, body)) c =
+            raise Fail "bind not implemented"
           | augment (AST.Cond (test, cons, alt)) c =
             let val test' = augment test c
                 and cons' = augment cons c
