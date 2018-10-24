@@ -146,8 +146,14 @@ structure OAST :> OAST = struct
         raise Fail "Invalid `construct` form"
 
     and transformCase (exp::rest) =
-        raise Fail "derp"
+        Case (transform exp,
+              map transformCaseVariant rest)
       | transformCase _ =
+        raise Fail "Invalid `case` form"
+
+    and transformCaseVariant (RCST.List (name::rest)) =
+        raise Fail "not done yet"
+      | transformCaseVariant _ =
         raise Fail "Invalid `case` form"
 
     and transformForeignFuncall ((RCST.StringConstant name)::rt::args) =
