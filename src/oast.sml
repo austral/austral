@@ -152,7 +152,7 @@ structure OAST :> OAST = struct
         raise Fail "Invalid `case` form"
 
     and transformCaseVariant (RCST.List (name::body)) =
-        VariantCase (parseName name,
+        VariantCase (parseCaseName name,
                      Operation (au "progn", map transform body))
       | transformCaseVariant _ =
         raise Fail "Invalid `case` form"
