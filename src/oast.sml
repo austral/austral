@@ -82,6 +82,8 @@ structure OAST :> OAST = struct
     and transformOp f args =
         if f = au "let" then
             transformLet args
+        else if f = au "bind" then
+            transformBind args
         else if f = au "the" then
             transformThe args
         else if f = Symbol.auKer "construct" then
