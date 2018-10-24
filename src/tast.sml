@@ -82,6 +82,8 @@ structure TAst :> TAST = struct
             t
           | typeOf (Let (_, _, b)) =
             typeOf b
+          | typeOf (Bind (_, _, b)) =
+            typeOf b
           | typeOf (Cond (_, tb, _)) =
             typeOf tb
           | typeOf (ArithOp (kind, _, lhs, _)) =
