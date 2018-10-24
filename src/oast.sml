@@ -92,6 +92,8 @@ structure OAST :> OAST = struct
             transformThe args
         else if f = Symbol.auKer "construct" then
             transformConstruct args
+        else if f = au "case" then
+            transformCase args
         else if f = Symbol.auCffi "foreign-funcall" then
             transformForeignFuncall args
         else if f = Symbol.auCffi "null-pointer" then
