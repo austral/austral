@@ -53,3 +53,8 @@ clang++ -std=c++11 test/valid/compare.cpp -o test/valid/compare.bin
 echo "defdisjunction.au"
 ./boreal test/valid/defdisjunction.au --output=test/valid/defdisjunction.cpp
 clang++ -shared -fPIC -std=c++11 test/valid/defdisjunction.cpp
+
+echo "bind.au"
+./boreal test/valid/bind.au --output=test/valid/bind.cpp --entrypoint=austral-user:main
+clang++ -std=c++11 test/valid/bind.cpp -o test/valid/bind.bin
+./test/valid/bind.bin
