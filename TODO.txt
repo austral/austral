@@ -1,5 +1,6 @@
 TODO:
 
+- Tuple bind
 - Case expressions
 
 - Implement static-array-index
@@ -30,7 +31,6 @@ LONG-TERM TODO:
 - Function or*
 - Bitwise operators
 
-- Tuple bind
 - Prelude: equality and comparison instances
 
 - Implement defcfun
