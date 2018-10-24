@@ -124,6 +124,8 @@ structure OAST :> OAST = struct
                 transform tup,
                 Operation (au "progn", map transform body))
         end
+      | transformBind _ =
+        raise Fail "Invalid `bind` form"
 
     and transformThe [ty, exp] =
         The (Type.parseTypespec ty, transform exp)
