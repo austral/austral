@@ -174,7 +174,24 @@ structure TAst :> TAST = struct
                 end
             end
           | augment (AST.Bind (vars, tup, body)) c =
-            raise Fail "bind not implemented"
+            let val tup' = augment tup c
+            in
+                case typeOf tup' of
+                    (Tuple tys) => if (List.length tys) = (List.length vars) then
+                                       let val s' = Map.iaddList (ctxBindings c)
+                                                                 (ListPair.map (fn (b, idx) => (b, Binding (List.nth (tys, idx), Immutable)))
+                                                                               (binds,
+                                                                                List.tabulate (List.length binds, fn x => x)))
+                                       in
+                                           let val ctx' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                           in
+                                               Bind (binds, tup', augment body ctx')
+                                           end
+                                       end
+                                   else
+                                       raise Fail "Number of bindings does not match tuple size"
+                 |  _ => raise Fail "Cannot bind a non-tuple"
+            end
           | augment (AST.Cond (test, cons, alt)) c =
             let val test' = augment test c
                 and cons' = augment cons c
