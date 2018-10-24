@@ -112,11 +112,11 @@ structure Alpha :> ALPHA = struct
         end
       | alphaRename s (OAST.Let (var, value, body)) =
         let val fresh = freshVar var
+            and value' = alphaRename s value
         in
             let val s' = (var, fresh) :: s
             in
-                let val value' = alphaRename s value
-                    and body' = alphaRename s' body
+                let val body' = alphaRename s' body
                 in
                     Let (fresh, value', body')
                 end
