@@ -176,20 +176,24 @@ structure TAst :> TAST = struct
           | augment (AST.Bind (vars, tup, body)) c =
             let val tup' = augment tup c
             in
-                case typeOf tup' of
-                    (Tuple tys) => if (List.length tys) = (List.length vars) then
-                                       let val s' = Map.iaddList (ctxBindings c)
-                                                                 (Util.mapidx (fn (b, idx) => (b, Binding (List.nth (tys, idx), Immutable)))
-                                                                              vars)
-                                       in
-                                           let val ctx' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
-                                           in
-                                               Bind (vars, tup', augment body ctx')
-                                           end
-                                       end
-                                   else
-                                       raise Fail "Number of bindings does not match tuple size"
-                 |  _ => raise Fail "Cannot bind a non-tuple"
+                let fun augmentBind tys =
+                        if (List.length tys) = (List.length vars) then
+                            let val s' = Map.iaddList (ctxBindings c)
+                                                      (Util.mapidx (fn (b, idx) => (b, Binding (List.nth (tys, idx), Immutable)))
+                                                                   vars)
+                            in
+                                let val ctx' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                in
+                                    Bind (vars, tup', augment body ctx')
+                                end
+                            end
+                        else
+                            raise Fail "Number of bindings does not match tuple size"
+                in
+                    case typeOf tup' of
+                        (Tuple tys) => augmentBind tys
+                     |  _ => raise Fail "Cannot bind a non-tuple"
+                end
             end
           | augment (AST.Cond (test, cons, alt)) c =
             let val test' = augment test c
