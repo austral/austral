@@ -1,6 +1,5 @@
 TODO:
 
-- Tuple bind
 - Case expressions
 
 - Implement static-array-index
@@ -127,3 +126,4 @@ DONE:
 - Implement austral.ext.cffi:null? (generic function, prelude)
 - `construct` builtin
 - Parse bind expressions
+- Tuple bind
