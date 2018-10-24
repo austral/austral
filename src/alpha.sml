@@ -112,14 +112,14 @@ structure Alpha :> ALPHA = struct
         end
       | alphaRename s (OAST.Let (var, value, body)) =
         let val fresh = freshVar var
-          in
-              let val s' = (var, fresh) :: s
-              in
-                  let val body' = alphaRename s' body
-                  in
-                      Let (fresh, alphaRename s value, body')
-                  end
-              end
+        in
+            let val s' = (var, fresh) :: s
+            in
+                let val body' = alphaRename s' body
+                in
+                    Let (fresh, alphaRename s value, body')
+                end
+            end
         end
       | alphaRename s (OAST.Bind (vars, tup, body)) =
         raise Fail "bind not implemented"
