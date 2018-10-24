@@ -72,6 +72,7 @@ structure Module : MODULE = struct
                 "or",
                 "progn",
                 "let",
+                "bind",
                 "if",
                 "the",
                 "+",
