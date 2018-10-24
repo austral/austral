@@ -127,7 +127,10 @@ structure Alpha :> ALPHA = struct
             let val s' = ListPair.map (fn (v, fv) => (v, fv)) (vars, freshVars)
                          @ s
             in
-                raise Fail "bind not implemented"
+                let val body' = alphaRename s' body
+                in
+                    raise Fail "bind not implemented"
+                end
             end
         end
       | alphaRename s (OAST.The (ty, exp)) =
