@@ -32,10 +32,14 @@ signature OAST = sig
                  | Bind of name list * ast * ast
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
+                 | Case of variant_case list
                  | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
                  | Operation of name * ast list
+         and variant_case = VariantCase of case_name * ast
+         and case_name = NameOnly of name
+                       | NameBinding of { casename: name, var: name }
 
     type docstring = string option
     type param_name = symbol
