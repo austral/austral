@@ -1,6 +1,7 @@
 TODO:
 
 - Case expressions
+- Augment methods
 
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
