@@ -133,9 +133,9 @@ structure HIR :> HIR = struct
                       | _ => raise Fail "not a tuple"
 
                 and transformBind (var::rest) tupref body idx =
-                    Let (var,
+                    Let (escapeVariable var,
                          nthTupTy idx,
-                         TupleProj (tupref, idx),
+                         TupleProj (Variable tupref, idx),
                          transformBind rest tupref body (idx+1))
                   | transformBind nil _ body _ =
                     body
