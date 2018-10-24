@@ -113,7 +113,31 @@ structure HIR :> HIR = struct
       | transform (TAst.Bind (vars, tup, body)) =
         (* At the TAST->HIR boundary we map bindings to a chain of let
            expressions where each variable is bound to a tuple projection *)
-        raise Fail "bind not implemented"
+        let val tupTy = TAst.typeOf tup
+            and tup' = transform tup
+        in
+            let fun nthTupTy idx =
+                    case tupTy of
+                        (Type.Tuple tys) => List.nth (tys, idx)
+                      | _ => raise Fail "not a tuple"
+
+                and transformBind (var::rest) tupref body idx =
+                    Let (escapeVariable var,
+                         nthTupTy idx,
+                         TupleProj (tupref, idx),
+                         transformBind rest tupref body (idx+1))
+                  | transformBind nil _ body _ =
+                    body
+            in
+                let val tupref = gensym ()
+                in
+                    Let (tupref,
+                         tupTy,
+                         tup',
+                         transformBind vars tupref body 0)
+                end
+            end
+        end
       | transform (TAst.Cond (test, cons, alt)) =
         Cond (transform test, transform cons, transform alt, TAst.typeOf cons)
       | transform (TAst.ArithOp (kind, oper, lhs, rhs)) =
