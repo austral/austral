@@ -1,6 +1,7 @@
 TODO:
 
 - Tuple bind
+- Parse bind expressions
 - Case expressions
 
 - Implement static-array-index
