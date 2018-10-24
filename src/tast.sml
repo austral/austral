@@ -181,7 +181,7 @@ structure TAst :> TAST = struct
                                        let val s' = Map.iaddList (ctxBindings c)
                                                                  (ListPair.map (fn (b, idx) => (b, Binding (List.nth (tys, idx), Immutable)))
                                                                                (vars,
-                                                                                List.tabulate (List.length binds, fn x => x)))
+                                                                                List.tabulate (List.length vars, fn x => x)))
                                        in
                                            let val ctx' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                            in
