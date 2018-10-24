@@ -161,6 +161,8 @@ structure OAST :> OAST = struct
         NameOnly label
       | parseCaseName (RCST.List [RCST.Symbol label, RCST.Symbol var]) =
         NameBinding { casename = label, var = var }
+      | parseCaseName _ =
+        raise Fail "Invalid case name in a `case` form"
 
     and transformForeignFuncall ((RCST.StringConstant name)::rt::args) =
         ForeignFuncall (CST.escapedToString name,
