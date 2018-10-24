@@ -124,13 +124,14 @@ structure Alpha :> ALPHA = struct
         end
       | alphaRename s (OAST.Bind (vars, tup, body)) =
         let val freshVars = map (fn name => freshVar name) vars
+            and tup' = alphaRename s tup
         in
             let val s' = ListPair.map (fn (v, fv) => (v, fv)) (vars, freshVars)
                          @ s
             in
                 let val body' = alphaRename s' body
                 in
-                    Bind (freshVars, alphaRename s tup, body')
+                    Bind (freshVars, tup', body')
                 end
             end
         end
