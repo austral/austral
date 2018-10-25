@@ -128,3 +128,4 @@ DONE:
 - `construct` builtin
 - Parse bind expressions
 - Tuple bind
+- Parse case expressions
