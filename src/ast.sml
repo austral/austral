@@ -96,8 +96,16 @@ structure AST :> AST = struct
         The (ty, transform exp)
       | transform (Alpha.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map transform exp)
-      | transform (Alpha.Case _) =
-        raise Fail "case not implemented"
+      | transform (Alpha.Case (exp, cases)) =
+        let fun transformCase (Alpha.VariantCase (name, body)) =
+                VariantCase (transformCaseName name, transform body)
+            and transformCaseName (Alpha.NameOnly name) =
+                NameOnly name
+              | transformCaseName (Alpha.NameBinding {casename, var}) =
+                NameBinding { casename = casename, var = var }
+        in
+            Case (exp, map transformCase cases)
+        end
       | transform (Alpha.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map transform args)
       | transform (Alpha.ForeignNull ty) =
