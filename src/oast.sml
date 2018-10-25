@@ -157,7 +157,7 @@ structure OAST :> OAST = struct
       | transformCaseVariant _ =
         raise Fail "Invalid `case` form"
 
-    and parseCaseName (RCST.List [RCST.Symbol label]) =
+    and parseCaseName (RCST.Symbol label) =
         NameOnly label
       | parseCaseName (RCST.List [RCST.Symbol label, RCST.Symbol var]) =
         NameBinding { casename = label, var = var }
