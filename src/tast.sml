@@ -317,6 +317,20 @@ structure TAst :> TAST = struct
                   | _ => raise Fail "construct: not a disjunction"
             end
           | augment (AST.Case _) c =
+            (* Things we have to verify:
+
+               1. The type of exp is a disjunction.
+
+               2. The set of case names in this expression is equal to the set
+                  of case names in the disjunction.
+
+               3. If a case name is a name without a binding, the corresponding
+                  case in the disjunction must not have a value associated to
+                  it.
+
+               4. If a case name has a binding, the corresponding case in the
+                  disjunction must have a value associated to it.
+             *)
             raise Fail "Case not implemented"
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
