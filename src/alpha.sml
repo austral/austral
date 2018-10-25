@@ -142,7 +142,7 @@ structure Alpha :> ALPHA = struct
         The (ty, alphaRename s exp)
       | alphaRename s (OAST.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map (alphaRename s) exp)
-      | alphaRename s (OAST.Case _) =
+      | alphaRename s (OAST.Case (exp, cases)) =
         raise Fail "case not implemented"
       | alphaRename s (OAST.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map (alphaRename s) args)
