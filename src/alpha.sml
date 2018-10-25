@@ -160,9 +160,10 @@ structure Alpha :> ALPHA = struct
                                          alphaRename s' body)
                         end
                     end
-
-            Case (exp',
-                  map renameCase cases)
+            in
+                Case (exp',
+                      map renameCase cases)
+            end
         end
       | alphaRename s (OAST.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map (alphaRename s) args)
