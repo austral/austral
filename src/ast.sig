@@ -39,11 +39,15 @@ signature AST = sig
                  | Store of ast * ast
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
+                 | Case of ast * variant_case list
                  | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
                  | Seq of ast * ast
                  | Funcall of Symbol.symbol * ast list
+         and variant_case = VariantCase of case_name * ast
+         and case_name = NameOnly of name
+                       | NameBinding of { casename: name, var: name }
 
     type param_name = name
     type docstring = string option
