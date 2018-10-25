@@ -92,6 +92,8 @@ structure AST :> AST = struct
         The (ty, transform exp)
       | transform (Alpha.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map transform exp)
+      | transform (Alpha.Case _) =
+        raise Fail "case not implemented"
       | transform (Alpha.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map transform args)
       | transform (Alpha.ForeignNull ty) =
