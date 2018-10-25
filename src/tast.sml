@@ -316,7 +316,7 @@ structure TAst :> TAST = struct
                                           ^ "\n"))
                   | _ => raise Fail "construct: not a disjunction"
             end
-          | augment (AST.Case _) =
+          | augment (AST.Case _) c =
             raise Fail "Case not implemented"
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
