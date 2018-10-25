@@ -143,7 +143,10 @@ structure Alpha :> ALPHA = struct
       | alphaRename s (OAST.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map (alphaRename s) exp)
       | alphaRename s (OAST.Case (exp, cases)) =
-        raise Fail "case not implemented"
+        let val exp' = alphaRename s exp
+        in
+            raise Fail "case not implemented"
+        end
       | alphaRename s (OAST.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map (alphaRename s) args)
       | alphaRename s (OAST.ForeignNull ty) =
