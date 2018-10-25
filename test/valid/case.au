@@ -1,0 +1,18 @@
+;; -*- mode: lisp -*-
+
+(defdisjunction color ()
+  (red)
+  (green)
+  (blue))
+
+(defun color-to-int ((color color)) i32
+  (case color
+    (red
+      0)
+    (green
+      1)
+    (blue
+      3)))
+
+(defun main () i32
+  (color-to-int (austral.kernel:construct color red)))
