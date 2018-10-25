@@ -145,7 +145,24 @@ structure Alpha :> ALPHA = struct
       | alphaRename s (OAST.Case (exp, cases)) =
         let val exp' = alphaRename s exp
         in
-            raise Fail "case not implemented"
+            let fun renameCase (AST.VariantCase (AST.NameOnly name, body)) =
+                    (* In this case, we only have the name of the disjunction's
+                       case, so we don't have to define any bindings *)
+                    VariantCase (NameOnly name, alphaRename s body)
+                  | renameCase (AST.VariantCase (AST.NameBinding {casename, var}, body)) =
+                    (* In this case, we have to define a new binding for the
+                       value of this variant *)
+                    let val fresh = freshVar var
+                    in
+                        let val s' = (var, fresh) :: s
+                        in
+                            VariantCase (NameBinding { casename = name, var = var},
+                                         alphaRename s' body)
+                        end
+                    end
+
+            Case (exp',
+                  map renameCase cases)
         end
       | alphaRename s (OAST.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map (alphaRename s) args)
