@@ -104,7 +104,7 @@ structure AST :> AST = struct
               | transformCaseName (Alpha.NameBinding {casename, var}) =
                 NameBinding { casename = casename, var = var }
         in
-            Case (exp, map transformCase cases)
+            Case (transform exp, map transformCase cases)
         end
       | transform (Alpha.ForeignFuncall (name, rt, args)) =
         ForeignFuncall (name, rt, map transform args)
