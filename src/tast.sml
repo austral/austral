@@ -335,7 +335,11 @@ structure TAst :> TAST = struct
             in
                 case typeOf exp' of
                     (Disjunction (_, tyargs, variants)) =>
-                    let val caseNames = map (fn (AST.VariantCase (name, _)) => name) cases
+                    let val caseNames = map (fn (AST.VariantCase (name, _)) =>
+                                                case name of
+                                                    (AST.NameOnly n) => n
+                                                 | (AST.NameBinding (n, _)) => n)
+                                            cases
                         and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                     in
                         if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
