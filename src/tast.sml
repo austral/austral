@@ -378,10 +378,13 @@ structure TAst :> TAST = struct
                                                  associated value *)
                                               (case variant of
                                                    (Type.Variant (_, SOME ty)) =>
-                                                   let val c' = x
+                                                   let val s' = Map.iadd (ctxBindings c)
+                                                                         (var, (Binding (ty, Immutable)))
                                                    in
-                                                       VariantCase (transformCaseName name,
-                                                                    augment body c')
+                                                       let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                                       in
+                                                           VariantCase (transformCaseName name,
+                                                                        augment body c')
                                                    end
                                                  | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
                                             | _ => raise Fail "no variant with this name")
