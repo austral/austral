@@ -376,7 +376,16 @@ structure TAst :> TAST = struct
                                                    (Type.Variant (_, NONE)) => true
                                                  | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
                                             | _ => raise Fail "no variant with this name")
-                                       | (NameBinding { casename = casename, var = var }) => raise Fail "Not implemented")
+                                       | (NameBinding { casename = casename, var = var }) =>
+                                         (case getVariantByName variants name of
+                                              (SOME variant) =>
+                                              (* Since this case has a binding,
+                                                 the variant must have an
+                                                 associated value *)
+                                              (case variant of
+                                                   (Type.Variant (_, SOME ty)) => true
+                                                 | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
+                                            | _ => raise Fail "no variant with this name")
 
                             in
                                 let val cases' = map transformCase cases
