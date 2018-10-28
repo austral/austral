@@ -359,8 +359,8 @@ structure TAst :> TAST = struct
 
                                 and transformCase (AST.VariantCase (name, body)) =
                                     (case name of
-                                         (AST.NameOnly name) =>
-                                         (case getVariantByName variants name of
+                                         (AST.NameOnly name') =>
+                                         (case getVariantByName variants name' of
                                               (SOME variant) =>
                                               (* Since this is a name-only case,
                                                  the variant must have no associated
