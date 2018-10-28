@@ -382,8 +382,9 @@ structure TAst :> TAST = struct
                                 let val cases' = map transformCase cases
                                 in
                                     if (Set.size (Set.fromList (map (fn (VariantCase (_, b)) => typeOf b) cases'))) = 1 then
+                                        List.all validateCase cases';
                                         Case (exp',
-                                              map validateCase cases',
+                                              cases',
                                               caseType (List.hd cases'))
                                     else
                                         raise Fail "case: not all cases have the same type"
