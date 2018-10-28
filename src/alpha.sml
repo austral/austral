@@ -156,7 +156,7 @@ structure Alpha :> ALPHA = struct
                     in
                         let val s' = (var, fresh) :: s
                         in
-                            VariantCase (NameBinding { casename = casename, var = var},
+                            VariantCase (NameBinding { casename = casename, var = fresh},
                                          alphaRename s' body)
                         end
                     end
