@@ -316,7 +316,7 @@ structure TAst :> TAST = struct
                                           ^ "\n"))
                   | _ => raise Fail "construct: not a disjunction"
             end
-          | augment (AST.Case _) c =
+          | augment (AST.Case (exp, variants)) c =
             (* Things we have to verify:
 
                1. The type of exp is a disjunction.
