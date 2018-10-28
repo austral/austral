@@ -371,7 +371,7 @@ structure TAst :> TAST = struct
                                                  | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
                                             | _ => raise Fail "no variant with this name")
                                        | (AST.NameBinding { casename = casename, var = var }) =>
-                                         (case getVariantByName variants name of
+                                         (case getVariantByName variants casename of
                                               (SOME variant) =>
                                               (* Since this case has a binding,
                                                  the variant must have an
@@ -383,7 +383,7 @@ structure TAst :> TAST = struct
                                                    in
                                                        let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                                        in
-                                                           VariantCase (transformCaseName name,
+                                                           VariantCase (transformCaseName casename,
                                                                         augment body c')
                                                        end
                                                    end
