@@ -115,6 +115,8 @@ structure TAst :> TAST = struct
             t
           | typeOf (Construct (t, _, _)) =
             t
+          | typeOf (Case (_, _, t)) =
+            t
           | typeOf (SizeOf _) =
             Integer (Unsigned, Int64)
           | typeOf (ForeignFuncall (_, rt, _)) =
