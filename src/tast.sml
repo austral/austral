@@ -388,7 +388,7 @@ structure TAst :> TAST = struct
                                                        end
                                                    end
                                                  | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
-                                            | _ => raise Fail "no variant with this name")
+                                            | _ => raise Fail "no variant with this name"))
 
                                      and caseType (VariantCase (_, body)) =
                                          typeOf body
