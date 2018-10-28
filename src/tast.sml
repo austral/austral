@@ -334,7 +334,11 @@ structure TAst :> TAST = struct
             let val exp' = augment exp c
             in
                 case typeOf exp' of
-                    (Disjunction (_, tyargs, variants)) => raise Fail "Case not implemented"
+                    (Disjunction (_, tyargs, variants)) =>
+                    let val casenames = map (fn (AST.VariantCase (name, _)) => name) cases
+                    in
+                        raise Fail "Case not implemented"
+                    end
                   | _ => raise Fail "case: the type of the expression is not a disjunction"
             end
           | augment (AST.SizeOf typespec) c =
