@@ -336,6 +336,7 @@ structure TAst :> TAST = struct
                 case typeOf exp' of
                     (Disjunction (_, tyargs, variants)) =>
                     let val caseNames = map (fn (AST.VariantCase (name, _)) => name) cases
+                        and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                     in
                         raise Fail "Case not implemented"
                     end
