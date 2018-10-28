@@ -359,11 +359,15 @@ structure TAst :> TAST = struct
                                     NameOnly name
                                   | transformCaseName (AST.NameBinding {casename, var}) =
                                     NameBinding { casename = casename, var = var }
+                                and caseType (VariantCase (_, body)) =
+                                    typeOf body
                             in
                                 let val cases' = map transformCase cases
                                 in
                                     if (Set.size (Set.fromList (map (fn (VariantCase (_, b)) => typeOf b) cases'))) = 1 then
-                                        raise Fail "Case not implemented"
+                                        Case (exp',
+                                              map (fn (VariantCase (name, body)) => raise Fail "Case not implemented") cases',
+                                              caseType (List.hd cases'))
                                     else
                                         raise Fail "case: not all cases have the same type"
                                 end
