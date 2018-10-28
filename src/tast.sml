@@ -38,11 +38,15 @@ structure TAst :> TAST = struct
                  | Store of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
+                 | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ty * ast list
                  | ForeignNull of ty
                  | SizeOf of ty
                  | Seq of ast * ast
                  | Funcall of Symbol.symbol * ty list * ast list * ty
+         and variant_case = VariantCase of case_name * ast
+         and case_name = NameOnly of name
+                       | NameBinding of { casename: name, var: name }
 
     type param_name = name
     type docstring = string option
