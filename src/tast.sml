@@ -383,7 +383,7 @@ structure TAst :> TAST = struct
                                                    in
                                                        let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                                        in
-                                                           VariantCase (transformCaseName casename,
+                                                           VariantCase (transformCaseName name,
                                                                         augment body c')
                                                        end
                                                    end
