@@ -362,7 +362,10 @@ structure TAst :> TAST = struct
                             in
                                 let val cases' = map transformCase cases
                                 in
-                                    raise Fail "Case not implemented"
+                                    if (Set.size (Set.fromList (map (fn (VariantCase (_, b)) => typeOf b)))) = 1 then
+                                        raise Fail "Case not implemented"
+                                    else
+                                        raise Fail "case: not all cases have the same type"
                                 end
                             end
                         else
