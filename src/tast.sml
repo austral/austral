@@ -338,7 +338,7 @@ structure TAst :> TAST = struct
                     let val caseNames = map (fn (AST.VariantCase (name, _)) =>
                                                 case name of
                                                     (AST.NameOnly n) => n
-                                                 | (AST.NameBinding (n, _)) => n)
+                                                 | (AST.NameBinding { casename = n, var = _ }) => n)
                                             cases
                         and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                     in
