@@ -352,49 +352,49 @@ structure TAst :> TAST = struct
                         and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                     in
                         if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
-                            let fun transformCase (AST.VariantCase (name, body)) =
-                                    VariantCase (transformCaseName name,
-                                                 augment body c)
-
-                                and transformCaseName (AST.NameOnly name) =
+                            let fun transformCaseName (AST.NameOnly name) =
                                     NameOnly name
                                   | transformCaseName (AST.NameBinding {casename, var}) =
                                     NameBinding { casename = casename, var = var }
 
-                                and caseType (VariantCase (_, body)) =
-                                    typeOf body
-
-                                and validateCase (VariantCase (name, body)) =
+                                and transformCase (AST.VariantCase (name, body)) =
                                     (case name of
-                                         (NameOnly name) =>
+                                         (AST.NameOnly name) =>
                                          (case getVariantByName variants name of
                                               (SOME variant) =>
                                               (* Since this is a name-only case,
                                                  the variant must have no associated
                                                  value *)
                                               (case variant of
-                                                   (Type.Variant (_, NONE)) => true
+                                                   (Type.Variant (_, NONE)) => VariantCase (transformCaseName name,
+                                                                                            augment body c)
                                                  | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
                                             | _ => raise Fail "no variant with this name")
-                                       | (NameBinding { casename = casename, var = var }) =>
+                                       | (AST.NameBinding { casename = casename, var = var }) =>
                                          (case getVariantByName variants name of
                                               (SOME variant) =>
                                               (* Since this case has a binding,
                                                  the variant must have an
                                                  associated value *)
                                               (case variant of
-                                                   (Type.Variant (_, SOME ty)) => true
+                                                   (Type.Variant (_, SOME ty)) =>
+                                                   let val c' = x
+                                                   in
+                                                       VariantCase (transformCaseName name,
+                                                                    augment body c')
+                                                   end
                                                  | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
                                             | _ => raise Fail "no variant with this name")
 
+                                     and caseType (VariantCase (_, body)) =
+                                         typeOf body
                             in
                                 let val cases' = map transformCase cases
                                 in
                                     if (Set.size (Set.fromList (map (fn (VariantCase (_, b)) => typeOf b) cases'))) = 1 then
-                                        (List.all validateCase cases';
-                                         Case (exp',
-                                               cases',
-                                               caseType (List.hd cases')))
+                                        Case (exp',
+                                              cases',
+                                              caseType (List.hd cases'))
                                     else
                                         raise Fail "case: not all cases have the same type"
                                 end
