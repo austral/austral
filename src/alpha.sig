@@ -40,7 +40,7 @@ signature ALPHA = sig
                  | Operation of symbol * ast list
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
-                       | NameBinding of { casename: name, var: name }
+                       | NameBinding of { casename: name, var: variable }
 
     type docstring = string option
     type param_name = symbol
