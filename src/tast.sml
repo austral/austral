@@ -316,7 +316,7 @@ structure TAst :> TAST = struct
                                           ^ "\n"))
                   | _ => raise Fail "construct: not a disjunction"
             end
-          | augment (AST.Case (exp, variants)) c =
+          | augment (AST.Case (exp, cases)) c =
             (* Things we have to verify:
 
                1. The type of exp is a disjunction.
@@ -333,7 +333,9 @@ structure TAst :> TAST = struct
              *)
             let val exp' = augment exp c
             in
-                raise Fail "Case not implemented"
+                case typeOf exp' of
+                    (Disjunction (_, tyargs, variants)) => raise Fail "Case not implemented"
+                  | _ => raise Fail "case: the type of the expression is not a disjunction"
             end
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
