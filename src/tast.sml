@@ -331,7 +331,10 @@ structure TAst :> TAST = struct
                4. If a case name has a binding, the corresponding case in the
                   disjunction must have a value associated to it.
              *)
-            raise Fail "Case not implemented"
+            let val exp' = augment exp c
+            in
+                raise Fail "Case not implemented"
+            end
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.ForeignNull typespec) c =
