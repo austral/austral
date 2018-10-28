@@ -355,9 +355,9 @@ structure TAst :> TAST = struct
                             let fun transformCase (AST.VariantCase (name, body)) =
                                     VariantCase (transformCaseName name,
                                                  augment body c)
-                                and transformCaseName (Alpha.NameOnly name) =
+                                and transformCaseName (AST.NameOnly name) =
                                     NameOnly name
-                                  | transformCaseName (Alpha.NameBinding {casename, var}) =
+                                  | transformCaseName (AST.NameBinding {casename, var}) =
                                     NameBinding { casename = casename, var = var }
                             in
                                 let val cases' = map transformCase cases
