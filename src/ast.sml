@@ -49,7 +49,7 @@ structure AST :> AST = struct
                  | Funcall of Symbol.symbol * ast list
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
-                       | NameBinding of { casename: name, var: name }
+                       | NameBinding of { casename: name, var: Symbol.variable }
 
     (* Toplevel AST *)
 
