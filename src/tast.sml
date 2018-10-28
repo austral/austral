@@ -338,7 +338,10 @@ structure TAst :> TAST = struct
                     let val caseNames = map (fn (AST.VariantCase (name, _)) => name) cases
                         and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                     in
-                        raise Fail "Case not implemented"
+                        if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
+                            raise Fail "Case not implemented"
+                        else
+                            raise Fail "case: the set of case names in the disjunction is not equal to the set of case names in the expression"
                     end
                   | _ => raise Fail "case: the type of the expression is not a disjunction"
             end
