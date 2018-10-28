@@ -366,7 +366,16 @@ structure TAst :> TAST = struct
 
                                 and validateCase (VariantCase (name, body)) =
                                     (case name of
-                                         (NameOnly name) => raise Fail "not implemented"
+                                         (NameOnly name) =>
+                                         (case getVariantByName variants name of
+                                              (SOME variant) =>
+                                              (* Since this is a name-only case,
+                                                 the variant must have no associated
+                                                 value *)
+                                              (case variant of
+                                                   (Type.Variant (_, NONE)) => true
+                                                 | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
+                                            | _ => raise Fail "no variant with this name")
                                        | (NameBinding { casename = casename, var = var }) => raise Fail "Not implemented")
 
                             in
