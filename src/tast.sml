@@ -385,6 +385,7 @@ structure TAst :> TAST = struct
                                                        in
                                                            VariantCase (transformCaseName name,
                                                                         augment body c')
+                                                       end
                                                    end
                                                  | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
                                             | _ => raise Fail "no variant with this name")
