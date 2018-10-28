@@ -352,7 +352,19 @@ structure TAst :> TAST = struct
                         and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                     in
                         if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
-                            raise Fail "Case not implemented"
+                            let fun transformCase (AST.VariantCase (name, body)) =
+                                    VariantCase (transformCaseName name,
+                                                 augment body c)
+                                and transformCaseName (Alpha.NameOnly name) =
+                                    NameOnly name
+                                  | transformCaseName (Alpha.NameBinding {casename, var}) =
+                                    NameBinding { casename = casename, var = var }
+                            in
+                                let val cases' = map transformCase cases
+                                in
+                                    raise Fail "Case not implemented"
+                                end
+                            end
                         else
                             raise Fail "case: the set of case names in the disjunction is not equal to the set of case names in the expression"
                     end
