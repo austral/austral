@@ -143,7 +143,7 @@ structure MIR :> MIR = struct
         in
             (Progn [Declare (fresh, ty),
                     Assign (StructAccess (Variable fresh, "_length"), IntConstant (Int.toString (String.size (CST.unescapeString s)))),
-                    Assign (StructAccess (Variable fresh, "_data"), StringConstant s)],
+                    Assign (StructAccess (Variable fresh, "_data"), Cast (Pointer UInt8, StringConstant s))],
              Variable fresh)
         end
       | transformExp HIR.NullConstant =
