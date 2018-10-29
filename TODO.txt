@@ -1,6 +1,5 @@
 TODO:
 
-- Case expressions
 - Augment methods
 
 - Implement static-array-index
@@ -129,3 +128,4 @@ DONE:
 - Parse bind expressions
 - Tuple bind
 - Parse case expressions
+- Case expressions
