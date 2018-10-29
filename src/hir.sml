@@ -29,7 +29,7 @@ structure HIR :> HIR = struct
         let
         in
             count := !count + 1;
-            "auto_" ^ (Int.toString (!count))
+            "hir_auto_" ^ (Int.toString (!count))
         end
 
     (* Expression AST *)
