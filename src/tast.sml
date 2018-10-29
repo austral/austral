@@ -120,6 +120,8 @@ structure TAst :> TAST = struct
             t
           | typeOf (SizeOf _) =
             Integer (Unsigned, Int64)
+          | typeOf (AddressOf (_, ty)) =
+            ty
           | typeOf (ForeignFuncall (_, rt, _)) =
             rt
           | typeOf (ForeignNull ty) =
