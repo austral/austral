@@ -266,7 +266,7 @@ structure MIR :> MIR = struct
       | transformExp (HIR.TagEq (exp, idx)) =
         let val (expBlock, exp') = transformExp exp
         in
-            (expBlock, ComparisonOp (Builton.EqualTo, exp', IntConstant (Int.toString idx)))
+            (expBlock, ComparisonOp (Builtin.EqualTo, exp', IntConstant (Int.toString idx)))
         end
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
