@@ -188,7 +188,7 @@ structure HIR :> HIR = struct
             in
                 Let (temp,
                      TAst.typeOf exp,
-                     transform exp',
+                     transform exp,
                      Case (Variable temp,
                            map mapVariant variants,
                            ty))
