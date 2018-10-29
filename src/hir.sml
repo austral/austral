@@ -193,7 +193,7 @@ structure HIR :> HIR = struct
 
                 and disjIndex casename =
                     case TAst.typeOf exp of
-                        (Type.Disjunction (_, _, variants)) => Type.posInVariants variants casename
+                        (Type.Disjunction (_, _, variants)) => Option.valOf (Type.posInVariants variants casename)
                       | _ => raise Fail "not a disjunction"
             in
                 Let (temp,
