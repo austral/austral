@@ -267,7 +267,7 @@ structure MIR :> MIR = struct
         let val (expBlock, exp') = transformExp exp
         in
             (expBlock, ComparisonOp (Builtin.EqualTo,
-                                     exp',
+                                     StructAccess (exp', "_tag"),
                                      IntConstant (Int.toString idx)))
         end
       | transformExp (HIR.SizeOf ty) =
