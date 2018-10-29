@@ -58,6 +58,7 @@ signature MIR = sig
                      | TupleCreate of exp_ast list
                      | TupleProj of exp_ast * int
                      | Construct of ty * int * exp_ast option
+                     | DisjunctionNth of exp_ast * int
                      | Funcall of string * ty list * exp_ast list
 
     datatype block_ast = Progn of block_ast list
