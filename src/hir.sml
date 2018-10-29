@@ -199,7 +199,7 @@ structure HIR :> HIR = struct
                 and processVariants variants =
                     case variants of
                         [(n, body)] => body
-                      | ((casename, body)::tail) => Cond (TagEq (temp, casename),
+                      | ((casename, body)::tail) => Cond (TagEq (Variable temp, casename),
                                                           body,
                                                           processVariants tail,
                                                           ty)
