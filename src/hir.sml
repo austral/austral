@@ -194,16 +194,19 @@ structure HIR :> HIR = struct
                     case TAst.typeOf exp of
                         (Type.Disjunction (_, _, variants)) => Option.valOf (Type.posInVariants variants casename)
                       | _ => raise Fail "not a disjunction"
+
+                and processVariants variants =
+                    case variants of
+                        [(n, body)] => body
+                      | ((casename, body)::tail) => Cond (TagEq (temp, casename),
+                                                          body,
+                                                          processVariants tail,
+                                                          ty)
             in
-                let val variants' = map mapVariant variants
-                in
-                    Let (temp,
-                         TAst.typeOf exp,
-                         transform exp,
-                         case variants' of
-                             [(n, body)] => body
-                           | _ => raise Fail "not implemented")
-                end
+                Let (temp,
+                     TAst.typeOf exp,
+                     transform exp,
+                     processVariants (map mapVariant variants))
             end
         end
       | transform (TAst.ForeignFuncall (name, rt, args)) =
