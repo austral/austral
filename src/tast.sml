@@ -46,7 +46,7 @@ structure TAst :> TAST = struct
                  | Funcall of Symbol.symbol * ty list * ast list * ty
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
-                       | NameBinding of { casename: name, var: Symbol.variable }
+                       | NameBinding of { casename: name, var: Symbol.variable, ty: ty }
 
     type param_name = name
     type docstring = string option
