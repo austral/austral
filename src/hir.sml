@@ -53,6 +53,7 @@ structure HIR :> HIR = struct
                  | Store of ast * ast
                  | Cast of ty * ast
                  | Construct of ty * Symbol.symbol * ast option
+                 | Case of ast * (name * ast) list * ty
                  | SizeOf of ty
                  | Seq of ast * ast
                  | Funcall of string * ty list * ast list
