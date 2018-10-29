@@ -138,7 +138,14 @@ structure MIR :> MIR = struct
       | transformExp (HIR.FloatConstant f) =
         (Progn [], FloatConstant f)
       | transformExp (HIR.StringConstant s) =
-        (Progn [], StringConstant s)
+        let val fresh = freshVar ()
+            and ty = transformType (Type.StaticArray (Type.Integer (Type.Unsigned, Type.Int8)))
+        in
+            (Progn [Declare (fresh, ty),
+                    Assign (StructAccess (Variable fresh, "_length"), IntConstant (Int.toString (String.size (CST.unescapeString s)))),
+                    Assign (StructAccess (Variable fresh, "_data"), StringConstant s)],
+             Variable fresh)
+        end
       | transformExp HIR.NullConstant =
         (Progn [], NullConstant)
       | transformExp (HIR.Negation v) =
