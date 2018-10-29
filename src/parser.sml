@@ -87,11 +87,18 @@ structure Parser :> PARSER = struct
                                  (seqR (many (noneOf [#"\n"]))
                                        (pchar #"\n"))
 
+    val multiLineComment =
+        seqR (pstring "#|")
+             (seqR (many1 (noneOf []))
+                   (seqR (pstring "|#")
+                         (preturn #" ")))
+
     (* S-expressions *)
 
     val whitespaceParser = choice [pchar #" ",
                                    pchar #"\n",
-                                   singleLineComment]
+                                   singleLineComment,
+                                   multiLineComment]
 
     val ws = many whitespaceParser
 
