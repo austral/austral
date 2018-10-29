@@ -33,6 +33,7 @@ signature TAST = sig
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
+                 | ArrayLength of ast
                  | Allocate of ast
                  | Load of ast
                  | Store of ast * ast

@@ -22,7 +22,6 @@ structure CppAst :> CPP_AST = struct
 
     datatype ty = NamedType of string
                 | Pointer of ty
-                | Array of ty * int
                 | Struct of (ty * string) list
                 | Union of (ty * string) list
                 | TypeCons of string * ty list

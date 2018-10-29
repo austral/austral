@@ -79,12 +79,9 @@ structure TypeMatch = struct
           (case matchType t t' of
                (Bindings l) => Bindings l
              | (Failure f) => Failure f)
-        | matchType (StaticArray (t, len)) (StaticArray (t', len')) =
+        | matchType (StaticArray t) (StaticArray t') =
           (case matchType t t' of
-               (Bindings l) => if len = len' then
-                                   Bindings l
-                               else
-                                   Failure "Static array length doesn't match"
+               (Bindings l) => Bindings l
              | (Failure f) => Failure f)
         | matchType (Disjunction (n, args, _)) (Disjunction (n', args', _)) =
           if n = n' then

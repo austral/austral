@@ -29,7 +29,7 @@ structure Type :> TYPE = struct
                 | Tuple of ty list
                 | Pointer of ty
                 | ForeignPointer of ty
-                | StaticArray of ty * int
+                | StaticArray of ty
                 | Disjunction of name * ty list * variant list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
@@ -50,7 +50,7 @@ structure Type :> TYPE = struct
       | tyVars (Tuple tys) = Set.unionList (map tyVars tys)
       | tyVars (Pointer ty) = tyVars ty
       | tyVars (ForeignPointer ty) = tyVars ty
-      | tyVars (StaticArray (ty, _)) = tyVars ty
+      | tyVars (StaticArray ty) = tyVars ty
       | tyVars (Disjunction (_, tys, variants)) =
         Set.union (Set.unionList (map tyVars tys))
                   (Set.unionList (map variantVars variants))
@@ -69,7 +69,6 @@ structure Type :> TYPE = struct
         Util.position name (map (fn (Variant (name, _)) => name) variants)
 
     datatype typespec = TypeCons of name * (typespec list)
-                      | TyIntArg of int
 
     type typarams = param OrderedSet.set
 
@@ -112,9 +111,7 @@ structure Type :> TYPE = struct
             SOME _ => NONE (* Another type with this name exists *)
           | NONE => SOME (Map.iadd tenv (name, Datatype (name, params, variants)))
 
-    fun parseTypespec (RCST.IntConstant i) =
-        TyIntArg (Option.valOf (Int.fromString i))
-      | parseTypespec (RCST.Symbol s) = TypeCons (s, [])
+    fun parseTypespec (RCST.Symbol s) = TypeCons (s, [])
       | parseTypespec (RCST.List l) = parseTypespecList l
       | parseTypespec _ = raise Fail "Invalid type specifier"
     and parseTypespecList ((RCST.Symbol f)::args) =
@@ -192,11 +189,9 @@ structure Type :> TYPE = struct
                        | NONE =>
                          raise Fail ("No type named " ^ (Symbol.toString name)))
                 end
-    | resolve _ _ (TyIntArg _) =
-      raise Fail "Invalid type spec"
 
-    and resolveStaticArray tenv params [typespec, TyIntArg len] =
-        StaticArray (resolve tenv params typespec, len)
+    and resolveStaticArray tenv params [typespec] =
+        StaticArray (resolve tenv params typespec)
       | resolveStaticArray _ _ _ =
         raise Fail "Bad static-array type specifier"
 

@@ -35,6 +35,7 @@ signature HIR = sig
                  | ComparisonOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
+                 | ArrayLength of ast
                  | Allocate of ast * ty
                  | Load of ast
                  | Store of ast * ast

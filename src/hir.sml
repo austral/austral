@@ -48,6 +48,7 @@ structure HIR :> HIR = struct
                  | ComparisonOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
+                 | ArrayLength of ast
                  | Allocate of ast * ty
                  | Load of ast
                  | Store of ast * ast
@@ -169,6 +170,8 @@ structure HIR :> HIR = struct
         TupleCreate (map transform exps)
       | transform (TAst.TupleProj (tup, idx)) =
         TupleProj (transform tup, idx)
+      | transform (TAst.ArrayLength arr) =
+        ArrayLength (transform arr)
       | transform (TAst.Allocate v) =
         Allocate (transform v, TAst.typeOf v)
       | transform (TAst.Load ptr) =

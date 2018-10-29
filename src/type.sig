@@ -29,7 +29,7 @@ signature TYPE = sig
                 | Tuple of ty list
                 | Pointer of ty
                 | ForeignPointer of ty
-                | StaticArray of ty * int
+                | StaticArray of ty
                 | Disjunction of name * ty list * variant list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
@@ -46,7 +46,6 @@ signature TYPE = sig
     val posInVariants : variant list -> name -> int option
 
     datatype typespec = TypeCons of name * (typespec list)
-                      | TyIntArg of int
 
     type typarams = param OrderedSet.set
 

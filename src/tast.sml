@@ -33,6 +33,7 @@ structure TAst :> TAST = struct
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
+                 | ArrayLength of ast
                  | Allocate of ast
                  | Load of ast
                  | Store of ast * ast
@@ -81,8 +82,7 @@ structure TAst :> TAST = struct
           | typeOf (FloatConstant (_, t)) =
             t
           | typeOf (StringConstant s) =
-            StaticArray (Integer (Unsigned, Int8),
-                         String.size (CST.escapedToString s))
+            StaticArray (Integer (Unsigned, Int8))
           | typeOf (Variable (_, t)) =
             t
           | typeOf (Let (_, _, b)) =
@@ -104,6 +104,8 @@ structure TAst :> TAST = struct
             (case typeOf tup of
                  Tuple tys => List.nth (tys, idx)
                | _ => raise Fail "Not a tuple")
+          | typeOf (ArrayLength _) =
+            Integer (Unsigned, Int64)
           | typeOf (Allocate v) =
             Pointer (typeOf v)
           | typeOf (Load p) =
@@ -246,7 +248,7 @@ structure TAst :> TAST = struct
             let val arr' = augment arr c
             in
                 case typeOf arr' of
-                    (StaticArray (_, len)) => IntConstant (Int.toString len, sizeType)
+                    (StaticArray _) => ArrayLength arr'
                   | _ => raise Fail "Argument to static-array-length not a static array"
 
             end
