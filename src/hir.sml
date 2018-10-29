@@ -203,6 +203,7 @@ structure HIR :> HIR = struct
                                                           body,
                                                           processVariants tail,
                                                           ty)
+                      | _ => raise "Invalid case expression: empty"
             in
                 Let (temp,
                      TAst.typeOf exp,
