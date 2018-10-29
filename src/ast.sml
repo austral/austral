@@ -113,6 +113,8 @@ structure AST :> AST = struct
         ForeignNull ty
       | transform (Alpha.SizeOf tys) =
         SizeOf tys
+      | transform (Alpha.AddressOf var) =
+        AddressOf var
       | transform (Alpha.Operation (f, args)) =
         transformOp f (map transform args)
     and transformOp f args =
