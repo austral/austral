@@ -225,7 +225,7 @@ structure Module : MODULE = struct
         let fun useToImports moduleName =
                 (case envGet menv moduleName of
                      SOME m => (moduleName, Set.toList (moduleExports m))
-                   | NONE => raise Fail "Not module with this name")
+                   | NONE => raise Fail ("Not module with this name: " ^ (Ident.identString moduleName)))
             (* map use clauses to a list of import clauses, import clauses to
                themselves, and drop everything else *)
             and transformClause (ImportFromClause i) = SOME [i]
