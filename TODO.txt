@@ -1,6 +1,5 @@
 TODO:
 
-- address-of
 - Augment methods
 - MIR should be flat
 
@@ -131,3 +130,4 @@ DONE:
 - Tuple bind
 - Parse case expressions
 - Case expressions
+- address-of
