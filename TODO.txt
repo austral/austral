@@ -2,6 +2,7 @@ TODO:
 
 - Augment methods
 - MIR should be flat
+- Static arrays should contain the length in their runtime representation, not at the type-level
 
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
