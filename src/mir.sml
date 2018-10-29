@@ -258,6 +258,8 @@ structure MIR :> MIR = struct
         end
       | transformExp (HIR.Case _) =
         raise Fail "case not implemented"
+      | transformExp (HIR.DisjunctionNth (exp, idx)) =
+        raise Fail "disjunction nth not implemented"
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
       | transformExp (HIR.Seq (a, b)) =
