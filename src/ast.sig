@@ -43,6 +43,7 @@ signature AST = sig
                  | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
+                 | AddressOf of name
                  | Seq of ast * ast
                  | Funcall of Symbol.symbol * ast list
          and variant_case = VariantCase of case_name * ast
