@@ -53,7 +53,6 @@ structure HIR :> HIR = struct
                  | Store of ast * ast
                  | Cast of ty * ast
                  | Construct of ty * Symbol.symbol * ast option
-                 | Case of ast * (name * ast) list * ty
                  | DisjunctionNth of ast * int
                  | SizeOf of ty
                  | Seq of ast * ast
@@ -196,12 +195,15 @@ structure HIR :> HIR = struct
                         (Type.Disjunction (_, _, variants)) => Option.valOf (Type.posInVariants variants casename)
                       | _ => raise Fail "not a disjunction"
             in
-                Let (temp,
-                     TAst.typeOf exp,
-                     transform exp,
-                     Case (Variable temp,
-                           map mapVariant variants,
-                           ty))
+                let val variants' = map mapVariant variants
+                in
+                    Let (temp,
+                         TAst.typeOf exp,
+                         transform exp,
+                         case variants' of
+                             [(n, body)] => body
+                           | _ => raise Fail "not implemented")
+                end
             end
         end
       | transform (TAst.ForeignFuncall (name, rt, args)) =

@@ -257,8 +257,6 @@ structure MIR :> MIR = struct
                                  | NONE => (Progn [], Construct (transformType ty, idx, NONE)))
               | NONE => raise Fail "construct->MIR: internal compiler error: not a valid label"
         end
-      | transformExp (HIR.Case _) =
-        raise Fail "case not implemented"
       | transformExp (HIR.DisjunctionNth (exp, idx)) =
         let val (expBlock, exp') = transformExp exp
         in
