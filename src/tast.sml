@@ -352,12 +352,7 @@ structure TAst :> TAST = struct
                         and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                     in
                         if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
-                            let fun transformCaseName (AST.NameOnly name) =
-                                    NameOnly name
-                                  | transformCaseName (AST.NameBinding {casename, var, ty}) =
-                                    NameBinding { casename = casename, var = var, ty = ty }
-
-                                and transformCase (AST.VariantCase (name, body)) =
+                            let fun transformCase (AST.VariantCase (name, body)) =
                                     (case name of
                                          (AST.NameOnly name') =>
                                          (case getVariantByName variants name' of
@@ -366,7 +361,7 @@ structure TAst :> TAST = struct
                                                  the variant must have no associated
                                                  value *)
                                               (case variant of
-                                                   (Type.Variant (_, NONE)) => VariantCase (transformCaseName name,
+                                                   (Type.Variant (_, NONE)) => VariantCase (NameOnly name',
                                                                                             augment body c)
                                                  | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
                                             | _ => raise Fail "no variant with this name")
@@ -383,7 +378,7 @@ structure TAst :> TAST = struct
                                                    in
                                                        let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                                        in
-                                                           VariantCase (transformCaseName name,
+                                                           VariantCase (NameBinding { casename = casename, var = var, ty = ty },
                                                                         augment body c')
                                                        end
                                                    end
