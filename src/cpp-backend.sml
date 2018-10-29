@@ -101,6 +101,8 @@ structure CppBackend :> CPP_BACKEND = struct
         Funcall ("std::get",
                  [NamedType (Int.toString idx)],
                  [transformExp tup])
+      | transformExp (MIR.StructAccess (exp, name)) =
+        StructAccess (transformExp exp, name)
       | transformExp (MIR.Construct (ty, idx, exp)) =
         let val ty' = transformType ty
         in
