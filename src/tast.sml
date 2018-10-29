@@ -42,7 +42,7 @@ structure TAst :> TAST = struct
                  | ForeignFuncall of string * ty * ast list
                  | ForeignNull of ty
                  | SizeOf of ty
-                 | AddressOf of name
+                 | AddressOf of Symbol.variable
                  | Seq of ast * ast
                  | Funcall of Symbol.symbol * ty list * ast list * ty
          and variant_case = VariantCase of case_name * ast
