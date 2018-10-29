@@ -196,7 +196,7 @@ structure Compiler : COMPILER = struct
         in
             let val newModule = case Module.envGet menv moduleName of
                                     SOME m => m
-                                  | NONE => raise Fail "in-module: no module with this name"
+                                  | NONE => raise Fail ("in-module: no module with this name: " ^ (Ident.identString moduleName))
             in
                 Compiler (menv, macenv, tenv, fenv, moduleName, code)
             end
