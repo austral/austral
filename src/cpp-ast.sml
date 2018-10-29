@@ -105,8 +105,6 @@ structure CppAst :> CPP_AST = struct
         n
       | renderType (Pointer t) =
         (renderType t) ^ "*"
-      | renderType (Array (t, idx)) =
-        (renderType t) ^ "[" ^ (Int.toString idx) ^ "]"
       | renderType (Struct slots) =
         let fun renderSlot (ty, name) =
                 (renderType ty) ^ " " ^ name

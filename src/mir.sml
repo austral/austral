@@ -123,8 +123,9 @@ structure MIR :> MIR = struct
         Pointer (transformType ty)
       | transformType (Type.ForeignPointer ty) =
         Pointer (transformType ty)
-      | transformType (Type.StaticArray (ty, idx)) =
-        Array (transformType ty, idx)
+      | transformType (Type.StaticArray ty) =
+        Struct [Slot ("_length", UInt64),
+                Slot ("_data", Pointer (transformType ty))]
       | transformType (Type.Disjunction (name, args, _)) =
         TypeCons (HIR.escapeSymbol name, map transformType args)
       | transformType (Type.TypeVariable name) =
@@ -214,6 +215,11 @@ structure MIR :> MIR = struct
         let val (tupBlock, tupExp) = transformExp tup
         in
             (tupBlock, TupleProj (tupExp, idx))
+        end
+      | transformExp (HIR.ArrayLength arr) =
+        let val (arrBlock, arrExp) = transformExp arr
+        in
+            (arrBlock, StructAccess (arrExp, "_length"))
         end
       | transformExp (HIR.Allocate (exp, ty)) =
         let val pointer = freshVar ()
