@@ -60,6 +60,6 @@ clang++ -std=c++11 test/valid/bind.cpp -o test/valid/bind.bin
 ./test/valid/bind.bin
 
 echo "case.au"
-#./boreal test/valid/case.au --output=test/valid/case.cpp --entrypoint=austral-user:main
-#clang++ -std=c++11 test/valid/case.cpp -o test/valid/case.bin
+./boreal test/valid/case.au --output=test/valid/case.cpp --entrypoint=austral-user:main
+clang++ -std=c++11 test/valid/case.cpp -o test/valid/case.bin
 #./test/valid/case.bin
