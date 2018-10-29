@@ -410,7 +410,7 @@ structure TAst :> TAST = struct
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.AddressOf name) c =
             (case (Map.get (ctxBindings c) name) of
-                 SOME bind => AddresssOf (name, ForeignPointer (bindType bind))
+                 SOME bind => AddressOf (name, ForeignPointer (bindType bind))
                | NONE => raise Fail ("No such variable: " ^ (Symbol.varToString name)))
           | augment (AST.ForeignNull typespec) c =
             ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
