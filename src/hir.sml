@@ -228,6 +228,8 @@ structure HIR :> HIR = struct
         NullConstant
       | transform (TAst.SizeOf ty) =
         SizeOf ty
+      | transform (TAst.AddressOf (var, _)) =
+        AddressOf (escapeVariable var)
       | transform (TAst.Seq (a, b)) =
         Seq (transform a, transform b)
       | transform (TAst.Funcall (f, tyargs, args, _)) =
