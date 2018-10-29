@@ -90,7 +90,7 @@ structure MIR :> MIR = struct
         let
         in
             count := !count + 1;
-            "auto_" ^ (Int.toString (!count))
+            "mir_auto_" ^ (Int.toString (!count))
         end
 
     (* Transformations *)
