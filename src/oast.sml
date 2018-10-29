@@ -101,6 +101,8 @@ structure OAST :> OAST = struct
             transformForeignNull args
         else if f = Symbol.auCffi "size-of" then
             transformSizeOf args
+        else if f = Symbol.auCffi "address-of" then
+            transformAddressOf args
         else
             Operation (f, map transform args)
 
