@@ -56,6 +56,7 @@ structure HIR :> HIR = struct
                  | DisjunctionNth of ast * int
                  | TagEq of ast * int
                  | SizeOf of ty
+                 | AddressOf of name
                  | Seq of ast * ast
                  | Funcall of string * ty list * ast list
 
