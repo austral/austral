@@ -55,7 +55,6 @@ signature MIR = sig
                      | Load of exp_ast
                      | AddressOf of exp_ast
                      | SizeOf of ty
-                     | AddressOf of name
                      | TupleCreate of exp_ast list
                      | TupleProj of exp_ast * int
                      | StructAccess of exp_ast * string
