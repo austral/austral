@@ -37,7 +37,7 @@ signature ALPHA = sig
                  | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
-                 | AddressOf of name
+                 | AddressOf of variable
                  | Operation of symbol * ast list
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
