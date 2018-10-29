@@ -354,8 +354,8 @@ structure TAst :> TAST = struct
                         if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
                             let fun transformCaseName (AST.NameOnly name) =
                                     NameOnly name
-                                  | transformCaseName (AST.NameBinding {casename, var}) =
-                                    NameBinding { casename = casename, var = var }
+                                  | transformCaseName (AST.NameBinding {casename, var, ty}) =
+                                    NameBinding { casename = casename, var = var, ty = ty }
 
                                 and transformCase (AST.VariantCase (name, body)) =
                                     (case name of
