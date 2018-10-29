@@ -177,16 +177,22 @@ structure HIR :> HIR = struct
         Cast (ty, transform exp)
       | transform (TAst.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map transform exp)
-      | transform (TAst.Case (name, variants, ty)) =
+      | transform (TAst.Case (exp, variants, ty)) =
         (* In the TAST->HIR stage, we move case bindings to their own let *)
-        let fun mapVariant (TAst.VariantCase (TAst.NameOnly name, body)) =
-                (name, transform body)
-              | mapVariant _ =
-                raise Fail "not implemented"
+        let val temp = gensym ()
         in
-            Case (escapeSymbol name,
-                  map mapVariant variants,
-                  ty)
+            let fun mapVariant (TAst.VariantCase (TAst.NameOnly name, body)) =
+                    (name, transform body)
+                  | mapVariant _ =
+                    raise Fail "not implemented"
+            in
+                Let (temp,
+                     TAst.typeOf exp,
+                     transform exp',
+                     Case (Variable temp,
+                           map mapVariant variants,
+                           ty))
+            end
         end
       | transform (TAst.ForeignFuncall (name, rt, args)) =
         (* If the function return type is unit, we're calling a function that
