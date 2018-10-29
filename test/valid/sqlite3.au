@@ -1,0 +1,18 @@
+;; -*- mode: lisp -*-
+(defmodule sqlite3-test
+  (:use :austral)
+  (:import-from :austral.ext.cffi
+                :foreign-funcall
+                :foreign-pointer
+                :malloc
+                :free
+                :null-pointer
+                :null?
+                :address-of))
+(in-module :sqlite3-test)
+
+(defun main () i32
+  (let ((handle (null-pointer u8)))
+    (let ((open-rc (foreign-funcall "sqlite3_open" i32 ":memory:" (address-of handle))))
+      ))
+  0)
