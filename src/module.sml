@@ -137,7 +137,8 @@ structure Module : MODULE = struct
                 "malloc",
                 "free",
                 "null-pointer",
-                "null?"
+                "null?",
+                "address-of"
             ]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
