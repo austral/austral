@@ -7,7 +7,8 @@
                 :malloc
                 :free
                 :null-pointer
-                :null?))
+                :null?
+                :address-of))
 (in-module :cffi-test)
 
 (defun main () i32
@@ -18,5 +19,6 @@
   (let ((pointer (the (foreign-pointer i32) (malloc (the u64 4))))
         (null-pointer (null-pointer i32)))
     (null? null-pointer)
+    (null? (address-of pointer))
     (free pointer))
   (the i32 0))
