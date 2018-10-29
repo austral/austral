@@ -199,10 +199,11 @@ structure HIR :> HIR = struct
                 and processVariants variants =
                     case variants of
                         [(n, body)] => body
-                      | ((casename, body)::tail) => Cond (TagEq (Variable temp, casename),
-                                                          body,
-                                                          processVariants tail,
-                                                          ty)
+                      | ((casename, body)::tail) =>
+                        Cond (TagEq (Variable temp, disjIndex casename),
+                              body,
+                              processVariants tail,
+                              ty)
                       | _ => raise Fail "Invalid case expression: empty"
             in
                 Let (temp,
