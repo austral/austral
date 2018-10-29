@@ -261,7 +261,8 @@ structure MIR :> MIR = struct
       | transformExp (HIR.DisjunctionNth (exp, idx)) =
         let val (expBlock, exp') = transformExp exp
         in
-            (expBlock, DisjunctionNth (exp', idx))
+            (expBlock, StructAccess (StructAccess (exp', "_data"),
+                                     unionSlotName idx))
         end
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
