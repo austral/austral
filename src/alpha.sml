@@ -184,7 +184,7 @@ structure Alpha :> ALPHA = struct
         if specialSymbol name then
             raise Fail "address-of: variable is a special symbol"
         else
-            AddressOf (Variable (lookup s name))
+            AddressOf (lookup s name)
       | alphaRename s (OAST.Operation (f, args)) =
         Operation (f, map (alphaRename s) args)
 
