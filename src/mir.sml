@@ -256,6 +256,8 @@ structure MIR :> MIR = struct
                                  | NONE => (Progn [], Construct (transformType ty, idx, NONE)))
               | NONE => raise Fail "construct->MIR: internal compiler error: not a valid label"
         end
+      | transformExp (HIR.Case _) =
+        raise Fail "case not implemented"
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
       | transformExp (HIR.Seq (a, b)) =
