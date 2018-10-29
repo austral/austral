@@ -177,7 +177,7 @@ structure HIR :> HIR = struct
         Cast (ty, transform exp)
       | transform (TAst.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map transform exp)
-      | transform (TAst.Case _) =
+      | transform (TAst.Case (name, variants, ty)) =
         raise Fail "case not implemented"
       | transform (TAst.ForeignFuncall (name, rt, args)) =
         (* If the function return type is unit, we're calling a function that
