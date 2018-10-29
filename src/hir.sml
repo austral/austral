@@ -183,9 +183,9 @@ structure HIR :> HIR = struct
         let val temp = gensym ()
         in
             let fun mapVariant (TAst.VariantCase (TAst.NameOnly name, body)) =
-                    (escapeSymbol name, transform body)
+                    (name, transform body)
                   | mapVariant (TAst.VariantCase (TAst.NameBinding {casename, var, ty}, body)) =
-                    (escapeSymbol casename,
+                    (casename,
                      Let (escapeVariable var,
                           ty,
                           DisjunctionNth (Variable temp, disjIndex casename),
