@@ -41,6 +41,7 @@ signature HIR = sig
                  | Cast of ty * ast
                  | Construct of ty * Symbol.symbol * ast option
                  | DisjunctionNth of ast * int
+                 | TagEq of ast * name
                  | SizeOf of ty
                  | Seq of ast * ast
                  | Funcall of string * ty list * ast list
