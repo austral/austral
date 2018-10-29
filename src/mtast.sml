@@ -19,21 +19,7 @@
 
 structure MTAST :> MTAST = struct
     type name = Symbol.symbol
-
-    (* Monomorphic types *)
-
-    datatype ty = Unit
-                | Bool
-                | Integer of signedness * width
-                | Float of float_type
-                | Tuple of ty list
-                | Pointer of ty
-                | Array of ty
-                | Disjunction of name * variant list
-         and signedness = Unsigned | Signed
-         and width = Int8 | Int16 | Int32 | Int64
-         and float_type = Single | Double
-         and variant = Variant of name * ty option
+    type ty = MonoType.ty
 
     (* Expression AST *)
 
@@ -68,6 +54,7 @@ structure MTAST :> MTAST = struct
     (* Block AST *)
 
     datatype top_ast = Defun of name * param list * ty * ast
+                     | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
 
     (* Monomorphization *)
@@ -77,4 +64,28 @@ structure MTAST :> MTAST = struct
 
     val emptyContext =
         Context (TypeMono Map.empty)
+
+    fun monomorphize ctx (TAst.Defun (name, params, rt, _, body)) =
+        monomorphizeDefun ctx name params rt body
+      | monomorphize ctx (TAst.Defgeneric _) =
+        (ToplevelProgn [], ctx)
+      | monomorphize ctx (TAst.Defclass _) =
+        (ToplevelProgn [], ctx)
+      | monomorphize _ (TAst.Definstance (name, arg, docstring, methods)) =
+        raise Fail "Not implemented yet"
+      | monomorphize _ (TAst.Deftype (name, params, _, ty)) =
+        raise Fail "Not implemented yet"
+      | monomorphize _ (TAst.Defdisjunction (name, params, _, variants)) =
+        raise Fail "Not implemented yet"
+      | monomorphize ctx (TAst.Deftemplate _) =
+        (ToplevelProgn [], ctx)
+      | monomorphize ctx (TAst.DefineSymbolMacro _) =
+        (ToplevelProgn [], ctx)
+      | monomorphize ctx (TAst.Defmodule _) =
+        (ToplevelProgn [], ctx)
+      | monomorphize ctx (TAst.InModule _) =
+        (ToplevelProgn [], ctx)
+
+    and monomorphizeDefun ctx name params rt body =
+        raise Fail "Not implemented yet"
 end

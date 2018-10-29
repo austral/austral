@@ -19,21 +19,7 @@
 
 signature MTAST = sig
     type name = Symbol.symbol
-
-    (* Monomorphic types *)
-
-    datatype ty = Unit
-                | Bool
-                | Integer of signedness * width
-                | Float of float_type
-                | Tuple of ty list
-                | Pointer of ty
-                | Array of ty
-                | Disjunction of name * variant list
-         and signedness = Unsigned | Signed
-         and width = Int8 | Int16 | Int32 | Int64
-         and float_type = Single | Double
-         and variant = Variant of name * ty option
+    type ty = MonoType.ty
 
     (* Expression AST *)
 
@@ -68,6 +54,7 @@ signature MTAST = sig
     (* Block AST *)
 
     datatype top_ast = Defun of name * param list * ty * ast
+                     | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
 
     (* Monomorphization *)
@@ -76,4 +63,5 @@ signature MTAST = sig
 
     val emptyContext : context
 
+    val monomorphize : context -> TAst.top_ast -> (top_ast * context)
 end
