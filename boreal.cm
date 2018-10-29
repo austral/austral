@@ -66,6 +66,7 @@ is
   src/tast.sml
 
   src/mtast.sig
+  src/mtast.sml
 
   src/hir.sig
   src/hir.sml

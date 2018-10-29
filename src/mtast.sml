@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature MTAST = sig
+structure MTAST :> MTAST = struct
     type name = Symbol.symbol
 
     (* Monomorphic types *)
@@ -72,8 +72,9 @@ signature MTAST = sig
 
     (* Monomorphization *)
 
-    type context
+    datatype context = Context of type_monomorphs
+         and type_monomorphs = TypeMono of ((name * ty list), ty) Map.map
 
-    val emptyContext : context
-
+    val emptyContext =
+        Context (TypeMono Map.empty)
 end
