@@ -183,7 +183,7 @@ structure HIR :> HIR = struct
         in
             let fun mapVariant (TAst.VariantCase (TAst.NameOnly name, body)) =
                     (escapeSymbol name, transform body)
-                  | mapVariant _ =
+                  | mapVariant (TAst.VariantCase (TAst.NameBinding {casename, var}, body)) =
                     raise Fail "not implemented"
             in
                 Let (temp,
