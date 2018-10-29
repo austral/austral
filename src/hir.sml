@@ -184,12 +184,17 @@ structure HIR :> HIR = struct
         in
             let fun mapVariant (TAst.VariantCase (TAst.NameOnly name, body)) =
                     (escapeSymbol name, transform body)
-                  | mapVariant (TAst.VariantCase (TAst.NameBinding {casename, var}, body)) =
+                  | mapVariant (TAst.VariantCase (TAst.NameBinding {casename, var, casety}, body)) =
                     (escapeSymbol casename,
                      Let (escapeVariable var,
-                          TAst.typeOf body,
-                          DisjunctionNth (Variable temp, 0),
+                          casety,
+                          DisjunctionNth (Variable temp, disjIndex casename),
                           transform body))
+
+                and disjIndex casename =
+                    case TAst.typeOf exp of
+                        (Type.Disjunction (_, _, variants)) => Type.posInVariants variants casename
+                      | _ => raise Fail "not a disjunction"
             in
                 Let (temp,
                      TAst.typeOf exp,
