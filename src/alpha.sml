@@ -181,7 +181,7 @@ structure Alpha :> ALPHA = struct
       | alphaRename s (OAST.SizeOf ty) =
         SizeOf ty
       | alphaRename s (OAST.AddressOf name) =
-        if specialSymbol var then
+        if specialSymbol name then
             raise Fail "address-of: variable is a special symbol"
         else
             AddressOf (Variable (lookup s name))
