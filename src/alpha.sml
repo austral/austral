@@ -91,6 +91,14 @@ structure Alpha :> ALPHA = struct
                                    ^ (Ident.identString (Symbol.symbolName s))
                                    ^ "'")
 
+    (* Special symbols *)
+
+    fun specialSymbol name =
+        let val syms = ["nil", "true", "false"]
+        in
+            Option.isSome (Util.position name (map Symbol.au syms))
+        end
+
     (* Alpha renaming *)
 
     fun alphaRename _ OAST.UnitConstant =
@@ -172,6 +180,11 @@ structure Alpha :> ALPHA = struct
         ForeignNull ty
       | alphaRename s (OAST.SizeOf ty) =
         SizeOf ty
+      | alphaRename s (OAST.AddressOf name) =
+        if specialSymbol var then
+            raise Fail "address-of: variable is a special symbol"
+        else
+            AddressOf (Variable (lookup s name))
       | alphaRename s (OAST.Operation (f, args)) =
         Operation (f, map (alphaRename s) args)
 
