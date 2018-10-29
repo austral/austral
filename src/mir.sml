@@ -260,7 +260,10 @@ structure MIR :> MIR = struct
       | transformExp (HIR.Case _) =
         raise Fail "case not implemented"
       | transformExp (HIR.DisjunctionNth (exp, idx)) =
-        DisjunctionNth (transformExp exp, idx)
+        let val (expBlock, exp') = transformExp exp
+        in
+            (expBlock, DisjunctionNth (exp', idx))
+        end
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
       | transformExp (HIR.Seq (a, b)) =
