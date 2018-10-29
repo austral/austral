@@ -272,6 +272,11 @@ structure MIR :> MIR = struct
         end
       | transformExp (HIR.SizeOf ty) =
         (Progn [], SizeOf (transformType ty))
+      | transformExp (HIR.AddressOf var) =
+        let val (varBlock, varExp) = transformExp (HIR.Variable var)
+        in
+            (varBlock, AddressOf varExp)
+        end
       | transformExp (HIR.Seq (a, b)) =
         let val (aBlock, aExp) = transformExp a
             and (bBlock, bExp) = transformExp b
