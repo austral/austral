@@ -181,6 +181,11 @@ structure OAST :> OAST = struct
       | transformSizeOf _ =
         raise Fail "Bad `size-of` form"
 
+    and transformAddressOf [RCST.Symbol name] =
+        AddressOf name
+      | transformAddressOf _ =
+        raise Fail "Invalid `address-of` form"
+
     (* Parse toplevel forms into the toplevel AST *)
 
     fun transformTop (RCST.List l) = transformTopList l
