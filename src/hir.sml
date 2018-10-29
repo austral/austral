@@ -182,7 +182,7 @@ structure HIR :> HIR = struct
         let val temp = gensym ()
         in
             let fun mapVariant (TAst.VariantCase (TAst.NameOnly name, body)) =
-                    (name, transform body)
+                    (escapeSymbol name, transform body)
                   | mapVariant _ =
                     raise Fail "not implemented"
             in
