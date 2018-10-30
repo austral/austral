@@ -139,7 +139,7 @@ structure MonoType :> MONO_TYPE = struct
     and monomorphizeVariant tm rs (Type.Variant (name, SOME ty)) =
         let val (ty', tm') = monomorphize tm rs ty
         in
-            (Variant (name, ty'), tm')
+            (Variant (name, SOME ty'), tm')
         end
       | monomorphizeVariant _ _ (Type.Variant (name, NONE)) =
         Variant (name, NONE)
