@@ -28,7 +28,8 @@ signature MONO_TYPE = sig
                 | Float of float_type
                 | Tuple of ty list
                 | Pointer of ty
-                | Array of ty
+                | ForeignPointer of ty
+                | StaticArray of ty
                 | Disjunction of name * variant list
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64
