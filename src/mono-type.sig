@@ -37,5 +37,5 @@ signature MONO_TYPE = sig
 
     (* Type monomorphization *)
 
-    val monomorphizeType : (name, ty) Map.map -> Type.ty -> ty
+    val monomorphize : (name, ty) Map.map -> Type.ty -> ty
 end

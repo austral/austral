@@ -37,6 +37,44 @@ structure MonoType :> MONO_TYPE = struct
 
     (* Type monomorphization *)
 
-    fun monomorphizeType replacements ty =
-        raise Fail "Not implemented yet"
+    fun monomorphize _ Type.Unit =
+        Unit
+      | monomorphize _ Type.Bool =
+        Bool
+      | monomorphize _ (Type.Integer (s, w)) =
+        Integer (mapSignedness s, mapWidth w)
+      | monomorphize _ (Type.Float f) =
+        Float (mapFloat f)
+      | monomorphize m (Type.Tuple tys) =
+        Tuple (map (monomorphize m) tys)
+      | monomorphize m (Type.Pointer ty) =
+        Pointer (monomorphize m ty)
+      | monomorphize m (Type.ForeignPointer ty) =
+        Pointer (monomorphize m ty)
+      | monomorphize m (Type.StaticArray ty) =
+        Array (monomorphize m ty)
+      | monomorphize m (Type.Disjunction (name, _, variants)) =
+        Disjunction (name, map (monomorphizeVariant m) variants)
+      | monomorphize m (Type.TypeVariable name) =
+        (case Map.get m name of
+             SOME ty => ty
+           | NONE => raise Fail ("Error during monomorphization: no replacement for the type variable '"
+                                 ^ (Symbol.toString name)
+                                 ^ "' found"))
+
+    and mapSignedness Type.Unsigned = Unsigned
+      | mapSignedness Type.Signed = Signed
+
+    and mapWidth Type.Int8 = Int8
+      | mapWidth Type.Int16 = Int16
+      | mapWidth Type.Int32 = Int32
+      | mapWidth Type.Int64 = Int64
+
+    and mapFloat Type.Single = Single
+      | mapFloat Type.Double = Double
+
+    and monomorphizeVariant m (Type.Variant (name, SOME ty)) =
+        Variant (name, SOME (monomorphize m ty))
+      | monomorphizeVariant _ (Type.Variant (name, NONE)) =
+        Variant (name, NONE)
 end
