@@ -70,7 +70,8 @@ structure MonoType :> MONO_TYPE = struct
         in
             (StaticArray ty', tm')
         end
-      | monomorphize tm rs (Type.Disjunction (name, _, variants)) =
+      | monomorphize tm rs (Type.Disjunction (name, tyargs, variants)) =
+        (* Check the table of type monomorphs for this name and type arguments *)
         raise Fail "Not implemented yet"
       | monomorphize tm rs (Type.TypeVariable name) =
         (case Map.get rs name of
