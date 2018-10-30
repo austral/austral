@@ -41,7 +41,7 @@ structure MonoType :> MONO_TYPE = struct
     datatype type_monomorphs = TypeMonos of ((name * ty list), ty) Map.map
 
     fun addMonomorph (TypeMonos tm) name tyargs ty =
-        Map.iadd tm ((name, tyargs), ty)
+        TypeMonos (Map.iadd tm ((name, tyargs), ty))
 
     type replacements = (name, ty) Map.map
 
