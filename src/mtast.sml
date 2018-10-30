@@ -65,25 +65,25 @@ structure MTAST :> MTAST = struct
     val emptyContext =
         Context (TypeMono Map.empty)
 
-    fun monomorphize ctx (TAst.Defun (name, params, rt, _, body)) =
+    fun monomorphize ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
-      | monomorphize ctx (TAst.Defgeneric _) =
+      | monomorphize ctx (TAST.Defgeneric _) =
         (ToplevelProgn [], ctx)
-      | monomorphize ctx (TAst.Defclass _) =
+      | monomorphize ctx (TAST.Defclass _) =
         (ToplevelProgn [], ctx)
-      | monomorphize _ (TAst.Definstance (name, arg, docstring, methods)) =
+      | monomorphize _ (TAST.Definstance (name, arg, docstring, methods)) =
         raise Fail "Not implemented yet"
-      | monomorphize _ (TAst.Deftype (name, params, _, ty)) =
+      | monomorphize _ (TAST.Deftype (name, params, _, ty)) =
         raise Fail "Not implemented yet"
-      | monomorphize _ (TAst.Defdisjunction (name, params, _, variants)) =
+      | monomorphize _ (TAST.Defdisjunction (name, params, _, variants)) =
         raise Fail "Not implemented yet"
-      | monomorphize ctx (TAst.Deftemplate _) =
+      | monomorphize ctx (TAST.Deftemplate _) =
         (ToplevelProgn [], ctx)
-      | monomorphize ctx (TAst.DefineSymbolMacro _) =
+      | monomorphize ctx (TAST.DefineSymbolMacro _) =
         (ToplevelProgn [], ctx)
-      | monomorphize ctx (TAst.Defmodule _) =
+      | monomorphize ctx (TAST.Defmodule _) =
         (ToplevelProgn [], ctx)
-      | monomorphize ctx (TAst.InModule _) =
+      | monomorphize ctx (TAST.InModule _) =
         (ToplevelProgn [], ctx)
 
     and monomorphizeDefun ctx name params rt body =
