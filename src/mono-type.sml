@@ -47,8 +47,8 @@ structure MonoType :> MONO_TYPE = struct
         (Bool, tm)
       | monomorphize tm _ (Type.Integer (s, w)) =
         (Integer (mapSignedness s, mapWidth w), tm)
-      | monomorphize _ (Type.Float f) =
-        Float (mapFloat f)
+      | monomorphize tm _ (Type.Float f) =
+        (Float (mapFloat f), tm)
       | monomorphize m (Type.Tuple tys) =
         Tuple (map (monomorphize m) tys)
       | monomorphize m (Type.Pointer ty) =
