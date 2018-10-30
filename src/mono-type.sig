@@ -37,5 +37,7 @@ signature MONO_TYPE = sig
 
     (* Type monomorphization *)
 
+    datatype type_monomorphs = TypeMonos of ((name * ty list), ty) Map.map
+
     val monomorphize : (name, ty) Map.map -> Type.ty -> ty
 end
