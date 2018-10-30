@@ -63,9 +63,9 @@ structure MonoType :> MONO_TYPE = struct
         Array (monomorphize m ty)
       | monomorphize tm rs (Type.Disjunction (name, _, variants)) =
         Disjunction (name, map (monomorphizeVariant m) variants)*)
-      | monomorphize _ rs (Type.TypeVariable name) =
+      | monomorphize tm rs (Type.TypeVariable name) =
         (case Map.get rs name of
-             SOME ty => ty
+             SOME ty => (ty, tm)
            | NONE => raise Fail ("Error during monomorphization: no replacement for the type variable '"
                                  ^ (Symbol.toString name)
                                  ^ "' found"))
