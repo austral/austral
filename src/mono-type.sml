@@ -40,6 +40,9 @@ structure MonoType :> MONO_TYPE = struct
 
     datatype type_monomorphs = TypeMonos of ((name * ty list), ty) Map.map
 
+    fun addMonomorph (TypeMonos tm) name tyargs ty =
+        Map.iadd tm ((name, tyargs), disj)
+
     type replacements = (name, ty) Map.map
 
     fun monomorphize tm _ Type.Unit =
@@ -83,7 +86,7 @@ structure MonoType :> MONO_TYPE = struct
                  in
                      let val disj = Disjunction (name, variants')
                      in
-                         let val tm''' = Map.iadd tm'' ((name, tyargs'), disj)
+                         let val tm''' = addMonomorph tm'' name tyargs disj
                          in
                              (disj, tm''')
                          end
