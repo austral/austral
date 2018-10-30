@@ -45,8 +45,8 @@ structure MonoType :> MONO_TYPE = struct
         (Unit, tm)
       | monomorphize tm _ Type.Bool =
         (Bool, tm)
-      | monomorphize _ (Type.Integer (s, w)) =
-        Integer (mapSignedness s, mapWidth w)
+      | monomorphize tm _ (Type.Integer (s, w)) =
+        (Integer (mapSignedness s, mapWidth w), tm)
       | monomorphize _ (Type.Float f) =
         Float (mapFloat f)
       | monomorphize m (Type.Tuple tys) =
