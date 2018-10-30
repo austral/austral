@@ -71,6 +71,11 @@ structure MTAST :> MTAST = struct
     fun concreteMonoType ty =
         MonoType.monomorphize Map.empty ty
 
+    fun monomorphize ctx TAST.UnitConstant =
+        (UnitConstant, ctx)
+      | monomorphize _ _ =
+        raise Fail "Not implemented yet"
+
     fun monomorphizeTop ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
       | monomorphizeTop ctx (TAST.Defgeneric _) =
