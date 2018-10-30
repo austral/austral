@@ -214,10 +214,10 @@ structure Compiler : COMPILER = struct
         ([], c)
 
     local
-        open TAst
+        open TAST
     in
     fun compileForm c topNode =
-        let val typedNode = TAst.augmentTop topNode
+        let val typedNode = TAST.augmentTop topNode
                                             (compilerTenv c)
                                             (compilerFenv c)
         in
