@@ -69,9 +69,9 @@ structure MonoType :> MONO_TYPE = struct
         let val (ty', tm') = monomorphize tm rs ty
         in
             (StaticArray ty', tm')
-        end(*
+        end
       | monomorphize tm rs (Type.Disjunction (name, _, variants)) =
-        Disjunction (name, map (monomorphizeVariant m) variants)*)
+        raise Fail "Not implemented yet"
       | monomorphize tm rs (Type.TypeVariable name) =
         (case Map.get rs name of
              SOME ty => (ty, tm)
