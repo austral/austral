@@ -41,10 +41,10 @@ structure MonoType :> MONO_TYPE = struct
 
     type replacements = (name, ty) Map.map
 
-    fun monomorphize tm Type.Unit =
+    fun monomorphize tm _ Type.Unit =
         (Unit, tm)
-      | monomorphize _ Type.Bool =
-        Bool
+      | monomorphize tm _ Type.Bool =
+        (Bool, tm)
       | monomorphize _ (Type.Integer (s, w)) =
         Integer (mapSignedness s, mapWidth w)
       | monomorphize _ (Type.Float f) =
