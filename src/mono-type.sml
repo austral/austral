@@ -72,7 +72,18 @@ structure MonoType :> MONO_TYPE = struct
         end
       | monomorphize tm rs (Type.Disjunction (name, tyargs, variants)) =
         (* Check the table of type monomorphs for this name and type arguments *)
-        raise Fail "Not implemented yet"
+        (case Map.get tm (name, tyargs) of
+             SOME ty => (ty, tm)
+           | NONE =>
+             (* If this pair of name+type args is not present in the table of
+                monomorphs, add it *)
+             let val tyargs' = monomorphizeList tm rs tyargs
+             in
+                 let val tm' = Map.iadd ((name, tyargs), Disjunction (name, tyargs, variants'))
+                 in
+                     raise Fail "Not implemented yet"
+                 end
+             end)
       | monomorphize tm rs (Type.TypeVariable name) =
         (case Map.get rs name of
              SOME ty => (ty, tm)
@@ -91,14 +102,14 @@ structure MonoType :> MONO_TYPE = struct
     and mapFloat Type.Single = Single
       | mapFloat Type.Double = Double
 
-    and  monomorphizeList tm rs (head::tail) =
-         let val (mono, tm') = monomorphize tm rs head
-         in
-             let val (rest, tm'') = monomorphizeList tm' rs tail
-             in
-                 (mono :: rest, tm'')
-             end
-         end
-       | monomorphizeList tm rs nil =
-         (nil, tm)
+    and monomorphizeList tm rs (head::tail) =
+        let val (mono, tm') = monomorphize tm rs head
+        in
+            let val (rest, tm'') = monomorphizeList tm' rs tail
+            in
+                (mono :: rest, tm'')
+            end
+        end
+      | monomorphizeList tm rs nil =
+        (nil, tm)
 end
