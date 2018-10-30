@@ -81,9 +81,12 @@ structure MonoType :> MONO_TYPE = struct
              in
                  let val (variants', tm'') = monomorphizeVariants tm' rs variants
                  in
-                     let val tm' = Map.iadd tm'' ((name, tyargs'), Disjunction (name, variants'))
+                     let val disj = Disjunction (name, variants')
                      in
-                         raise Fail "Not implemented yet"
+                         let val tm' = Map.iadd tm'' ((name, tyargs'), disj)
+                         in
+                             (disj, tm')
+                         end
                      end
                  end
              end)
