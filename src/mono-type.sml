@@ -40,6 +40,9 @@ structure MonoType :> MONO_TYPE = struct
 
     datatype type_monomorphs = TypeMonos of ((name * ty list), ty) Map.map
 
+    fun getMonomorph (TypeMonos tm) name tyargs =
+        Map.get tm (name, tyargs)
+
     fun addMonomorph (TypeMonos tm) name tyargs ty =
         TypeMonos (Map.iadd tm ((name, tyargs), ty))
 
@@ -75,7 +78,7 @@ structure MonoType :> MONO_TYPE = struct
         end
       | monomorphize tm rs (Type.Disjunction (name, tyargs, variants)) =
         (* Check the table of type monomorphs for this name and type arguments *)
-        (case Map.get tm (name, tyargs) of
+        (case getMonomorph tm name tyargs of
              SOME ty => (ty, tm)
            | NONE =>
              (* If this pair of name+type args is not present in the table of
