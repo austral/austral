@@ -100,9 +100,4 @@ structure MonoType :> MONO_TYPE = struct
          end
        | monomorphizeList tm rs nil =
          (nil, tm)
-
-    (*and monomorphizeVariant m (Type.Variant (name, SOME ty)) =
-        Variant (name, SOME (monomorphize m ty))
-      | monomorphizeVariant _ (Type.Variant (name, NONE)) =
-        Variant (name, NONE)*)
 end
