@@ -128,7 +128,7 @@ structure MonoType :> MONO_TYPE = struct
     and monomorphizeVariants tm rs (head::tail) =
         let val (variant, tm') = monomorphizeVariant tm rs head
         in
-            let val (rest, tm'') = monomorphizeList tm' rs tail
+            let val (rest, tm'') = monomorphizeVariants tm' rs tail
             in
                 (variant :: rest, tm'')
             end
