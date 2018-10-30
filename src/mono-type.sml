@@ -83,9 +83,9 @@ structure MonoType :> MONO_TYPE = struct
                  in
                      let val disj = Disjunction (name, variants')
                      in
-                         let val tm' = Map.iadd tm'' ((name, tyargs'), disj)
+                         let val tm''' = Map.iadd tm'' ((name, tyargs'), disj)
                          in
-                             (disj, tm')
+                             (disj, tm''')
                          end
                      end
                  end
