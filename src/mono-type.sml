@@ -60,9 +60,12 @@ structure MonoType :> MONO_TYPE = struct
         in
             (Pointer ty', tm')
         end
-      (*| monomorphize tm rs (Type.ForeignPointer ty) =
-        Pointer (monomorphize m ty)
-      | monomorphize tm rs (Type.StaticArray ty) =
+      | monomorphize tm rs (Type.ForeignPointer ty) =
+        let val (ty', tm') = monomorphize tm rs ty
+        in
+            (ForeignPointer ty', tm')
+        end
+      (*| monomorphize tm rs (Type.StaticArray ty) =
         Array (monomorphize m ty)
       | monomorphize tm rs (Type.Disjunction (name, _, variants)) =
         Disjunction (name, map (monomorphizeVariant m) variants)*)
