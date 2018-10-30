@@ -63,5 +63,6 @@ signature MTAST = sig
 
     val emptyContext : context
 
+    val monomorphize : context -> TAST.ast -> (ast * context)
     val monomorphizeTop : context -> TAST.top_ast -> (top_ast * context)
 end
