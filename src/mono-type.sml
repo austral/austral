@@ -77,25 +77,25 @@ structure MonoType :> MONO_TYPE = struct
             (StaticArray ty', tm')
         end
       | monomorphize tm rs (Type.Disjunction (name, tyargs, variants)) =
-        (* Check the table of type monomorphs for this name and type arguments *)
-        (case getMonomorph tm name tyargs of
-             SOME ty => (ty, tm)
-           | NONE =>
-             (* If this pair of name+type args is not present in the table of
-                monomorphs, add it *)
-             let val (tyargs', tm') = monomorphizeList tm rs tyargs
-             in
-                 let val (variants', tm'') = monomorphizeVariants tm' rs variants
-                 in
-                     let val disj = Disjunction (name, variants')
-                     in
-                         let val tm''' = addMonomorph tm'' name tyargs' disj
-                         in
-                             (disj, tm''')
-                         end
-                     end
-                 end
-             end)
+        let val (tyargs', tm') = monomorphizeList tm rs tyargs
+        in
+            (* Check the table of type monomorphs for this name and type arguments *)
+            case getMonomorph tm name tyargs' of
+                SOME ty => (ty, tm)
+              | NONE =>
+                (* If this pair of name+type args is not present in the table of
+                   monomorphs, add it *)
+                let val (variants', tm'') = monomorphizeVariants tm' rs variants
+                in
+                    let val disj = Disjunction (name, variants')
+                    in
+                        let val tm''' = addMonomorph tm'' name tyargs' disj
+                        in
+                            (disj, tm''')
+                        end
+                    end
+                end
+        end
       | monomorphize tm rs (Type.TypeVariable name) =
         (case Map.get rs name of
              SOME ty => (ty, tm)
