@@ -55,9 +55,12 @@ structure MonoType :> MONO_TYPE = struct
         in
             (Tuple tys', tm')
         end
-      (*| monomorphize tm rs (Type.Pointer ty) =
-        Pointer (monomorphize m ty)
-      | monomorphize tm rs (Type.ForeignPointer ty) =
+      | monomorphize tm rs (Type.Pointer ty) =
+        let val (ty', tm') = monomorphize tm rs ty
+        in
+            (Pointer ty', tm')
+        end
+      (*| monomorphize tm rs (Type.ForeignPointer ty) =
         Pointer (monomorphize m ty)
       | monomorphize tm rs (Type.StaticArray ty) =
         Array (monomorphize m ty)
