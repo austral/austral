@@ -39,6 +39,8 @@ structure MonoType :> MONO_TYPE = struct
 
     datatype type_monomorphs = TypeMonos of ((name * ty list), ty) Map.map
 
+    type replacements = (name, ty) Map.map
+
     fun monomorphize _ Type.Unit =
         Unit
       | monomorphize _ Type.Bool =
