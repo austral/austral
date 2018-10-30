@@ -65,6 +65,12 @@ structure MTAST :> MTAST = struct
     val emptyContext =
         Context (TypeMono Map.empty)
 
+    (* Monomorphize a type with an empty replacements map, that is, in a
+       concrete context. *)
+
+    fun concreteMonoType ty =
+        MonoType.monomorphize Map.empty ty
+
     fun monomorphize ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
       | monomorphize ctx (TAST.Defgeneric _) =
@@ -87,5 +93,12 @@ structure MTAST :> MTAST = struct
         (ToplevelProgn [], ctx)
 
     and monomorphizeDefun ctx name params rt body =
-        raise Fail "Not implemented yet"
+        let fun mapParam (TAST.Param (name, ty)) =
+                Param (name, concreteMonoType ty)
+        in
+            Defun (name,
+                   map mapParam params,
+                   concreteMonoType rt,
+                   monomorphize ctx body)
+        end
 end
