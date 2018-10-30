@@ -115,4 +115,23 @@ structure MonoType :> MONO_TYPE = struct
         end
       | monomorphizeList tm rs nil =
         (nil, tm)
+
+    and monomorphizeVariants tm rs (head::tail) =
+        let val (mono, tm') = monomorphize tm rs head
+        in
+            let val (rest, tm'') = monomorphizeList tm' rs tail
+            in
+                (mono :: rest, tm'')
+            end
+        end
+      | monomorphizeVariants tm rs nil =
+        (nil, tm)
+
+    and monomorphizeVariant tm rs (Type.Variant (name, SOME ty)) =
+        let val (ty', tm') = monomorphize tm rs ty
+        in
+            (Variant (name, ty'), tm')
+        end
+      | monomorphizeVariant _ _ (Type.Variant (name, NONE)) =
+        Variant (name, NONE)
 end
