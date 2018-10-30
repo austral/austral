@@ -141,6 +141,6 @@ structure MonoType :> MONO_TYPE = struct
         in
             (Variant (name, SOME ty'), tm')
         end
-      | monomorphizeVariant _ _ (Type.Variant (name, NONE)) =
-        Variant (name, NONE)
+      | monomorphizeVariant tm _ (Type.Variant (name, NONE)) =
+        (Variant (name, NONE), tm)
 end
