@@ -50,18 +50,21 @@ structure MonoType :> MONO_TYPE = struct
         (Integer (mapSignedness s, mapWidth w), tm)
       | monomorphize tm _ (Type.Float f) =
         (Float (mapFloat f), tm)
-      | monomorphize m (Type.Tuple tys) =
-        Tuple (map (monomorphize m) tys)
-      | monomorphize m (Type.Pointer ty) =
+      | monomorphize tm rs (Type.Tuple tys) =
+        let val (tys', tm') = monomorphizeList tm rs tys
+        in
+            (Tuple tys', tm')
+        end
+      | monomorphize tm rs (Type.Pointer ty) =
         Pointer (monomorphize m ty)
-      | monomorphize m (Type.ForeignPointer ty) =
+      | monomorphize tm rs (Type.ForeignPointer ty) =
         Pointer (monomorphize m ty)
-      | monomorphize m (Type.StaticArray ty) =
+      | monomorphize tm rs (Type.StaticArray ty) =
         Array (monomorphize m ty)
-      | monomorphize m (Type.Disjunction (name, _, variants)) =
+      | monomorphize tm rs (Type.Disjunction (name, _, variants)) =
         Disjunction (name, map (monomorphizeVariant m) variants)
-      | monomorphize m (Type.TypeVariable name) =
-        (case Map.get m name of
+      | monomorphize _ rs (Type.TypeVariable name) =
+        (case Map.get rs name of
              SOME ty => ty
            | NONE => raise Fail ("Error during monomorphization: no replacement for the type variable '"
                                  ^ (Symbol.toString name)
@@ -77,6 +80,17 @@ structure MonoType :> MONO_TYPE = struct
 
     and mapFloat Type.Single = Single
       | mapFloat Type.Double = Double
+
+    and  monomorphizeList tm rs (head::tail) =
+         let val (mono, tm') = monomorphize tm rs head
+         in
+             let val (rest, tm'') = monomorphizeList tm' rs tail
+             in
+                 (mono :: rest, tm'')
+             end
+         end
+       | monomorphizeList tm rs nil =
+         (nil, tm)
 
     and monomorphizeVariant m (Type.Variant (name, SOME ty)) =
         Variant (name, SOME (monomorphize m ty))
