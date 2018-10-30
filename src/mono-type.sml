@@ -126,11 +126,11 @@ structure MonoType :> MONO_TYPE = struct
         (nil, tm)
 
     and monomorphizeVariants tm rs (head::tail) =
-        let val (mono, tm') = monomorphize tm rs head
+        let val (variant, tm') = monomorphizeVariant tm rs head
         in
             let val (rest, tm'') = monomorphizeList tm' rs tail
             in
-                (mono :: rest, tm'')
+                (variant :: rest, tm'')
             end
         end
       | monomorphizeVariants tm rs nil =
