@@ -55,14 +55,14 @@ structure MonoType :> MONO_TYPE = struct
         in
             (Tuple tys', tm')
         end
-      | monomorphize tm rs (Type.Pointer ty) =
+      (*| monomorphize tm rs (Type.Pointer ty) =
         Pointer (monomorphize m ty)
       | monomorphize tm rs (Type.ForeignPointer ty) =
         Pointer (monomorphize m ty)
       | monomorphize tm rs (Type.StaticArray ty) =
         Array (monomorphize m ty)
       | monomorphize tm rs (Type.Disjunction (name, _, variants)) =
-        Disjunction (name, map (monomorphizeVariant m) variants)
+        Disjunction (name, map (monomorphizeVariant m) variants)*)
       | monomorphize _ rs (Type.TypeVariable name) =
         (case Map.get rs name of
              SOME ty => ty
@@ -92,8 +92,8 @@ structure MonoType :> MONO_TYPE = struct
        | monomorphizeList tm rs nil =
          (nil, tm)
 
-    and monomorphizeVariant m (Type.Variant (name, SOME ty)) =
+    (*and monomorphizeVariant m (Type.Variant (name, SOME ty)) =
         Variant (name, SOME (monomorphize m ty))
       | monomorphizeVariant _ (Type.Variant (name, NONE)) =
-        Variant (name, NONE)
+        Variant (name, NONE)*)
 end
