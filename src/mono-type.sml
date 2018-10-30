@@ -77,11 +77,14 @@ structure MonoType :> MONO_TYPE = struct
            | NONE =>
              (* If this pair of name+type args is not present in the table of
                 monomorphs, add it *)
-             let val tyargs' = monomorphizeList tm rs tyargs
+             let val (tyargs', tm') = monomorphizeList tm rs tyargs
              in
-                 let val tm' = Map.iadd ((name, tyargs), Disjunction (name, tyargs, variants'))
+                 let val (variants', tm'') = monomorphizeVariants tm' rs variants
                  in
-                     raise Fail "Not implemented yet"
+                     let val tm' = Map.iadd tm'' ((name, tyargs), Disjunction (name, tyargs, variants'))
+                     in
+                         raise Fail "Not implemented yet"
+                     end
                  end
              end)
       | monomorphize tm rs (Type.TypeVariable name) =
