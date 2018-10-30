@@ -98,8 +98,8 @@ structure MTAST :> MTAST = struct
         (ToplevelProgn [], ctx)
 
     and monomorphizeDefun ctx name params rt body =
-        let fun mapParam (TAST.Param (name, ty)) =
-                Param (name, concreteMonoType ty)
+        let fun mapParam (TAST.Param (var, ty)) =
+                Param (var, concreteMonoType ty)
         in
             Defun (name,
                    map mapParam params,
