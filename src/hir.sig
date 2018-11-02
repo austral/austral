@@ -36,6 +36,7 @@ signature HIR = sig
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | ArrayLength of ast
+                 | ArrayPointer of ast
                  | Allocate of ast * ty
                  | Load of ast
                  | Store of ast * ast
