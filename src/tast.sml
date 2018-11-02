@@ -419,9 +419,19 @@ structure TAST :> TAST = struct
           | augment (AST.ForeignFuncall (name, typespec, args)) c =
             let val tenv = ctxTenv c
             in
+                let fun augmentArg v =
+                        let val value' = augment c value
+                        in
+                            if validType (typeOf value') then
+                                case typeOf value' of
+                                    (StaticArray t) => ArrayPointer value'
+                                  | _ => value'
+                            else
+                                raise Fail "Type is not valid for a foreign funcall"
+                        end
                 ForeignFuncall (name,
                                 resolve tenv (ctxTyParams c) typespec,
-                                map (fn a => augment a c) args)
+                                map augmentArg args)
             end
           | augment (AST.Seq (a, b)) c =
             Seq (augment a c,
