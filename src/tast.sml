@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure TAst :> TAST = struct
+structure TAST :> TAST = struct
     type name = Symbol.symbol
     type ty = Type.ty
 

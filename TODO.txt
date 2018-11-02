@@ -1,5 +1,6 @@
 TODO:
 
+- Monomorphize TAST
 - Augment methods
 
 - Implement static-array-pointer function
@@ -133,3 +134,4 @@ DONE:
 - Case expressions
 - address-of
 - Static arrays should contain the length in their runtime representation, not at the type-level
+- Monomorphize types

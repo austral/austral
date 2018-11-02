@@ -47,6 +47,9 @@ is
   src/type-match.sig
   src/type-match.sml
 
+  src/mono-type.sig
+  src/mono-type.sml
+
   src/function.sig
   src/function.sml
 
@@ -64,6 +67,9 @@ is
 
   src/tast.sig
   src/tast.sml
+
+  src/mtast.sig
+  src/mtast.sml
 
   src/hir.sig
   src/hir.sml

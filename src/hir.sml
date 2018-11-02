@@ -111,24 +111,24 @@ structure HIR :> HIR = struct
 
     (* Transform expression AST *)
 
-    fun transform TAst.UnitConstant =
+    fun transform TAST.UnitConstant =
         BoolConstant false
-      | transform (TAst.BoolConstant b) =
+      | transform (TAST.BoolConstant b) =
         BoolConstant b
-      | transform (TAst.IntConstant (i, _)) =
+      | transform (TAST.IntConstant (i, _)) =
         IntConstant i
-      | transform (TAst.FloatConstant (f, _)) =
+      | transform (TAST.FloatConstant (f, _)) =
         FloatConstant f
-      | transform (TAst.StringConstant s) =
+      | transform (TAST.StringConstant s) =
         StringConstant s
-      | transform (TAst.Variable (v, _)) =
+      | transform (TAST.Variable (v, _)) =
         Variable (escapeVariable v)
-      | transform (TAst.Let (var, value, body)) =
-        Let (escapeVariable var, TAst.typeOf value, transform value, transform body)
-      | transform (TAst.Bind (vars, tup, body)) =
+      | transform (TAST.Let (var, value, body)) =
+        Let (escapeVariable var, TAST.typeOf value, transform value, transform body)
+      | transform (TAST.Bind (vars, tup, body)) =
         (* At the TAST->HIR boundary we map bindings to a chain of let
            expressions where each variable is bound to a tuple projection *)
-        let val tupTy = TAst.typeOf tup
+        let val tupTy = TAST.typeOf tup
             and tup' = transform tup
             and body' = transform body
         in
@@ -154,9 +154,9 @@ structure HIR :> HIR = struct
                 end
             end
         end
-      | transform (TAst.Cond (test, cons, alt)) =
-        Cond (transform test, transform cons, transform alt, TAst.typeOf cons)
-      | transform (TAst.ArithOp (kind, oper, lhs, rhs)) =
+      | transform (TAST.Cond (test, cons, alt)) =
+        Cond (transform test, transform cons, transform alt, TAST.typeOf cons)
+      | transform (TAST.ArithOp (kind, oper, lhs, rhs)) =
         let val lhs' = transform lhs
             and rhs' = transform rhs
         in
@@ -166,29 +166,29 @@ structure HIR :> HIR = struct
               | Arith.Saturation => transformSaturationArithOp oper lhs' rhs'
               | Arith.Float => FloatArithOp (oper, lhs', rhs')
         end
-      | transform (TAst.TupleCreate exps) =
+      | transform (TAST.TupleCreate exps) =
         TupleCreate (map transform exps)
-      | transform (TAst.TupleProj (tup, idx)) =
+      | transform (TAST.TupleProj (tup, idx)) =
         TupleProj (transform tup, idx)
-      | transform (TAst.ArrayLength arr) =
+      | transform (TAST.ArrayLength arr) =
         ArrayLength (transform arr)
-      | transform (TAst.Allocate v) =
-        Allocate (transform v, TAst.typeOf v)
-      | transform (TAst.Load ptr) =
+      | transform (TAST.Allocate v) =
+        Allocate (transform v, TAST.typeOf v)
+      | transform (TAST.Load ptr) =
         Load (transform ptr)
-      | transform (TAst.Store (ptr, v)) =
+      | transform (TAST.Store (ptr, v)) =
         Store (transform ptr, transform v)
-      | transform (TAst.The (ty, exp)) =
+      | transform (TAST.The (ty, exp)) =
         Cast (ty, transform exp)
-      | transform (TAst.Construct (ty, label, exp)) =
+      | transform (TAST.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map transform exp)
-      | transform (TAst.Case (exp, variants, ty)) =
+      | transform (TAST.Case (exp, variants, ty)) =
         (* In the TAST->HIR stage, we move case bindings to their own let *)
         let val temp = gensym ()
         in
-            let fun mapVariant (TAst.VariantCase (TAst.NameOnly name, body)) =
+            let fun mapVariant (TAST.VariantCase (TAST.NameOnly name, body)) =
                     (name, transform body)
-                  | mapVariant (TAst.VariantCase (TAst.NameBinding {casename, var, ty}, body)) =
+                  | mapVariant (TAST.VariantCase (TAST.NameBinding {casename, var, ty}, body)) =
                     (casename,
                      Let (escapeVariable var,
                           ty,
@@ -196,7 +196,7 @@ structure HIR :> HIR = struct
                           transform body))
 
                 and disjIndex casename =
-                    case TAst.typeOf exp of
+                    case TAST.typeOf exp of
                         (Type.Disjunction (_, _, variants)) => Option.valOf (Type.posInVariants variants casename)
                       | _ => raise Fail "not a disjunction"
 
@@ -211,12 +211,12 @@ structure HIR :> HIR = struct
                       | _ => raise Fail "Invalid case expression: empty"
             in
                 Let (temp,
-                     TAst.typeOf exp,
+                     TAST.typeOf exp,
                      transform exp,
                      processVariants (map mapVariant variants))
             end
         end
-      | transform (TAst.ForeignFuncall (name, rt, args)) =
+      | transform (TAST.ForeignFuncall (name, rt, args)) =
         (* If the function return type is unit, we're calling a function that
            returns void. In which case use a progn to seq call the function,
            and then return the unit constant *)
@@ -227,15 +227,15 @@ structure HIR :> HIR = struct
             else
                 Cast (rt, call)
         end
-      | transform (TAst.ForeignNull ty) =
+      | transform (TAST.ForeignNull ty) =
         NullConstant
-      | transform (TAst.SizeOf ty) =
+      | transform (TAST.SizeOf ty) =
         SizeOf ty
-      | transform (TAst.AddressOf (var, _)) =
+      | transform (TAST.AddressOf (var, _)) =
         AddressOf (escapeVariable var)
-      | transform (TAst.Seq (a, b)) =
+      | transform (TAST.Seq (a, b)) =
         Seq (transform a, transform b)
-      | transform (TAst.Funcall (f, tyargs, args, _)) =
+      | transform (TAST.Funcall (f, tyargs, args, _)) =
         transformFuncall f tyargs (map transform args)
     and transformCheckedArithOp oper lhs rhs =
         Funcall ("austral_checked_" ^ arithOpName oper, [], [lhs, rhs])
@@ -280,54 +280,54 @@ structure HIR :> HIR = struct
 
     (* Transform top-level AST *)
 
-    fun transformTop (TAst.Defun (name, params, rt, _, body)) =
+    fun transformTop (TAST.Defun (name, params, rt, _, body)) =
         Defun (escapeSymbol name,
                mapParams params,
                rt,
                transform body)
-      | transformTop (TAst.Defgeneric (name, typarams, params, rt, _, body)) =
+      | transformTop (TAST.Defgeneric (name, typarams, params, rt, _, body)) =
         Defgeneric (escapeSymbol name,
                     mapTypeParams typarams,
                     mapParams params,
                     rt,
                     transform body)
-      | transformTop (TAst.Defclass _) =
+      | transformTop (TAST.Defclass _) =
         (* Defclass declarations don't need to be compiled, all the actual work
            is done in instance declarations *)
         ToplevelProgn []
-      | transformTop (TAst.Definstance (_, _, _, methods)) =
+      | transformTop (TAST.Definstance (_, _, _, methods)) =
         (* The compilation strategy for instances is each method is compiled to
            a standalone generic function *)
         (* FIXME: definstance methods should be compiled to generic functions *)
         ToplevelProgn (map transformMethod methods)
-      | transformTop (TAst.Deftype (name, params, _, ty)) =
+      | transformTop (TAST.Deftype (name, params, _, ty)) =
         Deftype (escapeSymbol name,
                  mapTypeParams params,
                  ty)
-      | transformTop (TAst.Defdisjunction (name, params, _, variants)) =
+      | transformTop (TAST.Defdisjunction (name, params, _, variants)) =
         Defdisjunction (escapeSymbol name,
                         mapTypeParams params,
                         variants)
-      | transformTop (TAst.Deftemplate _) =
+      | transformTop (TAST.Deftemplate _) =
         ToplevelProgn []
-      | transformTop (TAst.DefineSymbolMacro _) =
+      | transformTop (TAST.DefineSymbolMacro _) =
         ToplevelProgn []
-      | transformTop (TAst.Defmodule _) =
+      | transformTop (TAST.Defmodule _) =
         ToplevelProgn []
-      | transformTop (TAst.InModule _) =
+      | transformTop (TAST.InModule _) =
         ToplevelProgn []
 
       and mapParams params =
-          map (fn (TAst.Param (n, t)) => Param (escapeVariable n, t))
+          map (fn (TAST.Param (n, t)) => Param (escapeVariable n, t))
               params
 
     and mapTypeParams typarams =
         map (fn (Type.TypeParam n) => escapeSymbol n)
             (OrderedSet.toList typarams)
 
-    and transformMethod (TAst.MethodDef (name, params, rt, _, body)) =
+    and transformMethod (TAST.MethodDef (name, params, rt, _, body)) =
         Defun (escapeSymbol name,
-               map (fn (TAst.Param (n, t)) => Param (escapeVariable n, t)) params,
+               map (fn (TAST.Param (n, t)) => Param (escapeVariable n, t)) params,
                rt,
                transform body)
 end
