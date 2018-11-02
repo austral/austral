@@ -107,6 +107,8 @@ structure TAST :> TAST = struct
                | _ => raise Fail "Not a tuple")
           | typeOf (ArrayLength _) =
             Integer (Unsigned, Int64)
+          | typeOf (ArrayPointer ty) =
+            ForeignPointer ty
           | typeOf (Allocate v) =
             Pointer (typeOf v)
           | typeOf (Load p) =
