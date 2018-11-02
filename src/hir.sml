@@ -173,6 +173,8 @@ structure HIR :> HIR = struct
         TupleProj (transform tup, idx)
       | transform (TAST.ArrayLength arr) =
         ArrayLength (transform arr)
+      | transform (TAST.ArrayPointer arr) =
+        ArrayPointer (transform arr)
       | transform (TAST.Allocate v) =
         Allocate (transform v, TAST.typeOf v)
       | transform (TAST.Load ptr) =
