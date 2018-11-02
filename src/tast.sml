@@ -425,7 +425,7 @@ structure TAST :> TAST = struct
             let val tenv = ctxTenv c
             in
                 let fun augmentArg v =
-                        let val value' = augment c value
+                        let val value' = augment value c
                         in
                             if validType (typeOf value') then
                                 case typeOf value' of
