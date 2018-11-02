@@ -228,6 +228,11 @@ structure MIR :> MIR = struct
         in
             (arrBlock, StructAccess (arrExp, "_length"))
         end
+      | transformExp (HIR.ArrayPointer arr) =
+        let val (arrBlock, arrExp) = transformExp arr
+        in
+            (arrBlock, StructAccess (arrExp, "_data"))
+        end
       | transformExp (HIR.Allocate (exp, ty)) =
         let val pointer = freshVar ()
             and ty' = transformType ty
