@@ -437,6 +437,7 @@ structure TAST :> TAST = struct
 
                     and validType (Type.Integer _) = true
                       | validType (Type.Float _) = true
+                      | validType (Type.ForeignPointer _) = true
                       | validType (Type.StaticArray _) = true
                       | validType _ = false
                 in
