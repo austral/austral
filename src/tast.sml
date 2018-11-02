@@ -424,7 +424,7 @@ structure TAST :> TAST = struct
           | augment (AST.ForeignFuncall (name, typespec, args)) c =
             let val tenv = ctxTenv c
             in
-                let fun augmentArg v =
+                let fun augmentArg value =
                         let val value' = augment value c
                         in
                             if validType (typeOf value') then
