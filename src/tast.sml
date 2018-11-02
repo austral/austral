@@ -429,9 +429,16 @@ structure TAST :> TAST = struct
                             else
                                 raise Fail "Type is not valid for a foreign funcall"
                         end
-                ForeignFuncall (name,
-                                resolve tenv (ctxTyParams c) typespec,
-                                map augmentArg args)
+
+                    and validType (Type.Integer _) = true
+                      | validType (Type.Float _) = true
+                      | validType (Type.StaticArray _) = true
+                      | validType _ = false
+                in
+                    ForeignFuncall (name,
+                                    resolve tenv (ctxTyParams c) typespec,
+                                    map augmentArg args)
+                end
             end
           | augment (AST.Seq (a, b)) c =
             Seq (augment a c,
