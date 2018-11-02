@@ -69,7 +69,8 @@ structure MTAST :> MTAST = struct
        concrete context. *)
 
     fun concreteMonoType ty =
-        MonoType.monomorphize Map.empty ty
+        (* MonoType.monomorphize Map.empty ty *)
+        raise Fail "not implemented"
 
     fun monomorphize ctx TAST.UnitConstant =
         (UnitConstant, ctx)
@@ -101,9 +102,10 @@ structure MTAST :> MTAST = struct
         let fun mapParam (TAST.Param (var, ty)) =
                 Param (var, concreteMonoType ty)
         in
-            Defun (name,
-                   map mapParam params,
-                   concreteMonoType rt,
-                   monomorphize ctx body)
+            raise Fail "Not implemented"
+            (* Defun (name,
+                      map mapParam params,
+                      concreteMonoType rt,
+                      monomorphize ctx body) *)
         end
 end
