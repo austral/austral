@@ -585,10 +585,11 @@ structure TAST :> TAST = struct
         Defmodule clauses
       | augmentTop (DAST.InModule name) _ _ =
         InModule name
-      | augmentTop (DAST.Defcfun (name, rawname, params, rt, docstring)) _ _ =
+      | augmentTop (DAST.Defcfun (name, rawname, params, arity, rt, docstring)) _ _ =
         Defcfun (name,
                  rawname,
                  mapParams params,
+                 arity,
                  rt,
                  docstring)
 end
