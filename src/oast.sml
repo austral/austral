@@ -64,6 +64,26 @@ structure OAST :> OAST = struct
          and instance_arg = InstanceArg of name * name list
          and variant = Variant of name * typespec option
 
+    (* Parameter list parsing*)
+
+    fun parseForeignParamList (RCST.List l) =
+        parseForeignParamList' l
+      | parseForeignParamList _ =
+        raise Fail "defun parameter list must be a list"
+
+    and parseForeignParamList' (head::tail) =
+        let val (arity, tail') = parseForeignParamList' tail
+        in
+            (arity, (parseParam head) :: tail')
+        end
+      | parseForeignParamList' ((RCST.Symbol keyword)::restp::nil) =
+        if keyword = au "&rest" then
+            (Function.VariableArity, parseParam restp)
+        else
+            raise Fail "Invalid parameter list keyword"
+      | parseForeignParamList' (head::nil) =
+        (Function.FixedArity, parseParam head)
+
     (* Functions *)
 
     val au = Symbol.au
@@ -492,25 +512,7 @@ structure OAST :> OAST = struct
                           ::params
                           ::rt
                           ::nil) =
-        let fun parseParams (RCST.List l) =
-                parseParams' l
-              | parseParams _ =
-                raise Fail "defun parameter list must be a list"
-
-            and parseParams' (head::tail) =
-                let val (arity, tail') = parseParams' tail
-                in
-                    (arity, (parseParam head) :: tail')
-                end
-              | parseParams' ((RCST.Symbol keyword)::restp::nil) =
-                if keyword = au "&rest" then
-                    (Function.VariableArity, parseParam restp)
-                else
-                    raise Fail "Invalid parameter list keyword"
-              | parseParams' (head::nil) =
-                (Function.FixedArity, parseParam head)
-
-            and parseParam (RCST.List [RCST.Symbol name, ty]) =
+        let fun parseParam (RCST.List [RCST.Symbol name, ty]) =
                 Param (name, Type.parseTypespec ty)
               | parseParam _ =
                 raise Fail "Bad defun parameter"
