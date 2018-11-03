@@ -145,9 +145,9 @@ structure Function :> FUNCTION = struct
     fun addTypeclass fenv tc =
         (case findTypeclassByName fenv (typeclassName tc) of
              SOME _ => NONE
-           | _ => let val (FunctionEnv (fm, gm, ts, is)) = fenv
+           | _ => let val (FunctionEnv (fm, ffm, gm, ts, is)) = fenv
                   in
-                      SOME (FunctionEnv (fm, gm, tc :: ts, is))
+                      SOME (FunctionEnv (fm, ffm, gm, tc :: ts, is))
                   end)
 
     fun addInstance fenv ins =
