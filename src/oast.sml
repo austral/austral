@@ -57,6 +57,7 @@ structure OAST :> OAST = struct
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
                      | InModule of Symbol.symbol_name
+                     | Defcfun of (name * string) * param list * rt * docstring
          and param = Param of name * typespec
          and method_decl = MethodDecl of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
