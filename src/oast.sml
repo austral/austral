@@ -514,12 +514,12 @@ structure OAST :> OAST = struct
         in
             let val (arity, params') = parseParams params
             in
-                Defun (name,
-                       rawname,
-                       params',
-                       arity,
-                       Type.parseTypespec rt,
-                       NONE)
+                Defcfun (name,
+                         rawname,
+                         params',
+                         arity,
+                         Type.parseTypespec rt,
+                         NONE)
             end
         end
       | transformDefcfun _ =
