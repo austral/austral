@@ -29,6 +29,12 @@ signature FUNCTION = sig
     datatype func = Function of name * param list * ty * docstring
          and param = Param of name * ty
 
+    (* Foreign functions *)
+
+    datatype ffunc = ForeignFunction of name * param list * foreign_arity * ty * docstring
+         and foreign_arity = FixedArity
+                           | VariableArity
+
     (* Generic functions *)
 
     datatype gfunc = GenericFunction of name * Type.typarams * param list * ty * docstring
@@ -88,8 +94,4 @@ signature FUNCTION = sig
        names to their replacements, return a list of types by replacing each
        type parameter in the set with its replacement. *)
     val typeArgs : Type.typarams -> (name, ty) Map.map -> ty list
-
-    (* Arity of foreign functions *)
-    datatype foreign_arity = FixedArity
-                           | VariableArity
 end
