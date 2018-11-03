@@ -1,6 +1,5 @@
 TODO:
 
-- Foreign funcall: extract array pointer
 - Augment methods
 
 - Implement static-array-pointer function
@@ -137,3 +136,4 @@ DONE:
 - Monomorphize types
 - Monomorphize TAST
 - Foreign funcall: valid types
+- Foreign funcall: extract array pointer
