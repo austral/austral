@@ -259,7 +259,11 @@ structure Alpha :> ALPHA = struct
       | transformTop' (OAST.InModule name) =
         InModule name
       | transformTop' (OAST.Defcfun (name, rawname, params, rt, docstring)) =
-        Defcfun (name, rawname, params, rt, docstring)
+        Defcfun (name,
+                 mapParams params,
+                 params,
+                 rt,
+                 docstring)
 
     and mapParams (params: OAST.param list): param list =
         map (fn (OAST.Param (name, ty)) => Param (freshVar name, ty))
