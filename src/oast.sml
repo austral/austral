@@ -517,7 +517,7 @@ structure OAST :> OAST = struct
                           ::params
                           ::rt
                           ::nil) =
-        let val (arity, params') = parseForeignParams params
+        let val (arity, params') = parseForeignParamList params
         in
             Defcfun (name,
                      CST.unescapeString rawname,
