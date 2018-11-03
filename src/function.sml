@@ -168,7 +168,7 @@ structure Function :> FUNCTION = struct
             case Map.get funs name of
                 SOME f => SOME (CallableFunc f)
               | NONE => case Map.get ffuncs of
-                            SOME ff -> raise Fail "Not implemented yet"
+                            SOME ff => raise Fail "Not implemented yet"
                           | NONE => case Map.get gfuncs name of
                                         SOME gf => SOME (CallableGFunc gf)
                                       | NONE => NONE
