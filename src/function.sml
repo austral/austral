@@ -39,6 +39,16 @@ structure Function :> FUNCTION = struct
     fun gFunctionName (GenericFunction (name, _, _, _, _)) =
         name
 
+    fun isRTP (GenericFunction (_, _, params, rt, _)) =
+        let val paramVars = Set.unionList (map (fn (Param (name, ty)) => Type.tyVars ty) params)
+            and rtVars = Type.tyVars rt
+        in
+            (* The set difference of the rtVars and paramVars is the set of
+               all type variables that are in the rtVars but not in the
+               paramVars. If this set is non-empty, return true. *)
+            (Set.size (Set.difference rtVars paramVars)) > 0
+        end
+
     (* Typeclasses *)
 
     type param_name = Symbol.symbol
@@ -49,16 +59,6 @@ structure Function :> FUNCTION = struct
     datatype instance = Instance of name * instance_arg * docstring * method_def list
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
-
-    fun isRTP (GenericFunction (_, _, params, rt, _)) =
-        let val paramVars = Set.unionList (map (fn (Param (name, ty)) => Type.tyVars ty) params)
-            and rtVars = Type.tyVars rt
-        in
-            (* The set difference of the rtVars and paramVars is the set of
-               all type variables that are in the rtVars but not in the
-               paramVars. If this set is non-empty, return true. *)
-            (Set.size (Set.difference rtVars paramVars)) > 0
-        end
 
     datatype fenv = FunctionEnv of (name, func) Map.map
                                    * (name, gfunc) Map.map
