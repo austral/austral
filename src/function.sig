@@ -23,7 +23,7 @@ signature FUNCTION = sig
     type ty = Type.ty
     type docstring = string option
 
-    (* Generic functions *)
+    (* Concrete functions *)
 
     datatype func = Function of name * param list * ty * docstring
          and param = Param of name * ty
