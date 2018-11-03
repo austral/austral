@@ -39,6 +39,8 @@ structure Function :> FUNCTION = struct
     fun gFunctionName (GenericFunction (name, _, _, _, _)) =
         name
 
+    (* Typeclasses *)
+
     type param_name = Symbol.symbol
 
     datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
