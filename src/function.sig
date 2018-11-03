@@ -34,6 +34,12 @@ signature FUNCTION = sig
 
     val gFunctionName : gfunc -> name
 
+    (* Return whether a function is return type-polymorphic or not. That is, if
+       there are type variables in the return type that do not appear in the
+       argument list (and thus, cannot be resolved in a context-independent
+       manner without type-inference), return true. *)
+    val isRTP : gfunc -> bool
+
     type param_name = Symbol.symbol
 
     (* Typeclasses *)
@@ -44,12 +50,6 @@ signature FUNCTION = sig
     datatype instance = Instance of name * instance_arg * docstring * method_def list
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
-
-    (* Return whether a function is return type-polymorphic or not. That is, if
-       there are type variables in the return type that do not appear in the
-       argument list (and thus, cannot be resolved in a context-independent
-       manner without type-inference), return true. *)
-    val isRTP : gfunc -> bool
 
     type fenv
 
