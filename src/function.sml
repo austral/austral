@@ -129,7 +129,7 @@ structure Function :> FUNCTION = struct
                   | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), ffm, gm, ts, is))
         end
 
-    fun addGenericFunction (FunctionEnv (fm, gm, ts, is)) gf =
+    fun addGenericFunction (FunctionEnv (fm, ffm, gm, ts, is)) gf =
         let val name = gFunctionName gf
         in
             (* If there's a function with this name, fail *)
