@@ -86,7 +86,7 @@ structure OAST :> OAST = struct
 
     and parseForeignParam (RCST.List [RCST.Symbol name, ty]) =
         Param (name, Type.parseTypespec ty)
-      | parseParam _ =
+      | parseForeignParam _ =
         raise Fail "Bad defcfun parameter"
 
     (* Functions *)
