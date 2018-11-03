@@ -490,7 +490,8 @@ structure OAST :> OAST = struct
     and transformDefcfun ((RCST.List [RCST.Symbol name,
                                       RCST.StringConstant rawname])
                           ::params
-                          ::rt) =
+                          ::rt
+                          ::nil) =
         let fun parseParams (RCST.List l) =
                 parseParams' l
               | parseParams _ =
