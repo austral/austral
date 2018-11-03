@@ -64,7 +64,9 @@ structure OAST :> OAST = struct
          and instance_arg = InstanceArg of name * name list
          and variant = Variant of name * typespec option
 
-    (* Parameter list parsing*)
+    (* Parameter list parsing *)
+
+    val au = Symbol.au
 
     fun parseForeignParamList (RCST.List l) =
         parseForeignParamList' l
@@ -90,8 +92,6 @@ structure OAST :> OAST = struct
         raise Fail "Bad defcfun parameter"
 
     (* Functions *)
-
-    val au = Symbol.au
 
     fun transform (RCST.IntConstant i) = IntConstant i
       | transform (RCST.FloatConstant f) = FloatConstant f
