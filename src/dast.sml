@@ -134,7 +134,7 @@ structure DAST :> DAST = struct
         Defmodule clauses
       | transformTop (AST.InModule name) _ _ =
         InModule name
-      | transformTop (AST.Defcfun (name, rawname, params, rt, docstring)) =
+      | transformTop (AST.Defcfun (name, rawname, params, rt, docstring)) _ _ =
         Defcfun (name,
                  rawname,
                  map mapParam params,
