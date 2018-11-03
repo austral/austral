@@ -139,7 +139,7 @@ structure Function :> FUNCTION = struct
                 (* If there's a gfunc with this name also fail *)
                 case Map.get gm name of
                     SOME _ => NONE
-                  | NONE => SOME (FunctionEnv (fm, Map.iadd gm (name, gf), ts, is))
+                  | NONE => SOME (FunctionEnv (fm, ffm, Map.iadd gm (name, gf), ts, is))
         end
 
     fun addTypeclass fenv tc =
