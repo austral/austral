@@ -36,6 +36,8 @@ signature FUNCTION = sig
 
     type param_name = Symbol.symbol
 
+    (* Typeclasses *)
+
     datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
          and method_decl = MethodDecl of name * param list * ty * docstring
 
