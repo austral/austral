@@ -100,14 +100,14 @@ structure Function :> FUNCTION = struct
             end
         end
 
-    fun findTypeclassByName (FunctionEnv (_, _, ts, _)) name =
+    fun findTypeclassByName (FunctionEnv (_, _, _, ts, _)) name =
         let fun isValidTC (Typeclass (name', _, _, _)) =
                 name = name'
         in
             List.find isValidTC ts
         end
 
-    fun findTypeclassByMethod (FunctionEnv (_, _, ts, _)) name =
+    fun findTypeclassByMethod (FunctionEnv (_, _, _, ts, _)) name =
         let fun isValidTC (Typeclass (_, _, _, methods)) =
                 Option.isSome (List.find isValidMethod methods)
             and isValidMethod (MethodDecl (name', _, _, _)) =
