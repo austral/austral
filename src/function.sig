@@ -40,9 +40,9 @@ signature FUNCTION = sig
        manner without type-inference), return true. *)
     val isRTP : gfunc -> bool
 
-    type param_name = Symbol.symbol
-
     (* Typeclasses *)
+
+    type param_name = Symbol.symbol
 
     datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
          and method_decl = MethodDecl of name * param list * ty * docstring
