@@ -73,16 +73,16 @@ structure OAST :> OAST = struct
       | parseForeignParamList _ =
         raise Fail "defun parameter list must be a list"
 
-    and parseForeignParamList' (head::tail) =
-        let val (arity, tail') = parseForeignParamList' tail
-        in
-            (arity, (parseForeignParam head) :: tail')
-        end
-      | parseForeignParamList' ((RCST.Symbol keyword)::restp::nil) =
+    and parseForeignParamList' ((RCST.Symbol keyword)::restp::nil) =
         if keyword = au "&rest" then
             (Function.VariableArity, [parseForeignParam restp])
         else
             raise Fail "Invalid parameter list keyword"
+      | parseForeignParamList' (head::tail) =
+        let val (arity, tail') = parseForeignParamList' tail
+        in
+            (arity, (parseForeignParam head) :: tail')
+        end
       | parseForeignParamList' nil =
         (Function.FixedArity, nil)
 
