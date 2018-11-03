@@ -1,7 +1,6 @@
 TODO:
 
 - Implement defcfun
-- Parse defcfun forms
 - Augment methods
 - address-of should only work on mutable variables
 
@@ -139,3 +138,4 @@ DONE:
 - Monomorphize TAST
 - Foreign funcall: valid types
 - Foreign funcall: extract array pointer
+- Parse defcfun forms
