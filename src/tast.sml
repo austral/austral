@@ -470,6 +470,8 @@ structure TAST :> TAST = struct
 
         and augmentCallable (Function.CallableFunc f) args c _ =
             augmentConcreteFuncall f args c
+          | augmentCallable (Function.CallableForeign ff) args c _ =
+            raise Fail "foreign funcalls not implemented yet"
           | augmentCallable (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
                 case the_context of
