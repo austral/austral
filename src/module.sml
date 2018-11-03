@@ -64,6 +64,7 @@ structure Module : MODULE = struct
 
     val defaultMenv =
         let val australExports = [
+                "&rest",
                 "nil",
                 "true",
                 "false",
