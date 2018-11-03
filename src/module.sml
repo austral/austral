@@ -163,7 +163,8 @@ structure Module : MODULE = struct
                                                    NONE)
                     and australExtCffiMod = Module (Ident.mkIdentEx "austral.ext.cffi",
                                                     Map.empty,
-                                                    Imports Map.empty,
+                                                    Imports (Map.fromList [(Ident.mkIdentEx "&rest",
+                                                                            Ident.mkIdentEx "austral")]),
                                                     Exports (Set.fromList (map Ident.mkIdentEx cffiExports)),
                                                     NONE)
                 in
