@@ -169,7 +169,7 @@ structure Function :> FUNCTION = struct
             case Map.get funcs name of
                 SOME f => SOME (CallableFunc f)
               | NONE => case Map.get ffuncs name of
-                            SOME ff => raise Fail "Not implemented yet"
+                            SOME ff => SOME (callableForeign ff)
                           | NONE => case Map.get gfuncs name of
                                         SOME gf => SOME (CallableGFunc gf)
                                       | NONE => NONE
