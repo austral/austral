@@ -1,7 +1,6 @@
 TODO:
 
 - Foreign funcall: extract array pointer
-- Foreign funcall: valid types
 - Augment methods
 
 - Implement static-array-pointer function
@@ -137,3 +136,4 @@ DONE:
 - Static arrays should contain the length in their runtime representation, not at the type-level
 - Monomorphize types
 - Monomorphize TAST
+- Foreign funcall: valid types
