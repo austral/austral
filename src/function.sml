@@ -163,9 +163,9 @@ structure Function :> FUNCTION = struct
                       | CallableMethod
 
     fun envGet menv name =
-        let val (FunctionEnv (funs, ffuncs, gfuncs, classes, instances)) = menv
+        let val (FunctionEnv (funcs, ffuncs, gfuncs, classes, instances)) = menv
         in
-            case Map.get funs name of
+            case Map.get funcs name of
                 SOME f => SOME (CallableFunc f)
               | NONE => case Map.get ffuncs name of
                             SOME ff => raise Fail "Not implemented yet"
