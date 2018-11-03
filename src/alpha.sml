@@ -260,8 +260,8 @@ structure Alpha :> ALPHA = struct
         InModule name
       | transformTop' (OAST.Defcfun (name, rawname, params, rt, docstring)) =
         Defcfun (name,
+                 rawname,
                  mapParams params,
-                 params,
                  rt,
                  docstring)
 
