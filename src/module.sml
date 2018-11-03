@@ -132,6 +132,7 @@ structure Module : MODULE = struct
                 "construct"
             ]
             and cffiExports = [
+                "&rest",
                 "foreign-pointer",
                 "foreign-funcall",
                 "size-of",
