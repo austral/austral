@@ -80,4 +80,8 @@ signature FUNCTION = sig
        names to their replacements, return a list of types by replacing each
        type parameter in the set with its replacement. *)
     val typeArgs : Type.typarams -> (name, ty) Map.map -> ty list
+
+    (* Arity of foreign functions *)
+    datatype foreign_arity = FixedArity
+                           | VariableArity
 end
