@@ -167,9 +167,11 @@ structure Function :> FUNCTION = struct
         in
             case Map.get funs name of
                 SOME f => SOME (CallableFunc f)
-              | NONE => case Map.get gfuncs name of
-                            SOME gf => SOME (CallableGFunc gf)
-                          | NONE => NONE
+              | NONE => case Map.get ffuncs of
+                            SOME ff -> raise Fail "Not implemented yet"
+                          | NONE => case Map.get gfuncs name of
+                                        SOME gf => SOME (CallableGFunc gf)
+                                      | NONE => NONE
         end
 
     fun matchParams params types =
