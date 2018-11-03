@@ -93,6 +93,7 @@ structure Function :> FUNCTION = struct
                 in
                     FunctionEnv (Map.fromList (map (fn f => (funcName f, f)) builtins),
                                  Map.empty,
+                                 Map.empty,
                                  [],
                                  [])
                 end
