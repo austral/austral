@@ -1,5 +1,6 @@
 TODO:
 
+- Implement defcfun
 - Augment methods
 - address-of should only work on mutable variables
 
@@ -35,7 +36,6 @@ LONG-TERM TODO:
 
 - Prelude: equality and comparison instances
 
-- Implement defcfun
 - Runtime support for saturation arithmetic
 
 - Implement static-array constructor
