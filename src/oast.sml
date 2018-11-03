@@ -74,15 +74,20 @@ structure OAST :> OAST = struct
     and parseForeignParamList' (head::tail) =
         let val (arity, tail') = parseForeignParamList' tail
         in
-            (arity, (parseParam head) :: tail')
+            (arity, (parseForeignParam head) :: tail')
         end
       | parseForeignParamList' ((RCST.Symbol keyword)::restp::nil) =
         if keyword = au "&rest" then
-            (Function.VariableArity, parseParam restp)
+            (Function.VariableArity, parseForeignParam restp)
         else
             raise Fail "Invalid parameter list keyword"
       | parseForeignParamList' (head::nil) =
-        (Function.FixedArity, parseParam head)
+        (Function.FixedArity, parseForeignParam head)
+
+    and parseForeignParam (RCST.List [RCST.Symbol name, ty]) =
+        Param (name, Type.parseTypespec ty)
+      | parseParam _ =
+        raise Fail "Bad defcfun parameter"
 
     (* Functions *)
 
@@ -512,20 +517,14 @@ structure OAST :> OAST = struct
                           ::params
                           ::rt
                           ::nil) =
-        let fun parseParam (RCST.List [RCST.Symbol name, ty]) =
-                Param (name, Type.parseTypespec ty)
-              | parseParam _ =
-                raise Fail "Bad defun parameter"
+        let val (arity, params') = parseParams params
         in
-            let val (arity, params') = parseParams params
-            in
-                Defcfun (name,
-                         CST.unescapeString rawname,
-                         params',
-                         arity,
-                         Type.parseTypespec rt,
-                         NONE)
-            end
+            Defcfun (name,
+                     CST.unescapeString rawname,
+                     params',
+                     arity,
+                     Type.parseTypespec rt,
+                     NONE)
         end
       | transformDefcfun _ =
         raise Fail "Invalid defcfun form"
