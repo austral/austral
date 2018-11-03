@@ -135,9 +135,12 @@ structure DAST :> DAST = struct
       | transformTop (AST.InModule name) _ _ =
         InModule name
       | transformTop (AST.Defcfun (name, rawname, params, rt, docstring)) tenv _ =
-        Defcfun (name,
-                 rawname,
-                 map mapParam params,
-                 Type.resolve tenv Set.empty rt,
-                 docstring)
+        let val params' = map (mapParam tenv OrderedSet.empty) params
+        in
+            Defcfun (name,
+                     rawname,
+                     params',
+                     Type.resolve tenv Set.empty rt,
+                     docstring)
+        end
 end
