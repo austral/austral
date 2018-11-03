@@ -58,6 +58,8 @@ signature FUNCTION = sig
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
 
+    (* Function environments *)
+
     type fenv
 
     val defaultFenv : fenv
