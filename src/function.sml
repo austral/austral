@@ -62,6 +62,9 @@ structure Function :> FUNCTION = struct
     datatype typeclass = Typeclass of name * param_name * docstring * method_decl list
          and method_decl = MethodDecl of name * param list * ty * docstring
 
+    fun typeclassName (Typeclass (name, _, _, _)) =
+        name
+
     datatype instance = Instance of name * instance_arg * docstring * method_def list
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
@@ -70,9 +73,6 @@ structure Function :> FUNCTION = struct
                                    * (name, gfunc) Map.map
                                    * typeclass list
                                    * instance list
-
-    fun typeclassName (Typeclass (name, _, _, _)) =
-        name
 
     fun instanceName (Instance (name, _, _, _)) =
         name
