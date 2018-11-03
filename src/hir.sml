@@ -319,6 +319,8 @@ structure HIR :> HIR = struct
         ToplevelProgn []
       | transformTop (TAST.InModule _) =
         ToplevelProgn []
+      | transformTop (TAST.Defcfun _) =
+        raise Fail "defcfun not implemented"
 
       and mapParams params =
           map (fn (TAST.Param (n, t)) => Param (escapeVariable n, t))
