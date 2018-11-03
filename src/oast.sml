@@ -83,7 +83,7 @@ structure OAST :> OAST = struct
             (Function.VariableArity, [parseForeignParam restp])
         else
             raise Fail "Invalid parameter list keyword"
-      | parseForeignParamList' (head::nil) =
+      | parseForeignParamList' nil =
         (Function.FixedArity, [parseForeignParam head])
 
     and parseForeignParam (RCST.List [RCST.Symbol name, ty]) =
