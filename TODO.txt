@@ -1,6 +1,5 @@
 TODO:
 
-- Foreign function in the fenv
 - Implement defcfun
 - Augment methods
 - address-of should only work on mutable variables
@@ -140,3 +139,4 @@ DONE:
 - Foreign funcall: valid types
 - Foreign funcall: extract array pointer
 - Parse defcfun forms
+- Foreign function in the fenv
