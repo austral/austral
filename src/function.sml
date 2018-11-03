@@ -69,13 +69,13 @@ structure Function :> FUNCTION = struct
          and instance_arg = InstanceArg of name * Type.typarams
          and method_def = MethodDef of name * param list * ty * docstring
 
+    fun instanceName (Instance (name, _, _, _)) =
+        name
+
     datatype fenv = FunctionEnv of (name, func) Map.map
                                    * (name, gfunc) Map.map
                                    * typeclass list
                                    * instance list
-
-    fun instanceName (Instance (name, _, _, _)) =
-        name
 
     val defaultFenv =
         let fun funcName (Function (name, _, _, _)) =
