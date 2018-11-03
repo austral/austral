@@ -486,4 +486,42 @@ structure OAST :> OAST = struct
         InModule moduleName
       | transformInModule _ =
         raise Fail "Bad in-module form"
+
+    and transformDefcfun ((RCST.List [RCST.Symbol name,
+                                      RCST.StringConstant rawname])
+                          ::params
+                          ::rt) =
+        let fun parseParams (RCST.List l) =
+                parseParams' l
+              | parseParams _ =
+                raise Fail "defun parameter list must be a list"
+
+            and parseParams' (head::tail) =
+                let val (arity, tail') = parseParams' tail
+                in
+                    (arity, (parseParam head) :: tail')
+                end
+              | parseParams' ((RCST.Symbol keyword)::restp::nil) =
+                (Function.VariableArity, parseParam restp)
+              | parseParams' (head::nil) =
+                (Function.FixedArity, parseParam head)
+
+            and parseParam (RCST.List [RCST.Symbol name, ty]) =
+                Param (name, Type.parseTypespec ty)
+              | parseParam _ =
+                raise Fail "Bad defun parameter"
+        in
+            let val (arity, params') = parseParams params
+            in
+                Defun (name,
+                       rawname,
+                       params',
+                       arity,
+                       Type.parseTypespec rt,
+                       NONE)
+            end
+        end
+      | transformDefcfun _ =
+        raise Fail "Invalid defcfun form"
+
 end
