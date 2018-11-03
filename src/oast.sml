@@ -503,7 +503,10 @@ structure OAST :> OAST = struct
                     (arity, (parseParam head) :: tail')
                 end
               | parseParams' ((RCST.Symbol keyword)::restp::nil) =
-                (Function.VariableArity, parseParam restp)
+                if keyword = au "&rest" then
+                    (Function.VariableArity, parseParam restp)
+                else
+                    raise Fail "Invalid parameter list keyword"
               | parseParams' (head::nil) =
                 (Function.FixedArity, parseParam head)
 
