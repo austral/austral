@@ -126,7 +126,7 @@ structure Function :> FUNCTION = struct
                 (* If there's a gfunc with this name also fail *)
                 case Map.get gm name of
                     SOME _ => NONE
-                  | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), gm, ts, is))
+                  | NONE => SOME (FunctionEnv (Map.iadd fm (name, f), ffm, gm, ts, is))
         end
 
     fun addGenericFunction (FunctionEnv (fm, gm, ts, is)) gf =
