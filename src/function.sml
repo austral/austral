@@ -24,6 +24,8 @@ structure Function :> FUNCTION = struct
     type ty = Type.ty
     type docstring = string option
 
+    (* Concrete functions *)
+
     datatype func = Function of name * param list * ty * docstring
          and param = Param of name * ty
 
