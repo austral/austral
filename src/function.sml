@@ -159,6 +159,7 @@ structure Function :> FUNCTION = struct
            | _ => NONE)
 
     datatype callable = CallableFunc of func
+                      | CallableForeign of ffunc
                       | CallableGFunc of gfunc
                       | CallableMethod
 
