@@ -32,6 +32,8 @@ structure Function :> FUNCTION = struct
     fun functionName (Function (name, _, _, _)) =
         name
 
+    (* Generic functions *)
+
     datatype gfunc = GenericFunction of name * Type.typarams * param list * ty * docstring
 
     fun gFunctionName (GenericFunction (name, _, _, _, _)) =
