@@ -271,10 +271,11 @@ structure AST :> AST = struct
         Defmodule module
       | transformTop (Alpha.InModule name) =
         InModule name
-      | transformTop (Alpha.Defcfun (name, rawname, params, rt, docstring)) =
+      | transformTop (Alpha.Defcfun (name, rawname, params, arity, rt, docstring)) =
         Defcfun (name,
                  rawname,
                  mapParams params,
+                 arity,
                  rt,
                  docstring)
 
