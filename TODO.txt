@@ -1,6 +1,7 @@
 TODO:
 
 - Implement defcfun
+- Parse defcfun forms
 - Augment methods
 - address-of should only work on mutable variables
 
