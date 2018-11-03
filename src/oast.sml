@@ -515,7 +515,7 @@ structure OAST :> OAST = struct
             let val (arity, params') = parseParams params
             in
                 Defcfun (name,
-                         rawname,
+                         CST.unescapeString rawname,
                          params',
                          arity,
                          Type.parseTypespec rt,
