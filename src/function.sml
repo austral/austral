@@ -187,4 +187,7 @@ structure Function :> FUNCTION = struct
         in
             map mapParam (OrderedSet.toList params)
         end
+
+    datatype foreign_arity = FixedArity
+                           | VariableArity
 end
