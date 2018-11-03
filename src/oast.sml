@@ -80,7 +80,7 @@ structure OAST :> OAST = struct
         end
       | parseForeignParamList' ((RCST.Symbol keyword)::restp::nil) =
         if keyword = au "&rest" then
-            (Function.VariableArity, parseForeignParam restp)
+            (Function.VariableArity, [parseForeignParam restp])
         else
             raise Fail "Invalid parameter list keyword"
       | parseForeignParamList' (head::nil) =

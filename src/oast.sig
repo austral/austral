@@ -62,7 +62,7 @@ signature OAST = sig
          and instance_arg = InstanceArg of name * name list
          and variant = Variant of name * typespec option
 
-    val parseForeignParamList : RCST.rcst -> (Function.foreign_arity, Function.param list)
+    val parseForeignParamList : RCST.rcst -> (Function.foreign_arity * Function.param list)
 
     val transform : RCST.rcst -> ast
     val transformTop : RCST.rcst -> top_ast
