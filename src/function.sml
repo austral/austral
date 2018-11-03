@@ -75,6 +75,7 @@ structure Function :> FUNCTION = struct
     (* Function environments *)
 
     datatype fenv = FunctionEnv of (name, func) Map.map
+                                   * (name, ffunc) Map.map
                                    * (name, gfunc) Map.map
                                    * typeclass list
                                    * instance list
