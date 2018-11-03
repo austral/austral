@@ -1,6 +1,7 @@
 TODO:
 
 - Augment methods
+- address-of should only work on mutable variables
 
 - Implement static-array-pointer function
 
