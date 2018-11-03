@@ -258,10 +258,11 @@ structure Alpha :> ALPHA = struct
         Defmodule module
       | transformTop' (OAST.InModule name) =
         InModule name
-      | transformTop' (OAST.Defcfun (name, rawname, params, rt, docstring)) =
+      | transformTop' (OAST.Defcfun (name, rawname, params, arity, rt, docstring)) =
         Defcfun (name,
                  rawname,
                  mapParams params,
+                 arity,
                  rt,
                  docstring)
 
