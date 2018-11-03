@@ -97,6 +97,8 @@ structure MTAST :> MTAST = struct
         (ToplevelProgn [], ctx)
       | monomorphizeTop ctx (TAST.InModule _) =
         (ToplevelProgn [], ctx)
+      | monomorphizeTop ctx (TAST.Defcfun _) =
+        raise Fail "defcfun not implemented"
 
     and monomorphizeDefun ctx name params rt body =
         let fun mapParam (TAST.Param (var, ty)) =
