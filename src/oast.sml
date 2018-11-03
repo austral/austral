@@ -218,6 +218,8 @@ structure OAST :> OAST = struct
                 transformDefmodule args
             else if f = au "in-module" then
                 transformInModule args
+            else if f = Symbol.auCffi "defcfun" then
+                transformDefcfun args
             else
                 raise Fail "Unknown toplevel form"
         end
