@@ -18,6 +18,7 @@
 *)
 
 signature FUNCTION = sig
+    (* Type aliases *)
     type name = Symbol.symbol
     type ty = Type.ty
     type docstring = string option
