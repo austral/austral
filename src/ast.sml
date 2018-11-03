@@ -69,7 +69,7 @@ structure AST :> AST = struct
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
                      | InModule of Symbol.symbol_name
-                     | Defcfun of name * string * param list * typespec * docstring
+                     | Defcfun of name * string * param list * Function.foreign_arity * typespec * docstring
          and param = Param of variable * typespec
          and method_decl = MethodDecl of name * param list * typespec * docstring
          and method_def = MethodDef of name * param list * typespec * docstring * ast
