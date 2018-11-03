@@ -1,5 +1,6 @@
 TODO:
 
+- Foreign function in the fenv
 - Implement defcfun
 - Augment methods
 - address-of should only work on mutable variables
