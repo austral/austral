@@ -18,6 +18,8 @@
 *)
 
 structure Function :> FUNCTION = struct
+    (* Type aliases *)
+
     type name = Symbol.symbol
     type ty = Type.ty
     type docstring = string option
