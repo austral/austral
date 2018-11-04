@@ -202,7 +202,10 @@ structure Compiler : COMPILER = struct
             end
         end
       | declareTopForm c (DAST.Defcfun (name, rawname, params, arity, rt, docstring)) =
-        raise Fail "defcfun not implemented"
+        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
+        in
+            raise Fail "defcfun not implemented"
+        end
 
     fun declarationPass c (head::tail) =
         let val (node, c') = declareForm c head
