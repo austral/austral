@@ -116,8 +116,9 @@ structure Function :> FUNCTION = struct
             List.find isValidTC ts
         end
 
-    fun addFunction (FunctionEnv (fm, ffm, gm, ts, is)) f =
+    fun addFunction fenv f =
         let val name = functionName f
+            and (FunctionEnv (fm, ffm, gm, ts, is)) = fenv
         in
             (* If there's a function with this name, fail *)
             case Map.get fm name of
