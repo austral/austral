@@ -163,8 +163,8 @@ structure Function :> FUNCTION = struct
                       | CallableGFunc of gfunc
                       | CallableMethod
 
-    fun envGet menv name =
-        let val (FunctionEnv (funcs, ffuncs, gfuncs, classes, instances)) = menv
+    fun envGet fenv name =
+        let val (FunctionEnv (funcs, ffuncs, gfuncs, classes, instances)) = fenv
         in
             case Map.get funcs name of
                 SOME f => SOME (CallableFunc f)
