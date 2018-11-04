@@ -201,7 +201,7 @@ structure Compiler : COMPILER = struct
                 Compiler (menv, macenv, tenv, fenv, moduleName, code)
             end
         end
-      | declareTopForm c (DAST.Defcfun _) =
+      | declareTopForm c (DAST.Defcfun (name, rawname, params, arity, rt, docstring)) =
         raise Fail "defcfun not implemented"
 
     fun declarationPass c (head::tail) =
