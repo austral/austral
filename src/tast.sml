@@ -419,7 +419,7 @@ structure TAST :> TAST = struct
           | augment (AST.AddressOf name) c =
             (case (Map.get (ctxBindings c) name) of
                  (SOME (Binding (ty, Mutable))) => AddressOf (name, ForeignPointer ty)
-               | (SOME (Binding (ty, Immutable))) => raise Fail ("address-of: the variable " ^ (Symbol.varToString name) ^ " must be mutable to take its address."))
+               | (SOME (Binding (ty, Immutable))) => raise Fail ("address-of: the variable " ^ (Symbol.varToString name) ^ " must be mutable to take its address.")
                | NONE => raise Fail ("No such variable: " ^ (Symbol.varToString name)))
           | augment (AST.ForeignNull typespec) c =
             ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
