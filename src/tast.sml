@@ -1,4 +1,4 @@
-(*
+)(*
     Copyright 2018 Fernando Borretti <fernando@borretti.me>
 
     This file is part of Boreal.
@@ -418,7 +418,8 @@ structure TAST :> TAST = struct
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.AddressOf name) c =
             (case (Map.get (ctxBindings c) name) of
-                 SOME bind => AddressOf (name, ForeignPointer (bindType bind))
+                 (SOME (Binding (ty, Mutable))) => AddressOf (name, ForeignPointer ty)
+               | (SOME (Binding (ty, Immutable))) => raise Fail ("address-of: the variable " ^ (Symbol.varToString name) ^ " must be mutable to take its address."))
                | NONE => raise Fail ("No such variable: " ^ (Symbol.varToString name)))
           | augment (AST.ForeignNull typespec) c =
             ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
