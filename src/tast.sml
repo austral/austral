@@ -1,4 +1,4 @@
-)(*
+(*
     Copyright 2018 Fernando Borretti <fernando@borretti.me>
 
     This file is part of Boreal.
