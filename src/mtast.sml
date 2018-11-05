@@ -69,10 +69,6 @@ structure MTAST :> MTAST = struct
     (* Monomorphize a type with an empty replacements map, that is, in a
        concrete context. *)
 
-    fun concreteMonoType ty =
-        (* MonoType.monomorphize Map.empty ty *)
-        raise Fail "not implemented"
-
     fun monomorphize ctx TAST.UnitConstant =
         (UnitConstant, ctx)
       | monomorphize _ _ =
