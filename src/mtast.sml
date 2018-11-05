@@ -59,8 +59,9 @@ structure MTAST :> MTAST = struct
 
     (* Monomorphization *)
 
+    type type_monomorphs = MonoType.type_monomorphs
+
     datatype context = Context of type_monomorphs
-         and type_monomorphs = TypeMono of ((name * ty list), ty) Map.map
 
     val emptyContext =
         Context (TypeMono Map.empty)
