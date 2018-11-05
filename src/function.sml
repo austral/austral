@@ -55,10 +55,10 @@ structure Function :> FUNCTION = struct
         let val paramVars = Set.unionList (map (fn (Param (name, ty)) => Type.tyVars ty) params)
             and rtVars = Type.tyVars rt
         in
-            (* The set difference of the rtVars and paramVars is the set of
-               all type variables that are in the rtVars but not in the
-               paramVars. If this set is non-empty, return true. *)
-            (Set.size (Set.difference rtVars paramVars)) > 0
+            (* rtVars minus paramVars is the set of all type variables that are
+               in the return type and are not in the parameters. If this set is
+               non-empty, return true. *)
+            (Set.size (Set.minus rtVars paramVars)) > 0
         end
 
     (* Typeclasses *)
