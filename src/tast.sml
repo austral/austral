@@ -491,10 +491,10 @@ structure TAST :> TAST = struct
                                            in
                                                let val binds = Function.matchFunc params rt argTypes ty
                                                in
-                                                   Funcall (name,
-                                                            Function.typeArgs typarams binds,
-                                                            args',
-                                                            ty)
+                                                   GenericFuncall (name,
+                                                                   Function.typeArgs typarams binds,
+                                                                   args',
+                                                                   ty)
                                                end
                                            end
                                        end
