@@ -223,7 +223,7 @@ structure CppAst :> CPP_AST = struct
         in
             typarams' ^ "\n" ^ rt' ^ " " ^ name' ^ "(" ^ params' ^ ") {\n" ^ body' ^ "\n}"
         end
-      | renderTop (FunctionDecl (name, paramtys, arity, rt)) =
+      | renderTop (ExternFunctionDecl (name, paramtys, arity, rt)) =
         let val paramlist = "(" ^ (commaSep (map renderType paramtys))
         in
             let val paramlist' =
