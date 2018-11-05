@@ -82,6 +82,11 @@ structure MTAST :> MTAST = struct
             end
         end
 
+    fun monoTypeList ctx tys =
+        Util.foldThread (fn (ty, ctx) => monoType ctx ty)
+                        tys
+                        ctx
+
     fun forciblyMonomorphize ctx ty =
         (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
            defun or some other provably-concrete context *)
