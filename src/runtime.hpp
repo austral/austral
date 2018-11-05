@@ -1,5 +1,4 @@
 #include <cinttypes>
-#include <iostream>
 #include <tuple>
 
 /* Checked arithmetic */
