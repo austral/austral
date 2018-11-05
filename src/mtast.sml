@@ -234,7 +234,7 @@ structure MTAST :> MTAST = struct
                     NameBinding { casename = casename, var = var, ty = ty }
 
             in
-                let val (cases', ctx) monomorphizeCases ctx cases
+                let val (cases', ctx) = monomorphizeCases ctx cases
                 in
                     let val (ty', ctx) = monoType ty ctx
                     in
