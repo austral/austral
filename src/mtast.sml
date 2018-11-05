@@ -262,6 +262,11 @@ structure MTAST :> MTAST = struct
         in
             (ForeignNull ty', ctx)
         end
+      | monomorphize ctx (TAST.SizeOf ty) =
+        let val (ty', ctx) = monoType ctx ty
+        in
+            (SizeOf ty', ctx)
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
