@@ -536,7 +536,7 @@ structure TAST :> TAST = struct
                 in
 
                     ForeignFuncall (rawname,
-                                    augmentArgs args,
+                                    augmentArgs (map augmentArg args),
                                     rt)
                 end
             end
