@@ -120,17 +120,12 @@ structure Function :> FUNCTION = struct
                                       | NONE => NONE
         end
 
-    fun findForeignByRawName fenv name =
+    fun findForeignByRawName fenv rawname =
         let val (FunctionEnv (_, ffm, _, _, _)) = fenv
         in
-            let val ffm' = Map.toList ffm
-            in
-                let val rawnames = map (fn (_, ForeignFunction (_, rawname, _, _, _, _)) => rawname)
-                                       ffm'
-                in
-                    raise Fail "Not implemented"
-                end
-            end
+            List.find (fn (_, ForeignFunction (_, rawname', _, _, _, _)) =>
+                          rawname = rawname')
+                      (Map.toList ffm)
         end
 
     fun findTypeclassByName (FunctionEnv (_, _, _, ts, _)) name =
