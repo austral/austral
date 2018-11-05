@@ -74,7 +74,7 @@ structure MTAST :> MTAST = struct
 
     fun monomorphize ctx TAST.UnitConstant =
         (UnitConstant, ctx)
-      | monomorphize ctr (TAST.BoolConstant b) =
+      | monomorphize ctx (TAST.BoolConstant b) =
         (BoolConstant b, ctx)
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
