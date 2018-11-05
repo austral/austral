@@ -72,7 +72,7 @@ structure MTAST :> MTAST = struct
 
     (* Monomorphization utilities *)
 
-    fun monoType ty ctx =
+    fun monoType ctx ty =
         let val (Context (tm, rs)) = ctx
         in
             let val (ty', tm') = MonoType.monomorphize tm rs ty
@@ -118,7 +118,7 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.StringConstant s) =
         (StringConstant s, ctx)
       | monomorphize ctx (TAST.Variable (var, ty)) =
-        let val (ty', ctx) = monoType ty ctx
+        let val (ty', ctx) = monoType ctx ty
         in
             (Variable (var, ty'), ctx)
         end
@@ -204,7 +204,7 @@ structure MTAST :> MTAST = struct
             (exp', ctx)
         end
       | monomorphize ctx (TAST.Construct (ty, name, expOpt)) =
-        let val (ty', ctx) = monoType ty ctx
+        let val (ty', ctx) = monoType ctx ty
         in
             case expOpt of
                 (SOME exp) => let val (exp', ctx) = monomorphize ctx exp
@@ -234,7 +234,7 @@ structure MTAST :> MTAST = struct
                 and mapName ctx (TAST.NameOnly name) =
                     (NameOnly name, ctx)
                   | mapName ctx (TAST.NameBinding { casename, var, ty}) =
-                    let val (ty', ctx) = monoType ty ctx
+                    let val (ty', ctx) = monoType ctx ty
                     in
                         (NameBinding { casename = casename, var = var, ty = ty' }, ctx)
                     end
@@ -242,7 +242,7 @@ structure MTAST :> MTAST = struct
             in
                 let val (cases', ctx) = monomorphizeCases ctx cases
                 in
-                    let val (ty', ctx) = monoType ty ctx
+                    let val (ty', ctx) = monoType ctx ty
                     in
                         (Case (exp', cases', ty'), ctx)
                     end
@@ -252,7 +252,7 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.ForeignFuncall (name, args, ty)) =
         let val (args', exp) = monomorphizeList ctx args
         in
-            let val (ty', exp) = monoType ty ctx
+            let val (ty', exp) = monoType ctx ty
             in
                 (ForeignFuncall (name, args', ty'), ctx)
             end
