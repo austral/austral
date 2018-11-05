@@ -145,6 +145,8 @@ structure TAST :> TAST = struct
             ty
           | typeOf (GenericFuncall (_, _, _, ty)) =
             ty
+          | typeOf (MethodFuncall (_, _, _, ty)) =
+            ty
     end
 
     (* Bindings *)
