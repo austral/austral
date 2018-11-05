@@ -206,7 +206,12 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.Construct (ty, name, expOpt)) =
         let val (ty', ctx) = monoType ty ctx
         in
-            raise Fail ""
+            case expOpt of
+                (SOME exp) => let val (exp', ctx) = monomorphize ctx exp
+                              in
+                                  (Construct (ty', name, SOME exp'))
+                              end
+              | NONE => (Construct (ty', name, NONE))
         end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
