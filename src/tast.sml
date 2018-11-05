@@ -540,7 +540,7 @@ structure TAST :> TAST = struct
                                     raise Fail "Not enough arguments"
                             end
 
-                    and checkArg argument param =
+                    and checkArg (argument, param) =
                         raise Fail "checkArg not implemented"
                 in
 
