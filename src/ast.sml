@@ -114,6 +114,8 @@ structure AST :> AST = struct
         SizeOf tys
       | transform (Alpha.AddressOf var) =
         AddressOf var
+      | transform (Alpha.Cast (ty, exp)) =
+        Cast (ty, transform exp)
       | transform (Alpha.Operation (f, args)) =
         transformOp f (map transform args)
     and transformOp f args =
