@@ -190,12 +190,6 @@ structure OAST :> OAST = struct
       | parseCaseName _ =
         raise Fail "Invalid case name in a `case` form"
 
-    and transformForeignFuncall ((RCST.StringConstant name)::rt::args) =
-        ForeignFuncall (CST.escapedToString name,
-                        Type.parseTypespec rt,
-                        map transform args)
-      | transformForeignFuncall _ = raise Fail "Invalid `foreign-funcall` form"
-
     and transformForeignNull [tys] =
         ForeignNull (Type.parseTypespec tys)
       | transformForeignNull _ =
