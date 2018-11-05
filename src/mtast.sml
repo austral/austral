@@ -121,7 +121,7 @@ structure MTAST :> MTAST = struct
             (Variable (var, ty'), ctx)
         end
       | monomorphize ctx (TAST.Let (name, value, body)) =
-        let val (value', ctx') = monomorphize ctx value
+        let val (value', ctx) = monomorphize ctx value
         in
             raise Fail "Not implemented yet"
         end
