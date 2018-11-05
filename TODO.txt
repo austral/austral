@@ -1,6 +1,6 @@
 TODO:
 
-- Implement austral.ext.cffi:bitcast
+- Implement austral.ext.cffi:cast
 - Augment methods
 
 - Implement static-array-pointer function
