@@ -38,7 +38,7 @@ structure MonoType :> MONO_TYPE = struct
 
     (* Type monomorphization *)
 
-    datatype type_monomorphs = TypeMonos of ((name * ty list), ty) Map.map
+    datatype type_monomorphs = TypeMonos of ((name * ty list), ty) OrderedMap.map
 
     fun getMonomorph (TypeMonos tm) name tyargs =
         Map.get tm (name, tyargs)
