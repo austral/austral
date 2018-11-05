@@ -155,7 +155,10 @@ structure CppBackend :> CPP_BACKEND = struct
                  map (fn n => TypeParam n) params,
                  transformType ty)
       | transformTop (MIR.DeclareForeign (name, paramtys, arity, rt)) =
-        ExternFunctionDecl (name, map transformType paramtys, arity, transformType rt)
+        ExternFunctionDecl (name,
+                            map transformType paramtys,
+                            arity,
+                            transformType rt)
       | transformTop (MIR.ToplevelProgn nodes) =
         ToplevelProgn (map transformTop nodes)
 end
