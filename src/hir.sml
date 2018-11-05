@@ -220,7 +220,7 @@ structure HIR :> HIR = struct
                      processVariants (map mapVariant variants))
             end
         end
-      | transform (TAST.ForeignFuncall (name, rt, args)) =
+      | transform (TAST.ForeignFuncall (name, args, rt)) =
         (* If the function return type is unit, we're calling a function that
            returns void. In which case use a progn to seq call the function,
            and then return the unit constant *)
