@@ -213,6 +213,17 @@ structure MTAST :> MTAST = struct
                               end
               | NONE => (Construct (ty', name, NONE), ctx)
         end
+      | monomorphize ctx (TAST.Case (exp, cases, ty)) =
+        let val (exp', ctx) = monomorphize ctx exp
+        in
+            let val (cases', ctx) monomorphizeCases ctx cases
+            in
+                let val (ty', ctx) = monoType ty ctx
+                in
+                    (Case (exp', cases', ty'), ctx)
+                end
+            end
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
