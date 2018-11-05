@@ -38,7 +38,7 @@ signature MONO_TYPE = sig
 
     (* Type monomorphization *)
 
-    datatype type_monomorphs = TypeMonos of ((name * ty list), ty) OrderedMap.map
+    type type_monomorphs
 
     val emptyMonomorphs : type_monomorphs
 
