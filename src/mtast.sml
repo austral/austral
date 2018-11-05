@@ -105,6 +105,7 @@ structure MTAST :> MTAST = struct
                 Param (var, forciblyMonomorphize ty)
 
             and forciblyMonomorphize ty =
+                (* We can ignore the resulting type monomorphs since a defun is always concrete *)
                 let val (ty', _) = MonoType.monomorphize (ctxTM ctx)
                                                          Map.empty
                                                          ty
