@@ -41,6 +41,9 @@ structure Function :> FUNCTION = struct
     fun fFunctionName (ForeignFunction (name, _, _, _, _, _)) =
         name
 
+    fun fFunctionRawName (ForeignFunction (_, rawname, _, _, _, _)) =
+        rawname
+
     (* Generic functions *)
 
     datatype gfunc = GenericFunction of name * Type.typarams * param list * ty * docstring
