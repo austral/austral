@@ -34,5 +34,8 @@ structure OrderedMap :> ORDERED_MAP = struct
     fun add m (k, v) =
         case (get m k) of
             SOME _ => NONE
-          | NONE => SOME (Map ((k, v) :: (mapl m)))
+          | NONE => let val (Map l) = m
+                    in
+                        SOME (Map ((k, v) :: l))
+                    end
 end
