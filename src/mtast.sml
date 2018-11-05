@@ -299,6 +299,8 @@ structure MTAST :> MTAST = struct
         end
       | monomorphize ctx (TAST.GenericFuncall (name, tyargs, args, ty)) =
         raise Fail "monomorphize: generic funcall not implemented yet"
+      | monomorphize ctx (TAST.MethodFuncall (name, tyargs, args, ty)) =
+        raise Fail "monomorphize: method funcall not implemented yet"
 
     and monomorphizeList ctx exps =
         Util.foldThread (fn (exp, ctx) => monomorphize ctx exp)
