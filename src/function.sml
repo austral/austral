@@ -123,9 +123,11 @@ structure Function :> FUNCTION = struct
     fun findForeignByRawName fenv rawname =
         let val (FunctionEnv (_, ffm, _, _, _)) = fenv
         in
-            List.find (fn (_, ForeignFunction (_, rawname', _, _, _, _)) =>
-                          rawname = rawname')
-                      (Map.toList ffm)
+            case List.find (fn (_, ForeignFunction (_, rawname', _, _, _, _)) =>
+                               rawname = rawname')
+                           (Map.toList ffm) of
+                (SOME (name, ff)) => SOME ff
+              | NONE => NONE
         end
 
     fun findTypeclassByName (FunctionEnv (_, _, _, ts, _)) name =
