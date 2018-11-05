@@ -1,6 +1,5 @@
 TODO:
 
-- Fix runtime
 - Augment methods
 
 - Implement static-array-pointer function
