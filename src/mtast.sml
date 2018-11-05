@@ -91,7 +91,9 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.IntConstant (i, ty)) =
         let val ty' = forciblyMonomorphize ctx ty
         in
-            (IntConstant (i, ty'), ctx)
+            case ty' of
+                (MonoType.Integer _) => (IntConstant (i, ty'), ctx)
+              | _ => raise Fail "Internal error: not a valid type for an integer constant"
         end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
