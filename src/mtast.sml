@@ -106,7 +106,7 @@ structure MTAST :> MTAST = struct
 
     and monomorphizeDefun ctx name params rt body =
         let fun mapParam (TAST.Param (var, ty)) =
-                Param (var, forciblyMonomorphize ty)
+                Param (var, forciblyMonomorphize ctx ty)
         in
             raise Fail "Not implemented"
             (* Defun (name,
