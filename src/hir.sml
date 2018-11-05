@@ -245,6 +245,8 @@ structure HIR :> HIR = struct
         raise Fail "Not implemented"
       | transform (TAST.GenericFuncall (f, tyargs, args, _)) =
         transformFuncall f tyargs (map transform args)
+      | transform (TAST.MethodFuncall (f, tyargs, args, _)) =
+        transformFuncall f tyargs (map transform args)
     and transformCheckedArithOp oper lhs rhs =
         Funcall ("austral_checked_" ^ arithOpName oper, [], [lhs, rhs])
     and transformSaturationArithOp oper lhs rhs =
