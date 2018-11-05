@@ -53,7 +53,7 @@ signature HIR = sig
                      | Defgeneric of name * name list * param list * ty * ast
                      | Deftype of name * name list * ty
                      | Defdisjunction of name * name list * Type.variant list
-                     | DeclareForeign of name * ty list * ty
+                     | DeclareForeign of name * ty list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of name * ty
 
