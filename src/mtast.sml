@@ -157,6 +157,11 @@ structure MTAST :> MTAST = struct
                 (ArithOp (kind, oper, lhs', rhs'), ctx)
             end
         end
+      | monomorphize ctx (TAST.TupleCreate exps) =
+        let val (exps', ctx) = monomorphizeList exps
+        in
+            (TupleCreate exps', ctx)
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
