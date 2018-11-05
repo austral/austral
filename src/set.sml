@@ -52,7 +52,7 @@ structure Set :> SET = struct
             union a' b'
         end
 
-    fun minus a b =
+    fun minus b a =
         List.filter (fn belem => not (isIn a belem)) b
 
     fun size set = List.length set
