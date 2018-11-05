@@ -517,7 +517,7 @@ structure TAST :> TAST = struct
                                each argument has the same type as its
                                corresponding parameter *)
                             if (List.length arglist) = (List.length params) then
-                                map augmentArg arglist
+                                ListPair.map checkArg (arglist, params)
                             else
                                 raise Fail "Foreign funcall arity error"
                           | Function.VariableArity =>
@@ -532,6 +532,9 @@ structure TAST :> TAST = struct
                                 raise Fail "Variable-arity foreign funcalls not implemented"
                             else
                                 raise Fail "Not enough arguments"
+
+                    and checkArg argument param =
+                        raise Fail "checkArg not implemented"
                 in
 
                     ForeignFuncall (rawname,
