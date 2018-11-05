@@ -67,6 +67,9 @@ structure MTAST :> MTAST = struct
 
     datatype fn_monomorphs = FuncMonos of (name * ty list) OrderedSet.set
 
+    fun hasMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
+        OrderedSet.exists fm (name, tyargs)
+
     datatype context = Context of type_monomorphs * replacements * fn_monomorphs
 
     val emptyContext =
