@@ -1,6 +1,6 @@
 TODO:
 
-- Augment calls to foreign functions
+
 - Remove foreign-funcall
 - Augment methods
 
@@ -143,3 +143,4 @@ DONE:
 - address-of should only work on mutable variables
 - Error when defining multiple foreign functions with the same raw name
 - Implement defcfun
+- Augment calls to foreign functions
