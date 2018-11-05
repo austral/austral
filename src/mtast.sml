@@ -166,7 +166,7 @@ structure MTAST :> MTAST = struct
         raise Fail "Not implemented yet"
 
     and monomorphizeList ctx exps =
-        Util.foldThread (fn exp ctx => monomorphize ctx exp)
+        Util.foldThread (fn (exp, ctx) => monomorphize ctx exp)
                         ctx
                         exps
 
