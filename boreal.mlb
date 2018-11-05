@@ -13,6 +13,8 @@ src/ordered-set.sml
 src/map.sig
 src/map.sml
 
+src/ordered-map.sig
+
 src/ident.sig
 src/ident.sml
 
