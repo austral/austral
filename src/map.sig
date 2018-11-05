@@ -30,6 +30,7 @@ signature MAP = sig
     val keys : (''k, 'v) map -> ''k Set.set
 
     val fromList : (''k * 'v) list -> (''k, 'v) map
+    val toList : (''k, 'v) map -> (''k * 'v) list
 
     val mergeMaps : (''k, 'v) map -> (''k, 'v) map -> (''k, 'v) map
 end
