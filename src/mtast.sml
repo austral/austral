@@ -70,6 +70,9 @@ structure MTAST :> MTAST = struct
     fun hasMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
         OrderedSet.exists fm (name, tyargs)
 
+    fun addMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
+        OrderedSet.add fm (name, tyargs)
+
     datatype context = Context of type_monomorphs * replacements * fn_monomorphs
 
     val emptyContext =
