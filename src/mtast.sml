@@ -69,6 +69,18 @@ structure MTAST :> MTAST = struct
     fun ctxTM (Context (tm)) =
         tm
 
+    (* Monomorphization utilities *)
+
+    fun forciblyMonomorphize ctx ty =
+        (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
+           defun or some other provably-concrete context *)
+        let val (ty', _) = MonoType.monomorphize (ctxTM ctx)
+                                                 Map.empty
+                                                 ty
+        in
+            ty'
+        end
+
     (* Monomorphize a type with an empty replacements map, that is, in a
        concrete context. *)
 
@@ -116,15 +128,5 @@ structure MTAST :> MTAST = struct
                       map mapParam params,
                       concreteMonoType rt,
                       monomorphize ctx body) *)
-        end
-
-    and forciblyMonomorphize ctx ty =
-        (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
-           defun or some other provably-concrete context *)
-        let val (ty', _) = MonoType.monomorphize (ctxTM ctx)
-                                                 Map.empty
-                                                 ty
-        in
-            ty'
         end
 end
