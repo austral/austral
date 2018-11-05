@@ -146,6 +146,19 @@ structure Function :> FUNCTION = struct
                 end
         end
 
+    fun addForeignFunction fenv ff =
+        let val name = fFunctionName f
+        in
+            (* If there's a function or method with this name, fail *)
+            case envGet fenv name of
+                SOME _ => NONE
+              | NONE =>
+                let val (FunctionEnv (fm, ffm, gm, ts, is)) = fenv
+                in
+                    SOME (FunctionEnv (fm, Map.iadd ffm (name, ff), gm, ts, is))
+                end
+        end
+
     fun addGenericFunction fenv gf =
         let val name = gFunctionName gf
         in
