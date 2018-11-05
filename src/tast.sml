@@ -443,7 +443,10 @@ structure TAST :> TAST = struct
                       | compatible _ _ =
                         false
                 in
-                    raise Fail "cast not implemented"
+                    if compatible ty (typeOf exp') then
+                        Cast (ty, exp')
+                    else
+                        raise Fail "cast: casted-to type and type of expression are not compatible"
                 end
             end
           | augment (AST.Seq (a, b)) c =
