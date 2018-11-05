@@ -42,7 +42,6 @@ LONG-TERM TODO:
 - Bind standalone expressions to unused variables to suppress warnings
 - Warn when not using the result value of a progn (any expression with type other than unit)
 - Fully flatten the intermediate representation early on
-- Generalize that foldl2-like pattern
 
 DONE:
 
@@ -146,3 +145,4 @@ DONE:
 - Remove foreign-funcall
 - Implement austral.ext.cffi:cast
 - Fix prelude
+- Generalize that foldl2-like pattern
