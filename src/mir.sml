@@ -347,7 +347,12 @@ structure MIR :> MIR = struct
                  Struct [
                      Slot ("_tag", UInt8),
                      Slot ("_data", Union (Util.mapidx transformVariant variants))
-                 ])
+                ])
+      | transformTop (HIR.DeclareForeign (name, params, arity, rt)) =
+        DeclareForeign (name,
+                        map transformType params,
+                        arity,
+                        transformType rt)
       | transformTop (HIR.ToplevelProgn nodes) =
         ToplevelProgn (map transformTop nodes)
 
