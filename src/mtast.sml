@@ -102,6 +102,8 @@ structure MTAST :> MTAST = struct
                 (MonoType.Float _) => (FloatConstant (f, ty'), ctx)
               | _ => raise Fail "Internal error: not a valid type for a float constant"
         end
+      | monomorphize ctx (TAST.StringConstant s) =
+        (StringConstant s, ctx)
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
