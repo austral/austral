@@ -1,6 +1,5 @@
 TODO:
 
-- Implement ordered maps
 - Augment methods
 
 - Implement static-array-pointer function
@@ -147,3 +146,4 @@ DONE:
 - Implement austral.ext.cffi:cast
 - Fix prelude
 - Generalize that foldl2-like pattern
+- Implement ordered maps
