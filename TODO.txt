@@ -1,17 +1,17 @@
 TODO:
 
-- Augment methods
-
-- Implement static-array-pointer function
-
-- Implement static-array-index
-- Compile definstance methods to generic, not concrete, functions
-- `the` for float constants
+- EMTAST (expanded, monomorphic, typed)
+- MTAST to EMTAST (hoist and expand monomorphs)
+- Augment method calls
+- Monomorphize method calls
 
 LONG-TERM TODO:
 
 - Static array constructors
-
+- Implement static-array-pointer function
+- Implement static-array-index
+- Compile definstance methods to generic, not concrete, functions
+- `the` for float constants
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
 - Parse nested comments
