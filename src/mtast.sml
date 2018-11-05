@@ -307,7 +307,10 @@ structure MTAST :> MTAST = struct
         in
             let val (args', ctx) = monomorphizeList ctx args
             in
-                raise Fail "monomorphize: generic funcall not implemented yet"
+                let val (ty', ctx) = monoType ctx ty
+                in
+                    raise Fail "monomorphize: generic funcall not implemented yet"
+                end
             end
         end
       | monomorphize ctx (TAST.MethodFuncall (name, tyargs, args, ty)) =
