@@ -38,7 +38,7 @@ structure Function :> FUNCTION = struct
          and foreign_arity = FixedArity
                            | VariableArity
 
-    fun foreignFunctionName (ForeignFunction (name, _, _, _, _, _)) =
+    fun fFunctionName (ForeignFunction (name, _, _, _, _, _)) =
         name
 
     (* Generic functions *)
