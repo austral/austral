@@ -19,13 +19,13 @@
 
 structure Prelude :> PRELUDE = struct
     val prelude = [
-        (*"(in-module :austral.ext.cffi)",
-        "(ausdefgeneric austral.ext.cffi:malloc (tau) ((size u64)) (austral.ext.cffi:foreign-pointer tau)\
+        "(in-module :austral.ext.cffi)",
+        (*"(ausdefgeneric austral.ext.cffi:malloc (tau) ((size u64)) (austral.ext.cffi:foreign-pointer tau)\
         \  (austral.ext.cffi:foreign-funcall \"malloc\" (austral.ext.cffi:foreign-pointer tau) size))",
         "(defgeneric austral.ext.cffi:free (tau) ((pointer (austral.ext.cffi:foreign-pointer tau))) unit\
         \  (austral.ext.cffi:foreign-funcall \"free\" unit pointer))",
         "(defgeneric austral.ext.cffi:null? (tau) ((pointer (austral.ext.cffi:foreign-pointer tau))) boolean\
-        \  (austral.kernel:eq pointer (austral.ext.cffi:null-pointer tau)))",*)
-        "(in-module :austral-user)"
+        \  (austral.kernel:eq pointer (austral.ext.cffi:null-pointer tau)))",
+        "(austral:in-module :austral-user)"
     ]
 end
