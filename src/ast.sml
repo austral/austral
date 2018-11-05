@@ -107,8 +107,6 @@ structure AST :> AST = struct
         in
             Case (transform exp, map transformCase cases)
         end
-      | transform (Alpha.ForeignFuncall (name, rt, args)) =
-        ForeignFuncall (name, rt, map transform args)
       | transform (Alpha.ForeignNull ty) =
         ForeignNull ty
       | transform (Alpha.SizeOf tys) =
