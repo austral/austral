@@ -140,6 +140,8 @@ structure TAST :> TAST = struct
             ForeignPointer ty
           | typeOf (Seq (_, v)) =
             typeOf v
+          | typeOf (ConcreteFuncall (_, _, ty)) =
+            ty
           | typeOf (Funcall (_, _, _, t)) =
             t
     end
