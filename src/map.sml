@@ -48,6 +48,9 @@ structure Map :> MAP = struct
 
     fun fromList l = iaddList empty l
 
+    fun toList (Map l) =
+        l
+
     fun mergeMaps (Map a) (Map b) =
         Map (a @ b)
 end
