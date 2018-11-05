@@ -322,7 +322,7 @@ structure HIR :> HIR = struct
         ToplevelProgn []
       | transformTop (TAST.Defcfun (_, rawname, params, arity, rt, _)) =
         DeclareForeign (rawname,
-                        map (fn (TAST.Param (_, ty)) => t) params,
+                        map (fn (TAST.Param (_, ty)) => ty) params,
                         arity,
                         rt)
 
