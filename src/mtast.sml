@@ -77,7 +77,10 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.BoolConstant b) =
         (BoolConstant b, ctx)
       | monomorphize ctx (TAST.IntConstant (i, ty)) =
-        (IntConstant (i, ty), ctx)
+        let val ty' = forciblyMonomorphize ctx ty
+        in
+            (IntConstant (i, ty'), ctx)
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
