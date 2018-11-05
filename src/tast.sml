@@ -130,7 +130,7 @@ structure TAST :> TAST = struct
             Integer (Unsigned, Int64)
           | typeOf (AddressOf (_, ty)) =
             ty
-          | typeOf (ForeignFuncall (_, rt, _)) =
+          | typeOf (ForeignFuncall (_, _, rt)) =
             rt
           | typeOf (ForeignNull ty) =
             ForeignPointer ty
