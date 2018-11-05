@@ -588,7 +588,7 @@ structure TAST :> TAST = struct
                     in
                         let val argTypes = map typeOf args'
                         in
-                            let val binds = Function.matchFunc params rt argTypes ty
+                            let val binds = Function.matchFunc params rt argTypes assertedRt
                             in
                                 GenericFuncall (name,
                                                 Function.typeArgs typarams binds,
