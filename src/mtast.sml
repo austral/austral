@@ -128,6 +128,15 @@ structure MTAST :> MTAST = struct
                 (Let (name, value', body'), ctx)
             end
         end
+      | monomorphize ctx (TAST.Bind (names, tup, body)) =
+        let val (tup', ctx) = monomorphize ctx tup
+        in
+            let val (body', ctx) = monomorphize ctx body
+            in
+                (Bind (names, tup', body'), ctx)
+            end
+        end
+
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
