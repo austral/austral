@@ -24,7 +24,7 @@ structure Prelude :> PRELUDE = struct
         "(austral:defgeneric malloc (tau) ((size austral:u64)) (foreign-pointer tau)\
         \  (cast (foreign-pointer tau) (malloc* size)))",
         "(defcfun (free* \"free\") ((pointer (foreign-pointer austral:u8))) austral:unit)",
-        "(austral:defgeneric free (tau) ((pointer (foreign-pointer tau))) unit\
+        "(austral:defgeneric free (tau) ((pointer (foreign-pointer tau))) austral:unit\
         \  (free* (cast (foreign-pointer u8) pointer)))",
         (*"(defgeneric austral.ext.cffi:null? (tau) ((pointer (austral.ext.cffi:foreign-pointer tau))) boolean\
         \  (austral.kernel:eq pointer (austral.ext.cffi:null-pointer tau)))",*)
