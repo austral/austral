@@ -430,7 +430,21 @@ structure TAST :> TAST = struct
             let val ty = (resolve (ctxTenv c) (ctxTyParams c) typespec)
                 and exp' = augment exp c
             in
-                raise Fail "cast not implemented"
+                let fun compatible (Type.Integer _) (Type.Integer _) =
+                        true
+                      | compatible (Type.Float Type.Single) (Type.Float Type.Single) =
+                        true
+                      | compatible (Type.Float Type.Double) (Type.Float Type.Double) =
+                        true
+                      | compatible (Type.ForeignPointer _) (Type.ForeignPointer _) =
+                        true
+                      | compatible (Type.StaticArray _) (Type.StaticArray _) =
+                        true
+                      | compatible _ _ =
+                        false
+                in
+                    raise Fail "cast not implemented"
+                end
             end
           | augment (AST.Seq (a, b)) c =
             Seq (augment a c,
