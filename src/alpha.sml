@@ -184,6 +184,8 @@ structure Alpha :> ALPHA = struct
             raise Fail "address-of: variable is a special symbol"
         else
             AddressOf (lookup s name)
+      | alphaRename s (OAST.Cast (ty, exp)) =
+        Cast (ty, exp)
       | alphaRename s (OAST.Operation (f, args)) =
         Operation (f, map (alphaRename s) args)
 
