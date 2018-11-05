@@ -41,6 +41,7 @@ signature MONO_TYPE = sig
     datatype type_monomorphs = TypeMonos of ((name * ty list), ty) OrderedMap.map
 
     val getMonomorph : type_monomorphs -> name -> ty list -> ty option
+    val addMonomorph : type_monomorphs -> name -> ty list -> ty -> type_monomorphs
 
     type replacements = (name, ty) Map.map
 
