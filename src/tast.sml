@@ -508,7 +508,7 @@ structure TAST :> TAST = struct
                       | validType (Type.StaticArray _) = true
                       | validType _ = false
 
-                    and augmentArgs arglist =
+                    and checkArgs arglist =
                         case arity of
                             Function.FixedArity =>
                             (* If the function has a fixed arity, we have to
@@ -536,7 +536,7 @@ structure TAST :> TAST = struct
                 in
 
                     ForeignFuncall (rawname,
-                                    augmentArgs (map augmentArg args),
+                                    checkArgs (map augmentArg args),
                                     rt)
                 end
             end
