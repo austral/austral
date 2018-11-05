@@ -39,6 +39,7 @@ structure Alpha :> ALPHA = struct
                  | ForeignNull of typespec
                  | SizeOf of typespec
                  | AddressOf of variable
+                 | Cast of typespec * ast
                  | Operation of symbol * ast list
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
