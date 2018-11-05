@@ -79,7 +79,7 @@ structure Util :> UTIL = struct
             NONE
 
     fun foldThread f (head::tail) ctx =
-        let val (head', ctx') = f head ctx
+        let val (head', ctx') = f (head, ctx)
         in
             let val (rest, ctx'') = foldThread f tail ctx'
             in
