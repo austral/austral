@@ -1,6 +1,7 @@
 TODO:
 
 - Implement defcfun
+- Error when defining multiple foreign functions with the same raw name
 - Augment methods
 
 - Implement static-array-pointer function
