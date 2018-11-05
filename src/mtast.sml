@@ -73,7 +73,10 @@ structure MTAST :> MTAST = struct
     fun monoType ty ctx =
         let val (Context (tm, rs)) = ctx
         in
-            MonoType.monomorphize tm rs ty
+            let val (ty', tm') = MonoType.monomorphize tm rs ty
+            in
+                (ty', Context (tm', rs))
+            end
         end
 
     fun forciblyMonomorphize ctx ty =
