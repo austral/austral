@@ -426,6 +426,8 @@ structure TAST :> TAST = struct
                | NONE => raise Fail ("No such variable: " ^ (Symbol.varToString name)))
           | augment (AST.ForeignNull typespec) c =
             ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
+          | augment (AST.Cast (typespec, exp)) c =
+            raise Fail "cast not implemented"
           | augment (AST.Seq (a, b)) c =
             Seq (augment a c,
                  augment b c)
