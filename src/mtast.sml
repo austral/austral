@@ -149,6 +149,14 @@ structure MTAST :> MTAST = struct
                 end
             end
         end
+      | monomorphize ctx (TAST.ArithOp (kind, oper, lhs, rhs)) =
+        let val (lhs', ctx) = monomorphize ctx lhs
+        in
+            let val (rhs', ctx) = monomorphize ctx rhs
+            in
+                (ArithOp (kind, oper, lhs', rhs'), ctx)
+            end
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
