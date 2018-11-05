@@ -172,6 +172,11 @@ structure MTAST :> MTAST = struct
         in
             (ArrayLength arr', ctx)
         end
+      | monomorphize ctx (TAST.ArrayPointer arr) =
+        let val (arr', ctx) = monomorphize ctx arr
+        in
+            (ArrayPointer arr', ctx)
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
