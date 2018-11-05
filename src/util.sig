@@ -39,5 +39,5 @@ signature UTIL = sig
        return NONE. *)
     val afterPrefix : string -> prefix -> string option
 
-    val foldThread : ('a -> 'b -> ('c * 'b)) -> 'a list -> 'b -> 'c list
+    val foldThread : ('a -> 'b -> ('c * 'b)) -> 'a list -> 'b -> ('c list * 'b)
 end
