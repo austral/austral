@@ -516,7 +516,6 @@ structure TAST :> TAST = struct
                                list have the same length, and then check that
                                each argument has the same type as its
                                corresponding parameter *)
-
                             if (List.length arglist) = (List.length params) then
                                 map augmentArg arglist
                             else
