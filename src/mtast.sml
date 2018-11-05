@@ -104,6 +104,8 @@ structure MTAST :> MTAST = struct
         end
       | monomorphize ctx (TAST.StringConstant s) =
         (StringConstant s, ctx)
+      | monomorphize ctx (TAST.Variable (var, ty)) =
+        raise Fail "Not implemented yet"
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
