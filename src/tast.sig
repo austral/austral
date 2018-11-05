@@ -1,4 +1,4 @@
-(*
+)(*
     Copyright 2018 Fernando Borretti <fernando@borretti.me>
 
     This file is part of Boreal.
@@ -47,6 +47,7 @@ signature TAST = sig
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
                  | Seq of ast * ast
+                 | ConcreteFuncall of name * ast list * ty
                  | Funcall of Symbol.symbol * ty list * ast list * ty
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
