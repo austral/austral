@@ -241,6 +241,8 @@ structure HIR :> HIR = struct
         Cast (ty, transform exp)
       | transform (TAST.Seq (a, b)) =
         Seq (transform a, transform b)
+      | transform (TAST.ConcreteFuncall (f, tyargs, args, _)) =
+        raise Fail "Not implemented"
       | transform (TAST.Funcall (f, tyargs, args, _)) =
         transformFuncall f tyargs (map transform args)
     and transformCheckedArithOp oper lhs rhs =
