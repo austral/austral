@@ -575,28 +575,31 @@ structure TAST :> TAST = struct
 
         and augmentRTPGenericFuncall gf args c the_context =
             (case the_context of
-                 SOME ty => let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
-                            in
-                                if (List.length params) = (List.length args) then
-                                    let val args' = map (fn a => augment a c) args
-                                    in
-                                        let val argTypes = map typeOf args'
-                                        in
-                                            let val binds = Function.matchFunc params rt argTypes ty
-                                            in
-                                                GenericFuncall (name,
-                                                                Function.typeArgs typarams binds,
-                                                                args',
-                                                                ty)
-                                            end
-                                        end
-                                    end
-                                else
-                                    raise Fail "Funcall arity error"
-                            end
+                 SOME ty => augmentGenericFuncallCommon gf args c ty
                | NONE => raise Fail ("Error in call to function "
                                      ^ (Symbol.toString (Function.gFunctionName gf))
                                      ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form."))
+
+        and augmentGenericFuncallCommon gf args c rt =
+            let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
+            in
+                if (List.length params) = (List.length args) then
+                    let val args' = map (fn a => augment a c) args
+                    in
+                        let val argTypes = map typeOf args'
+                        in
+                            let val binds = Function.matchFunc params rt argTypes ty
+                            in
+                                GenericFuncall (name,
+                                                Function.typeArgs typarams binds,
+                                                args',
+                                                rt)
+                            end
+                        end
+                    end
+                else
+                    raise Fail "Funcall arity error"
+            end
 
         and augmentMethodCall args c the_context =
             raise Fail "method calls not implemented yet"
