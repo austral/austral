@@ -95,6 +95,13 @@ structure MTAST :> MTAST = struct
                 (MonoType.Integer _) => (IntConstant (i, ty'), ctx)
               | _ => raise Fail "Internal error: not a valid type for an integer constant"
         end
+      | monomorphize ctx (TAST.FloatConstant (f, ty)) =
+        let val ty' = forciblyMonomorphize ctx ty
+        in
+            case ty' of
+                (MonoType.Float _) => (FloatConstant (f, ty'), ctx)
+              | _ => raise Fail "Internal error: not a valid type for a float constant"
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
