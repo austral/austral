@@ -120,6 +120,12 @@ structure Function :> FUNCTION = struct
                                       | NONE => NONE
         end
 
+    fun findForeignByRawName fenv name =
+        let val (FunctionEnv (_, ffm, _, _, _)) = fenv
+        in
+
+        end
+
     fun findTypeclassByName (FunctionEnv (_, _, _, ts, _)) name =
         let fun isValidTC (Typeclass (name', _, _, _)) =
                 name = name'
