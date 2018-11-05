@@ -140,7 +140,8 @@ structure Module : MODULE = struct
                 "free",
                 "null-pointer",
                 "null?",
-                "address-of"
+                "address-of",
+                "cast"
             ]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
