@@ -60,6 +60,7 @@ structure MTAST :> MTAST = struct
     (* Monomorphization *)
 
     type type_monomorphs = MonoType.type_monomorphs
+    type replacements = MonoType.replacements
 
     datatype context = Context of type_monomorphs
 
