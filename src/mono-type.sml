@@ -41,12 +41,14 @@ structure MonoType :> MONO_TYPE = struct
     datatype type_monomorphs = TypeMonos of ((name * ty list), ty) OrderedMap.map
 
     fun getMonomorph (TypeMonos tm) name tyargs =
-        Map.get tm (name, tyargs)
+        OrderedMap.get tm (name, tyargs)
 
     fun addMonomorph (TypeMonos tm) name tyargs ty =
-        TypeMonos (Map.iadd tm ((name, tyargs), ty))
+        case OrderedMap.add tm ((name, tyargs), ty) of
+            SOME tm' => TypeMonos tm
+          | NONE => TypeMonos tm
 
-    type replacements = (name, ty) Map.map
+    type replacements = (name, ty) OrderedMap.map
 
     fun monomorphize tm _ Type.Unit =
         (Unit, tm)
