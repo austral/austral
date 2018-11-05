@@ -70,6 +70,14 @@ structure MTAST :> MTAST = struct
 
     (* Monomorphization utilities *)
 
+    fun monoType ctx ty =
+        let val (Context (tm, rs)) = ctx
+        in
+            MonoType.monomorphize tm
+                                  rs
+                                  ty
+        end
+
     fun forciblyMonomorphize ctx ty =
         (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
            defun or some other provably-concrete context *)
@@ -107,7 +115,7 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.StringConstant s) =
         (StringConstant s, ctx)
       | monomorphize ctx (TAST.Variable (var, ty)) =
-        raise Fail "Not implemented yet"
+        let val ty'
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
