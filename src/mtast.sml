@@ -68,7 +68,7 @@ structure MTAST :> MTAST = struct
         Context (MonoType.TypeMonos Map.empty,
                  Map.empty)
 
-    fun ctxTM (Context (tm)) =
+    fun ctxTM (Context (tm, _)) =
         tm
 
     (* Monomorphization utilities *)
