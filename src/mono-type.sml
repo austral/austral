@@ -44,9 +44,7 @@ structure MonoType :> MONO_TYPE = struct
         OrderedMap.get tm (name, tyargs)
 
     fun addMonomorph (TypeMonos tm) name tyargs ty =
-        case OrderedMap.add tm ((name, tyargs), ty) of
-            SOME tm' => TypeMonos tm
-          | NONE => TypeMonos tm
+        TypeMonos (OrderedMap.iadd tm ((name, tyargs), ty))
 
     type replacements = (name, ty) Map.map
 
