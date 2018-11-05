@@ -208,6 +208,11 @@ structure OAST :> OAST = struct
       | transformAddressOf _ =
         raise Fail "Invalid `address-of` form"
 
+    and transformCast [ty, exp] =
+        Cast (Type.parseTypespec ty, transform exp)
+      | transformCast _ =
+        raise Fail "Invalid `cast` form"
+
     (* Parse toplevel forms into the toplevel AST *)
 
     fun transformTop (RCST.List l) = transformTopList l
