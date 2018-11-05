@@ -204,7 +204,17 @@ structure Compiler : COMPILER = struct
       | declareTopForm c (DAST.Defcfun (name, rawname, params, arity, rt, docstring)) =
         let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
         in
-            raise Fail "defcfun not implemented"
+            let val ff = Function.ForeignFunction (name,
+                                                   rawname,
+                                                   map (fn (DAST.Param (n, t)) => Function.Param (Symbol.varSymbol n, t))
+                                                       params,
+                                                   rt,
+                                                   docstring)
+            in
+                case (Function.addForeignFunction fenv ff) of
+                    SOME fenv' => Compiler (menv, macenv, tenv, fenv', currModuleName, code)
+                  | NONE => raise Fail "Error defining defcfun"
+            end
         end
 
     fun declarationPass c (head::tail) =
