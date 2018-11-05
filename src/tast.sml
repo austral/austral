@@ -580,7 +580,7 @@ structure TAST :> TAST = struct
                                      ^ (Symbol.toString (Function.gFunctionName gf))
                                      ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form."))
 
-        and augmentGenericFuncallCommon gf args c rt =
+        and augmentGenericFuncallCommon gf args c assertedRt =
             let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
             in
                 if (List.length params) = (List.length args) then
@@ -593,7 +593,7 @@ structure TAST :> TAST = struct
                                 GenericFuncall (name,
                                                 Function.typeArgs typarams binds,
                                                 args',
-                                                rt)
+                                                assertedRt)
                             end
                         end
                     end
