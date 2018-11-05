@@ -1,7 +1,6 @@
 TODO:
 
 
-- Remove foreign-funcall
 - Augment methods
 
 - Implement static-array-pointer function
@@ -144,3 +143,4 @@ DONE:
 - Error when defining multiple foreign functions with the same raw name
 - Implement defcfun
 - Augment calls to foreign functions
+- Remove foreign-funcall
