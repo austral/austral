@@ -23,7 +23,7 @@ signature ORDERED_SET = sig
     val empty : ''a set
     val singleton : ''a -> ''a set
 
-    val isIn : ''a set -> ''a -> bool
+    val exists : ''a set -> ''a -> bool
 
     val add : ''a set -> ''a -> ''a set
     val addList : ''a set -> ''a list -> ''a set
