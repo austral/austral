@@ -323,7 +323,7 @@ structure MTAST :> MTAST = struct
                         (* Check the table of function monomorphs. If this
                            name+type arg list combination doesn't exist yet, add
                            it *)
-                        if hasMonomorph fm name tyargs' then
+                        if hasMonomorph ctx name tyargs' then
                             (gfcall, ctx)
                         else
                             let val ctx = addMonomorph ctx name tyargs'
