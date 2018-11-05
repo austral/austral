@@ -42,7 +42,6 @@ structure AST :> AST = struct
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
-                 | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
                  | AddressOf of Symbol.variable
