@@ -38,6 +38,9 @@ structure Function :> FUNCTION = struct
          and foreign_arity = FixedArity
                            | VariableArity
 
+    fun foreignFunctionName (Function (name, _, _, _, _, _)) =
+        name
+
     (* Generic functions *)
 
     datatype gfunc = GenericFunction of name * Type.typarams * param list * ty * docstring
