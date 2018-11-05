@@ -237,6 +237,8 @@ structure HIR :> HIR = struct
         SizeOf ty
       | transform (TAST.AddressOf (var, _)) =
         AddressOf (escapeVariable var)
+      | transform (TAST.Cast (ty, exp)) =
+        Cast (ty, transform exp)
       | transform (TAST.Seq (a, b)) =
         Seq (transform a, transform b)
       | transform (TAST.Funcall (f, tyargs, args, _)) =
