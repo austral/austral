@@ -312,14 +312,18 @@ structure MTAST :> MTAST = struct
             in
                 let val (ty', ctx) = monoType ctx ty
                 in
-                    let val (Context (tm, rs, fm)) = ctx
+                    let val gfcall = GenericFuncall (name, tyargs', args', ty')
                     in
                         (* Check the table of function monomorphs. If this
                            name+type arg list combination doesn't exist yet, add
                            it *)
-                        if OrderedSet.exists fm (name, tyargs') then
-
-                        raise Fail "monomorphize: generic funcall not implemented yet"
+                        if hasMonomorph fm name tyargs' then
+                            (gfcall, ctx)
+                        else
+                            let val ctx = addMonomorph ctx name tyargs'
+                            in
+                                (gfcall, ctx)
+                            end
                     end
                 end
             end
