@@ -182,6 +182,11 @@ structure MTAST :> MTAST = struct
         in
             (Allocate exp', ctx)
         end
+      | monomorphize ctx (TAST.Load exp) =
+        let val (exp', ctx) = monomorphize ctx exp
+        in
+            (Load exp', ctx)
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
