@@ -507,9 +507,25 @@ structure TAST :> TAST = struct
                       | validType (Type.ForeignPointer _) = true
                       | validType (Type.StaticArray _) = true
                       | validType _ = false
+
+                    and augmentArgs arglist =
+                        case arity of
+                            Function.FixedArity =>
+                            (* If the function has a fixed arity, we have to
+                               check that the parameter list and the argument
+                               list have the same length, and then check that
+                               each argument has the same type as its
+                               corresponding parameter *)
+
+                            if (List.length arglist) = (List.length params) then
+                                map augmentArg arglist
+                            else
+                                raise Fail "Foreign funcall arity error"
+                          | Function.VariableArity =>
                 in
+
                     ForeignFuncall (rawname,
-                                    map augmentArg args,
+                                    augmentArgs args,
                                     rt)
                 end
             end
