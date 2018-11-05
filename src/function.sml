@@ -100,6 +100,23 @@ structure Function :> FUNCTION = struct
             end
         end
 
+    datatype callable = CallableFunc of func
+                      | CallableForeign of ffunc
+                      | CallableGFunc of gfunc
+                      | CallableMethod
+
+    fun envGet fenv name =
+        let val (FunctionEnv (funcs, ffuncs, gfuncs, classes, instances)) = fenv
+        in
+            case Map.get funcs name of
+                SOME f => SOME (CallableFunc f)
+              | NONE => case Map.get ffuncs name of
+                            SOME ff => SOME (CallableForeign ff)
+                          | NONE => case Map.get gfuncs name of
+                                        SOME gf => SOME (CallableGFunc gf)
+                                      | NONE => NONE
+        end
+
     fun findTypeclassByName (FunctionEnv (_, _, _, ts, _)) name =
         let fun isValidTC (Typeclass (name', _, _, _)) =
                 name = name'
@@ -155,23 +172,6 @@ structure Function :> FUNCTION = struct
                            SOME (FunctionEnv (fm, ffm, gm, ts, ins :: is))
                        end
            | _ => NONE)
-
-    datatype callable = CallableFunc of func
-                      | CallableForeign of ffunc
-                      | CallableGFunc of gfunc
-                      | CallableMethod
-
-    fun envGet fenv name =
-        let val (FunctionEnv (funcs, ffuncs, gfuncs, classes, instances)) = fenv
-        in
-            case Map.get funcs name of
-                SOME f => SOME (CallableFunc f)
-              | NONE => case Map.get ffuncs name of
-                            SOME ff => SOME (CallableForeign ff)
-                          | NONE => case Map.get gfuncs name of
-                                        SOME gf => SOME (CallableGFunc gf)
-                                      | NONE => NONE
-        end
 
     fun matchParams params types =
         let val paramTypes = map (fn (Param (_, t)) => t) params
