@@ -36,6 +36,7 @@ signature OAST = sig
                  | ForeignNull of typespec
                  | SizeOf of typespec
                  | AddressOf of name
+                 | Cast of typespec * ast
                  | Operation of name * ast list
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
