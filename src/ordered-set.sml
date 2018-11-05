@@ -18,51 +18,51 @@
 *)
 
 structure OrderedSet :> ORDERED_SET = struct
-  datatype ''a set = Set of ''a list
+    datatype ''a set = Set of ''a list
 
-  val empty = Set []
+    val empty = Set []
 
-  fun singleton a = Set [a]
+    fun singleton a = Set [a]
 
-  fun exists (Set l) elem =
-    Util.member elem l
+    fun exists (Set l) elem =
+        Util.member elem l
 
-  fun add (Set l) elem =
-    if Util.member elem l then
-        Set l
-    else
-        Set (elem :: l)
+    fun add (Set l) elem =
+        if Util.member elem l then
+            Set l
+        else
+            Set (elem :: l)
 
-  fun addList set (x::xs) = add (addList set xs) x
-    | addList set nil = set
+    fun addList set (x::xs) = add (addList set xs) x
+      | addList set nil = set
 
-  fun union (Set a) (Set b) = addList (addList empty a) b
+    fun union (Set a) (Set b) = addList (addList empty a) b
 
-  fun unionList l = foldl (fn (a, b) => union a b)
-                          empty
-                          l
+    fun unionList l = foldl (fn (a, b) => union a b)
+                            empty
+                            l
 
-  fun difference (Set blist) a =
-    (* All elements in B but not in A *)
-    Set (List.filter (fn belem => not (exists a belem)) blist)
+    fun difference (Set blist) a =
+        (* All elements in B but not in A *)
+        Set (List.filter (fn belem => not (exists a belem)) blist)
 
-  fun size (Set l) = List.length l
+    fun size (Set l) = List.length l
 
-  fun positionOf (Set l) elem =
-    case Util.position elem l of
-        SOME p => SOME ((List.length l) - p)
-      | _ => NONE
+    fun positionOf (Set l) elem =
+        case Util.position elem l of
+            SOME p => SOME ((List.length l) - p)
+          | _ => NONE
 
-  fun nth (Set l) idx =
-      List.nth (l, idx - 1)
+    fun nth (Set l) idx =
+        List.nth (l, idx - 1)
 
-  fun filter (Set l) f = Set (List.filter f l)
+    fun filter (Set l) f = Set (List.filter f l)
 
-  fun fromList (x::xs) = add (fromList xs) x
-    | fromList nil = empty
+    fun fromList (x::xs) = add (fromList xs) x
+      | fromList nil = empty
 
-  fun toList (Set l) = l
+    fun toList (Set l) = l
 
-  fun toUnordered (Set l) =
-      Set.fromList l
+    fun toUnordered (Set l) =
+        Set.fromList l
 end
