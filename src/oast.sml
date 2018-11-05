@@ -120,8 +120,6 @@ structure OAST :> OAST = struct
             transformConstruct args
         else if f = au "case" then
             transformCase args
-        else if f = Symbol.auCffi "foreign-funcall" then
-            transformForeignFuncall args
         else if f = Symbol.auCffi "null-pointer" then
             transformForeignNull args
         else if f = Symbol.auCffi "size-of" then
