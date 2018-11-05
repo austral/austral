@@ -529,7 +529,10 @@ structure TAST :> TAST = struct
                                arguments in the first list have types that
                                correspond to those in the parameter list. For
                                the second list, we don't do type checking. *)
-                            raise Fail "Variable-arity foreign funcalls not implemented"
+                            if (List.length arglist) >= (List.length params) then
+                                raise Fail "Variable-arity foreign funcalls not implemented"
+                            else
+                                raise Fail "Not enough arguments"
                 in
 
                     ForeignFuncall (rawname,
