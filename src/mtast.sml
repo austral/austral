@@ -70,7 +70,7 @@ structure MTAST :> MTAST = struct
 
     (* Monomorphization utilities *)
 
-    fun monoType ty ctx =
+    fun monoType ctx ty =
         let val (Context (tm, rs)) = ctx
         in
             MonoType.monomorphize tm rs ty
@@ -113,7 +113,7 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.StringConstant s) =
         (StringConstant s, ctx)
       | monomorphize ctx (TAST.Variable (var, ty)) =
-        let val (ty', ctx') = monoType ctx ty
+        let val (ty', ctx') = monoType ty ctx
         in
             (Variable (var, ty'), ctx')
         end
