@@ -1,6 +1,5 @@
 TODO:
 
-- Implement defcfun
 - Augment methods
 
 - Implement static-array-pointer function
@@ -141,3 +140,4 @@ DONE:
 - Foreign function in the fenv
 - address-of should only work on mutable variables
 - Error when defining multiple foreign functions with the same raw name
+- Implement defcfun
