@@ -34,7 +34,7 @@ structure Function :> FUNCTION = struct
 
     (* Foreign functions *)
 
-    datatype ffunc = ForeignFunction of name * param list * foreign_arity * ty * docstring
+    datatype ffunc = ForeignFunction of name * string * param list * foreign_arity * ty * docstring
          and foreign_arity = FixedArity
                            | VariableArity
 
