@@ -33,8 +33,8 @@ signature SET = sig
 
     val intersection : ''a set -> ''a set -> ''a set
 
-    (* All elements in the first argument, but not in the second argument *)
-    val difference : ''a set -> ''a set -> ''a set
+    (* A-B : all the elements in A, except those also in B *)
+    val minus : ''a set -> ''a set -> ''a set
 
     val isIn : ''a set -> ''a -> bool
     val size : ''a set -> int
