@@ -174,8 +174,6 @@ structure Alpha :> ALPHA = struct
                       map renameCase cases)
             end
         end
-      | alphaRename s (OAST.ForeignFuncall (name, rt, args)) =
-        ForeignFuncall (name, rt, map (alphaRename s) args)
       | alphaRename s (OAST.ForeignNull ty) =
         ForeignNull ty
       | alphaRename s (OAST.SizeOf ty) =
