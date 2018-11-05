@@ -195,6 +195,14 @@ structure MTAST :> MTAST = struct
                 (Store (ptr', value'), ctx)
             end
         end
+      | monomorphize ctx (TAST.The (_, exp)) =
+        (* The MTAST doesn't have a case for `the` expressions. Since type
+           checking is done at the TAST level, we don't need one. We ignore the
+           provided type and monomorphize the expression. *)
+        let val (exp', ctx) = monomorphize ctx exp
+        in
+            (exp', ctx)
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
