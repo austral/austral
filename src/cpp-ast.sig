@@ -60,6 +60,7 @@ signature CPP_AST = sig
                        | StandaloneExp of exp_ast
 
     datatype top_ast = FunctionDef of string * typaram list * param list * ty * block_ast * exp_ast
+                     | FunctionDecl of string * ty list * ty
                      | TypeDef of string * typaram list * ty
                      | ToplevelProgn of top_ast list
          and typaram = TypeParam of string
