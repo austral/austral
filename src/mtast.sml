@@ -288,6 +288,8 @@ structure MTAST :> MTAST = struct
                 (Seq (a', b'), ctx)
             end
         end
+      | monomorphize ctx (TAST.Funcall (name, tyargs, args, ty)) =
+        raise Fail "monomorphize: funcall not implemented yet"
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
