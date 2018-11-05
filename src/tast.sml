@@ -48,7 +48,7 @@ structure TAST :> TAST = struct
                  | Cast of ty * ast
                  | Seq of ast * ast
                  | ConcreteFuncall of name * ast list * ty
-                 | GenericFuncall of Symbol.symbol * ty list * ast list * ty
+                 | GenericFuncall of name * ty list * ast list * ty
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
                        | NameBinding of { casename: name, var: Symbol.variable, ty: ty }
