@@ -243,7 +243,7 @@ structure HIR :> HIR = struct
         Seq (transform a, transform b)
       | transform (TAST.ConcreteFuncall (f, args, _)) =
         raise Fail "Not implemented"
-      | transform (TAST.Funcall (f, tyargs, args, _)) =
+      | transform (TAST.GenericFuncall (f, tyargs, args, _)) =
         transformFuncall f tyargs (map transform args)
     and transformCheckedArithOp oper lhs rhs =
         Funcall ("austral_checked_" ^ arithOpName oper, [], [lhs, rhs])
