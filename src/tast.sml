@@ -142,8 +142,8 @@ structure TAST :> TAST = struct
             typeOf v
           | typeOf (ConcreteFuncall (_, _, ty)) =
             ty
-          | typeOf (Funcall (_, _, _, t)) =
-            t
+          | typeOf (GenericFuncall (_, _, _, ty)) =
+            ty
     end
 
     (* Bindings *)
