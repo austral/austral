@@ -162,6 +162,11 @@ structure MTAST :> MTAST = struct
         in
             (TupleCreate exps', ctx)
         end
+      | monomorphize ctx (TAST.TupleProj (tup, idx)) =
+        let val (tup', ctx) = monomorphize ctx tup
+        in
+            (TupleProj (tup', idx), ctx)
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
