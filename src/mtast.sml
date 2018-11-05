@@ -216,11 +216,30 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.Case (exp, cases, ty)) =
         let val (exp', ctx) = monomorphize ctx exp
         in
-            let val (cases', ctx) monomorphizeCases ctx cases
+            let fun monomorphizeCases ctx cases =
+                    Util.foldThread (fn (c, ctx) =>
+                                      monomorphizeCase ctx c)
+                                    cases
+                                    ctx
+
+                and monomorphizeCase ctx (TAST.VariantCase (name, body)) =
+                    let val (body', ctx) = monomorphize ctx body
+                    in
+                        (VariantCase (mapName name, body'), ctx)
+                    end
+
+                and mapName (TAST.NameOnly name) =
+                    NameOnly name
+                  | mapName (TAST.NameBinding { casename, var, ty}) =
+                    NameBinding { casename = casename, var = var, ty = ty }
+
             in
-                let val (ty', ctx) = monoType ty ctx
+                let val (cases', ctx) monomorphizeCases ctx cases
                 in
-                    (Case (exp', cases', ty'), ctx)
+                    let val (ty', ctx) = monoType ty ctx
+                    in
+                        (Case (exp', cases', ty'), ctx)
+                    end
                 end
             end
         end
