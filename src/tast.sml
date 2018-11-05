@@ -522,6 +522,13 @@ structure TAST :> TAST = struct
                             else
                                 raise Fail "Foreign funcall arity error"
                           | Function.VariableArity =>
+                            (* If the function has a variable arity, we divide
+                               the argument list into two segments: the first is
+                               as long as the parameter list, and the second is
+                               the remainder of that. Then, we check that the
+                               arguments in the first list have types that
+                               correspond to those in the parameter list. For
+                               the second list, we don't do type checking. *)
                             raise Fail "Variable-arity foreign funcalls not implemented"
                 in
 
