@@ -64,6 +64,13 @@ signature FUNCTION = sig
 
     val defaultFenv : fenv
 
+    datatype callable = CallableFunc of func
+                      | CallableForeign of ffunc
+                      | CallableGFunc of gfunc
+                      | CallableMethod
+
+    val envGet : fenv -> name -> callable option
+
     val findTypeclassByMethod : fenv -> name -> typeclass option
 
     val addFunction : fenv -> func -> fenv option
@@ -71,13 +78,6 @@ signature FUNCTION = sig
     val addGenericFunction : fenv -> gfunc -> fenv option
     val addTypeclass : fenv -> typeclass -> fenv option
     val addInstance : fenv -> instance -> fenv option
-
-    datatype callable = CallableFunc of func
-                      | CallableForeign of ffunc
-                      | CallableGFunc of gfunc
-                      | CallableMethod
-
-    val envGet : fenv -> name -> callable option
 
     (* Given a list of function parameters, and a list of types, return a map of
     type parameter names to their replacement types if the match succeeds. Fails
