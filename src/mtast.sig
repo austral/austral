@@ -28,7 +28,6 @@ signature MTAST = sig
                  | IntConstant of string * ty
                  | FloatConstant of string * ty
                  | StringConstant of CST.escaped_string
-                 | NullConstant of ty
                  | Variable of Symbol.variable * ty
                  | Let of Symbol.variable * ast * ast
                  | Bind of Symbol.variable list * ast * ast
