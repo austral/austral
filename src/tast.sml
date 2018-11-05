@@ -509,8 +509,9 @@ structure TAST :> TAST = struct
                       | validType _ = false
                 in
                     ForeignFuncall (rawname,
-                                    resolve tenv (ctxTyParams c) typespec,
-                                    map augmentArg args)
+                                    map augmentArg args,
+                                    arity,
+                                    rt)
                 end
             end
 
