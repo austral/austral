@@ -509,10 +509,9 @@ structure TAST :> TAST = struct
 
         and augmentConcreteFuncall (Function.Function (name, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
-                Funcall (name,
-                         [],
-                         map (fn a => augment a c) args,
-                         rt)
+                ConcreteFuncall (name,
+                                 map (fn a => augment a c) args,
+                                 rt)
             else
                 raise Fail "Funcall arity error"
 
