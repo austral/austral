@@ -48,7 +48,7 @@ structure MonoType :> MONO_TYPE = struct
             SOME tm' => TypeMonos tm
           | NONE => TypeMonos tm
 
-    type replacements = (name, ty) OrderedMap.map
+    type replacements = (name, ty) Map.map
 
     fun monomorphize tm _ Type.Unit =
         (Unit, tm)
