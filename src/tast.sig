@@ -45,6 +45,7 @@ signature TAST = sig
                  | ForeignNull of ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
+                 | Cast of ty * ast
                  | Seq of ast * ast
                  | Funcall of Symbol.symbol * ty list * ast list * ty
          and variant_case = VariantCase of case_name * ast
