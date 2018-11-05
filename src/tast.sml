@@ -466,10 +466,9 @@ structure TAST :> TAST = struct
                 and auKer = Symbol.auKer
             in
                 if Builtin.isBuiltin name then
-                    Funcall (name,
-                             [],
-                             map (fn e => augment e c) args,
-                             Bool)
+                    ConcreteFuncall (name,
+                                     map (fn e => augment e c) args,
+                                     Bool)
                 else
                     case Function.envGet fenv name of
                         SOME f => augmentCallable f args c the_context
