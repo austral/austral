@@ -209,9 +209,9 @@ structure MTAST :> MTAST = struct
             case expOpt of
                 (SOME exp) => let val (exp', ctx) = monomorphize ctx exp
                               in
-                                  (Construct (ty', name, SOME exp'))
+                                  (Construct (ty', name, SOME exp'), ctx)
                               end
-              | NONE => (Construct (ty', name, NONE))
+              | NONE => (Construct (ty', name, NONE), ctx)
         end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
