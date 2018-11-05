@@ -427,7 +427,10 @@ structure TAST :> TAST = struct
           | augment (AST.ForeignNull typespec) c =
             ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.Cast (typespec, exp)) c =
-            raise Fail "cast not implemented"
+            let val ty = (resolve (ctxTenv c) (ctxTyParams c) typespec)
+            in
+                raise Fail "cast not implemented"
+            end
           | augment (AST.Seq (a, b)) c =
             Seq (augment a c,
                  augment b c)
