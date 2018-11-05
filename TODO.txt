@@ -1,6 +1,5 @@
 TODO:
 
-- Fix prelude
 - Augment methods
 
 - Implement static-array-pointer function
@@ -145,3 +144,4 @@ DONE:
 - Augment calls to foreign functions
 - Remove foreign-funcall
 - Implement austral.ext.cffi:cast
+- Fix prelude
