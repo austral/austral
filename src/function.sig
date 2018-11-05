@@ -71,6 +71,7 @@ signature FUNCTION = sig
 
     val envGet : fenv -> name -> callable option
 
+    val findForeignByRawName : fenv -> string -> ffunc option
     val findTypeclassByMethod : fenv -> name -> typeclass option
 
     val addFunction : fenv -> func -> fenv option
