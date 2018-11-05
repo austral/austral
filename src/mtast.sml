@@ -138,7 +138,17 @@ structure MTAST :> MTAST = struct
                 (Bind (names, tup', body'), ctx)
             end
         end
-
+      | monomorphize ctx (TAST.Cond (t, c, a)) =
+        let val (t', ctx) = monomorphize ctx t
+        in
+            let val (c', ctx) = monomorphize ctx c
+            in
+                let val (a', ctx) = monomorphize ctx a
+                in
+                    (Cond (t', c', a'), ctx)
+                end
+            end
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
