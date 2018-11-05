@@ -513,7 +513,30 @@ structure TAST :> TAST = struct
                 raise Fail "Funcall arity error"
 
         and augmentForeignFuncall ff args c =
-            raise Fail "foreign funcalls not implemented yet"
+            let val tenv = ctxTenv c
+            in
+                let fun augmentArg value =
+                        let val value' = augment value c
+                        in
+                            if validType (typeOf value') then
+                                case typeOf value' of
+                                    (StaticArray t) => ArrayPointer value'
+                                  | _ => value'
+                            else
+                                raise Fail "Type is not valid for a foreign funcall"
+                        end
+
+                    and validType (Type.Integer _) = true
+                      | validType (Type.Float _) = true
+                      | validType (Type.ForeignPointer _) = true
+                      | validType (Type.StaticArray _) = true
+                      | validType _ = false
+                in
+                    ForeignFuncall (name,
+                                    resolve tenv (ctxTyParams c) typespec,
+                                    map augmentArg args)
+                end
+            end
 
         and augmentGenericFuncall (Function.GenericFunction (name, typarams, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
