@@ -534,7 +534,10 @@ structure TAST :> TAST = struct
                                     let val firstArgs = List.take (arglist, paramCount)
                                         and secondArgs = List.drop (arglist, paramCount)
                                     in
-                                        raise Fail "Variable-arity foreign funcalls not implemented"
+                                        let val firstArgs' = ListPair.map checkArg (firstArgs, params)
+                                        in
+                                            firstArgs' @ secondArgs
+                                        end
                                     end
                                 else
                                     raise Fail "Not enough arguments"
