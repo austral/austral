@@ -234,7 +234,7 @@ structure MTAST :> MTAST = struct
                 and mapName ctx (TAST.NameOnly name) =
                     (NameOnly name, ctx)
                   | mapName ctx (TAST.NameBinding { casename, var, ty}) =
-                    let val (ty', ctx) = monoType ctx ty
+                    let val (ty', ctx) = monoType ty ctx
                     in
                         (NameBinding { casename = casename, var = var, ty = ty }, ctx)
                     end
