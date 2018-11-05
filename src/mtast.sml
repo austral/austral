@@ -272,6 +272,14 @@ structure MTAST :> MTAST = struct
         in
             (AddressOf (var, ty'), ctx)
         end
+      | monomorphize ctx (TAST.Cast (ty, exp)) =
+        let val (ty', ctx) = monoType ctx ty
+        in
+            let val (exp', ctx) = monomorphize ctx exp
+            in
+                (Cast (ty', exp'), ctx)
+            end
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
