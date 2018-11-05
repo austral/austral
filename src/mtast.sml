@@ -65,7 +65,8 @@ structure MTAST :> MTAST = struct
     datatype context = Context of type_monomorphs * replacements
 
     val emptyContext =
-        Context (MonoType.TypeMonos Map.empty)
+        Context (MonoType.TypeMonos Map.empty,
+                 Map.empty)
 
     fun ctxTM (Context (tm)) =
         tm
