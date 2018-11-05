@@ -76,6 +76,8 @@ structure MTAST :> MTAST = struct
         (UnitConstant, ctx)
       | monomorphize ctx (TAST.BoolConstant b) =
         (BoolConstant b, ctx)
+      | monomorphize ctx (TAST.IntConstant (i, ty)) =
+        (IntConstant (i, ty), ctx)
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
@@ -105,20 +107,21 @@ structure MTAST :> MTAST = struct
     and monomorphizeDefun ctx name params rt body =
         let fun mapParam (TAST.Param (var, ty)) =
                 Param (var, forciblyMonomorphize ty)
-
-            and forciblyMonomorphize ty =
-                (* We can ignore the resulting type monomorphs since a defun is always concrete *)
-                let val (ty', _) = MonoType.monomorphize (ctxTM ctx)
-                                                         Map.empty
-                                                         ty
-                in
-                    ty'
-                end
         in
             raise Fail "Not implemented"
             (* Defun (name,
                       map mapParam params,
                       concreteMonoType rt,
                       monomorphize ctx body) *)
+        end
+
+    and forciblyMonomorphize ctx ty =
+        (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
+           defun or some other provably-concrete context *)
+        let val (ty', _) = MonoType.monomorphize (ctxTM ctx)
+                                                 Map.empty
+                                                 ty
+        in
+            ty'
         end
 end
