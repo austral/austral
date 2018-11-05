@@ -225,13 +225,19 @@ structure MTAST :> MTAST = struct
                 and monomorphizeCase ctx (TAST.VariantCase (name, body)) =
                     let val (body', ctx) = monomorphize ctx body
                     in
-                        (VariantCase (mapName name, body'), ctx)
+                        let val (name', ctx) = mapName ctx name
+                        in
+                            (VariantCase (mapName name, body'), ctx)
+                        end
                     end
 
-                and mapName (TAST.NameOnly name) =
-                    NameOnly name
-                  | mapName (TAST.NameBinding { casename, var, ty}) =
-                    NameBinding { casename = casename, var = var, ty = ty }
+                and mapName ctx (TAST.NameOnly name) =
+                    (NameOnly name, ctx)
+                  | mapName ctx (TAST.NameBinding { casename, var, ty}) =
+                    let val (ty', ctx) = monoType ctx ty
+                    in
+                        (NameBinding { casename = casename, var = var, ty = ty }, ctx)
+                    end
 
             in
                 let val (cases', ctx) = monomorphizeCases ctx cases
