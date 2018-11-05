@@ -481,29 +481,7 @@ structure TAST :> TAST = struct
             augmentForeignFuncall ff args c
           | augmentCallable (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
-                case the_context of
-                    SOME ty => let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
-                               in
-                                   if (List.length params) = (List.length args) then
-                                       let val args' = map (fn a => augment a c) args
-                                       in
-                                           let val argTypes = map typeOf args'
-                                           in
-                                               let val binds = Function.matchFunc params rt argTypes ty
-                                               in
-                                                   GenericFuncall (name,
-                                                                   Function.typeArgs typarams binds,
-                                                                   args',
-                                                                   ty)
-                                               end
-                                           end
-                                       end
-                                   else
-                                       raise Fail "Funcall arity error"
-                               end
-                  | NONE => raise Fail ("Error in call to function "
-                                        ^ (Symbol.toString (Function.gFunctionName gf))
-                                        ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form.")
+                augmentRTPGenericFuncall gf args c the_context
             else
                 augmentGenericFuncall gf args c
           | augmentCallable Function.CallableMethod args c the_context =
@@ -594,6 +572,31 @@ structure TAST :> TAST = struct
                                 rt)
             else
                 raise Fail "Funcall arity error"
+
+        and augmentRTPGenericFuncall gf args c the_context =
+            (case the_context of
+                 SOME ty => let val (Function.GenericFunction (name, typarams, params, rt, _)) = gf
+                            in
+                                if (List.length params) = (List.length args) then
+                                    let val args' = map (fn a => augment a c) args
+                                    in
+                                        let val argTypes = map typeOf args'
+                                        in
+                                            let val binds = Function.matchFunc params rt argTypes ty
+                                            in
+                                                GenericFuncall (name,
+                                                                Function.typeArgs typarams binds,
+                                                                args',
+                                                                ty)
+                                            end
+                                        end
+                                    end
+                                else
+                                    raise Fail "Funcall arity error"
+                            end
+               | NONE => raise Fail ("Error in call to function "
+                                     ^ (Symbol.toString (Function.gFunctionName gf))
+                                     ^ ": generic functions that are return-type polymorphic must be called in the context of a `the` form."))
 
         and augmentMethodCall args c the_context =
             raise Fail "method calls not implemented yet"
