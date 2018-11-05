@@ -588,10 +588,10 @@ structure TAST :> TAST = struct
 
         and augmentGenericFuncall (Function.GenericFunction (name, typarams, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
-                Funcall (name,
-                         [], (* We don't need to supply type parameters for non-RTP functions *)
-                         map (fn a => augment a c) args,
-                         rt)
+                GenericFuncall (name,
+                                [], (* We don't need to supply type parameters for non-RTP functions *)
+                                map (fn a => augment a c) args,
+                                rt)
             else
                 raise Fail "Funcall arity error"
 
