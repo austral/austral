@@ -41,7 +41,7 @@ structure MTAST :> MTAST = struct
                  | Store of ast * ast
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
-                 | ForeignFuncall of string * ty * ast list
+                 | ForeignFuncall of string * ast list * ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
                  | Seq of ast * ast
