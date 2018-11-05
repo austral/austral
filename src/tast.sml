@@ -522,6 +522,7 @@ structure TAST :> TAST = struct
                             else
                                 raise Fail "Foreign funcall arity error"
                           | Function.VariableArity =>
+                            raise Fail "Variable-arity foreign funcalls not implemented"
                 in
 
                     ForeignFuncall (rawname,
