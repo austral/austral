@@ -227,7 +227,7 @@ structure MTAST :> MTAST = struct
                     in
                         let val (name', ctx) = mapName ctx name
                         in
-                            (VariantCase (mapName name, body'), ctx)
+                            (VariantCase (name', body'), ctx)
                         end
                     end
 
