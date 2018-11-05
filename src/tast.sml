@@ -41,7 +41,7 @@ structure TAST :> TAST = struct
                  | The of ty * ast
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
-                 | ForeignFuncall of string * ty * ast list
+                 | ForeignFuncall of string * ast list * ty
                  | ForeignNull of ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
@@ -472,7 +472,7 @@ structure TAST :> TAST = struct
         and augmentCallable (Function.CallableFunc f) args c _ =
             augmentConcreteFuncall f args c
           | augmentCallable (Function.CallableForeign ff) args c _ =
-            raise Fail "foreign funcalls not implemented yet"
+            augmentForeignFuncall ff args c
           | augmentCallable (Function.CallableGFunc gf) args c the_context =
             if Function.isRTP gf then
                 case the_context of
@@ -511,6 +511,9 @@ structure TAST :> TAST = struct
                          rt)
             else
                 raise Fail "Funcall arity error"
+
+        and augmentForeignFuncall ff args c =
+            raise Fail "foreign funcalls not implemented yet"
 
         and augmentGenericFuncall (Function.GenericFunction (name, typarams, params, rt, _)) args c =
             if (List.length params) = (List.length args) then
