@@ -70,7 +70,8 @@ structure MTAST :> MTAST = struct
 
     val emptyContext =
         Context (MonoType.emptyMonomorphs,
-                 Map.empty)
+                 Map.empty,
+                 FuncMonos OrderedSet.empty)
 
     (* Monomorphization utilities *)
 
