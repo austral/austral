@@ -280,6 +280,14 @@ structure MTAST :> MTAST = struct
                 (Cast (ty', exp'), ctx)
             end
         end
+      | monomorphize ctx (TAST.Seq (a, b)) =
+        let val (a', ctx) = monomorphize ctx a
+        in
+            let val (b', ctx) = monomorphize ctx b
+            in
+                (Seq (a', b'), ctx)
+            end
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
