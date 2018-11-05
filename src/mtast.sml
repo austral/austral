@@ -113,7 +113,10 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx (TAST.StringConstant s) =
         (StringConstant s, ctx)
       | monomorphize ctx (TAST.Variable (var, ty)) =
-        let val ty'
+        let val (ty', ctx') = monoType ctx ty
+        in
+            (Variable (var, ty'), ctx')
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
