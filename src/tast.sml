@@ -423,31 +423,6 @@ structure TAST :> TAST = struct
                | NONE => raise Fail ("No such variable: " ^ (Symbol.varToString name)))
           | augment (AST.ForeignNull typespec) c =
             ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
-          | augment (AST.ForeignFuncall (name, typespec, args)) c =
-            let val tenv = ctxTenv c
-            in
-                let fun augmentArg value =
-                        let val value' = augment value c
-                        in
-                            if validType (typeOf value') then
-                                case typeOf value' of
-                                    (StaticArray t) => ArrayPointer value'
-                                  | _ => value'
-                            else
-                                raise Fail "Type is not valid for a foreign funcall"
-                        end
-
-                    and validType (Type.Integer _) = true
-                      | validType (Type.Float _) = true
-                      | validType (Type.ForeignPointer _) = true
-                      | validType (Type.StaticArray _) = true
-                      | validType _ = false
-                in
-                    ForeignFuncall (name,
-                                    resolve tenv (ctxTyParams c) typespec,
-                                    map augmentArg args)
-                end
-            end
           | augment (AST.Seq (a, b)) c =
             Seq (augment a c,
                  augment b c)
