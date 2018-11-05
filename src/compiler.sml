@@ -208,6 +208,7 @@ structure Compiler : COMPILER = struct
                                                    rawname,
                                                    map (fn (DAST.Param (n, t)) => Function.Param (Symbol.varSymbol n, t))
                                                        params,
+                                                   arity,
                                                    rt,
                                                    docstring)
             in
