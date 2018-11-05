@@ -71,7 +71,7 @@ structure MIR :> MIR = struct
 
     datatype top_ast = Defun of name * typaram list * param list * ty * block_ast * exp_ast
                      | Deftype of name * typaram list * ty
-                     | DeclareForeign of rawname * ty list * ty
+                     | DeclareForeign of string * ty list * ty
                      | ToplevelProgn of top_ast list
          and param = Param of name * ty
 
