@@ -134,7 +134,6 @@ structure Module : MODULE = struct
             and cffiExports = [
                 "&rest",
                 "foreign-pointer",
-                "foreign-funcall",
                 "size-of",
                 "malloc",
                 "free",
