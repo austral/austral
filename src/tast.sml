@@ -428,6 +428,7 @@ structure TAST :> TAST = struct
             ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.Cast (typespec, exp)) c =
             let val ty = (resolve (ctxTenv c) (ctxTyParams c) typespec)
+                and exp' = augment exp c
             in
                 raise Fail "cast not implemented"
             end
