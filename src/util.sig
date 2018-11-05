@@ -38,4 +38,6 @@ signature UTIL = sig
     (* If string starts with prefix, return the remainder of string. Otherwise
        return NONE. *)
     val afterPrefix : string -> prefix -> string option
+
+    val foldThread : ('a -> 'b -> ('c * 'b)) -> 'a list -> 'b -> 'c list
 end
