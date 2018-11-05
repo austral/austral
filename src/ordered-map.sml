@@ -38,4 +38,9 @@ structure OrderedMap :> ORDERED_MAP = struct
                     in
                         SOME (Map ((k, v) :: l))
                     end
+
+    fun iadd m (k, v) =
+        case add m (k, v) of
+            SOME m' => m'
+          | NONE => m
 end
