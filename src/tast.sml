@@ -131,6 +131,8 @@ structure TAST :> TAST = struct
             Integer (Unsigned, Int64)
           | typeOf (AddressOf (_, ty)) =
             ty
+          | typeOf (Cast (ty, _)) =
+            ty
           | typeOf (ForeignFuncall (_, _, rt)) =
             rt
           | typeOf (ForeignNull ty) =
