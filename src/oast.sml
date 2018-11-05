@@ -35,7 +35,6 @@ structure OAST :> OAST = struct
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
-                 | ForeignFuncall of string * typespec * ast list
                  | ForeignNull of typespec
                  | SizeOf of typespec
                  | AddressOf of name
