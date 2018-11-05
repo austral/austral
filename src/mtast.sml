@@ -68,19 +68,19 @@ structure MTAST :> MTAST = struct
         Context (MonoType.TypeMonos Map.empty,
                  Map.empty)
 
-    fun ctxTM (Context (tm, _)) =
-        tm
-
     (* Monomorphization utilities *)
 
     fun forciblyMonomorphize ctx ty =
         (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
            defun or some other provably-concrete context *)
-        let val (ty', _) = MonoType.monomorphize (ctxTM ctx)
-                                                 Map.empty
-                                                 ty
+        let val (Context (tm, rs)) = ctx
         in
-            ty'
+            let val (ty', _) = MonoType.monomorphize tm
+                                                     rs
+                                                     ty
+            in
+                ty'
+            end
         end
 
     (* Monomorphize a type with an empty replacements map, that is, in a
