@@ -185,7 +185,7 @@ structure Alpha :> ALPHA = struct
         else
             AddressOf (lookup s name)
       | alphaRename s (OAST.Cast (ty, exp)) =
-        Cast (ty, exp)
+        Cast (ty, alphaRename s exp)
       | alphaRename s (OAST.Operation (f, args)) =
         Operation (f, map (alphaRename s) args)
 
