@@ -150,7 +150,7 @@ structure Function :> FUNCTION = struct
         end
 
     fun addForeignFunction fenv ff =
-        let val name = fFunctionName f
+        let val name = fFunctionName ff
         in
             (* If there's a function or method with this name, fail *)
             case envGet fenv name of
