@@ -82,7 +82,7 @@ structure MTAST :> MTAST = struct
             end
         end
 
-    fun monoTypeList ctx tys =
+    fun monoTypes ctx tys =
         Util.foldThread (fn (ty, ctx) => monoType ctx ty)
                         tys
                         ctx
@@ -303,9 +303,7 @@ structure MTAST :> MTAST = struct
             end
         end
       | monomorphize ctx (TAST.GenericFuncall (name, tyargs, args, ty)) =
-        let val (tyargs', ctx) = Util.foldThread (fn (ty, ctx) => monoType ctx ty)
-                                                 tyargs
-                                                 ctx
+        let val (tyargs', ctx) = monoTypes ctx tyargs
         in
             raise Fail "monomorphize: generic funcall not implemented yet"
         end
