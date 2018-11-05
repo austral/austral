@@ -1,6 +1,7 @@
 TODO:
 
 - Augment calls to foreign functions
+- Remove foreign-funcall
 - Augment methods
 
 - Implement static-array-pointer function
