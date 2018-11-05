@@ -528,14 +528,17 @@ structure TAST :> TAST = struct
                                arguments in the first list have types that
                                correspond to those in the parameter list. For
                                the second list, we don't do type checking. *)
-                            if (List.length arglist) >= (List.length params) then
-                                let val firstArgs = List.take (arglist, List.length params)
-                                    and secondArgs = List.drop (arglist, List.length params)
-                                in
-                                    raise Fail "Variable-arity foreign funcalls not implemented"
-                                end
-                            else
-                                raise Fail "Not enough arguments"
+                            let val paramCount = List.length params
+                            in
+                                if (List.length arglist) >= paramCount then
+                                    let val firstArgs = List.take (arglist, paramCount)
+                                        and secondArgs = List.drop (arglist, paramCount)
+                                    in
+                                        raise Fail "Variable-arity foreign funcalls not implemented"
+                                    end
+                                else
+                                    raise Fail "Not enough arguments"
+                            end
 
                     and checkArg argument param =
                         raise Fail "checkArg not implemented"
