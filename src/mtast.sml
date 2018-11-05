@@ -167,10 +167,10 @@ structure MTAST :> MTAST = struct
         in
             (TupleProj (tup', idx), ctx)
         end
-      | monomorphize ctx (TAST.ArrayLength exp) =
-        let val (exp', ctx) = monomorphize ctx exp
+      | monomorphize ctx (TAST.ArrayLength arr) =
+        let val (arr', ctx) = monomorphize ctx arr
         in
-            (ArrayLength exp', ctx)
+            (ArrayLength arr', ctx)
         end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
