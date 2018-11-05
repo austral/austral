@@ -62,7 +62,7 @@ structure MTAST :> MTAST = struct
     type type_monomorphs = MonoType.type_monomorphs
     type replacements = MonoType.replacements
 
-    datatype context = Context of type_monomorphs
+    datatype context = Context of type_monomorphs * replacements
 
     val emptyContext =
         Context (MonoType.TypeMonos Map.empty)
