@@ -107,7 +107,7 @@ structure HIR :> HIR = struct
                      | Defgeneric of name * name list * param list * ty * ast
                      | Deftype of name * name list * ty
                      | Defdisjunction of name * name list * Type.variant list
-                     | DeclareForeign of rawname * ty list * ty
+                     | DeclareForeign of name * ty list * ty
                      | ToplevelProgn of top_ast list
          and param = Param of name * ty
 
