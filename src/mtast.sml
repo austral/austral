@@ -165,16 +165,10 @@ structure MTAST :> MTAST = struct
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
-    and monomorphizeList ctx (head::tail) =
-        let val (head', ctx') = monomorphize ctx head
-        in
-            let val (rest, ctx'') = monomorphizeList ctx' tail
-            in
-                (head' :: rest, ctx'')
-            end
-        end
-      | monomorphizeList ctx nil =
-        (nil, ctx)
+    and monomorphizeList ctx exps =
+        Util.foldThread (fn (exp, ctx) => monomorphize ctx exp)
+                        ctx
+                        exps
 
     fun monomorphizeTop ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
