@@ -177,6 +177,11 @@ structure MTAST :> MTAST = struct
         in
             (ArrayPointer arr', ctx)
         end
+      | monomorphize ctx (TAST.Allocate exp) =
+        let val (exp', ctx) = monomorphize ctx exp
+        in
+            (Allocate exp', ctx)
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
