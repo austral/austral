@@ -133,6 +133,7 @@ structure Module : MODULE = struct
             ]
             and cffiExports = [
                 "&rest",
+                "defcfun",
                 "foreign-pointer",
                 "size-of",
                 "malloc",
