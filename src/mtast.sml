@@ -249,6 +249,14 @@ structure MTAST :> MTAST = struct
                 end
             end
         end
+      | monomorphize ctx (TAST.ForeignFuncall (name, args, ty)) =
+        let val (args', exp) = monomorphizeList ctx args
+        in
+            let val (ty', exp) = monoType ty ctx
+            in
+                (ForeignFuncall (name, args', ty'), ctx)
+            end
+        end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
 
