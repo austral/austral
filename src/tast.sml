@@ -543,8 +543,11 @@ structure TAST :> TAST = struct
                                     raise Fail "Not enough arguments"
                             end
 
-                    and checkArg (argument, param) =
-                        raise Fail "checkArg not implemented"
+                    and checkArg (argument, (Function.Param (_, ty))) =
+                        if (typeOf argument) <> ty then
+                            raise Fail "Foreign funcall: type mismatch"
+                        else
+                            argument
                 in
 
                     ForeignFuncall (rawname,
