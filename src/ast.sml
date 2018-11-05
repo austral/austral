@@ -45,6 +45,7 @@ structure AST :> AST = struct
                  | ForeignNull of typespec
                  | SizeOf of typespec
                  | AddressOf of Symbol.variable
+                 | Cast of typespec * ast
                  | Seq of ast * ast
                  | Funcall of Symbol.symbol * ast list
          and variant_case = VariantCase of case_name * ast
