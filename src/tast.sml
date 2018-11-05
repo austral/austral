@@ -564,14 +564,11 @@ structure TAST :> TAST = struct
                 end
             end
 
-        and augmentGenericFuncall (Function.GenericFunction (name, typarams, params, rt, _)) args c =
-            if (List.length params) = (List.length args) then
-                GenericFuncall (name,
-                                [], (* We don't need to supply type parameters for non-RTP functions *)
-                                map (fn a => augment a c) args,
-                                rt)
-            else
-                raise Fail "Funcall arity error"
+        and augmentGenericFuncall gf args c =
+            let val (Function.GenericFunction (_, _, _, rt, _)) = gf
+            in
+                augmentGenericFuncallCommon gf args c rt
+            end
 
         and augmentRTPGenericFuncall gf args c the_context =
             (case the_context of
