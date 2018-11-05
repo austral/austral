@@ -41,7 +41,7 @@ signature TAST = sig
                  | The of ty * ast
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
-                 | ForeignFuncall of string * ty * ast list
+                 | ForeignFuncall of string *  ast list * ty
                  | ForeignNull of ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
