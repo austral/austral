@@ -78,7 +78,7 @@ structure MTAST :> MTAST = struct
         OrderedSet.exists fm (name, tyargs)
 
     fun addMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
-        OrderedSet.add fm (name, tyargs)
+        FuncMonos (OrderedSet.add fm (name, tyargs))
 
     (* Monomorphization utilities *)
 
