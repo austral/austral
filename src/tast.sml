@@ -489,6 +489,7 @@ structure TAST :> TAST = struct
 
         and augmentForeignFuncall ff args c =
             let val tenv = ctxTenv c
+                and (Function.ForeignFunction (_, rawname, params, arity, rt, _)) = ff
             in
                 let fun augmentArg value =
                         let val value' = augment value c
@@ -507,7 +508,7 @@ structure TAST :> TAST = struct
                       | validType (Type.StaticArray _) = true
                       | validType _ = false
                 in
-                    ForeignFuncall (name,
+                    ForeignFuncall (rawname,
                                     resolve tenv (ctxTyParams c) typespec,
                                     map augmentArg args)
                 end
