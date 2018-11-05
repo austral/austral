@@ -77,4 +77,15 @@ structure Util :> UTIL = struct
                                   NONE))
         else
             NONE
+
+    fun foldThread f (head::tail) ctx =
+        let val (head', ctx') = f head ctx
+        in
+            let val (rest, ctx'') = foldThread f tail ctx'
+            in
+                (head' :: rest, ctx'')
+            end
+        end
+      | foldThread f nil ctx =
+        (nil, ctx)
 end
