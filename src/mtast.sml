@@ -158,12 +158,23 @@ structure MTAST :> MTAST = struct
             end
         end
       | monomorphize ctx (TAST.TupleCreate exps) =
-        let val (exps', ctx) = monomorphizeList exps
+        let val (exps', ctx) = monomorphizeList ctx exps
         in
             (TupleCreate exps', ctx)
         end
       | monomorphize _ _ =
         raise Fail "Not implemented yet"
+
+    and monomorphizeList ctx (head::tail) =
+        let val (head', ctx') = monomorphize ctx head
+        in
+            let val (rest, ctx'') = monomorphizeList ctx' tail
+            in
+                (head' :: rest, ctx'')
+            end
+        end
+      | monomorphizeList ctx nil =
+        (nil, ctx)
 
     fun monomorphizeTop ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
