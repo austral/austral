@@ -29,4 +29,5 @@ signature ORDERED_MAP = sig
     val iadd : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map
 
     val keys : (''k, 'v) map -> ''k OrderedSet.set
+    val keyPosition : (''k, 'v) map -> ''k -> int option
 end
