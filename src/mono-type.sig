@@ -39,8 +39,8 @@ signature MONO_TYPE = sig
 
     val emptyMonomorphs : type_monomorphs
 
-    val getMonomorph : type_monomorphs -> name -> ty list -> ty option
-    val addMonomorph : type_monomorphs -> name -> ty list -> ty -> type_monomorphs
+    val getMonomorph : type_monomorphs -> name -> ty list -> (ty * int) option
+    val addMonomorph : type_monomorphs -> name -> ty list -> ty -> int -> type_monomorphs
 
     (* Return a list of all the monomorphs that are in the second argument but
        not in the first *)

@@ -33,37 +33,44 @@ structure MonoType :> MONO_TYPE = struct
                 | Disjunction of name * int * variant list
          and variant = Variant of name * ty option
 
+    (* Fresh monomorph ids *)
+
+    val id = ref 0
+
+    fun freshId () =
+        let
+        in
+            id := !id + 1;
+            !id
+        end
+
     (* Type monomorphization *)
 
-    datatype type_monomorphs = TypeMonos of ((name * ty list), ty) OrderedMap.map
+    datatype type_monomorphs = TypeMonos of ((name * ty list), (ty * int)) Map.map
 
     type monomorph = name * ty list * ty
 
     val emptyMonomorphs =
-        TypeMonos OrderedMap.empty
+        TypeMonos Map.empty
 
     fun getMonomorph (TypeMonos tm) name tyargs =
-        OrderedMap.get tm (name, tyargs)
+        Map.get tm (name, tyargs)
 
-    fun monomorphIndex (TypeMonos tm) name tyargs =
-        OrderedSet.positionOf (OrderedMap.keys tm)
-                              (name, tyargs)
-
-    fun addMonomorph (TypeMonos tm) name tyargs ty =
-        TypeMonos (OrderedMap.iadd tm ((name, tyargs), ty))
+    fun addMonomorph (TypeMonos tm) name tyargs ty id =
+        TypeMonos (Map.iadd tm ((name, tyargs), (ty, id)))
 
     fun newMonomorphs (TypeMonos old) (TypeMonos new) =
-        let val oldKeys = OrderedMap.keys old
-            and newKeys = OrderedMap.keys new
+        let val oldKeys = Map.keys old
+            and newKeys = Map.keys new
         in
-            let val newKeys' = OrderedSet.difference newKeys oldKeys
+            let val newKeys' = Set.minus newKeys oldKeys
             in
-                map (fn k => let val ty = Option.valOf (OrderedMap.get new k)
+                map (fn k => let val ty = Option.valOf (Map.get new k)
                                  and (name, args) = k
                              in
                                  (name, args, ty)
                              end)
-                    (OrderedSet.toList newKeys')
+                    (Set.toList newKeys')
             end
         end
 
@@ -108,15 +115,18 @@ structure MonoType :> MONO_TYPE = struct
                    monomorphs, add it *)
                 let val (variants', tm'') = monomorphizeVariants tm' rs variants
                 in
-                    case monomorphIndex tm'' name tyargs' of
-                        SOME idx => let val disj = Disjunction (name, idx, variants')
+                    case getMonomorph tm'' name tyargs' of
+                        (SOME (ty, id)) => (ty, tm'')
+                      | NONE => let val id = freshId ()
+                                in
+                                    let val disj = Disjunction (name, id, variants')
                                     in
-                                        let val tm''' = addMonomorph tm'' name tyargs' disj
+                                        let val tm''' = addMonomorph tm'' name tyargs' disj id
                                         in
                                             (disj, tm''')
                                         end
                                     end
-                      | NONE => raise Fail "Internal compiler error: name+tyargs not in table of monomorphs"
+                                end
                 end
         end
       | monomorphize tm rs (Type.TypeVariable name) =
