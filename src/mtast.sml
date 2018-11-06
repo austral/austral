@@ -82,7 +82,7 @@ structure MTAST :> MTAST = struct
     fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs =
         Context (tm, rs, FuncMonos (OrderedSet.add fm (name, tyargs)))
 
-    fun monomorphIndex (Context (FuncMonos tm, _, _)) name tyargs =
+    fun monomorphIndex (Context (_, _, FuncMonos tm)) name tyargs =
         OrderedSet.positionOf tm (name, tyargs)
 
     (* Diffing contexts *)
@@ -331,20 +331,28 @@ structure MTAST :> MTAST = struct
             in
                 let val (ty', ctx) = monoType ctx ty
                 in
-                    let val gfcall = GenericFuncall (name, tyargs', args', ty')
-                    in
-                        (* Check the table of function monomorphs. If this
-                           name+type arg list combination doesn't exist yet, add
-                           it *)
-                        if hasMonomorph ctx name tyargs' then
-                            let val pos = monomorphIndex ctx
-                            (gfcall, ctx)
-                        else
-                            let val ctx = addMonomorph ctx name tyargs'
+                    (* Check the table of function monomorphs. If this
+                       name+type arg list combination doesn't exist yet, add
+                       it *)
+                    if hasMonomorph ctx name tyargs' then
+                        let val pos = monomorphIndex ctx name tyargs'
+                        in
+                            let val gfcall = GenericFuncall (name, pos, tyargs', args', ty')
                             in
                                 (gfcall, ctx)
                             end
-                    end
+                        end
+                    else
+                        let val ctx = addMonomorph ctx name tyargs'
+                        in
+                            let val pos = monomorphIndex ctx name tyargs'
+                            in
+                                let val gfcall = GenericFuncall (name, pos, tyargs', args', ty')
+                                in
+                                    (gfcall, ctx)
+                                end
+                            end
+                        end
                 end
             end
         end
