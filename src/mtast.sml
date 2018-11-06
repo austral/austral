@@ -335,7 +335,7 @@ structure MTAST :> MTAST = struct
                        name+type arg list combination doesn't exist yet, add
                        it *)
                     if hasMonomorph ctx name tyargs' then
-                        let val pos = monomorphIndex ctx name tyargs'
+                        let val pos = Option.valOf monomorphIndex ctx name tyargs'
                         in
                             let val gfcall = GenericFuncall (name, pos, tyargs', args', ty')
                             in
