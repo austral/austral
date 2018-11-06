@@ -30,7 +30,7 @@ structure MonoType :> MONO_TYPE = struct
                 | Pointer of ty
                 | ForeignPointer of ty
                 | StaticArray of ty
-                | Disjunction of name * variant list
+                | Disjunction of name * int * variant list
          and variant = Variant of name * ty option
 
     (* Type monomorphization *)
@@ -44,6 +44,10 @@ structure MonoType :> MONO_TYPE = struct
 
     fun getMonomorph (TypeMonos tm) name tyargs =
         OrderedMap.get tm (name, tyargs)
+
+    fun monomorphIndex (TypeMonos tm) name tyargs =
+        OrderedSet.positionOf (OrderedMap.keys tm)
+                              (name, tyargs)
 
     fun addMonomorph (TypeMonos tm) name tyargs ty =
         TypeMonos (OrderedMap.iadd tm ((name, tyargs), ty))
@@ -104,13 +108,15 @@ structure MonoType :> MONO_TYPE = struct
                    monomorphs, add it *)
                 let val (variants', tm'') = monomorphizeVariants tm' rs variants
                 in
-                    let val disj = Disjunction (name, variants')
-                    in
-                        let val tm''' = addMonomorph tm'' name tyargs' disj
-                        in
-                            (disj, tm''')
-                        end
-                    end
+                    case monomorphIndex tm'' name tyargs' of
+                        SOME idx => let val disj = Disjunction (name, idx, variants')
+                                    in
+                                        let val tm''' = addMonomorph tm'' name tyargs' disj
+                                        in
+                                            (disj, tm''')
+                                        end
+                                    end
+                      | NONE => raise Fail "Internal compiler error: name+tyargs not in table of monomorphs"
                 end
         end
       | monomorphize tm rs (Type.TypeVariable name) =
