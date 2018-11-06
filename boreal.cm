@@ -71,6 +71,9 @@ is
   src/tast.sig
   src/tast.sml
 
+  src/fdefs.sig
+  src/fdefs.sml
+
   src/mtast.sig
   src/mtast.sml
 
