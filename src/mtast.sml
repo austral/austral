@@ -88,6 +88,9 @@ structure MTAST :> MTAST = struct
                  FuncMonos Map.empty,
                  fdefenv)
 
+    fun ctxFdefs (Context (_, _, _, env)) =
+        env
+
     fun getMonomorph (Context (_, _, FuncMonos fm, _)) name tyargs =
         Map.get fm (name, tyargs)
 
@@ -432,6 +435,7 @@ structure MTAST :> MTAST = struct
                but are not present in the ctx. *)
             let val newFuncs = newFuncMonomorphs ctx ctx'
                 and newTypes = newTypeMonomorphs ctx ctx'
+                and fdefenv = ctxFdefs ctx
             in
                 let val defuns = map (fn (name, args, id) =>
                                        DefunMonomorph (name, args, id))
