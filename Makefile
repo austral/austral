@@ -64,5 +64,6 @@ clean:
 	if [ -f $(TEST_BIN) ]; then rm $(TEST_BIN); fi
 	if [ -f $(CPP_RUNTIME_ML) ]; then rm $(CPP_RUNTIME_ML); fi
 	if [ -f $(DOCS_HTML) ]; then rm $(DOCS_HTML); fi
+	if [ -f $(DOCS_ARCH_PNG) ]; then rm $(DOCS_ARCH_PNG); fi
 	rm test/valid/*.cpp
 	rm test/valid/*.bin
