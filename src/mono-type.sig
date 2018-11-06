@@ -40,6 +40,8 @@ signature MONO_TYPE = sig
 
     type type_monomorphs
 
+    type monomorph = name * ty list * ty
+
     val emptyMonomorphs : type_monomorphs
 
     val getMonomorph : type_monomorphs -> name -> ty list -> ty option
