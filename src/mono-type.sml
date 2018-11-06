@@ -40,6 +40,8 @@ structure MonoType :> MONO_TYPE = struct
 
     datatype type_monomorphs = TypeMonos of ((name * ty list), ty) OrderedMap.map
 
+    type monomorph = name * ty list * ty
+
     val emptyMonomorphs =
         TypeMonos OrderedMap.empty
 
