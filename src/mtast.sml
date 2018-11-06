@@ -96,7 +96,7 @@ structure MTAST :> MTAST = struct
 
     (* Diffing contexts *)
 
-    fun newFuncMonomorphs (Context (_, _, FuncMonos old)) (Context (_, _, FuncMonos new)) =
+    fun newFuncMonomorphs (Context (_, _, FuncMonos old, _)) (Context (_, _, FuncMonos new, _)) =
         let val oldKeys = Map.keys old
             and newKeys = Map.keys new
         in
