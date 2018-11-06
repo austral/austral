@@ -68,7 +68,7 @@ signature MTAST = sig
 
     val emptyContext : context
 
-    val getMonomorph : context -> name -> ty list -> bool
+    val getMonomorph : context -> name -> ty list -> int option
     val addMonomorph : context -> name -> ty list -> int -> context
     val newFuncMonomorphs : context -> context -> (name * ty list * int) list
     val newTypeMonomorphs : context -> context -> (name * ty list * ty * int) list
