@@ -23,6 +23,11 @@ DOCS_DIR := docs
 DOCS_SRC := $(DOCS_DIR)/internals.md
 DOCS_HTML := $(DOCS_DIR)/internals.html
 
+DOCS_ARCH_SRC := $(DOCS_DIR)/architecture.mmd
+DOCS_ARCH_PNG := $(DOCS_DIR)/architecture.png
+MERMAID := ./node_modules/.bin/mmdc
+MERMAID_P_CONFIG := $(DOCS_DIR)/puppeteer-config.json
+
 all: compile
 
 $(CPP_RUNTIME_ML): $(CPP_RUNTIME_SRC) $(CPP_RUNTIME_SCRIPT)
@@ -48,7 +53,10 @@ mlton-test: $(TEST_BIN)
 .PHONY: docs
 docs: $(DOCS_HTML)
 
-$(DOCS_HTML): $(DOCS_SRC)
+$(DOCS_ARCH_PNG): $(DOCS_ARCH_SRC)
+	$(MERMAID) -i $(DOCS_ARCH_SRC) -o $(DOCS_ARCH_PNG) -t neutral -p $(MERMAID_P_CONFIG)
+
+$(DOCS_HTML): $(DOCS_SRC) $(DOCS_ARCH_PNG)
 	pandoc $(DOCS_SRC) -f markdown+smart -t html -s -o $(DOCS_HTML)
 
 clean:
