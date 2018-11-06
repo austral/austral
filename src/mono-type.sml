@@ -24,16 +24,13 @@ structure MonoType :> MONO_TYPE = struct
 
     datatype ty = Unit
                 | Bool
-                | Integer of signedness * width
-                | Float of float_type
+                | Integer of Type.signedness * Type.width
+                | Float of Type.float_type
                 | Tuple of ty list
                 | Pointer of ty
                 | ForeignPointer of ty
                 | StaticArray of ty
                 | Disjunction of name * variant list
-         and signedness = Unsigned | Signed
-         and width = Int8 | Int16 | Int32 | Int64
-         and float_type = Single | Double
          and variant = Variant of name * ty option
 
     (* Type monomorphization *)
@@ -73,9 +70,9 @@ structure MonoType :> MONO_TYPE = struct
       | monomorphize tm _ Type.Bool =
         (Bool, tm)
       | monomorphize tm _ (Type.Integer (s, w)) =
-        (Integer (mapSignedness s, mapWidth w), tm)
+        (Integer (s, w), tm)
       | monomorphize tm _ (Type.Float f) =
-        (Float (mapFloat f), tm)
+        (Float f, tm)
       | monomorphize tm rs (Type.Tuple tys) =
         let val (tys', tm') = monomorphizeList tm rs tys
         in
@@ -122,17 +119,6 @@ structure MonoType :> MONO_TYPE = struct
            | NONE => raise Fail ("Error during monomorphization: no replacement for the type variable '"
                                  ^ (Symbol.toString name)
                                  ^ "' found"))
-
-    and mapSignedness Type.Unsigned = Unsigned
-      | mapSignedness Type.Signed = Signed
-
-    and mapWidth Type.Int8 = Int8
-      | mapWidth Type.Int16 = Int16
-      | mapWidth Type.Int32 = Int32
-      | mapWidth Type.Int64 = Int64
-
-    and mapFloat Type.Single = Single
-      | mapFloat Type.Double = Double
 
     and monomorphizeList tm rs (head::tail) =
         let val (mono, tm') = monomorphize tm rs head

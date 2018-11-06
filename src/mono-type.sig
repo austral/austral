@@ -24,16 +24,13 @@ signature MONO_TYPE = sig
 
     datatype ty = Unit
                 | Bool
-                | Integer of signedness * width
-                | Float of float_type
+                | Integer of Type.signedness * Type.width
+                | Float of Type.float_type
                 | Tuple of ty list
                 | Pointer of ty
                 | ForeignPointer of ty
                 | StaticArray of ty
                 | Disjunction of name * variant list
-         and signedness = Unsigned | Signed
-         and width = Int8 | Int16 | Int32 | Int64
-         and float_type = Single | Double
          and variant = Variant of name * ty option
 
     (* Type monomorphization *)
