@@ -379,11 +379,16 @@ structure MTAST :> MTAST = struct
         let fun mapParam (TAST.Param (var, ty)) =
                 Param (var, forciblyMonomorphize ctx ty)
         in
-            raise Fail "Not implemented"
-            (* Defun (name,
-                      map mapParam params,
-                      concreteMonoType rt,
-                      monomorphize ctx body) *)
+            let val (body', ctx) = monomorphize ctx body
+            in
+                let val node = Defun (name,
+                                      map mapParam params,
+                                      forciblyMonomorphize ctx rt,
+                                      body')
+                in
+                    (node, ctx)
+                end
+            end
         end
 
     and monomorphizeTop ctx node =
