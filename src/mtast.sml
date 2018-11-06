@@ -114,7 +114,7 @@ structure MTAST :> MTAST = struct
             end
         end
 
-    fun newTypeMonomorphs (Context (old, _, _, _)) (Context (new, _, _, _)) =
+    fun newTypeMonomorphs (Context (old, _, _)) (Context (new, _, _)) =
         MonoType.newMonomorphs old new
 
     (* Monomorphization utilities *)
