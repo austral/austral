@@ -82,6 +82,9 @@ structure MTAST :> MTAST = struct
     fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs =
         Context (tm, rs, FuncMonos (OrderedSet.add fm (name, tyargs)))
 
+    fun monomorphIndex (FuncMonos tm) name tyargs =
+        OrderedSet.positionOf tm (name, tyargs)
+
     (* Diffing contexts *)
 
     fun newFuncMonomorphs (Context (_, _, FuncMonos old)) (Context (_, _, FuncMonos new)) =
