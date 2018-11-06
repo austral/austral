@@ -62,6 +62,17 @@ structure MTAST :> MTAST = struct
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
 
+    (* Fresh monomorph ids *)
+
+    val id = ref 0
+
+    fun freshId () =
+        let
+        in
+            id := !id + 1;
+            !id
+        end
+
     (* Monomorphization *)
 
     type type_monomorphs = MonoType.type_monomorphs
