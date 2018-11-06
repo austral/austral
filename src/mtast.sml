@@ -82,7 +82,7 @@ structure MTAST :> MTAST = struct
 
     (* Diffing contexts *)
 
-    fun newFuncMonomorphs old new =
+    fun newFuncMonomorphs (Context (_, _, FuncMonos old)) (Context (_, _, FuncMonos new)) =
         raise Fail "Not implemented"
 
     (* Monomorphization utilities *)
