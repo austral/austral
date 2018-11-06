@@ -88,7 +88,8 @@ structure MTAST :> MTAST = struct
     (* Diffing contexts *)
 
     fun newFuncMonomorphs (Context (_, _, FuncMonos old)) (Context (_, _, FuncMonos new)) =
-        OrderedSet.toList (OrderedSet.difference new old)
+        map (fn ((n, t), id) => (n, t, id))
+            (Map.toList (OrderedSet.difference new old))
 
     fun newTypeMonomorphs (Context (old, _, _)) (Context (new, _, _)) =
         MonoType.newMonomorphs old new
