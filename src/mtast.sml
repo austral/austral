@@ -80,7 +80,7 @@ structure MTAST :> MTAST = struct
         Option.isSome (Map.get fm (name, tyargs))
 
     fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs =
-        Context (tm, rs, FuncMonos (OrderedSet.add fm (name, tyargs)))
+        Context (tm, rs, FuncMonos (Map.iadd fm (name, tyargs)))
 
     fun monomorphIndex (Context (_, _, FuncMonos tm)) name tyargs =
         OrderedSet.positionOf tm (name, tyargs)
