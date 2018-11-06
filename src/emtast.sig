@@ -22,8 +22,10 @@ signature EMTAST = sig
     type ty = MonoType.ty
     type ast = MTAST.ast
 
+    (* Block AST *)
+
     datatype top_ast = Defun of name * param list * ty * ast
-                     | DefunMonomorph of name * ty list * int
+                     | DefunMonomorph of name * param list * ty * ast * int
                      | DeftypeMonomorph of name * ty list * ty * int
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
