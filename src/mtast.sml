@@ -91,8 +91,8 @@ structure MTAST :> MTAST = struct
     fun getMonomorph (Context (_, _, FuncMonos fm, _)) name tyargs =
         Map.get fm (name, tyargs)
 
-    fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs id =
-        Context (tm, rs, FuncMonos (Map.iadd fm ((name, tyargs), id)))
+    fun addMonomorph (Context (tm, rs, FuncMonos fm, env)) name tyargs id =
+        Context (tm, rs, FuncMonos (Map.iadd fm ((name, tyargs), id)), env)
 
     (* Diffing contexts *)
 
