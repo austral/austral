@@ -377,8 +377,8 @@ structure MTAST :> MTAST = struct
         end
 
     and monomorphizeTop ctx node =
-        let val (node, ctx) = monomorphizeTop' ctx node
+        let val (node, ctx') = monomorphizeTop' ctx node
         in
-            (node, ctx)
+            (node, ctx')
         end
 end
