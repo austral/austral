@@ -21,4 +21,12 @@ structure FDefs :> FDEFS = struct
     type name = Symbol.symbol
 
     type fdefenv = (name, TAST.ast) Map.map
+
+    val emptyEnv = Map.empty
+
+    fun getDefinition env name =
+        Map.get env name
+
+    fun addDefinition env name body =
+        Map.iadd env (name, body)
 end
