@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature FDEFS = sig
+structure FDefs :> FDEFS = struct
     type name = Symbol.symbol
 
     type fdefenv = (name, TAST.ast) Map.map
