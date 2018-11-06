@@ -342,27 +342,27 @@ structure MTAST :> MTAST = struct
                         exps
                         ctx
 
-    fun monomorphizeTop ctx (TAST.Defun (name, params, rt, _, body)) =
+    fun monomorphizeTop' ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
-      | monomorphizeTop ctx (TAST.Defgeneric _) =
+      | monomorphizeTop' ctx (TAST.Defgeneric _) =
         (ToplevelProgn [], ctx)
-      | monomorphizeTop ctx (TAST.Defclass _) =
+      | monomorphizeTop' ctx (TAST.Defclass _) =
         (ToplevelProgn [], ctx)
-      | monomorphizeTop _ (TAST.Definstance (name, arg, docstring, methods)) =
+      | monomorphizeTop' _ (TAST.Definstance (name, arg, docstring, methods)) =
         raise Fail "Not implemented yet"
-      | monomorphizeTop _ (TAST.Deftype (name, params, _, ty)) =
+      | monomorphizeTop' _ (TAST.Deftype (name, params, _, ty)) =
         raise Fail "Not implemented yet"
-      | monomorphizeTop _ (TAST.Defdisjunction (name, params, _, variants)) =
+      | monomorphizeTop' _ (TAST.Defdisjunction (name, params, _, variants)) =
         raise Fail "Not implemented yet"
-      | monomorphizeTop ctx (TAST.Deftemplate _) =
+      | monomorphizeTop' ctx (TAST.Deftemplate _) =
         (ToplevelProgn [], ctx)
-      | monomorphizeTop ctx (TAST.DefineSymbolMacro _) =
+      | monomorphizeTop' ctx (TAST.DefineSymbolMacro _) =
         (ToplevelProgn [], ctx)
-      | monomorphizeTop ctx (TAST.Defmodule _) =
+      | monomorphizeTop' ctx (TAST.Defmodule _) =
         (ToplevelProgn [], ctx)
-      | monomorphizeTop ctx (TAST.InModule _) =
+      | monomorphizeTop' ctx (TAST.InModule _) =
         (ToplevelProgn [], ctx)
-      | monomorphizeTop ctx (TAST.Defcfun _) =
+      | monomorphizeTop' ctx (TAST.Defcfun _) =
         (ToplevelProgn [], ctx)
 
     and monomorphizeDefun ctx name params rt body =
@@ -375,4 +375,7 @@ structure MTAST :> MTAST = struct
                       concreteMonoType rt,
                       monomorphize ctx body) *)
         end
+
+    and monomorphizeTop ctx node =
+        monomorphizeTop' ctx node
 end
