@@ -47,6 +47,10 @@ signature MONO_TYPE = sig
     val getMonomorph : type_monomorphs -> name -> ty list -> ty option
     val addMonomorph : type_monomorphs -> monomorph -> type_monomorphs
 
+    (* Return a list of all the monomorphs that are in the second argument but
+       not in the first *)
+    val newMonomorphs : type_monomorphs -> type_monomorphs -> monomorph list
+
     type replacements = (name, ty) Map.map
 
     val monomorphize : type_monomorphs -> replacements -> Type.ty -> (ty * type_monomorphs)
