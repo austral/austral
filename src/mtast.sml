@@ -439,7 +439,8 @@ structure MTAST :> MTAST = struct
                                            DeftypeMonomorph (name, args, ty, id))
                                        newTypes
                 in
-                    (node, ctx')
+                    (ToplevelProgn (defuns @ deftypes @ [node]),
+                     ctx')
                 end
             end
         end
