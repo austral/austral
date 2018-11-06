@@ -57,8 +57,8 @@ structure MTAST :> MTAST = struct
     (* Block AST *)
 
     datatype top_ast = Defun of name * param list * ty * ast
-                     | DefunMonomorph of name * ty list
-                     | DeftypeMonomorph of name * ty list * ty
+                     | DefunMonomorph of name * int * ty list
+                     | DeftypeMonomorph of name * int * ty list * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
 
