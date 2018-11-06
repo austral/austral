@@ -21,4 +21,10 @@ signature FDEFS = sig
     type name = Symbol.symbol
 
     type fdefenv
+
+    val emptyEnv : fdefenv
+
+    val getDefinition : fdefenv -> name -> TAST.ast option
+
+    val addDefinition : fdefenv -> name -> TAST.ast -> fdefenv
 end
