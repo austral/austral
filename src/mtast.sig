@@ -68,6 +68,7 @@ signature MTAST = sig
 
     val hasMonomorph : context -> name -> ty list -> bool
     val addMonomorph : context -> name -> ty list -> context
+    val newFuncMonomorphs : context -> context -> (name * ty list) list
 
     val monomorphize : context -> TAST.ast -> (ast * context)
     val monomorphizeList : context -> TAST.ast list -> (ast list * context)

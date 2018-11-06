@@ -80,6 +80,10 @@ structure MTAST :> MTAST = struct
     fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs =
         Context (tm, rs, FuncMonos (OrderedSet.add fm (name, tyargs)))
 
+    (* Diffing contexts *)
+
+
+
     (* Monomorphization utilities *)
 
     fun monoType ctx ty =
