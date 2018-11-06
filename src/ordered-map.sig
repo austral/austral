@@ -27,4 +27,6 @@ signature ORDERED_MAP = sig
    (* Add a key-value pair to the map if it is not already present, otherwise,
       return the map as-is *)
     val iadd : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map
+
+    val keys : (''k, 'v) map -> ''k OrderedSet.set
 end
