@@ -1,5 +1,6 @@
 TODO:
 
+- Store generic function definitions
 - EMTAST (expanded, monomorphic, typed)
 - MTAST to EMTAST (expand monomorphs)
 - Augment method calls
