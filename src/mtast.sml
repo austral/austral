@@ -79,8 +79,8 @@ structure MTAST :> MTAST = struct
     fun getMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
         Map.get fm (name, tyargs)
 
-    fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs =
-        Context (tm, rs, FuncMonos (Map.iadd fm (name, tyargs)))
+    fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs id =
+        Context (tm, rs, FuncMonos (Map.iadd fm ((name, tyargs), id)))
 
     (* Diffing contexts *)
 
@@ -344,25 +344,21 @@ structure MTAST :> MTAST = struct
                     (* Check the table of function monomorphs. If this
                        name+type arg list combination doesn't exist yet, add
                        it *)
-                    if hasMonomorph ctx name tyargs' then
-                        let val pos = Option.valOf (monomorphIndex ctx name tyargs')
-                        in
-                            let val gfcall = GenericFuncall (name, pos, tyargs', args', ty')
-                            in
-                                (gfcall, ctx)
-                            end
-                        end
-                    else
-                        let val ctx = addMonomorph ctx name tyargs'
-                        in
-                            let val pos = Option.valOf (monomorphIndex ctx name tyargs')
-                            in
-                                let val gfcall = GenericFuncall (name, pos, tyargs', args', ty')
+                    case getMonomorph ctx name tyargs' of
+                        SOME id => let val gfcall = GenericFuncall (name, id, tyargs', args', ty')
+                                   in
+                                       (gfcall, ctx)
+                                   end
+                      | NONE => let val ctx = addMonomorph ctx name tyargs'
                                 in
-                                    (gfcall, ctx)
+                                    let val pos = Option.valOf (monomorphIndex ctx name tyargs')
+                                    in
+                                        let val gfcall = GenericFuncall (name, pos, tyargs', args', ty')
+                                        in
+                                            (gfcall, ctx)
+                                        end
+                                    end
                                 end
-                            end
-                        end
                 end
             end
         end
