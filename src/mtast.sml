@@ -76,8 +76,8 @@ structure MTAST :> MTAST = struct
                  Map.empty,
                  FuncMonos Map.empty)
 
-    fun hasMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
-        Option.isSome (Map.get fm (name, tyargs))
+    fun getMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
+        Map.get fm (name, tyargs)
 
     fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs =
         Context (tm, rs, FuncMonos (Map.iadd fm (name, tyargs)))
