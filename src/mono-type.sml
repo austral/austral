@@ -51,8 +51,20 @@ structure MonoType :> MONO_TYPE = struct
     fun addMonomorph (TypeMonos tm) (name, tyargs, ty) =
         TypeMonos (OrderedMap.iadd tm ((name, tyargs), ty))
 
-    fun newMonomorphs old new =
-        raise Fail "not implemented"
+    fun newMonomorphs (TypeMonos old) (TypeMonos new) =
+        let val oldKeys = OrderedMap.keys old
+            and newKeys = OrderedMap.keys new
+        in
+            let val newKeys' = OrderedSet.difference newKeys oldKeys
+            in
+                map (fn k => let val ty = Option.valOf (OrderedMap.get new k)
+                                 and (name, args) = k
+                             in
+                                 (name, args, ty)
+                             end)
+                    (OrderedSet.toList newKeys')
+            end
+        end
 
     type replacements = (name, ty) Map.map
 
