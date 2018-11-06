@@ -80,12 +80,13 @@ structure MTAST :> MTAST = struct
 
     datatype fn_monomorphs = FuncMonos of ((name * ty list), int) Map.map
 
-    datatype context = Context of type_monomorphs * replacements * fn_monomorphs
+    datatype context = Context of type_monomorphs * replacements * fn_monomorphs * FDefs.fdefenv
 
-    val emptyContext =
+    fun makeContext fdefenv =
         Context (MonoType.emptyMonomorphs,
                  Map.empty,
-                 FuncMonos Map.empty)
+                 FuncMonos Map.empty,
+                 fdefenv)
 
     fun getMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
         Map.get fm (name, tyargs)
