@@ -94,7 +94,7 @@ structure MTAST :> MTAST = struct
                         let val id = Option.valOf (Map.get new k)
                             and (name, args) = k
                         in
-                            (name, tys, id)
+                            (name, args, id)
                         end)
                     (Set.toList newKeys')
             end
