@@ -65,10 +65,10 @@ structure MonoType :> MONO_TYPE = struct
         in
             let val newKeys' = Set.minus newKeys oldKeys
             in
-                map (fn k => let val ty = Option.valOf (Map.get new k)
+                map (fn k => let val (ty, id) = Option.valOf (Map.get new k)
                                  and (name, args) = k
                              in
-                                 (name, args, ty)
+                                 (name, args, ty, id)
                              end)
                     (Set.toList newKeys')
             end
@@ -109,14 +109,14 @@ structure MonoType :> MONO_TYPE = struct
         in
             (* Check the table of type monomorphs for this name and type arguments *)
             case getMonomorph tm name tyargs' of
-                SOME ty => (ty, tm)
+                SOME (ty, _) => (ty, tm)
               | NONE =>
                 (* If this pair of name+type args is not present in the table of
                    monomorphs, add it *)
                 let val (variants', tm'') = monomorphizeVariants tm' rs variants
                 in
                     case getMonomorph tm'' name tyargs' of
-                        (SOME (ty, id)) => (ty, tm'')
+                        (SOME (ty, _)) => (ty, tm'')
                       | NONE => let val id = freshId ()
                                 in
                                     let val disj = Disjunction (name, id, variants')

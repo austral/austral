@@ -44,7 +44,7 @@ signature MONO_TYPE = sig
 
     (* Return a list of all the monomorphs that are in the second argument but
        not in the first *)
-    val newMonomorphs : type_monomorphs -> type_monomorphs -> (name * ty list * ty) list
+    val newMonomorphs : type_monomorphs -> type_monomorphs -> (name * ty list * ty * int) list
 
     type replacements = (name, ty) Map.map
 
