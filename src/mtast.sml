@@ -67,17 +67,17 @@ structure MTAST :> MTAST = struct
     type type_monomorphs = MonoType.type_monomorphs
     type replacements = MonoType.replacements
 
-    datatype fn_monomorphs = FuncMonos of (name * ty list) OrderedSet.set
+    datatype fn_monomorphs = FuncMonos of ((name * ty list), int) Map.map
 
     datatype context = Context of type_monomorphs * replacements * fn_monomorphs
 
     val emptyContext =
         Context (MonoType.emptyMonomorphs,
                  Map.empty,
-                 FuncMonos OrderedSet.empty)
+                 FuncMonos Map.empty)
 
     fun hasMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
-        OrderedSet.exists fm (name, tyargs)
+        Option.isSome (Map.get fm (name, tyargs))
 
     fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs =
         Context (tm, rs, FuncMonos (OrderedSet.add fm (name, tyargs)))
