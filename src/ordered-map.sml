@@ -43,4 +43,7 @@ structure OrderedMap :> ORDERED_MAP = struct
         case add m (k, v) of
             SOME m' => m'
           | NONE => m
+
+    fun keys (Map l) =
+        OrderedSet.fromList (map (fn (k, _) => k) l)
 end
