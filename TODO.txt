@@ -151,3 +151,4 @@ DONE:
 - Diff contexts for monomorphizations
 - Add ID to function monomorphs
 - Hoist new monomorphs
+- Function definition environment
