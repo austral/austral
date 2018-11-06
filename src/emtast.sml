@@ -1,0 +1,30 @@
+(*
+    Copyright 2018 Fernando Borretti <fernando@borretti.me>
+
+    This file is part of Boreal.
+
+    Boreal is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Boreal is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
+*)
+
+structure EMTAST :> EMTAST = struct
+    type name = Symbol.symbol
+    type ty = MonoType.ty
+    type ast = MTAST.ast
+
+    datatype top_ast = Defun of name * param list * ty * ast
+                     | DefunMonomorph of name * ty list * int
+                     | DeftypeMonomorph of name * ty list * ty * int
+                     | ToplevelProgn of top_ast list
+         and param = Param of Symbol.variable * ty
+end
