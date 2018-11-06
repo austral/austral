@@ -134,7 +134,7 @@ structure MTAST :> MTAST = struct
     fun forciblyMonomorphize ctx ty =
         (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
            defun or some other provably-concrete context *)
-        let val (Context (tm, rs, _)) = ctx
+        let val (Context (tm, rs, _, _)) = ctx
         in
             let val (ty', _) = MonoType.monomorphize tm
                                                      rs
