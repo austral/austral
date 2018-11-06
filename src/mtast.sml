@@ -420,7 +420,7 @@ structure MTAST :> MTAST = struct
             end
         end
 
-    and monomorphizeTop ctx node =
+    and monomorphizeTop fenv fdefenv ctx node =
         let val (node, ctx') = monomorphizeTop' ctx node
         in
             (* When we monomorphize a toplevel node, we have two contents: the
@@ -431,10 +431,9 @@ structure MTAST :> MTAST = struct
                but are not present in the ctx. *)
             let val newFuncs = newFuncMonomorphs ctx ctx'
                 and newTypes = newTypeMonomorphs ctx ctx'
-                and fdefenv = ctxFdefs ctx
             in
                 let val defuns = map (fn (name, args, id) =>
-                                         expandDefgeneric fdefenv name args id)
+                                         expandDefgeneric fenv fdefenv name args id)
                                      newFuncs
                     and deftypes = map (fn (name, _, ty, id) =>
                                            expandDeftype name ty id)
