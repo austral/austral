@@ -349,11 +349,11 @@ structure MTAST :> MTAST = struct
                                    in
                                        (gfcall, ctx)
                                    end
-                      | NONE => let val ctx = addMonomorph ctx name tyargs'
+                      | NONE => let val id = freshId ()
                                 in
-                                    let val pos = Option.valOf (monomorphIndex ctx name tyargs')
+                                    let val ctx = addMonomorph ctx name tyargs' id
                                     in
-                                        let val gfcall = GenericFuncall (name, pos, tyargs', args', ty')
+                                        let val gfcall = GenericFuncall (name, id, tyargs', args', ty')
                                         in
                                             (gfcall, ctx)
                                         end
