@@ -48,7 +48,7 @@ structure MonoType :> MONO_TYPE = struct
     fun getMonomorph (TypeMonos tm) name tyargs =
         OrderedMap.get tm (name, tyargs)
 
-    fun addMonomorph (TypeMonos tm) (name, tyargs, ty) =
+    fun addMonomorph (TypeMonos tm) name tyargs ty =
         TypeMonos (OrderedMap.iadd tm ((name, tyargs), ty))
 
     fun newMonomorphs (TypeMonos old) (TypeMonos new) =
@@ -109,7 +109,7 @@ structure MonoType :> MONO_TYPE = struct
                 in
                     let val disj = Disjunction (name, variants')
                     in
-                        let val tm''' = addMonomorph tm'' (name, tyargs', disj)
+                        let val tm''' = addMonomorph tm'' name tyargs' disj
                         in
                             (disj, tm''')
                         end
