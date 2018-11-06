@@ -90,7 +90,7 @@ structure MTAST :> MTAST = struct
     fun ctxFdefs (Context (_, _, _, env)) =
         env
 
-    fun getMonomorph (Context (_, _, FuncMonos fm, _)) name tyargs =
+    fun getMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
         Map.get fm (name, tyargs)
 
     fun addMonomorph (Context (tm, rs, FuncMonos fm, env)) name tyargs id =
