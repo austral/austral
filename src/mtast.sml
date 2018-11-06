@@ -440,8 +440,8 @@ structure MTAST :> MTAST = struct
                 let val defuns = map (fn (name, args, id) =>
                                          expandDefgeneric fdefenv name args id)
                                      newFuncs
-                    and deftypes = map (fn (name, args, ty, id) =>
-                                           expandDeftype name args ty id)
+                    and deftypes = map (fn (name, _, ty, id) =>
+                                           expandDeftype name ty id)
                                        newTypes
                 in
                     (ToplevelProgn (defuns @ deftypes @ [node]),
@@ -453,6 +453,6 @@ structure MTAST :> MTAST = struct
     and expandDefgeneric env name args id =
         raise Fail "Not implemented"
 
-    and expandDeftype name _ ty id =
+    and expandDeftype name ty id =
         DeftypeMonomorph (name, ty, id)
 end
