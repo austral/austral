@@ -22,6 +22,8 @@ structure EMTAST :> EMTAST = struct
     type ty = MonoType.ty
     type ast = MTAST.ast
 
+    (* Block AST *)
+
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
                      | DeftypeMonomorph of name * ty list * ty * int
