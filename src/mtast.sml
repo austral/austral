@@ -87,9 +87,6 @@ structure MTAST :> MTAST = struct
                  Map.empty,
                  FuncMonos Map.empty)
 
-    fun ctxFdefs (Context (_, _, _, env)) =
-        env
-
     fun getMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
         Map.get fm (name, tyargs)
 
