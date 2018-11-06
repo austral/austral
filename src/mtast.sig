@@ -49,7 +49,7 @@ signature MTAST = sig
                  | Cast of ty * ast
                  | Seq of ast * ast
                  | ConcreteFuncall of name * ast list * ty
-                 | GenericFuncall of name * ty list * ast list * ty
+                 | GenericFuncall of name * int * ty list * ast list * ty
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
                        | NameBinding of { casename: name, var: Symbol.variable, ty: ty }
