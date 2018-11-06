@@ -453,6 +453,6 @@ structure MTAST :> MTAST = struct
     and expandDefgeneric env name args id =
         raise Fail "Not implemented"
 
-    and expandDeftype name args ty id =
-        raise Fail "Not implemented"
+    and expandDeftype name _ ty id =
+        DeftypeMonomorph (name, ty, id)
 end
