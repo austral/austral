@@ -5,3 +5,5 @@ src/cpp-runtime.sml
 test/valid/*.cpp
 test/valid/*.bin
 docs/*.html
+node_modules
+package-lock.json
