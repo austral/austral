@@ -66,7 +66,7 @@ signature MTAST = sig
 
     type context
 
-    val emptyContext : context
+    val makeContext : FDefs.fdefenv -> context
 
     val getMonomorph : context -> name -> ty list -> int option
     val addMonomorph : context -> name -> ty list -> int -> context
