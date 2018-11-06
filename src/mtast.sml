@@ -379,6 +379,12 @@ structure MTAST :> MTAST = struct
     and monomorphizeTop ctx node =
         let val (node, ctx') = monomorphizeTop' ctx node
         in
+            (* When we monomorphize a toplevel node, we have two contents: the
+               starting context `ctx` and the resulting context `ctx'`. To
+               create monomorph placeholders, we take a diff of both contexts,
+               and create placeholders for concrete function definitions and
+               type definitions that are implied by the monomorphs in the ctx'
+               but are not present in the ctx. *)
             (node, ctx')
         end
 end
