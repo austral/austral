@@ -1,6 +1,5 @@
 TODO:
 
-- Add ID to function monomorphs
 - Hoist new monomorphs
 - EMTAST (expanded, monomorphic, typed)
 - MTAST to EMTAST (expand monomorphs)
@@ -150,3 +149,4 @@ DONE:
 - Generalize that foldl2-like pattern
 - Implement ordered maps
 - Diff contexts for monomorphizations
+- Add ID to function monomorphs
