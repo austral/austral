@@ -51,6 +51,9 @@ structure MonoType :> MONO_TYPE = struct
     fun addMonomorph (TypeMonos tm) (name, tyargs, ty) =
         TypeMonos (OrderedMap.iadd tm ((name, tyargs), ty))
 
+    fun newMonomorphs old new =
+        raise Fail "not implemented"
+
     type replacements = (name, ty) Map.map
 
     fun monomorphize tm _ Type.Unit =
