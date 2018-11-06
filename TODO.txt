@@ -1,7 +1,8 @@
 TODO:
 
+- Hoist new monomorphs
 - EMTAST (expanded, monomorphic, typed)
-- MTAST to EMTAST (hoist and expand monomorphs)
+- MTAST to EMTAST (expand monomorphs)
 - Augment method calls
 - Monomorphize method calls
 
