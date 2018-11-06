@@ -395,6 +395,10 @@ structure MTAST :> MTAST = struct
                and create placeholders for concrete function definitions and
                type definitions that are implied by the monomorphs in the ctx'
                but are not present in the ctx. *)
-            (node, ctx')
+            let val newFuncs = newFuncMonomorphs ctx ctx'
+                and newTypes = newTypeMonomorphs ctx ctx'
+            in
+                (node, ctx')
+            end
         end
 end
