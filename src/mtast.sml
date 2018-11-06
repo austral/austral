@@ -57,8 +57,8 @@ structure MTAST :> MTAST = struct
     (* Block AST *)
 
     datatype top_ast = Defun of name * param list * ty * ast
-                     | DefunMonomorph of name * int * ty list
-                     | DeftypeMonomorph of name * int * ty list * ty
+                     | DefunMonomorph of name * ty list * int
+                     | DeftypeMonomorph of name * ty list * ty * int
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
 
@@ -432,7 +432,15 @@ structure MTAST :> MTAST = struct
             let val newFuncs = newFuncMonomorphs ctx ctx'
                 and newTypes = newTypeMonomorphs ctx ctx'
             in
-                (node, ctx')
+                let val defuns = map (fn (name, args, id) =>
+                                       DefunMonomorph (name, args, id))
+                                     newFuncs
+                    and deftypes = map (fn (name, args, ty, id) =>
+                                           DeftypeMonomorph (name, args, ty, id))
+                                       newTypes
+                in
+                    (node, ctx')
+                end
             end
         end
 end
