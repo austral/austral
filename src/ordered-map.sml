@@ -46,4 +46,7 @@ structure OrderedMap :> ORDERED_MAP = struct
 
     fun keys (Map l) =
         OrderedSet.fromList (map (fn (k, _) => k) l)
+
+    fun keyPosition (Map l) k =
+        Util.position k (map (fn (k, _) => k) l)
 end
