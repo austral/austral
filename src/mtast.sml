@@ -117,11 +117,11 @@ structure MTAST :> MTAST = struct
     (* Monomorphization utilities *)
 
     fun monoType ctx ty =
-        let val (Context (tm, rs, fm, env)) = ctx
+        let val (Context (tm, rs, fm)) = ctx
         in
             let val (ty', tm') = MonoType.monomorphize tm rs ty
             in
-                (ty', Context (tm', rs, fm, env))
+                (ty', Context (tm', rs, fm))
             end
         end
 
