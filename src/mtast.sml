@@ -82,7 +82,7 @@ structure MTAST :> MTAST = struct
     fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs =
         Context (tm, rs, FuncMonos (OrderedSet.add fm (name, tyargs)))
 
-    fun monomorphIndex (FuncMonos tm) name tyargs =
+    fun monomorphIndex (Context (FuncMonos tm, _, _)) name tyargs =
         OrderedSet.positionOf tm (name, tyargs)
 
     (* Diffing contexts *)
@@ -337,6 +337,7 @@ structure MTAST :> MTAST = struct
                            name+type arg list combination doesn't exist yet, add
                            it *)
                         if hasMonomorph ctx name tyargs' then
+                            let val pos = monomorphIndex ctx
                             (gfcall, ctx)
                         else
                             let val ctx = addMonomorph ctx name tyargs'
