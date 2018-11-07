@@ -62,6 +62,8 @@ signature HIR = sig
                  | GenericFuncall of name * int * ast list * ty
          and variant_case = VariantCase of name * ast
 
+    val typeOf : ast -> ty
+
     (* Toplevel AST *)
 
     datatype top_ast = Defun of name * param list * ty * ast
