@@ -119,8 +119,6 @@ structure MTAST :> MTAST = struct
             ty
           | typeOf (GenericFuncall (_, _, _, ty)) =
             ty
-          | typeOf (MethodFuncall (_, _, _, ty)) =
-            ty
     end
 
     (* Block AST *)
