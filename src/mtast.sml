@@ -455,6 +455,7 @@ structure MTAST :> MTAST = struct
 
     and expandGf gf fdefenv name args id =
         let val fdef = Option.valOf (FDefs.getDefinition fdefenv name)
+            and (Function.GenericFunction (name, typarams, params, ty, _)) = gf
         in
             raise Fail "Not implemented"
         end
