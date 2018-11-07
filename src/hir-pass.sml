@@ -163,6 +163,25 @@ structure HirPass :> HIR_PASS = struct
             transformInner vars tupvar body 0
         end
 
-    fun transformTop _ =
-        raise Fail "Not done yet"
+    fun transformTop (M.Defun (name, params, ty, body)) =
+        Defun (name,
+               mapParams params,
+               transformType ty,
+               transform body)
+      | transformTop (M.DefunMonomorph (name, params, ty, body, id)) =
+        DefunMonomorph (name,
+                        mapParams params,
+                        transformType ty,
+                        transform body,
+                        id)
+      | transformTop (M.DeftypeMonomorph (name, ty, id)) =
+        DeftypeMonomorph (name,
+                          transformType ty,
+                          id)
+
+    and mapParams l =
+        map mapParam l
+
+    and mapParam (MTAST.Param (var, ty)) =
+        Param (var, transformType ty)
 end
