@@ -136,6 +136,8 @@ structure HirPass :> HIR_PASS = struct
         SizeOf (transformType ty)
       | transform (M.AddressOf (var, ty)) =
         AddressOf (var, transformType ty)
+      | transform (M.Cast (ty, exp)) =
+        Cast (transformType ty, transform exp)
       | transform _ =
         raise Fail "Not done yet"
 
