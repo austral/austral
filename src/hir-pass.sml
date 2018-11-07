@@ -178,6 +178,8 @@ structure HirPass :> HIR_PASS = struct
         DeftypeMonomorph (name,
                           transformType ty,
                           id)
+      | transformTop (M.ToplevelProgn l) =
+        ToplevelProgn (map transformTop l)
 
     and mapParams l =
         map mapParam l
