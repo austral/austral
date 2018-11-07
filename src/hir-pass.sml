@@ -40,8 +40,10 @@ structure HirPass :> HIR_PASS = struct
       | transformType (MT.Disjunction (name, id, _)) =
         Disjunction (name, id)
 
-    fun transform _ =
-        raise Fail "Not done yet"
+    fun transform MT.UnitConstant =
+        UnitConstant
+      | transform (MT.BoolConstant b) =
+        BoolConstant b
 
     fun transformTop _ =
         raise Fail "Not done yet"
