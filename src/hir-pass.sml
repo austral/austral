@@ -80,6 +80,8 @@ structure HirPass :> HIR_PASS = struct
                  transform tup,
                  transformBind tys vars tupvar body)
         end
+      | transform (M.Cond (t, c, a)) =
+        Cond (transform t, transform c, transform a)
       | transform _ =
         raise Fail "Not done yet"
 
