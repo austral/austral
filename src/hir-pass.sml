@@ -71,7 +71,7 @@ structure HirPass :> HIR_PASS = struct
       | transform (M.Let (var, value, body)) =
         Let (var, transform value, transform body)
       | transform (M.Bind (vars, tup, body)) =
-        let tupvar = freshVar()
+        let val tupvar = freshVar()
         in
             Let (tupvar,
                  transform tup,
