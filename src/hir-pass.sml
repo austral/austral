@@ -22,7 +22,7 @@ structure HirPass :> HIR_PASS = struct
     structure MT = MonoType
 
     val count = ref 0
-    fun freshVar () =
+    fun freshVar ty =
         let
         in
             count := !count + 1;
@@ -30,7 +30,7 @@ structure HirPass :> HIR_PASS = struct
             in
                 let val name = Symbol.mkSymbol (Ident.mkIdentEx "#", Ident.mkIdentEx ("g" ^ (Int.toString newid)))
                 in
-                    Variable (Symbol.Var (name, newid))
+                    Variable (Symbol.Var (name, newid), ty)
                 end
             end
         end
@@ -71,7 +71,7 @@ structure HirPass :> HIR_PASS = struct
       | transform (M.Let (var, value, body)) =
         Let (var, transform value, transform body)
       | transform (M.Bind (vars, tup, body)) =
-        let val tupvar = freshVar()
+        let val tupvar = freshVar ()
         in
             Let (tupvar,
                  transform tup,
@@ -82,18 +82,11 @@ structure HirPass :> HIR_PASS = struct
 
     and transformBind vars tupvar body =
         let fun transformInner (head::tail) tupvar body i =
-                let val ty = nthTy i
-                in
-                    Let (ransform head,
-                         TupleProj (tupvar, i),
-                         transformInner tail tupvar body (i + 1))
-                end
+                Let (transform head,
+                     TupleProj (tupvar, i),
+                     transformInner tail tupvar body (i + 1))
               | transformInner nil _ body _ =
                 transform body
-
-            and nthTy n =
-                raise Fail "not done yet"
-
         in
             transformInner vars tupvar body 0
         end
