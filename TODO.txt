@@ -1,7 +1,9 @@
 TODO:
 
 - New MIR
+- New HIR->MIR
 - New LIR
+- New MIR->LIR
 - LLVM AST
 - LLVM backend
 - Expand monomorphs recursively
