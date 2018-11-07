@@ -18,5 +18,14 @@
 *)
 
 structure HirPass :> HIR_PASS = struct
+    open HIR
 
+    fun transformType _ =
+        raise Fail "Not done yet"
+
+    fun transform _ =
+        raise Fail "Not done yet"
+
+    fun transformTop _ =
+        raise Fail "Not done yet"
 end
