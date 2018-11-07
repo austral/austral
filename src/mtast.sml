@@ -433,7 +433,7 @@ structure MTAST :> MTAST = struct
                 and newTypes = newTypeMonomorphs ctx ctx'
             in
                 let val defuns = map (fn (name, args, id) =>
-                                         expandDefgeneric fenv fdefenv name args id)
+                                         expandDefgeneric ctx' fenv fdefenv name args id)
                                      newFuncs
                     and deftypes = map (fn (name, _, ty, id) =>
                                            expandDeftype name ty id)
@@ -445,18 +445,33 @@ structure MTAST :> MTAST = struct
             end
         end
 
-    and expandDefgeneric fenv fdefenv name args id =
+    and expandDefgeneric ctx fenv fdefenv name args id =
         (case Function.envGet fenv name of
-             (SOME (Function.CallableGFunc gf)) => expandGf gf fdefenv name args id
+             (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
     and expandDeftype name ty id =
         DeftypeMonomorph (name, ty, id)
 
-    and expandGf gf fdefenv name args id =
+    and expandGf ctx gf fdefenv name tyargs id =
         let val fdef = Option.valOf (FDefs.getDefinition fdefenv name)
             and (Function.GenericFunction (name, typarams, params, ty, _)) = gf
         in
-            raise Fail "Not implemented"
+            let val (ty', ctx) = monoType ctx ty
+            in
+                let val (params', ctx) = Util.foldThread (fn (Function.Param (name, ty), ctx) =>
+                                                             let val (ty, ctx) = monoType ctx ty
+                                                             in
+                                                                 (Param (name, ty), ctx)
+                                                             end)
+                                                         params
+                                                         ctx
+                in
+                    let val node = ()
+                    in
+                        raise Fail "Not implemented"
+                    end
+                end
+            end
         end
 end
