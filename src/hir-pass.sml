@@ -107,19 +107,25 @@ structure HirPass :> HIR_PASS = struct
       | transform (M.Case (exp, cases, ty)) =
         let val expvar = freshVar ()
         in
-            let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
-                    VariantCase (name, transform body)
-                  | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
-                    VariantCase (casename,
-                                 Let (var,
-                                      UnsafeExtractCase (expvar, casename , transformType ty),
-                                      transform body))
+            (* TODO: better name for this *)
+            let val expvarVar = Variable (expvar, transformType ty)
             in
-                Let (expvar,
-                     transform exp,
-                     Case (Variable (expvar transformType ty),
-                           map transformCase cases,
-                           transformType ty))
+                let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
+                        VariantCase (name, transform body)
+                      | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
+                        VariantCase (casename,
+                                     Let (var,
+                                          UnsafeExtractCase (expvarVar,
+                                                             casename,
+                                                             transformType ty),
+                                          transform body))
+                in
+                    Let (expvar,
+                         transform exp,
+                         Case (expvarVar,
+                               map transformCase cases,
+                               transformType ty))
+                end
             end
         end
       | transform _ =
