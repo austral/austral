@@ -40,7 +40,6 @@ signature HIR = sig
                  | StringConstant of CST.escaped_string
                  | Variable of Symbol.variable * ty
                  | Let of Symbol.variable * ast * ast
-                 | Bind of Symbol.variable list * ast * ast
                  | Cond of ast * ast * ast
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
                  | TupleCreate of ast list
