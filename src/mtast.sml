@@ -467,9 +467,12 @@ structure MTAST :> MTAST = struct
                                                          params
                                                          ctx
                 in
-                    let val node = DefunMonomorph (name, params', ty', id)
+                    let val (body', ctx) = monomorphize ctx body
                     in
-                        raise Fail "Not implemented"
+                        let val node = DefunMonomorph (name, params', ty', body', id)
+                        in
+                            raise Fail "Not implemented"
+                        end
                     end
                 end
             end
