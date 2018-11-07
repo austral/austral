@@ -142,8 +142,11 @@ structure HirPass :> HIR_PASS = struct
         Seq (transform a, transform b)
       | transform (M.ConcreteFuncall (name, args, ty)) =
         ConcreteFuncall (name, map transform args, transformType ty)
-      | transform _ =
-        raise Fail "Not done yet"
+      | transform (M.GenericFuncall (name, id, _, args, ty)) =
+        GenericFuncall (name,
+                        id,
+                        map transform args,
+                        transformType ty)
 
     and transformBind tys (vars: Symbol.variable list) (tupvar: Symbol.variable) (body: MTAST.ast) =
         let fun transformInner (head::tail) tupvar body i =
