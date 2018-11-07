@@ -454,5 +454,8 @@ structure MTAST :> MTAST = struct
         DeftypeMonomorph (name, ty, id)
 
     and expandGf fdefenv name args id =
-        raise Fail "Not implemented"
+        let val fdef = Option.valOf (FDefs.getDefinition fdefenv name)
+        in
+            raise Fail "Not implemented"
+        end
 end
