@@ -18,48 +18,5 @@
 *)
 
 signature HIR = sig
-    type name = string
-    type ty = Type.ty
 
-    datatype ast = BoolConstant of bool
-                 | IntConstant of string
-                 | FloatConstant of string
-                 | StringConstant of CST.escaped_string
-                 | NullConstant
-                 | Negation of ast
-                 | Variable of string
-                 | Let of string * ty * ast * ast
-                 | Cond of ast * ast * ast * ty
-                 | IntArithOp of Arith.oper * ast * ast
-                 | FloatArithOp of Arith.oper * ast * ast
-                 | ComparisonOp of Builtin.comp_op * ast * ast
-                 | TupleCreate of ast list
-                 | TupleProj of ast * int
-                 | ArrayLength of ast
-                 | ArrayPointer of ast
-                 | Allocate of ast * ty
-                 | Load of ast
-                 | Store of ast * ast
-                 | Cast of ty * ast
-                 | Construct of ty * Symbol.symbol * ast option
-                 | DisjunctionNth of ast * int
-                 | TagEq of ast * int
-                 | SizeOf of ty
-                 | AddressOf of name
-                 | Seq of ast * ast
-                 | Funcall of string * ty list * ast list
-
-    datatype top_ast = Defun of name * param list * ty * ast
-                     | Defgeneric of name * name list * param list * ty * ast
-                     | Deftype of name * name list * ty
-                     | Defdisjunction of name * name list * Type.variant list
-                     | DeclareForeign of name * ty list * Function.foreign_arity * ty
-                     | ToplevelProgn of top_ast list
-         and param = Param of name * ty
-
-    val escapeSymbol : Symbol.symbol -> string
-    val escapeVariable : Symbol.variable -> string
-
-    val transform : TAST.ast -> ast
-    val transformTop : TAST.top_ast -> top_ast
 end
