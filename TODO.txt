@@ -1,6 +1,5 @@
 TODO:
 
-- Store generic function definitions
 - EMTAST (expanded, monomorphic, typed)
 - MTAST to EMTAST (expand monomorphs)
 - Augment method calls
@@ -152,3 +151,4 @@ DONE:
 - Add ID to function monomorphs
 - Hoist new monomorphs
 - Function definition environment
+- Store generic function definitions
