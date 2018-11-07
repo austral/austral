@@ -1,6 +1,5 @@
 TODO:
 
-- New HIR
 - New MIR
 - New LIR
 - LLVM AST
@@ -158,3 +157,4 @@ DONE:
 - Function definition environment
 - Store generic function definitions
 - Expand monomorphs
+- New HIR
