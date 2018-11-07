@@ -82,6 +82,8 @@ structure HirPass :> HIR_PASS = struct
         end
       | transform (M.Cond (t, c, a)) =
         Cond (transform t, transform c, transform a)
+      | transform (M.ArithOp (kind, oper, lhs, rhs)) =
+        ArithOp (kind, oper, transform lhs, transform rhs)
       | transform _ =
         raise Fail "Not done yet"
 
