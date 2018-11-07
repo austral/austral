@@ -31,7 +31,6 @@ structure Symbol : SYMBOL = struct
         (Ident.identString m) ^ "::" ^ (Ident.identString n)
 
     datatype variable = Var of symbol * int
-                      | Genvar of int
 
     fun varSymbol (Var (s, _)) =
         s

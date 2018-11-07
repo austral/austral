@@ -29,7 +29,6 @@ signature SYMBOL = sig
     val toString : symbol -> string
 
     datatype variable = Var of symbol * int
-                      | Genvar of int
 
     val varSymbol : variable -> symbol
     val varToString : variable -> string
