@@ -1,6 +1,5 @@
 TODO:
 
-- EMTAST (expanded, monomorphic, typed)
 - MTAST to EMTAST (expand monomorphs)
 - Augment method calls
 - Monomorphize method calls
