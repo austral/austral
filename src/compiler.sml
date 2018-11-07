@@ -237,7 +237,8 @@ structure Compiler : COMPILER = struct
                                             (compilerTenv c)
                                             (compilerFenv c)
         in
-            let val hirTop = HIR.transformTop typedNode
+            raise Fail "compiler machine is kill"
+            (*let val hirTop = HIR.transformTop typedNode
             in
                 let val mir = MIR.transformTop hirTop
                 in
@@ -250,7 +251,7 @@ structure Compiler : COMPILER = struct
                         end
                     end
                 end
-            end
+            end*)
         end
     end
 
