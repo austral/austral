@@ -28,7 +28,8 @@ structure HirPass :> HIR_PASS = struct
             count := !count + 1;
             let val newid = !count
             in
-                let val name = Symbol.mkSymbol (Ident.mkIdentEx "#", Ident.mkIdentEx ("g" ^ (Int.toString newid)))
+                let val name = Symbol.mkSymbol (Ident.mkIdentEx "#",
+                                                Ident.mkIdentEx ("g" ^ (Int.toString newid)))
                 in
                     Symbol.Var (name, newid)
                 end
