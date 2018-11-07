@@ -85,7 +85,7 @@ structure HirPass :> HIR_PASS = struct
 
     and transformBind tys (vars: Symbol.variable list) (tupvar: Symbol.variable) (body: MTAST.ast) =
         let fun transformInner (head::tail) tupvar body i =
-                let val elemTy = List.nth (tys, i)
+                let val elemTy = transformType (List.nth (tys, i))
                 in
                     Let (head,
                          TupleProj (Variable (tupvar, elemTy), i),
