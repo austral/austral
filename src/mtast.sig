@@ -54,6 +54,8 @@ signature MTAST = sig
          and case_name = NameOnly of name
                        | NameBinding of { casename: name, var: Symbol.variable, ty: ty }
 
+    val typeOf : ast -> ty
+
     (* Toplevel AST *)
 
     datatype top_ast = Defun of name * param list * ty * ast
