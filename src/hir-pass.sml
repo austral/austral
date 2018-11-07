@@ -90,6 +90,10 @@ structure HirPass :> HIR_PASS = struct
         TupleProj (transform tup, idx)
       | transform (M.ArrayLength arr) =
         ArrayLength (transform arr)
+      | transform (M.ArrayPointer arr) =
+        ArrayPointer (transform arr)
+      | transform (M.Allocate exp) =
+        Allocate (transform exp)
       | transform _ =
         raise Fail "Not done yet"
 
