@@ -105,8 +105,10 @@ structure HirPass :> HIR_PASS = struct
                    name,
                    Option.map transform value)
       | transform (M.Case (exp, cases, ty)) =
-        let fun transformCase (M.VariantCase (M.Name, body)) =
-
+        let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
+                VariantCase (name, transform body)
+              | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
+                raise Fail "derp"
         in
             Case (transform exp,
                   map transformCase cases,
