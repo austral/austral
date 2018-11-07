@@ -40,9 +40,11 @@ structure HirPass :> HIR_PASS = struct
       | transformType (MT.Disjunction (name, id, _)) =
         Disjunction (name, id)
 
-    fun transform MT.UnitConstant =
+    structure M = MTAST
+
+    fun transform M.UnitConstant =
         UnitConstant
-      | transform (MT.BoolConstant b) =
+      | transform (M.BoolConstant b) =
         BoolConstant b
 
     fun transformTop _ =
