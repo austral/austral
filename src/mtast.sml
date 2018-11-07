@@ -445,7 +445,7 @@ structure MTAST :> MTAST = struct
             end
         end
 
-    and expandDefgeneric env name args id =
+    and expandDefgeneric fenv fdefenv name args id =
         raise Fail "Not implemented"
 
     and expandDeftype name ty id =
