@@ -22,9 +22,11 @@ signature FDEFS = sig
 
     type fdefenv
 
+    type fdef = TAST.ast
+
     val emptyEnv : fdefenv
 
-    val getDefinition : fdefenv -> name -> TAST.ast option
+    val getDefinition : fdefenv -> name -> fdef option
 
-    val addDefinition : fdefenv -> name -> TAST.ast -> fdefenv
+    val addDefinition : fdefenv -> name -> fdef -> fdefenv
 end
