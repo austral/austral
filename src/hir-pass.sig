@@ -18,5 +18,5 @@
 *)
 
 signature HIR_PASS = sig
-
+  val transformType : MonoType.ty -> HIR.ty
 end
