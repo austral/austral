@@ -21,6 +21,20 @@ structure HirPass :> HIR_PASS = struct
     open HIR
     structure MT = MonoType
 
+    val count = ref 0
+    fun freshVar () =
+        let
+        in
+            count := !count + 1;
+            let val newid = !count
+            in
+                let val name = Symbol.mkSymbol (Ident.mkIdentEx "#", Ident.mkIdentEx ("g" ^ (Int.toString newid)))
+                in
+                    Symbol.Var (name, newid)
+                end
+            end
+        end
+
     fun transformType MT.Unit =
         Unit
       | transformType MT.Bool =
