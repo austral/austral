@@ -80,20 +80,6 @@ is
   src/emtast.sig
   src/emtast.sml
 
-  src/hir.sig
-  src/hir.sml
-
-  src/mir.sig
-  src/mir.sml
-
-  src/cpp-ast.sig
-  src/cpp-ast.sml
-
-  src/cpp-backend.sig
-  src/cpp-backend.sml
-
-  src/cpp-runtime.sml
-
   src/prelude.sig
   src/prelude.sml
 
