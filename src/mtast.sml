@@ -447,13 +447,13 @@ structure MTAST :> MTAST = struct
 
     and expandDefgeneric fenv fdefenv name args id =
         (case Function.envGet fenv name of
-             (SOME (Function.CallableGFunc gf)) => expandGf fdefenv name args id
+             (SOME (Function.CallableGFunc gf)) => expandGf gf fdefenv name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
     and expandDeftype name ty id =
         DeftypeMonomorph (name, ty, id)
 
-    and expandGf fdefenv name args id =
+    and expandGf gf fdefenv name args id =
         let val fdef = Option.valOf (FDefs.getDefinition fdefenv name)
         in
             raise Fail "Not implemented"
