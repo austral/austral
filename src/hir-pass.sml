@@ -105,14 +105,22 @@ structure HirPass :> HIR_PASS = struct
                    name,
                    Option.map transform value)
       | transform (M.Case (exp, cases, ty)) =
-        let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
-                VariantCase (name, transform body)
-              | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
-                raise Fail "derp"
+        let val expvar = freshVar ()
         in
-            Case (transform exp,
-                  map transformCase cases,
-                  transformType ty)
+            let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
+                    VariantCase (name, transform body)
+                  | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
+                    VariantCase (casename,
+                                 Let (var,
+                                      UnsafeExtractCase (expvar, casename , transformType ty),
+                                      transform body))
+            in
+                Let (expvar,
+                     transform exp,
+                     Case (Variable (expvar trnasformType ty),
+                           map transformCase cases,
+                           transformType ty))
+            end
         end
       | transform _ =
         raise Fail "Not done yet"
