@@ -1,5 +1,10 @@
 TODO:
 
+- New HIR
+- New MIR
+- New LIR
+- LLVM AST
+- LLVM backend
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
