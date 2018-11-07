@@ -30,7 +30,7 @@ structure HirPass :> HIR_PASS = struct
             in
                 let val name = Symbol.mkSymbol (Ident.mkIdentEx "#", Ident.mkIdentEx ("g" ^ (Int.toString newid)))
                 in
-                    Symbol.Var (name, newid)
+                    Variable (Symbol.Var (name, newid))
                 end
             end
         end
@@ -80,8 +80,17 @@ structure HirPass :> HIR_PASS = struct
       | transform _ =
         raise Fail "Not done yet"
 
-    and transformBind _ _ _ =
-        raise Fail "Not done yet"
+    and transformBind vars tupvar body =
+        let fun transformInner (head::tail) tupvar body i =
+                Let (ransform head,
+                     TupleProj (tupvar, i),
+                     transformInner tail tupvar body (i + 1))
+              | transformInner nil _ body _ =
+                transform body
+        in
+            transformInner vars tupvar body 0
+        end
+
 
     fun transformTop _ =
         raise Fail "Not done yet"
