@@ -20,9 +20,9 @@
 signature FDEFS = sig
     type name = Symbol.symbol
 
-    type fdefenv
-
     type fdef = TAST.ast
+
+    type fdefenv
 
     val emptyEnv : fdefenv
 
