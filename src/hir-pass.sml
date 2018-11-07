@@ -138,6 +138,8 @@ structure HirPass :> HIR_PASS = struct
         AddressOf (var, transformType ty)
       | transform (M.Cast (ty, exp)) =
         Cast (transformType ty, transform exp)
+      | transform (M.Seq (a, b)) =
+        Seq (transform a, transform b)
       | transform _ =
         raise Fail "Not done yet"
 
