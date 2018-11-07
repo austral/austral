@@ -80,15 +80,15 @@ structure HirPass :> HIR_PASS = struct
       | transform _ =
         raise Fail "Not done yet"
 
-    and transformBind vars tupvar body =
-        let fun transformInner (head::tail) tupvar body i =
+    and transformBind (vars: Symbol.variable list) (tupvar: Symbol.variable) (body: MTAST.ast) =
+        let fun transformInner (head::tail, tupvar, body, i) =
                 Let (head,
-                     TupleProj (tupvar, i),
-                     transformInner tail tupvar body (i + 1))
-              | transformInner nil _ body _ =
+                     TupleProj (Variable (tupvar, elemTy), i),
+                     transformInner (tail, tupvar, body, (i + 1)))
+              | transformInner (nil, _, body, _) =
                 transform body
         in
-            transformInner vars tupvar body 0
+            transformInner (vars, tupvar, body, 0)
         end
 
     fun transformTop _ =
