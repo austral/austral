@@ -23,6 +23,8 @@ structure HirPass :> HIR_PASS = struct
 
     fun transformType MT.Unit =
         Unit
+      | transformType MT.Bool =
+        Bool
       | transformType (MT.Integer (s, w)) =
         Integer (s, w)
       | transformType (MT.Float f) =
