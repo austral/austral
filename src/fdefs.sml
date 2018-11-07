@@ -20,7 +20,7 @@
 structure FDefs :> FDEFS = struct
     type name = Symbol.symbol
 
-    type fdef = TAST.ast
+    type fdef = (TAST.param list * TAST.ast)
 
     type fdefenv = (name, fdef) Map.map
 
