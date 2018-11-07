@@ -117,7 +117,7 @@ structure HirPass :> HIR_PASS = struct
             in
                 Let (expvar,
                      transform exp,
-                     Case (Variable (expvar trnasformType ty),
+                     Case (Variable (expvar transformType ty),
                            map transformCase cases,
                            transformType ty))
             end
