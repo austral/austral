@@ -19,9 +19,24 @@
 
 structure HirPass :> HIR_PASS = struct
     open HIR
+    structure MT = MonoType
 
-    fun transformType _ =
-        raise Fail "Not done yet"
+    fun transformType MT.Unit =
+        Unit
+      | transformType (MT.Integer (s, w)) =
+        Integer (s, w)
+      | transformType (MT.Float f) =
+        Float f
+      | transformType (MT.Tuple tys) =
+        Tuple (map transformType tys)
+      | transformType (MT.Pointer ty) =
+        Pointer (transformType ty)
+      | transformType (MT.ForeignPointer ty) =
+        Pointer (transformType ty)
+      | transformType (MT.StaticArray ty) =
+        StaticArray (transformType ty)
+      | transformType (MT.Disjunction (name, id, _)) =
+        Disjunction (name, id)
 
     fun transform _ =
         raise Fail "Not done yet"
