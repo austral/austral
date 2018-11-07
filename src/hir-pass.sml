@@ -71,7 +71,12 @@ structure HirPass :> HIR_PASS = struct
       | transform (M.Let (var, value, body)) =
         Let (var, transform value, transform body)
       | transform (M.Bind (vars, tup, body)) =
-        transformBind vars tup body
+        let tupvar = freshVar()
+        in
+            Let (tupvar,
+                 transform tup,
+                 transformBind vars tupvar body)
+        end
       | transform _ =
         raise Fail "Not done yet"
 
