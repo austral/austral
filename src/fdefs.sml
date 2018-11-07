@@ -29,6 +29,6 @@ structure FDefs :> FDEFS = struct
     fun getDefinition env name =
         Map.get env name
 
-    fun addDefinition env name body =
-        Map.iadd env (name, body)
+    fun addDefinition env name def =
+        Map.iadd env (name, def)
 end
