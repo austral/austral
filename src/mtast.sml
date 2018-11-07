@@ -454,8 +454,8 @@ structure MTAST :> MTAST = struct
         DeftypeMonomorph (name, ty, id)
 
     and expandGf ctx gf fdefenv name tyargs id =
-        let val fdef = Option.valOf (FDefs.getDefinition fdefenv name)
-            and (Function.GenericFunction (name, typarams, params, ty, _)) = gf
+        let val (params, body) = Option.valOf (FDefs.getDefinition fdefenv name)
+            and (Function.GenericFunction (name, typarams, _, ty, _)) = gf
         in
             let val (ty', ctx) = monoType ctx ty
             in
