@@ -96,6 +96,8 @@ structure HirPass :> HIR_PASS = struct
         Allocate (transform exp)
       | transform (M.Load exp) =
         Load (transform exp)
+      | transform (M.Store (ptr, value)) =
+        Store (transform ptr, transform value)
       | transform _ =
         raise Fail "Not done yet"
 
