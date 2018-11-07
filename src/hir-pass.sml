@@ -140,6 +140,8 @@ structure HirPass :> HIR_PASS = struct
         Cast (transformType ty, transform exp)
       | transform (M.Seq (a, b)) =
         Seq (transform a, transform b)
+      | transform (M.ConcreteFuncall (name, args, ty)) =
+        ConcreteFuncall (name, map transform args, transformType ty)
       | transform _ =
         raise Fail "Not done yet"
 
