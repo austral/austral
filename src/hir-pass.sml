@@ -82,11 +82,18 @@ structure HirPass :> HIR_PASS = struct
 
     and transformBind vars tupvar body =
         let fun transformInner (head::tail) tupvar body i =
-                Let (ransform head,
-                     TupleProj (tupvar, i),
-                     transformInner tail tupvar body (i + 1))
+                let val ty = nthTy i
+                in
+                    Let (ransform head,
+                         TupleProj (tupvar, i),
+                         transformInner tail tupvar body (i + 1))
+                end
               | transformInner nil _ body _ =
                 transform body
+
+            and nthTy n =
+                raise Fail "not done yet"
+
         in
             transformInner vars tupvar body 0
         end
