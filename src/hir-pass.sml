@@ -72,7 +72,9 @@ structure HirPass :> HIR_PASS = struct
         Let (var, transform value, transform body)
       | transform (M.Bind (vars, tup, body)) =
         let val tupvar = freshVar ()
-            and tupty = M.typeOf tup
+            and tys = case M.typeOf tup of
+                          (MT.Tuple tys) => tys
+                        | _ => raise Fail "Not a tuple [internal compiler error]"
         in
             Let (tupvar,
                  transform tup,
