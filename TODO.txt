@@ -1,6 +1,5 @@
 TODO:
 
-- Expand monomorphs
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
@@ -152,3 +151,4 @@ DONE:
 - Hoist new monomorphs
 - Function definition environment
 - Store generic function definitions
+- Expand monomorphs
