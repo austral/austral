@@ -8,6 +8,7 @@ TODO:
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
+- Separate IRs from passes
 
 LONG-TERM TODO:
 
