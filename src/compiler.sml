@@ -278,7 +278,7 @@ structure Compiler : COMPILER = struct
         let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
             and sym = Parser.parseQualifiedSymbol name
         in
-            let val name = HIR.escapeSymbol sym
+            let val name = "" (* HIR.escapeSymbol sym TODO FIXME *)
             in
                 let val newCode = code ^ "\n\nint main() {\n  return " ^ name ^ "();\n}\n"
                 in
