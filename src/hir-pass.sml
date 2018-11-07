@@ -54,6 +54,15 @@ structure HirPass :> HIR_PASS = struct
         StringConstant s
       | transform (M.Variable (var, ty)) =
         Variable (var, transformType ty)
+      | transform (M.Let (var, value, body)) =
+        Let (var, transform value, transform body)
+      | transform (M.Bind (vars, tup, body)) =
+        transformBind vars tup body
+      | transform _ =
+        raise Fail "Not done yet"
+
+    and transformBind _ _ _ =
+        raise Fail "Not done yet"
 
     fun transformTop _ =
         raise Fail "Not done yet"
