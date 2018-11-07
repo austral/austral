@@ -22,7 +22,7 @@ structure FDefs :> FDEFS = struct
 
     type fdef = TAST.ast
 
-    type fdefenv = (name, TAST.ast) Map.map
+    type fdefenv = (name, fdef) Map.map
 
     val emptyEnv = Map.empty
 
