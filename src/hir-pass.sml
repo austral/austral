@@ -48,6 +48,8 @@ structure HirPass :> HIR_PASS = struct
         BoolConstant b
       | transform (M.IntConstant (i, ty)) =
         IntConstant (i, transformType ty)
+      | transform (M.FloatConstant (f, ty)) =
+        FloatConstant (f, transformType ty)
 
     fun transformTop _ =
         raise Fail "Not done yet"
