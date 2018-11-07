@@ -462,8 +462,7 @@ structure MTAST :> MTAST = struct
                 let val (params', ctx) = Util.foldThread (fn (TAST.Param (name, ty), ctx) =>
                                                              let val (ty, ctx) = monoType ctx ty
                                                              in
-                                                                 raise Fail "derp"
-                                                                 (*(Param (name, ty), ctx)*)
+                                                                 (Param (name, ty), ctx)
                                                              end)
                                                          params
                                                          ctx
