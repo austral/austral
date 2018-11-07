@@ -20,6 +20,8 @@
 structure FDefs :> FDEFS = struct
     type name = Symbol.symbol
 
+    type fdef = TAST.ast
+
     type fdefenv = (name, TAST.ast) Map.map
 
     val emptyEnv = Map.empty
