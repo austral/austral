@@ -130,6 +130,8 @@ structure HirPass :> HIR_PASS = struct
         end
       | transform (M.ForeignFuncall (name, args, ty)) =
         ForeignFuncall (name, map transform args, transformType ty)
+      | transform (M.ForeignNull ty) =
+        ForeignNull (transformType ty)
       | transform _ =
         raise Fail "Not done yet"
 
