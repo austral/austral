@@ -102,6 +102,14 @@ structure HirPass :> HIR_PASS = struct
         Construct (transformType ty,
                    name,
                    Option.map transform value)
+      | transform (M.Case (exp, cases, ty)) =
+        let fun transformCase (M.VariantCase (name, body)) =
+                raise Fail "derp"
+        in
+            Case (transform exp,
+                  map transformCase cases,
+                  transformType ty)
+        end
       | transform _ =
         raise Fail "Not done yet"
 
