@@ -71,6 +71,8 @@ structure HirPass :> HIR_PASS = struct
       | transform (M.Let (var, value, body)) =
         Let (var, transform value, transform body)
       | transform (M.Bind (vars, tup, body)) =
+        (* Since we drop linearity in HIR, we can turn bind expressions into a
+           Let that simply projects each tuple element. *)
         let val tupvar = freshVar ()
             and tys = case M.typeOf tup of
                           (MT.Tuple tys) => tys
@@ -103,8 +105,8 @@ structure HirPass :> HIR_PASS = struct
                    name,
                    Option.map transform value)
       | transform (M.Case (exp, cases, ty)) =
-        let fun transformCase (M.VariantCase (name, body)) =
-                raise Fail "derp"
+        let fun transformCase (M.VariantCase (M.Name, body)) =
+
         in
             Case (transform exp,
                   map transformCase cases,
