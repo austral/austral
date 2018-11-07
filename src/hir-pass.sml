@@ -86,6 +86,8 @@ structure HirPass :> HIR_PASS = struct
         ArithOp (kind, oper, transform lhs, transform rhs)
       | transform (M.TupleCreate elems) =
         TupleCreate (map transform elems)
+      | transform (M.TupleProj (tup, idx)) =
+        TupleProj (transform tup, idx)
       | transform _ =
         raise Fail "Not done yet"
 
