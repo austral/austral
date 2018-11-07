@@ -77,9 +77,6 @@ is
   src/mtast.sig
   src/mtast.sml
 
-  src/emtast.sig
-  src/emtast.sml
-
   src/prelude.sig
   src/prelude.sml
 
