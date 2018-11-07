@@ -88,6 +88,8 @@ structure HirPass :> HIR_PASS = struct
         TupleCreate (map transform elems)
       | transform (M.TupleProj (tup, idx)) =
         TupleProj (transform tup, idx)
+      | transform (M.ArrayLength arr) =
+        ArrayLength (transform arr)
       | transform _ =
         raise Fail "Not done yet"
 
