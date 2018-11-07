@@ -446,8 +446,13 @@ structure MTAST :> MTAST = struct
         end
 
     and expandDefgeneric fenv fdefenv name args id =
-        raise Fail "Not implemented"
+        (case Function.envGet fenv name of
+             (SOME (Function.CallableGFunc gf)) => expandGf fdefenv name args id
+           | _ => raise Fail "Internal compiler error")
 
     and expandDeftype name ty id =
         DeftypeMonomorph (name, ty, id)
+
+    and expandGf fdefenv name args id =
+        raise Fail "Not implemented"
 end
