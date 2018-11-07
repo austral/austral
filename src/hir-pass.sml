@@ -50,6 +50,8 @@ structure HirPass :> HIR_PASS = struct
         IntConstant (i, transformType ty)
       | transform (M.FloatConstant (f, ty)) =
         FloatConstant (f, transformType ty)
+      | transform (M.StringConstant s) =
+        StringConstant s
 
     fun transformTop _ =
         raise Fail "Not done yet"
