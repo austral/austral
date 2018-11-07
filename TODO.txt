@@ -1,6 +1,5 @@
 TODO:
 
-- New MTAST->HIR
 - New MIR
 - New HIR->MIR
 - New LIR
@@ -161,3 +160,4 @@ DONE:
 - Store generic function definitions
 - Expand monomorphs
 - New HIR
+- New MTAST->HIR
