@@ -94,6 +94,8 @@ structure HirPass :> HIR_PASS = struct
         ArrayPointer (transform arr)
       | transform (M.Allocate exp) =
         Allocate (transform exp)
+      | transform (M.Load exp) =
+        Load (transform exp)
       | transform _ =
         raise Fail "Not done yet"
 
