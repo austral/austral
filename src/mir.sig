@@ -29,4 +29,12 @@ signature MIR = sig
                 | Pointer of ty
                 | StaticArray of ty
                 | Disjunction of name * int
+
+    (* AST *)
+
+    datatype operand = BoolConstant of bool
+                     | IntConstant of string * ty
+                     | FloatConstant of string * ty
+                     | RegisterOp of int
+                     | VariableOp of Symbol.variable
 end
