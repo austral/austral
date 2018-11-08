@@ -41,4 +41,5 @@ structure MIR :> MIR = struct
                        | TupleCreate of operand list
                        | TupleProj of operand * int
                        | Load of operand
+                       | Store of { ptr : operand, value : operand }
 end
