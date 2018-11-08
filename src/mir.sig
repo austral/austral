@@ -44,9 +44,9 @@ signature MIR = sig
                        | TupleCreate of operand list
                        | TupleProj of operand * int
                        | Load of operand
-                       | Store of { ptr : operand, value : operand }
                        | SizeOf of ty
 
     datatype instruction = Assignment of register * operation
+                         | Store of { ptr : operand, value : operand }
 
 end
