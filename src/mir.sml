@@ -43,4 +43,5 @@ structure MIR :> MIR = struct
                        | TupleProj of operand * int
                        | Load of operand
                        | Store of { ptr : operand, value : operand }
+                       | SizeOf of ty
 end
