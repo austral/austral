@@ -37,4 +37,6 @@ structure MIR :> MIR = struct
                      | FloatConstant of string * ty
                      | RegisterOp of int
                      | VariableOp of Symbol.variable
+
+    datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
 end
