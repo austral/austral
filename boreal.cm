@@ -83,6 +83,9 @@ is
   src/hir-pass.sig
   src/hir-pass.sml
 
+  src/mir.sig
+  src/mir.sml
+
   src/prelude.sig
   src/prelude.sml
 
