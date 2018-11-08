@@ -48,5 +48,6 @@ signature MIR = sig
 
     datatype instruction = Assignment of register * operation
                          | Store of { ptr : operand, value : operand }
+                         | DeclareLocal of Symbol.variable * ty
 
 end
