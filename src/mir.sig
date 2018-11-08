@@ -27,7 +27,6 @@ signature MIR = sig
                 | Float of Type.float_type
                 | Tuple of ty list
                 | Pointer of ty
-                | StaticArray of ty
                 | Disjunction of name * int
 
     (* AST *)
