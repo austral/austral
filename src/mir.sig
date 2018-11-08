@@ -34,6 +34,7 @@ signature MIR = sig
     datatype operand = BoolConstant of bool
                      | IntConstant of string * ty
                      | FloatConstant of string * ty
+                     | NullConstant of ty
                      | RegisterOp of int
                      | VariableOp of Symbol.variable
 
