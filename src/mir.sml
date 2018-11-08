@@ -40,4 +40,5 @@ structure MIR :> MIR = struct
 
     datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
                        | TupleCreate of operand list
+                       | TupleProj of operand * int
 end
