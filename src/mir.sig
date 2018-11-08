@@ -18,5 +18,15 @@
 *)
 
 signature MIR = sig
+    type name = Symbol.symbol
 
+    (* Type System *)
+
+    datatype ty = Bool
+                | Integer of Type.signedness * Type.width
+                | Float of Type.float_type
+                | Tuple of ty list
+                | Pointer of ty
+                | StaticArray of ty
+                | Disjunction of name * int
 end
