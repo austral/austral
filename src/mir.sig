@@ -31,11 +31,13 @@ signature MIR = sig
 
     (* AST *)
 
+    type register = int
+
     datatype operand = BoolConstant of bool
                      | IntConstant of string * ty
                      | FloatConstant of string * ty
                      | NullConstant of ty
-                     | RegisterOp of int
+                     | RegisterOp of register
                      | VariableOp of Symbol.variable
 
     datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
