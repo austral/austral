@@ -44,4 +44,6 @@ structure MIR :> MIR = struct
                        | Load of operand
                        | Store of { ptr : operand, value : operand }
                        | SizeOf of ty
+
+    datatype instruction = Assignment of register * operation
 end

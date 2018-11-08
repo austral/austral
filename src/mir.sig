@@ -45,4 +45,6 @@ signature MIR = sig
                        | Store of { ptr : operand, value : operand }
                        | SizeOf of ty
 
+    datatype instruction = Assignment of register * operation
+
 end
