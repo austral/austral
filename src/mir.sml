@@ -39,4 +39,5 @@ structure MIR :> MIR = struct
                      | VariableOp of Symbol.variable
 
     datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
+                       | TupleCreate of operand list
 end
