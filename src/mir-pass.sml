@@ -153,7 +153,7 @@ structure MirPass :> MIR_PASS = struct
         let val (ptrBlock, ptr') = transform ptr
             and (valBlock, val') = transform value
         in
-
+            raise Fail "Store not implemented"
         end
       | transform _ =
         raise Fail "Not implemented yet"
