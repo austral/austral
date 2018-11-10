@@ -182,7 +182,7 @@ structure MirPass :> MIR_PASS = struct
              RegisterOp result)
         end
       | transform (HIR.Case (exp, cases, ty)) =
-        raise Fail "Case not implemented yet"
+        transformCase exp cases ty
       | transform (HIR.UnsafeExtractCase (exp, caseId, ty)) =
         let val (expBlock, exp') = transform exp
             and result = freshRegister ()
@@ -266,6 +266,18 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, RegisterOp result)
             end
         end
+
+    and transformCases exp cases ty =
+        let val (expBlock, exp') = transform exp
+        in
+            let val cases' = map transformCase cases
+            in
+                raise Fail "Case not implemented yet"
+            end
+        end
+
+    and transformCase (HIR.VariantCase (name, body)) =
+        raise Fail "Not implemented yet"
 
     and transformVoidForeignFuncall name args =
         let val (argBlocks, argOps) = transformArgs args
