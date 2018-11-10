@@ -176,7 +176,13 @@ structure MirPass :> MIR_PASS = struct
       | transform (HIR.Case (exp, cases, ty)) =
         raise Fail "Case not implemented yet"
       | transform (HIR.UnsafeExtractCase (exp, caseId, ty)) =
-        raise Fail "Not implemented yet"
+        let val (expBlock, exp') = transform exp
+            and result = freshRegister ()
+        in
+            (expBlock
+             @ [Assignment (result, TupleProj (exp', 1))],
+             RegisterOp result)
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
