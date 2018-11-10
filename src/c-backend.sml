@@ -162,7 +162,10 @@ structure CBackend :> C_BACKEND = struct
       | transformOperand tt (MIR.IntConstant (i, ty)) =
         C.Cast (transformType tt ty, C.IntConstant i)
       | transformOperand tt (MIR.FloatConstant (f, ty)) =
-        C.Cast (transformType tt ty, C.FloatConstant f)
+        let val (ty', _) = transformType tt ty
+        in
+            C.Cast (ty', C.FloatConstant f)
+        end
       | transformOperand _ (MIR.StringConstant s) =
         C.StringConstant (CST.unescapeString s)
       | transformOperand _(MIR.RegisterOp r) =
