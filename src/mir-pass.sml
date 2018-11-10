@@ -195,7 +195,10 @@ structure MirPass :> MIR_PASS = struct
              RegisterOp result)
         end
       | transform (HIR.ForeignFuncall (name, args, rt)) =
-        raise Fail "Foreign funcall not implemented yet"
+        (case rt of
+             (* The function returns void, so we have to handle it especially. *)
+             HIR.Unit => transformVoidForeignFuncall name args
+           | _ => transformForeignFuncall name args rt)
       | transform (HIR.ForeignNull ty) =
         let val result = freshRegister ()
             and ty' = transformType (HIR.typeOf (HIR.ForeignNull ty))
@@ -273,4 +276,10 @@ structure MirPass :> MIR_PASS = struct
                 end
             end
         end
+
+    and transformVoidForeignFuncall name args =
+        raise Fail "Not implemented"
+
+    and transformForeignFuncall name args rt =
+        raise Fail "Not implemented"
 end
