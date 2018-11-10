@@ -146,10 +146,11 @@ structure MirPass :> MIR_PASS = struct
         let val (ptrBlock, ptr') = transform ptr
             and deref = freshRegister ()
             and result = freshRegister ()
+            and ty = transformType (HIR.typeOf (HIR.Load ptr))
         in
             let val nodes = ptrBlock
                             @ [Assignment (deref, Load ptr'),
-                               Assignment (result, TupleCreate [RegisterOp deref, ptr'])]
+                               Assignment (result, TupleCreate [RegisterOp deref, ptr'], ty)]
             in
                 (nodes, RegisterOp result)
             end
