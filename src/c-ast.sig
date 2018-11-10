@@ -20,4 +20,30 @@
 signature CPP_AST = sig
     datatype ty = NamedType of string
                 | Pointer of ty
+
+    datatype exp_ast = BoolConstant of bool
+                     | IntConstant of string
+                     | FloatConstant of string
+                     | StringConstant of string
+                     | NullConstant
+                     | Negation of exp_ast
+                     | Variable of string
+                     | Binop of binop * exp_ast * exp_ast
+                     | Cast of ty * exp_ast
+                     | Deref of exp_ast
+                     | AddressOf of exp_ast
+                     | SizeOf of ty
+                     | StructInitializer of ty * (string * exp_ast) list
+                     | StructAccess of exp_ast * string
+                     | Funcall of string * ty list * exp_ast list
+         and binop = Add
+                   | Sub
+                   | Mul
+                   | Div
+                   | EqualTo
+                   | NotEqualTo
+                   | GreaterThan
+                   | LessThan
+                   | GreaterThanEq
+                   | LessThanEq
 end
