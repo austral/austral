@@ -108,7 +108,7 @@ structure MirPass :> MIR_PASS = struct
             let val expBlocks = map (fn (is, _) => is) exps'
             in
                 let val nodes = (List.concat expBlocks)
-                                @ Assignment (result, TupleCreate (map (fn (_, oper) => oper) exps'))
+                                @ [Assignment (result, TupleCreate (map (fn (_, oper) => oper) exps'))]
                 in
                     (nodes, RegisterOp result)
                 end
