@@ -192,15 +192,6 @@ structure MirPass :> MIR_PASS = struct
              @ [Assignment (result, UnsafeExtractCase (exp', caseId), ty')],
              RegisterOp result)
         end
-      | transform (HIR.Seq (a, b)) =
-        let val (aBlock, _) = transform a
-            and (bBlock, b') = transform b
-        in
-            let val nodes = aBlock @ bBlock
-            in
-                (nodes, b')
-            end
-        end
       | transform (HIR.SizeOf ty) =
         let val result = freshRegister ()
             and ty' = transformType (HIR.typeOf (HIR.SizeOf ty))
@@ -217,6 +208,15 @@ structure MirPass :> MIR_PASS = struct
             let val nodes = [Assignment (result, AddressOf var, ty')]
             in
                 (nodes, RegisterOp result)
+            end
+        end
+      | transform (HIR.Seq (a, b)) =
+        let val (aBlock, _) = transform a
+            and (bBlock, b') = transform b
+        in
+            let val nodes = aBlock @ bBlock
+            in
+                (nodes, b')
             end
         end
       | transform (HIR.ConcreteFuncall (name, args, rt)) =
