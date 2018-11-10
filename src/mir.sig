@@ -22,21 +22,24 @@ signature MIR = sig
 
     (* Type System *)
 
-    datatype ty = Bool
+    datatype ty = Unit
+                | Bool
                 | Integer of Type.signedness * Type.width
                 | Float of Type.float_type
                 | Tuple of ty list
                 | Pointer of ty
+                | StaticArray of ty
                 | Disjunction of name * int
 
     (* AST *)
 
     type register = int
 
-    datatype operand = BoolConstant of bool
+    datatype operand = UnitConstant
+                     | BoolConstant of bool
                      | IntConstant of string * ty
                      | FloatConstant of string * ty
-                     | NullConstant of ty
+                     | StringConstant of CST.escaped_string
                      | RegisterOp of register
                      | VariableOp of Symbol.variable * ty
 
