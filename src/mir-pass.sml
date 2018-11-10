@@ -189,7 +189,7 @@ structure MirPass :> MIR_PASS = struct
             and ty' = transformType ty
         in
             (expBlock
-             @ [Assignment (result, UnsafeExtractCase exp', ty')],
+             @ [Assignment (result, UnsafeExtractCase (exp', caseId), ty')],
              RegisterOp result)
         end
       | transform (HIR.Seq (a, b)) =
