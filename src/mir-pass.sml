@@ -183,6 +183,15 @@ structure MirPass :> MIR_PASS = struct
              @ [Assignment (result, TupleProj (exp', 1))],
              RegisterOp result)
         end
+      | transform (HIR.Seq (a, b)) =
+        let val (aBlock, _) = transform a
+            and (bBlock, b') = transform b
+        in
+            let val nodes = aBlock @ bBlock
+            in
+                (nodes, b')
+            end
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
