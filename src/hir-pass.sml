@@ -104,8 +104,6 @@ structure HirPass :> HIR_PASS = struct
         ArrayLength (transform arr)
       | transform (M.ArrayPointer arr) =
         ArrayPointer (transform arr)
-      | transform (M.Allocate exp) =
-        Allocate (transform exp)
       | transform (M.Load exp) =
         Load (transform exp)
       | transform (M.Store (ptr, value)) =
