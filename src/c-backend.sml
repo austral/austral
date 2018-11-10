@@ -177,7 +177,11 @@ structure CBackend :> C_BACKEND = struct
         C.Variable (escapeVariable var)
 
     fun transform tt (MIR.ArithOp (kind, oper, lhs, rhs)) =
-        raise Fail "derp"
+        let val lhs = transformOperand tt lhs
+            and rhs = transformOperand tt rhs
+        in
+            raise Fail "Not implemented yet"
+        end
       | transform _ _ =
         raise Fail "Not implemented yet"
 end
