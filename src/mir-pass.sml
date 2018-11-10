@@ -89,6 +89,18 @@ structure MirPass :> MIR_PASS = struct
                 end
             end
         end
+      | transform (HIR.ArithOp (kind, oper, lhs, rhs)) =
+        let val (lBlock, lhs') = transform lhs
+            and (rBlock, rhs') = transform rhs
+            and result = freshRegister ()
+        in
+            let val nodes = lBlock
+                            @ rBlock
+                            @ [Assignment (result, ArithOp (kind, oper, lhs', rhs'))]
+            in
+                (nodes, result)
+            end
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
