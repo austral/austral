@@ -67,4 +67,5 @@ signature MIR = sig
                                      alternate : instruction list,
                                      result : register,
                                      ty : ty }
+                         | VoidForeignFuncall of string * operand list
 end
