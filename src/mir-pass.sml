@@ -105,7 +105,7 @@ structure MirPass :> MIR_PASS = struct
         let val exps' = map transform exps
             and result = freshRegister ()
         in
-            (map (fn (is, _) => is) exps',
+            (List.concat (map (fn (is, _) => is) exps'),
              Assignment (result, TupleCreate (map (fn (_, oper) => oper) exps')))
         end
       | transform _ =
