@@ -36,5 +36,5 @@ signature C_BACKEND = sig
 
     (* Transform types *)
 
-    val transformType : tuple_types -> HIR.ty -> ty * tuple_types
+    val transformType : tuple_types -> MIR.ty -> ty * tuple_types
 end
