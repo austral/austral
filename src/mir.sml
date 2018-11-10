@@ -22,33 +22,45 @@ structure MIR :> MIR = struct
 
     (* Type System *)
 
-    datatype ty = Bool
+    datatype ty = Unit
+                | Bool
                 | Integer of Type.signedness * Type.width
                 | Float of Type.float_type
                 | Tuple of ty list
                 | Pointer of ty
+                | StaticArray of ty
                 | Disjunction of name * int
 
     (* AST *)
 
     type register = int
 
-    datatype operand = BoolConstant of bool
+    datatype operand = UnitConstant
+                     | BoolConstant of bool
                      | IntConstant of string * ty
                      | FloatConstant of string * ty
-                     | NullConstant of ty
+                     | StringConstant of CST.escaped_string
                      | RegisterOp of register
                      | VariableOp of Symbol.variable * ty
 
     datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
                        | TupleCreate of operand list
                        | TupleProj of operand * int
+                       | ArrayLength of operand
+                       | ArrayPointer of operand
                        | Load of operand
-                       | SizeOf of ty
+                       | Store { ptr : operand, value : operand }
                        | Construct of ty * int * operand option
+                       | UnsafeExtractCase of operand * int * ty
+                       | ForeignFuncall of string * operand list * ty
+                       | ForeignNull of ty
+                       | SizeOf of ty
+                       | AddressOf of Symbol.variable * ty
+                       | Cast of ty * ast
+                       | ConcreteFuncall of name * ast list * ty
+                       | GenericFuncall of name * int * ast list * ty
 
     datatype instruction = Assignment of register * operation * ty
-                         | Store of { ptr : operand, value : operand }
                          | DeclareLocal of Symbol.variable * ty * operand
                          | Cond of { test : operand,
                                      consequent : instruction list,
