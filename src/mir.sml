@@ -57,8 +57,8 @@ structure MIR :> MIR = struct
                        | SizeOf of ty
                        | AddressOf of Symbol.variable * ty
                        | Cast of ty * operand
-                       | ConcreteFuncall of name * operand list * ty
-                       | GenericFuncall of name * int * operand list * ty
+                       | ConcreteFuncall of name * operand list
+                       | GenericFuncall of name * int * operand list
 
     datatype instruction = Assignment of register * operation * ty
                          | DeclareLocal of Symbol.variable * ty * operand
