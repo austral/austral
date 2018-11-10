@@ -175,4 +175,9 @@ structure CBackend :> C_BACKEND = struct
         C.Variable (regName r)
       | transformOperand _ (MIR.VariableOp (var, _)) =
         C.Variable (escapeVariable var)
+
+    fun transform tt (MIR.ArithOp (kind, oper, lhs, rhs)) =
+        raise Fail "derp"
+      | transform _ _ =
+        raise Fail "Not implemented yet"
 end
