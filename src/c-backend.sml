@@ -35,4 +35,13 @@ structure CBackend :> C_BACKEND = struct
                      CAst.NamedType ("_A_tuple_" ^ (Int.toString id)))
 
     (* Transform types *)
+
+    local
+        open CAst
+    in
+        fun transformType tt HIR.Unit =
+            (NamedType "_A_bool", tt)
+          | transformType _ _ =
+            raise Fail "Not implemented yet"
+    end
 end
