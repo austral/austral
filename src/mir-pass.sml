@@ -101,6 +101,13 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, RegisterOp result)
             end
         end
+      | transform (HIR.TupleCreate exps) =
+        let val exps' = map transform exps
+            and result = freshRegister ()
+        in
+            (map (fn (is, _) => is) exps',
+             Assignment (result, TupleCreate (map (fn (_, oper) => oper) exps')))
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
