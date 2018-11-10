@@ -38,7 +38,7 @@ signature MIR = sig
                      | FloatConstant of string * ty
                      | NullConstant of ty
                      | RegisterOp of register
-                     | VariableOp of Symbol.variable
+                     | VariableOp of Symbol.variable * ty
 
     datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
                        | TupleCreate of operand list
