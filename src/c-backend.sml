@@ -20,6 +20,47 @@
 structure CBackend :> C_BACKEND = struct
     type ty = CAst.ty
 
+    (* Escaping *)
+
+    local
+        open Symbol
+    in
+        fun escapeSymbol symbol =
+            let val module = symbolModuleName symbol
+                and name = symbolName symbol
+            in
+                "_A_" ^ (escapeIdent module) ^ "___" ^ (escapeIdent name)
+            end
+        and escapeIdent i =
+            escapeString (Ident.identString i)
+        and escapeString s =
+            String.concat (map escapeChar (String.explode s))
+        and escapeChar #"!" = "_ba"
+          | escapeChar #"%" = "_pe"
+          | escapeChar #"&" = "_am"
+          | escapeChar #"$" = "_do"
+          | escapeChar #"#" = "_po"
+          | escapeChar #"+" = "_pl"
+          | escapeChar #"-" = "_da"
+          | escapeChar #"*" = "_mu"
+          | escapeChar #"/" = "_di"
+          | escapeChar #"<" = "_lt"
+          | escapeChar #"=" = "_eq"
+          | escapeChar #">" = "_gt"
+          | escapeChar #"?" = "_in"
+          | escapeChar #"@" = "_at"
+          | escapeChar #"\\" = "_bs"
+          | escapeChar #"~" = "_ti"
+          | escapeChar #"^" = "_ca"
+          | escapeChar #"|" = "_pi"
+          | escapeChar #"'" = "_qu"
+          | escapeChar #"." = "_pe"
+          | escapeChar c = str c
+
+        fun escapeVariable (Symbol.Var (sym, i)) =
+            (escapeSymbol sym) ^ "_" ^ (Int.toString i)
+    end
+
     (* Tuples *)
 
     type tuple_types = (ty list, ty) Map.map
