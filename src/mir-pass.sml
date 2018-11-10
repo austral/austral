@@ -295,4 +295,14 @@ structure MirPass :> MIR_PASS = struct
                 end
             end
         end
+
+    and transformArgs args =
+        let val args' = map transform args
+        in
+            let val argBlocks = map (fn (is, _) => is) args'
+                and argOps = map (fn (_, oper) => oper) args'
+            in
+                (argBlocks, argOps)
+            end
+        end
 end
