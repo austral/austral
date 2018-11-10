@@ -44,7 +44,7 @@ structure MirPass :> MIR_PASS = struct
     (* Transform HIR expressions to MIR basic blocks *)
 
     fun transform HIR.UnitConstant =
-        BoolConstant false
+        ([], BoolConstant false)
       | transform _ =
         raise Fail "Not implemented yet"
 end
