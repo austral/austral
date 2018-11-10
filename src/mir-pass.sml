@@ -277,7 +277,12 @@ structure MirPass :> MIR_PASS = struct
         end
 
     and transformCase (HIR.VariantCase (name, body)) =
-        raise Fail "Not implemented yet"
+        let val (bodyBlock, body') = transform body
+            and result = freshRegister ()
+            and ty = transformType (HIR.typeOf body)
+        in
+            VariantCase (name, bodyBlock, body', ty)
+        end
 
     and transformVoidForeignFuncall name args =
         let val (argBlocks, argOps) = transformArgs args
