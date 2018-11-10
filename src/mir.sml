@@ -51,7 +51,7 @@ structure MIR :> MIR = struct
                        | Load of operand
                        | Store of { ptr : operand, value : operand }
                        | Construct of ty * int * operand option
-                       | UnsafeExtractCase of operand * int * ty
+                       | UnsafeExtractCase of operand * int
                        | ForeignFuncall of string * operand list * ty
                        | ForeignNull of ty
                        | SizeOf of ty
