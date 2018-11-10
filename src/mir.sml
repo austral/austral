@@ -67,4 +67,5 @@ structure MIR :> MIR = struct
                                      alternate : instruction list,
                                      result : register,
                                      ty : ty }
+                         | VoidForeignFuncall of string * operand list
 end
