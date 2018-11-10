@@ -121,6 +121,13 @@ structure MirPass :> MIR_PASS = struct
             (tupBlock @ [Assignment (result, TupleProj (tup', idx))],
              RegisterOp result)
         end
+      | transform (HIR.ArrayLength arr) =
+        let val (arrBlock, arr') = transform arr
+            and result = freshRegister ()
+        in
+            (arrBlock @ [Assignment (result, TupleProj (arr', 0))],
+             RegisterOp result)
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
