@@ -142,8 +142,6 @@ structure MirPass :> MIR_PASS = struct
             (arrBlock @ [Assignment (result, ArrayPointer arr', ty)],
              RegisterOp result)
         end
-      | transform (HIR.Allocate _) =
-        raise Fail "Allocate not implemented"
       | transform (HIR.Load ptr) =
         let val (ptrBlock, ptr') = transform ptr
             and result = freshRegister ()
