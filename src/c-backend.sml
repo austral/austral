@@ -37,11 +37,13 @@ structure CBackend :> C_BACKEND = struct
 
     fun addTuple tt tys =
         case getTuple tt tys of
-            (SOME _) => tt
+            (SOME ty) => (ty, tt)
           | NONE => let val id = freshId ()
                     in
-                        Map.iadd tt (tys,
-                                     CAst.NamedType ("_A_tuple_" ^ (Int.toString id)))
+                        let val ty = CAst.NamedType ("_A_tuple_" ^ (Int.toString id))
+                        in
+                            (ty, Map.iadd tt (tys, ty))
+                        end
                     end
 
     (* Transform types *)
@@ -70,6 +72,9 @@ structure CBackend :> C_BACKEND = struct
                 case getTuple tt tys' of
                     (SOME ty) => (ty, NamedType tt')
                   | NONE => let val tt = addTuple tt tys
+                            in
+
+                            end
             end
           | transformType _ _ =
             raise Fail "Not implemented yet"
