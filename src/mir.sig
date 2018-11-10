@@ -46,6 +46,7 @@ signature MIR = sig
                        | Load of operand
                        | SizeOf of ty
                        | Construct of ty * int * operand option
+                       | ForeignFuncall of string * operand list * ty
 
     datatype instruction = Assignment of register * operation * ty
                          | Store of { ptr : operand, value : operand }
