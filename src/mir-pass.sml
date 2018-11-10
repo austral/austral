@@ -105,11 +105,12 @@ structure MirPass :> MIR_PASS = struct
       | transform (HIR.TupleCreate exps) =
         let val exps' = map transform exps
             and result = freshRegister ()
+            and ty = Tuple (map (transformType o HIR.typeOf) exps)
         in
             let val expBlocks = map (fn (is, _) => is) exps'
             in
                 let val nodes = (List.concat expBlocks)
-                                @ [Assignment (result, TupleCreate (map (fn (_, oper) => oper) exps'))]
+                                @ [Assignment (result, TupleCreate (map (fn (_, oper) => oper) exps'), ty)]
                 in
                     (nodes, RegisterOp result)
                 end
