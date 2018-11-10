@@ -77,7 +77,12 @@ structure MirPass :> MIR_PASS = struct
             and (aBlock, a') = transform a
             and result = freshRegister ()
         in
-
+            (tBlock,
+             Cond { test = t',
+                    consequent = cBlock,
+                    alternate = aBlock,
+                    result = result,
+                    ty = transformType (HIR.typeOf c) })
         end
       | transform _ =
         raise Fail "Not implemented yet"
