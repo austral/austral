@@ -186,9 +186,10 @@ structure MirPass :> MIR_PASS = struct
       | transform (HIR.UnsafeExtractCase (exp, caseId, ty)) =
         let val (expBlock, exp') = transform exp
             and result = freshRegister ()
+            and ty' = transformType ty
         in
             (expBlock
-             @ [Assignment (result, TupleProj (exp', 1))],
+             @ [Assignment (result, TupleProj (exp', 1), ty')],
              RegisterOp result)
         end
       | transform (HIR.Seq (a, b)) =
