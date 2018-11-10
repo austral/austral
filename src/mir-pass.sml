@@ -210,7 +210,7 @@ structure MirPass :> MIR_PASS = struct
                 and argOps = map (fn (_, oper) => oper) args'
             in
                 let val nodes = argBlocks
-                                @ [Assignment (register, ConcreteFuncall (name, argOps))]
+                                @ [Assignment (result, ConcreteFuncall (name, argOps))]
                 in
                     (nodes, RegisterOp result)
                 end
