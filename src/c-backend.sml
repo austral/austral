@@ -33,4 +33,6 @@ structure CBackend :> C_BACKEND = struct
     fun addTuple tt tys id =
         Map.iadd tt (tys,
                      CAst.NamedType ("_A_tuple_" ^ (Int.toString id)))
+
+    (* Transform types *)
 end

@@ -28,4 +28,8 @@ signature C_BACKEND = sig
 
     val getTuple : tuple_types -> ty list -> ty option
     val addTuple : tuple_types -> ty list -> int -> tuple_types
+
+    (* Transform types *)
+
+    val transformType : HIR.ty -> ty
 end
