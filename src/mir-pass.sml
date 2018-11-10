@@ -54,6 +54,17 @@ structure MirPass :> MIR_PASS = struct
       | transform (HIR.Variable (name, ty)) =
         ([], VariableOp (name, transformType ty))
       | transform (HIR.Let (var, value, body)) =
+        let val (valueBlock, value') = transform value
+            and (bodyBlock, body') = transform body
+        in
+            let val decl = DeclareLocal (var, HIR.typeOf value, value')
+            in
+                let val nodes = valueBlock @ [decl] @ bodyBlock
+                in
+                    (nodes, body')
+                end
+            end
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
