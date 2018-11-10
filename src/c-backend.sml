@@ -180,8 +180,36 @@ structure CBackend :> C_BACKEND = struct
         let val lhs = transformOperand tt lhs
             and rhs = transformOperand tt rhs
         in
-            raise Fail "Not implemented yet"
+            let val f = case kind of
+                            Arith.Modular => transformModularArith
+                          | Arith.Checked => transformCheckedArith
+                          | Arith.Saturation => transformSaturationArith
+                          | Arith.Float => transformFloatArith
+            in
+                f oper lhs rhs
+            end
         end
       | transform _ _ =
         raise Fail "Not implemented yet"
+
+    and transformModularArith oper lhs rhs =
+        raise Fail "Not implemented yet"
+
+    and transformCheckedArith oper lhs rhs =
+        raise Fail "Not implemented yet"
+
+    and transformSaturationArith oper lhs rhs =
+        raise Fail "Not implemented yet"
+
+    and transformFloatArith oper lhs rhs =
+        C.Binop (mapOper oper, lhs, rhs)
+
+    and mapOper Arith.Add =
+        C.Add
+      | mapOper Arith.Sub =
+        C.Sub
+      | mapOper Arith.Mul =
+        C.Mul
+      | mapOper Arith.Div =
+        C.Div
 end
