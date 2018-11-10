@@ -17,6 +17,6 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure MirPass :> MIR_PASS = sig
+structure MirPass :> MIR_PASS = struct
 
 end
