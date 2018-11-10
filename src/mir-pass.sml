@@ -93,10 +93,11 @@ structure MirPass :> MIR_PASS = struct
         let val (lBlock, lhs') = transform lhs
             and (rBlock, rhs') = transform rhs
             and result = freshRegister ()
+            and ty = transformType (HIR.typeOf (HIR.ArithOp (kind, oper, lhs, rhs)))
         in
             let val nodes = lBlock
                             @ rBlock
-                            @ [Assignment (result, ArithOp (kind, oper, lhs', rhs'))]
+                            @ [Assignment (result, ArithOp (kind, oper, lhs', rhs'), ty)]
             in
                 (nodes, RegisterOp result)
             end
