@@ -71,18 +71,23 @@ structure MirPass :> MIR_PASS = struct
                 end
             end
         end
-      | transform (Cond (t, c, a)) =
+      | transform (HIR.Cond (t, c, a)) =
         let val (tBlock, t') = transform t
             and (cBlock, c') = transform c
             and (aBlock, a') = transform a
             and result = freshRegister ()
         in
-            (tBlock,
-             Cond { test = t',
-                    consequent = cBlock,
-                    alternate = aBlock,
-                    result = result,
-                    ty = transformType (HIR.typeOf c) })
+            let val cond = Cond { test = t',
+                                  consequent = cBlock,
+                                  alternate = aBlock,
+                                  result = result,
+                                  ty = transformType (HIR.typeOf c) }
+            in
+                let val nodes = tBlock @ [cond]
+                in
+                    (nodes, result)
+                end
+            end
         end
       | transform _ =
         raise Fail "Not implemented yet"
