@@ -46,7 +46,7 @@ structure MirPass :> MIR_PASS = struct
     val regCount = ref 0
     fun freshRegister () =
         (regCount := !regCount + 1;
-         RegisterOp !regCount)
+         RegisterOp (!regCount))
 
     fun transform HIR.UnitConstant =
         ([], BoolConstant false)
