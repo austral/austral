@@ -52,7 +52,7 @@ signature MIR = sig
                          | Cond of { test : operand,
                                      consequent : instruction list,
                                      alternate : instruction list,
-                                     result : operand,
+                                     result : register,
                                      ty : ty }
 
 end
