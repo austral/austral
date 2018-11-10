@@ -72,7 +72,7 @@ structure CBackend :> C_BACKEND = struct
                 addTuple tt tys'
             end
           | transformType tt (HIR.Pointer t) =
-            let val (t', tt) = transformType t
+            let val (t', tt) = transformType tt t
             in
                 (Pointer t', tt)
             end
