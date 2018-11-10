@@ -161,7 +161,11 @@ structure MirPass :> MIR_PASS = struct
             end
         end
       | transform (HIR.Construct (ty, caseId, NONE)) =
-        Construct (transformType ty, caseId, NONE))
+        let val result = freshRegister ()
+        in
+            ([Assignment (result, Construct (transformType ty, caseId, NONE))],
+             RegisterOp result)
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
