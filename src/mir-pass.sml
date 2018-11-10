@@ -182,7 +182,7 @@ structure MirPass :> MIR_PASS = struct
              RegisterOp result)
         end
       | transform (HIR.Case (exp, cases, ty)) =
-        transformCase exp cases ty
+        transformCases exp cases ty
       | transform (HIR.UnsafeExtractCase (exp, caseId, ty)) =
         let val (expBlock, exp') = transform exp
             and result = freshRegister ()
