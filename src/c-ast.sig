@@ -54,4 +54,11 @@ signature CPP_AST = sig
                        | Cond of exp_ast * block_ast * block_ast
                        | While of exp_ast * block_ast
                        | StandaloneExp of exp_ast
+
+    datatype top_ast = FunctionDef of string * typaram list * param list * ty * block_ast * exp_ast
+                     | ExternFunctionDecl of string * ty list * Function.foreign_arity * ty
+                     | TypeDef of string * typaram list * ty
+                     | ToplevelProgn of top_ast list
+         and typaram = TypeParam of string
+         and param = Param of string * ty
 end
