@@ -22,7 +22,7 @@ structure CBackend :> C_BACKEND = struct
 
     (* Tuples *)
 
-    type tuple_types = (ty list, ty * int) Map.map
+    type tuple_types = (ty list, ty) Map.map
 
     val emptyTupleTypes =
         Map.empty
