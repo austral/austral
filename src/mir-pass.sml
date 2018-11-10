@@ -55,7 +55,7 @@ structure MirPass :> MIR_PASS = struct
       | transform (HIR.FloatConstant (f, ty)) =
         ([], FloatConstant (f, transformType ty))
       | transform (HIR.StringConstant s) =
-        raise Fail "String constants not implemented yet"
+        ([], StringConstant s)
       | transform (HIR.Variable (name, ty)) =
         ([], VariableOp (name, transformType ty))
       | transform (HIR.Let (var, value, body)) =
