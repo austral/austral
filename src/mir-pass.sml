@@ -114,6 +114,13 @@ structure MirPass :> MIR_PASS = struct
                 end
             end
         end
+      | transform (HIR.TupleProj (tup, idx)) =
+        let val (tupBlock, tup') = transform tup
+            and result = freshRegister ()
+        in
+            (tupBlock @ [Assignment (result, TupleProj (tup', idx))],
+             RegisterOp result)
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
