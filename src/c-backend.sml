@@ -36,11 +36,15 @@ structure CBackend :> C_BACKEND = struct
 
     (* Transform types *)
 
+    val boolType = CAst.NamedType "_A_bool"
+
     local
         open CAst
     in
         fun transformType tt HIR.Unit =
-            (NamedType "_A_bool", tt)
+            (boolType, tt)
+          | transformType tt HIR.Bool =
+            (boolType, tt)
           | transformType _ _ =
             raise Fail "Not implemented yet"
     end
