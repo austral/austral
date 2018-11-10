@@ -85,7 +85,7 @@ structure MirPass :> MIR_PASS = struct
             in
                 let val nodes = tBlock @ [cond]
                 in
-                    (nodes, result)
+                    (nodes, RegisterOp result)
                 end
             end
         end
