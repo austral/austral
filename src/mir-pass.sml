@@ -137,7 +137,7 @@ structure MirPass :> MIR_PASS = struct
             and result = freshRegister ()
             and ty = transformType (HIR.typeOf (HIR.ArrayPointer arr))
         in
-            (arrBlock @ [Assignment (result, TupleProj (arr', 1), ty)],
+            (arrBlock @ [Assignment (result, ArrayPointer arr', ty)],
              RegisterOp result)
         end
       | transform (HIR.Allocate _) =
