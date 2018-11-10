@@ -20,6 +20,8 @@
 structure MirPass :> MIR_PASS = struct
     open MIR
 
+    (* Transform HIR types to MIR types *)
+
     val sizeType = Integer (Type.Unsigned, Type.Int64)
 
     fun transformType HIR.Unit =
@@ -38,4 +40,9 @@ structure MirPass :> MIR_PASS = struct
         Tuple [sizeType, Pointer (transformType t)]
       | transformType (HIR.Disjunction (name, id)) =
         Disjunction (name, id)
+
+    (* Transform HIR expressions to MIR basic blocks *)
+
+    fun transform HIR.UnitConstant =
+        BoolConstant false
 end
