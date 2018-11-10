@@ -43,7 +43,7 @@ structure MirPass :> MIR_PASS = struct
 
     (* Transform HIR expressions to MIR basic blocks *)
 
-(*    val regCount = ref 0
+    val regCount = ref 0
     fun freshRegister () =
         (regCount := !regCount + 1;
          !regCount)
@@ -202,5 +202,5 @@ structure MirPass :> MIR_PASS = struct
             end
         end
       | transform _ =
-        raise Fail "Not implemented yet"*)
+        raise Fail "Not implemented yet"
 end
