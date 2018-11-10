@@ -186,7 +186,7 @@ structure CBackend :> C_BACKEND = struct
                           | Arith.Saturation => transformSaturationArith
                           | Arith.Float => transformFloatArith
             in
-                f oper lhs rhs
+                (f oper lhs rhs, tt)
             end
         end
       | transform _ _ =
