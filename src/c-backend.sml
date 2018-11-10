@@ -51,6 +51,14 @@ structure CBackend :> C_BACKEND = struct
             (NamedType "float", tt)
           | transformType tt (HIR.Float Type.Double) =
             (NamedType "double", tt)
+          | transformType tt (HIR.Tuple tys) =
+            let val (tys', tt') = Util.foldThread (fn (ty, tt) =>
+                                                      transformType tt ty)
+                                                  tys
+                                                  tt
+            in
+                raise Fail "Not implemented"
+            end
           | transformType _ _ =
             raise Fail "Not implemented yet"
 
