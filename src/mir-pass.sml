@@ -18,14 +18,14 @@
 *)
 
 structure MirPass :> MIR_PASS = struct
-(*    open MIR
+    open MIR
 
-    (* Transform HIR types to MIR types *)
+    (* Transform types *)
 
     val sizeType = Integer (Type.Unsigned, Type.Int64)
 
     fun transformType HIR.Unit =
-        Bool
+        Unit
       | transformType HIR.Bool =
         Bool
       | transformType (HIR.Integer (s, w)) =
@@ -37,13 +37,13 @@ structure MirPass :> MIR_PASS = struct
       | transformType (HIR.Pointer t) =
         Pointer (transformType t)
       | transformType (HIR.StaticArray t) =
-        Tuple [sizeType, Pointer (transformType t)]
+        StaticArray (transformType t)
       | transformType (HIR.Disjunction (name, id)) =
         Disjunction (name, id)
 
     (* Transform HIR expressions to MIR basic blocks *)
 
-    val regCount = ref 0
+(*    val regCount = ref 0
     fun freshRegister () =
         (regCount := !regCount + 1;
          !regCount)
