@@ -96,6 +96,8 @@ structure CBackend :> C_BACKEND = struct
     fun disjName name id =
         "_A_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
 
+    structure C = CAst
+
     local
         open CAst
     in
@@ -147,4 +149,24 @@ structure CBackend :> C_BACKEND = struct
           | transformIntType Type.Signed   Type.Int64 =
             "int64_t"
     end
+
+    (* Transform code *)
+
+    fun regName r =
+        "_A_r" ^ (Int.toString r)
+
+    fun transformOperand MIR.UnitConstant =
+        C.BoolConstant false
+      | transformOperand (MIR.BoolConstant b) =
+        C.BoolConstant b
+      | transformOperand (MIR.IntConstant (i, ty)) =
+        C.Cast (transformType ty, C.IntConstant i)
+      | transformOperand (MIR.FloatConstant (f, ty)) =
+        C.Cast (transformType ty, C.FloatConstant f)
+      | transformOperand (MIR.StringConstant s) =
+        C.StringConstant (CST.unescapeString s)
+      | transformOperand (MIR.RegisterOp r) =
+        C.Variable (regName r)
+      | transformOperand (MIR.VariableOp (var, _)) =
+        C.Variable (escapeVariable var)
 end
