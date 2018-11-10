@@ -203,7 +203,7 @@ structure MirPass :> MIR_PASS = struct
         end
       | transform (HIR.SizeOf ty) =
         let val result = freshRegister ()
-            and ty' = transformType (HIR.SizeOf ty)
+            and ty' = transformType (HIR.typeOf (HIR.SizeOf ty))
         in
             let val nodes = [Assignment (result, SizeOf (transformType ty), ty')]
             in
