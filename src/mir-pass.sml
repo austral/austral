@@ -47,6 +47,8 @@ structure MirPass :> MIR_PASS = struct
         ([], BoolConstant false)
       | transform (HIR.IntConstant (i, ty)) =
         ([], IntConstant (i, transformType ty))
+      | transform (HIR.FloatConstant (f, ty)) =
+        ([], FloatConstant (f, transformType ty))
       | transform _ =
         raise Fail "Not implemented yet"
 end
