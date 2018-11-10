@@ -1,6 +1,5 @@
 TODO:
 
-- New HIR->MIR
 - New LIR
 - New MIR->LIR
 - LLVM AST
@@ -161,3 +160,4 @@ DONE:
 - New HIR
 - New MTAST->HIR
 - New MIR
+- New HIR->MIR
