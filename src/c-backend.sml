@@ -45,7 +45,26 @@ structure CBackend :> C_BACKEND = struct
             (boolType, tt)
           | transformType tt HIR.Bool =
             (boolType, tt)
+          | transformType tt (HIR.Integer (s, w)) =
+            (transformIntType s w, tt)
           | transformType _ _ =
             raise Fail "Not implemented yet"
+
+        and transformIntType Type.Unsigned Type.Int8 =
+            "uint8_t"
+          | transformIntType Type.Signed   Type.Int8 =
+            "int8_t"
+          | transformIntType Type.Unsigned Type.Int16 =
+            "uint16_t"
+          | transformIntType Type.Signed   Type.Int16 =
+            "int16_t"
+          | transformIntType Type.Unsigned Type.Int32 =
+            "uint32_t"
+          | transformIntType Type.Signed   Type.Int32 =
+            "int32_t"
+          | transformIntType Type.Unsigned Type.Int64 =
+            "uint64_t"
+          | transformIntType Type.Signed   Type.Int64 =
+            "int64_t"
     end
 end
