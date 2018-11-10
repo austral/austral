@@ -269,12 +269,17 @@ structure MirPass :> MIR_PASS = struct
 
     and transformCases exp cases ty =
         let val (expBlock, exp') = transform exp
+            and result = freshRegister ()
         in
             let val cases' = map transformCase cases
             in
                 let val ty' = transformType ty
                 in
-                    raise Fail "Case not implemented yet"
+                    let val nodes = expBlock
+                                    @ [Cond (exp', cases', result, ty')]
+                    in
+                        (nodes, RegisterOp result)
+                    end
                 end
             end
         end
