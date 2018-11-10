@@ -18,5 +18,6 @@
 *)
 
 signature CPP_AST = sig
-
+    datatype ty = NamedType of string
+                | Pointer of ty
 end
