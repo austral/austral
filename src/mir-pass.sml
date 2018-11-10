@@ -149,11 +149,16 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, RegisterOp result)
             end
         end
-      | transform (HIR.Load (ptr, value)) =
+      | transform (HIR.Store(ptr, value)) =
         let val (ptrBlock, ptr') = transform ptr
             and (valBlock, val') = transform value
         in
-            raise Fail "Store not implemented"
+            let val nodes = ptrBlock
+                            @ valBlock
+                            @ [Store { ptr = ptr', value = val' }]
+            in
+                (nodes, ptr')
+            end
         end
       | transform _ =
         raise Fail "Not implemented yet"
