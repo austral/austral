@@ -54,6 +54,11 @@ signature MIR = sig
                        | UnsafeExtractCase of operand * int * ty
                        | ForeignFuncall of string * operand list * ty
                        | ForeignNull of ty
+                       | SizeOf of ty
+                       | AddressOf of Symbol.variable * ty
+                       | Cast of ty * ast
+                       | ConcreteFuncall of name * ast list * ty
+                       | GenericFuncall of name * int * ast list * ty
 
     datatype instruction = Assignment of register * operation * ty
                          | DeclareLocal of Symbol.variable * ty * operand
@@ -62,5 +67,4 @@ signature MIR = sig
                                      alternate : instruction list,
                                      result : register,
                                      ty : ty }
-
 end
