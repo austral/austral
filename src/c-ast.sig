@@ -46,4 +46,12 @@ signature CPP_AST = sig
                    | LessThan
                    | GreaterThanEq
                    | LessThanEq
+
+    datatype block_ast = Sequence of block_ast list
+                       | Block of block_ast list
+                       | Declare of ty * string
+                       | Assign of exp_ast * exp_ast
+                       | Cond of exp_ast * block_ast * block_ast
+                       | While of exp_ast * block_ast
+                       | StandaloneExp of exp_ast
 end
