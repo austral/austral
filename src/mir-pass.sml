@@ -49,7 +49,7 @@ structure MirPass :> MIR_PASS = struct
          !regCount)
 
     fun transform HIR.UnitConstant =
-        ([], BoolConstant false)
+        ([], UnitConstant)
       | transform (HIR.IntConstant (i, ty)) =
         ([], IntConstant (i, transformType ty))
       | transform (HIR.FloatConstant (f, ty)) =
