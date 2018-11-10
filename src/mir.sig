@@ -53,6 +53,7 @@ signature MIR = sig
                        | Construct of ty * int * operand option
                        | UnsafeExtractCase of operand * int * ty
                        | ForeignFuncall of string * operand list * ty
+                       | ForeignNull of ty
 
     datatype instruction = Assignment of register * operation * ty
                          | Store of { ptr : operand, value : operand }
