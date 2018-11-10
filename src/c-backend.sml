@@ -155,18 +155,18 @@ structure CBackend :> C_BACKEND = struct
     fun regName r =
         "_A_r" ^ (Int.toString r)
 
-    fun transformOperand MIR.UnitConstant =
+    fun transformOperand _ MIR.UnitConstant =
         C.BoolConstant false
-      | transformOperand (MIR.BoolConstant b) =
+      | transformOperand _ (MIR.BoolConstant b) =
         C.BoolConstant b
-      | transformOperand (MIR.IntConstant (i, ty)) =
-        C.Cast (transformType ty, C.IntConstant i)
-      | transformOperand (MIR.FloatConstant (f, ty)) =
-        C.Cast (transformType ty, C.FloatConstant f)
-      | transformOperand (MIR.StringConstant s) =
+      | transformOperand tt (MIR.IntConstant (i, ty)) =
+        C.Cast (transformType tt ty, C.IntConstant i)
+      | transformOperand tt (MIR.FloatConstant (f, ty)) =
+        C.Cast (transformType tt ty, C.FloatConstant f)
+      | transformOperand _ (MIR.StringConstant s) =
         C.StringConstant (CST.unescapeString s)
-      | transformOperand (MIR.RegisterOp r) =
+      | transformOperand _(MIR.RegisterOp r) =
         C.Variable (regName r)
-      | transformOperand (MIR.VariableOp (var, _)) =
+      | transformOperand _ (MIR.VariableOp (var, _)) =
         C.Variable (escapeVariable var)
 end
