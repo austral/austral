@@ -160,6 +160,8 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, ptr')
             end
         end
+      | transform (HIR.Construct (ty, name, value)) =
+        raise Fail "Construct not implemented"
       | transform _ =
         raise Fail "Not implemented yet"
 end
