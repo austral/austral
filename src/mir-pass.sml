@@ -18,7 +18,7 @@
 *)
 
 structure MirPass :> MIR_PASS = struct
-    open MIR
+(*    open MIR
 
     (* Transform HIR types to MIR types *)
 
@@ -202,5 +202,5 @@ structure MirPass :> MIR_PASS = struct
             end
         end
       | transform _ =
-        raise Fail "Not implemented yet"
+        raise Fail "Not implemented yet"*)
 end
