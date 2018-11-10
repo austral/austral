@@ -50,6 +50,8 @@ structure CBackend :> C_BACKEND = struct
 
     val boolType = CAst.NamedType "_A_bool"
 
+    val sizeType = CAst.NamedType "size_t"
+
     local
         open CAst
     in
@@ -75,6 +77,11 @@ structure CBackend :> C_BACKEND = struct
             let val (t', tt) = transformType tt t
             in
                 (Pointer t', tt)
+            end
+          | transformType tt (HIR.StaticArray t) =
+            let val (t', tt) = transformType tt t
+            in
+                addTuple tt [sizeType, t']
             end
           | transformType _ _ =
             raise Fail "Not implemented yet"
