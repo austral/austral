@@ -20,6 +20,11 @@
 signature C_BACKEND = sig
     type ty = CAst.ty
 
+    (* Escaping *)
+
+    val escapeSymbol : Symbol.symbol -> string
+    val escapeVariable : Symbol.variable -> string
+
     (* Tuples *)
 
     type tuple_types
