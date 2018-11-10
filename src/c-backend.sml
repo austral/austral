@@ -69,12 +69,7 @@ structure CBackend :> C_BACKEND = struct
                                                  tys
                                                  tt
             in
-                case getTuple tt tys' of
-                    (SOME ty) => (ty, NamedType tt')
-                  | NONE => let val tt = addTuple tt tys
-                            in
-
-                            end
+                addTuple tt tys'
             end
           | transformType _ _ =
             raise Fail "Not implemented yet"
