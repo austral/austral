@@ -56,9 +56,9 @@ signature MIR = sig
                        | ForeignNull of ty
                        | SizeOf of ty
                        | AddressOf of Symbol.variable * ty
-                       | Cast of ty * ast
-                       | ConcreteFuncall of name * ast list * ty
-                       | GenericFuncall of name * int * ast list * ty
+                       | Cast of ty * operand
+                       | ConcreteFuncall of name * operand list * ty
+                       | GenericFuncall of name * int * operand list * ty
 
     datatype instruction = Assignment of register * operation * ty
                          | DeclareLocal of Symbol.variable * ty * operand
