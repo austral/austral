@@ -160,7 +160,10 @@ structure CBackend :> C_BACKEND = struct
       | transformOperand _ (MIR.BoolConstant b) =
         C.BoolConstant b
       | transformOperand tt (MIR.IntConstant (i, ty)) =
-        C.Cast (transformType tt ty, C.IntConstant i)
+        let val (ty', _) = transformType tt ty
+        in
+            C.Cast (ty', C.IntConstant f)
+        end
       | transformOperand tt (MIR.FloatConstant (f, ty)) =
         let val (ty', _) = transformType tt ty
         in
