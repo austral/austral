@@ -30,9 +30,19 @@ structure CBackend :> C_BACKEND = struct
     fun getTuple tt tys =
         Map.get tt tys
 
-    fun addTuple tt tys id =
-        Map.iadd tt (tys,
-                     CAst.NamedType ("_A_tuple_" ^ (Int.toString id)))
+    val count = ref 0
+    fun freshId () =
+        (count := !count + 1;
+         !count)
+
+    fun addTuple tt tys =
+        case getTuple tt tys of
+            (SOME _) => tt
+          | NONE => let val id = freshId ()
+                    in
+                        Map.iadd tt (tys,
+                                     CAst.NamedType ("_A_tuple_" ^ (Int.toString id)))
+                    end
 
     (* Transform types *)
 
@@ -52,12 +62,14 @@ structure CBackend :> C_BACKEND = struct
           | transformType tt (HIR.Float Type.Double) =
             (NamedType "double", tt)
           | transformType tt (HIR.Tuple tys) =
-            let val (tys', tt') = Util.foldThread (fn (ty, tt) =>
-                                                      transformType tt ty)
-                                                  tys
-                                                  tt
+            let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
+                                                     transformType tt ty)
+                                                 tys
+                                                 tt
             in
-                raise Fail "Not implemented"
+                case getTuple tt tys' of
+                    (SOME ty) => (ty, NamedType tt')
+                  | NONE => let val tt = addTuple tt tys
             end
           | transformType _ _ =
             raise Fail "Not implemented yet"
