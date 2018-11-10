@@ -173,6 +173,8 @@ structure MirPass :> MIR_PASS = struct
             ([Assignment (result, Construct (transformType ty, caseId, NONE))],
              RegisterOp result)
         end
+      | transform (HIR.Case (exp, cases, ty)) =
+        raise Fail "Case not implemented yet"
       | transform _ =
         raise Fail "Not implemented yet"
 end
