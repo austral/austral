@@ -47,6 +47,10 @@ structure CBackend :> C_BACKEND = struct
             (boolType, tt)
           | transformType tt (HIR.Integer (s, w)) =
             (NamedType (transformIntType s w), tt)
+          | transformType tt (HIR.Float Type.Single) =
+            (NamedType "float", tt)
+          | transformType tt (HIR.Float Type.Double) =
+            (NamedType "double", tt)
           | transformType _ _ =
             raise Fail "Not implemented yet"
 
