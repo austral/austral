@@ -18,5 +18,24 @@
 *)
 
 structure MirPass :> MIR_PASS = struct
+    open MIR
 
+    val sizeType = Integer (Type.Unsigned, Type.Int64)
+
+    fun transformType HIR.Unit =
+        Bool
+      | transformType HIR.Bool =
+        Bool
+      | transformType (HIR.Integer (s, w)) =
+        Integer (s, w)
+      | transformType (HIR.Float f) =
+        Float f
+      | transformType (HIR.Tuple tys) =
+        Tuple (map transformType tys)
+      | transformType (HIR.Pointer t) =
+        Pointer (transformType t)
+      | transformType (HIR.StaticArray t) =
+        Tuple (sizeType, Pointer (transformType t))
+      | transformType (HIR.Disjunction (name, id)) =
+        Disjunction (name, id)
 end
