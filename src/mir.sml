@@ -67,5 +67,7 @@ structure MIR :> MIR = struct
                                      alternate : instruction list,
                                      result : register,
                                      ty : ty }
+                         | Case of operand * variant_case list * ty
                          | VoidForeignFuncall of string * operand list
+         and variant_case = VariantCase of name * instruction list * operand * ty
 end
