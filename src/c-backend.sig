@@ -27,7 +27,7 @@ signature C_BACKEND = sig
     val emptyTupleTypes : tuple_types
 
     val getTuple : tuple_types -> ty list -> ty option
-    val addTuple : tuple_types -> ty list -> int -> tuple_types
+    val addTuple : tuple_types -> ty list -> tuple_types
 
     (* Transform types *)
 
