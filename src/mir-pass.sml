@@ -231,6 +231,4 @@ structure MirPass :> MIR_PASS = struct
                 end
             end
         end
-      | transform _ =
-        raise Fail "Not implemented yet"
 end
