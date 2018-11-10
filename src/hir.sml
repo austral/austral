@@ -51,7 +51,7 @@ structure HIR :> HIR = struct
                  | Store of ast * ast
                  | Construct of ty * int * ast option
                  | Case of ast * variant_case list * ty
-                 | UnsafeExtractCase of ast * name * ty
+                 | UnsafeExtractCase of ast * int * ty
                  | ForeignFuncall of string * ast list * ty
                  | ForeignNull of ty
                  | SizeOf of ty
