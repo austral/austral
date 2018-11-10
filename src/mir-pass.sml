@@ -164,7 +164,7 @@ structure MirPass :> MIR_PASS = struct
         let val (valBlock, value') = transform value
             and result = freshRegister ()
         in
-            (valBlock @ [Assignment (result, Construct (transformType ty, caseId, value'))],
+            (valBlock @ [Assignment (result, Construct (transformType ty, caseId, SOME value'))],
              RegisterOp result)
         end
       | transform (HIR.Construct (ty, caseId, NONE)) =
