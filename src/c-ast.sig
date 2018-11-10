@@ -17,7 +17,7 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature CPP_AST = sig
+signature C_AST = sig
     datatype ty = NamedType of string
                 | Pointer of ty
 
