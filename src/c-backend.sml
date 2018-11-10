@@ -193,6 +193,9 @@ structure CBackend :> C_BACKEND = struct
         raise Fail "Not implemented yet"
 
     and transformModularArith oper lhs rhs =
+        (* Modular arithmetic is implemented directly, except for division,
+           where we call a function to check if the divisor is zero and fail at
+           runtime *)
         raise Fail "Not implemented yet"
 
     and transformCheckedArith oper lhs rhs =
@@ -202,6 +205,7 @@ structure CBackend :> C_BACKEND = struct
         raise Fail "Not implemented yet"
 
     and transformFloatArith oper lhs rhs =
+        (* Floating point arithmetic is implemented directly. *)
         C.Binop (mapOper oper, lhs, rhs)
 
     and mapOper Arith.Add =
