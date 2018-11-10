@@ -17,5 +17,5 @@
     along with Boreal.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure CBackend = sig
+structure CBackend :> C_BACKEND = struct
 end
