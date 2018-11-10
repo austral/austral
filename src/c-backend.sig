@@ -42,5 +42,5 @@ signature C_BACKEND = sig
 
     val transformOperand : tuple_types -> MIR.operand -> CAst.exp_ast
 
-    val transformOperation : tuple_types -> MIR.operation -> CAst.exp_ast * tuple_types
+    val transform : tuple_types -> MIR.operation -> CAst.exp_ast * tuple_types
 end
