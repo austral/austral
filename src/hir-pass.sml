@@ -102,9 +102,18 @@ structure HirPass :> HIR_PASS = struct
       | transform (M.Store (ptr, value)) =
         Store (transform ptr, transform value)
       | transform (M.Construct (ty, name, value)) =
-        Construct (transformType ty,
-                   name,
-                   Option.map transform value)
+        let fun nameIdx ty name =
+                case ty of
+                    (MonoType.Disjunction (_, _, variants)) => nameVariantsIdx variants name
+                  | _ => raise Fail "Internal error: not a disjunction"
+
+            and nameVariantsIdx variants name =
+                Option.valOf (Util.position name (map (fn (MonoType.Variant (name, _)) => name) variants))
+        in
+            Construct (transformType ty,
+                       nameIdx ty name,
+                       Option.map transform value)
+        end
       | transform (M.Case (exp, cases, ty)) =
         let val expvar = freshVar ()
         in
