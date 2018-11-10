@@ -46,6 +46,8 @@ signature MIR = sig
     datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
                        | TupleCreate of operand list
                        | TupleProj of operand * int
+                       | ArrayLength of operand
+                       | ArrayPointer of operand
                        | Load of operand
                        | SizeOf of ty
                        | Construct of ty * int * operand option
