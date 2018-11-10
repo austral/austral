@@ -46,7 +46,7 @@ structure MirPass :> MIR_PASS = struct
     val regCount = ref 0
     fun freshRegister () =
         (regCount := !regCount + 1;
-         !regCount)
+         RegisterOp !regCount)
 
     fun transform HIR.UnitConstant =
         ([], BoolConstant false)
@@ -70,6 +70,14 @@ structure MirPass :> MIR_PASS = struct
                     (nodes, body')
                 end
             end
+        end
+      | transform (Cond (t, c, a)) =
+        let val (tBlock, t') = transform t
+            and (cBlock, c') = transform c
+            and (aBlock, a') = transform a
+            and result = freshRegister ()
+        in
+
         end
       | transform _ =
         raise Fail "Not implemented yet"
