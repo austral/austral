@@ -49,7 +49,7 @@ signature HIR = sig
                  | Allocate of ast
                  | Load of ast
                  | Store of ast * ast
-                 | Construct of ty * name * ast option
+                 | Construct of ty * int * ast option
                  | Case of ast * variant_case list * ty
                  | UnsafeExtractCase of ast * name * ty
                  | ForeignFuncall of string * ast list * ty
