@@ -262,18 +262,14 @@ structure MirPass :> MIR_PASS = struct
             end
         end
       | transform (HIR.GenericFuncall (name, id, args, rt)) =
-        let val args' = map transform args
+        let val (argBlocks, argOps) = transformArgs args
             and result = freshRegister ()
             and ty = transformType rt
         in
-            let val argBlocks = map (fn (is, _) => is) args'
-                and argOps = map (fn (_, oper) => oper) args'
+            let val nodes = (List.concat argBlocks)
+                            @ [Assignment (result, GenericFuncall (name, id, argOps), ty)]
             in
-                let val nodes = (List.concat argBlocks)
-                                @ [Assignment (result, GenericFuncall (name, id, argOps), ty)]
-                in
-                    (nodes, RegisterOp result)
-                end
+                (nodes, RegisterOp result)
             end
         end
 
