@@ -1,6 +1,5 @@
 TODO:
 
-- New MIR
 - New HIR->MIR
 - New LIR
 - New MIR->LIR
@@ -161,3 +160,4 @@ DONE:
 - Expand monomorphs
 - New HIR
 - New MTAST->HIR
+- New MIR
