@@ -87,6 +87,7 @@ is
   src/mir.sml
 
   src/mir-pass.sig
+  src/mir-pass.sml
 
   src/prelude.sig
   src/prelude.sml
