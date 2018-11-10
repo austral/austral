@@ -18,4 +18,19 @@
 *)
 
 structure CBackend :> C_BACKEND = struct
+    type ty = CAst.ty
+
+    (* Tuples *)
+
+    type tuple_types = (ty list, ty * int) Map.map
+
+    val emptyTupleTypes =
+        Map.empty
+
+    fun getTuple tt tys =
+        Map.get tt tys
+
+    fun addTuple tt tys id =
+        Map.iadd tt (tys,
+                     CAst.NamedType ("_A_tuple_" ^ (Int.toString id)))
 end
