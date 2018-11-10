@@ -50,6 +50,8 @@ structure MirPass :> MIR_PASS = struct
 
     fun transform HIR.UnitConstant =
         ([], UnitConstant)
+      | transform (HIR.BoolConstant b) =
+        ([], BoolConstant b)
       | transform (HIR.IntConstant (i, ty)) =
         ([], IntConstant (i, transformType ty))
       | transform (HIR.FloatConstant (f, ty)) =
