@@ -210,6 +210,17 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, RegisterOp result)
             end
         end
+      | transform (HIR.Cast (ty, value)) =
+        let val (valBlock, val') = transform value
+            and result = freshRegister ()
+            and ty' = transformType (HIR.typeOf (HIR.Cast (ty, value)))
+        in
+            let val nodes = valBlock
+                            @ [Assignment (result, Cast (transformType ty, val'), ty')]
+            in
+                (nodes, RegisterOp result)
+            end
+        end
       | transform (HIR.Seq (a, b)) =
         let val (aBlock, _) = transform a
             and (bBlock, b') = transform b
