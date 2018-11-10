@@ -126,7 +126,7 @@ structure HirPass :> HIR_PASS = struct
                         VariantCase (casename,
                                      Let (var,
                                           UnsafeExtractCase (expvarVar,
-                                                             casename,
+                                                             caseNameIdx ty casename,
                                                              transformType ty),
                                           transform body))
                 in
