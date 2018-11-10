@@ -98,7 +98,7 @@ structure MirPass :> MIR_PASS = struct
                             @ rBlock
                             @ [Assignment (result, ArithOp (kind, oper, lhs', rhs'))]
             in
-                (nodes, result)
+                (nodes, RegisterOp result)
             end
         end
       | transform _ =
