@@ -49,14 +49,13 @@ signature MIR = sig
                        | ArrayLength of operand
                        | ArrayPointer of operand
                        | Load of operand
-                       | SizeOf of ty
+                       | Store { ptr : operand, value : operand }
                        | Construct of ty * int * operand option
                        | UnsafeExtractCase of operand * int * ty
                        | ForeignFuncall of string * operand list * ty
                        | ForeignNull of ty
 
     datatype instruction = Assignment of register * operation * ty
-                         | Store of { ptr : operand, value : operand }
                          | DeclareLocal of Symbol.variable * ty * operand
                          | Cond of { test : operand,
                                      consequent : instruction list,
