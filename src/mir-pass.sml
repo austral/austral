@@ -192,6 +192,15 @@ structure MirPass :> MIR_PASS = struct
              @ [Assignment (result, UnsafeExtractCase (exp', caseId), ty')],
              RegisterOp result)
         end
+      | transform (HIR.ForeignNull ty) =
+        let val result = freshRegister ()
+            and ty' = transformType (HIR.typeOf (HIR.ForeignNull ty))
+        in
+            let val nodes = [Assignment (result, ForeignNull (transformType ty), ty')]
+            in
+                (nodes, RegisterOp result)
+            end
+        end
       | transform (HIR.SizeOf ty) =
         let val result = freshRegister ()
             and ty' = transformType (HIR.typeOf (HIR.SizeOf ty))
