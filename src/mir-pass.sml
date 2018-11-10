@@ -53,6 +53,7 @@ structure MirPass :> MIR_PASS = struct
         raise Fail "String constants not implemented yet"
       | transform (HIR.Variable (name, ty)) =
         ([], VariableOp (name, transformType ty))
+      | transform (HIR.Let (var, value, body)) =
       | transform _ =
         raise Fail "Not implemented yet"
 end
