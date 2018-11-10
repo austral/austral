@@ -272,7 +272,10 @@ structure MirPass :> MIR_PASS = struct
         in
             let val cases' = map transformCase cases
             in
-                raise Fail "Case not implemented yet"
+                let val ty' = transformType ty
+                in
+                    raise Fail "Case not implemented yet"
+                end
             end
         end
 
