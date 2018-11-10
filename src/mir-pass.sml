@@ -137,6 +137,18 @@ structure MirPass :> MIR_PASS = struct
         end
       | transform (HIR.Allocate _) =
         raise Fail "Allocate not implemented"
+      | transform (HIR.Load ptr) =
+        let val (ptrBlock, ptr') = transform ptr
+            and deref = freshRegister ()
+            and result = freshRegister ()
+        in
+            let val nodes = ptrBlock
+                            @ [Assignment (deref, Load ptr'),
+                               Assignment (result, TupleCreate [RegisterOp deref, ptr'])]
+            in
+                (nodes, RegisterOp result)
+            end
+        end
       | transform _ =
         raise Fail "Not implemented yet"
 end
