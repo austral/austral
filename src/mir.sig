@@ -51,6 +51,7 @@ signature MIR = sig
                        | Load of operand
                        | SizeOf of ty
                        | Construct of ty * int * operand option
+                       | UnsafeExtractCase of operand * int * ty
                        | ForeignFuncall of string * operand list * ty
 
     datatype instruction = Assignment of register * operation * ty
