@@ -135,6 +135,8 @@ structure MirPass :> MIR_PASS = struct
             (arrBlock @ [Assignment (result, TupleProj (arr', 1))],
              RegisterOp result)
         end
+      | transform (HIR.Allocate _) =
+        raise Fail "Allocate not implemented"
       | transform _ =
         raise Fail "Not implemented yet"
 end
