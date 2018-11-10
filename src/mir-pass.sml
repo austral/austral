@@ -270,7 +270,14 @@ structure MirPass :> MIR_PASS = struct
         end
 
     and transformVoidForeignFuncall name args =
-        raise Fail "Not implemented"
+        let val (argBlocks, argOps) = transformArgs args
+        in
+            let val nodes = (List.concat argBlocks)
+                            @ [VoidForeignFuncall (name, argOps)]
+            in
+                (nodes, UnitConstant)
+            end
+        end
 
     and transformForeignFuncall name args rt =
         let val (argBlocks, argOps) = transformArgs args
