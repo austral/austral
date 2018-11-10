@@ -71,6 +71,11 @@ structure CBackend :> C_BACKEND = struct
             in
                 addTuple tt tys'
             end
+          | transformType tt (HIR.Pointer t) =
+            let val (t', tt) = transformType t
+            in
+                (Pointer t', tt)
+            end
           | transformType _ _ =
             raise Fail "Not implemented yet"
 
