@@ -18,4 +18,14 @@
 *)
 
 signature C_BACKEND = sig
+    type ty = CAst.ty
+
+    (* Tuples *)
+
+    type tuple_types
+
+    val emptyTupleTypes : tuple_types
+
+    val getTuple : tuple_types -> ty list -> CAst.ty
+    val addTuple : tuple_types -> ty list -> int -> tuple_types
 end
