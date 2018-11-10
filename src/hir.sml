@@ -93,7 +93,6 @@ structure HIR :> HIR = struct
         (case (typeOf arr) of
              (StaticArray ty) => Pointer ty
            | _ => raise Fail "Invalid type for ArrayPointer")
-      | typeOf (Allocate v) =
         Pointer (typeOf v)
       | typeOf (Load p) =
         (case typeOf p of
