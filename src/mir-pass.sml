@@ -192,6 +192,8 @@ structure MirPass :> MIR_PASS = struct
              @ [Assignment (result, UnsafeExtractCase (exp', caseId), ty')],
              RegisterOp result)
         end
+      | transform (HIR.ForeignFuncall (name, args, rt)) =
+        raise Fail "Foreign funcall not implemented yet"
       | transform (HIR.ForeignNull ty) =
         let val result = freshRegister ()
             and ty' = transformType (HIR.typeOf (HIR.ForeignNull ty))
