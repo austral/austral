@@ -105,8 +105,14 @@ structure MirPass :> MIR_PASS = struct
         let val exps' = map transform exps
             and result = freshRegister ()
         in
-            (List.concat (map (fn (is, _) => is) exps'),
-             Assignment (result, TupleCreate (map (fn (_, oper) => oper) exps')))
+            let val expBlocks = map (fn (is, _) => is) exps'
+            in
+                let val nodes = (List.concat expBlocks)
+                                @ Assignment (result, TupleCreate (map (fn (_, oper) => oper) exps'))
+                in
+                    (nodes, RegisterOp result)
+                end
+            end
         end
       | transform _ =
         raise Fail "Not implemented yet"
