@@ -276,7 +276,7 @@ structure MirPass :> MIR_PASS = struct
                 let val ty' = transformType ty
                 in
                     let val nodes = expBlock
-                                    @ [Cond (exp', cases', result, ty')]
+                                    @ [Case (exp', cases', result, ty')]
                     in
                         (nodes, RegisterOp result)
                     end
