@@ -149,7 +149,7 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, RegisterOp result)
             end
         end
-      | transform (HIR.Store(ptr, value)) =
+      | transform (HIR.Store (ptr, value)) =
         let val (ptrBlock, ptr') = transform ptr
             and (valBlock, val') = transform value
         in
