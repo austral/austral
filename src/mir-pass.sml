@@ -176,8 +176,9 @@ structure MirPass :> MIR_PASS = struct
         end
       | transform (HIR.Construct (ty, caseId, NONE)) =
         let val result = freshRegister ()
+            and ty' = transformType ty
         in
-            ([Assignment (result, Construct (transformType ty, caseId, NONE))],
+            ([Assignment (result, Construct (transformType ty, caseId, NONE), ty')],
              RegisterOp result)
         end
       | transform (HIR.Case (exp, cases, ty)) =
