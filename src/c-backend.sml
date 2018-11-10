@@ -46,7 +46,7 @@ structure CBackend :> C_BACKEND = struct
           | transformType tt HIR.Bool =
             (boolType, tt)
           | transformType tt (HIR.Integer (s, w)) =
-            (transformIntType s w, tt)
+            (NamedType (transformIntType s w), tt)
           | transformType _ _ =
             raise Fail "Not implemented yet"
 
