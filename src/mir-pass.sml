@@ -149,7 +149,7 @@ structure MirPass :> MIR_PASS = struct
             and ty = transformType (HIR.typeOf (HIR.Load ptr))
         in
             let val nodes = ptrBlock
-                            @ [Assignment (deref, Load ptr'),
+                            @ [Assignment (deref, Load ptr', transformType (HIR.typeOf ptr)),
                                Assignment (result, TupleCreate [RegisterOp deref, ptr'], ty)]
             in
                 (nodes, RegisterOp result)
