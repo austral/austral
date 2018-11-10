@@ -99,17 +99,17 @@ structure CBackend :> C_BACKEND = struct
     local
         open CAst
     in
-        fun transformType tt HIR.Unit =
+        fun transformType tt MIR.Unit =
             (boolType, tt)
-          | transformType tt HIR.Bool =
+          | transformType tt MIR.Bool =
             (boolType, tt)
-          | transformType tt (HIR.Integer (s, w)) =
+          | transformType tt (MIR.Integer (s, w)) =
             (NamedType (transformIntType s w), tt)
-          | transformType tt (HIR.Float Type.Single) =
+          | transformType tt (MIR.Float Type.Single) =
             (NamedType "float", tt)
-          | transformType tt (HIR.Float Type.Double) =
+          | transformType tt (MIR.Float Type.Double) =
             (NamedType "double", tt)
-          | transformType tt (HIR.Tuple tys) =
+          | transformType tt (MIR.Tuple tys) =
             let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
                                                      transformType tt ty)
                                                  tys
@@ -117,17 +117,17 @@ structure CBackend :> C_BACKEND = struct
             in
                 addTuple tt tys'
             end
-          | transformType tt (HIR.Pointer t) =
+          | transformType tt (MIR.Pointer t) =
             let val (t', tt) = transformType tt t
             in
                 (Pointer t', tt)
             end
-          | transformType tt (HIR.StaticArray t) =
+          | transformType tt (MIR.StaticArray t) =
             let val (t', tt) = transformType tt t
             in
                 addTuple tt [sizeType, t']
             end
-          | transformType tt (HIR.Disjunction (name, id)) =
+          | transformType tt (MIR.Disjunction (name, id)) =
             (CAst.NamedType (disjName name id), tt)
 
         and transformIntType Type.Unsigned Type.Int8 =
