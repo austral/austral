@@ -45,6 +45,8 @@ structure MirPass :> MIR_PASS = struct
 
     fun transform HIR.UnitConstant =
         ([], BoolConstant false)
+      | transform (HIR.IntConstant (i, ty)) =
+        ([], IntConstant (i, transformType ty))
       | transform _ =
         raise Fail "Not implemented yet"
 end
