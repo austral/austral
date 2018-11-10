@@ -163,7 +163,7 @@ structure MirPass :> MIR_PASS = struct
                             @ valBlock
                             @ [Assignment (result, Store { ptr = ptr', value = val' }, ty)]
             in
-                (nodes, result)
+                (nodes, RegisterOp result)
             end
         end
       | transform (HIR.Construct (ty, caseId, SOME value)) =
@@ -189,7 +189,7 @@ structure MirPass :> MIR_PASS = struct
             and ty' = transformType ty
         in
             (expBlock
-             @ [Assignment (result, TupleProj (exp', 1), ty')],
+             @ [Assignment (result, UnsafeExtractCase exp', ty')],
              RegisterOp result)
         end
       | transform (HIR.Seq (a, b)) =
