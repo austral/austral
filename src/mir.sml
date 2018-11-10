@@ -49,7 +49,7 @@ structure MIR :> MIR = struct
                        | ArrayLength of operand
                        | ArrayPointer of operand
                        | Load of operand
-                       | Store { ptr : operand, value : operand }
+                       | Store of { ptr : operand, value : operand }
                        | Construct of ty * int * operand option
                        | UnsafeExtractCase of operand * int * ty
                        | ForeignFuncall of string * operand list * ty
