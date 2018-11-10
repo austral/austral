@@ -35,7 +35,7 @@ structure MirPass :> MIR_PASS = struct
       | transformType (HIR.Pointer t) =
         Pointer (transformType t)
       | transformType (HIR.StaticArray t) =
-        Tuple (sizeType, Pointer (transformType t))
+        Tuple [sizeType, Pointer (transformType t)]
       | transformType (HIR.Disjunction (name, id)) =
         Disjunction (name, id)
 end
