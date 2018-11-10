@@ -52,6 +52,9 @@ structure CBackend :> C_BACKEND = struct
 
     val sizeType = CAst.NamedType "size_t"
 
+    fun disjName name id =
+        "_A_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
+
     local
         open CAst
     in
@@ -83,8 +86,8 @@ structure CBackend :> C_BACKEND = struct
             in
                 addTuple tt [sizeType, t']
             end
-          | transformType _ _ =
-            raise Fail "Not implemented yet"
+          | transformType tt (HIR.Disjunction (name, id)) =
+            (CAst.NamedType (disjName name id), tt)
 
         and transformIntType Type.Unsigned Type.Int8 =
             "uint8_t"
