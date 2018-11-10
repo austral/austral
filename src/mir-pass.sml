@@ -201,6 +201,15 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, b')
             end
         end
+      | transform (HIR.AddressOf (var, ty)) =
+        let val result = freshRegister ()
+            and ty' = transformType ty
+        in
+            let val nodes = [Assignment (result, AddressOf var, ty')]
+            in
+                (nodes, RegisterOp result)
+            end
+        end
       | transform (HIR.ConcreteFuncall (name, args, rt)) =
         let val args' = map transform args
             and result = freshRegister ()
