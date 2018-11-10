@@ -55,7 +55,7 @@ structure MIR :> MIR = struct
                        | ForeignFuncall of string * operand list * ty
                        | ForeignNull of ty
                        | SizeOf of ty
-                       | AddressOf of Symbol.variable * ty
+                       | AddressOf of Symbol.variable
                        | Cast of ty * operand
                        | ConcreteFuncall of name * operand list
                        | GenericFuncall of name * int * operand list
