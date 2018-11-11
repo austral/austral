@@ -106,7 +106,7 @@ structure CBackend :> C_BACKEND = struct
           | transformType tt MIR.Bool =
             (boolType, tt)
           | transformType tt (MIR.Integer (s, w)) =
-            (NamedType (transformIntType s w), tt)
+            (NamedType (intTypeName s w), tt)
           | transformType tt (MIR.Float Type.Single) =
             (NamedType "float", tt)
           | transformType tt (MIR.Float Type.Double) =
@@ -132,21 +132,21 @@ structure CBackend :> C_BACKEND = struct
           | transformType tt (MIR.Disjunction (name, id)) =
             (CAst.NamedType (disjName name id), tt)
 
-        and transformIntType Type.Unsigned Type.Int8 =
+        and intTypeName Type.Unsigned Type.Int8 =
             "uint8_t"
-          | transformIntType Type.Signed   Type.Int8 =
+          | intTypeName Type.Signed   Type.Int8 =
             "int8_t"
-          | transformIntType Type.Unsigned Type.Int16 =
+          | intTypeName Type.Unsigned Type.Int16 =
             "uint16_t"
-          | transformIntType Type.Signed   Type.Int16 =
+          | intTypeName Type.Signed   Type.Int16 =
             "int16_t"
-          | transformIntType Type.Unsigned Type.Int32 =
+          | intTypeName Type.Unsigned Type.Int32 =
             "uint32_t"
-          | transformIntType Type.Signed   Type.Int32 =
+          | intTypeName Type.Signed   Type.Int32 =
             "int32_t"
-          | transformIntType Type.Unsigned Type.Int64 =
+          | intTypeName Type.Unsigned Type.Int64 =
             "uint64_t"
-          | transformIntType Type.Signed   Type.Int64 =
+          | intTypeName Type.Signed   Type.Int64 =
             "int64_t"
     end
 
