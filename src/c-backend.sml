@@ -206,7 +206,7 @@ structure CBackend :> C_BACKEND = struct
                          in
                              let val name = "austral_div_" ^ (intTypeName s w)
                              in
-                                 Funcall (name, [lhs, rhs])
+                                 C.Funcall (name, [lhs, rhs])
                              end
                          end
           | _ => C.Binop (mapOper oper, lhs, rhs)
