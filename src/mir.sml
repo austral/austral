@@ -34,8 +34,7 @@ structure MIR :> MIR = struct
 
     type register = int
 
-    datatype operand = UnitConstant
-                     | BoolConstant of bool
+    datatype operand = BoolConstant of bool
                      | IntConstant of string * ty
                      | FloatConstant of string * ty
                      | StringConstant of CST.escaped_string
