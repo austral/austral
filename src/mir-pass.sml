@@ -48,8 +48,10 @@ structure MirPass :> MIR_PASS = struct
         (regCount := !regCount + 1;
          !regCount)
 
+    val unitConstant = BoolConstant false
+
     fun transform HIR.UnitConstant =
-        ([], BoolConstant false)
+        ([], unitConstant)
       | transform (HIR.BoolConstant b) =
         ([], BoolConstant b)
       | transform (HIR.IntConstant (i, ty)) =
@@ -298,7 +300,7 @@ structure MirPass :> MIR_PASS = struct
             let val nodes = (List.concat argBlocks)
                             @ [VoidForeignFuncall (name, argOps)]
             in
-                (nodes, BoolConstant false)
+                (nodes, unitConstant)
             end
         end
 
