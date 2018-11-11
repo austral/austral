@@ -158,9 +158,7 @@ structure CBackend :> C_BACKEND = struct
       | unwrapInt _ =
         raise Fail "Internal error: not an integer type"
 
-    fun transformOperand _ MIR.UnitConstant =
-        C.BoolConstant false
-      | transformOperand _ (MIR.BoolConstant b) =
+    fun transformOperand _ (MIR.BoolConstant b) =
         C.BoolConstant b
       | transformOperand tt (MIR.IntConstant (i, ty)) =
         let val (ty', _) = transformType tt ty
