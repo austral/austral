@@ -176,7 +176,7 @@ structure CBackend :> C_BACKEND = struct
       | transformOperand _ (MIR.VariableOp (var, _)) =
         C.Variable (escapeVariable var)
 
-    fun transform tt (MIR.ArithOp (kind, oper, lhs, rhs)) =
+    fun transform tt (MIR.ArithOp (kind, oper, lhs, rhs, ty)) =
         let val lhs = transformOperand tt lhs
             and rhs = transformOperand tt rhs
         in
@@ -186,25 +186,25 @@ structure CBackend :> C_BACKEND = struct
                           | Arith.Saturation => transformSaturationArith
                           | Arith.Float => transformFloatArith
             in
-                (f oper lhs rhs, tt)
+                (f ty oper lhs rhs, tt)
             end
         end
       | transform _ _ =
         raise Fail "Not implemented yet"
 
-    and transformModularArith oper lhs rhs =
+    and transformModularArith ty oper lhs rhs =
         (* Modular arithmetic is implemented directly, except for division,
            where we call a function to check if the divisor is zero and fail at
            runtime *)
         raise Fail "Not implemented yet"
 
-    and transformCheckedArith oper lhs rhs =
+    and transformCheckedArith ty oper lhs rhs =
         raise Fail "Not implemented yet"
 
-    and transformSaturationArith oper lhs rhs =
+    and transformSaturationArith ty oper lhs rhs =
         raise Fail "Not implemented yet"
 
-    and transformFloatArith oper lhs rhs =
+    and transformFloatArith ty oper lhs rhs =
         (* Floating point arithmetic is implemented directly. *)
         C.Binop (mapOper oper, lhs, rhs)
 
