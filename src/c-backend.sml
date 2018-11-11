@@ -101,9 +101,7 @@ structure CBackend :> C_BACKEND = struct
     local
         open CAst
     in
-        fun transformType tt MIR.Unit =
-            (boolType, tt)
-          | transformType tt MIR.Bool =
+        fun transformType tt MIR.Bool =
             (boolType, tt)
           | transformType tt (MIR.Integer (s, w)) =
             (NamedType (intTypeName s w), tt)
