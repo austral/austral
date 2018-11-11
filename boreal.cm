@@ -89,6 +89,9 @@ is
   src/mir-pass.sig
   src/mir-pass.sml
 
+  src/lir.sig
+  src/lir.sml
+
   src/c-ast.sig
   src/c-ast.sml
 
