@@ -99,7 +99,7 @@ structure MirPass :> MIR_PASS = struct
         in
             let val nodes = lBlock
                             @ rBlock
-                            @ [Assignment (result, ArithOp (kind, oper, lhs', rhs'), ty)]
+                            @ [Assignment (result, ArithOp (kind, oper, lhs', rhs', ty), ty)]
             in
                 (nodes, RegisterOp result)
             end
