@@ -92,6 +92,9 @@ is
   src/lir.sig
   src/lir.sml
 
+  src/lir-pass.sig
+  src/lir-pass.sml
+
   src/c-ast.sig
   src/c-ast.sml
 
