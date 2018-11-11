@@ -25,7 +25,7 @@ structure MirPass :> MIR_PASS = struct
     val sizeType = Integer (Type.Unsigned, Type.Int64)
 
     fun transformType HIR.Unit =
-        Unit
+        Bool
       | transformType HIR.Bool =
         Bool
       | transformType (HIR.Integer (s, w)) =
