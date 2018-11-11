@@ -298,7 +298,7 @@ structure MirPass :> MIR_PASS = struct
             let val nodes = (List.concat argBlocks)
                             @ [VoidForeignFuncall (name, argOps)]
             in
-                (nodes, UnitConstant)
+                (nodes, BoolConstant false)
             end
         end
 
