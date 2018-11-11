@@ -201,7 +201,15 @@ structure CBackend :> C_BACKEND = struct
         (* Modular arithmetic is implemented directly, except for division,
            where we call a function to check if the divisor is zero and fail at
            runtime *)
-        raise Fail "Not implemented yet"
+        case oper of
+            Arith.Div => let val (s, w) = unwrapInt ty
+                         in
+                             let val name = "austral_div_" ^ (intTypeName s w)
+                             in
+                                 Funcall (name, [lhs, rhs])
+                             end
+                         end
+          | _ => C.Binop (mapOper oper, lhs, rhs)
 
     and transformCheckedArith ty oper lhs rhs =
         raise Fail "Not implemented yet"
