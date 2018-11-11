@@ -35,7 +35,7 @@ signature C_AST = sig
                      | SizeOf of ty
                      | StructInitializer of ty * (string * exp_ast) list
                      | StructAccess of exp_ast * string
-                     | Funcall of string * ty list * exp_ast list
+                     | Funcall of string * exp_ast list
          and binop = Add
                    | Sub
                    | Mul
