@@ -155,6 +155,11 @@ structure CBackend :> C_BACKEND = struct
     fun regName r =
         "_A_r" ^ (Int.toString r)
 
+    fun unwrapInt (MIR.Integer (s, w)) =
+        (s, w)
+      | unwrapInt _ =
+        raise Fail "Internal error: not an integer type"
+
     fun transformOperand _ MIR.UnitConstant =
         C.BoolConstant false
       | transformOperand _ (MIR.BoolConstant b) =
