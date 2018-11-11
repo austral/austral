@@ -43,7 +43,7 @@ signature MIR = sig
                      | RegisterOp of register
                      | VariableOp of Symbol.variable * ty
 
-    datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
+    datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand * ty
                        | TupleCreate of operand list
                        | TupleProj of operand * int
                        | ArrayLength of operand
