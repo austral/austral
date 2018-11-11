@@ -22,8 +22,7 @@ signature MIR = sig
 
     (* Type System *)
 
-    datatype ty = Unit
-                | Bool
+    datatype ty = Bool
                 | Integer of Type.signedness * Type.width
                 | Float of Type.float_type
                 | Tuple of ty list
