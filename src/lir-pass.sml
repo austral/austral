@@ -164,7 +164,7 @@ structure LirPass :> LIR_PASS = struct
       | transformOperation tt (MIR.ForeignFuncall (name, args)) =
         let val (args, tt) = transformOperands tt args
         in
-            (L.ForeignFucall (name, args), tt)
+            (L.ForeignFuncall (name, args), tt)
         end
       | transformOperation tt (MIR.ForeignNull ty) =
         let val (ty, tt) = transformType tt ty
