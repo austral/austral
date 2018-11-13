@@ -100,7 +100,7 @@ structure Compiler : COMPILER = struct
                                            docstring)
             in
                 case (Function.addFunction fenv f) of
-                    SOME fenv' => Compiler (menv, macenv, tenv, fenv', currModuleName, code)
+                    SOME fenv' => compilerFromFenv c fenv'
                   | NONE => raise Fail "Repeat function"
             end
         end
