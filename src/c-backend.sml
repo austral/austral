@@ -80,12 +80,9 @@ structure CBackend :> C_BACKEND = struct
       | transformType (LIR.Float Type.Double) =
         C.NamedType "double"
       | transformType (LIR.Tuple id) =
-        C.Tuple id
+        C.NamedType (tupleName id)
       | transformType (LIR.Pointer t) =
-        let val (t', tt) = transformType t
-        in
-            (Pointer t', tt)
-        end
+
       | transformType (LIR.StaticArray t) =
         let val (t', tt) = transformType t
         in
