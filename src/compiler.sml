@@ -82,6 +82,12 @@ structure Compiler : COMPILER = struct
             Compiler (menv, macenv, tenv, fenv, modname, code)
         end
 
+    fun compilerFromModName c modname =
+        let val (Compiler (menv, macenv, tenv, fenv, modname, code)) = c
+        in
+            Compiler (menv, macenv, tenv, fenv, modname, code)
+        end
+
     (* Compilation units *)
 
     type pathname = string
@@ -233,7 +239,7 @@ structure Compiler : COMPILER = struct
                                     SOME m => m
                                   | NONE => raise Fail ("in-module: no module with this name: " ^ (Ident.identString moduleName))
             in
-                Compiler (menv, macenv, tenv, fenv, moduleName, code)
+                compilerFromModName c moduleName
             end
         end
       | declareTopForm c (DAST.Defcfun (name, rawname, params, arity, rt, docstring)) =
