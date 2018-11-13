@@ -110,6 +110,14 @@ structure LirPass :> LIR_PASS = struct
                 (L.ArithOp (kind, oper, lhs, rhs), tt)
             end
         end
+      | transformOperation tt (MIR.TupleCreate opers) =
+
+    and transformOperands tt opers =
+        Util.foldThread (fn (oper, tt) =>
+                            transformOperand tt oper)
+                        opers
+                        tt
+
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 end
