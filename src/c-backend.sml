@@ -61,32 +61,6 @@ structure CBackend :> C_BACKEND = struct
             (escapeSymbol sym) ^ "_" ^ (Int.toString i)
     end
 
-    (* Tuples *)
-
-    type tuple_types = (ty list, ty) Map.map
-
-    val emptyTupleTypes =
-        Map.empty
-
-    fun getTuple tt tys =
-        Map.get tt tys
-
-    val count = ref 0
-    fun freshId () =
-        (count := !count + 1;
-         !count)
-
-    fun addTuple tt tys =
-        case getTuple tt tys of
-            (SOME ty) => (ty, tt)
-          | NONE => let val id = freshId ()
-                    in
-                        let val ty = CAst.NamedType ("_A_tuple_" ^ (Int.toString id))
-                        in
-                            (ty, Map.iadd tt (tys, ty))
-                        end
-                    end
-
     (* Transform types *)
 
     val boolType = CAst.NamedType "_A_bool"
