@@ -32,7 +32,7 @@ structure Compiler : COMPILER = struct
                                   Type.defaultTenv,
                                   Function.defaultFenv,
                                   Ident.mkIdentEx "austral-user",
-                                  "" (*CppRuntime.prelude TODO FIXME *))
+                                  CRuntime.prelude)
 
     fun compilerMenv (Compiler (menv, _, _, _, _, _)) =
         menv
