@@ -238,6 +238,17 @@ structure LirPass :> LIR_PASS = struct
                 end
             end
         end
+      | transformInstruction tt (MIR.Case (oper, variants, register, ty)) =
+        let val (oper, tt) = transformOperand tt oper
+        in
+            let val (variants, tt) = transformVariants tt variants
+            in
+                let val (ty, tt) = transformType tt ty
+                in
+                    (L.Case (oper, variants, register, ty), tt)
+                end
+            end
+        end
       | transformInstruction _ _ =
         raise Fail "Not done yet"
 
