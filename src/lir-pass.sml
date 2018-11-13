@@ -219,4 +219,23 @@ structure LirPass :> LIR_PASS = struct
                 (L.DeclareLocal (var, ty, oper), tt)
             end
         end
+      | transformInstruction tt (MIR.Cond { test, consequent, alternate, result, ty }) =
+        let val (test, tt) = transformOperation tt test
+        in
+            let val (consequent, tt) = transformInstructions tt consequent
+            in
+                let val (alternate, tt) = transformInstructions tt alternate
+                in
+                    let val (ty, tt) = transformType tt ty
+                    in
+                        (L.Cond { test = test,
+                                  consequent = consequent,
+                                  alternate = alternate,
+                                  result = result,
+                                  ty = ty},
+                         tt)
+                    end
+                end
+            end
+        end
 end
