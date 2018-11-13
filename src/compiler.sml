@@ -197,7 +197,7 @@ structure Compiler : COMPILER = struct
         let val macenv = compilerMacEnv c
         in
             case Macro.addSymbolMacro macenv (Macro.SymbolMacro mac) of
-                SOME macenv' => compilerFromMenv c macenv'
+                SOME macenv' => compilerFromMacEnv c macenv'
               | _ => raise Fail "Duplicate symbol macro definition"
         end
       | declareTopForm c (DAST.Defmodule (name, clauses)) =
