@@ -47,7 +47,6 @@ structure LIR :> LIR = struct
                        | ArrayLength of operand
                        | ArrayPointer of operand
                        | Load of operand
-                       | Store of { ptr : operand, value : operand }
                        | Construct of ty * int * operand option
                        | UnsafeExtractCase of operand * int
                        | ForeignFuncall of string * operand list
@@ -65,6 +64,7 @@ structure LIR :> LIR = struct
                                      alternate : instruction list,
                                      result : register,
                                      ty : ty }
+                         | Store of { ptr : operand, value : operand, ty : ty }
                          | Case of operand * variant_case list * register * ty
                          | VoidForeignFuncall of string * operand list
          and variant_case = VariantCase of name * instruction list * operand * ty
