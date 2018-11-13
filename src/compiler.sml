@@ -121,7 +121,7 @@ structure Compiler : COMPILER = struct
             end
         end
       | declareTopForm c (DAST.Defclass tcDef) =
-        let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
+        let val fenv = compilerFenv c
         in
             let fun resolveTypeclass (name, paramName, docstring, methods) =
                     let val typarams = Set.singleton (Type.TypeParam paramName)
