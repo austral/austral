@@ -41,7 +41,7 @@ structure LIR :> LIR = struct
                      | RegisterOp of register
                      | VariableOp of Symbol.variable * ty
 
-    datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand * ty
+    datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
                        | TupleCreate of operand list
                        | TupleProj of operand * int
                        | ArrayLength of operand
