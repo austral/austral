@@ -233,14 +233,16 @@ structure Compiler : COMPILER = struct
         open TAST
     in
     fun compileForm c topNode =
-        let val typedNode = TAST.augmentTop topNode
-                                            (compilerTenv c)
-                                            (compilerFenv c)
+        let val tastNode = TAST.augmentTop topNode
+                                           (compilerTenv c)
+                                           (compilerFenv c)
         in
             raise Fail "compiler machine is kill"
-            (*let val hirTop = HIR.transformTop typedNode
+            (*let val mtastNode = MTAST
+            let val hirTop = HirPass.transformTop typedNode
             in
-                let val mir = MIR.transformTop hirTop
+
+            let val mir = MIR.transformTop hirTop
                 in
                     let val cpp = CppBackend.transformTop mir
                     in
@@ -251,7 +253,7 @@ structure Compiler : COMPILER = struct
                         end
                     end
                 end
-            end*)
+            *)
         end
     end
 
