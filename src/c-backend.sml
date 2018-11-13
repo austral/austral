@@ -123,7 +123,7 @@ structure CBackend :> C_BACKEND = struct
             C.Cast (ty', C.IntConstant i)
         end
       | transformOperand (LIR.FloatConstant (f, ty)) =
-        let val (ty', _) = transformType tt ty
+        let val ty' = transformType ty
         in
             C.Cast (ty', C.FloatConstant f)
         end
