@@ -120,6 +120,11 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.TupleProj (tup, idx), tt)
         end
+      | transformOperation tt (MIR.ArrayLength arr) =
+        let val (oper, tt) = transformOperand arr
+        in
+            (L.ArrayLength arr, tt)
+        end
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
