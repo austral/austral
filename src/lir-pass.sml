@@ -176,6 +176,8 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.SizeOf ty, tt)
         end
+      | transformOperation tt (MIR.AddressOf var) =
+        (L.AddressOf var, tt)
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
