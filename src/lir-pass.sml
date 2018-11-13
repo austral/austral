@@ -96,6 +96,6 @@ structure LirPass :> LIR_PASS = struct
         (L.StringConstant (CST.unescapeString s), tt)
       | transformOperand tt (MIR.RegisterOp r) =
         (L.RegisterOp r, tt)
-      | transformOperand tt (MIR.VariableOp (var, _)) =
-        (L.Variable (escapeVariable var), tt)
+      | transformOperand tt (MIR.VariableOp (var, ty)) =
+        (L.VariableOp (var, ty), tt)
 end
