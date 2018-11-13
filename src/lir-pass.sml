@@ -178,6 +178,14 @@ structure LirPass :> LIR_PASS = struct
         end
       | transformOperation tt (MIR.AddressOf var) =
         (L.AddressOf var, tt)
+      | transformOperation tt (MIR.Cast (ty, oper)) =
+        let val (ty, tt) = transformType tt ty
+        in
+            let val (oper, tt) = transformOperand tt oper
+            in
+                (L.Cast (ty, oper), tt)
+            end
+        end
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
