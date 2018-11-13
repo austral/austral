@@ -135,6 +135,14 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.Load ptr, tt)
         end
+      | transformOperation tt (MIR.Load { ptr, value }) =
+        let val (ptr, tt) = transformOperand tt ptr
+        in
+            let val (value, tt) = transformOperand tt value
+            in
+                (L.Store { ptr = ptr, value = value }, tt)
+            end
+        end
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
