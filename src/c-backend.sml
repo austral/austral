@@ -177,7 +177,7 @@ structure CBackend :> C_BACKEND = struct
       | transformOperand _ (MIR.VariableOp (var, _)) =
         C.Variable (escapeVariable var)
 
-    fun transform tt (MIR.ArithOp (kind, oper, lhs, rhs, ty)) =
+    fun transform tt (MIR.ArithOp (kind, oper, lhs, rhs)) ty =
         let val lhs = transformOperand tt lhs
             and rhs = transformOperand tt rhs
         in
@@ -190,7 +190,7 @@ structure CBackend :> C_BACKEND = struct
                 (f ty oper lhs rhs, tt)
             end
         end
-      | transform _ _ =
+      | transform _ _ _ =
         raise Fail "Not implemented yet"
 
     and transformModularArith ty oper lhs rhs =

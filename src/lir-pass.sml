@@ -102,15 +102,12 @@ structure LirPass :> LIR_PASS = struct
             (L.VariableOp (var, ty), tt)
         end
 
-    fun transformOperation tt (MIR.ArithOp (kind, oper, lhs, rhs, ty)) =
+    fun transformOperation tt (MIR.ArithOp (kind, oper, lhs, rhs)) =
         let val (lhs, tt) = transformOperand tt lhs
         in
             let val (rhs, tt) = transformOperand tt rhs
             in
-                let val (ty, tt) = transformType tt ty
-                in
-                    (L.ArithOp (kind, oper, lhs, rhs, ty), tt)
-                end
+                (L.ArithOp (kind, oper, lhs, rhs), tt)
             end
         end
       | transformOperation _ _ =
