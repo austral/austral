@@ -182,6 +182,8 @@ structure CBackend :> C_BACKEND = struct
         C.Funcall (name, map transformOperand args)
       | transform (LIR.ForeignNull ty) _ =
         C.NullConstant
+      | transform (LIR.SizeOf ty) _ =
+        C.SizeOf (transformType ty)
       | transform _ _ =
         raise Fail "Not implemented yet"
 
