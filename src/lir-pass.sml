@@ -83,14 +83,14 @@ structure LirPass :> LIR_PASS = struct
     fun transformOperand tt (MIR.BoolConstant b) =
         (L.BoolConstant b, tt)
       | transformOperand tt (MIR.IntConstant (i, ty)) =
-        let val (ty', tt) = transformType tt ty
+        let val (ty, tt) = transformType tt ty
         in
-            (L.Cast (ty', L.IntConstant i), tt)
+            (L.IntConstant (i, ty)), tt)
         end
       | transformOperand tt (MIR.FloatConstant (f, ty)) =
-        let val (ty', tt) = transformType tt ty
+        let val (ty, tt) = transformType tt ty
         in
-            (L.Cast (ty', L.FloatConstant f), tt)
+            (L.FloatConstant (f, ty)), tt)
         end
       | transformOperand tt (MIR.StringConstant s) =
         (L.StringConstant (CST.unescapeString s), tt)
