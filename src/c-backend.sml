@@ -170,11 +170,11 @@ structure CBackend :> C_BACKEND = struct
       | transform (LIR.Construct (ty, id, SOME value)) _ =
         (* Disjunction constructors are compiled to a structure initializer *)
         C.StructInitializer (transformType ty,
-                             [(disjTagFieldName, C.IntConstant id),
+                             [(disjTagFieldName, C.IntConstant (Int.toString id)),
                               (disjDataFieldName, transformOperand value)])
       | transform (LIR.Construct (ty, id, NONE)) _ =
         C.StructInitializer (transformType ty,
-                             [(disjTagFieldName, C.IntConstant id),
+                             [(disjTagFieldName, C.IntConstant (Int.toString id)),
                               (disjDataFieldName, 0)])
       | transform _ _ =
         raise Fail "Not implemented yet"
