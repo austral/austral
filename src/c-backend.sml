@@ -118,15 +118,9 @@ structure CBackend :> C_BACKEND = struct
     fun transformOperand (LIR.BoolConstant b) =
         C.BoolConstant b
       | transformOperand (LIR.IntConstant (i, ty)) =
-        let val ty' = transformType ty
-        in
-            C.Cast (ty', C.IntConstant i)
-        end
+        C.Cast (transformType ty, C.IntConstant i)
       | transformOperand (LIR.FloatConstant (f, ty)) =
-        let val ty' = transformType ty
-        in
-            C.Cast (ty', C.FloatConstant f)
-        end
+        C.Cast (transformType ty, C.FloatConstant f)
       | transformOperand (LIR.StringConstant s) =
         C.StringConstant (CST.unescapeString s)
       | transformOperand (LIR.RegisterOp r) =
