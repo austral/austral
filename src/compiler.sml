@@ -327,7 +327,7 @@ structure Compiler : COMPILER = struct
         let val code = compilerCode c
             and sym = Parser.parseQualifiedSymbol name
         in
-            let val name = "" (* HIR.escapeSymbol sym TODO FIXME *)
+            let val name = CBackend.escapeSymbol sym
             in
                 let val newCode = code ^ "\n\nint main() {\n  return " ^ name ^ "();\n}\n"
                 in
