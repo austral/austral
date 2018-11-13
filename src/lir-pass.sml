@@ -202,4 +202,13 @@ structure LirPass :> LIR_PASS = struct
                             transformOperand tt oper)
                         opers
                         tt
+
+    fun transformInstruction tt (MIR.Assignment (r, oper, ty)) =
+        let val (oper, tt) = transformOperation tt oper
+        in
+            let val (ty, tt) = transformType tt ty
+            in
+                (L.Assignment (r, oper, ty), tt)
+            end
+        end
 end
