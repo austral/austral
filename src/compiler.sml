@@ -99,7 +99,7 @@ structure Compiler : COMPILER = struct
         end
 
     fun addFundef c name params body =
-        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, _)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)) = c
         in
             let val fdefs = FDefs.addDefinition fdefs (params, body)
             in
