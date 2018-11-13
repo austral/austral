@@ -59,14 +59,14 @@ structure CBackend :> C_BACKEND = struct
 
     (* Transform types *)
 
-    val boolType = CAst.NamedType "_A_bool"
+    structure C = CAst
 
-    val sizeType = CAst.NamedType "size_t"
+    val boolType = C.NamedType "_A_bool"
+
+    val sizeType = C.NamedType "size_t"
 
     fun disjName name id =
         "_A_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
-
-    structure C = CAst
 
     fun transformType tt LIR.Bool =
         (boolType, tt)
