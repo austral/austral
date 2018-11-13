@@ -98,6 +98,15 @@ structure Compiler : COMPILER = struct
             Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
         end
 
+    fun addFundef c name params body =
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, _)) = c
+        in
+            let val fdefs = FDefs.addDefinition fdefs (params, body)
+            in
+                Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
+            end
+        end
+
     (* Compilation units *)
 
     type pathname = string
@@ -150,7 +159,10 @@ structure Compiler : COMPILER = struct
                                                    docstring)
             in
                 case (Function.addGenericFunction fenv gf) of
-                    SOME fenv' => compilerFromFenv c fenv'
+                    SOME fenv' => let val c' = compilerFromFenv c fenv'
+                                  in
+                                      addFundef c' name params ast
+                                  end
                   | NONE => raise Fail "Repeat function"
             end
         end
