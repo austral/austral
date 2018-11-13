@@ -192,8 +192,6 @@ structure CBackend :> C_BACKEND = struct
         C.Funcall (escapeSymbol name, map transformOperand args)
       | transform (LIR.GenericFuncall (name, id, args)) _ =
         C.Funcall ("_A_generic_" ^ (Int.toString id), map transformOperand args)
-      | transform _ _ =
-        raise Fail "Not implemented yet"
 
     and transformModularArith ty oper lhs rhs =
         (* Modular arithmetic is implemented directly, except for division,
