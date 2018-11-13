@@ -69,13 +69,13 @@ structure CBackend :> C_BACKEND = struct
         "_A_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
 
     fun transformType LIR.Bool =
-        (boolType, tt)
+        boolType
       | transformType (LIR.Integer (s, w)) =
-        (C.NamedType (intTypeName s w), tt)
+        C.NamedType (intTypeName s w)
       | transformType (LIR.Float Type.Single) =
-        (C.NamedType "float", tt)
+        C.NamedType "float"
       | transformType (LIR.Float Type.Double) =
-        (C.NamedType "double", tt)
+        C.NamedType "double"
       | transformType (LIR.Tuple tys) =
         let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
                                                  transformType ty)
