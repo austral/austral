@@ -116,7 +116,7 @@ structure Compiler : COMPILER = struct
                                                    docstring)
             in
                 case (Function.addGenericFunction fenv gf) of
-                    SOME fenv' => Compiler (menv, macenv, tenv, fenv', currModuleName, code)
+                    SOME fenv' => compilerFromFenv c fenv'
                   | NONE => raise Fail "Repeat function"
             end
         end
