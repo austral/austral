@@ -88,6 +88,12 @@ structure Compiler : COMPILER = struct
             Compiler (menv, macenv, tenv, fenv, modname, code)
         end
 
+    fun compilerFromCode c code =
+        let val (Compiler (menv, macenv, tenv, fenv, modname, _)) = c
+        in
+            Compiler (menv, macenv, tenv, fenv, modname, code)
+        end
+
     (* Compilation units *)
 
     type pathname = string
