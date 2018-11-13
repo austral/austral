@@ -149,14 +149,11 @@ structure CBackend :> C_BACKEND = struct
       | transform (LIR.TupleCreate operands) ty =
         (* For tuple creation, we create a struct initializer and cast it to the
            given tuple type *)
-        let val ty' = transformType ty
+        let val args = Util.mapidx (fn (oper, idx) =>
+                                       (tupleIdxName idx, transformOperand oper))
+                                   operands
         in
-            let val args = Util.mapidx (fn (oper, idx) =>
-                                           (tupleIdxName idx, transformOperand oper))
-                                       operands
-            in
-                C.StructInitializer (ty', args)
-            end
+            C.StructInitializer (transformType ty, args)
         end
 
       | transform _ _ =
