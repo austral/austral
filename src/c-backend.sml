@@ -161,6 +161,8 @@ structure CBackend :> C_BACKEND = struct
         raise Fail "Not implemented yet"
       | transform (LIR.ArrayPointer arr) ty =
         raise Fail "Not implemented yet"
+      | transform (LIR.Load ptr) _ =
+        C.Deref (transformOperand ptr)
 
       | transform _ _ =
         raise Fail "Not implemented yet"
