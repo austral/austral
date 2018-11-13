@@ -79,7 +79,7 @@ structure CBackend :> C_BACKEND = struct
 
     structure C = CAst
 
-    val boolType = C.NamedType "_A_bool"
+    val boolType = C.NamedType "austral_bool"
 
     val sizeType = C.NamedType "size_t"
 
