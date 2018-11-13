@@ -115,23 +115,23 @@ structure CBackend :> C_BACKEND = struct
       | unwrapInt _ =
         raise Fail "Internal error: not an integer type"
 
-    fun transformOperand _ (LIR.BoolConstant b) =
+    fun transformOperand (LIR.BoolConstant b) =
         C.BoolConstant b
-      | transformOperand tt (LIR.IntConstant (i, ty)) =
+      | transformOperand (LIR.IntConstant (i, ty)) =
         let val (ty', _) = transformType tt ty
         in
             C.Cast (ty', C.IntConstant i)
         end
-      | transformOperand tt (LIR.FloatConstant (f, ty)) =
+      | transformOperand (LIR.FloatConstant (f, ty)) =
         let val (ty', _) = transformType tt ty
         in
             C.Cast (ty', C.FloatConstant f)
         end
-      | transformOperand _ (LIR.StringConstant s) =
+      | transformOperand (LIR.StringConstant s) =
         C.StringConstant (CST.unescapeString s)
-      | transformOperand _(LIR.RegisterOp r) =
+      | transformOperand (LIR.RegisterOp r) =
         C.Variable (regName r)
-      | transformOperand _ (LIR.VariableOp (var, _)) =
+      | transformOperand (LIR.VariableOp (var, _)) =
         C.Variable (escapeVariable var)
 
     fun transform tt (LIR.ArithOp (kind, oper, lhs, rhs)) ty =
