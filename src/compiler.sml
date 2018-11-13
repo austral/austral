@@ -207,7 +207,7 @@ structure Compiler : COMPILER = struct
               | _ => raise Fail "Duplicate symbol macro definition"
         end
       | declareTopForm c (DAST.Defmodule (name, clauses)) =
-        let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
+        let val menv = compilerMenv c
         in
             let val module = Module.resolveModule menv name clauses
             in
@@ -215,7 +215,7 @@ structure Compiler : COMPILER = struct
                     SOME _ => raise Fail "Duplicate module definition"
                   | NONE => let val menv' = Module.addModule menv module
                             in
-                                Compiler (menv', macenv, tenv, fenv, moduleName, code)
+                                compilerFromMenv c menv'
                             end
             end
         end
