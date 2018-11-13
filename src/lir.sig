@@ -47,7 +47,6 @@ signature LIR = sig
                        | ArrayLength of operand
                        | ArrayPointer of operand
                        | Load of operand
-                       | Store of { ptr : operand, value : operand }
                        | Construct of ty * int * operand option
                        | UnsafeExtractCase of operand * int
                        | ForeignFuncall of string * operand list
@@ -65,6 +64,7 @@ signature LIR = sig
                                      alternate : instruction list,
                                      result : register,
                                      ty : ty }
+                         | Store of { ptr : operand, value : operand, ty : ty } (* ty is the type of the value being stored *)
                          | Case of operand * variant_case list * register * ty
                          | VoidForeignFuncall of string * operand list
          and variant_case = VariantCase of name * instruction list * operand * ty
