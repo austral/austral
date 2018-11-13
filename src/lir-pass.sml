@@ -97,5 +97,8 @@ structure LirPass :> LIR_PASS = struct
       | transformOperand tt (MIR.RegisterOp r) =
         (L.RegisterOp r, tt)
       | transformOperand tt (MIR.VariableOp (var, ty)) =
-        (L.VariableOp (var, ty), tt)
+        let val (ty, tt) = transformType tt ty
+        in
+            (L.VariableOp (var, ty), tt)
+        end
 end
