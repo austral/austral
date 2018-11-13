@@ -178,7 +178,7 @@ structure Compiler : COMPILER = struct
             end
         end
       | declareTopForm c (DAST.Deftype (name, params, docstring, ty)) =
-        let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
+        let val tenv = compilerTenv c
         in
             case (Type.addTypeAlias tenv (name, params, ty)) of
                 SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
