@@ -175,7 +175,7 @@ structure CBackend :> C_BACKEND = struct
       | transform (LIR.Construct (ty, id, NONE)) _ =
         C.StructInitializer (transformType ty,
                              [(disjTagFieldName, C.IntConstant (Int.toString id)),
-                              (disjDataFieldName, 0)])
+                              (disjDataFieldName, C.IntConstant "0")])
       | transform _ _ =
         raise Fail "Not implemented yet"
 
