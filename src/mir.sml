@@ -66,8 +66,8 @@ structure MIR :> MIR = struct
                                      ty : ty }
                          | Store of { ptr : operand,
                                       value : operand,
-                                     result : register,
-                                     ty : ty }
+                                      result : register,
+                                      ty : ty }
                          | Case of operand * variant_case list * register * ty
                          | VoidForeignFuncall of string * operand list
          and variant_case = VariantCase of name * instruction list * operand * ty
