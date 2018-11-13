@@ -1,6 +1,8 @@
 TODO:
 
-- New MIR->LIR
+- LIR pass
+- C backend
+
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
