@@ -163,7 +163,10 @@ structure MirPass :> MIR_PASS = struct
         in
             let val nodes = ptrBlock
                             @ valBlock
-                            @ [Assignment (result, Store { ptr = ptr', value = val' }, ty)]
+                            @ [Store { ptr = ptr',
+                                       value = val',
+                                       result = result,
+                                       ty : ty }]
             in
                 (nodes, RegisterOp result)
             end
