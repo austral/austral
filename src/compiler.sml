@@ -254,7 +254,7 @@ structure Compiler : COMPILER = struct
                                                    docstring)
             in
                 case (Function.addForeignFunction fenv ff) of
-                    SOME fenv' => Compiler (menv, macenv, tenv, fenv', currModuleName, code)
+                    SOME fenv' => compilerFromFenv c fenv'
                   | NONE => raise Fail "Error defining defcfun"
             end
         end
