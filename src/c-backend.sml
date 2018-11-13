@@ -71,11 +71,11 @@ structure CBackend :> C_BACKEND = struct
     fun transformType tt LIR.Bool =
         (boolType, tt)
       | transformType tt (LIR.Integer (s, w)) =
-        (NamedType (intTypeName s w), tt)
+        (C.NamedType (intTypeName s w), tt)
       | transformType tt (LIR.Float Type.Single) =
-        (NamedType "float", tt)
+        (C.NamedType "float", tt)
       | transformType tt (LIR.Float Type.Double) =
-        (NamedType "double", tt)
+        (C.NamedType "double", tt)
       | transformType tt (LIR.Tuple tys) =
         let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
                                                  transformType tt ty)
@@ -95,7 +95,7 @@ structure CBackend :> C_BACKEND = struct
             addTuple tt [sizeType, t']
         end
       | transformType tt (LIR.Disjunction (name, id)) =
-        (CAst.NamedType (disjName name id), tt)
+        (C.NamedType (disjName name id), tt)
 
     and intTypeName Type.Unsigned Type.Int8 =
         "uint8_t"
