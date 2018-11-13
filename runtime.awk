@@ -1,6 +1,6 @@
 BEGIN {
     ORS = ""
-    print "structure CppRuntime = struct\n\
+    print "structure CRuntime = struct\n\
     val prelude = \""
 }
 
