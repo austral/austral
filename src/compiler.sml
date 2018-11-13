@@ -227,7 +227,7 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (DAST.InModule moduleName) =
         (* Switch current module *)
-        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
+        let val menv = compilerMenv c
         in
             let val newModule = case Module.envGet menv moduleName of
                                     SOME m => m
