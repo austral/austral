@@ -69,7 +69,7 @@ structure Compiler : COMPILER = struct
         end
 
     fun compilerFromTenv c tenv =
-        let val (Compiler (menv, macenv, _, fenv, mtast, modname, code)) = c
+        let val (Compiler (menv, macenv, _, fenv, mtast, fdefs, modname, code)) = c
         in
             Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
         end
