@@ -115,6 +115,11 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.TupleCreate opers, tt)
         end
+      | transformOperation tt (MIR.TupleProj (tup, idx)) =
+        let val (tup, tt) = transformOperand tup
+        in
+            (L.TupleProj (tup, idx), tt)
+        end
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
