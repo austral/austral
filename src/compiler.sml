@@ -41,22 +41,22 @@ structure Compiler : COMPILER = struct
 
     (* Accessors *)
 
-    fun compilerMenv (Compiler (menv, _, _, _, _, _, _)) =
+    fun compilerMenv (Compiler (menv, _, _, _, _, _, _, _)) =
         menv
 
-    fun compilerMacEnv (Compiler (_, macenv, _, _, _, _, _)) =
+    fun compilerMacEnv (Compiler (_, macenv, _, _, _, _, _, _)) =
         macenv
 
-    fun compilerTenv (Compiler (_, _, tenv, _, _, _, _)) =
+    fun compilerTenv (Compiler (_, _, tenv, _, _, _, _, _)) =
         tenv
 
-    fun compilerFenv (Compiler (_, _, _, fenv, _, _, _)) =
+    fun compilerFenv (Compiler (_, _, _, fenv, _, _, _, _)) =
         fenv
 
-    fun currentModule (Compiler (menv, _, _, _, _, modName, _)) =
+    fun currentModule (Compiler (menv, _, _, _, _, _, modName, _)) =
         Option.valOf (Module.envGet menv modName)
 
-    fun compilerCode (Compiler (_, _, _, _, _, _, code)) =
+    fun compilerCode (Compiler (_, _, _, _, _, _, _, code)) =
         code
 
     (* Constructors *)
