@@ -128,9 +128,9 @@ structure CBackend :> C_BACKEND = struct
       | transformOperand (LIR.VariableOp (var, _)) =
         C.Variable (escapeVariable var)
 
-    fun transform tt (LIR.ArithOp (kind, oper, lhs, rhs)) ty =
-        let val lhs = transformOperand tt lhs
-            and rhs = transformOperand tt rhs
+    fun transform (LIR.ArithOp (kind, oper, lhs, rhs)) ty =
+        let val lhs = transformOperand lhs
+            and rhs = transformOperand rhs
         in
             let val f = case kind of
                             Arith.Modular => transformModularArith
@@ -138,10 +138,10 @@ structure CBackend :> C_BACKEND = struct
                           | Arith.Saturation => transformSaturationArith
                           | Arith.Float => transformFloatArith
             in
-                (f ty oper lhs rhs, tt)
+                (f ty oper lhs rhs)
             end
         end
-      | transform _ _ _ =
+      | transform _ _ =
         raise Fail "Not implemented yet"
 
     and transformModularArith ty oper lhs rhs =
