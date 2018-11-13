@@ -151,6 +151,11 @@ structure LirPass :> LIR_PASS = struct
                 (L.Construct (ty, id, oper), tt)
             end
         end
+      | transformOperation tt (MIR.Construct (ty, id, NONE)) =
+        let val (ty, tt) = transformType tt ty
+        in
+            (L.Construct (ty, id, NONE), tt)
+        end
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
