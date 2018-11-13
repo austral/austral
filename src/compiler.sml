@@ -18,6 +18,8 @@
 *)
 
 structure Compiler : COMPILER = struct
+    (* Compiler type *)
+
     type code = string
 
     datatype compiler = Compiler of Module.menv
@@ -34,6 +36,8 @@ structure Compiler : COMPILER = struct
                                   Ident.mkIdentEx "austral-user",
                                   CRuntime.prelude)
 
+    (* Accessors *)
+
     fun compilerMenv (Compiler (menv, _, _, _, _, _)) =
         menv
 
@@ -48,6 +52,10 @@ structure Compiler : COMPILER = struct
 
     fun compilerCode (Compiler (_, _, _, _, _, code)) =
         code
+
+    (* Constructors *)
+
+    (* Compilation units *)
 
     type pathname = string
 
