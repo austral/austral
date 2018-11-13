@@ -257,4 +257,19 @@ structure LirPass :> LIR_PASS = struct
                             transformInstruction tt oper)
                         opers
                         tt
+
+    and transformVariants tt variants =
+        Util.foldThread (fn (MIR.VariantCase (name, insts, oper, ty), tt) =>
+                            let val (insts, tt) = transformInstructions tt insts
+                            in
+                                let val (oper, tt) = transformOperand tt oper
+                                in
+                                    let val (ty, tt) = transformType tt ty
+                                    in
+                                        (VariantCase (name, insts, oper, ty), tt)
+                                    end
+                                end
+                            end)
+                        variants
+                        tt
 end
