@@ -68,33 +68,33 @@ structure CBackend :> C_BACKEND = struct
     fun disjName name id =
         "_A_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
 
-    fun transformType tt LIR.Bool =
+    fun transformType LIR.Bool =
         (boolType, tt)
-      | transformType tt (LIR.Integer (s, w)) =
+      | transformType (LIR.Integer (s, w)) =
         (C.NamedType (intTypeName s w), tt)
-      | transformType tt (LIR.Float Type.Single) =
+      | transformType (LIR.Float Type.Single) =
         (C.NamedType "float", tt)
-      | transformType tt (LIR.Float Type.Double) =
+      | transformType (LIR.Float Type.Double) =
         (C.NamedType "double", tt)
-      | transformType tt (LIR.Tuple tys) =
+      | transformType (LIR.Tuple tys) =
         let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
-                                                 transformType tt ty)
+                                                 transformType ty)
                                              tys
                                              tt
         in
-            addTuple tt tys'
+            addTuple tys'
         end
-      | transformType tt (LIR.Pointer t) =
-        let val (t', tt) = transformType tt t
+      | transformType (LIR.Pointer t) =
+        let val (t', tt) = transformType t
         in
             (Pointer t', tt)
         end
-      | transformType tt (LIR.StaticArray t) =
-        let val (t', tt) = transformType tt t
+      | transformType (LIR.StaticArray t) =
+        let val (t', tt) = transformType t
         in
-            addTuple tt [sizeType, t']
+            addTuple [sizeType, t']
         end
-      | transformType tt (LIR.Disjunction (name, id)) =
+      | transformType (LIR.Disjunction (name, id)) =
         (C.NamedType (disjName name id), tt)
 
     and intTypeName Type.Unsigned Type.Int8 =
