@@ -101,6 +101,8 @@ is
   src/c-backend.sig
   src/c-backend.sml
 
+  src/c-runtime.sml
+
   src/prelude.sig
   src/prelude.sml
 
