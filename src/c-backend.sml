@@ -176,6 +176,8 @@ structure CBackend :> C_BACKEND = struct
         C.StructInitializer (transformType ty,
                              [(disjTagFieldName, C.IntConstant (Int.toString id)),
                               (disjDataFieldName, C.IntConstant "0")])
+      | transform (LIR.UnsafeExtractCase (oper, id)) ty =
+        C.StructAccess (transformOperand oper, disjDataFieldName)
       | transform _ _ =
         raise Fail "Not implemented yet"
 
