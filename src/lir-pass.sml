@@ -249,8 +249,11 @@ structure LirPass :> LIR_PASS = struct
                 end
             end
         end
-      | transformInstruction _ _ =
-        raise Fail "Not done yet"
+      | transformInstruction tt (MIR.VoidForeignFuncall (name, args)) =
+        let val (args, tt) = transformOperands tt args
+        in
+            (L.VoidForeignFuncall (name, args), tt)
+        end
 
     and transformInstructions tt opers =
         Util.foldThread (fn (oper, tt) =>
