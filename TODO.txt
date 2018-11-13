@@ -1,6 +1,5 @@
 TODO:
 
-- New LIR
 - New MIR->LIR
 - LLVM AST
 - LLVM backend
@@ -161,3 +160,4 @@ DONE:
 - New MTAST->HIR
 - New MIR
 - New HIR->MIR
+- New LIR
