@@ -266,7 +266,7 @@ structure LirPass :> LIR_PASS = struct
                                 in
                                     let val (ty, tt) = transformType tt ty
                                     in
-                                        (VariantCase (name, insts, oper, ty), tt)
+                                        (L.VariantCase (name, insts, oper, ty), tt)
                                     end
                                 end
                             end)
