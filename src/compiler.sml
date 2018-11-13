@@ -181,7 +181,7 @@ structure Compiler : COMPILER = struct
         let val tenv = compilerTenv c
         in
             case (Type.addTypeAlias tenv (name, params, ty)) of
-                SOME tenv' => compilerFromTenv tenv'
+                SOME tenv' => compilerFromTenv c tenv'
               | NONE => raise Fail "Duplicate type definition"
         end
       | declareTopForm c (DAST.Defdisjunction (name, params, docstring, variants)) =
