@@ -190,6 +190,8 @@ structure CBackend :> C_BACKEND = struct
         C.Cast (transformType ty, transformOperand oper)
       | transform (LIR.ConcreteFuncall (name, args)) _ =
         C.Funcall (escapeSymbol name, map transformOperand args)
+      | transform (LIR.GenericFuncall (name, id, args)) _ =
+        C.Funcall ("_A_generic_" ^ (Int.toString id), map transformOperand args)
       | transform _ _ =
         raise Fail "Not implemented yet"
 
