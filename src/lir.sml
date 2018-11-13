@@ -64,7 +64,10 @@ structure LIR :> LIR = struct
                                      alternate : instruction list,
                                      result : register,
                                      ty : ty }
-                         | Store of { ptr : operand, value : operand, ty : ty }
+                         | Store of { ptr : operand,
+                                      value : operand,
+                                     result : register,
+                                     ty : ty }
                          | Case of operand * variant_case list * register * ty
                          | VoidForeignFuncall of string * operand list
          and variant_case = VariantCase of name * instruction list * operand * ty
