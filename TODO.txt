@@ -1,8 +1,6 @@
 TODO:
 
 - New MIR->LIR
-- LLVM AST
-- LLVM backend
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
