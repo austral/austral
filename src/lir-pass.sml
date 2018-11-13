@@ -123,7 +123,4 @@ structure LirPass :> LIR_PASS = struct
                             transformOperand tt oper)
                         opers
                         tt
-
-      | transformOperation _ _ =
-        raise Fail "Not implemented yet"
 end
