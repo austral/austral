@@ -1,6 +1,7 @@
 TODO:
 
-- C backend
+- C runtime file and script
+- Update compiler to use C backend
 - Expand tuple types
 
 - Expand monomorphs recursively
@@ -162,3 +163,4 @@ DONE:
 - New HIR->MIR
 - New LIR
 - LIR pass
+- C backend
