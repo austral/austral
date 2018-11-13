@@ -65,6 +65,9 @@ structure CBackend :> C_BACKEND = struct
 
     val sizeType = C.NamedType "size_t"
 
+    fun tupleName id =
+        "_A_tuple_" ^ (Int.toString id)
+
     fun disjName name id =
         "_A_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
 
