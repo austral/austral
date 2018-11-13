@@ -110,6 +110,9 @@ structure CBackend :> C_BACKEND = struct
     fun regName r =
         "_A_r" ^ (Int.toString r)
 
+    fun tupleIdxName i =
+        "_" ^ Int.toString i
+
     fun unwrapInt (LIR.Integer (s, w)) =
         (s, w)
       | unwrapInt _ =
