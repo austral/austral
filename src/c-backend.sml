@@ -23,7 +23,7 @@ structure CBackend :> C_BACKEND = struct
     (* Escaping *)
 
     fun escapeSymbol symbol =
-        let val module = symbolModuleName symbol
+        let val module = Symbol.symbolModuleName symbol
             and name = symbolName symbol
         in
             "_A_" ^ (escapeIdent module) ^ "___" ^ (escapeIdent name)
