@@ -214,7 +214,7 @@ structure LirPass :> LIR_PASS = struct
       | transformInstruction tt (MIR.DeclareLocal (var, ty, oper)) =
         let val (ty, tt) = transformType tt ty
         in
-            let val (oper, tt) = transformOperation tt oper
+            let val (oper, tt) = transformOperand tt oper
             in
                 (L.DeclareLocal (var, ty, oper), tt)
             end
