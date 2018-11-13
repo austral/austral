@@ -168,6 +168,10 @@ structure CBackend :> C_BACKEND = struct
         C.StructInitializer (transformType ty,
                              [(disjTagFieldName, C.IntConstant id),
                               (disjDataFieldName, transformOperand value)])
+      | transform (LIR.Construct (ty, id, NONE)) _ =
+        C.StructInitializer (transformType ty,
+                             [(disjTagFieldName, C.IntConstant id),
+                              (disjDataFieldName, 0)])
       | transform _ _ =
         raise Fail "Not implemented yet"
 
