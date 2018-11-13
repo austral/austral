@@ -58,6 +58,11 @@ structure Compiler : COMPILER = struct
 
     (* Constructors *)
 
+    fun compilerFromFenv c fenv =
+        let val (Compiler (menv, macenv, tenv, _, modname, code)) = c
+        in
+            Compiler (menv, macenv, tenv, fenv, modname, code)
+        end
 
     (* Compilation units *)
 
