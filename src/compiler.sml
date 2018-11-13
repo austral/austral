@@ -34,6 +34,7 @@ structure Compiler : COMPILER = struct
                                   Macro.emptyMacroEnv,
                                   Type.defaultTenv,
                                   Function.defaultFenv,
+                                  MTAST.emptyContext,
                                   Ident.mkIdentEx "austral-user",
                                   CRuntime.prelude)
 
