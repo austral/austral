@@ -82,12 +82,9 @@ structure CBackend :> C_BACKEND = struct
       | transformType (LIR.Tuple id) =
         C.NamedType (tupleName id)
       | transformType (LIR.Pointer t) =
-
+        C.Pointer (transformType t)
       | transformType (LIR.StaticArray t) =
-        let val (t', tt) = transformType t
-        in
-            addTuple [sizeType, t']
-        end
+        raise Fail "Static arrays not implemented yet"
       | transformType (LIR.Disjunction (name, id)) =
         (C.NamedType (disjName name id), tt)
 
