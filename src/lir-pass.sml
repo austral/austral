@@ -148,7 +148,7 @@ structure LirPass :> LIR_PASS = struct
         in
             let val (oper, tt) = transformOperand tt oper
             in
-                (L.Construct (ty, id, oper), tt)
+                (L.Construct (ty, id, SOME oper), tt)
             end
         end
       | transformOperation tt (MIR.Construct (ty, id, NONE)) =
