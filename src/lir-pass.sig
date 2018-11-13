@@ -38,4 +38,6 @@ signature LIR_PASS = sig
     val transformOperand : tuple_types -> MIR.operand -> LIR.operand * tuple_types
 
     val transformOperation : tuple_types -> MIR.operation -> LIR.operation * tuple_types
+
+    val transformInstruction : tuple_types -> MIR.instruction -> LIR.instruction * tuple_types
 end
