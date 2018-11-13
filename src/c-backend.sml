@@ -76,14 +76,8 @@ structure CBackend :> C_BACKEND = struct
         C.NamedType "float"
       | transformType (LIR.Float Type.Double) =
         C.NamedType "double"
-      | transformType (LIR.Tuple tys) =
-        let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
-                                                 transformType ty)
-                                             tys
-                                             tt
-        in
-            addTuple tys'
-        end
+      | transformType (LIR.Tuple id) =
+        C.Tuple id
       | transformType (LIR.Pointer t) =
         let val (t', tt) = transformType t
         in
