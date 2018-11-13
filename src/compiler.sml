@@ -101,9 +101,12 @@ structure Compiler : COMPILER = struct
     fun addFundef c name params body =
         let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)) = c
         in
-            let val fdefs = FDefs.addDefinition fdefs name (params, body)
+            let val params' = map (fn (DAST.Param (n, t)) => TAST.Param (n, t)) params
             in
-                Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
+                let val fdefs = FDefs.addDefinition fdefs name (params', body)
+                in
+                    Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
+                end
             end
         end
 
