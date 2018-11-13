@@ -76,7 +76,7 @@ structure Compiler : COMPILER = struct
             Compiler (menv, macenv, tenv, fenv, modname, code)
         end
 
-    fun compilerFromMenv c mnv =
+    fun compilerFromMenv c menv =
         let val (Compiler (_, macenv, tenv, fenv, modname, code)) = c
         in
             Compiler (menv, macenv, tenv, fenv, modname, code)
