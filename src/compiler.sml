@@ -149,7 +149,7 @@ structure Compiler : COMPILER = struct
             end
         end
       | declareTopForm c (DAST.Definstance (name, DAST.InstanceArg (arg, typarams), docstring, methods)) =
-        let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
+        let val fenv = compilerFenv c
         in
             let fun resolveMethod (DAST.MethodDef (name, params, rt, docstring, body)) =
                     Function.MethodDef (name,
@@ -166,7 +166,7 @@ structure Compiler : COMPILER = struct
                                                  map resolveMethod methods)
                 in
                     case Function.addInstance fenv ins of
-                        SOME fenv' => Compiler (menv, macenv, tenv, fenv', module, code)
+                        SOME fenv' => compilerFromFenv c fenv'
                       | _ => raise Fail "Bad instance definition"
                 end
             end
