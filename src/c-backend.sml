@@ -141,6 +141,19 @@ structure CBackend :> C_BACKEND = struct
                 (f ty oper lhs rhs)
             end
         end
+      | transform (LIR.TupleCreate operands) ty =
+        (* For tuple creation, we create a struct initializer and cast it to the
+           given tuple type *)
+        let val ty' = transformType ty
+        in
+            let val args = Util.mapidx (fn (oper, idx) =>
+                                           (tupleIdxName idx, transformOperand oper))
+                                       operands
+            in
+                C.StructInitializer (ty', args)
+            end
+        end
+
       | transform _ _ =
         raise Fail "Not implemented yet"
 
