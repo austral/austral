@@ -188,7 +188,7 @@ structure CBackend :> C_BACKEND = struct
         C.AddressOf (C.Variable (escapeVariable var))
       | transform (LIR.Cast (ty, oper)) _ =
         C.Cast (transformType ty, transformOperand oper)
-      | transform (LIR.ConcreteFuncall (name, args)) =
+      | transform (LIR.ConcreteFuncall (name, args)) _ =
         C.Funcall (escapeSymbol name, map transformOperand args)
       | transform _ _ =
         raise Fail "Not implemented yet"
