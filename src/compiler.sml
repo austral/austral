@@ -324,14 +324,14 @@ structure Compiler : COMPILER = struct
         compileUnits c (map ReplUnit Prelude.prelude)
 
     fun compileEntrypoint c name =
-        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
+        let val code = compilerCode c
             and sym = Parser.parseQualifiedSymbol name
         in
             let val name = "" (* HIR.escapeSymbol sym TODO FIXME *)
             in
                 let val newCode = code ^ "\n\nint main() {\n  return " ^ name ^ "();\n}\n"
                 in
-                    Compiler (menv, macenv, tenv, fenv, currModuleName, newCode)
+                    compilerFromCode c newCode
                 end
             end
         end
