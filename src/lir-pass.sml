@@ -171,6 +171,11 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.ForeignNull ty, tt)
         end
+      | transformOperation tt (MIR.SizeOf ty) =
+        let val (ty, tt) = transformType tt ty
+        in
+            (L.SizeOf ty, tt)
+        end
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
