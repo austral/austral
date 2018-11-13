@@ -36,11 +36,11 @@ signature C_BACKEND = sig
 
     (* Transform types *)
 
-    val transformType : tuple_types -> MIR.ty -> ty * tuple_types
+    val transformType : tuple_types -> LIR.ty -> ty * tuple_types
 
     (* Transform code *)
 
-    val transformOperand : tuple_types -> MIR.operand -> CAst.exp_ast
+    val transformOperand : tuple_types -> LIR.operand -> CAst.exp_ast
 
-    val transform : tuple_types -> MIR.operation -> MIR.ty -> CAst.exp_ast * tuple_types
+    val transform : tuple_types -> LIR.operation -> LIR.ty -> CAst.exp_ast * tuple_types
 end
