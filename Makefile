@@ -13,10 +13,10 @@ TEST_BIN := boreal-test
 
 BIN = boreal
 
-CPP_RUNTIME_SRC := src/runtime.hpp
-CPP_RUNTIME_SCRIPT := runtime.awk
-CPP_RUNTIME_ML := src/cpp-runtime.sml
-SRC := src/*.sig src/*.sml $(CPP_RUNTIME_ML)
+C_RUNTIME_SRC := src/runtime.c
+C_RUNTIME_SCRIPT := runtime.awk
+C_RUNTIME_ML := src/c-runtime.sml
+SRC := src/*.sig src/*.sml $(C_RUNTIME_ML)
 TEST_SRC := test/*.sml
 
 DOCS_DIR := docs
