@@ -64,6 +64,12 @@ structure Compiler : COMPILER = struct
             Compiler (menv, macenv, tenv, fenv, modname, code)
         end
 
+    fun compilerFromTenv c tenv =
+        let val (Compiler (menv, macenv, _, fenv, modname, code)) = c
+        in
+            Compiler (menv, macenv, tenv, fenv, modname, code)
+        end
+
     (* Compilation units *)
 
     type pathname = string
