@@ -1,6 +1,7 @@
 TODO:
 
 - C backend
+- Expand tuple types
 
 - Expand monomorphs recursively
 - Augment method calls
