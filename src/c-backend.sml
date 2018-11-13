@@ -72,55 +72,51 @@ structure CBackend :> C_BACKEND = struct
 
     structure C = CAst
 
-    local
-        open CAst
-    in
-        fun transformType tt LIR.Bool =
-            (boolType, tt)
-          | transformType tt (LIR.Integer (s, w)) =
-            (NamedType (intTypeName s w), tt)
-          | transformType tt (LIR.Float Type.Single) =
-            (NamedType "float", tt)
-          | transformType tt (LIR.Float Type.Double) =
-            (NamedType "double", tt)
-          | transformType tt (LIR.Tuple tys) =
-            let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
-                                                     transformType tt ty)
-                                                 tys
-                                                 tt
-            in
-                addTuple tt tys'
-            end
-          | transformType tt (LIR.Pointer t) =
-            let val (t', tt) = transformType tt t
-            in
-                (Pointer t', tt)
-            end
-          | transformType tt (LIR.StaticArray t) =
-            let val (t', tt) = transformType tt t
-            in
-                addTuple tt [sizeType, t']
-            end
-          | transformType tt (LIR.Disjunction (name, id)) =
-            (CAst.NamedType (disjName name id), tt)
+    fun transformType tt LIR.Bool =
+        (boolType, tt)
+      | transformType tt (LIR.Integer (s, w)) =
+        (NamedType (intTypeName s w), tt)
+      | transformType tt (LIR.Float Type.Single) =
+        (NamedType "float", tt)
+      | transformType tt (LIR.Float Type.Double) =
+        (NamedType "double", tt)
+      | transformType tt (LIR.Tuple tys) =
+        let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
+                                                 transformType tt ty)
+                                             tys
+                                             tt
+        in
+            addTuple tt tys'
+        end
+      | transformType tt (LIR.Pointer t) =
+        let val (t', tt) = transformType tt t
+        in
+            (Pointer t', tt)
+        end
+      | transformType tt (LIR.StaticArray t) =
+        let val (t', tt) = transformType tt t
+        in
+            addTuple tt [sizeType, t']
+        end
+      | transformType tt (LIR.Disjunction (name, id)) =
+        (CAst.NamedType (disjName name id), tt)
 
-        and intTypeName Type.Unsigned Type.Int8 =
-            "uint8_t"
-          | intTypeName Type.Signed   Type.Int8 =
-            "int8_t"
-          | intTypeName Type.Unsigned Type.Int16 =
-            "uint16_t"
-          | intTypeName Type.Signed   Type.Int16 =
-            "int16_t"
-          | intTypeName Type.Unsigned Type.Int32 =
-            "uint32_t"
-          | intTypeName Type.Signed   Type.Int32 =
-            "int32_t"
-          | intTypeName Type.Unsigned Type.Int64 =
-            "uint64_t"
-          | intTypeName Type.Signed   Type.Int64 =
-            "int64_t"
-    end
+    and intTypeName Type.Unsigned Type.Int8 =
+        "uint8_t"
+      | intTypeName Type.Signed   Type.Int8 =
+        "int8_t"
+      | intTypeName Type.Unsigned Type.Int16 =
+        "uint16_t"
+      | intTypeName Type.Signed   Type.Int16 =
+        "int16_t"
+      | intTypeName Type.Unsigned Type.Int32 =
+        "uint32_t"
+      | intTypeName Type.Signed   Type.Int32 =
+        "int32_t"
+      | intTypeName Type.Unsigned Type.Int64 =
+        "uint64_t"
+      | intTypeName Type.Signed   Type.Int64 =
+        "int64_t"
 
     (* Transform code *)
 
