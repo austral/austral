@@ -118,7 +118,7 @@ structure CBackend :> C_BACKEND = struct
     fun transformOperand (LIR.BoolConstant b) =
         C.BoolConstant b
       | transformOperand (LIR.IntConstant (i, ty)) =
-        let val (ty', _) = transformType tt ty
+        let val ty' = transformType ty
         in
             C.Cast (ty', C.IntConstant i)
         end
