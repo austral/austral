@@ -101,15 +101,15 @@ structure CBackend :> C_BACKEND = struct
     local
         open CAst
     in
-        fun transformType tt MIR.Bool =
+        fun transformType tt LIR.Bool =
             (boolType, tt)
-          | transformType tt (MIR.Integer (s, w)) =
+          | transformType tt (LIR.Integer (s, w)) =
             (NamedType (intTypeName s w), tt)
-          | transformType tt (MIR.Float Type.Single) =
+          | transformType tt (LIR.Float Type.Single) =
             (NamedType "float", tt)
-          | transformType tt (MIR.Float Type.Double) =
+          | transformType tt (LIR.Float Type.Double) =
             (NamedType "double", tt)
-          | transformType tt (MIR.Tuple tys) =
+          | transformType tt (LIR.Tuple tys) =
             let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
                                                      transformType tt ty)
                                                  tys
@@ -117,17 +117,17 @@ structure CBackend :> C_BACKEND = struct
             in
                 addTuple tt tys'
             end
-          | transformType tt (MIR.Pointer t) =
+          | transformType tt (LIR.Pointer t) =
             let val (t', tt) = transformType tt t
             in
                 (Pointer t', tt)
             end
-          | transformType tt (MIR.StaticArray t) =
+          | transformType tt (LIR.StaticArray t) =
             let val (t', tt) = transformType tt t
             in
                 addTuple tt [sizeType, t']
             end
-          | transformType tt (MIR.Disjunction (name, id)) =
+          | transformType tt (LIR.Disjunction (name, id)) =
             (CAst.NamedType (disjName name id), tt)
 
         and intTypeName Type.Unsigned Type.Int8 =
@@ -153,31 +153,31 @@ structure CBackend :> C_BACKEND = struct
     fun regName r =
         "_A_r" ^ (Int.toString r)
 
-    fun unwrapInt (MIR.Integer (s, w)) =
+    fun unwrapInt (LIR.Integer (s, w)) =
         (s, w)
       | unwrapInt _ =
         raise Fail "Internal error: not an integer type"
 
-    fun transformOperand _ (MIR.BoolConstant b) =
+    fun transformOperand _ (LIR.BoolConstant b) =
         C.BoolConstant b
-      | transformOperand tt (MIR.IntConstant (i, ty)) =
+      | transformOperand tt (LIR.IntConstant (i, ty)) =
         let val (ty', _) = transformType tt ty
         in
             C.Cast (ty', C.IntConstant i)
         end
-      | transformOperand tt (MIR.FloatConstant (f, ty)) =
+      | transformOperand tt (LIR.FloatConstant (f, ty)) =
         let val (ty', _) = transformType tt ty
         in
             C.Cast (ty', C.FloatConstant f)
         end
-      | transformOperand _ (MIR.StringConstant s) =
+      | transformOperand _ (LIR.StringConstant s) =
         C.StringConstant (CST.unescapeString s)
-      | transformOperand _(MIR.RegisterOp r) =
+      | transformOperand _(LIR.RegisterOp r) =
         C.Variable (regName r)
-      | transformOperand _ (MIR.VariableOp (var, _)) =
+      | transformOperand _ (LIR.VariableOp (var, _)) =
         C.Variable (escapeVariable var)
 
-    fun transform tt (MIR.ArithOp (kind, oper, lhs, rhs)) ty =
+    fun transform tt (LIR.ArithOp (kind, oper, lhs, rhs)) ty =
         let val lhs = transformOperand tt lhs
             and rhs = transformOperand tt rhs
         in
