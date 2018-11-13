@@ -26,6 +26,7 @@ structure Compiler : COMPILER = struct
                                     * Macro.macroenv
                                     * Type.tenv
                                     * Function.fenv
+                                    * MTAST.context
                                     * Symbol.module_name
                                     * code
 
