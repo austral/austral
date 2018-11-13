@@ -191,6 +191,11 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.ConcreteFuncall (name, args), tt)
         end
+      | transformOperation tt (MIR.GenericFuncall (name, id, args)) =
+        let val (args, tt) = transformOperands tt args
+        in
+            (L.GenericFuncall (name, id, args), tt)
+        end
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
