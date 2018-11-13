@@ -1,12 +1,10 @@
 TODO:
 
-- LIR pass
 - C backend
 
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
-- Separate IRs from passes
 
 LONG-TERM TODO:
 
@@ -22,6 +20,7 @@ LONG-TERM TODO:
 - Better error messages
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
+- Separate IRs from passes
 
 - Define an integer-cast thing to cast integers or some such
 
@@ -161,3 +160,4 @@ DONE:
 - New MIR
 - New HIR->MIR
 - New LIR
+- LIR pass
