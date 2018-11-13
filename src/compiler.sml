@@ -36,6 +36,7 @@ structure Compiler : COMPILER = struct
                                   Type.defaultTenv,
                                   Function.defaultFenv,
                                   MTAST.emptyContext,
+                                  FDefs.emptyEnv,
                                   Ident.mkIdentEx "austral-user",
                                   CRuntime.prelude)
 
