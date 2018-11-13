@@ -57,6 +57,20 @@ structure CBackend :> C_BACKEND = struct
     fun escapeVariable (Symbol.Var (sym, i)) =
         (escapeSymbol sym) ^ "_" ^ (Int.toString i)
 
+    (* Names *)
+
+    fun tupleName id =
+        "_A_tuple_" ^ (Int.toString id)
+
+    fun disjName name id =
+        "_A_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
+
+    fun regName r =
+        "_A_r" ^ (Int.toString r)
+
+    fun tupleIdxName i =
+        "_" ^ Int.toString i
+
     (* Transform types *)
 
     structure C = CAst
@@ -64,12 +78,6 @@ structure CBackend :> C_BACKEND = struct
     val boolType = C.NamedType "_A_bool"
 
     val sizeType = C.NamedType "size_t"
-
-    fun tupleName id =
-        "_A_tuple_" ^ (Int.toString id)
-
-    fun disjName name id =
-        "_A_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
 
     fun transformType LIR.Bool =
         boolType
@@ -106,12 +114,6 @@ structure CBackend :> C_BACKEND = struct
         "int64_t"
 
     (* Transform code *)
-
-    fun regName r =
-        "_A_r" ^ (Int.toString r)
-
-    fun tupleIdxName i =
-        "_" ^ Int.toString i
 
     fun unwrapInt (LIR.Integer (s, w)) =
         (s, w)
