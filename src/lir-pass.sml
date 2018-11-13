@@ -161,6 +161,11 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.UnsafeExtractCase (oper, id), tt)
         end
+      | transformOperation tt (MIR.ForeignFuncall (name, args)) =
+        let val (args, tt) = transformOperands tt args
+        in
+            (L.ForeignFucall (name, args), tt)
+        end
       | transformOperation _ _ =
         raise Fail "Not implemented yet"
 
