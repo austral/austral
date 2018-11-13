@@ -143,7 +143,7 @@ structure Compiler : COMPILER = struct
                 let val tc = resolveTypeclass tcDef
                 in
                     case Function.addTypeclass fenv tc of
-                        SOME fenv' => Compiler (menv, macenv, tenv, fenv', module, code)
+                        SOME fenv' => compilerFromFenv c fenv'
                       | _ => raise Fail "Duplicate typeclass definition"
                 end
             end
