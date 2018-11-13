@@ -243,7 +243,7 @@ structure Compiler : COMPILER = struct
             end
         end
       | declareTopForm c (DAST.Defcfun (name, rawname, params, arity, rt, docstring)) =
-        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
+        let val fenv = compilerFenv c
         in
             let val ff = Function.ForeignFunction (name,
                                                    rawname,
