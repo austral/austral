@@ -180,6 +180,8 @@ structure CBackend :> C_BACKEND = struct
         C.StructAccess (transformOperand oper, disjDataFieldName)
       | transform (LIR.ForeignFuncall (name, args)) ty =
         C.Funcall (name, map transformOperand args)
+      | transform (LIR.ForeignNull ty) ty =
+        C.NullConstant
       | transform _ _ =
         raise Fail "Not implemented yet"
 
