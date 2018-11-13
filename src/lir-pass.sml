@@ -93,7 +93,7 @@ structure LirPass :> LIR_PASS = struct
             (L.FloatConstant (f, ty), tt)
         end
       | transformOperand tt (MIR.StringConstant s) =
-        (L.StringConstant (CST.unescapeString s), tt)
+        (L.StringConstant s, tt)
       | transformOperand tt (MIR.RegisterOp r) =
         (L.RegisterOp r, tt)
       | transformOperand tt (MIR.VariableOp (var, ty)) =
