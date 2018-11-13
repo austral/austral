@@ -101,4 +101,18 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.VariableOp (var, ty), tt)
         end
+
+    fun transformOperation tt (MIR.ArithOp (kind, oper, lhs, rhs, ty)) =
+        let val (lhs, tt) = transformOperand tt lhs
+        in
+            let val (rhs, tt) = transformOperand tt rhs
+            in
+                let val (ty, tt) = transformType tt ty
+                in
+                    (L.ArithOp (kind, oper, lhs, rhs, ty), tt)
+                end
+            end
+        end
+      | transformOperation _ _ =
+        raise Fail "Not implemented yet"
 end
