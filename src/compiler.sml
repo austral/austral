@@ -185,10 +185,10 @@ structure Compiler : COMPILER = struct
               | NONE => raise Fail "Duplicate type definition"
         end
       | declareTopForm c (DAST.Defdisjunction (name, params, docstring, variants)) =
-        let val (Compiler (menv, macenv, tenv, fenv, module, code)) = c
+        let val tenv = compilerTenv c
         in
             case (Type.addDisjunction tenv (name, params, variants)) of
-                SOME tenv' => Compiler (menv, macenv, tenv', fenv, module, code)
+                SOME tenv' => compilerFromTenv c tenv'
               | NONE => raise Fail "Duplicate type definition"
         end
       | declareTopForm c (DAST.Deftemplate _) =
