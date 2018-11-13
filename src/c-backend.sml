@@ -86,7 +86,7 @@ structure CBackend :> C_BACKEND = struct
       | transformType (LIR.StaticArray t) =
         raise Fail "Static arrays not implemented yet"
       | transformType (LIR.Disjunction (name, id)) =
-        (C.NamedType (disjName name id), tt)
+        C.NamedType (disjName name id)
 
     and intTypeName Type.Unsigned Type.Int8 =
         "uint8_t"
