@@ -106,7 +106,7 @@ structure Compiler : COMPILER = struct
         end
       | declareTopForm c (DAST.Defgeneric (name, typarams, params, rt, docstring, ast)) =
         (* Add a generic function to the compiler fenv *)
-        let val (Compiler (menv, macenv, tenv, fenv, currModuleName, code)) = c
+        let val fenv = compilerFenv c
         in
             let val gf = Function.GenericFunction (name,
                                                    typarams,
