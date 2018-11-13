@@ -41,6 +41,9 @@ structure Compiler : COMPILER = struct
     fun compilerMenv (Compiler (menv, _, _, _, _, _)) =
         menv
 
+    fun compilerMacEnv (Compiler (_, macenv, _, _, _, _)) =
+        macenv
+
     fun compilerTenv (Compiler (_, _, tenv, _, _, _)) =
         tenv
 
@@ -54,6 +57,7 @@ structure Compiler : COMPILER = struct
         code
 
     (* Constructors *)
+
 
     (* Compilation units *)
 
