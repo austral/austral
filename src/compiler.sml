@@ -61,39 +61,39 @@ structure Compiler : COMPILER = struct
     (* Constructors *)
 
     fun compilerFromFenv c fenv =
-        let val (Compiler (menv, macenv, tenv, _, modname, code)) = c
+        let val (Compiler (menv, macenv, tenv, _, mtast, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, modname, code)
         end
 
     fun compilerFromTenv c tenv =
-        let val (Compiler (menv, macenv, _, fenv, modname, code)) = c
+        let val (Compiler (menv, macenv, _, fenv, mtast, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, modname, code)
         end
 
     fun compilerFromMacEnv c macenv =
-        let val (Compiler (menv, _, tenv, fenv, modname, code)) = c
+        let val (Compiler (menv, _, tenv, fenv, mtast, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, modname, code)
         end
 
     fun compilerFromMenv c menv =
-        let val (Compiler (_, macenv, tenv, fenv, modname, code)) = c
+        let val (Compiler (_, macenv, tenv, fenv, mtast, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, modname, code)
         end
 
     fun compilerFromModName c modname =
-        let val (Compiler (menv, macenv, tenv, fenv, modname, code)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, modname, code)
         end
 
     fun compilerFromCode c code =
-        let val (Compiler (menv, macenv, tenv, fenv, modname, _)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, modname, _)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, modname, code)
         end
 
     (* Compilation units *)
