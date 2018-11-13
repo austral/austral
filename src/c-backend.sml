@@ -186,7 +186,7 @@ structure CBackend :> C_BACKEND = struct
         C.SizeOf (transformType ty)
       | transform (LIR.AddressOf var) _ =
         C.AddressOf (C.Variable (escapeVariable var))
-      | transform (LIR.Cast (ty, oper)) =
+      | transform (LIR.Cast (ty, oper)) _ =
         C.Cast (transformType ty, transformOperand oper)
       | transform _ _ =
         raise Fail "Not implemented yet"
