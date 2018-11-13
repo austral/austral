@@ -159,10 +159,10 @@ structure CBackend :> C_BACKEND = struct
           | _ => C.Binop (mapOper oper, lhs, rhs)
 
     and transformCheckedArith ty oper lhs rhs =
-        raise Fail "Not implemented yet"
+        raise Fail "checked arith not implemented yet"
 
     and transformSaturationArith ty oper lhs rhs =
-        raise Fail "Not implemented yet"
+        raise Fail "saturation arith not implemented yet"
 
     and transformFloatArith ty oper lhs rhs =
         (* Floating point arithmetic is implemented directly. *)
