@@ -238,6 +238,8 @@ structure LirPass :> LIR_PASS = struct
                 end
             end
         end
+      | transformInstruction _ _ =
+        raise Fail "Not done yet"
 
     and transformInstructions tt opers =
         Util.foldThread (fn (oper, tt) =>
