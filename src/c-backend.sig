@@ -31,7 +31,7 @@ signature C_BACKEND = sig
 
     (* Transform code *)
 
-    val transformOperand : tuple_types -> LIR.operand -> CAst.exp_ast
+    val transformOperand : LIR.operand -> CAst.exp_ast
 
     val transform : tuple_types -> LIR.operation -> LIR.ty -> CAst.exp_ast * tuple_types
 end
