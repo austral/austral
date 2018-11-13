@@ -77,4 +77,25 @@ structure LirPass :> LIR_PASS = struct
         end
       | transformType tt (MIR.Disjunction (name, id)) =
         (L.Disjunction (name, id), tt)
+
+    (* Transform code *)
+
+    fun transformOperand tt (MIR.BoolConstant b) =
+        (L.BoolConstant b, tt)
+      | transformOperand tt (MIR.IntConstant (i, ty)) =
+        let val (ty', tt) = transformType tt ty
+        in
+            (L.Cast (ty', L.IntConstant i), tt)
+        end
+      | transformOperand tt (MIR.FloatConstant (f, ty)) =
+        let val (ty', tt) = transformType tt ty
+        in
+            (L.Cast (ty', L.FloatConstant f), tt)
+        end
+      | transformOperand tt (MIR.StringConstant s) =
+        (L.StringConstant (CST.unescapeString s), tt)
+      | transformOperand tt (MIR.RegisterOp r) =
+        (L.Variable (regName r), tt)
+      | transformOperand tt (MIR.VariableOp (var, _)) =
+        (L.Variable (escapeVariable var), tt)
 end
