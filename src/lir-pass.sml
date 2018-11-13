@@ -220,7 +220,7 @@ structure LirPass :> LIR_PASS = struct
             end
         end
       | transformInstruction tt (MIR.Cond { test, consequent, alternate, result, ty }) =
-        let val (test, tt) = transformOperation tt test
+        let val (test, tt) = transformOperand tt test
         in
             let val (consequent, tt) = transformInstructions tt consequent
             in
