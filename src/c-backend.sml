@@ -155,6 +155,8 @@ structure CBackend :> C_BACKEND = struct
         in
             C.StructInitializer (transformType ty, args)
         end
+      | transform (LIR.TupleProj (tup, idx)) _ =
+        C.StructAccess (transformOperand tup, tupleIdxName idx)
 
       | transform _ _ =
         raise Fail "Not implemented yet"
