@@ -194,10 +194,10 @@ structure Compiler : COMPILER = struct
       | declareTopForm c (DAST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
       | declareTopForm c (DAST.DefineSymbolMacro mac) =
-        let val (Compiler (menv, macenv, tenv, fenv, moduleName, code)) = c
+        let val macenv = compilerMacEnv c
         in
             case Macro.addSymbolMacro macenv (Macro.SymbolMacro mac) of
-                SOME macenv' => Compiler (menv, macenv', tenv, fenv, moduleName, code)
+                SOME macenv' => compilerFromMenv c macenv'
               | _ => raise Fail "Duplicate symbol macro definition"
         end
       | declareTopForm c (DAST.Defmodule (name, clauses)) =
