@@ -25,18 +25,9 @@ signature C_BACKEND = sig
     val escapeSymbol : Symbol.symbol -> string
     val escapeVariable : Symbol.variable -> string
 
-    (* Tuples *)
-
-    type tuple_types
-
-    val emptyTupleTypes : tuple_types
-
-    val getTuple : tuple_types -> ty list -> ty option
-    val addTuple : tuple_types -> ty list -> (ty * tuple_types)
-
     (* Transform types *)
 
-    val transformType : tuple_types -> LIR.ty -> ty * tuple_types
+    val transformType : LIR.ty -> ty
 
     (* Transform code *)
 
