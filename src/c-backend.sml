@@ -157,6 +157,10 @@ structure CBackend :> C_BACKEND = struct
         end
       | transform (LIR.TupleProj (tup, idx)) _ =
         C.StructAccess (transformOperand tup, tupleIdxName idx)
+      | transform (LIR.ArrayLength arr) ty =
+        raise Fail "Not implemented yet"
+      | transform (LIR.ArrayPointer arr) ty =
+        raise Fail "Not implemented yet"
 
       | transform _ _ =
         raise Fail "Not implemented yet"
