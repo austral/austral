@@ -238,4 +238,10 @@ structure LirPass :> LIR_PASS = struct
                 end
             end
         end
+
+    and transformInstructions tt opers =
+        Util.foldThread (fn (oper, tt) =>
+                            transformInstruction tt oper)
+                        opers
+                        tt
 end
