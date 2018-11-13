@@ -111,6 +111,12 @@ structure LirPass :> LIR_PASS = struct
             end
         end
       | transformOperation tt (MIR.TupleCreate opers) =
+        let val (opers, tt) = transformOperands tt opers
+        in
+            (L.TupleCreate opers, tt)
+        end
+      | transformOperation _ _ =
+        raise Fail "Not implemented yet"
 
     and transformOperands tt opers =
         Util.foldThread (fn (oper, tt) =>
