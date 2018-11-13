@@ -196,8 +196,6 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.GenericFuncall (name, id, args), tt)
         end
-      | transformOperation _ _ =
-        raise Fail "Not implemented yet"
 
     and transformOperands tt opers =
         Util.foldThread (fn (oper, tt) =>
