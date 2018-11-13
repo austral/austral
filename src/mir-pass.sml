@@ -166,7 +166,7 @@ structure MirPass :> MIR_PASS = struct
                             @ [Store { ptr = ptr',
                                        value = val',
                                        result = result,
-                                       ty : ty }]
+                                       ty = ty }]
             in
                 (nodes, RegisterOp result)
             end
