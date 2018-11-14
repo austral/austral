@@ -43,6 +43,9 @@ structure Type :> TYPE = struct
     fun isFloat (Float _) = true
       | isFloat _ = false
 
+    fun isNumeric t =
+        isInteger t orelse isFloat t
+
     fun tyVars Unit = Set.empty
       | tyVars Bool = Set.empty
       | tyVars (Integer _) = Set.empty
