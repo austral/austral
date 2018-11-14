@@ -19,7 +19,7 @@
 
 structure Prelude :> PRELUDE = struct
     val prelude = [
-        "(in-module :austral.ext.cffi)",
+        (*"(in-module :austral.ext.cffi)",
         "(defcfun (malloc* \"malloc\") ((size austral:u64)) (foreign-pointer austral:u8))",
         "(austral:defgeneric malloc (tau) ((size austral:u64)) (foreign-pointer tau)\
         \  (cast (foreign-pointer tau) (malloc* size)))",
@@ -28,6 +28,6 @@ structure Prelude :> PRELUDE = struct
         \  (free* (cast (foreign-pointer austral:u8) pointer)))",
         "(austral:defgeneric null? (tau) ((pointer (foreign-pointer tau))) austral:boolean\
         \  (austral.kernel:eq pointer (null-pointer tau)))",
-        "(austral:in-module :austral-user)"
+        "(austral:in-module :austral-user)"*)
     ]
 end
