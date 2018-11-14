@@ -1,8 +1,8 @@
 .cm
 boreal
 boreal-test
-src/cpp-runtime.sml
-test/valid/*.cpp
+src/c-runtime.sml
+test/valid/*.c
 test/valid/*.bin
 docs/*.html
 docs/*.png
