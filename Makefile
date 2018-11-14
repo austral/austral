@@ -65,5 +65,5 @@ clean:
 	if [ -f $(C_RUNTIME_ML) ]; then rm $(C_RUNTIME_ML); fi
 	if [ -f $(DOCS_HTML) ]; then rm $(DOCS_HTML); fi
 	if [ -f $(DOCS_ARCH_PNG) ]; then rm $(DOCS_ARCH_PNG); fi
-	rm test/valid/*.cpp
+	rm test/valid/*.c
 	rm test/valid/*.bin
