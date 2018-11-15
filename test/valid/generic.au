@@ -4,4 +4,4 @@
   value)
 
 (defun main () i32
-  (identity (the i32 0)))
+  (identity 0))
