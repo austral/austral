@@ -28,6 +28,7 @@ structure Compiler : COMPILER = struct
                                     * Function.fenv
                                     * MTAST.context
                                     * FDefs.fdefenv
+                                    * LirPass.tuple_types
                                     * Symbol.module_name
                                     * code
 
@@ -37,77 +38,90 @@ structure Compiler : COMPILER = struct
                                   Function.defaultFenv,
                                   MTAST.emptyContext,
                                   FDefs.emptyEnv,
+                                  LirPass.emptyTupleTypes,
                                   Ident.mkIdentEx "austral-user",
                                   CRuntime.prelude)
 
     (* Accessors *)
 
-    fun compilerMenv (Compiler (menv, _, _, _, _, _, _, _)) =
+    fun compilerMenv (Compiler (menv, _, _, _, _, _, _, _, _)) =
         menv
 
-    fun compilerMacEnv (Compiler (_, macenv, _, _, _, _, _, _)) =
+    fun compilerMacEnv (Compiler (_, macenv, _, _, _, _, _, _, _)) =
         macenv
 
-    fun compilerTenv (Compiler (_, _, tenv, _, _, _, _, _)) =
+    fun compilerTenv (Compiler (_, _, tenv, _, _, _, _, _, _)) =
         tenv
 
-    fun compilerFenv (Compiler (_, _, _, fenv, _, _, _, _)) =
+    fun compilerFenv (Compiler (_, _, _, fenv, _, _, _, _, _)) =
         fenv
 
-    fun currentModule (Compiler (menv, _, _, _, _, _, modName, _)) =
+    fun compilerMonoCtx (Compiler (_, _, _, _, ctx, _, _, _, _)) =
+        ctx
+
+    fun compilerFdefs (Compiler (_, _, _, _, _, fdefs, _, _, _)) =
+        fdefs
+
+    fun compilerTupleTypes (Compiler (_, _, _, _, _, _, tts, _, _)) =
+        tts
+
+    fun currentModule (Compiler (menv, _, _, _, _, _, _, modName, _)) =
         Option.valOf (Module.envGet menv modName)
 
-    fun compilerCode (Compiler (_, _, _, _, _, _, _, code)) =
+    fun compilerCode (Compiler (_, _, _, _, _, _, _, _, code)) =
         code
 
     (* Constructors *)
 
     fun compilerFromFenv c fenv =
-        let val (Compiler (menv, macenv, tenv, _, mtast, fdefs, modname, code)) = c
+        let val (Compiler (menv, macenv, tenv, _, mtast, fdefs, tts, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
         end
 
     fun compilerFromTenv c tenv =
-        let val (Compiler (menv, macenv, _, fenv, mtast, fdefs, modname, code)) = c
+        let val (Compiler (menv, macenv, _, fenv, mtast, fdefs, tts, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
         end
 
     fun compilerFromMacEnv c macenv =
-        let val (Compiler (menv, _, tenv, fenv, mtast, fdefs, modname, code)) = c
+        let val (Compiler (menv, _, tenv, fenv, mtast, fdefs, tts, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
         end
 
     fun compilerFromMenv c menv =
-        let val (Compiler (_, macenv, tenv, fenv, mtast, fdefs, modname, code)) = c
+        let val (Compiler (_, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)) = c
         in
-            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
-        end
-
-    fun compilerFromModName c modname =
-        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)) = c
-        in
-            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
-        end
-
-    fun compilerFromCode c code =
-        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, _)) = c
-        in
-            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
+            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
         end
 
     fun addFundef c name params body =
-        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)) = c
         in
-            let val params' = map (fn (DAST.Param (n, t)) => TAST.Param (n, t)) params
+            let val fdefs = FDefs.addDefinition fdefs name (params, body)
             in
-                let val fdefs = FDefs.addDefinition fdefs name (params', body)
-                in
-                    Compiler (menv, macenv, tenv, fenv, mtast, fdefs, modname, code)
-                end
+                Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
             end
+        end
+
+    fun compilerFromTTS c tts =
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, _, modname, code)) = c
+        in
+            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
+        end
+
+    fun compilerFromModName c modname =
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)) = c
+        in
+            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
+        end
+
+    fun compilerFromCode c code =
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, _)) = c
+        in
+            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
         end
 
     (* Compilation units *)
@@ -162,10 +176,7 @@ structure Compiler : COMPILER = struct
                                                    docstring)
             in
                 case (Function.addGenericFunction fenv gf) of
-                    SOME fenv' => let val c' = compilerFromFenv c fenv'
-                                  in
-                                      addFundef c' name params ast
-                                  end
+                    SOME fenv' => compilerFromFenv c fenv'
                   | NONE => raise Fail "Repeat function"
             end
         end
@@ -295,15 +306,62 @@ structure Compiler : COMPILER = struct
       | declarationPass c nil =
         ([], c)
 
-    local
-        open TAST
-    in
-    fun compileForm c topNode =
-        let val tastNode = TAST.augmentTop topNode
-                                           (compilerTenv c)
-                                           (compilerFenv c)
+    fun augmentForm c node =
+        (TAST.augmentTop node
+                         (compilerTenv c)
+                         (compilerFenv c),
+         c)
+
+    fun augmentationPass c forms =
+        Util.foldThread (fn (form, c) =>
+                            augmentForm c form)
+                        forms
+                        c
+
+    fun extractDefinition c (TAST.Defgeneric (name, typarams, params, ty, _, ast)) =
+        addFundef c name params ast
+      | extractDefinition c _ =
+        c
+
+    fun extractionPass c forms =
+        let val (forms, c) = Util.foldThread (fn (form, c) =>
+                                                 (form, extractDefinition c form))
+                                             forms
+                                             c
         in
-            raise Fail "compiler machine is kill"
+            c
+        end
+
+    fun compileForm c node =
+        let val (mtastNode, ctx) = MTAST.monomorphizeTop (compilerFenv c)
+                                                         (compilerFdefs c)
+                                                         (compilerMonoCtx c)
+                                                         node
+        in
+            let val hirNode = HirPass.transformTop mtastNode
+            in
+                let val mirNode = MirPass.transformTop hirNode
+                in
+                    let val (lirNode, tts) = LirPass.transformTop (compilerTupleTypes c)
+                                                                  mirNode
+                    in
+                        let val c = compilerFromTTS c tts
+                        in
+                            let val cNode = CBackend.transformTop lirNode
+                            in
+                                let val newCode = CRenderer.renderTop cNode
+                                in
+                                    let val code = (compilerCode c) ^ "\n\n" ^ newCode
+                                    in
+                                        compilerFromCode c code
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
             (*let val mtastNode = MTAST
             let val hirTop = HirPass.transformTop typedNode
             in
@@ -320,8 +378,6 @@ structure Compiler : COMPILER = struct
                     end
                 end
             *)
-        end
-    end
 
     fun compilationPass c (head::tail) =
         compilationPass (compileForm c head) tail
@@ -329,9 +385,15 @@ structure Compiler : COMPILER = struct
         c
 
     fun compileUnit c u =
-        let val (forms, c') = (declarationPass c (unitForms u))
+        let val (forms, c) = (declarationPass c (unitForms u))
         in
-            compilationPass c' forms
+            let val (forms, c) = augmentationPass c forms
+            in
+                let val c = extractionPass c forms
+                in
+                    compilationPass c forms
+                end
+            end
         end
 
     fun compileUnits c (head::tail) =
