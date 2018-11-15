@@ -27,9 +27,9 @@ structure Type :> TYPE = struct
                 | Integer of signedness * width
                 | Float of float_type
                 | Tuple of ty list
-                | Pointer of ty
-                | ForeignPointer of ty
+                | Address of ty
                 | StaticArray of ty
+                | Pointer of ty
                 | Disjunction of name * ty list * variant list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
