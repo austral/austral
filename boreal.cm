@@ -98,6 +98,9 @@ is
   src/c-ast.sig
   src/c-ast.sml
 
+  src/c-renderer.sig
+  src/c-renderer.sml
+
   src/c-backend.sig
   src/c-backend.sml
 
