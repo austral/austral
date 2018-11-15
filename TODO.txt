@@ -4,11 +4,12 @@ TODO:
 - Refactor: load/store/free only work on PositiveAddress types
 - Refactor: malloc builtin
 - Refactor: free builtin
-- malloc/load/store/free test
+- Builtin to turn an address to a positive address
 - Lift static arrays to (length, ptr) tuples in the LIR pass
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
+- malloc/load/store/free test
 
 LONG-TERM TODO:
 
