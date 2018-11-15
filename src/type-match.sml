@@ -33,16 +33,37 @@ structure TypeMatch = struct
           (* Ensure the bindings don't have conflicting elements! *)
           let val common = Set.intersection bsKeys bsKeys'
           in
-              if List.all (fn key =>
-                              let val a = Option.valOf (Map.get bs key)
-                                  and b = Option.valOf (Map.get bs' key)
-                              in
-                                  a = b
-                              end)
-                          (Set.toList common) then
-                  Bindings (Map.mergeMaps bs bs')
-              else
-                  Failure "Conflicting type variables"
+              let fun compatible key =
+                      let val a = Option.valOf (Map.get bs key)
+                          and b = Option.valOf (Map.get bs' key)
+                      in
+                          a = b
+                      end
+              in
+                  if List.all (fn key =>
+                                  let val a = Option.valOf (Map.get bs key)
+                                      and b = Option.valOf (Map.get bs' key)
+                                  in
+                                      a = b
+                                  end)
+                              (Set.toList common) then
+                      Bindings (Map.mergeMaps bs bs')
+                  else
+                      let val diff = List.filter (fn k => not (compatible k)) (Set.toList common)
+                      in
+                          Failure ("Conflicting type variables: "
+                                   ^ (String.concatWith ", " (map (fn key =>
+                                                                      let val symstr = Symbol.toString key
+                                                                      in
+                                                                          symstr ^ " = { "
+                                                                          ^ Type.toString (Option.valOf (Map.get bs key))
+                                                                          ^ ", "
+                                                                          ^ Type.toString (Option.valOf (Map.get bs' key))
+                                                                          ^ " }"
+                                                                      end)
+                                                                  diff)))
+                      end
+              end
           end
       end
     | mergeBindings (Bindings _) (Failure f) =
