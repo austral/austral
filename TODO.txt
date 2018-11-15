@@ -1,6 +1,5 @@
 TODO:
 
-- Compile defdisjunctions
 - Refactor: malloc builtin
 - Refactor: free builtin
 - Builtin to turn an address to a positive address
@@ -179,3 +178,4 @@ DONE:
 - Fix bug with type matching in generic function calls
 - Refactor: PositiveAddress type
 - Refactor: load/store only work on PositiveAddress types
+- Compile defdisjunctions
