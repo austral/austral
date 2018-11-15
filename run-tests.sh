@@ -51,9 +51,10 @@ echo "compare.au"
 gcc test/valid/compare.c -o test/valid/compare.bin
 ./test/valid/compare.bin
 
-# echo "defdisjunction.au"
-# ./boreal test/valid/defdisjunction.au --output=test/valid/defdisjunction.c
-# clang++ -shared -fPIC -std=c++11 test/valid/defdisjunction.cpp
+echo "defdisjunction.au"
+./boreal test/valid/defdisjunction.au --output=test/valid/defdisjunction.c --entrypoint=austral-user:main
+gcc test/valid/defdisjunction.c -o test/valid/defdisjunction.bin
+./test/valid/defdisjunction.bin
 
 echo "bind.au"
 ./boreal test/valid/bind.au --output=test/valid/bind.c --entrypoint=austral-user:main
