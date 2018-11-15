@@ -87,24 +87,11 @@ structure Function :> FUNCTION = struct
                                    * instance list
 
     val defaultFenv =
-        let fun funcName (Function (name, _, _, _)) =
-                name
-        in
-            let val notFn = Function (Symbol.au "not",
-                                      [Param (Symbol.au "v", Type.Bool)],
-                                      Type.Bool,
-                                      NONE)
-            in
-                let val builtins = [notFn]
-                in
-                    FunctionEnv (Map.fromList (map (fn f => (funcName f, f)) builtins),
-                                 Map.empty,
-                                 Map.empty,
-                                 [],
-                                 [])
-                end
-            end
-        end
+        FunctionEnv (Map.empty,
+                     Map.empty,
+                     Map.empty,
+                     [],
+                     [])
 
     datatype callable = CallableFunc of func
                       | CallableForeign of ffunc
