@@ -602,7 +602,7 @@ structure TAST :> TAST = struct
                             let val binds = Function.matchFunc params rt argTypes assertedRt
                             in
                                 GenericFuncall (name,
-                                                Function.typeArgs typarams binds,
+                                                binds,
                                                 args',
                                                 assertedRt)
                             end
