@@ -84,18 +84,17 @@ structure HirPass :> HIR_PASS = struct
         (* Since we drop linearity in HIR, we can turn bind expressions into a
            Let that simply projects each tuple element. *)
         let val tupvar = freshVar ()
-            and tys = case M.typeOf tup of
-                          (MT.Tuple tys) => tys
-                        | _ => raise Fail "Not a tuple [internal compiler error]"
         in
             Let (tupvar,
                  transform tup,
-                 transformBind tys vars tupvar body)
+                 transformBind (transformType (M.typeOf tup)) vars tupvar body)
         end
       | transform (M.Cond (t, c, a)) =
         Cond (transform t, transform c, transform a)
       | transform (M.ArithOp (kind, oper, lhs, rhs)) =
         ArithOp (kind, oper, transform lhs, transform rhs)
+      | transform (M.CompOp (oper, lhs, rhs)) =
+        CompOp (oper, transform lhs, transform rhs)
       | transform (M.TupleCreate elems) =
         TupleCreate (map transform elems)
       | transform (M.TupleProj (tup, idx)) =
@@ -115,26 +114,32 @@ structure HirPass :> HIR_PASS = struct
                    caseNameIdx ty name,
                    Option.map transform value)
       | transform (M.Case (exp, cases, ty)) =
-        let val expvar = freshVar ()
+        let val expTy = MTAST.typeOf exp
         in
-            (* TODO: better name for this *)
-            let val expvarVar = Variable (expvar, transformType ty)
+            let val expvar = freshVar ()
             in
-                let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
-                        VariantCase (name, transform body)
-                      | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
-                        VariantCase (casename,
-                                     Let (var,
-                                          UnsafeExtractCase (expvarVar,
-                                                             caseNameIdx ty casename,
-                                                             transformType ty),
-                                          transform body))
+                (* TODO: better name for this *)
+                let val expvarVar = Variable (expvar, transformType ty)
                 in
-                    Let (expvar,
-                         transform exp,
-                         Case (expvarVar,
-                               map transformCase cases,
-                               transformType ty))
+                    let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
+                            VariantCase (caseNameIdx expTy name, transform body)
+                          | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
+                            let val id = caseNameIdx expTy casename
+                            in
+                                VariantCase (id,
+                                             Let (var,
+                                                  UnsafeExtractCase (expvarVar,
+                                                                     id,
+                                                                     transformType ty),
+                                                  transform body))
+                            end
+                    in
+                        Let (expvar,
+                             transform exp,
+                             Case (expvarVar,
+                                   map transformCase cases,
+                                   transformType ty))
+                    end
                 end
             end
         end
@@ -158,14 +163,11 @@ structure HirPass :> HIR_PASS = struct
                         map transform args,
                         transformType ty)
 
-    and transformBind tys (vars: Symbol.variable list) (tupvar: Symbol.variable) (body: MTAST.ast) =
+    and transformBind tupty (vars: Symbol.variable list) (tupvar: Symbol.variable) (body: MTAST.ast) =
         let fun transformInner (head::tail) tupvar body i =
-                let val elemTy = transformType (List.nth (tys, i))
-                in
-                    Let (head,
-                         TupleProj (Variable (tupvar, elemTy), i),
-                         transformInner tail tupvar body (i + 1))
-                end
+                Let (head,
+                     TupleProj (Variable (tupvar, tupty), i),
+                     transformInner tail tupvar body (i + 1))
               | transformInner nil _ body _ =
                 transform body
         in
