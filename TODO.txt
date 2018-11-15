@@ -1,5 +1,6 @@
 TODO:
 
+- Fix bug with type matching in generic function calls
 - Refactor: malloc builtin
 - Refactor: free builtin
 - malloc/load/store/free test
