@@ -94,7 +94,7 @@ structure MonoType :> MONO_TYPE = struct
         in
             (Pointer ty', tm')
         end
-      | monomorphize tm rs (Type.AddressPointer ty) =
+      | monomorphize tm rs (Type.Address ty) =
         let val (ty', tm') = monomorphize tm rs ty
         in
             (Address ty', tm')
