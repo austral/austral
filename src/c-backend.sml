@@ -75,6 +75,9 @@ structure CBackend :> C_BACKEND = struct
     fun tupleIdxName i =
         "_" ^ Int.toString i
 
+    fun genericFuncName name id =
+        "_A_generic_" ^ (Int.toString id)
+
     (* Transform types *)
 
     structure C = CAst
@@ -150,6 +153,16 @@ structure CBackend :> C_BACKEND = struct
                 (f ty oper lhs rhs)
             end
         end
+      | transform (LIR.CompOp (oper, lhs, rhs)) ty =
+        let fun mapOper Builtin.EqualTo = C.EqualTo
+              | mapOper Builtin.NotEqualTo = C.NotEqualTo
+              | mapOper Builtin.GreaterThan = C.GreaterThan
+              | mapOper Builtin.LessThan = C.LessThan
+              | mapOper Builtin.GreaterThanEq = C.GreaterThanEq
+              | mapOper Builtin.LessThanEq = C.LessThanEq
+        in
+            C.Binop (mapOper oper, transformOperand lhs, transformOperand rhs)
+        end
       | transform (LIR.TupleCreate operands) ty =
         (* For tuple creation, we create a struct initializer and cast it to the
            given tuple type *)
@@ -162,9 +175,9 @@ structure CBackend :> C_BACKEND = struct
       | transform (LIR.TupleProj (tup, idx)) _ =
         C.StructAccess (transformOperand tup, tupleIdxName idx)
       | transform (LIR.ArrayLength arr) ty =
-        raise Fail "Not implemented yet"
+        raise Fail "array length: Not implemented yet"
       | transform (LIR.ArrayPointer arr) ty =
-        raise Fail "Not implemented yet"
+        raise Fail "array pointer: Not implemented yet"
       | transform (LIR.Load ptr) _ =
         C.Deref (transformOperand ptr)
       | transform (LIR.Construct (ty, id, SOME value)) _ =
@@ -191,7 +204,7 @@ structure CBackend :> C_BACKEND = struct
       | transform (LIR.ConcreteFuncall (name, args)) _ =
         C.Funcall (escapeSymbol name, map transformOperand args)
       | transform (LIR.GenericFuncall (name, id, args)) _ =
-        C.Funcall ("_A_generic_" ^ (Int.toString id), map transformOperand args)
+        C.Funcall (genericFuncName name id, map transformOperand args)
 
     and transformModularArith ty oper lhs rhs =
         (* Modular arithmetic is implemented directly, except for division,
@@ -225,4 +238,100 @@ structure CBackend :> C_BACKEND = struct
         C.Mul
       | mapOper Arith.Div =
         C.Div
+
+    (* Transforming instructions *)
+
+    fun transformInst (LIR.Assignment (reg, oper, ty)) =
+        let val var = regName reg
+            and ty' = transformType ty
+        in
+            C.DeclareAssign (ty', var, transform oper ty)
+        end
+      | transformInst (LIR.DeclareLocal (var, ty, operand)) =
+        let val var' = escapeVariable var
+            and ty' = transformType ty
+        in
+            C.DeclareAssign (ty', var', transformOperand operand)
+        end
+      | transformInst (LIR.Cond { test, consequent, consequent_res, alternate, alternate_res, result, ty }) =
+        let val result' = regName result
+            and ty' = transformType ty
+        in
+            C.Sequence [
+                C.Declare (ty', result'),
+                C.Cond (transformOperand test,
+                        C.Sequence [
+                            C.Sequence (map transformInst consequent),
+                            C.Assign (C.Variable result', transformOperand consequent_res)
+                        ],
+                        C.Sequence [
+                            C.Sequence (map transformInst alternate),
+                            C.Assign (C.Variable result', transformOperand alternate_res)
+                       ])
+            ]
+        end
+      | transformInst (LIR.Store { ptr, value, result, ty}) =
+        let val ptr' = transformOperand ptr
+            and value' = transformOperand value
+            and ty' = transformType ty
+        in
+            C.Sequence [
+                C.Assign (C.Deref ptr', value'),
+                C.DeclareAssign (ty', regName result, ptr')
+            ]
+        end
+      | transformInst (LIR.Case (oper, variants, result, ty)) =
+        let val oper' = transformOperand oper
+            and result' = regName result
+            and ty' = transformType ty
+        in
+            C.Sequence [
+                C.Declare (ty', result'),
+                C.Switch (C.StructAccess (oper', disjTagFieldName),
+                          map (fn (LIR.VariantCase (id, insts, oper, ty)) =>
+                                  let val insts' = map transformInst insts
+                                      and oper' = transformOperand oper
+                                  in
+                                      (id, C.Sequence [
+                                           C.Sequence insts',
+                                           C.Assign (C.Variable result', oper')
+                                       ])
+                                  end)
+                              variants)
+            ]
+        end
+      | transformInst (LIR.VoidForeignFuncall (name, args)) =
+        (C.VoidFuncall (name, map transformOperand args))
+
+    (* Transforming top ast *)
+
+    fun transformTop (LIR.Defun (name, params, ty, insts, oper)) =
+        C.FunctionDef (escapeSymbol name,
+                       mapParams params,
+                       transformType ty,
+                       C.Sequence (map transformInst insts),
+                       transformOperand oper)
+      | transformTop (LIR.DefunMonomorph (name, params, ty, insts, oper, id)) =
+        C.FunctionDef (genericFuncName name id,
+                       mapParams params,
+                       transformType ty,
+                       C.Sequence (map transformInst insts),
+                       transformOperand oper)
+      | transformTop (LIR.DeftypeMonomorph (name, ty, id)) =
+        raise Fail "deftype-monormoph: Not implemented yet"
+      | transformTop (LIR.Deftuple (id, tys)) =
+        let val name = tupleName id
+        in
+            C.TypeDef (name,
+                       C.Struct (Util.mapidx (fn (ty, idx) =>
+                                                 (transformType ty, tupleIdxName idx))
+                                             tys))
+        end
+      | transformTop (LIR.ToplevelProgn nodes) =
+        C.ToplevelProgn (map transformTop nodes)
+
+    and mapParams params =
+        map (fn (LIR.Param (var, ty)) =>
+                               C.Param (escapeVariable var, transformType ty))
+            params
 end
