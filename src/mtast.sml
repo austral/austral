@@ -573,7 +573,7 @@ structure MTAST :> MTAST = struct
                         in
                             let val node = DefunMonomorph (name, params', ty', body', id)
                             in
-                                raise Fail "Not implemented"
+                                node
                             end
                         end
                     end
