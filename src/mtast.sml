@@ -120,7 +120,7 @@ structure MTAST :> MTAST = struct
             typeOf v
           | typeOf (ConcreteFuncall (_, _, ty)) =
             ty
-          | typeOf (GenericFuncall (_, _, _, _, ty)) =
+          | typeOf (GenericFuncall (_, _, _, ty)) =
             ty
     end
 
