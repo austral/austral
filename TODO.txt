@@ -1,5 +1,7 @@
 TODO:
 
+- Refactor: PositiveAddress type
+- Refactor: load/store/free only work on PositiveAddress types
 - GenericFuncall: replace list of type args with map of type param names to type args
 - Fix bug with type matching in generic function calls
 - Refactor: malloc builtin
