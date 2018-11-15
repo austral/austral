@@ -115,7 +115,7 @@ structure MTAST :> MTAST = struct
           | typeOf (ForeignFuncall (_, _, rt)) =
             rt
           | typeOf (ForeignNull ty) =
-            ForeignPointer ty
+            Address ty
           | typeOf (Seq (_, v)) =
             typeOf v
           | typeOf (ConcreteFuncall (_, _, ty)) =
