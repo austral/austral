@@ -96,7 +96,7 @@ structure TypeMatch = struct
           (case matchType t t' of
                (Bindings l) => Bindings l
              | (Failure f) => Failure f)
-        | matchType (ForeignPointer t) (ForeignPointer t') =
+        | matchType (Address t) (Address t') =
           (case matchType t t' of
                (Bindings l) => Bindings l
              | (Failure f) => Failure f)
