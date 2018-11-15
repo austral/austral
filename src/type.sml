@@ -56,6 +56,10 @@ structure Type :> TYPE = struct
         "f32"
       | toString (Float Double) =
         "f64"
+      | toString (Tuple tys) =
+        "(tuple "
+        ^ (String.concatWith " " (map toString tys))
+        ^ ")"
       | toString (Pointer t) =
         "(pointer " ^ (toString t) ^ ")"
       | toString (ForeignPointer t) =
@@ -63,8 +67,9 @@ structure Type :> TYPE = struct
       | toString (StaticArray t) =
         "(static-array " ^ (toString t) ^ ")"
       | toString (Disjunction (name, tyargs, _)) =
-        "( "
+        "("
         ^ (Symbol.toString name)
+        ^ " "
         ^ (String.concatWith " " (map toString tyargs))
         ^ ")"
       | toString (TypeVariable name) =
