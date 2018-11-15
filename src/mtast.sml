@@ -459,7 +459,7 @@ structure MTAST :> MTAST = struct
                         exps
                         ctx
 
-    and monomorphizeReplacements ctx rs map =
+    and monoReplacements ctx rs map =
         let val pairs = Map.toList map
         in
             let val names = map (fn (n, _) => n) pairs
