@@ -107,6 +107,7 @@ structure Type :> TYPE = struct
       | tyVars (Float _) = Set.empty
       | tyVars (Tuple tys) = Set.unionList (map tyVars tys)
       | tyVars (Address ty) = tyVars ty
+      | tyVars (PositiveAddress ty) = tyVars ty
       | tyVars (StaticArray ty) = tyVars ty
       | tyVars (Pointer ty) = tyVars ty
       | tyVars (Disjunction (_, tys, variants)) =
