@@ -20,7 +20,7 @@ echo "tuple.au"
 gcc test/valid/tuple.c -o test/valid/tuple.bin
 ./test/valid/tuple.bin
 
-echo "class.au"
+#echo "class.au"
 #./boreal test/valid/class.au --output=test/valid/class.c
 # clang++ -shared -fPIC -std=c++11 test/valid/class.cpp
 
@@ -33,7 +33,7 @@ echo "class.au"
 # clang++ -shared -fPIC -std=c++11 test/valid/hello-world.cpp
 
 # echo "generic.au"
-# ./boreal test/valid/generic.au --output=test/valid/generic.cpp --entrypoint=austral-user:main
+# ./boreal test/valid/generic.au --output=test/valid/generic.c --entrypoint=austral-user:main
 # clang++ -std=c++11 test/valid/generic.cpp -o test/valid/generic.bin
 # ./test/valid/generic.bin
 
