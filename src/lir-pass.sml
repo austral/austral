@@ -74,10 +74,7 @@ structure LirPass :> LIR_PASS = struct
       | transformType tt (MIR.Float f) =
         (L.Float f, tt)
       | transformType tt (MIR.Tuple tys) =
-        let val (tys', tt) = Util.foldThread (fn (ty, tt) =>
-                                                 transformType tt ty)
-                                             tys
-                                             tt
+        let val (tys', tt) = transformTypes tt tys
         in
             addTuple tt tys'
         end
@@ -93,6 +90,12 @@ structure LirPass :> LIR_PASS = struct
         end
       | transformType tt (MIR.Disjunction (name, id)) =
         (L.Disjunction (name, id), tt)
+
+    and transformTypes tt tys =
+        Util.foldThread (fn (ty, tt) =>
+                            transformType tt ty)
+                        tys
+                        tt
 
     (* Transform code *)
 
