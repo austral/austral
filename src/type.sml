@@ -46,6 +46,11 @@ structure Type :> TYPE = struct
     fun isNumeric t =
         isInteger t orelse isFloat t
 
+    fun isComparable (ForeignPointer _) =
+        true
+      | isComparable t =
+        isNumeric t
+
     fun toString Unit =
         "unit"
       | toString Bool =
