@@ -203,8 +203,8 @@ structure Type :> TYPE = struct
     fun resolve tenv params (TypeCons (name, tyargs)) =
         if name = Symbol.au "static-array" then
             resolveStaticArray tenv params tyargs
-        else if name = Symbol.auCffi "foreign-pointer" then
-            resolveForeignPointer tenv params tyargs
+        else if name = Symbol.au "address" then
+            resolveAddress tenv params tyargs
         else
             if Set.isIn params (TypeParam name) then
                 TypeVariable name
