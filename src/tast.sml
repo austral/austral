@@ -116,7 +116,7 @@ structure TAST :> TAST = struct
             Integer (Unsigned, Int64)
           | typeOf (ArrayPointer arr) =
             (case (typeOf arr) of
-                 (StaticArray ty) => ForeignPointer ty
+                 (StaticArray ty) => Address ty
                | _ => raise Fail "Invalid type for ArrayPointer")
           | typeOf (Allocate v) =
             Pointer (typeOf v)
