@@ -31,6 +31,7 @@ structure TAST :> TAST = struct
                  | Bind of Symbol.variable list * ast * ast
                  | Cond of ast * ast * ast
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
+                 | CompOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | ArrayLength of ast
@@ -103,6 +104,8 @@ structure TAST :> TAST = struct
             (case kind of
                  Arith.Checked => Tuple [typeOf lhs, Bool]
                | _ => typeOf lhs)
+          | typeOf (CompOp _) =
+            Bool
           | typeOf (TupleCreate exps) =
             Tuple (map typeOf exps)
           | typeOf (TupleProj (tup, idx)) =
@@ -253,6 +256,22 @@ structure TAST :> TAST = struct
                                      raise Fail "Argument must be an integer"
                     else
                         raise Fail "Both arguments to an arithmetic operator must be of the same type"
+                end
+            end
+          | augment (AST.CompOp (oper, lhs, rhs)) c =
+            let val lhs' = augment lhs c
+                and rhs' = augment rhs c
+            in
+                let val lhsTy = typeOf lhs'
+                    and rhsTy = typeOf rhs'
+                in
+                    if lhsTy = rhsTy then
+                        if Type.isNumeric lhsTy then
+                            CompOp (oper, lhs', rhs')
+                        else
+                            raise Fail "Both arguments to a comparison operation must be numeric"
+                    else
+                        raise Fail "Both arguments to a comparison operator must be of the same type"
                 end
             end
           | augment (AST.TupleCreate exps) c =
@@ -465,14 +484,9 @@ structure TAST :> TAST = struct
             let val fenv = ctxFenv c
                 and auKer = Symbol.auKer
             in
-                if Builtin.isBuiltin name then
-                    ConcreteFuncall (name,
-                                     map (fn e => augment e c) args,
-                                     Bool)
-                else
-                    case Function.envGet fenv name of
-                        SOME f => augmentCallable f args c the_context
-                      | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
+                case Function.envGet fenv name of
+                    SOME f => augmentCallable f args c the_context
+                  | NONE => raise Fail ("No function with this name: " ^ (Symbol.toString name))
             end
 
         and augmentCallable (Function.CallableFunc f) args c _ =
