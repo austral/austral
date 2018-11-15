@@ -40,6 +40,7 @@ signature TYPE = sig
     val isInteger : ty -> bool
     val isFloat : ty -> bool
     val isNumeric : ty -> bool
+    val isComparable : ty -> bool
     val toString : ty -> string
 
     val tyVars : ty -> param Set.set
