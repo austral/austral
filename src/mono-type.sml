@@ -94,10 +94,10 @@ structure MonoType :> MONO_TYPE = struct
         in
             (Pointer ty', tm')
         end
-      | monomorphize tm rs (Type.ForeignPointer ty) =
+      | monomorphize tm rs (Type.AddressPointer ty) =
         let val (ty', tm') = monomorphize tm rs ty
         in
-            (ForeignPointer ty', tm')
+            (Address ty', tm')
         end
       | monomorphize tm rs (Type.StaticArray ty) =
         let val (ty', tm') = monomorphize tm rs ty
