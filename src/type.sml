@@ -69,8 +69,8 @@ structure Type :> TYPE = struct
         ^ ")"
       | toString (Pointer t) =
         "(pointer " ^ (toString t) ^ ")"
-      | toString (ForeignPointer t) =
-        "(foreign-pointer " ^ (toString t) ^ ")"
+      | toString (Address t) =
+        "(address " ^ (toString t) ^ ")"
       | toString (StaticArray t) =
         "(static-array " ^ (toString t) ^ ")"
       | toString (Disjunction (name, tyargs, _)) =
