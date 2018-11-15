@@ -354,7 +354,7 @@ structure LirPass :> LIR_PASS = struct
                 in
                     let val (oper, tt) = transformOperand tt oper
                     in
-                        (LIR.Defun (name, params, ty, insts, oper), tt)
+                        (LIR.DefunMonomorph (name, params, ty, insts, oper, id), tt)
                     end
                 end
             end
