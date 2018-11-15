@@ -100,6 +100,11 @@ structure MonoType :> MONO_TYPE = struct
         in
             (Address ty', tm')
         end
+      | monomorphize tm rs (Type.PositiveAddress ty) =
+        let val (ty', tm') = monomorphize tm rs ty
+        in
+            (PositiveAddress ty', tm')
+        end
       | monomorphize tm rs (Type.StaticArray ty) =
         let val (ty', tm') = monomorphize tm rs ty
         in
