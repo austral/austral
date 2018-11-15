@@ -70,19 +70,40 @@ src/dast.sml
 src/tast.sig
 src/tast.sml
 
+src/fdefs.sig
+src/fdefs.sml
+
+src/mtast.sig
+src/mtast.sml
+
 src/hir.sig
 src/hir.sml
+
+src/hir-pass.sig
+src/hir-pass.sml
 
 src/mir.sig
 src/mir.sml
 
-src/cpp-ast.sig
-src/cpp-ast.sml
+src/mir-pass.sig
+src/mir-pass.sml
 
-src/cpp-backend.sig
-src/cpp-backend.sml
+src/lir.sig
+src/lir.sml
 
-src/cpp-runtime.sml
+src/lir-pass.sig
+src/lir-pass.sml
+
+src/c-ast.sig
+src/c-ast.sml
+
+src/c-renderer.sig
+src/c-renderer.sml
+
+src/c-backend.sig
+src/c-backend.sml
+
+src/c-runtime.sml
 
 src/prelude.sig
 src/prelude.sml
