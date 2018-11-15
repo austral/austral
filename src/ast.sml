@@ -33,6 +33,7 @@ structure AST :> AST = struct
                  | Bind of Symbol.variable list * ast * ast
                  | Cond of ast * ast * ast
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
+                 | CompOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | StaticArrayLength of ast
@@ -120,11 +121,23 @@ structure AST :> AST = struct
         transformOp f (map transform args)
     and transformOp f args =
         let val au = Symbol.au
+            and auKer = Symbol.auKer
         in
             if f = au "progn" then
                 transformProgn args
             else if f = au "if" then
                 transformCond args
+            (* Comparison operations *)
+            else if f = auKer "eq" then
+                transformComp Builtin.EqualTo args
+            else if f = auKer ">" then
+                transformComp Builtin.GreaterThan args
+            else if f = auKer "<" then
+                transformComp Builtin.LessThan args
+            else if f = auKer ">=" then
+                transformComp Builtin.GreaterThanEq args
+            else if f = auKer "<=" then
+                transformComp Builtin.LessThanEq args
             (* Modular arithmetic *)
             else if f = au "+" then
                 transformArith Arith.Modular Arith.Add args
@@ -197,6 +210,11 @@ structure AST :> AST = struct
         ArithOp (kind, oper, lhs, rhs)
       | transformArith kind oper _ =
         raise Fail "Bad arithmetic operator"
+
+    and transformComp oper [lhs, rhs] =
+        CompOp (oper, lhs, rhs)
+      | transformComp oper _ =
+        raise Fail "Bad comparison operator"
 
     and transformProj [ast, IntConstant i] =
         TupleProj (ast, Option.valOf (Int.fromString i))
