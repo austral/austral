@@ -1,5 +1,6 @@
 TODO:
 
+- Compile defdisjunctions
 - Refactor: PositiveAddress type
 - Refactor: load/store/free only work on PositiveAddress types
 - Refactor: malloc builtin
