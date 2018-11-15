@@ -21,4 +21,6 @@ signature MIR_PASS = sig
     val transformType : HIR.ty -> MIR.ty
 
     val transform : HIR.ast -> (MIR.instruction list * MIR.operand)
+
+    val transformTop : HIR.top_ast -> MIR.top_ast
 end
