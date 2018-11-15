@@ -318,7 +318,13 @@ structure CBackend :> C_BACKEND = struct
                        C.Sequence (map transformInst insts),
                        transformOperand oper)
       | transformTop (LIR.DefdisjunctionMono (name, id, tys)) =
-        raise Fail "deftype-monormoph: Not implemented yet"
+        let val name = disjName name id
+            and slots = []
+        in
+            C.TypeDef (name,
+                       C.Struct [(C.NamedType "uint8_t", disjTagFieldName),
+                                 (C.Union slots, disjDataFieldName)])
+        end
       | transformTop (LIR.Deftuple (id, tys)) =
         let val name = tupleName id
         in

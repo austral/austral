@@ -489,8 +489,8 @@ structure MTAST :> MTAST = struct
       | monomorphizeTop' ctx (TAST.Deftype (name, params, _, ty)) =
         (* Type aliases don't need to be compiled to anything *)
         (ToplevelProgn [], ctx)
-      | monomorphizeTop' _ (TAST.Defdisjunction (name, params, _, variants)) =
-        raise Fail "defdisjunction: not implemented yet"
+      | monomorphizeTop' ctx (TAST.Defdisjunction (name, params, _, variants)) =
+        (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Deftemplate _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.DefineSymbolMacro _) =
