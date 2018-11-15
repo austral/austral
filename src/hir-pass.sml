@@ -48,7 +48,7 @@ structure HirPass :> HIR_PASS = struct
         Tuple (map transformType tys)
       | transformType (MT.Pointer ty) =
         Pointer (transformType ty)
-      | transformType (MT.ForeignPointer ty) =
+      | transformType (MT.Address ty) =
         Pointer (transformType ty)
       | transformType (MT.StaticArray ty) =
         StaticArray (transformType ty)
