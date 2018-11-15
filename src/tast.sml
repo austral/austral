@@ -124,8 +124,8 @@ structure TAST :> TAST = struct
             (case typeOf p of
                  (Address t) => t
                | _ => raise Fail "Not an address")
-          | typeOf (Store (p, _)) =
-            typeOf p
+          | typeOf (Store (_, v)) =
+            typeOf v
           | typeOf (The (t, _)) =
             t
           | typeOf (Construct (t, _, _)) =
