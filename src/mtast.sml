@@ -424,11 +424,11 @@ structure MTAST :> MTAST = struct
             end
         end
       | monomorphize ctx rs (TAST.GenericFuncall (name, tyargs, args, ty)) =
-        let val (tyargs', ctx) = monoTypes ctx rs tyargs
+        let val (rs', ctx) = monoReplacements ctx rs tyargs
         in
             let val (args', ctx) = monomorphizeList ctx rs args
             in
-                let val (ty', ctx) = monoType ctx rs ty
+                let val (ty', ctx) = monoType ctx rs' ty
                 in
                     (* Check the table of function monomorphs. If this
                        name+type arg list combination doesn't exist yet, add
@@ -458,6 +458,22 @@ structure MTAST :> MTAST = struct
         Util.foldThread (fn (exp, ctx) => monomorphize ctx rs exp)
                         exps
                         ctx
+
+    and monomorphizeReplacements ctx rs map =
+        let val pairs = Map.toList map
+        in
+            let val names = map (fn (n, _) => n) pairs
+                and tys = map (fn (_, t) => t) pairs
+            in
+                let val (tys', ctx) = monoTypes ctx rs tys
+                in
+                    let val pairs' = ListPair.zip (names, tys')
+                    in
+                        Map.fromList pairs'
+                    end
+                end
+            end
+        end
 
     fun monomorphizeTop' ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
