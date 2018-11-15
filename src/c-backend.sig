@@ -34,4 +34,8 @@ signature C_BACKEND = sig
     val transformOperand : LIR.operand -> CAst.exp_ast
 
     val transform : LIR.operation -> LIR.ty -> CAst.exp_ast
+
+    val transformInst : LIR.instruction -> CAst.block_ast
+
+    val transformTop : LIR.top_ast -> CAst.top_ast
 end
