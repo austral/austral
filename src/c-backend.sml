@@ -277,7 +277,7 @@ structure CBackend :> C_BACKEND = struct
         in
             C.Sequence [
                 C.Assign (C.Deref ptr', value'),
-                C.DeclareAssign (ty', regName result, ptr')
+                C.DeclareAssign (ty', regName result, value')
             ]
         end
       | transformInst (LIR.Case (oper, variants, result, ty)) =
