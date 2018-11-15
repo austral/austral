@@ -99,7 +99,7 @@ structure HIR :> HIR = struct
       | typeOf (Load p) =
         (case typeOf p of
              (Pointer t) => t
-           | _ => raise Fail "Not a pointer")
+           | _ => raise Fail "Internal compiler error: Not a pointer")
       | typeOf (Store (p, _)) =
         typeOf p
       | typeOf (Construct (t, _, _)) =
