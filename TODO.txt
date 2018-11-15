@@ -3,6 +3,7 @@ TODO:
 - Refactor: ForeignPointer to Address
 - Refactor: load works on addresses only, returns dereferenced value
 - Refactor: store works on addresses only, returns stored value
+- Refactor: malloc/free builtins
 - Lift static arrays to (length, ptr) tuples in the LIR pass
 - Expand monomorphs recursively
 - Augment method calls
