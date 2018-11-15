@@ -360,8 +360,10 @@ structure MirPass :> MIR_PASS = struct
         in
             MIR.DefunMonomorph (name, params', ty', insts, oper, id)
         end
-      | transformTop (HIR.DeftypeMonomorph (name, ty, id)) =
-        MIR.DeftypeMonomorph (name, transformType ty, id)
+      | transformTop (HIR.DefdisjunctionMono (name, id, tys)) =
+        MIR.DefdisjunctionMono (name,
+                                id,
+                                map transformType tys)
       | transformTop (HIR.ToplevelProgn nodes) =
         MIR.ToplevelProgn (map transformTop nodes)
 
