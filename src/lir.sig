@@ -79,7 +79,7 @@ signature LIR = sig
 
     datatype top_ast = Defun of name * param list * ty * instruction list * operand
                      | DefunMonomorph of name * param list * ty * instruction list * operand * int
-                     | DeftypeMonomorph of name * ty * int
+                     | DefdisjunctionMono of name * int * ty list
                      | Deftuple of int * ty list
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
