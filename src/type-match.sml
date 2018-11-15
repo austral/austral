@@ -109,6 +109,11 @@ structure TypeMatch = struct
               matchTypeLists args args'
           else
               Failure "Disjunction names don't match"
+        | matchType (TypeVariable n) (TypeVariable n') =
+          if n = n' then
+              emptyBindings
+          else
+              Bindings (Map.fromList [(n, TypeVariable n')])
         | matchType (TypeVariable n) t =
           Bindings (Map.fromList [(n, t)])
         | matchType _ _ =
