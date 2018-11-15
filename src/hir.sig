@@ -68,7 +68,7 @@ signature HIR = sig
 
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
-                     | DeftypeMonomorph of name * ty * int
+                     | DefdisjunctionMono of name * int * ty list
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
 end
