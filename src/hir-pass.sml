@@ -188,9 +188,9 @@ structure HirPass :> HIR_PASS = struct
                         transform body,
                         id)
       | transformTop (M.DefdisjunctionMono (name, id, tys)) =
-        DisjunctionMono (name,
-                         id,
-                         map transformType tys)
+        DefdisjunctionMono (name,
+                            id,
+                            map transformType tys)
       | transformTop (M.ToplevelProgn l) =
         ToplevelProgn (map transformTop l)
 
