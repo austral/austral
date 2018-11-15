@@ -28,6 +28,7 @@ signature LIR_PASS = sig
 
     val getTuple : tuple_types -> ty list -> ty option
     val addTuple : tuple_types -> ty list -> (ty * tuple_types)
+    val newTuples : tuple_types -> tuple_types -> ((int * ty list) list)
 
     (* Transform types *)
 
@@ -40,4 +41,6 @@ signature LIR_PASS = sig
     val transformOperation : tuple_types -> MIR.operation -> LIR.operation * tuple_types
 
     val transformInstruction : tuple_types -> MIR.instruction -> LIR.instruction * tuple_types
+
+    val transformTop : tuple_types -> MIR.top_ast -> LIR.top_ast * tuple_types
 end
