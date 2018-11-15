@@ -359,10 +359,10 @@ structure LirPass :> LIR_PASS = struct
                 end
             end
         end
-      | transformTop' tt (MIR.DeftypeMonomorph (name, ty, id)) =
-        let val (ty, tt) = transformType tt ty
+      | transformTop' tt (MIR.DefdisjunctionMono (name, id, tys)) =
+        let val (tys, tt) = transformTypes tt tys
         in
-            (LIR.DeftypeMonomorph (name, ty, id), tt)
+            (LIR.DefdisjunctionMono (name, id, tys), tt)
         end
       | transformTop' tt (MIR.ToplevelProgn nodes) =
         let val (nodes, tt) = Util.foldThread (fn (node, tt) =>
