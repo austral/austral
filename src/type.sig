@@ -28,6 +28,7 @@ signature TYPE = sig
                 | Float of float_type
                 | Tuple of ty list
                 | Address of ty
+                | PositiveAddress of ty
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * ty list * variant list
