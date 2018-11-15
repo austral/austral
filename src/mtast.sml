@@ -426,12 +426,16 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx rs (TAST.GenericFuncall (name, typarams, tyargs, args, ty)) =
         let val (rs', ctx) = monoReplacements ctx rs tyargs
         in
+            print "mono replacements\n";
             let val (tyargs', ctx) = monoTypes ctx rs (Function.typeArgs typarams tyargs)
             in
+                print "mono tyargs\n";
                 let val (args', ctx) = monomorphizeList ctx rs args
                 in
+                    print "mono args\n";
                     let val (ty', ctx) = monoType ctx rs' ty
                     in
+                        print "mono rt\n";
                         (* Check the table of function monomorphs. If this
                            name+type arg list combination doesn't exist yet, add
                            it *)
