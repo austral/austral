@@ -28,6 +28,7 @@ structure MonoType :> MONO_TYPE = struct
                 | Float of Type.float_type
                 | Tuple of ty list
                 | Address of ty
+                | PositiveAddress of ty
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * int * variant list
