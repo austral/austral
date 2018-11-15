@@ -292,8 +292,8 @@ structure TAST :> TAST = struct
             let val e' = augment e c
             in
                 case (typeOf e') of
-                    Address t => Load e'
-                  | _ => raise Fail "load: not an address"
+                    PositiveAddress t => Load e'
+                  | _ => raise Fail "load: not a positive address"
             end
           | augment (AST.Store (p, v)) c =
             let val p' = augment p c
