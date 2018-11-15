@@ -48,7 +48,7 @@ structure Type :> TYPE = struct
 
     fun isComparable Bool =
         true
-      | isComparable (ForeignPointer _) =
+      | isComparable (Address _) =
         true
       | isComparable t =
         isNumeric t
