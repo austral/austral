@@ -52,7 +52,7 @@ gcc test/valid/compare.c -o test/valid/compare.bin
 ./test/valid/compare.bin
 
 # echo "defdisjunction.au"
-# ./boreal test/valid/defdisjunction.au --output=test/valid/defdisjunction.cpp
+# ./boreal test/valid/defdisjunction.au --output=test/valid/defdisjunction.c
 # clang++ -shared -fPIC -std=c++11 test/valid/defdisjunction.cpp
 
 echo "bind.au"
