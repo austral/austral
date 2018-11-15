@@ -122,8 +122,8 @@ structure TAST :> TAST = struct
             Pointer (typeOf v)
           | typeOf (Load p) =
             (case typeOf p of
-                 (Pointer t) => Tuple [t, Pointer t]
-               | _ => raise Fail "Not a pointer")
+                 (Address t) => t
+               | _ => raise Fail "Not an address")
           | typeOf (Store (p, _)) =
             typeOf p
           | typeOf (The (t, _)) =
