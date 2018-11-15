@@ -47,6 +47,22 @@ structure LirPass :> LIR_PASS = struct
                         end
                     end
 
+    fun newTuples old new =
+        let val oldKeys = Map.keys old
+            and newKeys = Map.keys new
+        in
+            let val newKeys' = Set.minus newKeys oldKeys
+            in
+                map (fn tys => let val ty = Option.valOf (Map.get new tys)
+                               in
+                                   case ty of
+                                       (LIR.Tuple id) => (id, tys)
+                                     | _ => raise Fail "Internal compiler error: not a tuple"
+                               end)
+                    (Set.toList newKeys')
+            end
+        end
+
     (* Transform types *)
 
     val sizeType = L.Integer (Type.Unsigned, Type.Int64)
@@ -108,6 +124,14 @@ structure LirPass :> LIR_PASS = struct
             let val (rhs, tt) = transformOperand tt rhs
             in
                 (L.ArithOp (kind, oper, lhs, rhs), tt)
+            end
+        end
+      | transformOperation tt (MIR.CompOp (oper, lhs, rhs)) =
+        let val (lhs, tt) = transformOperand tt lhs
+        in
+            let val (rhs, tt) = transformOperand tt rhs
+            in
+                (L.CompOp (oper, lhs, rhs), tt)
             end
         end
       | transformOperation tt (MIR.TupleCreate opers) =
@@ -211,21 +235,29 @@ structure LirPass :> LIR_PASS = struct
                 (L.DeclareLocal (var, ty, oper), tt)
             end
         end
-      | transformInstruction tt (MIR.Cond { test, consequent, alternate, result, ty }) =
+      | transformInstruction tt (MIR.Cond { test, consequent, consequent_res, alternate, alternate_res, result, ty }) =
         let val (test, tt) = transformOperand tt test
         in
             let val (consequent, tt) = transformInstructions tt consequent
             in
-                let val (alternate, tt) = transformInstructions tt alternate
+                let val (consequent_res, tt) = transformOperand tt consequent_res
                 in
-                    let val (ty, tt) = transformType tt ty
+                    let val (alternate, tt) = transformInstructions tt alternate
                     in
-                        (L.Cond { test = test,
-                                  consequent = consequent,
-                                  alternate = alternate,
-                                  result = result,
-                                  ty = ty},
-                         tt)
+                        let val (alternate_res, tt) = transformOperand tt alternate_res
+                        in
+                            let val (ty, tt) = transformType tt ty
+                            in
+                                (L.Cond { test = test,
+                                          consequent = consequent,
+                                          consequent_res = consequent_res,
+                                          alternate = alternate,
+                                          alternate_res = alternate_res,
+                                          result = result,
+                                          ty = ty},
+                                 tt)
+                            end
+                        end
                     end
                 end
             end
@@ -269,17 +301,84 @@ structure LirPass :> LIR_PASS = struct
                         tt
 
     and transformVariants tt variants =
-        Util.foldThread (fn (MIR.VariantCase (name, insts, oper, ty), tt) =>
+        Util.foldThread (fn (MIR.VariantCase (id, insts, oper, ty), tt) =>
                             let val (insts, tt) = transformInstructions tt insts
                             in
                                 let val (oper, tt) = transformOperand tt oper
                                 in
                                     let val (ty, tt) = transformType tt ty
                                     in
-                                        (L.VariantCase (name, insts, oper, ty), tt)
+                                        (L.VariantCase (id, insts, oper, ty), tt)
                                     end
                                 end
                             end)
                         variants
+                        tt
+
+    fun transformTop tt node =
+        let val (node, tt') = transformTop' tt node
+        in
+            (* After transforming a top-level node, extract new tuple types and
+               define them *)
+            let val new = newTuples tt tt'
+            in
+                let val tupNodes = map (fn (id, tys) =>
+                                           (LIR.Deftuple (id, tys)))
+                                       new
+                in
+                    (LIR.ToplevelProgn (tupNodes @ [node]), tt')
+                end
+            end
+        end
+
+    and transformTop' tt (MIR.Defun (name, params, ty, insts, oper)) =
+        let val (params, tt) = transformParams tt params
+        in
+            let val (ty, tt) = transformType tt ty
+            in
+                let val (insts, tt) = transformInstructions tt insts
+                in
+                    let val (oper, tt) = transformOperand tt oper
+                    in
+                        (LIR.Defun (name, params, ty, insts, oper), tt)
+                    end
+                end
+            end
+        end
+      | transformTop' tt (MIR.DefunMonomorph (name, params, ty, insts, oper, id)) =
+        let val (params, tt) = transformParams tt params
+        in
+            let val (ty, tt) = transformType tt ty
+            in
+                let val (insts, tt) = transformInstructions tt insts
+                in
+                    let val (oper, tt) = transformOperand tt oper
+                    in
+                        (LIR.Defun (name, params, ty, insts, oper), tt)
+                    end
+                end
+            end
+        end
+      | transformTop' tt (MIR.DeftypeMonomorph (name, ty, id)) =
+        let val (ty, tt) = transformType tt ty
+        in
+            (LIR.DeftypeMonomorph (name, ty, id), tt)
+        end
+      | transformTop' tt (MIR.ToplevelProgn nodes) =
+        let val (nodes, tt) = Util.foldThread (fn (node, tt) =>
+                                                  transformTop' tt node)
+                                              nodes
+                                              tt
+        in
+            (LIR.ToplevelProgn nodes, tt)
+        end
+
+    and transformParams tt params =
+        Util.foldThread (fn (MIR.Param (var, ty), tt) =>
+                            let val (ty, tt) = transformType tt ty
+                            in
+                                (LIR.Param (var, ty), tt)
+                            end)
+                        params
                         tt
 end
