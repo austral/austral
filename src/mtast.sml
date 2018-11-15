@@ -537,7 +537,7 @@ structure MTAST :> MTAST = struct
                                          end)
                                      newFuncs
                     and deftypes = map (fn (name, _, ty, id) =>
-                                           expandDeftype name ty id)
+                                           expandDefdisjunction name id ty)
                                        newTypes
                 in
                     (ToplevelProgn (defuns @ deftypes @ [node]),
@@ -551,8 +551,19 @@ structure MTAST :> MTAST = struct
              (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv rs name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
-    and expandDeftype name ty id =
-        DeftypeMonomorph (name, ty, id)
+    and expandDefdisjunction name id ty =
+        let val variants = case ty of
+                               (MonoType.Disjunction (_, _, vs)) => vs
+                             | _ => raise Fail "expandDefdisjunction: not a disjunction"
+        in
+            DefdisjunctionMono (name,
+                                id,
+                                map (fn (MonoType.Variant (_, to)) =>
+                                        case to of
+                                            SOME t => t
+                                          | NONE => MonoType.Unit)
+                                    variants)
+        end
 
     and expandGf ctx gf fdefenv rs name tyargs id =
         let val (params, body) = Option.valOf (FDefs.getDefinition fdefenv name)
