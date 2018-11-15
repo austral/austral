@@ -266,10 +266,10 @@ structure TAST :> TAST = struct
                     and rhsTy = typeOf rhs'
                 in
                     if lhsTy = rhsTy then
-                        if Type.isNumeric lhsTy then
+                        if Type.isComparable lhsTy then
                             CompOp (oper, lhs', rhs')
                         else
-                            raise Fail "Both arguments to a comparison operation must be numeric"
+                            raise Fail "Both arguments to a comparison operation must be comparable"
                     else
                         raise Fail "Both arguments to a comparison operator must be of the same type"
                 end
