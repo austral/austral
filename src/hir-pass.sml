@@ -157,7 +157,7 @@ structure HirPass :> HIR_PASS = struct
         Seq (transform a, transform b)
       | transform (M.ConcreteFuncall (name, args, ty)) =
         ConcreteFuncall (name, map transform args, transformType ty)
-      | transform (M.GenericFuncall (name, id, _, args, ty)) =
+      | transform (M.GenericFuncall (name, id, args, ty)) =
         GenericFuncall (name,
                         id,
                         map transform args,
