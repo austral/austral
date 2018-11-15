@@ -557,24 +557,33 @@ structure MTAST :> MTAST = struct
         let val (params, body) = Option.valOf (FDefs.getDefinition fdefenv name)
             and (Function.GenericFunction (name, typarams, _, ty, _)) = gf
         in
-            let val (ty', ctx) = monoType ctx rs ty
+            let val rs = makeReplacements typarams tyargs
             in
-                let val (params', ctx) = Util.foldThread (fn (TAST.Param (name, ty), ctx) =>
-                                                             let val (ty, ctx) = monoType ctx rs ty
-                                                             in
-                                                                 (Param (name, ty), ctx)
-                                                             end)
-                                                         params
-                                                         ctx
+                let val (ty', ctx) = monoType ctx rs ty
                 in
-                    let val (body', ctx) = monomorphize ctx rs body
+                    let val (params', ctx) = Util.foldThread (fn (TAST.Param (name, ty), ctx) =>
+                                                                 let val (ty, ctx) = monoType ctx rs ty
+                                                                 in
+                                                                     (Param (name, ty), ctx)
+                                                                 end)
+                                                             params
+                                                             ctx
                     in
-                        let val node = DefunMonomorph (name, params', ty', body', id)
+                        let val (body', ctx) = monomorphize ctx rs body
                         in
-                            raise Fail "Not implemented"
+                            let val node = DefunMonomorph (name, params', ty', body', id)
+                            in
+                                raise Fail "Not implemented"
+                            end
                         end
                     end
                 end
             end
         end
+
+    and makeReplacements (params: Type.typarams) (args: ty list) =
+        Map.fromList
+            (Util.mapidx (fn (Type.TypeParam name, idx) =>
+                             (name, List.nth (args, idx)))
+                         (OrderedSet.toList params))
 end
