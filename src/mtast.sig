@@ -33,6 +33,7 @@ signature MTAST = sig
                  | Bind of Symbol.variable list * ast * ast
                  | Cond of ast * ast * ast
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
+                 | CompOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | ArrayLength of ast
