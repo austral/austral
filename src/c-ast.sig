@@ -20,6 +20,8 @@
 signature C_AST = sig
     datatype ty = NamedType of string
                 | Pointer of ty
+                | Struct of (ty * string) list
+                | Union of (ty * string) list
 
     datatype exp_ast = BoolConstant of bool
                      | IntConstant of string
@@ -48,17 +50,17 @@ signature C_AST = sig
                    | LessThanEq
 
     datatype block_ast = Sequence of block_ast list
-                       | Block of block_ast list
                        | Declare of ty * string
                        | Assign of exp_ast * exp_ast
+                       | DeclareAssign of ty * string * exp_ast
                        | Cond of exp_ast * block_ast * block_ast
                        | While of exp_ast * block_ast
-                       | StandaloneExp of exp_ast
+                       | Switch of exp_ast * (int * block_ast) list
+                       | VoidFuncall of string * exp_ast list
 
-    datatype top_ast = FunctionDef of string * typaram list * param list * ty * block_ast * exp_ast
+    datatype top_ast = FunctionDef of string * param list * ty * block_ast * exp_ast
                      | ExternFunctionDecl of string * ty list * Function.foreign_arity * ty
-                     | TypeDef of string * typaram list * ty
+                     | TypeDef of string * ty
                      | ToplevelProgn of top_ast list
-         and typaram = TypeParam of string
          and param = Param of string * ty
 end
