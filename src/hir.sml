@@ -42,6 +42,7 @@ structure HIR :> HIR = struct
                  | Let of Symbol.variable * ast * ast
                  | Cond of ast * ast * ast
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
+                 | CompOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | ArrayLength of ast
@@ -59,7 +60,7 @@ structure HIR :> HIR = struct
                  | Seq of ast * ast
                  | ConcreteFuncall of name * ast list * ty
                  | GenericFuncall of name * int * ast list * ty
-         and variant_case = VariantCase of name * ast
+         and variant_case = VariantCase of int * ast
 
     fun typeOf UnitConstant =
         Unit
@@ -81,12 +82,14 @@ structure HIR :> HIR = struct
         (case kind of
              Arith.Checked => Tuple [typeOf lhs, Bool]
            | _ => typeOf lhs)
+      | typeOf (CompOp _) =
+        Bool
       | typeOf (TupleCreate exps) =
         Tuple (map typeOf exps)
       | typeOf (TupleProj (tup, idx)) =
         (case typeOf tup of
              Tuple tys => List.nth (tys, idx)
-           | _ => raise Fail "Not a tuple")
+           | _ => raise Fail "HIR: Not a tuple")
       | typeOf (ArrayLength _) =
         Integer (Type.Unsigned, Type.Int64)
       | typeOf (ArrayPointer arr) =
