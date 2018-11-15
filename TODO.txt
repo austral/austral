@@ -1,6 +1,5 @@
 TODO:
 
-- Refactor: ForeignPointer to Address
 - Refactor: load works on addresses only, returns dereferenced value
 - Refactor: store works on addresses only, returns stored value
 - Refactor: malloc/free builtins
@@ -171,3 +170,4 @@ DONE:
 - Update compiler to use C backend
 - C AST renderer
 - Expand tuple types
+- Refactor: ForeignPointer to Address
