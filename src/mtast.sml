@@ -33,6 +33,7 @@ structure MTAST :> MTAST = struct
                  | Bind of Symbol.variable list * ast * ast
                  | Cond of ast * ast * ast
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
+                 | CompOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | ArrayLength of ast
@@ -79,6 +80,8 @@ structure MTAST :> MTAST = struct
             (case kind of
                  Arith.Checked => Tuple [typeOf lhs, Bool]
                | _ => typeOf lhs)
+          | typeOf (CompOp _) =
+            Bool
           | typeOf (TupleCreate exps) =
             Tuple (map typeOf exps)
           | typeOf (TupleProj (tup, idx)) =
@@ -273,6 +276,14 @@ structure MTAST :> MTAST = struct
                 (ArithOp (kind, oper, lhs', rhs'), ctx)
             end
         end
+      | monomorphize ctx (TAST.CompOp (oper, lhs, rhs)) =
+        let val (lhs', ctx) = monomorphize ctx lhs
+        in
+            let val (rhs', ctx) = monomorphize ctx rhs
+            in
+                (CompOp (oper, lhs', rhs'), ctx)
+            end
+        end
       | monomorphize ctx (TAST.TupleCreate exps) =
         let val (exps', ctx) = monomorphizeList ctx exps
         in
@@ -455,11 +466,11 @@ structure MTAST :> MTAST = struct
       | monomorphizeTop' ctx (TAST.Defclass _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' _ (TAST.Definstance (name, arg, docstring, methods)) =
-        raise Fail "Not implemented yet"
+        raise Fail "definstance: not implemented yet"
       | monomorphizeTop' _ (TAST.Deftype (name, params, _, ty)) =
-        raise Fail "Not implemented yet"
+        raise Fail "deftype: not implemented yet"
       | monomorphizeTop' _ (TAST.Defdisjunction (name, params, _, variants)) =
-        raise Fail "Not implemented yet"
+        raise Fail "defdisjunction: not implemented yet"
       | monomorphizeTop' ctx (TAST.Deftemplate _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.DefineSymbolMacro _) =
