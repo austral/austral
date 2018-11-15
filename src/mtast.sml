@@ -426,28 +426,31 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx rs (TAST.GenericFuncall (name, tyargs, args, ty)) =
         let val (rs', ctx) = monoReplacements ctx rs tyargs
         in
-            let val (args', ctx) = monomorphizeList ctx rs args
+            let val tyargs' = []
             in
-                let val (ty', ctx) = monoType ctx rs' ty
+                let val (args', ctx) = monomorphizeList ctx rs args
                 in
-                    (* Check the table of function monomorphs. If this
-                       name+type arg list combination doesn't exist yet, add
-                       it *)
-                    case getMonomorph ctx name tyargs' of
-                        SOME id => let val gfcall = GenericFuncall (name, id, tyargs', args', ty')
-                                   in
-                                       (gfcall, ctx)
-                                   end
-                      | NONE => let val id = freshId ()
-                                in
-                                    let val ctx = addMonomorph ctx name tyargs' id
+                    let val (ty', ctx) = monoType ctx rs' ty
+                    in
+                        (* Check the table of function monomorphs. If this
+                           name+type arg list combination doesn't exist yet, add
+                           it *)
+                        case getMonomorph ctx name tyargs' of
+                            SOME id => let val gfcall = GenericFuncall (name, id, args', ty')
+                                       in
+                                           (gfcall, ctx)
+                                       end
+                          | NONE => let val id = freshId ()
                                     in
-                                        let val gfcall = GenericFuncall (name, id, tyargs', args', ty')
+                                        let val ctx = addMonomorph ctx name tyargs' id
                                         in
-                                            (gfcall, ctx)
+                                            let val gfcall = GenericFuncall (name, id, args', ty')
+                                            in
+                                                (gfcall, ctx)
+                                            end
                                         end
                                     end
-                                end
+                    end
                 end
             end
         end
@@ -459,8 +462,8 @@ structure MTAST :> MTAST = struct
                         exps
                         ctx
 
-    and monoReplacements ctx rs map =
-        let val pairs = Map.toList map
+    and monoReplacements ctx rs tyargs =
+        let val pairs = Map.toList tyargs
         in
             let val names = map (fn (n, _) => n) pairs
                 and tys = map (fn (_, t) => t) pairs
