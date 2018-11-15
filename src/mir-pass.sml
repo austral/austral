@@ -83,7 +83,9 @@ structure MirPass :> MIR_PASS = struct
         in
             let val cond = Cond { test = t',
                                   consequent = cBlock,
+                                  consequent_res = c',
                                   alternate = aBlock,
+                                  alternate_res = a',
                                   result = result,
                                   ty = transformType (HIR.typeOf c) }
             in
@@ -102,6 +104,19 @@ structure MirPass :> MIR_PASS = struct
             let val nodes = lBlock
                             @ rBlock
                             @ [Assignment (result, ArithOp (kind, oper, lhs', rhs'), ty)]
+            in
+                (nodes, RegisterOp result)
+            end
+        end
+      | transform (HIR.CompOp (oper, lhs, rhs)) =
+        let val (lBlock, lhs') = transform lhs
+            and (rBlock, rhs') = transform rhs
+            and result = freshRegister ()
+            and ty = Bool
+        in
+            let val nodes = lBlock
+                            @ rBlock
+                            @ [Assignment (result, CompOp (oper, lhs', rhs'), ty)]
             in
                 (nodes, RegisterOp result)
             end
@@ -289,12 +304,12 @@ structure MirPass :> MIR_PASS = struct
             end
         end
 
-    and transformCase (HIR.VariantCase (name, body)) =
+    and transformCase (HIR.VariantCase (id, body)) =
         let val (bodyBlock, body') = transform body
             and result = freshRegister ()
             and ty = transformType (HIR.typeOf body)
         in
-            VariantCase (name, bodyBlock, body', ty)
+            VariantCase (id, bodyBlock, body', ty)
         end
 
     and transformVoidForeignFuncall name args =
@@ -328,4 +343,28 @@ structure MirPass :> MIR_PASS = struct
                 (argBlocks, argOps)
             end
         end
+
+    (* Transform top-level nodes *)
+
+    fun transformTop (HIR.Defun (name, params, ty, ast)) =
+        let val (insts, oper) = transform ast
+            and ty' = transformType ty
+            and params' = map transformParam params
+        in
+            MIR.Defun (name, params', ty', insts, oper)
+        end
+      | transformTop (HIR.DefunMonomorph (name, params, ty, ast, id)) =
+        let val (insts, oper) = transform ast
+            and ty' = transformType ty
+            and params' = map transformParam params
+        in
+            MIR.DefunMonomorph (name, params', ty', insts, oper, id)
+        end
+      | transformTop (HIR.DeftypeMonomorph (name, ty, id)) =
+        MIR.DeftypeMonomorph (name, transformType ty, id)
+      | transformTop (HIR.ToplevelProgn nodes) =
+        MIR.ToplevelProgn (map transformTop nodes)
+
+    and transformParam (HIR.Param (var, ty)) =
+        MIR.Param (var, transformType ty)
 end
