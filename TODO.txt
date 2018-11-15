@@ -1,6 +1,5 @@
 TODO:
 
-- Refactor: load works on addresses only, returns dereferenced value
 - Refactor: store works on addresses only, returns stored value
 - Refactor: malloc builtin
 - Refactor: free builtin
@@ -172,3 +171,4 @@ DONE:
 - C AST renderer
 - Expand tuple types
 - Refactor: ForeignPointer to Address
+- Refactor: load works on addresses only, returns dereferenced value
