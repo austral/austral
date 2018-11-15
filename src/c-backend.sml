@@ -319,7 +319,9 @@ structure CBackend :> C_BACKEND = struct
                        transformOperand oper)
       | transformTop (LIR.DefdisjunctionMono (name, id, tys)) =
         let val name = disjName name id
-            and slots = []
+            and slots = Util.mapidx (fn (ty, idx) =>
+                                        (transformType ty, tupleIdxName idx))
+                                    tys
         in
             C.TypeDef (name,
                        C.Struct [(C.NamedType "uint8_t", disjTagFieldName),
