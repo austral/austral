@@ -423,10 +423,10 @@ structure MTAST :> MTAST = struct
                 (ConcreteFuncall (name, args', ty'), ctx)
             end
         end
-      | monomorphize ctx rs (TAST.GenericFuncall (name, tyargs, args, ty)) =
+      | monomorphize ctx rs (TAST.GenericFuncall (name, typarams, tyargs, args, ty)) =
         let val (rs', ctx) = monoReplacements ctx rs tyargs
         in
-            let val tyargs' = []
+            let val (tyargs', ctx) = monoTypes ctx rs (Function.typeArgs typarams tyargs)
             in
                 let val (args', ctx) = monomorphizeList ctx rs args
                 in

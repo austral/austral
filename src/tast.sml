@@ -49,7 +49,7 @@ structure TAST :> TAST = struct
                  | Cast of ty * ast
                  | Seq of ast * ast
                  | ConcreteFuncall of name * ast list * ty
-                 | GenericFuncall of name * (name, ty) Map.map * ast list * ty
+                 | GenericFuncall of name * Type.typarams * (name, ty) Map.map * ast list * ty
                  | MethodFuncall of name * ty list * ast list * ty
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
@@ -146,7 +146,7 @@ structure TAST :> TAST = struct
             typeOf v
           | typeOf (ConcreteFuncall (_, _, ty)) =
             ty
-          | typeOf (GenericFuncall (_, _, _, ty)) =
+          | typeOf (GenericFuncall (_, _, _, _, ty)) =
             ty
           | typeOf (MethodFuncall (_, _, _, ty)) =
             ty
