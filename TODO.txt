@@ -2,6 +2,7 @@ TODO:
 
 - Refactor: malloc builtin
 - Refactor: free builtin
+- malloc/load/store/free test
 - Lift static arrays to (length, ptr) tuples in the LIR pass
 - Expand monomorphs recursively
 - Augment method calls
