@@ -42,6 +42,7 @@ signature HIR = sig
                  | Let of Symbol.variable * ast * ast
                  | Cond of ast * ast * ast
                  | ArithOp of Arith.kind * Arith.oper * ast * ast
+                 | CompOp of Builtin.comp_op * ast * ast
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | ArrayLength of ast
@@ -59,7 +60,7 @@ signature HIR = sig
                  | Seq of ast * ast
                  | ConcreteFuncall of name * ast list * ty
                  | GenericFuncall of name * int * ast list * ty
-         and variant_case = VariantCase of name * ast
+         and variant_case = VariantCase of int * ast
 
     val typeOf : ast -> ty
 
