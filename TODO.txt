@@ -2,7 +2,6 @@ TODO:
 
 - Refactor: PositiveAddress type
 - Refactor: load/store/free only work on PositiveAddress types
-- GenericFuncall: replace list of type args with map of type param names to type args
 - Fix bug with type matching in generic function calls
 - Refactor: malloc builtin
 - Refactor: free builtin
@@ -177,3 +176,4 @@ DONE:
 - Refactor: ForeignPointer to Address
 - Refactor: load works on addresses only, returns dereferenced value
 - Refactor: store works on addresses only, returns stored value
+- GenericFuncall: replace list of type args with map of type param names to type args
