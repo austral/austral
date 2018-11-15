@@ -461,7 +461,7 @@ structure TAST :> TAST = struct
                         true
                       | compatible (Type.Float Type.Double) (Type.Float Type.Double) =
                         true
-                      | compatible (Type.ForeignPointer _) (Type.ForeignPointer _) =
+                      | compatible (Type.Address _) (Type.Address _) =
                         true
                       | compatible (Type.StaticArray _) (Type.StaticArray _) =
                         true
