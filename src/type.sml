@@ -248,10 +248,10 @@ structure Type :> TYPE = struct
       | resolveStaticArray _ _ _ =
         raise Fail "Bad static-array type specifier"
 
-    and resolveForeignPointer tenv params [typespec] =
-        ForeignPointer (resolve tenv params typespec)
-      | resolveForeignPointer _ _ _ =
-        raise Fail "Bad foreign-pointer type specifier"
+    and resolveAddress tenv params [typespec] =
+        Address (resolve tenv params typespec)
+      | resolveAddress _ _ _ =
+        raise Fail "Bad address type specifier"
 
     and replaceVariant m (Variant (name, SOME ty)) =
         Variant (name, SOME (replaceVars m ty))
