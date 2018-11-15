@@ -27,9 +27,9 @@ structure MonoType :> MONO_TYPE = struct
                 | Integer of Type.signedness * Type.width
                 | Float of Type.float_type
                 | Tuple of ty list
-                | Pointer of ty
-                | ForeignPointer of ty
+                | Address of ty
                 | StaticArray of ty
+                | Pointer of ty
                 | Disjunction of name * int * variant list
          and variant = Variant of name * ty option
 
