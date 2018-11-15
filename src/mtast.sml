@@ -146,26 +146,24 @@ structure MTAST :> MTAST = struct
     (* Monomorphization *)
 
     type type_monomorphs = MonoType.type_monomorphs
-    type replacements = MonoType.replacements
 
     datatype fn_monomorphs = FuncMonos of ((name * ty list), int) Map.map
 
-    datatype context = Context of type_monomorphs * replacements * fn_monomorphs
+    datatype context = Context of type_monomorphs * fn_monomorphs
 
     val emptyContext =
         Context (MonoType.emptyMonomorphs,
-                 Map.empty,
                  FuncMonos Map.empty)
 
-    fun getMonomorph (Context (_, _, FuncMonos fm)) name tyargs =
+    fun getMonomorph (Context (_, FuncMonos fm)) name tyargs =
         Map.get fm (name, tyargs)
 
-    fun addMonomorph (Context (tm, rs, FuncMonos fm)) name tyargs id =
-        Context (tm, rs, FuncMonos (Map.iadd fm ((name, tyargs), id)))
+    fun addMonomorph (Context (tm, FuncMonos fm)) name tyargs id =
+        Context (tm, FuncMonos (Map.iadd fm ((name, tyargs), id)))
 
     (* Diffing contexts *)
 
-    fun newFuncMonomorphs (Context (_, _, FuncMonos old)) (Context (_, _, FuncMonos new)) =
+    fun newFuncMonomorphs (Context (_, FuncMonos old)) (Context (_, FuncMonos new)) =
         let val oldKeys = Map.keys old
             and newKeys = Map.keys new
         in
@@ -181,32 +179,32 @@ structure MTAST :> MTAST = struct
             end
         end
 
-    fun newTypeMonomorphs (Context (old, _, _)) (Context (new, _, _)) =
+    fun newTypeMonomorphs (Context (old, _)) (Context (new, _)) =
         MonoType.newMonomorphs old new
 
     (* Monomorphization utilities *)
 
-    fun monoType ctx ty =
-        let val (Context (tm, rs, fm)) = ctx
+    fun monoType ctx rs ty =
+        let val (Context (tm, fm)) = ctx
         in
             let val (ty', tm') = MonoType.monomorphize tm rs ty
             in
-                (ty', Context (tm', rs, fm))
+                (ty', Context (tm', fm))
             end
         end
 
-    fun monoTypes ctx tys =
-        Util.foldThread (fn (ty, ctx) => monoType ctx ty)
+    fun monoTypes ctx rs tys =
+        Util.foldThread (fn (ty, ctx) => monoType ctx rs ty)
                         tys
                         ctx
 
     fun forciblyMonomorphize ctx ty =
         (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
            defun or some other provably-concrete context *)
-        let val (Context (tm, rs, _)) = ctx
+        let val (Context (tm, _)) = ctx
         in
             let val (ty', _) = MonoType.monomorphize tm
-                                                     rs
+                                                     Map.empty
                                                      ty
             in
                 ty'
@@ -216,132 +214,134 @@ structure MTAST :> MTAST = struct
     (* Monomorphize a type with an empty replacements map, that is, in a
        concrete context. *)
 
-    fun monomorphize ctx TAST.UnitConstant =
+    type replacements = MonoType.replacements
+
+    fun monomorphize ctx _ TAST.UnitConstant =
         (UnitConstant, ctx)
-      | monomorphize ctx (TAST.BoolConstant b) =
+      | monomorphize ctx _ (TAST.BoolConstant b) =
         (BoolConstant b, ctx)
-      | monomorphize ctx (TAST.IntConstant (i, ty)) =
+      | monomorphize ctx _ (TAST.IntConstant (i, ty)) =
         let val ty' = forciblyMonomorphize ctx ty
         in
             case ty' of
                 (MonoType.Integer _) => (IntConstant (i, ty'), ctx)
               | _ => raise Fail "Internal error: not a valid type for an integer constant"
         end
-      | monomorphize ctx (TAST.FloatConstant (f, ty)) =
+      | monomorphize ctx _ (TAST.FloatConstant (f, ty)) =
         let val ty' = forciblyMonomorphize ctx ty
         in
             case ty' of
                 (MonoType.Float _) => (FloatConstant (f, ty'), ctx)
               | _ => raise Fail "Internal error: not a valid type for a float constant"
         end
-      | monomorphize ctx (TAST.StringConstant s) =
+      | monomorphize ctx _ (TAST.StringConstant s) =
         (StringConstant s, ctx)
-      | monomorphize ctx (TAST.Variable (var, ty)) =
-        let val (ty', ctx) = monoType ctx ty
+      | monomorphize ctx rs (TAST.Variable (var, ty)) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
             (Variable (var, ty'), ctx)
         end
-      | monomorphize ctx (TAST.Let (name, value, body)) =
-        let val (value', ctx) = monomorphize ctx value
+      | monomorphize ctx rs (TAST.Let (name, value, body)) =
+        let val (value', ctx) = monomorphize ctx rs value
         in
-            let val (body', ctx) = monomorphize ctx body
+            let val (body', ctx) = monomorphize ctx rs body
             in
                 (Let (name, value', body'), ctx)
             end
         end
-      | monomorphize ctx (TAST.Bind (names, tup, body)) =
-        let val (tup', ctx) = monomorphize ctx tup
+      | monomorphize ctx rs (TAST.Bind (names, tup, body)) =
+        let val (tup', ctx) = monomorphize ctx rs tup
         in
-            let val (body', ctx) = monomorphize ctx body
+            let val (body', ctx) = monomorphize ctx rs body
             in
                 (Bind (names, tup', body'), ctx)
             end
         end
-      | monomorphize ctx (TAST.Cond (t, c, a)) =
-        let val (t', ctx) = monomorphize ctx t
+      | monomorphize ctx rs (TAST.Cond (t, c, a)) =
+        let val (t', ctx) = monomorphize ctx rs t
         in
-            let val (c', ctx) = monomorphize ctx c
+            let val (c', ctx) = monomorphize ctx rs c
             in
-                let val (a', ctx) = monomorphize ctx a
+                let val (a', ctx) = monomorphize ctx rs a
                 in
                     (Cond (t', c', a'), ctx)
                 end
             end
         end
-      | monomorphize ctx (TAST.ArithOp (kind, oper, lhs, rhs)) =
-        let val (lhs', ctx) = monomorphize ctx lhs
+      | monomorphize ctx rs (TAST.ArithOp (kind, oper, lhs, rhs)) =
+        let val (lhs', ctx) = monomorphize ctx rs lhs
         in
-            let val (rhs', ctx) = monomorphize ctx rhs
+            let val (rhs', ctx) = monomorphize ctx rs rhs
             in
                 (ArithOp (kind, oper, lhs', rhs'), ctx)
             end
         end
-      | monomorphize ctx (TAST.CompOp (oper, lhs, rhs)) =
-        let val (lhs', ctx) = monomorphize ctx lhs
+      | monomorphize ctx rs (TAST.CompOp (oper, lhs, rhs)) =
+        let val (lhs', ctx) = monomorphize ctx rs lhs
         in
-            let val (rhs', ctx) = monomorphize ctx rhs
+            let val (rhs', ctx) = monomorphize ctx rs rhs
             in
                 (CompOp (oper, lhs', rhs'), ctx)
             end
         end
-      | monomorphize ctx (TAST.TupleCreate exps) =
-        let val (exps', ctx) = monomorphizeList ctx exps
+      | monomorphize ctx rs (TAST.TupleCreate exps) =
+        let val (exps', ctx) = monomorphizeList ctx rs exps
         in
             (TupleCreate exps', ctx)
         end
-      | monomorphize ctx (TAST.TupleProj (tup, idx)) =
-        let val (tup', ctx) = monomorphize ctx tup
+      | monomorphize ctx rs (TAST.TupleProj (tup, idx)) =
+        let val (tup', ctx) = monomorphize ctx rs tup
         in
             (TupleProj (tup', idx), ctx)
         end
-      | monomorphize ctx (TAST.ArrayLength arr) =
-        let val (arr', ctx) = monomorphize ctx arr
+      | monomorphize ctx rs (TAST.ArrayLength arr) =
+        let val (arr', ctx) = monomorphize ctx rs arr
         in
             (ArrayLength arr', ctx)
         end
-      | monomorphize ctx (TAST.ArrayPointer arr) =
-        let val (arr', ctx) = monomorphize ctx arr
+      | monomorphize ctx rs (TAST.ArrayPointer arr) =
+        let val (arr', ctx) = monomorphize ctx rs arr
         in
             (ArrayPointer arr', ctx)
         end
-      | monomorphize ctx (TAST.Allocate exp) =
-        let val (exp', ctx) = monomorphize ctx exp
+      | monomorphize ctx rs (TAST.Allocate exp) =
+        let val (exp', ctx) = monomorphize ctx rs exp
         in
             (Allocate exp', ctx)
         end
-      | monomorphize ctx (TAST.Load exp) =
-        let val (exp', ctx) = monomorphize ctx exp
+      | monomorphize ctx rs (TAST.Load exp) =
+        let val (exp', ctx) = monomorphize ctx rs exp
         in
             (Load exp', ctx)
         end
-      | monomorphize ctx (TAST.Store (ptr, value)) =
-        let val (ptr', ctx) = monomorphize ctx ptr
+      | monomorphize ctx rs (TAST.Store (ptr, value)) =
+        let val (ptr', ctx) = monomorphize ctx rs ptr
         in
-            let val (value', ctx) = monomorphize ctx value
+            let val (value', ctx) = monomorphize ctx rs value
             in
                 (Store (ptr', value'), ctx)
             end
         end
-      | monomorphize ctx (TAST.The (_, exp)) =
+      | monomorphize ctx rs (TAST.The (_, exp)) =
         (* The MTAST doesn't have a case for `the` expressions. Since type
            checking is done at the TAST level, we don't need one. We ignore the
            provided type and monomorphize the expression. *)
-        let val (exp', ctx) = monomorphize ctx exp
+        let val (exp', ctx) = monomorphize ctx rs exp
         in
             (exp', ctx)
         end
-      | monomorphize ctx (TAST.Construct (ty, name, expOpt)) =
-        let val (ty', ctx) = monoType ctx ty
+      | monomorphize ctx rs (TAST.Construct (ty, name, expOpt)) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
             case expOpt of
-                (SOME exp) => let val (exp', ctx) = monomorphize ctx exp
+                (SOME exp) => let val (exp', ctx) = monomorphize ctx rs exp
                               in
                                   (Construct (ty', name, SOME exp'), ctx)
                               end
               | NONE => (Construct (ty', name, NONE), ctx)
         end
-      | monomorphize ctx (TAST.Case (exp, cases, ty)) =
-        let val (exp', ctx) = monomorphize ctx exp
+      | monomorphize ctx rs (TAST.Case (exp, cases, ty)) =
+        let val (exp', ctx) = monomorphize ctx rs exp
         in
             let fun monomorphizeCases ctx cases =
                     Util.foldThread (fn (c, ctx) =>
@@ -350,7 +350,7 @@ structure MTAST :> MTAST = struct
                                     ctx
 
                 and monomorphizeCase ctx (TAST.VariantCase (name, body)) =
-                    let val (body', ctx) = monomorphize ctx body
+                    let val (body', ctx) = monomorphize ctx rs body
                     in
                         let val (name', ctx) = mapName ctx name
                         in
@@ -361,7 +361,7 @@ structure MTAST :> MTAST = struct
                 and mapName ctx (TAST.NameOnly name) =
                     (NameOnly name, ctx)
                   | mapName ctx (TAST.NameBinding { casename, var, ty}) =
-                    let val (ty', ctx) = monoType ctx ty
+                    let val (ty', ctx) = monoType ctx rs ty
                     in
                         (NameBinding { casename = casename, var = var, ty = ty' }, ctx)
                     end
@@ -369,66 +369,66 @@ structure MTAST :> MTAST = struct
             in
                 let val (cases', ctx) = monomorphizeCases ctx cases
                 in
-                    let val (ty', ctx) = monoType ctx ty
+                    let val (ty', ctx) = monoType ctx rs ty
                     in
                         (Case (exp', cases', ty'), ctx)
                     end
                 end
             end
         end
-      | monomorphize ctx (TAST.ForeignFuncall (name, args, ty)) =
-        let val (args', exp) = monomorphizeList ctx args
+      | monomorphize ctx rs (TAST.ForeignFuncall (name, args, ty)) =
+        let val (args', exp) = monomorphizeList ctx rs args
         in
-            let val (ty', exp) = monoType ctx ty
+            let val (ty', exp) = monoType ctx rs ty
             in
                 (ForeignFuncall (name, args', ty'), ctx)
             end
         end
-      | monomorphize ctx (TAST.ForeignNull ty) =
-        let val (ty', ctx) = monoType ctx ty
+      | monomorphize ctx rs (TAST.ForeignNull ty) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
             (ForeignNull ty', ctx)
         end
-      | monomorphize ctx (TAST.SizeOf ty) =
-        let val (ty', ctx) = monoType ctx ty
+      | monomorphize ctx rs (TAST.SizeOf ty) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
             (SizeOf ty', ctx)
         end
-      | monomorphize ctx (TAST.AddressOf (var, ty)) =
-        let val (ty', ctx) = monoType ctx ty
+      | monomorphize ctx rs (TAST.AddressOf (var, ty)) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
             (AddressOf (var, ty'), ctx)
         end
-      | monomorphize ctx (TAST.Cast (ty, exp)) =
-        let val (ty', ctx) = monoType ctx ty
+      | monomorphize ctx rs (TAST.Cast (ty, exp)) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
-            let val (exp', ctx) = monomorphize ctx exp
+            let val (exp', ctx) = monomorphize ctx rs exp
             in
                 (Cast (ty', exp'), ctx)
             end
         end
-      | monomorphize ctx (TAST.Seq (a, b)) =
-        let val (a', ctx) = monomorphize ctx a
+      | monomorphize ctx rs (TAST.Seq (a, b)) =
+        let val (a', ctx) = monomorphize ctx rs a
         in
-            let val (b', ctx) = monomorphize ctx b
+            let val (b', ctx) = monomorphize ctx rs b
             in
                 (Seq (a', b'), ctx)
             end
         end
-      | monomorphize ctx (TAST.ConcreteFuncall (name, args, ty)) =
-        let val (args', ctx) = monomorphizeList ctx args
+      | monomorphize ctx rs (TAST.ConcreteFuncall (name, args, ty)) =
+        let val (args', ctx) = monomorphizeList ctx rs args
         in
-            let val (ty', ctx) = monoType ctx ty
+            let val (ty', ctx) = monoType ctx rs ty
             in
                 (ConcreteFuncall (name, args', ty'), ctx)
             end
         end
-      | monomorphize ctx (TAST.GenericFuncall (name, tyargs, args, ty)) =
-        let val (tyargs', ctx) = monoTypes ctx tyargs
+      | monomorphize ctx rs (TAST.GenericFuncall (name, tyargs, args, ty)) =
+        let val (tyargs', ctx) = monoTypes ctx rs tyargs
         in
-            let val (args', ctx) = monomorphizeList ctx args
+            let val (args', ctx) = monomorphizeList ctx rs args
             in
-                let val (ty', ctx) = monoType ctx ty
+                let val (ty', ctx) = monoType ctx rs ty
                 in
                     (* Check the table of function monomorphs. If this
                        name+type arg list combination doesn't exist yet, add
@@ -451,11 +451,11 @@ structure MTAST :> MTAST = struct
                 end
             end
         end
-      | monomorphize ctx (TAST.MethodFuncall (name, tyargs, args, ty)) =
+      | monomorphize ctx rs (TAST.MethodFuncall (name, tyargs, args, ty)) =
         raise Fail "monomorphize: method funcall not implemented yet"
 
-    and monomorphizeList ctx exps =
-        Util.foldThread (fn (exp, ctx) => monomorphize ctx exp)
+    and monomorphizeList ctx rs exps =
+        Util.foldThread (fn (exp, ctx) => monomorphize ctx rs exp)
                         exps
                         ctx
 
@@ -486,7 +486,7 @@ structure MTAST :> MTAST = struct
         let fun mapParam (TAST.Param (var, ty)) =
                 Param (var, forciblyMonomorphize ctx ty)
         in
-            let val (body', ctx) = monomorphize ctx body
+            let val (body', ctx) = monomorphize ctx Map.empty body
             in
                 let val node = Defun (name,
                                       map mapParam params,
@@ -511,7 +511,10 @@ structure MTAST :> MTAST = struct
                 and newTypes = newTypeMonomorphs ctx ctx'
             in
                 let val defuns = map (fn (name, args, id) =>
-                                         expandDefgeneric ctx' fenv fdefenv name args id)
+                                         let val rs = Map.empty (* TODO *)
+                                         in
+                                             expandDefgeneric ctx' fenv fdefenv rs name args id
+                                         end)
                                      newFuncs
                     and deftypes = map (fn (name, _, ty, id) =>
                                            expandDeftype name ty id)
@@ -523,29 +526,29 @@ structure MTAST :> MTAST = struct
             end
         end
 
-    and expandDefgeneric ctx fenv fdefenv name args id =
+    and expandDefgeneric ctx fenv fdefenv rs name args id =
         (case Function.envGet fenv name of
-             (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv name args id
+             (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv rs name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
     and expandDeftype name ty id =
         DeftypeMonomorph (name, ty, id)
 
-    and expandGf ctx gf fdefenv name tyargs id =
+    and expandGf ctx gf fdefenv rs name tyargs id =
         let val (params, body) = Option.valOf (FDefs.getDefinition fdefenv name)
             and (Function.GenericFunction (name, typarams, _, ty, _)) = gf
         in
-            let val (ty', ctx) = monoType ctx ty
+            let val (ty', ctx) = monoType ctx rs ty
             in
                 let val (params', ctx) = Util.foldThread (fn (TAST.Param (name, ty), ctx) =>
-                                                             let val (ty, ctx) = monoType ctx ty
+                                                             let val (ty, ctx) = monoType ctx rs ty
                                                              in
                                                                  (Param (name, ty), ctx)
                                                              end)
                                                          params
                                                          ctx
                 in
-                    let val (body', ctx) = monomorphize ctx body
+                    let val (body', ctx) = monomorphize ctx rs body
                     in
                         let val node = DefunMonomorph (name, params', ty', body', id)
                         in

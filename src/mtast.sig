@@ -76,7 +76,9 @@ signature MTAST = sig
     val newFuncMonomorphs : context -> context -> (name * ty list * int) list
     val newTypeMonomorphs : context -> context -> (name * ty list * ty * int) list
 
-    val monomorphize : context -> TAST.ast -> (ast * context)
-    val monomorphizeList : context -> TAST.ast list -> (ast list * context)
+    type replacements
+
+    val monomorphize : context -> replacements -> TAST.ast -> (ast * context)
+    val monomorphizeList : context -> replacements -> TAST.ast list -> (ast list * context)
     val monomorphizeTop : Function.fenv -> FDefs.fdefenv -> context -> TAST.top_ast -> (top_ast * context)
 end
