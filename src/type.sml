@@ -51,6 +51,8 @@ structure Type :> TYPE = struct
         true
       | isComparable (Address _) =
         true
+      | isComparable (PositiveAddress _) =
+        true
       | isComparable t =
         isNumeric t
 
