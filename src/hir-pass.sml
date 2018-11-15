@@ -50,6 +50,8 @@ structure HirPass :> HIR_PASS = struct
         Pointer (transformType ty)
       | transformType (MT.Address ty) =
         Pointer (transformType ty)
+      | transformType (MT.PositiveAddress ty) =
+        Pointer (transformType ty)
       | transformType (MT.StaticArray ty) =
         StaticArray (transformType ty)
       | transformType (MT.Disjunction (name, id, _)) =
