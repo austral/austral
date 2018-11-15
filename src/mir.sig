@@ -42,6 +42,7 @@ signature MIR = sig
                      | VariableOp of Symbol.variable * ty
 
     datatype operation = ArithOp of Arith.kind * Arith.oper * operand * operand
+                       | CompOp of Builtin.comp_op * operand * operand
                        | TupleCreate of operand list
                        | TupleProj of operand * int
                        | ArrayLength of operand
@@ -61,7 +62,9 @@ signature MIR = sig
                          | DeclareLocal of Symbol.variable * ty * operand
                          | Cond of { test : operand,
                                      consequent : instruction list,
+                                     consequent_res : operand,
                                      alternate : instruction list,
+                                     alternate_res : operand,
                                      result : register,
                                      ty : ty }
                          | Store of { ptr : operand,
@@ -70,5 +73,13 @@ signature MIR = sig
                                       ty : ty }
                          | Case of operand * variant_case list * register * ty
                          | VoidForeignFuncall of string * operand list
-         and variant_case = VariantCase of name * instruction list * operand * ty
+         and variant_case = VariantCase of int * instruction list * operand * ty
+
+    (* Toplevel AST *)
+
+    datatype top_ast = Defun of name * param list * ty * instruction list * operand
+                     | DefunMonomorph of name * param list * ty * instruction list * operand * int
+                     | DeftypeMonomorph of name * ty * int
+                     | ToplevelProgn of top_ast list
+         and param = Param of Symbol.variable * ty
 end
