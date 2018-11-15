@@ -472,7 +472,7 @@ structure MTAST :> MTAST = struct
                 in
                     let val pairs' = ListPair.zip (names, tys')
                     in
-                        Map.fromList pairs'
+                        (Map.fromList pairs', ctx)
                     end
                 end
             end
