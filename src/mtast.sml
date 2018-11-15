@@ -100,8 +100,8 @@ structure MTAST :> MTAST = struct
             (case typeOf p of
                  (Pointer t) => t
                | _ => raise Fail "Not a pointer")
-          | typeOf (Store (p, _)) =
-            typeOf p
+          | typeOf (Store (_, v)) =
+            typeOf v
           | typeOf (Construct (t, _, _)) =
             t
           | typeOf (Case (_, _, t)) =
