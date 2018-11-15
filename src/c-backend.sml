@@ -317,7 +317,7 @@ structure CBackend :> C_BACKEND = struct
                        transformType ty,
                        C.Sequence (map transformInst insts),
                        transformOperand oper)
-      | transformTop (LIR.DeftypeMonomorph (name, ty, id)) =
+      | transformTop (LIR.DefdisjunctionMono (name, id, tys)) =
         raise Fail "deftype-monormoph: Not implemented yet"
       | transformTop (LIR.Deftuple (id, tys)) =
         let val name = tupleName id
