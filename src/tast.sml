@@ -300,14 +300,14 @@ structure TAST :> TAST = struct
                 and v' = augment v c
             in
                 case (typeOf p') of
-                    Pointer t => let val ty = typeOf v'
+                    Address t => let val ty = typeOf v'
                                  in
                                      if ty = t then
                                          Store (p', v')
                                      else
                                          raise Fail "store: type mismatch"
                                  end
-                  | _ => raise Fail "store: first argument must be a pointer"
+                  | _ => raise Fail "store: first argument must be an address"
             end
           | augment (AST.The (typespec, exp)) c =
             let val tenv = ctxTenv c
