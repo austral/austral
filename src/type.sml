@@ -46,6 +46,35 @@ structure Type :> TYPE = struct
     fun isNumeric t =
         isInteger t orelse isFloat t
 
+    fun toString Unit =
+        "unit"
+      | toString Bool =
+        "boolean"
+      | toString (Integer (s, w)) =
+        (signednessToString s) ^ (widthToString w)
+      | toString (Float Single) =
+        "f32"
+      | toString (Float Double) =
+        "f64"
+      | toString (Pointer t) =
+        "(pointer " ^ (toString t) ^ ")"
+      | toString _ =
+        raise Fail "Not done yet"
+
+    and signednessToString Unsigned =
+        "u"
+      | signednessToString Signed =
+        "i"
+
+    and widthToString Int8 =
+        "8"
+      | widthToString Int16 =
+        "16"
+      | widthToString Int32 =
+        "32"
+      | widthToString Int64 =
+        "64"
+
     fun tyVars Unit = Set.empty
       | tyVars Bool = Set.empty
       | tyVars (Integer _) = Set.empty
