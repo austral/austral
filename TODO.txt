@@ -1,9 +1,11 @@
 TODO:
 
-- C runtime file and script
-- Update compiler to use C backend
-- Expand tuple types
-
+- Define foreign-load
+- Define foreign-store
+- Fix load type
+- Define function pointer type
+- Define `function` operator
+- Lift static arrays to (length, ptr) tuples in the LIR pass
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
@@ -164,3 +166,7 @@ DONE:
 - New LIR
 - LIR pass
 - C backend
+- C runtime file and script
+- Update compiler to use C backend
+- C AST renderer
+- Expand tuple types
