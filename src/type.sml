@@ -58,8 +58,17 @@ structure Type :> TYPE = struct
         "f64"
       | toString (Pointer t) =
         "(pointer " ^ (toString t) ^ ")"
-      | toString _ =
-        raise Fail "Not done yet"
+      | toString (ForeignPointer t) =
+        "(foreign-pointer " ^ (toString t) ^ ")"
+      | toString (StaticArray t) =
+        "(static-array " ^ (toString t) ^ ")"
+      | toString (Disjunction (name, tyargs, _)) =
+        "( "
+        ^ (Symbol.toString name)
+        ^ (String.concatWith " " (map toString tyargs))
+        ^ ")"
+      | toString (TypeVariable name) =
+        Symbol.toString name
 
     and signednessToString Unsigned =
         "u"
