@@ -344,22 +344,25 @@ structure Compiler : COMPILER = struct
                                                          (compilerMonoCtx c)
                                                          node
         in
-            let val hirNode = HirPass.transformTop mtastNode
+            let val c = compilerFromMonoCtx c ctx
             in
-                let val mirNode = MirPass.transformTop hirNode
+                let val hirNode = HirPass.transformTop mtastNode
                 in
-                    let val (lirNode, tts) = LirPass.transformTop (compilerTupleTypes c)
-                                                                  mirNode
+                    let val mirNode = MirPass.transformTop hirNode
                     in
-                        let val c = compilerFromTTS c tts
+                        let val (lirNode, tts) = LirPass.transformTop (compilerTupleTypes c)
+                                                                      mirNode
                         in
-                            let val cNode = CBackend.transformTop lirNode
+                            let val c = compilerFromTTS c tts
                             in
-                                let val newCode = CRenderer.renderTop cNode
+                                let val cNode = CBackend.transformTop lirNode
                                 in
-                                    let val code = (compilerCode c) ^ "\n\n" ^ newCode
+                                    let val newCode = CRenderer.renderTop cNode
                                     in
-                                        compilerFromCode c code
+                                        let val code = (compilerCode c) ^ "\n\n" ^ newCode
+                                        in
+                                            compilerFromCode c code
+                                        end
                                     end
                                 end
                             end
