@@ -97,6 +97,12 @@ structure Compiler : COMPILER = struct
             Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
         end
 
+    fun compilerFromMonoCtx c mtast =
+        let val (Compiler (menv, macenv, tenv, fenv, _, fdefs, tts, modname, code)) = c
+        in
+            Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
+        end
+
     fun addFundef c name params body =
         let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)) = c
         in
