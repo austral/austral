@@ -198,19 +198,6 @@ structure MTAST :> MTAST = struct
                         tys
                         ctx
 
-    fun forciblyMonomorphize ctx ty =
-        (* ONLY USE THIS when you can ignore resulting monomorphs, e.g. in a
-           defun or some other provably-concrete context *)
-        let val (Context (tm, _)) = ctx
-        in
-            let val (ty', _) = MonoType.monomorphize tm
-                                                     Map.empty
-                                                     ty
-            in
-                ty'
-            end
-        end
-
     (* Monomorphize a type with an empty replacements map, that is, in a
        concrete context. *)
 
@@ -220,8 +207,8 @@ structure MTAST :> MTAST = struct
         (UnitConstant, ctx)
       | monomorphize ctx _ (TAST.BoolConstant b) =
         (BoolConstant b, ctx)
-      | monomorphize ctx _ (TAST.IntConstant (i, ty)) =
-        let val ty' = forciblyMonomorphize ctx ty
+      | monomorphize ctx rs (TAST.IntConstant (i, ty)) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
             case ty' of
                 (MonoType.Integer _) => (IntConstant (i, ty'), ctx)
