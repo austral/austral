@@ -113,7 +113,7 @@ structure MonoType :> MONO_TYPE = struct
       | monomorphize tm rs (Type.Disjunction (name, tyargs, variants)) =
         let val (tyargs', tm) = monomorphizeList tm rs tyargs
         in
-            print ("SEARCH FOR MONOMORPH " ^ (Symbol.toString name) ^ " with args: {" ^ (String.concatWith ", " (map Type.toString tyargs)) ^ "}\n");
+            (*print ("SEARCH FOR MONOMORPH " ^ (Symbol.toString name) ^ " with args: {" ^ (String.concatWith ", " (map Type.toString tyargs)) ^ "}\n");*)
             (* Check the table of type monomorphs for this name and type arguments *)
             case getMonomorph tm name tyargs' of
                 SOME (ty, _) => (ty, tm)
@@ -124,7 +124,7 @@ structure MonoType :> MONO_TYPE = struct
                     (SOME (ty, _)) => (ty, tm)
                   | NONE => let val id = freshId ()
                             in
-                                print ("NEW MONOMORPH: " ^ (Int.toString id) ^ "\n");
+                                (*print ("NEW MONOMORPH: " ^ (Int.toString id) ^ "\n");*)
                                 let val (variants', tm) = monomorphizeVariants tm rs variants
                                 in
                                     let val disj = Disjunction (name, id, variants')
