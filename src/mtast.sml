@@ -214,8 +214,8 @@ structure MTAST :> MTAST = struct
                 (MonoType.Integer _) => (IntConstant (i, ty'), ctx)
               | _ => raise Fail "Internal error: not a valid type for an integer constant"
         end
-      | monomorphize ctx _ (TAST.FloatConstant (f, ty)) =
-        let val ty' = forciblyMonomorphize ctx ty
+      | monomorphize ctx rs (TAST.FloatConstant (f, ty)) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
             case ty' of
                 (MonoType.Float _) => (FloatConstant (f, ty'), ctx)
