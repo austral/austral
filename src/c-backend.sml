@@ -63,7 +63,7 @@ structure CBackend :> C_BACKEND = struct
         "_A_tuple_" ^ (Int.toString id)
 
     fun disjName name id =
-        (escapeSymbol name) ^ "_" ^ (Int.toString id)
+        "_A_type_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
 
     val disjTagFieldName = "tag"
 
