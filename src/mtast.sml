@@ -499,12 +499,15 @@ structure MTAST :> MTAST = struct
                                 params
                                 ctx
         in
-            let val (body', ctx) = monomorphize ctx Map.empty body
+            let val (params', ctx) = mapParams params
             in
-                let val (params', ctx) = mapParams params
+                let val (rt', ctx) = monoType ctx Map.empty rt
                 in
-                    let val (rt', ctx) = monoType ctx Map.empty rt
+                    let val (body', ctx) = monomorphize ctx Map.empty body
                     in
+                        (* FIXME: putting the above monomorphize ctx body call
+                           above the mapParams call suppresses the generation of
+                           monomorphs. find out why. *)
                         let val node = Defun (name,
                                               params',
                                               rt',
