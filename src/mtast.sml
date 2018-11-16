@@ -490,17 +490,29 @@ structure MTAST :> MTAST = struct
         (ToplevelProgn [], ctx)
 
     and monomorphizeDefun ctx name params rt body =
-        let fun mapParam (TAST.Param (var, ty)) =
-                Param (var, forciblyMonomorphize ctx ty)
+        let fun mapParams params =
+                Util.foldThread (fn (TAST.Param (var, ty), ctx) =>
+                                    let val (ty', ctx) = monoType ctx Map.empty ty
+                                    in
+                                        Param (var, ty')
+                                    end)
+                                params
+                                ctx
         in
             let val (body', ctx) = monomorphize ctx Map.empty body
             in
-                let val node = Defun (name,
-                                      map mapParam params,
-                                      forciblyMonomorphize ctx rt,
-                                      body')
+                let val (params', ctx) = mapParams params
                 in
-                    (node, ctx)
+                    let val (rt', ctx) = monoType ctx Map.empty rt
+                    in
+                        let val node = Defun (name,
+                                              params',
+                                              rt',
+                                              body')
+                        in
+                            (node, ctx)
+                        end
+                    end
                 end
             end
         end
