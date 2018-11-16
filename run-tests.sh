@@ -61,10 +61,10 @@ echo "bind.au"
 gcc test/valid/bind.c -o test/valid/bind.bin
 ./test/valid/bind.bin
 
-# echo "case.au"
-# ./boreal test/valid/case.au --output=test/valid/case.cpp --entrypoint=austral-user:main
-# clang++ -std=c++11 test/valid/case.cpp -o test/valid/case.bin
-# ./test/valid/case.bin
+echo "case.au"
+./boreal test/valid/case.au --output=test/valid/case.c --entrypoint=austral-user:main
+gcc test/valid/case.c -o test/valid/case.bin
+./test/valid/case.bin
 
 # echo "sqlite3.au"
 # ./boreal test/valid/sqlite3.au --output=test/valid/sqlite3.cpp --entrypoint=sqlite3-test:main
