@@ -111,29 +111,31 @@ structure MonoType :> MONO_TYPE = struct
             (StaticArray ty', tm')
         end
       | monomorphize tm rs (Type.Disjunction (name, tyargs, variants)) =
-        let val (tyargs', tm') = monomorphizeList tm rs tyargs
+        let val (tyargs', tm) = monomorphizeList tm rs tyargs
         in
+            print ("SEARCH FOR MONOMORPH " ^ (Symbol.toString name) ^ " with args: {" ^ (String.concatWith ", " (map Type.toString tyargs)) ^ "}\n");
             (* Check the table of type monomorphs for this name and type arguments *)
             case getMonomorph tm name tyargs' of
                 SOME (ty, _) => (ty, tm)
               | NONE =>
                 (* If this pair of name+type args is not present in the table of
                    monomorphs, add it *)
-                let val (variants', tm'') = monomorphizeVariants tm' rs variants
-                in
-                    case getMonomorph tm'' name tyargs' of
-                        (SOME (ty, _)) => (ty, tm'')
-                      | NONE => let val id = freshId ()
+                case getMonomorph tm name tyargs' of
+                    (SOME (ty, _)) => (ty, tm)
+                  | NONE => let val id = freshId ()
+                            in
+                                print ("NEW MONOMORPH: " ^ (Int.toString id) ^ "\n");
+                                let val (variants', tm) = monomorphizeVariants tm rs variants
                                 in
                                     let val disj = Disjunction (name, id, variants')
                                     in
-                                        let val tm''' = addMonomorph tm'' name tyargs' disj id
+                                        let val tm = addMonomorph tm name tyargs' disj id
                                         in
-                                            (disj, tm''')
+                                            (disj, tm)
                                         end
                                     end
                                 end
-                end
+                            end
         end
       | monomorphize tm rs (Type.TypeVariable name) =
         (case Map.get rs name of
