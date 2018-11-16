@@ -494,7 +494,7 @@ structure MTAST :> MTAST = struct
                 Util.foldThread (fn (TAST.Param (var, ty), ctx) =>
                                     let val (ty', ctx) = monoType ctx Map.empty ty
                                     in
-                                        Param (var, ty')
+                                        (Param (var, ty'), ctx)
                                     end)
                                 params
                                 ctx
