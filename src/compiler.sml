@@ -371,22 +371,6 @@ structure Compiler : COMPILER = struct
                 end
             end
         end
-            (*let val mtastNode = MTAST
-            let val hirTop = HirPass.transformTop typedNode
-            in
-
-            let val mir = MIR.transformTop hirTop
-                in
-                    let val cpp = CppBackend.transformTop mir
-                    in
-                        let val cppStr = CppAst.renderTop cpp
-                            and (Compiler (menv, macenv, tenv, fenv, currMod, code)) = c
-                        in
-                            Compiler (menv, macenv, tenv, fenv, currMod, code ^ "\n\n" ^ cppStr)
-                        end
-                    end
-                end
-            *)
 
     fun compilationPass c (head::tail) =
         compilationPass (compileForm c head) tail
