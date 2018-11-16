@@ -490,7 +490,7 @@ structure MTAST :> MTAST = struct
         (ToplevelProgn [], ctx)
 
     and monomorphizeDefun ctx name params rt body =
-        let fun mapParams params =
+        let fun mapParams ctx params =
                 Util.foldThread (fn (TAST.Param (var, ty), ctx) =>
                                     let val (ty', ctx) = monoType ctx Map.empty ty
                                     in
@@ -499,15 +499,12 @@ structure MTAST :> MTAST = struct
                                 params
                                 ctx
         in
-            let val (params', ctx) = mapParams params
+            let val (params', ctx) = mapParams ctx params
             in
                 let val (rt', ctx) = monoType ctx Map.empty rt
                 in
                     let val (body', ctx) = monomorphize ctx Map.empty body
                     in
-                        (* FIXME: putting the above monomorphize ctx body call
-                           above the mapParams call suppresses the generation of
-                           monomorphs. find out why. *)
                         let val node = Defun (name,
                                               params',
                                               rt',
