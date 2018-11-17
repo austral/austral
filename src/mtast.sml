@@ -128,7 +128,7 @@ structure MTAST :> MTAST = struct
 
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
-                     | DefdisjunctionMono of name * int * ty list
+                     | DefdatatypeMono of name * int * ty list
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
 
@@ -471,7 +471,7 @@ structure MTAST :> MTAST = struct
       | monomorphizeTop' ctx (TAST.Deftype (name, params, _, ty)) =
         (* Type aliases don't need to be compiled to anything *)
         (ToplevelProgn [], ctx)
-      | monomorphizeTop' ctx (TAST.Defdisjunction (name, params, _, variants)) =
+      | monomorphizeTop' ctx (TAST.Defdatatype (name, params, _, variants)) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Deftemplate _) =
         (ToplevelProgn [], ctx)
