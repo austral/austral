@@ -31,6 +31,7 @@ signature ALPHA = sig
                  | Variable of variable
                  | Let of variable * ast * ast
                  | Bind of variable list * ast * ast
+                 | Malloc of typespec * ast
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list

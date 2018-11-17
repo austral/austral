@@ -32,6 +32,7 @@ structure OAST :> OAST = struct
                  | Symbol of symbol
                  | Let of name * ast * ast
                  | Bind of name list * ast * ast
+                 | Malloc of typespec * ast
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
@@ -115,6 +116,8 @@ structure OAST :> OAST = struct
             transformLet args
         else if f = au "bind" then
             transformBind args
+        else if f = au "malloc" then
+            transformMalloc args
         else if f = au "the" then
             transformThe args
         else if f = Symbol.auKer "construct" then
@@ -161,6 +164,11 @@ structure OAST :> OAST = struct
         end
       | transformBind _ =
         raise Fail "Invalid `bind` form"
+
+    and transformMalloc [ty, len] =
+        Malloc (Type.parseTypespec ty, transform len)
+      | transformMalloc _ =
+        raise Fail "Invalid `malloc` form"
 
     and transformThe [ty, exp] =
         The (Type.parseTypespec ty, transform exp)

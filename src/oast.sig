@@ -30,6 +30,7 @@ signature OAST = sig
                  | Symbol of symbol
                  | Let of name * ast * ast
                  | Bind of name list * ast * ast
+                 | Malloc of typespec * ast
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
