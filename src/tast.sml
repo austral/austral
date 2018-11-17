@@ -119,7 +119,7 @@ structure TAST :> TAST = struct
                  (StaticArray ty) => Address ty
                | _ => raise Fail "Invalid type for ArrayPointer")
           | typeOf (Malloc (t, _)) =
-            t
+            Address t
           | typeOf (Load p) =
             (case typeOf p of
                  (PositiveAddress t) => t
