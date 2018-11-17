@@ -102,7 +102,7 @@ structure Module : MODULE = struct
                 "defun",
                 "defgeneric",
                 "deftype",
-                "defdisjunction",
+                "defdatatype",
                 "defclass",
                 "definstance",
                 "deftemplate",

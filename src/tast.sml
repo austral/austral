@@ -64,7 +64,7 @@ structure TAST :> TAST = struct
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
-                     | Defdisjunction of name * Type.typarams * docstring * Type.variant list
+                     | Defdatatype of name * Type.typarams * docstring * Type.variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -329,7 +329,7 @@ structure TAST :> TAST = struct
                 end
             end
           | augment (AST.Construct (typespec, label, exp)) c =
-            (* Three things: verify that the type is indeed a disjunction,
+            (* Three things: verify that the type is indeed a datatype,
                verify that the label is a valid variant name, and check that the
                expression (if the variant carries a value) is of the correct
                type. *)
@@ -358,23 +358,23 @@ structure TAST :> TAST = struct
                                           ^ ". Valid variant names for this type: \n  "
                                           ^ (String.concatWith "\n  " (map (fn (Variant (name, _)) => Symbol.toString name) variants))
                                           ^ "\n"))
-                  | _ => raise Fail "construct: not a disjunction"
+                  | _ => raise Fail "construct: not a datatype"
             end
           | augment (AST.Case (exp, cases)) c =
             (*
                Things we have to verify:
 
-               1. The type of exp is a disjunction.
+               1. The type of exp is a datatype.
 
                2. The set of case names in this expression is equal to the set
-                  of case names in the disjunction.
+                  of case names in the datatype.
 
                3. If a case name is a name without a binding, the corresponding
-                  case in the disjunction must not have a value associated to
+                  case in the datatype must not have a value associated to
                   it.
 
                4. If a case name has a binding, the corresponding case in the
-                  disjunction must have a value associated to it.
+                  datatype must have a value associated to it.
 
                5. All cases have the same type.
              *)
@@ -437,9 +437,9 @@ structure TAST :> TAST = struct
                                 end
                             end
                         else
-                            raise Fail "case: the set of case names in the disjunction is not equal to the set of case names in the expression"
+                            raise Fail "case: the set of case names in the datatype is not equal to the set of case names in the expression"
                     end
-                  | _ => raise Fail "case: the type of the expression is not a disjunction"
+                  | _ => raise Fail "case: the type of the expression is not a datatype"
             end
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
@@ -666,11 +666,11 @@ structure TAST :> TAST = struct
                      params,
                      docstring,
                      ty)
-      | augmentTop (DAST.Defdisjunction (name, params, docstring, variants)) tenv _ =
-        Defdisjunction (name,
-                        params,
-                        docstring,
-                        variants)
+      | augmentTop (DAST.Defdatatype (name, params, docstring, variants)) tenv _ =
+        Defdatatype (name,
+                     params,
+                     docstring,
+                     variants)
       | augmentTop (DAST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
       | augmentTop (DAST.DefineSymbolMacro (name, exp, docstring)) _ _ =

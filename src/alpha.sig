@@ -51,7 +51,7 @@ signature ALPHA = sig
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * param_name list * docstring * typespec
-                     | Defdisjunction of name * param_name list * docstring * variant list
+                     | Defdatatype of name * param_name list * docstring * variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list

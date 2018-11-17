@@ -30,7 +30,7 @@ structure DAST :> DAST = struct
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
-                     | Defdisjunction of name * Type.typarams * docstring * Type.variant list
+                     | Defdatatype of name * Type.typarams * docstring * Type.variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -112,7 +112,7 @@ structure DAST :> DAST = struct
                      docstring,
                      Type.resolve tenv (OrderedSet.toUnordered params') tys)
         end
-      | transformTop (AST.Defdisjunction (name, params, docstring, variants)) tenv _ =
+      | transformTop (AST.Defdatatype (name, params, docstring, variants)) tenv _ =
         let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
         in
             let fun mapVariant (AST.Variant (name, SOME tys)) =
@@ -120,10 +120,10 @@ structure DAST :> DAST = struct
                   | mapVariant (AST.Variant (name, NONE)) =
                     Type.Variant (name, NONE)
             in
-                Defdisjunction (name,
-                                params',
-                                docstring,
-                                map mapVariant variants)
+                Defdatatype (name,
+                             params',
+                             docstring,
+                             map mapVariant variants)
             end
         end
       | transformTop (AST.Deftemplate tmpl) _ _ =

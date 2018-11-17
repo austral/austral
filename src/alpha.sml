@@ -54,7 +54,7 @@ structure Alpha :> ALPHA = struct
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * param_name list * docstring * typespec
-                     | Defdisjunction of name * param_name list * docstring * variant list
+                     | Defdatatype of name * param_name list * docstring * variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -156,7 +156,7 @@ structure Alpha :> ALPHA = struct
         let val exp' = alphaRename s exp
         in
             let fun renameCase (OAST.VariantCase (OAST.NameOnly name, body)) =
-                    (* In this case, we only have the name of the disjunction's
+                    (* In this case, we only have the name of the datatypes's
                        case, so we don't have to define any bindings *)
                     VariantCase (NameOnly name, alphaRename s body)
                   | renameCase (OAST.VariantCase (OAST.NameBinding {casename, var}, body)) =
@@ -245,11 +245,11 @@ structure Alpha :> ALPHA = struct
                          methods)
       | transformTop' (OAST.Deftype tydef) =
         Deftype tydef
-      | transformTop' (OAST.Defdisjunction (name, typarams, docstring, variants)) =
-        Defdisjunction (name,
-                        typarams,
-                        docstring,
-                        map (fn (OAST.Variant v) => Variant v) variants)
+      | transformTop' (OAST.Defdatatype (name, typarams, docstring, variants)) =
+        Defdatatype (name,
+                     typarams,
+                     docstring,
+                     map (fn (OAST.Variant v) => Variant v) variants)
       | transformTop' (OAST.Deftemplate template) =
         Deftemplate template
       | transformTop' (OAST.DefineSymbolMacro mac) =

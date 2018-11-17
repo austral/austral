@@ -244,7 +244,7 @@ structure Compiler : COMPILER = struct
                 SOME tenv' => compilerFromTenv c tenv'
               | NONE => raise Fail "Duplicate type definition"
         end
-      | declareTopForm c (DAST.Defdisjunction (name, params, docstring, variants)) =
+      | declareTopForm c (DAST.Defdatatype (name, params, docstring, variants)) =
         let val tenv = compilerTenv c
         in
             case (Type.addDisjunction tenv (name, params, variants)) of

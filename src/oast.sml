@@ -52,7 +52,7 @@ structure OAST :> OAST = struct
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * param_name list * docstring * typespec
-                     | Defdisjunction of name * param_name list * docstring * variant list
+                     | Defdatatype of name * param_name list * docstring * variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -232,8 +232,8 @@ structure OAST :> OAST = struct
                 transformDefinstance args
             else if f = au "deftype" then
                 transformDeftype args
-            else if f = au "defdisjunction" then
-                transformDefdisjunction args
+            else if f = au "defdatatype" then
+                transformDefdatatype args
             else if f = au "deftemplate" then
                 transformDeftemplate args
             else if f = au "define-symbol-macro" then
@@ -415,7 +415,7 @@ structure OAST :> OAST = struct
         end
       | transformDeftype _ = raise Fail "Bad deftype form"
 
-    and transformDefdisjunction ((RCST.Symbol name)::(RCST.List params)::body) =
+    and transformDefdatatype ((RCST.Symbol name)::(RCST.List params)::body) =
         let fun parseBody ((RCST.StringConstant s)::def) =
                 (SOME (CST.escapedToString s), def)
               | parseBody def =
@@ -427,17 +427,17 @@ structure OAST :> OAST = struct
               | parseVariant (RCST.List [RCST.Symbol name]) =
                 Variant (name, NONE)
               | parseVariant _ =
-                raise Fail "defdisjunction: bad variant definition"
+                raise Fail "defdatatype: bad variant definition"
         in
             let val (docstring, variants) = parseBody body
             in
-                Defdisjunction (name,
-                                map parseParam params,
-                                docstring,
-                                map parseVariant variants)
+                Defdatatype (name,
+                             map parseParam params,
+                             docstring,
+                             map parseVariant variants)
             end
         end
-      | transformDefdisjunction _ = raise Fail "Bad defdisjunction form"
+      | transformDefdatatype _ = raise Fail "Bad defdatatype form"
 
     and transformDeftemplate ((RCST.Symbol name)::body) =
         raise Fail "deftemplate not implemented"
