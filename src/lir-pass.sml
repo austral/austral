@@ -157,6 +157,14 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.ArrayPointer arr, tt)
         end
+      | transformOperation tt (MIR.Malloc (ty, len)) =
+        let val (ty, tt) = transformType tt ty
+        in
+            let val (len, tt) = transformLenand tt len
+            in
+                (L.Malloc (ty, len), tt)
+            end
+        end
       | transformOperation tt (MIR.Load ptr) =
         let val (ptr, tt) = transformOperand tt ptr
         in
