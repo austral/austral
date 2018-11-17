@@ -317,7 +317,7 @@ structure CBackend :> C_BACKEND = struct
                        transformType ty,
                        C.Sequence (map transformInst insts),
                        transformOperand oper)
-      | transformTop (LIR.DefdisjunctionMono (name, id, tys)) =
+      | transformTop (LIR.DefdatatypeMono (name, id, tys)) =
         let val name = disjName name id
             and slots = Util.mapidx (fn (ty, idx) =>
                                         (transformType ty, tupleIdxName idx))
