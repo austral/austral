@@ -286,6 +286,17 @@ structure TAST :> TAST = struct
                   | _ => raise Fail "Argument to static-array-length not a static array"
 
             end
+          | augment (AST.Malloc (ty, len)) =
+            let val tenv = ctxTenv c
+            in
+                let val ty' = resolve tenv (ctxTyParams c) typespec
+                in
+                    let val len' = augment len c
+                    in
+                        Malloc (ty', len')
+                    end
+                end
+            end
           | augment (AST.Load e) c =
             let val e' = augment e c
             in
