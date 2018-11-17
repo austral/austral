@@ -149,6 +149,8 @@ structure Alpha :> ALPHA = struct
                 end
             end
         end
+      | alphaRename s (OAST.Malloc (ty, len)) =
+        Malloc (ty, alphaRename s len)
       | alphaRename s (OAST.The (ty, exp)) =
         The (ty, alphaRename s exp)
       | alphaRename s (OAST.Construct (ty, label, exp)) =
