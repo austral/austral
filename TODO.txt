@@ -1,5 +1,7 @@
 TODO:
 
+- usize alias
+- isize alias
 - Refactor: malloc builtin
 - Refactor: free builtin
 - Builtin to turn an address to a positive address
