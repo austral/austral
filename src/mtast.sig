@@ -41,6 +41,7 @@ signature MTAST = sig
                  | Allocate of ast
                  | Load of ast
                  | Store of ast * ast
+                 | The of ty * ast
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
