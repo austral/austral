@@ -5,14 +5,15 @@ TODO:
 - Builtin to turn an address to a positive address
 - malloc/load/store/free test
 - Separate type decl environment from datatype def environment
-
 - Lift static arrays to (length, ptr) tuples in the LIR pass
+
 - Expand monomorphs recursively
 - Augment method calls
 - Monomorphize method calls
 
 LONG-TERM TODO:
 
+- abort builtin
 - Define function pointer type
 - Define `function` operator
 - Static array constructors
