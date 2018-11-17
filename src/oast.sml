@@ -415,7 +415,7 @@ structure OAST :> OAST = struct
         end
       | transformDeftype _ = raise Fail "Bad deftype form"
 
-    and transformDefdisjunction ((RCST.Symbol name)::(RCST.List params)::body) =
+    and transformDefdatatype ((RCST.Symbol name)::(RCST.List params)::body) =
         let fun parseBody ((RCST.StringConstant s)::def) =
                 (SOME (CST.escapedToString s), def)
               | parseBody def =
@@ -427,17 +427,17 @@ structure OAST :> OAST = struct
               | parseVariant (RCST.List [RCST.Symbol name]) =
                 Variant (name, NONE)
               | parseVariant _ =
-                raise Fail "defdisjunction: bad variant definition"
+                raise Fail "defdatatype: bad variant definition"
         in
             let val (docstring, variants) = parseBody body
             in
-                Defdisjunction (name,
-                                map parseParam params,
-                                docstring,
-                                map parseVariant variants)
+                Defdatatype (name,
+                             map parseParam params,
+                             docstring,
+                             map parseVariant variants)
             end
         end
-      | transformDefdisjunction _ = raise Fail "Bad defdisjunction form"
+      | transformDefdatatype _ = raise Fail "Bad defdisjunction form"
 
     and transformDeftemplate ((RCST.Symbol name)::body) =
         raise Fail "deftemplate not implemented"
