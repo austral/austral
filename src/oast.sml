@@ -437,7 +437,7 @@ structure OAST :> OAST = struct
                              map parseVariant variants)
             end
         end
-      | transformDefdatatype _ = raise Fail "Bad defdisjunction form"
+      | transformDefdatatype _ = raise Fail "Bad defdatatype form"
 
     and transformDeftemplate ((RCST.Symbol name)::body) =
         raise Fail "deftemplate not implemented"
