@@ -6,7 +6,6 @@ TODO:
 - malloc/load/store/free test
 - Rename disjunctions to datatypes
 - Separate type decl environment from datatype def environment
-- `the` for float constants
 
 - Lift static arrays to (length, ptr) tuples in the LIR pass
 - Expand monomorphs recursively
@@ -181,3 +180,4 @@ DONE:
 - Refactor: load/store only work on PositiveAddress types
 - Compile defdisjunctions
 - Fully flatten the intermediate representation early on
+- `the` for float constants
