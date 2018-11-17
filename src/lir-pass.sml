@@ -160,7 +160,7 @@ structure LirPass :> LIR_PASS = struct
       | transformOperation tt (MIR.Malloc (ty, len)) =
         let val (ty, tt) = transformType tt ty
         in
-            let val (len, tt) = transformLenand tt len
+            let val (len, tt) = transformOperand tt len
             in
                 (L.Malloc (ty, len), tt)
             end
