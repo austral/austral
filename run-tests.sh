@@ -51,10 +51,10 @@ echo "compare.au"
 gcc test/valid/compare.c -o test/valid/compare.bin
 ./test/valid/compare.bin
 
-echo "defdisjunction.au"
-./boreal test/valid/defdisjunction.au --output=test/valid/defdisjunction.c --entrypoint=austral-user:main
-gcc test/valid/defdisjunction.c -o test/valid/defdisjunction.bin
-./test/valid/defdisjunction.bin
+echo "defdatatype.au"
+./boreal test/valid/defdatatype.au --output=test/valid/defdatatype.c --entrypoint=austral-user:main
+gcc test/valid/defdatatype.c -o test/valid/defdatatype.bin
+./test/valid/defdatatype.bin
 
 echo "bind.au"
 ./boreal test/valid/bind.au --output=test/valid/bind.c --entrypoint=austral-user:main
