@@ -159,6 +159,17 @@ structure MirPass :> MIR_PASS = struct
             (arrBlock @ [Assignment (result, ArrayPointer arr', ty)],
              RegisterOp result)
         end
+      | transform (HIR.Malloc (ty, len)) =
+        let val (lenBlock, len') = transform len
+            and result = freshRegister ()
+            and ty' = transformType ty
+        in
+            let val nodes = valBlock
+                            @ [Assignment (result, Malloc (ty', val'), ty')]
+            in
+                (nodes, RegisterOp result)
+            end
+        end
       | transform (HIR.Load ptr) =
         let val (ptrBlock, ptr') = transform ptr
             and result = freshRegister ()
