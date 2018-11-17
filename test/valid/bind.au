@@ -1,6 +1,6 @@
 ;; -*- mode: lisp -*-
 
 (defun main () i32
-  (let ((tup (tuple 0 3.14)))
-    (bind (a b) tup
+  (let ((tup (tuple 0 3.14 (the u64 10))))
+    (bind (a b c) tup
       a)))
