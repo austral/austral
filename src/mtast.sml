@@ -294,6 +294,14 @@ structure MTAST :> MTAST = struct
         in
             (ArrayPointer arr', ctx)
         end
+      | monomorphize ctx rs (TAST.Malloc (ty, len)) =
+        let val (ty', ctx) = monoType ctx rs ty
+        in
+            let val (len', ctx) = monomorphize ctx rs len
+            in
+                (Malloc (ty', len'), ctx)
+            end
+        end
       | monomorphize ctx rs (TAST.Load exp) =
         let val (exp', ctx) = monomorphize ctx rs exp
         in
