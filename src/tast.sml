@@ -437,9 +437,9 @@ structure TAST :> TAST = struct
                                 end
                             end
                         else
-                            raise Fail "case: the set of case names in the disjunction is not equal to the set of case names in the expression"
+                            raise Fail "case: the set of case names in the datatype is not equal to the set of case names in the expression"
                     end
-                  | _ => raise Fail "case: the type of the expression is not a disjunction"
+                  | _ => raise Fail "case: the type of the expression is not a datatype"
             end
           | augment (AST.SizeOf typespec) c =
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
@@ -666,11 +666,11 @@ structure TAST :> TAST = struct
                      params,
                      docstring,
                      ty)
-      | augmentTop (DAST.Defdisjunction (name, params, docstring, variants)) tenv _ =
-        Defdisjunction (name,
-                        params,
-                        docstring,
-                        variants)
+      | augmentTop (DAST.Defdatatype (name, params, docstring, variants)) tenv _ =
+        Defdatatype (name,
+                     params,
+                     docstring,
+                     variants)
       | augmentTop (DAST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
       | augmentTop (DAST.DefineSymbolMacro (name, exp, docstring)) _ _ =
