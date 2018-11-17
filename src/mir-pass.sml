@@ -164,8 +164,8 @@ structure MirPass :> MIR_PASS = struct
             and result = freshRegister ()
             and ty' = transformType ty
         in
-            let val nodes = valBlock
-                            @ [Assignment (result, Malloc (ty', val'), ty')]
+            let val nodes = lenBlock
+                            @ [Assignment (result, Malloc (ty', len'), ty')]
             in
                 (nodes, RegisterOp result)
             end
