@@ -97,6 +97,8 @@ structure HIR :> HIR = struct
         (case (typeOf arr) of
              (StaticArray ty) => Pointer ty
            | _ => raise Fail "Invalid type for ArrayPointer")
+      | typeOf (Malloc (t, _)) =
+        Pointer t
       | typeOf (Load p) =
         (case typeOf p of
              (Pointer t) => t
