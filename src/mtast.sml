@@ -291,11 +291,6 @@ structure MTAST :> MTAST = struct
         in
             (ArrayPointer arr', ctx)
         end
-      | monomorphize ctx rs (TAST.Allocate exp) =
-        let val (exp', ctx) = monomorphize ctx rs exp
-        in
-            (Allocate exp', ctx)
-        end
       | monomorphize ctx rs (TAST.Load exp) =
         let val (exp', ctx) = monomorphize ctx rs exp
         in
