@@ -94,8 +94,6 @@ structure MTAST :> MTAST = struct
             (case (typeOf arr) of
                  (StaticArray ty) => Address ty
                | _ => raise Fail "Invalid type for ArrayPointer")
-          | typeOf (Allocate v) =
-            Pointer (typeOf v)
           | typeOf (Load p) =
             (case typeOf p of
                  (Pointer t) => t
