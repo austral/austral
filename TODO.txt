@@ -1,7 +1,5 @@
 TODO:
 
-- usize alias
-- isize alias
 - Refactor: malloc builtin
 - Refactor: free builtin
 - Builtin to turn an address to a positive address
@@ -183,3 +181,5 @@ DONE:
 - Fully flatten the intermediate representation early on
 - `the` for float constants
 - Show symbol names in error messages
+- usize alias
+- isize alias
