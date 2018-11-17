@@ -95,6 +95,8 @@ structure AST :> AST = struct
         Let (var, transform value, transform body)
       | transform (Alpha.Bind (vars, tup, body)) =
         Bind (vars, transform tup, transform body)
+      | transform (Alpha.Malloc (ty, len)) =
+        Malloc (ty, transform len)
       | transform (Alpha.The (ty, exp)) =
         The (ty, transform exp)
       | transform (Alpha.Construct (ty, label, exp)) =
