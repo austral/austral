@@ -232,8 +232,8 @@ structure OAST :> OAST = struct
                 transformDefinstance args
             else if f = au "deftype" then
                 transformDeftype args
-            else if f = au "defdisjunction" then
-                transformDefdisjunction args
+            else if f = au "defdatatype" then
+                transformDefdatatype args
             else if f = au "deftemplate" then
                 transformDeftemplate args
             else if f = au "define-symbol-macro" then
