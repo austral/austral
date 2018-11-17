@@ -111,6 +111,8 @@ structure HirPass :> HIR_PASS = struct
         Load (transform exp)
       | transform (M.Store (ptr, value)) =
         Store (transform ptr, transform value)
+      | transform (M.The (ty, exp)) =
+        Cast (transformType ty, transform exp)
       | transform (M.Construct (ty, name, value)) =
         Construct (transformType ty,
                    caseNameIdx ty name,
