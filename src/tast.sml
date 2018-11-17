@@ -36,7 +36,6 @@ structure TAST :> TAST = struct
                  | TupleProj of ast * int
                  | ArrayLength of ast
                  | ArrayPointer of ast
-                 | Allocate of ast
                  | Load of ast
                  | Store of ast * ast
                  | The of ty * ast
