@@ -117,8 +117,6 @@ structure TAST :> TAST = struct
             (case (typeOf arr) of
                  (StaticArray ty) => Address ty
                | _ => raise Fail "Invalid type for ArrayPointer")
-          | typeOf (Allocate v) =
-            Pointer (typeOf v)
           | typeOf (Load p) =
             (case typeOf p of
                  (PositiveAddress t) => t
@@ -285,8 +283,6 @@ structure TAST :> TAST = struct
                   | _ => raise Fail "Argument to static-array-length not a static array"
 
             end
-          | augment (AST.Allocate v) c =
-            Allocate (augment v c)
           | augment (AST.Load e) c =
             let val e' = augment e c
             in
