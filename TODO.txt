@@ -4,7 +4,6 @@ TODO:
 - Refactor: free builtin
 - Builtin to turn an address to a positive address
 - malloc/load/store/free test
-- Rename disjunctions to datatypes
 - Separate type decl environment from datatype def environment
 
 - Lift static arrays to (length, ptr) tuples in the LIR pass
@@ -183,3 +182,4 @@ DONE:
 - Show symbol names in error messages
 - usize alias
 - isize alias
+- Rename disjunctions to datatypes
