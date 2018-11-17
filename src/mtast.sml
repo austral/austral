@@ -103,6 +103,8 @@ structure MTAST :> MTAST = struct
                | _ => raise Fail "Not a pointer")
           | typeOf (Store (_, v)) =
             typeOf v
+          | typeOf (The (t, _)) =
+            t
           | typeOf (Construct (t, _, _)) =
             t
           | typeOf (Case (_, _, t)) =
@@ -310,13 +312,13 @@ structure MTAST :> MTAST = struct
                 (Store (ptr', value'), ctx)
             end
         end
-      | monomorphize ctx rs (TAST.The (_, exp)) =
-        (* The MTAST doesn't have a case for `the` expressions. Since type
-           checking is done at the TAST level, we don't need one. We ignore the
-           provided type and monomorphize the expression. *)
-        let val (exp', ctx) = monomorphize ctx rs exp
+      | monomorphize ctx rs (TAST.The (ty, exp)) =
+        let val (ty', ctx) = monoType ctx rs ty
         in
-            (exp', ctx)
+            let val (exp', ctx) = monomorphize ctx rs exp
+            in
+                (The (ty', exp'), ctx)
+            end
         end
       | monomorphize ctx rs (TAST.Construct (ty, name, expOpt)) =
         let val (ty', ctx) = monoType ctx rs ty
