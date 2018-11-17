@@ -1,11 +1,11 @@
 ;; -*- mode: lisp -*-
 
-(defdisjunction color ()
+(defdatatype color ()
   (red)
   (green)
   (blue))
 
-(defdisjunction int-or-bool ()
+(defdatatype int-or-bool ()
   (int-case i32)
   (bool-case boolean))
 

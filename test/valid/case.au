@@ -1,6 +1,6 @@
 ;; -*- mode: lisp -*-
 
-(defdisjunction color ()
+(defdatatype color ()
   (red)
   (green)
   (blue))
