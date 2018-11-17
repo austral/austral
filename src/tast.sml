@@ -319,6 +319,10 @@ structure TAST :> TAST = struct
                                                    The (ty, augment exp c)
                                                else
                                                    raise Fail "Bad types for `the`"
+                      | (AST.FloatConstant f) => if isFloat ty then
+                                                     The (ty, augment exp c)
+                                                 else
+                                                     raise Fail "Bad types for `the`"
                       | (AST.Funcall (name, args)) => augmentFuncall name args c (SOME ty)
                       | e => let val exp' = augment exp c
                              in
