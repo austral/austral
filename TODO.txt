@@ -23,7 +23,6 @@ LONG-TERM TODO:
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
 - Parse nested comments
-- Show symbol names in error messages
 - Better error messages
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
@@ -181,3 +180,4 @@ DONE:
 - Compile defdisjunctions
 - Fully flatten the intermediate representation early on
 - `the` for float constants
+- Show symbol names in error messages
