@@ -64,7 +64,7 @@ structure AST :> AST = struct
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * name list * docstring * typespec
-                     | Defdisjunction of name * name list * docstring * variant list
+                     | Defdatatype of name * name list * docstring * variant list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -268,11 +268,11 @@ structure AST :> AST = struct
                          methods)
       | transformTop (Alpha.Deftype tydef) =
         Deftype tydef
-      | transformTop (Alpha.Defdisjunction (name, typarams, docstring, variants)) =
-        Defdisjunction (name,
-                        typarams,
-                        docstring,
-                        map (fn (Alpha.Variant v) => Variant v) variants)
+      | transformTop (Alpha.Defdatatype (name, typarams, docstring, variants)) =
+        Defdatatype (name,
+                     typarams,
+                     docstring,
+                     map (fn (Alpha.Variant v) => Variant v) variants)
       | transformTop (Alpha.Deftemplate template) =
         Deftemplate template
       | transformTop (Alpha.DefineSymbolMacro mac) =
