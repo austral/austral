@@ -183,6 +183,8 @@ structure AST :> AST = struct
             else if f = au "static-array-length" then
                 transformSArrayLength args
            (* Pointers *)
+            else if f = "malloc" then
+                transformMalloc args
             else if f = au "load" then
                 transformLoad args
             else if f = au "store" then
@@ -223,6 +225,11 @@ structure AST :> AST = struct
         StaticArrayLength arr
       | transformSArrayLength _ =
         raise Fail "Bad static-array-length form"
+
+    and transformMalloc [ty, len] =
+        Malloc (ty, len)
+      | transformMalloc _ =
+        raise Fail "Bad malloc form"
 
     and transformLoad [ptr] =
         Load ptr
