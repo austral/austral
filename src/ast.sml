@@ -37,7 +37,6 @@ structure AST :> AST = struct
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | StaticArrayLength of ast
-                 | Allocate of ast
                  | Load of ast
                  | Store of ast * ast
                  | The of Type.typespec * ast
