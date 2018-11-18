@@ -185,10 +185,10 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.ForeignFuncall (name, args), tt)
         end
-      | transformOperation tt (MIR.ForeignNull ty) =
+      | transformOperation tt (MIR.NullPointer ty) =
         let val (ty, tt) = transformType tt ty
         in
-            (L.ForeignNull ty, tt)
+            (L.NullPointer ty, tt)
         end
       | transformOperation tt (MIR.SizeOf ty) =
         let val (ty, tt) = transformType tt ty
