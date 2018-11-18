@@ -178,13 +178,6 @@ structure CBackend :> C_BACKEND = struct
         raise Fail "array length: Not implemented yet"
       | transform (LIR.ArrayPointer arr) ty =
         raise Fail "array pointer: Not implemented yet"
-      | transform (LIR.Malloc (ty, len)) _ =
-        let val ty = transformType ty
-            and len = transformOperand len
-        in
-            C.Cast (C.Pointer ty,
-                    C.Funcall ("malloc", [C.Binop (C.Mul, len, C.SizeOf ty)]))
-        end
       | transform (LIR.Load ptr) _ =
         C.Deref (transformOperand ptr)
       | transform (LIR.Construct (ty, id, SOME value)) _ =
