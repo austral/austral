@@ -182,7 +182,7 @@ structure CBackend :> C_BACKEND = struct
         let val ty = transformType ty
             and len = transformOperand len
         in
-            C.Cast (ty,
+            C.Cast (C.Pointer ty,
                     C.Funcall ("malloc", [C.Binop (C.Mul, len, C.SizeOf ty)]))
         end
       | transform (LIR.Load ptr) _ =
