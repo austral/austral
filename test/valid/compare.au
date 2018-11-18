@@ -3,6 +3,6 @@
 (defun main () i32
   (austral.kernel:eq true true)
   (austral.kernel:eq 0 0)
-  (austral.kernel:eq (austral.ext.cffi:null-pointer i32)
-                     (austral.ext.cffi:null-pointer i32))
+  (austral.kernel:eq (null-pointer i32)
+                     (null-pointer i32))
   0)
