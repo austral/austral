@@ -37,7 +37,7 @@ structure Alpha :> ALPHA = struct
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
-                 | ForeignNull of typespec
+                 | NullPointer of typespec
                  | SizeOf of typespec
                  | AddressOf of variable
                  | Cast of typespec * ast
@@ -178,8 +178,8 @@ structure Alpha :> ALPHA = struct
                       map renameCase cases)
             end
         end
-      | alphaRename s (OAST.ForeignNull ty) =
-        ForeignNull ty
+      | alphaRename s (OAST.NullPointer ty) =
+        NullPointer ty
       | alphaRename s (OAST.SizeOf ty) =
         SizeOf ty
       | alphaRename s (OAST.AddressOf name) =
