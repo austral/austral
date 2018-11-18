@@ -42,6 +42,7 @@ structure MTAST :> MTAST = struct
                  | Free of ast
                  | Load of ast
                  | Store of ast * ast
+                 | CoerceAddress of ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
