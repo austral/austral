@@ -161,8 +161,8 @@ structure HirPass :> HIR_PASS = struct
         end
       | transform (M.ForeignFuncall (name, args, ty)) =
         ForeignFuncall (name, map transform args, transformType ty)
-      | transform (M.ForeignNull ty) =
-        ForeignNull (transformType ty)
+      | transform (M.NullPointer ty) =
+        NullPointer (transformType ty)
       | transform (M.SizeOf ty) =
         SizeOf (transformType ty)
       | transform (M.AddressOf (var, ty)) =
