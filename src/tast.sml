@@ -37,6 +37,7 @@ structure TAST :> TAST = struct
                  | ArrayLength of ast
                  | ArrayPointer of ast
                  | Malloc of ty * ast
+                 | Free of ast
                  | Load of ast
                  | Store of ast * ast
                  | The of ty * ast
