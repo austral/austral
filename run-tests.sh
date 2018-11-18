@@ -41,6 +41,11 @@ echo "size-of.au"
 ./boreal test/valid/size-of.au --output=test/valid/size-of.c
 gcc -c test/valid/size-of.c -o test/valid/size-of.bin
 
+echo "memory.au"
+./boreal test/valid/memory.au --output=test/valid/memory.c --entrypoint=austral-user:main
+gcc test/valid/memory.c -o test/valid/memory.bin
+./test/valid/memory.bin
+
 # echo "cffi.au"
 # ./boreal test/valid/cffi.au --output=test/valid/cffi.cpp --entrypoint=cffi-test:main
 # clang++ -std=c++11 test/valid/cffi.cpp -o test/valid/cffi.bin

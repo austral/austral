@@ -1,0 +1,5 @@
+;; -*- mode: lisp -*-
+
+(defun test () i32
+  (let ((addr (malloc i32 1)))
+    0))
