@@ -1,5 +1,6 @@
 TODO:
 
+- Null pointer builtin
 - Builtin to turn an address to a positive address
 - malloc/load/store/free test
 - load-nth builtin
