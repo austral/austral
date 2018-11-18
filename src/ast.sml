@@ -44,7 +44,7 @@ structure AST :> AST = struct
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
-                 | ForeignNull of typespec
+                 | NullPointer of typespec
                  | SizeOf of typespec
                  | AddressOf of Symbol.variable
                  | Cast of typespec * ast
@@ -112,8 +112,8 @@ structure AST :> AST = struct
         in
             Case (transform exp, map transformCase cases)
         end
-      | transform (Alpha.ForeignNull ty) =
-        ForeignNull ty
+      | transform (Alpha.NullPointer ty) =
+        NullPointer ty
       | transform (Alpha.SizeOf tys) =
         SizeOf tys
       | transform (Alpha.AddressOf var) =
