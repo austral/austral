@@ -173,17 +173,13 @@ structure MirPass :> MIR_PASS = struct
       | transform (HIR.Store (ptr, value)) =
         let val (ptrBlock, ptr') = transform ptr
             and (valBlock, val') = transform value
-            and result = freshRegister ()
-            and ty = transformType (HIR.typeOf ptr)
         in
             let val nodes = ptrBlock
                             @ valBlock
                             @ [Store { ptr = ptr',
-                                       value = val',
-                                       result = result,
-                                       ty = ty }]
+                                       value = val' }]
             in
-                (nodes, RegisterOp result)
+                (nodes, RegisterOp val')
             end
         end
       | transform (HIR.Construct (ty, caseId, SOME value)) =
