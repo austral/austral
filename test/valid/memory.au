@@ -5,4 +5,5 @@
     (if (austral.kernel:eq addr (null-pointer i32))
         -1
         (let ((paddress (austral.kernel:paddress addr)))
-          0))))
+          (store paddress 0)
+          (load paddress)))))
