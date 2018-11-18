@@ -47,7 +47,6 @@ structure LIR :> LIR = struct
                        | TupleProj of operand * int
                        | ArrayLength of operand
                        | ArrayPointer of operand
-                       | Malloc of ty * operand
                        | Load of operand
                        | Construct of ty * int * operand option
                        | UnsafeExtractCase of operand * int
