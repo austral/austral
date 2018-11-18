@@ -36,6 +36,7 @@ signature AST = sig
                  | TupleProj of ast * int
                  | StaticArrayLength of ast
                  | Malloc of typespec * ast
+                 | Free of ast
                  | Load of ast
                  | Store of ast * ast
                  | The of Type.typespec * ast
