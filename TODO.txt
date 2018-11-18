@@ -1,6 +1,5 @@
 TODO:
 
-- Null pointer builtin
 - Builtin to turn an address to a positive address
 - malloc/load/store/free test
 - load-nth builtin
@@ -186,3 +185,4 @@ DONE:
 - Rename disjunctions to datatypes
 - Refactor: malloc builtin
 - Refactor: free builtin
+- Null pointer builtin
