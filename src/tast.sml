@@ -334,6 +334,13 @@ structure TAST :> TAST = struct
                                          end
                   | _ => raise Fail "store: first argument must be a positive address"
             end
+          | augment (AST.CoerceAddress addr) c =
+            let val addr' = augment addr c
+            in
+                case typeOf addr' of
+                    (Address t) => CoerceAddress addr'
+                  | _ => raise Fail "bad paddress form: not an address"
+            end
           | augment (AST.The (typespec, exp)) c =
             let val tenv = ctxTenv c
             in
