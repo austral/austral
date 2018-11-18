@@ -47,7 +47,6 @@ structure HIR :> HIR = struct
                  | TupleProj of ast * int
                  | ArrayLength of ast
                  | ArrayPointer of ast
-                 | Malloc of ty * ast
                  | Load of ast
                  | Store of ast * ast
                  | Construct of ty * int * ast option
