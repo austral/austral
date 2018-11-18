@@ -42,6 +42,7 @@ structure AST :> AST = struct
                  | Free of ast
                  | Load of ast
                  | Store of ast * ast
+                 | CoerceAddress of ast
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
