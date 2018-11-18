@@ -96,6 +96,7 @@ structure Module : MODULE = struct
                 "tuple",
                 "proj",
                 "static-array-length",
+                "null-pointer",
                 "malloc",
                 "free",
                 "allocate",
