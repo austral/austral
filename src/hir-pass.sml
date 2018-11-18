@@ -108,7 +108,7 @@ structure HirPass :> HIR_PASS = struct
       | transform (M.Malloc (ty, len)) =
         Malloc (transformType ty, transform len)
       | transform (M.Free ptr) =
-        Seq (ForeignFuncall ("free", transform ptr), UnitConstant)
+        ForeignFuncall ("free", [transform ptr], Unit)
       | transform (M.Load exp) =
         Load (transform exp)
       | transform (M.Store (ptr, value)) =
