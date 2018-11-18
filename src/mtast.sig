@@ -46,7 +46,7 @@ signature MTAST = sig
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
-                 | ForeignNull of ty
+                 | NullPointer of ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast

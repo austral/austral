@@ -46,7 +46,7 @@ structure MTAST :> MTAST = struct
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
-                 | ForeignNull of ty
+                 | NullPointer of ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
@@ -120,7 +120,7 @@ structure MTAST :> MTAST = struct
             ty
           | typeOf (ForeignFuncall (_, _, rt)) =
             rt
-          | typeOf (ForeignNull ty) =
+          | typeOf (NullPointer ty) =
             Address ty
           | typeOf (Seq (_, v)) =
             typeOf v
@@ -385,10 +385,10 @@ structure MTAST :> MTAST = struct
                 (ForeignFuncall (name, args', ty'), ctx)
             end
         end
-      | monomorphize ctx rs (TAST.ForeignNull ty) =
+      | monomorphize ctx rs (TAST.NullPointer ty) =
         let val (ty', ctx) = monoType ctx rs ty
         in
-            (ForeignNull ty', ctx)
+            (NullPointer ty', ctx)
         end
       | monomorphize ctx rs (TAST.SizeOf ty) =
         let val (ty', ctx) = monoType ctx rs ty
