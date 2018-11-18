@@ -270,15 +270,11 @@ structure CBackend :> C_BACKEND = struct
                        ])
             ]
         end
-      | transformInst (LIR.Store { ptr, value, result, ty}) =
+      | transformInst (LIR.Store { ptr, value }) =
         let val ptr' = transformOperand ptr
             and value' = transformOperand value
-            and ty' = transformType ty
         in
-            C.Sequence [
-                C.Assign (C.Deref ptr', value'),
-                C.DeclareAssign (ty', regName result, value')
-            ]
+            C.Assign (C.Deref ptr', value')
         end
       | transformInst (LIR.Case (oper, variants, result, ty)) =
         let val oper' = transformOperand oper
