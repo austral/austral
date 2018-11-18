@@ -305,6 +305,11 @@ structure MTAST :> MTAST = struct
                 (Malloc (ty', len'), ctx)
             end
         end
+      | monomorphize ctx rs (TAST.Free ptr) =
+        let val ptr' = monomorphize ctx rs ptr
+        in
+            (Free ptr', ctx)
+        end
       | monomorphize ctx rs (TAST.Load exp) =
         let val (exp', ctx) = monomorphize ctx rs exp
         in
