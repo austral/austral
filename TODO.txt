@@ -1,6 +1,5 @@
 TODO:
 
-- Builtin to turn an address to a positive address
 - malloc/load/store/free test
 - load-nth builtin
 - Separate type decl environment from datatype def environment
@@ -186,3 +185,4 @@ DONE:
 - Refactor: malloc builtin
 - Refactor: free builtin
 - Null pointer builtin
+- Builtin to turn an address to a positive address
