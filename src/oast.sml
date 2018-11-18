@@ -36,7 +36,7 @@ structure OAST :> OAST = struct
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
-                 | ForeignNull of typespec
+                 | NullPointer of typespec
                  | SizeOf of typespec
                  | AddressOf of name
                  | Cast of typespec * ast
@@ -124,8 +124,8 @@ structure OAST :> OAST = struct
             transformConstruct args
         else if f = au "case" then
             transformCase args
-        else if f = Symbol.auCffi "null-pointer" then
-            transformForeignNull args
+        else if f = Symbol.au "null-pointer" then
+            transformNullPointer args
         else if f = Symbol.auCffi "size-of" then
             transformSizeOf args
         else if f = Symbol.auCffi "address-of" then
@@ -201,9 +201,9 @@ structure OAST :> OAST = struct
       | parseCaseName _ =
         raise Fail "Invalid case name in a `case` form"
 
-    and transformForeignNull [tys] =
-        ForeignNull (Type.parseTypespec tys)
-      | transformForeignNull _ =
+    and transformNullPointer [tys] =
+        NullPointer (Type.parseTypespec tys)
+      | transformNullPointer _ =
         raise Fail "Invalid `null-pointer` form"
 
     and transformSizeOf [tys] =

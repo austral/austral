@@ -34,7 +34,7 @@ signature OAST = sig
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
-                 | ForeignNull of typespec
+                 | NullPointer of typespec
                  | SizeOf of typespec
                  | AddressOf of name
                  | Cast of typespec * ast
