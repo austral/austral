@@ -265,19 +265,14 @@ structure LirPass :> LIR_PASS = struct
                 end
             end
         end
-      | transformInstruction tt (MIR.Store { ptr, value, result, ty }) =
+      | transformInstruction tt (MIR.Store { ptr, value }) =
         let val (ptr, tt) = transformOperand tt ptr
         in
             let val (value, tt) = transformOperand tt value
             in
-                let val (ty, tt) = transformType tt ty
-                in
-                    (L.Store { ptr = ptr,
-                               value = value,
-                               result = result,
-                               ty = ty },
-                     tt)
-                end
+                (L.Store { ptr = ptr,
+                           value = value },
+                 tt)
             end
         end
       | transformInstruction tt (MIR.Case (oper, variants, register, ty)) =
