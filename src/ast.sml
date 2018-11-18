@@ -37,6 +37,7 @@ structure AST :> AST = struct
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | StaticArrayLength of ast
+                 | NullPointer of typespec
                  | Malloc of typespec * ast
                  | Free of ast
                  | Load of ast
@@ -44,7 +45,6 @@ structure AST :> AST = struct
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
-                 | NullPointer of typespec
                  | SizeOf of typespec
                  | AddressOf of Symbol.variable
                  | Cast of typespec * ast
