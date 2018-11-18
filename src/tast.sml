@@ -44,7 +44,7 @@ structure TAST :> TAST = struct
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
-                 | ForeignNull of ty
+                 | NullPointer of ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
@@ -143,7 +143,7 @@ structure TAST :> TAST = struct
             ty
           | typeOf (ForeignFuncall (_, _, rt)) =
             rt
-          | typeOf (ForeignNull ty) =
+          | typeOf (NullPointer ty) =
             Address ty
           | typeOf (Seq (_, v)) =
             typeOf v
@@ -473,8 +473,8 @@ structure TAST :> TAST = struct
                  (SOME (Binding (ty, Mutable))) => AddressOf (name, Address ty)
                | (SOME (Binding (ty, Immutable))) => raise Fail ("address-of: the variable " ^ (Symbol.varToString name) ^ " must be mutable to take its address.")
                | NONE => raise Fail ("No such variable: " ^ (Symbol.varToString name)))
-          | augment (AST.ForeignNull typespec) c =
-            ForeignNull (resolve (ctxTenv c) (ctxTyParams c) typespec)
+          | augment (AST.NullPointer typespec) c =
+            NullPointer (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.Cast (typespec, exp)) c =
             let val ty = (resolve (ctxTenv c) (ctxTyParams c) typespec)
                 and exp' = augment exp c
