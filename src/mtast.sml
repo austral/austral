@@ -306,7 +306,7 @@ structure MTAST :> MTAST = struct
             end
         end
       | monomorphize ctx rs (TAST.Free ptr) =
-        let val ptr' = monomorphize ctx rs ptr
+        let val (ptr', ctx) = monomorphize ctx rs ptr
         in
             (Free ptr', ctx)
         end
