@@ -107,6 +107,10 @@ structure MTAST :> MTAST = struct
                | _ => raise Fail "Not a pointer")
           | typeOf (Store (_, v)) =
             typeOf v
+          | typeOf (CoerceAddress addr) =
+            (case typeOf addr of
+                 (Address t) => PositiveAddress t
+               | _ => raise Fail "Not an address")
           | typeOf (The (t, _)) =
             t
           | typeOf (Construct (t, _, _)) =
