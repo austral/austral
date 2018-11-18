@@ -328,6 +328,11 @@ structure MTAST :> MTAST = struct
                 (Store (ptr', value'), ctx)
             end
         end
+      | monomorphize ctx rs (TAST.CoerceAddress addr) =
+        let val (addr', ctx) = monomorphize ctx rs addr
+        in
+            (CoerceAddress addr', ctx)
+        end
       | monomorphize ctx rs (TAST.The (ty, exp)) =
         let val (ty', ctx) = monoType ctx rs ty
         in
