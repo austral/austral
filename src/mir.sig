@@ -51,7 +51,7 @@ signature MIR = sig
                        | Construct of ty * int * operand option
                        | UnsafeExtractCase of operand * int
                        | ForeignFuncall of string * operand list
-                       | ForeignNull of ty
+                       | NullPointer of ty
                        | SizeOf of ty
                        | AddressOf of Symbol.variable
                        | Cast of ty * operand

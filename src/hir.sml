@@ -53,7 +53,7 @@ structure HIR :> HIR = struct
                  | Case of ast * variant_case list * ty
                  | UnsafeExtractCase of ast * int * ty
                  | ForeignFuncall of string * ast list * ty
-                 | ForeignNull of ty
+                 | NullPointer of ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
@@ -116,7 +116,7 @@ structure HIR :> HIR = struct
         ty
       | typeOf (ForeignFuncall (_, _, rt)) =
         rt
-      | typeOf (ForeignNull ty) =
+      | typeOf (NullPointer ty) =
         Pointer ty
       | typeOf (Seq (_, v)) =
         typeOf v

@@ -53,7 +53,7 @@ signature HIR = sig
                  | Case of ast * variant_case list * ty
                  | UnsafeExtractCase of ast * int * ty
                  | ForeignFuncall of string * ast list * ty
-                 | ForeignNull of ty
+                 | NullPointer of ty
                  | SizeOf of ty
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
