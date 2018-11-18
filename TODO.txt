@@ -1,6 +1,5 @@
 TODO:
 
-- Refactor: free builtin
 - Builtin to turn an address to a positive address
 - malloc/load/store/free test
 - load-nth builtin
@@ -185,3 +184,4 @@ DONE:
 - isize alias
 - Rename disjunctions to datatypes
 - Refactor: malloc builtin
+- Refactor: free builtin
