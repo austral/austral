@@ -217,11 +217,11 @@ structure MirPass :> MIR_PASS = struct
              (* The function returns void, so we have to handle it especially. *)
              HIR.Unit => transformVoidForeignFuncall name args
            | _ => transformForeignFuncall name args rt)
-      | transform (HIR.ForeignNull ty) =
+      | transform (HIR.NullPointer ty) =
         let val result = freshRegister ()
-            and ty' = transformType (HIR.typeOf (HIR.ForeignNull ty))
+            and ty' = transformType (HIR.typeOf (HIR.NullPointer ty))
         in
-            let val nodes = [Assignment (result, ForeignNull (transformType ty), ty')]
+            let val nodes = [Assignment (result, NullPointer (transformType ty), ty')]
             in
                 (nodes, RegisterOp result)
             end
