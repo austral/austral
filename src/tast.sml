@@ -300,6 +300,11 @@ structure TAST :> TAST = struct
                     end
                 end
             end
+          | augment (AST.Free ptr) c =
+            let val ptr' = augment ptr c
+            in
+                Free ptr'
+            end
           | augment (AST.Load e) c =
             let val e' = augment e c
             in
