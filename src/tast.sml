@@ -296,7 +296,10 @@ structure TAST :> TAST = struct
                 in
                     let val len' = augment len c
                     in
-                        Malloc (ty', len')
+                        if typeOf len' = sizeType then
+                            Malloc (ty', len')
+                        else
+                            raise Fail "Invalid type for malloc length argument"
                     end
                 end
             end
