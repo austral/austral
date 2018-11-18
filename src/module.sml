@@ -134,7 +134,8 @@ structure Module : MODULE = struct
                 "<=",
                 ">",
                 ">=",
-                "construct"
+                "construct",
+                "paddress"
             ]
             and cffiExports = [
                 "&rest",
