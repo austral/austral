@@ -123,6 +123,11 @@ structure HirPass :> HIR_PASS = struct
         Load (transform exp)
       | transform (M.Store (ptr, value)) =
         Store (transform ptr, transform value)
+      | transform (M.CoerceAddress addr) =
+        let val ty = transformType (M.typeOf (M.CoerceAddress addr))
+        in
+            Cast (ty, transform addr)
+        end
       | transform (M.The (ty, exp)) =
         Cast (transformType ty, transform exp)
       | transform (M.Construct (ty, name, value)) =
