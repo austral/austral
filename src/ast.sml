@@ -187,6 +187,8 @@ structure AST :> AST = struct
             else if f = au "static-array-length" then
                 transformSArrayLength args
            (* Pointers *)
+            else if f = auKer "paddress" then
+                transformCoerceAddress args
             else if f = au "free" then
                 transformFree args
             else if f = au "load" then
@@ -229,6 +231,11 @@ structure AST :> AST = struct
         StaticArrayLength arr
       | transformSArrayLength _ =
         raise Fail "Bad static-array-length form"
+
+    and transformCoerceAddress [addr] =
+        CoerceAddress addr
+      | transformCoerceAddress _ =
+        raise Fail "Bad paddress form"
 
     and transformFree [ptr] =
         Free ptr
