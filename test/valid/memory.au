@@ -4,4 +4,5 @@
   (let ((addr (malloc i32 (the usize 1))))
     (if (austral.kernel:eq addr (null-pointer i32))
         -1
-        0)))
+        (let ((paddress (austral.kernel:paddress addr)))
+          0))))
