@@ -179,7 +179,7 @@ structure MirPass :> MIR_PASS = struct
                             @ [Store { ptr = ptr',
                                        value = val' }]
             in
-                (nodes, RegisterOp val')
+                (nodes, val')
             end
         end
       | transform (HIR.Construct (ty, caseId, SOME value)) =
