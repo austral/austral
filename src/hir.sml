@@ -49,6 +49,7 @@ structure HIR :> HIR = struct
                  | ArrayPointer of ast
                  | Load of ast
                  | Store of ast * ast
+                 | AddressOffset of ast * ast
                  | Construct of ty * int * ast option
                  | Case of ast * variant_case list * ty
                  | UnsafeExtractCase of ast * int * ty
@@ -102,6 +103,8 @@ structure HIR :> HIR = struct
            | _ => raise Fail "Internal compiler error: Not a pointer")
       | typeOf (Store (p, _)) =
         typeOf p
+      | typeOf (AddressOffset (addr, _)) =
+        typeOf addr
       | typeOf (Construct (t, _, _)) =
         t
       | typeOf (Case (_, _, t)) =
