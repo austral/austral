@@ -24,9 +24,9 @@ gcc test/valid/tuple.c -o test/valid/tuple.bin
 #./boreal test/valid/class.au --output=test/valid/class.c
 # clang++ -shared -fPIC -std=c++11 test/valid/class.cpp
 
-# echo "string.au"
-# ./boreal test/valid/string.au --output=test/valid/string.cpp
-# clang++ -shared -fPIC -std=c++11 test/valid/string.cpp
+echo "string.au"
+./boreal test/valid/string.au --output=test/valid/string.c
+gcc test/valid/string.c
 
 # echo "hello-world.au"
 # ./boreal test/valid/hello-world.au --output=test/valid/hello-world.cpp
