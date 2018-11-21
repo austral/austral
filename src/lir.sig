@@ -27,7 +27,6 @@ signature LIR = sig
                 | Float of Type.float_type
                 | Tuple of int
                 | Pointer of ty
-                | StaticArray of ty
                 | Disjunction of name * int
 
     (* AST *)
