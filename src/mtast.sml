@@ -43,6 +43,7 @@ structure MTAST :> MTAST = struct
                  | Load of ast
                  | Store of ast * ast
                  | CoerceAddress of ast
+                 | AddressOffset of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
@@ -111,6 +112,8 @@ structure MTAST :> MTAST = struct
             (case typeOf addr of
                  (Address t) => PositiveAddress t
                | _ => raise Fail "Not an address")
+          | typeOf (AddressOffset (addr, _)) =
+            typeOf addr
           | typeOf (The (t, _)) =
             t
           | typeOf (Construct (t, _, _)) =
@@ -332,6 +335,14 @@ structure MTAST :> MTAST = struct
         let val (addr', ctx) = monomorphize ctx rs addr
         in
             (CoerceAddress addr', ctx)
+        end
+      | monomorphize ctx rs (TAST.AddressOffset (addr, offset)) =
+        let val (addr', ctx) = monomorphize ctx rs addr
+        in
+            let val (offset', ctx) = monomorphize ctx rs offset
+            in
+                (AddressOffset (addr', offset'), ctx)
+            end
         end
       | monomorphize ctx rs (TAST.The (ty, exp)) =
         let val (ty', ctx) = monoType ctx rs ty
