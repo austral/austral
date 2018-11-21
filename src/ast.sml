@@ -43,6 +43,7 @@ structure AST :> AST = struct
                  | Load of ast
                  | Store of ast * ast
                  | CoerceAddress of ast
+                 | AddressOffset of ast * ast
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
                  | Case of ast * variant_case list
@@ -189,6 +190,8 @@ structure AST :> AST = struct
            (* Pointers *)
             else if f = auKer "paddress" then
                 transformCoerceAddress args
+            else if f = au "address-ofsset" then
+                transformAddressOffset args
             else if f = au "free" then
                 transformFree args
             else if f = au "load" then
@@ -236,6 +239,11 @@ structure AST :> AST = struct
         CoerceAddress addr
       | transformCoerceAddress _ =
         raise Fail "Bad paddress form"
+
+    and transformAddressOffset [addr, offset] =
+        AddressOffset (addr, offset)
+      | transformAddressOffset _ =
+        raise Fail "Bad `address-offset` form"
 
     and transformFree [ptr] =
         Free ptr
