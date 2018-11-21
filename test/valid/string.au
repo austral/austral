@@ -2,6 +2,6 @@
 
 (defun main () i32
   (let ((len (static-array-length "test")))
-    (if (austral.kernel:> len 0)
+    (if (austral.kernel:> len (the usize 0))
         0
         -1)))
