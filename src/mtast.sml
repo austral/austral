@@ -96,7 +96,7 @@ structure MTAST :> MTAST = struct
             Integer (Type.Unsigned, Type.Int64)
           | typeOf (ArrayPointer arr) =
             (case (typeOf arr) of
-                 (StaticArray ty) => Address ty
+                 (StaticArray ty) => PositiveAddress ty
                | _ => raise Fail "Invalid type for ArrayPointer")
           | typeOf (Malloc (t, _)) =
             Address t
