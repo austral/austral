@@ -172,10 +172,6 @@ structure CBackend :> C_BACKEND = struct
         end
       | transform (LIR.TupleProj (tup, idx)) _ =
         C.StructAccess (transformOperand tup, tupleIdxName idx)
-      | transform (LIR.ArrayLength arr) ty =
-        raise Fail "array length: Not implemented yet"
-      | transform (LIR.ArrayPointer arr) ty =
-        raise Fail "array pointer: Not implemented yet"
       | transform (LIR.Load ptr) _ =
         C.Deref (transformOperand ptr)
       | transform (LIR.AddressOffset (addr, offset)) _ =
