@@ -49,6 +49,7 @@ signature HIR = sig
                  | ArrayPointer of ast
                  | Load of ast
                  | Store of ast * ast
+                 | AddressOffset of ast * ast
                  | Construct of ty * int * ast option
                  | Case of ast * variant_case list * ty
                  | UnsafeExtractCase of ast * int * ty
