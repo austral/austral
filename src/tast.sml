@@ -297,6 +297,14 @@ structure TAST :> TAST = struct
                   | _ => raise Fail "Argument to static-array-length not a static array"
 
             end
+          | augment (AST.StaticArrayPointer arr) c =
+            let val arr' = augment arr c
+            in
+                case typeOf arr' of
+                    (StaticArray _) => ArrayPointer arr'
+                  | _ => raise Fail "Argument to static-array-pointer not a static array"
+
+            end
           | augment (AST.Malloc (ty, len)) c =
             let val tenv = ctxTenv c
             in
