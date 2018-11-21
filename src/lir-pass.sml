@@ -122,9 +122,7 @@ structure LirPass :> LIR_PASS = struct
         in
             let val (ty', tt) = addTuple tt tys'
             in
-                case ty' of
-                    (L.Tuple id) => (L.StringConstant (s, id), tt)
-                  | _ => raise Fail "Internal compiler error"
+                (L.StringConstant (s, ty), tt)
             end
         end
       | transformOperand tt (MIR.RegisterOp r) =
