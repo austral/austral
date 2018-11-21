@@ -180,6 +180,12 @@ structure CBackend :> C_BACKEND = struct
         raise Fail "array pointer: Not implemented yet"
       | transform (LIR.Load ptr) _ =
         C.Deref (transformOperand ptr)
+      | transform (LIR.AddressOffset (addr, offset)) _ =
+        let val addr' = transformOperand addr
+            and offset' = transformOperand offset
+        in
+            C.AddressOf (C.ArrayIndex (addr', offset'))
+        end
       | transform (LIR.Construct (ty, id, SOME value)) _ =
         (* Disjunction constructors are compiled to a structure initializer *)
         C.StructInitializer (transformType ty,
