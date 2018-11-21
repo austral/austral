@@ -1,5 +1,8 @@
 TODO:
 
+- Linearity: extract all bindings out of an expression
+- Linearity: count appearances of bindings in expressions
+
 - Separate type decl environment from datatype def environment
 - Lift static arrays to (length, ptr) tuples in the LIR pass
 
@@ -20,8 +23,6 @@ LONG-TERM TODO:
 - Error on phantom type parameters in a type alias
 - Parse nested comments
 - Better error messages
-- Linearity: extract all bindings out of an expression
-- Linearity: count appearances of bindings in expressions
 - Separate IRs from passes
 
 - Define an integer-cast thing to cast integers or some such
