@@ -7,11 +7,11 @@ TODO:
 - Separate type decl environment from datatype def environment
 
 - Expand monomorphs recursively
-- Augment method calls
-- Monomorphize method calls
 
 LONG-TERM TODO:
 
+- Augment method calls
+- Monomorphize method calls
 - abort builtin
 - Define function pointer type
 - Define `function` operator
