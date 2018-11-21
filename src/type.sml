@@ -275,6 +275,11 @@ structure Type :> TYPE = struct
       | resolveAddress _ _ _ =
         raise Fail "Bad address type specifier"
 
+    and resolvePAddress tenv params [typespec] =
+        PositiveAddress (resolve tenv params typespec)
+      | resolvePAddress _ _ _ =
+        raise Fail "Bad paddress type specifier"
+
     and replaceVariant m (Variant (name, SOME ty)) =
         Variant (name, SOME (replaceVars m ty))
       | replaceVariant _ (Variant (name, NONE)) =
