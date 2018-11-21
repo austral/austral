@@ -186,3 +186,4 @@ DONE:
 - Builtin to turn an address to a positive address
 - malloc/load/store/free test
 - address-offset builtin
+- test address-offset
