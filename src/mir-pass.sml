@@ -182,6 +182,19 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, val')
             end
         end
+      | transform (HIR.AddressOffset (addr, offset)) =
+        let val (addrBlock, addr') = transform addr
+            and (offsetBlock, offset') = transform offset
+            and result = freshRegister ()
+            and ty = transformType (HIR.typeOf addr)
+        in
+            let val nodes = addrBlock
+                            @ offsetBlock
+                            @ [Assignment (result, AddressOffset (addr', offset'), ty)]
+            in
+                (nodes, RegisterOp result)
+            end
+        end
       | transform (HIR.Construct (ty, caseId, SOME value)) =
         let val (valBlock, value') = transform value
             and result = freshRegister ()
