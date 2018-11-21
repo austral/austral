@@ -29,9 +29,10 @@ echo "string.au"
 gcc test/valid/string.c -o test/valid/string.bin
 ./test/valid/string.bin
 
-# echo "hello-world.au"
-# ./boreal test/valid/hello-world.au --output=test/valid/hello-world.cpp
-# clang++ -shared -fPIC -std=c++11 test/valid/hello-world.cpp
+echo "hello-world.au"
+./boreal test/valid/hello-world.au --output=test/valid/hello-world.c --entrypoint=austral-user:main
+gcc test/valid/hello-world.c -o test/valid/hello-world.bin
+./test/valid/hello-world.bin
 
 echo "generic.au"
 ./boreal test/valid/generic.au --output=test/valid/generic.c --entrypoint=austral-user:main
