@@ -111,6 +111,8 @@ structure CRenderer :> C_RENDERER = struct
         "*" ^ (renderExp e)
       | renderExp (C.AddressOf e) =
         "&" ^ (renderExp e)
+      | renderExp (C.ArrayIndex (a, i)) =
+        (renderExp a) ^ "[" ^ (renderExp i) ^ "]"
       | renderExp (C.SizeOf t) =
         "sizeof(" ^ (renderType t) ^ ")"
       | renderExp (C.StructInitializer (ty, inits)) =
