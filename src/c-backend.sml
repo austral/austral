@@ -133,7 +133,7 @@ structure CBackend :> C_BACKEND = struct
         C.Cast (transformType ty, C.FloatConstant f)
       | transformOperand (LIR.StringConstant (s, id)) =
         C.StructInitializer (tupleName id, [
-            ("_0", C.IntConstant (Int.toString (String.size (CST.escapedToString s))))
+            ("_0", C.IntConstant (Int.toString (String.size (CST.escapedToString s)))),
             ("_1", C.StringConstant (CST.unescapeString s))
         ])
       | transformOperand (LIR.RegisterOp r) =
