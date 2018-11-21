@@ -2,6 +2,7 @@ TODO:
 
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
+- Warn when not using the result value of a progn (any expression with type other than unit)
 
 - Separate type decl environment from datatype def environment
 - Lift static arrays to (length, ptr) tuples in the LIR pass
@@ -42,8 +43,6 @@ LONG-TERM TODO:
 - Implement static-array constructor
 - Lift static array constructors to global constants
 - Verify if an expression is a valid static array element
-- Bind standalone expressions to unused variables to suppress warnings
-- Warn when not using the result value of a progn (any expression with type other than unit)
 - Prelude: equality and comparison instances
 
 DONE:
