@@ -131,8 +131,8 @@ structure CBackend :> C_BACKEND = struct
         C.Cast (transformType ty, C.IntConstant i)
       | transformOperand (LIR.FloatConstant (f, ty)) =
         C.Cast (transformType ty, C.FloatConstant f)
-      | transformOperand (LIR.StringConstant (s, ty)) =
-        C.StructInitializer (transformType ty, [
+      | transformOperand (LIR.StringConstant (s, id)) =
+        C.StructInitializer (tupleName id, [
             ("_0", C.IntConstant (Int.toString (String.size (CST.escapedToString s))))
             ("_1", C.StringConstant (CST.unescapeString s))
         ])
