@@ -190,7 +190,7 @@ structure AST :> AST = struct
            (* Pointers *)
             else if f = auKer "paddress" then
                 transformCoerceAddress args
-            else if f = au "address-ofsset" then
+            else if f = au "address-offset" then
                 transformAddressOffset args
             else if f = au "free" then
                 transformFree args
