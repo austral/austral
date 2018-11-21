@@ -35,6 +35,7 @@ signature AST = sig
                  | TupleCreate of ast list
                  | TupleProj of ast * int
                  | StaticArrayLength of ast
+                 | StaticArrayPointer of ast
                  | NullPointer of typespec
                  | Malloc of typespec * ast
                  | Free of ast
