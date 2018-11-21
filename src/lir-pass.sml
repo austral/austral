@@ -115,7 +115,16 @@ structure LirPass :> LIR_PASS = struct
             (L.FloatConstant (f, ty), tt)
         end
       | transformOperand tt (MIR.StringConstant s) =
-        (L.StringConstant s, tt)
+        let val (tys', tt) = transformTypes tt [
+                    MIR.Integer (Type.Unsigned, Type.Int64),
+                    MIR.Pointer (MIR.Integer (Type.Unsigned, Type.Int8))
+                ]
+        in
+            let val (ty', tt) = addTuple tt tys'
+            in
+                (L.StringConstant (s, ty'), tt)
+            end
+        end
       | transformOperand tt (MIR.RegisterOp r) =
         (L.RegisterOp r, tt)
       | transformOperand tt (MIR.VariableOp (var, ty)) =
