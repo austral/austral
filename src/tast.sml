@@ -627,7 +627,10 @@ structure TAST :> TAST = struct
 
                     and checkArg (argument, (Function.Param (_, ty))) =
                         if (typeOf argument) <> ty then
-                            raise Fail "Foreign funcall: type mismatch"
+                            raise Fail ("Foreign funcall: type mismatch. Parameter type: "
+                                        ^ (Type.toString ty)
+                                        ^ ", argument type: "
+                                        ^ (Type.toString (typeOf argument)))
                         else
                             argument
                 in
