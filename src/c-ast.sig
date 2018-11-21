@@ -34,6 +34,7 @@ signature C_AST = sig
                      | Cast of ty * exp_ast
                      | Deref of exp_ast
                      | AddressOf of exp_ast
+                     | ArrayIndex of exp_ast * exp_ast
                      | SizeOf of ty
                      | StructInitializer of ty * (string * exp_ast) list
                      | StructAccess of exp_ast * string
