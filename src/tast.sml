@@ -576,12 +576,13 @@ structure TAST :> TAST = struct
                 let fun augmentArg value =
                         let val value' = augment value c
                         in
-                            if validType (typeOf value') then
+                            if validArgType (typeOf value') then
                                 case typeOf value' of
                                     (StaticArray t) => ArrayPointer value'
                                   | _ => value'
                             else
-                                raise Fail "Type is not valid for a foreign funcall"
+                                raise Fail ("Type is not valid for a foreign funcall argument: "
+                                            ^ (Type.toString (typeOf value')))
                         end
 
                     and validArgType (Type.Integer _) = true
