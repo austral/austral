@@ -185,10 +185,10 @@ structure AST :> AST = struct
                 TupleCreate (args)
             else if f = au "proj" then
                 transformProj args
-           (* Arrays *)
+            (* Arrays *)
             else if f = au "static-array-length" then
                 transformSArrayLength args
-           (* Pointers *)
+            (* Pointers *)
             else if f = auKer "paddress" then
                 transformCoerceAddress args
             else if f = au "address-offset" then
