@@ -98,8 +98,6 @@ structure CBackend :> C_BACKEND = struct
         C.NamedType (tupleName id)
       | transformType (LIR.Pointer t) =
         C.Pointer (transformType t)
-      | transformType (LIR.StaticArray t) =
-        raise Fail "Static arrays not implemented yet"
       | transformType (LIR.Disjunction (name, id)) =
         C.NamedType (disjName name id)
 
