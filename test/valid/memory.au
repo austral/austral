@@ -6,8 +6,11 @@
         -1
         (let ((paddress (austral.kernel:paddress addr)))
           (store paddress 10)
-          (store (address-offset paddress 1) 20)
+          (store (address-offset paddress (the usize 1)) 20)
           (let ((val (load paddress)))
             (if (austral.kernel:eq val 10)
-                0
+                (if (austral.kernel:eq (load (address-offset paddress (the usize 1)))
+                                       20)
+                    0
+                    -1)
                 -1))))))
