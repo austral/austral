@@ -584,11 +584,12 @@ structure TAST :> TAST = struct
                                 raise Fail "Type is not valid for a foreign funcall"
                         end
 
-                    and validType (Type.Integer _) = true
-                      | validType (Type.Float _) = true
-                      | validType (Type.Address _) = true
-                      | validType (Type.StaticArray _) = true
-                      | validType _ = false
+                    and validArgType (Type.Integer _) = true
+                      | validArgType (Type.Float _) = true
+                      | validArgType (Type.Address _) = true
+                      | validArgType (Type.PositiveAddress _) = true
+                      | validArgType (Type.StaticArray _) = true
+                      | validArgType _ = false
 
                     and checkArgs arglist =
                         case arity of
