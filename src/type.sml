@@ -225,6 +225,8 @@ structure Type :> TYPE = struct
             resolveStaticArray tenv params tyargs
         else if name = Symbol.au "address" then
             resolveAddress tenv params tyargs
+        else if name = Symbol.au "paddress" then
+            resolvePAddress tenv params tyargs
         else
             if Set.isIn params (TypeParam name) then
                 TypeVariable name
