@@ -5,7 +5,6 @@ TODO:
 - Warn when not using the result value of a progn (any expression with type other than unit)
 
 - Separate type decl environment from datatype def environment
-- Lift static arrays to (length, ptr) tuples in the LIR pass
 
 - Expand monomorphs recursively
 - Augment method calls
@@ -187,3 +186,4 @@ DONE:
 - malloc/load/store/free test
 - address-offset builtin
 - test address-offset
+- Lift static arrays to (length, ptr) tuples in the LIR pass
