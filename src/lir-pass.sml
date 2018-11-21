@@ -162,6 +162,14 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.Load ptr, tt)
         end
+      | transformOperation tt (MIR.AddressOffset (addr, offset)) =
+        let val (addr, tt) = transformOperand tt addr
+        in
+            let val (offset, tt) = transformOperand tt offset
+            in
+                (L.AddressOffset (addr, offset), tt)
+            end
+        end
       | transformOperation tt (MIR.Construct (ty, id, SOME oper)) =
         let val (ty, tt) = transformType tt ty
         in
