@@ -41,6 +41,7 @@ structure TAST :> TAST = struct
                  | Load of ast
                  | Store of ast * ast
                  | CoerceAddress of ast
+                 | AddressOffset of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
@@ -134,6 +135,8 @@ structure TAST :> TAST = struct
             (case typeOf addr of
                  (Address t) => PositiveAddress t
                | _ => raise Fail "Not an address")
+          | typeOf (AddressOffset (addr, _)) =
+            typeOf addr
           | typeOf (The (t, _)) =
             t
           | typeOf (Construct (t, _, _)) =
@@ -340,6 +343,19 @@ structure TAST :> TAST = struct
                 case typeOf addr' of
                     (Address t) => CoerceAddress addr'
                   | _ => raise Fail "bad paddress form: not an address"
+            end
+          | augment (AST.AddressOffset (addr, offset)) c =
+            let val addr' = augment addr c
+            in
+                let val offset' = augment offset c
+                in
+                    case typeOf addr' of
+                        (PositiveAddress _) => if typeOf offset' = sizeType then
+                                                   AddressOffset (addr', offset')
+                                               else
+                                                   raise Fail "address-offset: offset value is not of type usize"
+                      | _ => raise Fail "address-offset: first argument is not a positive address"
+                end
             end
           | augment (AST.The (typespec, exp)) c =
             let val tenv = ctxTenv c
