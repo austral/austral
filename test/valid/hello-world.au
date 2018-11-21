@@ -1,4 +1,7 @@
 ;; -*- mode: lisp -*-
 
+(austral.ext.cffi:defcfun (puts "puts") ((ptr (paddress u8))) i32)
+
 (defun main () i32
-  (austral.ext.cffi:foreign-funcall "puts" i32 "Hello, world!"))
+  (puts "Hello, world!")
+  0)
