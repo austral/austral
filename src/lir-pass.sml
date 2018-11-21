@@ -122,7 +122,7 @@ structure LirPass :> LIR_PASS = struct
         in
             let val (ty', tt) = addTuple tt tys'
             in
-                (L.StringConstant (s, ty), tt)
+                (L.StringConstant (s, ty'), tt)
             end
         end
       | transformOperand tt (MIR.RegisterOp r) =
