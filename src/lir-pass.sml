@@ -84,9 +84,12 @@ structure LirPass :> LIR_PASS = struct
             (L.Pointer t', tt)
         end
       | transformType tt (MIR.StaticArray t) =
-        let val (t', tt) = transformType tt t
+        let val (tys', tt) = transformTypes tt [
+                    MIR.Integer (Type.Unsigned, Type.Int64),
+                    MIR.Pointer t
+                ]
         in
-            addTuple tt [sizeType, t']
+            addTuple tt tys'
         end
       | transformType tt (MIR.Disjunction (name, id)) =
         (L.Disjunction (name, id), tt)
