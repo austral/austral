@@ -127,6 +127,8 @@ structure Module : MODULE = struct
                 "isize",
                 "f32",
                 "f64",
+                "address",
+                "paddress",
                 "static-array"
             ]
             and kernelExports = [
