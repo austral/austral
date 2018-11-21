@@ -1,6 +1,5 @@
 TODO:
 
-- load-nth builtin
 - Separate type decl environment from datatype def environment
 - Lift static arrays to (length, ptr) tuples in the LIR pass
 
@@ -186,3 +185,4 @@ DONE:
 - Null pointer builtin
 - Builtin to turn an address to a positive address
 - malloc/load/store/free test
+- address-offset builtin
