@@ -43,6 +43,7 @@ signature MTAST = sig
                  | Load of ast
                  | Store of ast * ast
                  | CoerceAddress of ast
+                 | AddressOffset of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
                  | Case of ast * variant_case list * ty
