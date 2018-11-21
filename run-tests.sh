@@ -26,7 +26,8 @@ gcc test/valid/tuple.c -o test/valid/tuple.bin
 
 echo "string.au"
 ./boreal test/valid/string.au --output=test/valid/string.c
-gcc test/valid/string.c
+gcc test/valid/string.c -o test/valid/string.bin
+./test/valid/string.bin
 
 # echo "hello-world.au"
 # ./boreal test/valid/hello-world.au --output=test/valid/hello-world.cpp
