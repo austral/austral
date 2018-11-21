@@ -153,7 +153,7 @@ structure LirPass :> LIR_PASS = struct
       | transformOperation tt (MIR.ArrayLength arr) =
         let val (arr, tt) = transformOperand tt arr
         in
-            (L.ArrayLength arr, tt)
+            (L.TupleProj (arr, 0), tt)
         end
       | transformOperation tt (MIR.ArrayPointer arr) =
         let val (arr, tt) = transformOperand tt arr
