@@ -131,8 +131,11 @@ structure CBackend :> C_BACKEND = struct
         C.Cast (transformType ty, C.IntConstant i)
       | transformOperand (LIR.FloatConstant (f, ty)) =
         C.Cast (transformType ty, C.FloatConstant f)
-      | transformOperand (LIR.StringConstant s) =
-        C.StringConstant (CST.unescapeString s)
+      | transformOperand (LIR.StringConstant (s, ty)) =
+        C.StructInitializer (transformType ty) [
+            ("_0", C.IntConstant (Int.toString (String.length (CST.escapedToString s))))
+            ("_1", C.StringConstant (CST.unescapeString s))
+        ]
       | transformOperand (LIR.RegisterOp r) =
         C.Variable (regName r)
       | transformOperand (LIR.VariableOp (var, _)) =
