@@ -36,7 +36,7 @@ signature LIR = sig
     datatype operand = BoolConstant of bool
                      | IntConstant of string * ty
                      | FloatConstant of string * ty
-                     | StringConstant of CST.escaped_string * int
+                     | StringConstant of CST.escaped_string * ty
                      | RegisterOp of register
                      | VariableOp of Symbol.variable * ty
 
