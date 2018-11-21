@@ -48,6 +48,7 @@ structure MIR :> MIR = struct
                        | ArrayLength of operand
                        | ArrayPointer of operand
                        | Load of operand
+                       | AddressOffset of operand * operand
                        | Construct of ty * int * operand option
                        | UnsafeExtractCase of operand * int
                        | ForeignFuncall of string * operand list
