@@ -44,8 +44,6 @@ signature LIR = sig
                        | CompOp of Builtin.comp_op * operand * operand
                        | TupleCreate of operand list
                        | TupleProj of operand * int
-                       | ArrayLength of operand
-                       | ArrayPointer of operand
                        | Load of operand
                        | AddressOffset of operand * operand
                        | Construct of ty * int * operand option
