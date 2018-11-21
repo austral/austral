@@ -1,11 +1,12 @@
 ;; -*- mode: lisp -*-
 
 (defun main () i32
-  (let ((addr (malloc i32 (the usize 1))))
+  (let ((addr (malloc i32 (the usize 2))))
     (if (austral.kernel:eq addr (null-pointer i32))
         -1
         (let ((paddress (austral.kernel:paddress addr)))
           (store paddress 10)
+          (store (address-offset paddress 1) 20)
           (let ((val (load paddress)))
             (if (austral.kernel:eq val 10)
                 0
