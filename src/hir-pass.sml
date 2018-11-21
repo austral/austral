@@ -128,6 +128,8 @@ structure HirPass :> HIR_PASS = struct
         in
             Cast (ty, transform addr)
         end
+      | transform (M.AddressOffset (addr, offset)) =
+        AddressOffset (transform addr, transform offset)
       | transform (M.The (ty, exp)) =
         Cast (transformType ty, transform exp)
       | transform (M.Construct (ty, name, value)) =
