@@ -144,7 +144,8 @@ structure Module : MODULE = struct
             ]
             and cffiExports = [
                 "&rest",
-                "defcfun"
+                "defcfun",
+                "address-of"
             ]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
