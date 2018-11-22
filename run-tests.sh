@@ -73,7 +73,7 @@ echo "case.au"
 gcc test/valid/case.c -o test/valid/case.bin
 ./test/valid/case.bin
 
-# echo "sqlite3.au"
-# ./boreal test/valid/sqlite3.au --output=test/valid/sqlite3.cpp --entrypoint=sqlite3-test:main
-# clang++ -std=c++11 test/valid/sqlite3.cpp -o test/valid/sqlite3.bin
-# ./test/valid/sqlite3.bin
+echo "sqlite3.au"
+./boreal test/valid/sqlite3.au --output=test/valid/sqlite3.c --entrypoint=sqlite3-test:main
+gcc test/valid/sqlite3.c -o test/valid/sqlite3.bin -lsqlite3
+./test/valid/sqlite3.bin
