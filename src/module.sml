@@ -104,6 +104,7 @@ structure Module : MODULE = struct
                 "load",
                 "store",
                 "address-offset",
+                "size-of",
                 "defun",
                 "defgeneric",
                 "deftype",
