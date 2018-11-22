@@ -143,15 +143,7 @@ structure Module : MODULE = struct
             ]
             and cffiExports = [
                 "&rest",
-                "defcfun",
-                "foreign-pointer",
-                "size-of",
-                "malloc",
-                "free",
-                "null-pointer",
-                "null?",
-                "address-of",
-                "cast"
+                "defcfun"
             ]
         in
             let val australMod = Module (Ident.mkIdentEx "austral",
