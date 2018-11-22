@@ -126,7 +126,7 @@ structure OAST :> OAST = struct
             transformCase args
         else if f = Symbol.au "null-pointer" then
             transformNullPointer args
-        else if f = Symbol.auCffi "size-of" then
+        else if f = Symbol.au "size-of" then
             transformSizeOf args
         else if f = Symbol.auCffi "address-of" then
             transformAddressOf args
