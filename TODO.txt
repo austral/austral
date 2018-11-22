@@ -1,5 +1,6 @@
 TODO:
 
+- Define constructor generic functions for datatypes
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
 - Warn when not using the result value of a progn (any expression with type other than unit)
