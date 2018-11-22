@@ -373,6 +373,11 @@ structure MirPass :> MIR_PASS = struct
         MIR.DefdatatypeMono (name,
                              id,
                              map transformType tys)
+      | transformTop (HIR.Defcfun (rawname, tys, arity, rt)) =
+        Defcfun (rawname,
+                 map transformType tys,
+                 arity,
+                 transformType rt)
       | transformTop (HIR.ToplevelProgn nodes) =
         MIR.ToplevelProgn (map transformTop nodes)
 
