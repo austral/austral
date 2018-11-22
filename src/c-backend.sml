@@ -334,6 +334,12 @@ structure CBackend :> C_BACKEND = struct
                                                  (transformType ty, tupleIdxName idx))
                                              tys))
         end
+      | transformTop (LIR.Defcfun (rawname, tys, arity, rt)) =
+        let val tys' = map transformType tys
+            and rt' = transformType rt
+        in
+            C.ExternFunctionDecl (rawname, tys', arity, rt')
+        end
       | transformTop (LIR.ToplevelProgn nodes) =
         C.ToplevelProgn (map transformTop nodes)
 
