@@ -253,7 +253,7 @@ structure OAST :> OAST = struct
             else if f = Symbol.auCffi "defcfun" then
                 transformDefcfun args
             else
-                raise Fail "Unknown toplevel form"
+                raise Fail ("Unknown toplevel form: " ^ (Symbol.toString f))
         end
 
     and transformDefun ((RCST.Symbol name)::params::rt::body) =
