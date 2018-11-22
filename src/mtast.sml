@@ -143,6 +143,7 @@ structure MTAST :> MTAST = struct
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
                      | DefdatatypeMono of name * int * ty list
+                     | Defcfun of name * string * param list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
 
@@ -521,36 +522,44 @@ structure MTAST :> MTAST = struct
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.InModule _) =
         (ToplevelProgn [], ctx)
-      | monomorphizeTop' ctx (TAST.Defcfun _) =
-        (ToplevelProgn [], ctx)
+      | monomorphizeTop' ctx (TAST.Defcfun (name, rawname, params, arity, rt, _)) =
+        monomorphizeDefcfun ctx name rawname params arity rt
 
     and monomorphizeDefun ctx name params rt body =
-        let fun mapParams ctx params =
-                Util.foldThread (fn (TAST.Param (var, ty), ctx) =>
+        let val (params', ctx) = mapParams ctx params
+        in
+            let val (rt', ctx) = monoType ctx Map.empty rt
+            in
+                let val (body', ctx) = monomorphize ctx Map.empty body
+                in
+                    let val node = Defun (name,
+                                          params',
+                                          rt',
+                                          body')
+                    in
+                        (node, ctx)
+                    end
+                end
+            end
+        end
+
+    and monomorphizeDefcfun ctx name rawname params arity rt =
+        let val (params', ctx) = mapParams ctx params
+        in
+            let val (rt', ctx) = monoType ctx Map.empty rt
+            in
+                (Defcfun (name, rawname, params', arity, rt'), ctx)
+            end
+        end
+
+    and mapParams ctx params =
+        Util.foldThread (fn (TAST.Param (var, ty), ctx) =>
                                     let val (ty', ctx) = monoType ctx Map.empty ty
                                     in
                                         (Param (var, ty'), ctx)
                                     end)
                                 params
                                 ctx
-        in
-            let val (params', ctx) = mapParams ctx params
-            in
-                let val (rt', ctx) = monoType ctx Map.empty rt
-                in
-                    let val (body', ctx) = monomorphize ctx Map.empty body
-                    in
-                        let val node = Defun (name,
-                                              params',
-                                              rt',
-                                              body')
-                        in
-                            (node, ctx)
-                        end
-                    end
-                end
-            end
-        end
 
     and monomorphizeTop fenv fdefenv ctx node =
         let val (node, ctx') = monomorphizeTop' ctx node
