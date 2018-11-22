@@ -2,17 +2,17 @@
 (defmodule sqlite3-test
   (:use :austral)
   (:import-from :austral.ext.cffi
-                :foreign-funcall
-                :foreign-pointer
-                :malloc
-                :free
-                :null-pointer
-                :null?
-                :address-of))
+                :defcfun))
 (in-module :sqlite3-test)
+
+(defcfun (sqlite3-open "sqlite3_open") ((path (paddress u8))
+                                        (pointer (paddress (address u8))))
+  i32)
 
 (defun main () i32
   (let ((handle (null-pointer u8)))
-    (let ((open-rc (foreign-funcall "sqlite3_open" i32 ":memory:" (address-of handle))))
-      ))
-  0)
+    (let ((open-rc (sqlite3-open (static-array-pointer ":memory:")
+                                 (address-of handle))))
+      (if (austral.kernel:eq open-rc 0)
+          0
+          -1))))
