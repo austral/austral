@@ -23,7 +23,6 @@ LONG-TERM TODO:
 - Parse nested comments
 - Better error messages
 - Separate IRs from passes
-
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
 - Parse deftemplate declarations
@@ -35,9 +34,7 @@ LONG-TERM TODO:
 - Function and*
 - Function or*
 - Bitwise operators
-
 - Runtime support for saturation arithmetic
-
 - Implement static-array constructor
 - Lift static array constructors to global constants
 - Verify if an expression is a valid static array element
