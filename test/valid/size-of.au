@@ -1,4 +1,4 @@
 ;; -*- mode: lisp -*-
 
 (defun size-of-i32 () u64
-  (austral.ext.cffi:size-of i32))
+  (size-of i32))
