@@ -12,5 +12,5 @@ graph TB
     TAST --> |Monomorphization|MTAST
     MTAST --> HIR
     HIR --> |Data linearization|MIR
-    MIR --> |Flow linearization|LIR
-    LIR --> LLVM
+    MIR --> |Lifting tuples|LIR
+    LIR --> C
