@@ -1,19 +1,17 @@
 TODO:
 
+- Separate type decl environment from datatype def environment
 - Define constructor generic functions for datatypes
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
 - Warn when not using the result value of a progn (any expression with type other than unit)
-
-- Separate type decl environment from datatype def environment
-
 - Expand monomorphs recursively
+- abort builtin
 
 LONG-TERM TODO:
 
 - Augment method calls
 - Monomorphize method calls
-- abort builtin
 - Define function pointer type
 - Define `function` operator
 - Static array constructors
