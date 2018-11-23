@@ -146,7 +146,7 @@ structure TAST :> TAST = struct
           | typeOf (SizeOf _) =
             Integer (Unsigned, Int64)
           | typeOf (AddressOf (_, ty)) =
-            PositiveAddress ty
+            ty
           | typeOf (Cast (ty, _)) =
             ty
           | typeOf (ForeignFuncall (_, _, rt)) =
@@ -506,7 +506,7 @@ structure TAST :> TAST = struct
             SizeOf (resolve (ctxTenv c) (ctxTyParams c) typespec)
           | augment (AST.AddressOf name) c =
             (case (Map.get (ctxBindings c) name) of
-                 (SOME (Binding (ty, Mutable))) => AddressOf (name, Address ty)
+                 (SOME (Binding (ty, Mutable))) => AddressOf (name, PositiveAddress ty)
                | (SOME (Binding (ty, Immutable))) => raise Fail ("address-of: the variable " ^ (Symbol.varToString name) ^ " must be mutable to take its address.")
                | NONE => raise Fail ("No such variable: " ^ (Symbol.varToString name)))
           | augment (AST.NullPointer typespec) c =
