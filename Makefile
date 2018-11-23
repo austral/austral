@@ -3,15 +3,15 @@ SMLFLAGS := -Cprint.depth=30
 
 MLTON := mlton
 
-CM_FILE := boreal.cm
-MLB_FILE := boreal.mlb
-MLB_EXE_FILE := boreal-exe.mlb
+CM_FILE := austral.cm
+MLB_FILE := austral.mlb
+MLB_EXE_FILE := austral-exe.mlb
 
-CM_TEST_FILE := boreal-test.cm
-MLB_TEST_FILE := boreal-test.mlb
-TEST_BIN := boreal-test
+CM_TEST_FILE := austral-test.cm
+MLB_TEST_FILE := austral-test.mlb
+TEST_BIN := austral-test
 
-BIN = boreal
+BIN = austral
 
 C_RUNTIME_SRC := src/runtime.c
 C_RUNTIME_SCRIPT := runtime.awk
