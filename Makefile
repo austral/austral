@@ -69,5 +69,5 @@ clean:
 	if [ -f $(DOCS_HTML) ]; then rm $(DOCS_HTML); fi
 	if [ -f $(DOCS_ARCH_PNG) ]; then rm $(DOCS_ARCH_PNG); fi
 	if [ -d src/.cm/ ]; then rm -rf src/.cm/; fi
-	rm test/valid/*.c
-	rm test/valid/*.bin
+	rm -f test/valid/*.c
+	rm -f test/valid/*.bin
