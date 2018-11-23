@@ -3,5 +3,5 @@ is
   vendor/mlunit/mlunit.cm
   vendor/parsimony/parsimony.cm
 
-  boreal.cm
+  austral.cm
   test/test.sml

@@ -1,6 +1,6 @@
 .cm
-boreal
-boreal-test
+austral
+austral-test
 src/c-runtime.sml
 test/valid/*.c
 test/valid/*.bin
