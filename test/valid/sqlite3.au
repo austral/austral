@@ -2,7 +2,8 @@
 (defmodule sqlite3-test
   (:use :austral)
   (:import-from :austral.ext.cffi
-                :defcfun))
+                :defcfun
+                :address-of))
 (in-module :sqlite3-test)
 
 (defcfun (sqlite3-open "sqlite3_open") ((path (paddress u8))
