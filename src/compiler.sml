@@ -119,7 +119,7 @@ structure Compiler : COMPILER = struct
         end
 
     fun compilerFromModName c modname =
-        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)) = c
+        let val (Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, _, code)) = c
         in
             Compiler (menv, macenv, tenv, fenv, mtast, fdefs, tts, modname, code)
         end
@@ -145,6 +145,7 @@ structure Compiler : COMPILER = struct
                                                     (currentModule compiler)
                                                     form)
         in
+            print ("CURRENT MODULE " ^ (Ident.identString (Module.moduleName (currentModule compiler))) ^ "\n");
             let val topNode = AST.transformTop (Alpha.transformTop (OAST.transformTop resolved))
             in
                 let val dastNode = DAST.transformTop topNode
@@ -281,6 +282,7 @@ structure Compiler : COMPILER = struct
                                     SOME m => m
                                   | NONE => raise Fail ("in-module: no module with this name: " ^ (Ident.identString moduleName))
             in
+                print ("SWITCH CURRENT MODULE TO " ^ (Ident.identString moduleName) ^ "\n");
                 compilerFromModName c moduleName
             end
         end
