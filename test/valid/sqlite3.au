@@ -6,14 +6,34 @@
                 :address-of))
 (in-module :sqlite3-test)
 
-(defcfun (sqlite3-open "sqlite3_open") ((path (paddress u8))
-                                        (pointer (paddress (address u8))))
+(deftype db () (address u8))
+
+(deftype cstring () (paddress u8))
+
+(defcfun (sqlite3-open "sqlite3_open") ((path cstring)
+                                        (pointer (paddress db)))
   i32)
 
+(defcfun (sqlite3-exec "sqlite3_exec") ((db db)
+                                        (command cstring)
+                                        (callback (address u8))
+                                        (callback-arg (address u8))
+                                        (errptr (address u8)))
+  i32)
+
+(defun sqlite3-exec' ((db db) (command cstring)) i32
+  (sqlite3-exec db command (null-pointer u8) (null-pointer u8) (null-pointer u8)))
+
 (defun main () i32
+  ;; Try to open the database
   (let ((handle (null-pointer u8)))
     (let ((open-rc (sqlite3-open (static-array-pointer ":memory:")
                                  (address-of handle))))
       (if (austral.kernel:eq open-rc 0)
-          0
+          ;; Opened the database, now execute a command
+          (let ((exec-rc (sqlite3-exec' handle
+                                        (static-array-pointer "SELECT 1+1;"))))
+            (if (austral.kernel:eq exec-rc 0)
+                0
+                -1))
           -1))))
