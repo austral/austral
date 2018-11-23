@@ -1,4 +1,4 @@
-# Boreal
+# Austral
 
 [![Build Status](https://travis-ci.com/austral/boreal.svg?branch=master)](https://travis-ci.com/austral/boreal)
 
