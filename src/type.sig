@@ -57,6 +57,16 @@ signature TYPE = sig
                      | TypeAlias of name * typarams * ty
                      | Datatype of name * typarams * variant list
 
+    (* The type environment has two components: declarations and definitions.
+
+       The declarations part is a map from type names to: an ordered set of type
+       parameters, and a value of type decltype that describes whether it's a
+       type alias or a disjunction.
+
+       The definitions part is a map from type names to: an ordered set of type
+       parameters, and a `ty` instance which is the type definition. Type
+       aliases are not included in the definition map because they are expanded
+       at resolution time. *)
     type tenv
 
     val defaultTenv : tenv
