@@ -262,9 +262,7 @@ structure Type :> TYPE = struct
                              (* The arity matches, that is, we have exactly as
                                 many type arguments as type parameters in the
                                 definition of this type. *)
-                             (case decltype of
-                                  AliasDecl => ty
-                                | DisjunctionDecl => ty)
+                             ty
                          else
                              raise Fail "Type arity error"
                        | NONE =>
