@@ -280,7 +280,7 @@ structure Type :> TYPE = struct
         end
 
     and resolveBuiltin tenv name args =
-        (case Map.get builtInScalars of
+        (case Map.get builtInScalars name of
              (SOME t) => t
            | NONE =>
              if List.exists (fn n => n = name) builtInAggregateNames then
@@ -328,7 +328,7 @@ structure Type :> TYPE = struct
       | replaceVariant _ (Variant (name, NONE)) =
         Variant (name, NONE)
 
-    (* Variant utilities *)
+    (* Utilities *)
 
     fun getVariantByName variants name =
         List.find (fn (Variant (n, _)) => n = name) variants

@@ -91,7 +91,7 @@ signature TYPE = sig
        specifier, resolve the type specifier to a type *)
     val resolve : tenv -> param Set.set -> typespec -> ty
 
-    (* Variant utilities *)
+    (* Utilities *)
 
     val getVariantByName : variant list -> name -> variant option
     val posInVariants : variant list -> name -> int option
