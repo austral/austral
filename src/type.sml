@@ -143,6 +143,14 @@ structure Type :> TYPE = struct
     val defaultTenv =
         { decls = Map.empty, defs = Map.empty }
 
+    fun getDefinition tenv name =
+        let val { decls, defs } = tenv
+        in
+            case Map.get defs name of
+                (SOME d) => d
+              | NONE => raise Fail ("No type with this name: " ^ (Symbol.toString name))
+        end
+
     fun addDeclaration tenv (name, typarams, decltype) =
         let val { decls, defs } = tenv
         in
