@@ -60,11 +60,10 @@ signature TYPE = sig
        type alias or a disjunction.
 
        The definitions part is a map from type names to: an ordered set of type
-       parameters, and a `ty` instance which is the type definition. Type
-       aliases are not included in the definition map because they are expanded
-       at resolution time. *)
-    type tenv
-    type decltype
+       parameters, a `ty` instance which is the type definition, and decltype
+       instance that again specifies whether they are an alias or a
+       disjunction. *)
+    type tenv type decltype
 
     val defaultTenv : tenv
     val addDeclaration : tenv -> (name * typarams * decltype) -> tenv
