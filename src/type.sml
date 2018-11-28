@@ -253,19 +253,19 @@ structure Type :> TYPE = struct
                 let val tyargs' = map (resolve tenv params) tyargs
                 in
                     (case (getDefinition tenv name) of
-                         SOME (typarams, ty, decltype)) =>
-                        (* The name refers to an alias of another type. Ensure the type
-                           constructor has as many arguments as the type alias has
-                           parameters *)
-                    resolveAlias params tyargs' ty
-                      | DisjunctionDecl =>
-                        (* The name refers to an algebraic data type. Ensure the type
-                           constructor has as many arguments as the type alias has
-                           parameters *)
-                        resolveDisjunction params tyargs' ty
-                      | NONE =>
-                        raise Fail ("No type named " ^ (Symbol.toString name)))
-end
+                         (SOME (typarams, ty, decltype)) =>
+                         (case decltype of
+                              (* The name refers to an alias of another
+                                 type. Ensure the type constructor has as many
+                                 arguments as the type alias has parameters *)
+                              AliasDecl => resolveAlias params tyargs' ty
+                            (* The name refers to an algebraic data type. Ensure
+                               the type constructor has as many arguments as the
+                               type alias has parameters *)
+                            | DisjunctionDecl => resolveDisjunction params tyargs' ty)
+                       | NONE =>
+                         raise Fail ("No type named " ^ (Symbol.toString name)))
+                end
 
     and resolveBuiltin tenv params name args =
         raise Fail "Not done yet"
@@ -285,7 +285,7 @@ end
             let val m = replacements params tyargs'
             in
                 Disjunction (name,
-                             tyargs,
+                             tyargs',
                              map (replaceVariant m) variants)
             end
         else
