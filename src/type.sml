@@ -249,12 +249,14 @@ structure Type :> TYPE = struct
                 let val tyargs' = map (resolve tenv params) tyargs
                 in
                     (case (getDefinition tenv name) of
-                         (SOME (typarams, ty, decltype)) =>
+                         (SOME (typarams, typedef)) =>
                          if sameSize typarams tyargs' then
                              (* The arity matches, that is, we have exactly as
                                 many type arguments as type parameters in the
                                 definition of this type. *)
-                             ty
+                             (case typedef of
+                                  (AliasDef ty) => ty
+                                | (DisjunctionDef _) => Disjunction (name, tyargs'))
                          else
                              raise Fail "Type arity error"
                        | NONE =>
