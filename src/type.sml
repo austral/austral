@@ -177,6 +177,36 @@ structure Type :> TYPE = struct
       | parseTypespecList _ =
         raise Fail "Invalid type constructor"
 
+    (* Builtin types *)
+
+    val builtInScalars = [
+        ("unit", Unit),
+        ("boolean", Bool),
+        ("u8", Integer (Unsigned, Int8)),
+        ("i8", Integer (Signed, Int8)),
+        ("u16", Integer (Unsigned, Int16)),
+        ("i16", Integer (Signed, Int16)),
+        ("u32", Integer (Unsigned, Int32)),
+        ("i32", Integer (Signed, Int32)),
+        ("u64", Integer (Unsigned, Int64)),
+        ("i64", Integer (Signed, Int64)),
+        ("f32", Float Single),
+        ("f64", Float Double)
+    ]
+
+    fun isBuiltin name =
+        let val scalars = map (fn (n, _) => n) builtInScalars
+            and builtins = [
+                "tuple",
+                "address",
+                "paddress",
+                "static-array"
+            ]
+        in
+            List.exists (fn n => n = name)
+                        (scalars @ builtins)
+        end
+
     (* Resolution *)
 
     fun replaceArgs params args =
@@ -202,36 +232,13 @@ structure Type :> TYPE = struct
         Map.fromList (Util.mapidx (fn (TypeParam p, idx) => (p, List.nth (tyargs, idx)))
                                   (OrderedSet.toList typarams))
 
-    fun isBuiltin name =
-        let val builtins = map Symbol.au [
-                    "unit",
-                    "boolean",
-                    "u8",
-                    "i8",
-                    "u16",
-                    "i16",
-                    "u32",
-                    "i32",
-                    "u64",
-                    "i64",
-                    "f32",
-                    "f64",
-                    "tuple",
-                    "address",
-                    "paddress",
-                    "static-array"
-                ]
-        in
-            List.exists (fn n => n = name) builtins
-        end
-
     fun resolve tenv params (TypeCons (name, tyargs)) =
         let val tyargs' = map (resolve tenv params) tyargs
         in
             if isBuiltin name then
                 (* If the type specifier names a built-in type or built-in type
                    constructor, call resolveBuiltin *)
-                resolveBuiltin tenv params name tyargs
+                resolveBuiltin tenv name tyargs
             else
                 (* Otherwise, we're dealing with (potentially) a user-defined
                    type or type variable. *)
@@ -270,7 +277,8 @@ structure Type :> TYPE = struct
                          raise Fail ("No type named " ^ (Symbol.toString name)))
         end
 
-    and resolveBuiltin tenv params name args =
+    and resolveBuiltin tenv name args =
+
         raise Fail "Not done yet"
 
     and resolveAlias (tenv: tenv) (name: name) (tyargs: ty list) =
