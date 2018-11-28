@@ -226,28 +226,29 @@ structure Type :> TYPE = struct
         end
 
     fun resolve tenv params (TypeCons (name, tyargs)) =
-        if isBuiltin name then
-            (* If the type specifier names a built-in type or built-in type
-               constructor, call resolveBuiltin *)
-            resolveBuiltin tenv params name tyargs
-        else
-            (* Otherwise, we're dealing with (potentially) a user-defined type
-               or type variable. *)
-            if Set.isIn params (TypeParam name) then
-                (* If the constructor name is in the set of type parameters,
-                   it's a type variable. We also have to make sure that there
-                   are no args, that is, that this type variable doesn't appear
-                   as a constructor, *)
-                if List.length tyargs = 0 then
-                    TypeVariable name
-                else
-                    (* TODO: higher-kinded types would be nice *)
-                    raise Fail "Type variables cannot be constructors"
+        let val tyargs' = map (resolve tenv params) tyargs
+        in
+            if isBuiltin name then
+                (* If the type specifier names a built-in type or built-in type
+                   constructor, call resolveBuiltin *)
+                resolveBuiltin tenv params name tyargs
             else
-                (* Since it's not a builtin and not a type variable, we're
-                   dealing with a user-defined type. Try to find if it exists. *)
-                let val tyargs' = map (resolve tenv params) tyargs
-                in
+                (* Otherwise, we're dealing with (potentially) a user-defined
+                   type or type variable. *)
+                if Set.isIn params (TypeParam name) then
+                    (* If the constructor name is in the set of type parameters,
+                       it's a type variable. We also have to make sure that
+                       there are no args, that is, that this type variable
+                       doesn't appear as a constructor, *)
+                    if List.length tyargs = 0 then
+                        TypeVariable name
+                    else
+                        (* TODO: higher-kinded types would be nice *)
+                        raise Fail "Type variables cannot be constructors"
+                else
+                    (* Since it's not a builtin and not a type variable, we're
+                       dealing with a user-defined type. Try to find if it
+                       exists. *)
                     (case (getDeclaration tenv name) of
                          (SOME (typarams, decltype)) =>
                          if sameSize typarams tyargs' then
@@ -267,7 +268,7 @@ structure Type :> TYPE = struct
                              raise Fail "Type arity error"
                        | NONE =>
                          raise Fail ("No type named " ^ (Symbol.toString name)))
-                end
+        end
 
     and resolveBuiltin tenv params name args =
         raise Fail "Not done yet"
