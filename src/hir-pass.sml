@@ -62,7 +62,7 @@ structure HirPass :> HIR_PASS = struct
                 Option.valOf (Util.position name (map (fn (MonoType.Variant (name, _)) => name) variants))
         in
             case ty of
-                (MonoType.Disjunction (_, _, variants)) => nameVariantsIdx variants name
+                (MonoType.Disjunction (_, _)) => nameVariantsIdx variants name
               | _ => raise Fail "Internal error: not a disjunction"
         end
 
