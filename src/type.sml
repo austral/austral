@@ -260,7 +260,9 @@ structure Type :> TYPE = struct
                                      type declarations cannot be mutually
                                      recursive. *)
                                   AliasDecl => resolveAlias name tyargs'
-                                | (DisjunctionDef _) => Disjunction (name, tyargs'))
+                                (* If it's a disjunction, construct a ty
+                                   instance from the name and args *)
+                                | (DisjunctionDecl) => Disjunction (name, tyargs'))
                          else
                              raise Fail "Type arity error"
                        | NONE =>
