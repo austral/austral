@@ -332,7 +332,7 @@ structure Type :> TYPE = struct
 
     fun getDisjunctionVariants tenv name =
         (case getDefinition tenv name of
-             (SOME (_, (DisjunctionDef vs)) => vs
+             (SOME (_, (DisjunctionDef vs))) => vs
            | _ => raise Fail "Internal compiler error: getDisjunctionVariants: not found in the tenv")
 
     fun getVariantByName variants name =
