@@ -272,10 +272,16 @@ structure Type :> TYPE = struct
     and resolveBuiltin tenv params name args =
         raise Fail "Not done yet"
 
-    and resolveAlias tenv name tyargs' =
+    and resolveAlias tenv name tyargs =
         (case getDefinition tenv name of
-             (AliasDef ty) => ty
-           | _ => raise Fail "Internal compiler error: not a type alias")
+             (SOME (typarams, typedef)) =>
+             (case typedef of
+                  (AliasDef ty) => let val rs = replacements typarams tyargs
+                                   in
+                                       ty
+                                   end
+                | _ => raise Fail "Internal compiler error: not a type alias")
+           | _ => raise Fail "Internal compiler error: no such type")
 
     and resolveStaticArray tenv params [typespec] =
         StaticArray (resolve tenv params typespec)
