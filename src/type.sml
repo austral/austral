@@ -179,33 +179,35 @@ structure Type :> TYPE = struct
 
     (* Builtin types *)
 
-    val builtInScalars = [
-        ("unit", Unit),
-        ("boolean", Bool),
-        ("u8", Integer (Unsigned, Int8)),
-        ("i8", Integer (Signed, Int8)),
-        ("u16", Integer (Unsigned, Int16)),
-        ("i16", Integer (Signed, Int16)),
-        ("u32", Integer (Unsigned, Int32)),
-        ("i32", Integer (Signed, Int32)),
-        ("u64", Integer (Unsigned, Int64)),
-        ("i64", Integer (Signed, Int64)),
-        ("f32", Float Single),
-        ("f64", Float Double)
-    ]
+    val builtInScalars = Map.fromList
+                             map (fn (n, t) => (Symbol.au n, t)) [
+            ("unit", Unit),
+            ("boolean", Bool),
+            ("u8", Integer (Unsigned, Int8)),
+            ("i8", Integer (Signed, Int8)),
+            ("u16", Integer (Unsigned, Int16)),
+            ("i16", Integer (Signed, Int16)),
+            ("u32", Integer (Unsigned, Int32)),
+            ("i32", Integer (Signed, Int32)),
+            ("u64", Integer (Unsigned, Int64)),
+            ("i64", Integer (Signed, Int64)),
+            ("f32", Float Single),
+            ("f64", Float Double)
+        ]
+
+    val scalarTypeNames =
+        Set.toList (Map.keys builtInScalars)
+
+    val builtInAggregateNames = map Symbol.au [
+            "tuple",
+            "address",
+            "paddress",
+            "static-array"
+        ]
 
     fun isBuiltin name =
-        let val scalars = map (fn (n, _) => n) builtInScalars
-            and builtins = [
-                "tuple",
-                "address",
-                "paddress",
-                "static-array"
-            ]
-        in
-            List.exists (fn n => n = name)
-                        (scalars @ builtins)
-        end
+        List.exists (fn n => n = name)
+                    (scalarTypeNames @ scalarTypeNames)
 
     (* Resolution *)
 
