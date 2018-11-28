@@ -248,14 +248,18 @@ structure Type :> TYPE = struct
                    dealing with a user-defined type. Try to find if it exists. *)
                 let val tyargs' = map (resolve tenv params) tyargs
                 in
-                    (case (getDefinition tenv name) of
-                         (SOME (typarams, typedef)) =>
+                    (case (getDeclaration tenv name) of
+                         (SOME (typarams, decltype)) =>
                          if sameSize typarams tyargs' then
                              (* The arity matches, that is, we have exactly as
                                 many type arguments as type parameters in the
                                 definition of this type. *)
-                             (case typedef of
-                                  (AliasDef ty) => ty
+                             (case decltype of
+                                  (* If it's an alias, look up its
+                                     definition. The definition must exist since
+                                     type declarations cannot be mutually
+                                     recursive. *)
+                                  AliasDecl => resolveAlias name tyargs'
                                 | (DisjunctionDef _) => Disjunction (name, tyargs'))
                          else
                              raise Fail "Type arity error"
@@ -265,6 +269,11 @@ structure Type :> TYPE = struct
 
     and resolveBuiltin tenv params name args =
         raise Fail "Not done yet"
+
+    and resolveAlias tenv name tyargs' =
+        (case getDefinition tenv name of
+             (AliasDef ty) => ty
+           | _ => raise Fail "Internal compiler error: not a type alias")
 
     and resolveStaticArray tenv params [typespec] =
         StaticArray (resolve tenv params typespec)
