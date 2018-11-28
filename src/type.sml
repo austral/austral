@@ -272,13 +272,13 @@ structure Type :> TYPE = struct
     and resolveBuiltin tenv params name args =
         raise Fail "Not done yet"
 
-    and resolveAlias tenv name tyargs =
+    and resolveAlias (tenv: tenv) name (tyargs: ty list) =
         (case getDefinition tenv name of
              (SOME (typarams, typedef)) =>
              (case typedef of
                   (AliasDef ty) => let val rs = replacements typarams tyargs
                                    in
-                                       ty
+                                       replaceVars rs ty
                                    end
                 | _ => raise Fail "Internal compiler error: not a type alias")
            | _ => raise Fail "Internal compiler error: no such type")
