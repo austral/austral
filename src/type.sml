@@ -262,7 +262,7 @@ structure Type :> TYPE = struct
                                   AliasDecl => resolveAlias tenv name tyargs'
                                 (* If it's a disjunction, construct a ty
                                    instance from the name and args *)
-                                | (DisjunctionDecl) => Disjunction (name, tyargs'))
+                                | (DisjunctionDecl) => resolveDisjunction name typarams tyargs'
                          else
                              raise Fail "Type arity error"
                        | NONE =>
@@ -282,6 +282,15 @@ structure Type :> TYPE = struct
                                    end
                 | _ => raise Fail "Internal compiler error: not a type alias")
            | NONE => raise Fail "Internal compiler error: no such type")
+
+    and resolveDisjunction name typarams tyargs =
+        let val rs = replacements typarams tyargs
+        in
+            let val tyargs = map (replaceVars rs) tyargs
+            in
+                Disjunction (name, tyargs)
+            end
+        end
 
     and resolveStaticArray tenv params [typespec] =
         StaticArray (resolve tenv params typespec)
