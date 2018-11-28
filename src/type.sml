@@ -237,12 +237,8 @@ structure Type :> TYPE = struct
         end
 
     fun resolve tenv params (TypeCons (name, tyargs)) =
-        if name = Symbol.au "static-array" then
-            resolveStaticArray tenv params tyargs
-        else if name = Symbol.au "address" then
-            resolveAddress tenv params tyargs
-        else if name = Symbol.au "paddress" then
-            resolvePAddress tenv params tyargs
+        if isBuiltin name then
+            resolveBuiltin tenv params name tyargs
         else
             if Set.isIn params (TypeParam name) then
                 TypeVariable name
@@ -280,6 +276,9 @@ structure Type :> TYPE = struct
                        | NONE =>
                          raise Fail ("No type named " ^ (Symbol.toString name)))
                 end
+
+    and resolveBuiltin tenv params name args =
+        raise Fail "Not done yet"
 
     and resolveStaticArray tenv params [typespec] =
         StaticArray (resolve tenv params typespec)
