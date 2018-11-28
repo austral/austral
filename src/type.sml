@@ -213,6 +213,14 @@ structure Type :> TYPE = struct
         Map.fromList (Util.mapidx (fn (TypeParam p, idx) => (p, List.nth (tyargs, idx)))
                                   (OrderedSet.toList typarams))
 
+    fun isBuiltin name =
+        let val builtins = [
+
+            ]
+        in
+            List.exists (fn n => n = name) builtins
+        end
+
     fun resolve tenv params (TypeCons (name, tyargs)) =
         if name = Symbol.au "static-array" then
             resolveStaticArray tenv params tyargs
@@ -226,7 +234,7 @@ structure Type :> TYPE = struct
             else
                 let val tyargs' = map (resolve tenv params) tyargs
                 in
-                    (case (getTypedef tenv name) of
+                    (case (Typedef tenv name) of
                          SOME (BuiltInType (_, ty)) =>
                          ty
                        | SOME (TypeAlias (_, params, ty)) =>
