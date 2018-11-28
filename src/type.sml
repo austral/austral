@@ -330,6 +330,11 @@ structure Type :> TYPE = struct
 
     (* Utilities *)
 
+    fun getDisjunctionVariants tenv name =
+        (case getDefinition tenv name of
+             (DisjunctionDef vs) => vs
+           | _ => raise Fail "Internal compiler error: getDisjunctionVariants: not found in the tenv")
+
     fun getVariantByName variants name =
         List.find (fn (Variant (n, _)) => n = name) variants
 
