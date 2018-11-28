@@ -110,9 +110,8 @@ structure Type :> TYPE = struct
       | tyVars (PositiveAddress ty) = tyVars ty
       | tyVars (StaticArray ty) = tyVars ty
       | tyVars (Pointer ty) = tyVars ty
-      | tyVars (Disjunction (_, tys, variants)) =
-        Set.union (Set.unionList (map tyVars tys))
-                  (Set.unionList (map variantVars variants))
+      | tyVars (Disjunction (_, tys)) =
+        (Set.unionList (map tyVars tys))
       | tyVars (TypeVariable name) =
         Set.singleton (TypeParam name)
 
