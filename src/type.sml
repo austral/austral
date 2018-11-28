@@ -255,6 +255,8 @@ structure Type :> TYPE = struct
                     (* TODO: higher-kinded types would be nice *)
                     raise Fail "Type variables cannot be constructors"
             else
+                (* Since it's not a builtin and not a type variable, we're
+                   dealing with a user-defined type. Try to find if it exists. *)
                 let val tyargs' = map (resolve tenv params) tyargs
                 in
                     (case (Typedef tenv name) of
