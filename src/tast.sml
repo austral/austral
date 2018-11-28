@@ -397,28 +397,31 @@ structure TAST :> TAST = struct
             let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
             in
                 case ty of
-                    (Disjunction (name, tyargs, variants)) =>
-                    (case getVariantByName variants label of
-                         (SOME (Variant (_, tyOpt))) =>
-                         (case tyOpt of
-                              (SOME caseTy) => (case exp of
-                                                    (SOME exp') =>
-                                                    let val exp'' = augment exp' c
-                                                    in
-                                                        if typeOf exp'' = caseTy then
-                                                            Construct (ty, label, SOME exp'')
-                                                        else
-                                                            raise Fail "construct: type mismatch"
-                                                    end
-                                                  | NONE => raise Fail "construct: missing value")
-                            | NONE => (case exp of
-                                           (SOME _) => raise Fail "construct: superfluous value"
-                                         | NONE => Construct (ty, label, NONE)))
-                       | _ => raise Fail ("construct: not a valid variant name: "
-                                          ^ (Symbol.toString label)
-                                          ^ ". Valid variant names for this type: \n  "
-                                          ^ (String.concatWith "\n  " (map (fn (Variant (name, _)) => Symbol.toString name) variants))
-                                          ^ "\n"))
+                    (Disjunction (name, tyargs)) =>
+                    let val variants = Type.getDisjunctionVariants (ctxTenv c) name
+                    in
+                        (case getVariantByName variants label of
+                             (SOME (Variant (_, tyOpt))) =>
+                             (case tyOpt of
+                                  (SOME caseTy) => (case exp of
+                                                        (SOME exp') =>
+                                                        let val exp'' = augment exp' c
+                                                        in
+                                                            if typeOf exp'' = caseTy then
+                                                                Construct (ty, label, SOME exp'')
+                                                            else
+                                                                raise Fail "construct: type mismatch"
+                                                        end
+                                                      | NONE => raise Fail "construct: missing value")
+                                | NONE => (case exp of
+                                               (SOME _) => raise Fail "construct: superfluous value"
+                                             | NONE => Construct (ty, label, NONE)))
+                           | _ => raise Fail ("construct: not a valid variant name: "
+                                              ^ (Symbol.toString label)
+                                              ^ ". Valid variant names for this type: \n  "
+                                              ^ (String.concatWith "\n  " (map (fn (Variant (name, _)) => Symbol.toString name) variants))
+                                              ^ "\n"))
+                     end
                   | _ => raise Fail "construct: not a datatype"
             end
           | augment (AST.Case (exp, cases)) c =
