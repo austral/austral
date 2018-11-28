@@ -262,7 +262,7 @@ structure Type :> TYPE = struct
                                   AliasDecl => resolveAlias tenv name tyargs'
                                 (* If it's a disjunction, construct a ty
                                    instance from the name and args *)
-                                | (DisjunctionDecl) => resolveDisjunction name typarams tyargs'
+                                | (DisjunctionDecl) => resolveDisjunction name typarams tyargs')
                          else
                              raise Fail "Type arity error"
                        | NONE =>
