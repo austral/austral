@@ -136,45 +136,14 @@ structure Type :> TYPE = struct
     datatype decltype = AliasDecl
                       | DisjunctionDecl
 
-    type declmap = (name, (typarams, decltype)) Map.map
+    type declmap = (name, (typarams * decltype)) Map.map
 
-    type defmap = (name, (typarams, ty)) Map.map
+    type defmap = (name, (typarams * ty)) Map.map
 
-    type tenv = { decls : declmap, defs: defmap }
+    type tenv = { decls : declmap, defs : defmap }
 
     val defaultTenv =
-        let fun toMap l = Map.fromList (map (fn (n, t) =>
-                                                (Symbol.au n,
-                                                 BuiltInType (Symbol.au n, t)))
-                                            l)
-
-            and makeAlias name typarams def =
-                (Symbol.au name, TypeAlias (Symbol.au name, typarams, def))
-        in
-            let val builtins = toMap [("unit",    Unit),
-                                      ("boolean", Bool),
-                                      ("u8",      Integer (Unsigned, Int8)),
-                                      ("i8",      Integer (Signed,   Int8)),
-                                      ("u16",     Integer (Unsigned, Int16)),
-                                      ("i16",     Integer (Signed,   Int16)),
-                                      ("u32",     Integer (Unsigned, Int32)),
-                                      ("i32",     Integer (Signed,   Int32)),
-                                      ("u64",     Integer (Unsigned, Int64)),
-                                      ("i64",     Integer (Signed,   Int64)),
-                                      ("f32",     Float Single),
-                                      ("f64",     Float Double)]
-            in
-                let val aliases = Map.fromList [makeAlias "usize"
-                                                          OrderedSet.empty
-                                                          (Integer (Unsigned, Int64)),
-                                                makeAlias "isize"
-                                                          OrderedSet.empty
-                                                          (Integer (Signed, Int64))]
-                in
-                    Map.mergeMaps builtins aliases
-                end
-            end
-        end
+        { decls = Map.empty, defs = Map.empty }
 
     fun getTypedef tenv name =
         Map.get tenv name
