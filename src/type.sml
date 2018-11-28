@@ -214,21 +214,24 @@ structure Type :> TYPE = struct
                                   (OrderedSet.toList typarams))
 
     fun isBuiltin name =
-        let val builtins = [
-                "unit",
-                "boolean",
-                "u8",
-                "i8",
-                "u16",
-                "i16",
-                "u32",
-                "i32",
-                "u64",
-                "i64",
-                "f32",
-                "f64",
-
-            ]
+        let val builtins = map Symbol.au [
+                    "unit",
+                    "boolean",
+                    "u8",
+                    "i8",
+                    "u16",
+                    "i16",
+                    "u32",
+                    "i32",
+                    "u64",
+                    "i64",
+                    "f32",
+                    "f64",
+                    "tuple",
+                    "address",
+                    "paddress",
+                    "static-array"
+                ]
         in
             List.exists (fn n => n = name) builtins
         end
