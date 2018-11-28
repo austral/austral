@@ -258,15 +258,13 @@ structure Type :> TYPE = struct
                 in
                     (case (getDefinition tenv name) of
                          (SOME (typarams, ty, decltype)) =>
-                         (case decltype of
-                              (* The name refers to an alias of another
-                                 type. Ensure the type constructor has as many
-                                 arguments as the type alias has parameters *)
-                              AliasDecl => ty
-                              (* The name refers to an algebraic data
-                                 type. Ensure the type constructor has as many
-                                 arguments as the type alias has parameters *)
-                            | DisjunctionDecl => raise Fail "idk")
+                         (* First, check the arity matches *)
+                         if sameSize typarams tyargs' then
+                             (case decltype of
+                                  AliasDecl => ty
+                                | DisjunctionDecl => raise Fail "idk")
+                         else
+                             raise Fail "Type arity error"
                        | NONE =>
                          raise Fail ("No type named " ^ (Symbol.toString name)))
                 end
