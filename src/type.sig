@@ -53,10 +53,6 @@ signature TYPE = sig
 
     type typarams = param OrderedSet.set
 
-    datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * typarams * ty
-                     | Datatype of name * typarams * variant list
-
     (* The type environment has two components: declarations and definitions.
 
        The declarations part is a map from type names to: an ordered set of type
@@ -68,8 +64,10 @@ signature TYPE = sig
        aliases are not included in the definition map because they are expanded
        at resolution time. *)
     type tenv
+    type decltype
 
     val defaultTenv : tenv
+    val addDeclaration : tenv -> (name * typarams * decltype) -> tenv
     val getTypedef : tenv -> name -> typedef option
     val addTypeAlias : tenv -> (name * typarams * ty) -> tenv option
     val addDisjunction : tenv -> (name * typarams * variant list) -> tenv option
