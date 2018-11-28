@@ -445,7 +445,7 @@ structure TAST :> TAST = struct
             let val exp' = augment exp c
             in
                 case typeOf exp' of
-                    (Disjunction (_, tyargs)) =>
+                    (Disjunction (name, tyargs)) =>
                     let val variants = Type.getDisjunctionVariants (ctxTenv c) name
                     in
                         let val caseNames = map (fn (AST.VariantCase (name, _)) =>
