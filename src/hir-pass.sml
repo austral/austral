@@ -54,7 +54,7 @@ structure HirPass :> HIR_PASS = struct
         Pointer (transformType ty)
       | transformType (MT.StaticArray ty) =
         StaticArray (transformType ty)
-      | transformType (MT.Disjunction (name, id, _)) =
+      | transformType (MT.Disjunction (name, id)) =
         Disjunction (name, id)
 
     fun caseNameIdx ty name =
