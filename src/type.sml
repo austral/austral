@@ -127,8 +127,6 @@ structure Type :> TYPE = struct
     fun posInVariants variants name =
         Util.position name (map (fn (Variant (name, _)) => name) variants)
 
-    datatype typespec = TypeCons of name * (typespec list)
-
     type typarams = param OrderedSet.set
 
     (* Type environment *)
@@ -160,6 +158,8 @@ structure Type :> TYPE = struct
                 NONE => raise Fail "Duplicate type declaration"
               | (SOME defs) => { decls = decls, defs = defs }
         end
+
+    datatype typespec = TypeCons of name * (typespec list)
 
     fun parseTypespec (RCST.Symbol s) = TypeCons (s, [])
       | parseTypespec (RCST.List l) = parseTypespecList l
