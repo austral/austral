@@ -145,7 +145,7 @@ structure Type :> TYPE = struct
     fun getDeclaration tenv name =
         let val { decls, defs } = tenv
         in
-            case Map.get decl name of
+            case Map.get decls name of
                 (SOME d) => d
               | NONE => raise Fail ("No type with this name: " ^ (Symbol.toString name))
         end
