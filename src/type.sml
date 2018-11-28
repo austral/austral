@@ -153,12 +153,6 @@ structure Type :> TYPE = struct
               | (SOME decls) => { decls = decls, defs = defs }
         end
 
-    fun getTypedef tenv name =
-        let val { decls, defs } = tenv
-        in
-            Map.get defs name
-        end
-
     fun addTypeAlias tenv (name, params, def) =
         case (Map.get tenv name) of
             SOME _ => NONE (* Another type with this name exists *)
