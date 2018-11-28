@@ -174,6 +174,8 @@ structure Type :> TYPE = struct
         Map.fromList (Util.mapidx (fn (p, idx) => (p, List.nth (args, idx)))
                                   (OrderedSet.toList params))
 
+    (* Resolution *)
+
     (* Return whether the given set and the given list have the same size *)
     fun sameSize set list =
         (OrderedSet.size set) = (List.length list)
