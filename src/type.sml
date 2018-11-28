@@ -36,7 +36,6 @@ structure Type :> TYPE = struct
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64
          and float_type = Single | Double
-         and variant = Variant of name * ty option
 
     fun isInteger (Integer _) = true
       | isInteger _ = false
@@ -115,17 +114,6 @@ structure Type :> TYPE = struct
       | tyVars (TypeVariable name) =
         Set.singleton (TypeParam name)
 
-    and variantVars (Variant (_, SOME ty)) =
-        tyVars ty
-      | variantVars (Variant (_, NONE)) =
-        Set.empty
-
-    fun getVariantByName variants name =
-        List.find (fn (Variant (n, _)) => n = name) variants
-
-    fun posInVariants variants name =
-        Util.position name (map (fn (Variant (name, _)) => name) variants)
-
     type typarams = param OrderedSet.set
 
     (* Type environment *)
@@ -134,6 +122,10 @@ structure Type :> TYPE = struct
                       | DisjunctionDecl
 
     type declmap = (name, (typarams * decltype)) Map.map
+
+    datatype typedef = AliasDef of ty
+                     | DisjunctionDef of variant list
+         and variant = Variant of name * ty option
 
     type defmap = (name, (typarams * ty * decltype)) Map.map
 
@@ -291,4 +283,12 @@ structure Type :> TYPE = struct
         Variant (name, SOME (replaceVars m ty))
       | replaceVariant _ (Variant (name, NONE)) =
         Variant (name, NONE)
+
+    (* Variant utilities *)
+
+    fun getVariantByName variants name =
+        List.find (fn (Variant (n, _)) => n = name) variants
+
+    fun posInVariants variants name =
+        Util.position name (map (fn (Variant (name, _)) => name) variants)
 end

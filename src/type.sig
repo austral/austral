@@ -36,7 +36,6 @@ signature TYPE = sig
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64
          and float_type = Single | Double
-         and variant = Variant of name * ty option
 
     val isInteger : ty -> bool
     val isFloat : ty -> bool
@@ -45,9 +44,6 @@ signature TYPE = sig
     val toString : ty -> string
 
     val tyVars : ty -> param Set.set
-
-    val getVariantByName : variant list -> name -> variant option
-    val posInVariants : variant list -> name -> int option
 
     type typarams = param OrderedSet.set
 
@@ -63,6 +59,7 @@ signature TYPE = sig
        disjunction. *)
     type tenv
     type decltype
+    datatype variant = Variant of name * ty option
 
     val defaultTenv : tenv
 
@@ -92,4 +89,9 @@ signature TYPE = sig
     (* Given a type environment, a set of generic type parameters, and a type
        specifier, resolve the type specifier to a type *)
     val resolve : tenv -> param Set.set -> typespec -> ty
+
+    (* Variant utilities *)
+
+    val getVariantByName : variant list -> name -> variant option
+    val posInVariants : variant list -> name -> int option
 end
