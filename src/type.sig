@@ -49,8 +49,6 @@ signature TYPE = sig
     val getVariantByName : variant list -> name -> variant option
     val posInVariants : variant list -> name -> int option
 
-    datatype typespec = TypeCons of name * (typespec list)
-
     type typarams = param OrderedSet.set
 
     (* The type environment has two components: declarations and definitions.
@@ -82,6 +80,8 @@ signature TYPE = sig
     (* Given a type environment, a set of generic type parameters, and a type
        specifier, resolve the type specifier to a type *)
     val resolve : tenv -> param Set.set -> typespec -> ty
+
+    datatype typespec = TypeCons of name * (typespec list)
 
     val parseTypespec : RCST.rcst -> typespec
 end
