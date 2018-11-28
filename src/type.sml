@@ -145,8 +145,19 @@ structure Type :> TYPE = struct
     val defaultTenv =
         { decls = Map.empty, defs = Map.empty }
 
+    fun addDeclaration tenv (name, typarams, decltype) =
+        let val { decls, defs } = tenv
+        in
+            case Map.add decls (name, (typarams, decltype)) of
+                NONE => raise Fail "Duplicate type declaration"
+              | (SOME decls) => { decls = decls, defs = defs }
+        end
+
     fun getTypedef tenv name =
-        Map.get tenv name
+        let val { decls, defs } = tenv
+        in
+            Map.get defs name
+        end
 
     fun addTypeAlias tenv (name, params, def) =
         case (Map.get tenv name) of
