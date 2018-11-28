@@ -31,7 +31,7 @@ structure Type :> TYPE = struct
                 | PositiveAddress of ty
                 | StaticArray of ty
                 | Pointer of ty
-                | Disjunction of name * ty list * variant list
+                | Disjunction of name * ty list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64
