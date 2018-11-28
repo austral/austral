@@ -145,9 +145,7 @@ structure Type :> TYPE = struct
     fun getDeclaration (tenv: tenv) name =
         let val { decls, defs } = tenv
         in
-            case Map.get decls name of
-                (SOME d) => d
-              | NONE => NONE
+            Map.get decls name
         end
 
     fun getDefinition (tenv: tenv) name =
