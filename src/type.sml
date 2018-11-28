@@ -249,7 +249,11 @@ structure Type :> TYPE = struct
                    it's a type variable. We also have to make sure that there
                    are no args, that is, that this type variable doesn't appear
                    as a constructor, *)
-                TypeVariable name
+                if List.length tyargs = 0 then
+                    TypeVariable name
+                else
+                    (* TODO: higher-kinded types would be nice *)
+                    raise Fail "Type variables cannot be constructors"
             else
                 let val tyargs' = map (resolve tenv params) tyargs
                 in
