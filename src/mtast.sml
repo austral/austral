@@ -591,9 +591,14 @@ structure MTAST :> MTAST = struct
              (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
-    and expandDefdisjunction name id ty =
+    and expandDefdisjunction tenv name id ty =
         let val variants = case ty of
-                               (MonoType.Disjunction (_, _, vs)) => vs
+                               (MonoType.Disjunction (name, _, _)) =>
+                               (* Monomorphize the variants *)
+                               let val variants = Type.getDisjunctionVariants tenv name
+                               in
+                                   raise Fail "Not done yet"
+                               end
                              | _ => raise Fail "expandDefdisjunction: not a disjunction"
         in
             DefdatatypeMono (name,
