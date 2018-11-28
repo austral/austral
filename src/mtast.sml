@@ -593,7 +593,7 @@ structure MTAST :> MTAST = struct
 
     and expandDefdisjunction tenv name id ty =
         let val variants = case ty of
-                               (MonoType.Disjunction (name, _, _)) =>
+                               (MonoType.Disjunction (name, _)) =>
                                (* Monomorphize the variants *)
                                let val variants = Type.getDisjunctionVariants tenv name
                                in
