@@ -31,7 +31,7 @@ signature MONO_TYPE = sig
                 | PositiveAddress of ty
                 | StaticArray of ty
                 | Pointer of ty
-                | Disjunction of name * int * variant list
+                | Disjunction of name * int
          and variant = Variant of name * ty option
 
     (* Type monomorphization *)
