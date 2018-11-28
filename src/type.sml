@@ -158,7 +158,7 @@ structure Type :> TYPE = struct
               | NONE => NONE
         end
 
-    fun addDeclaration tenv (name, typarams, decltype) =
+    fun addDeclaration (tenv: tenv) (name, typarams, decltype) =
         let val { decls, defs } = tenv
         in
             case Map.add decls (name, (typarams, decltype)) of
@@ -166,10 +166,10 @@ structure Type :> TYPE = struct
               | (SOME decls) => { decls = decls, defs = defs }
         end
 
-    fun addDefinition tenv (name, typarams, ty, decltype) =
+    fun addDefinition (tenv: tenv) (name, typarams, ty, decltype) =
         let val { decls, defs } = tenv
         in
-            case Map.add defs (name, (typarams, decltype)) of
+            case Map.add defs (name, (typarams, ty, decltype)) of
                 NONE => raise Fail "Duplicate type declaration"
               | (SOME defs) => { decls = decls, defs = defs }
         end
