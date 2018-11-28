@@ -577,7 +577,7 @@ structure MTAST :> MTAST = struct
                                          expandDefgeneric ctx' fenv fdefenv name args id)
                                      newFuncs
                     and deftypes = map (fn (name, _, ty, id) =>
-                                           expandDefdatatype name id ty)
+                                           expandDefdisjunction name id ty)
                                        newTypes
                 in
                     (ToplevelProgn (defuns @ deftypes @ [node]),
