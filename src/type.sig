@@ -81,6 +81,8 @@ signature TYPE = sig
        specifier, resolve the type specifier to a type *)
     val resolve : tenv -> param Set.set -> typespec -> ty
 
+    (* Type specifiers *)
+
     datatype typespec = TypeCons of name * (typespec list)
 
     val parseTypespec : RCST.rcst -> typespec
