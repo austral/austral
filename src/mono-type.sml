@@ -110,7 +110,7 @@ structure MonoType :> MONO_TYPE = struct
         in
             (StaticArray ty', tm')
         end
-      | monomorphize tm rs (Type.Disjunction (name, tyargs, variants)) =
+      | monomorphize tm rs (Type.Disjunction (name, tyargs)) =
         let val (tyargs', tm) = monomorphizeList tm rs tyargs
         in
             (*print ("SEARCH FOR MONOMORPH " ^ (Symbol.toString name) ^ " with args: {" ^ (String.concatWith ", " (map Type.toString tyargs)) ^ "}\n");*)
