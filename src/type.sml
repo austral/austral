@@ -259,7 +259,7 @@ structure Type :> TYPE = struct
                                      definition. The definition must exist since
                                      type declarations cannot be mutually
                                      recursive. *)
-                                  AliasDecl => resolveAlias name tyargs'
+                                  AliasDecl => resolveAlias tenv name tyargs'
                                 (* If it's a disjunction, construct a ty
                                    instance from the name and args *)
                                 | (DisjunctionDecl) => Disjunction (name, tyargs'))
@@ -272,7 +272,7 @@ structure Type :> TYPE = struct
     and resolveBuiltin tenv params name args =
         raise Fail "Not done yet"
 
-    and resolveAlias (tenv: tenv) name (tyargs: ty list) =
+    and resolveAlias (tenv: tenv) (name: name) (tyargs: ty list) =
         (case getDefinition tenv name of
              (SOME (typarams, typedef)) =>
              (case typedef of
@@ -281,7 +281,7 @@ structure Type :> TYPE = struct
                                        replaceVars rs ty
                                    end
                 | _ => raise Fail "Internal compiler error: not a type alias")
-           | _ => raise Fail "Internal compiler error: no such type")
+           | NONE => raise Fail "Internal compiler error: no such type")
 
     and resolveStaticArray tenv params [typespec] =
         StaticArray (resolve tenv params typespec)
