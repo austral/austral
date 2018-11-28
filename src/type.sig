@@ -65,9 +65,10 @@ signature TYPE = sig
     type decltype
 
     val defaultTenv : tenv
+
+    val getDefinition : tenv -> name -> (typarams * ty * decltype) option
     val addDeclaration : tenv -> (name * typarams * decltype) -> tenv
     val addDefinition : tenv -> (name * typarams * ty * decltype) -> tenv
-    val getDefinition : tenv -> name -> (typarams * ty * decltype) option
 
     (* Type specifiers *)
 
