@@ -147,7 +147,7 @@ structure Type :> TYPE = struct
         in
             case Map.get decls name of
                 (SOME d) => d
-              | NONE => raise Fail ("No type with this name: " ^ (Symbol.toString name))
+              | NONE => NONE
         end
 
     fun getDefinition (tenv: tenv) name =
@@ -155,7 +155,7 @@ structure Type :> TYPE = struct
         in
             case Map.get defs name of
                 (SOME d) => d
-              | NONE => raise Fail ("No type with this name: " ^ (Symbol.toString name))
+              | NONE => NONE
         end
 
     fun addDeclaration tenv (name, typarams, decltype) =
