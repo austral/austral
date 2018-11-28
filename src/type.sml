@@ -159,15 +159,6 @@ structure Type :> TYPE = struct
               | (SOME defs) => { decls = decls, defs = defs }
         end
 
-    datatype typespec = TypeCons of name * (typespec list)
-
-    fun parseTypespec (RCST.Symbol s) = TypeCons (s, [])
-      | parseTypespec (RCST.List l) = parseTypespecList l
-      | parseTypespec _ = raise Fail "Invalid type specifier"
-    and parseTypespecList ((RCST.Symbol f)::args) =
-        TypeCons (f, map parseTypespec args)
-      | parseTypespecList _ = raise Fail "Invalid type constructor"
-
     fun replaceArgs params args =
         Map.fromList (Util.mapidx (fn (p, idx) => (p, List.nth (args, idx)))
                                   (OrderedSet.toList params))
@@ -261,4 +252,15 @@ structure Type :> TYPE = struct
         Variant (name, SOME (replaceVars m ty))
       | replaceVariant _ (Variant (name, NONE)) =
         Variant (name, NONE)
+
+    (* Type specifiers *)
+
+    datatype typespec = TypeCons of name * (typespec list)
+
+    fun parseTypespec (RCST.Symbol s) = TypeCons (s, [])
+      | parseTypespec (RCST.List l) = parseTypespecList l
+      | parseTypespec _ = raise Fail "Invalid type specifier"
+    and parseTypespecList ((RCST.Symbol f)::args) =
+        TypeCons (f, map parseTypespec args)
+      | parseTypespecList _ = raise Fail "Invalid type constructor"
 end
