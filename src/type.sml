@@ -215,6 +215,7 @@ structure Type :> TYPE = struct
 
     fun isBuiltin name =
         let val builtins = [
+                "unit",
                 "boolean",
                 "u8",
                 "i8",
@@ -225,7 +226,8 @@ structure Type :> TYPE = struct
                 "u64",
                 "i64",
                 "f32",
-                "f64"
+                "f64",
+
             ]
         in
             List.exists (fn n => n = name) builtins
