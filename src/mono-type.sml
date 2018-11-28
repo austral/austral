@@ -113,8 +113,6 @@ structure MonoType :> MONO_TYPE = struct
       | monomorphize tm rs (Type.Disjunction (name, tyargs)) =
         let val (tyargs', tm) = monomorphizeList tm rs tyargs
         in
-            (*print ("SEARCH FOR MONOMORPH " ^ (Symbol.toString name) ^ " with args: {" ^ (String.concatWith ", " (map Type.toString tyargs)) ^ "}\n");*)
-            (* Check the table of type monomorphs for this name and type arguments *)
             case getMonomorph tm name tyargs' of
                 SOME (ty, _) => (ty, tm)
               | NONE =>
