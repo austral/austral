@@ -33,6 +33,8 @@ signature MONO_TYPE = sig
                 | Pointer of ty
                 | Disjunction of name * int
 
+    datatype variant = Variant of name * ty option
+
     (* Type monomorphization *)
 
     type type_monomorphs
