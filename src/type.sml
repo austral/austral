@@ -270,7 +270,7 @@ structure Type :> TYPE = struct
                               (* The name refers to an algebraic data
                                  type. Ensure the type constructor has as many
                                  arguments as the type alias has parameters *)
-                            | DisjunctionDecl => raise Fail "idk"
+                            | DisjunctionDecl => raise Fail "idk")
                        | NONE =>
                          raise Fail ("No type named " ^ (Symbol.toString name)))
                 end
