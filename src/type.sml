@@ -135,7 +135,7 @@ structure Type :> TYPE = struct
 
     type declmap = (name, (typarams * decltype)) Map.map
 
-    type defmap = (name, (typarams * ty)) Map.map
+    type defmap = (name, (typarams * ty * decltype)) Map.map
 
     type tenv = { decls : declmap, defs : defmap }
 
