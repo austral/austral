@@ -31,7 +31,7 @@ structure MonoType :> MONO_TYPE = struct
                 | PositiveAddress of ty
                 | StaticArray of ty
                 | Pointer of ty
-                | Disjunction of name * int * variant list
+                | Disjunction of name * int
          and variant = Variant of name * ty option
 
     (* Fresh monomorph ids *)
