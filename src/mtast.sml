@@ -561,7 +561,7 @@ structure MTAST :> MTAST = struct
                                 params
                                 ctx
 
-    and monomorphizeTop fenv fdefenv ctx node =
+    and monomorphizeTop tenv fenv fdefenv ctx node =
         let val (node, ctx') = monomorphizeTop' ctx node
         in
             (* When we monomorphize a toplevel node, we have two contents: the
@@ -577,7 +577,7 @@ structure MTAST :> MTAST = struct
                                          expandDefgeneric ctx' fenv fdefenv name args id)
                                      newFuncs
                     and deftypes = map (fn (name, _, ty, id) =>
-                                           expandDefdisjunction name id ty)
+                                           expandDefdisjunction tenv name id ty)
                                        newTypes
                 in
                     (ToplevelProgn (defuns @ deftypes @ [node]),
