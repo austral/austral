@@ -266,37 +266,17 @@ structure Type :> TYPE = struct
                               (* The name refers to an alias of another
                                  type. Ensure the type constructor has as many
                                  arguments as the type alias has parameters *)
-                              AliasDecl => resolveAlias params tyargs' ty
-                            (* The name refers to an algebraic data type. Ensure
-                               the type constructor has as many arguments as the
-                               type alias has parameters *)
-                            | DisjunctionDecl => resolveDisjunction name params tyargs' ty)
+                              AliasDecl => raise Fail "idk"
+                              (* The name refers to an algebraic data
+                                 type. Ensure the type constructor has as many
+                                 arguments as the type alias has parameters *)
+                            | DisjunctionDecl => raise Fail "idk"
                        | NONE =>
                          raise Fail ("No type named " ^ (Symbol.toString name)))
                 end
 
     and resolveBuiltin tenv params name args =
         raise Fail "Not done yet"
-
-    and resolveAlias params tyargs ty =
-        if sameSize params tyargs then
-            (* Replace parameters in the aliased type with arguments from the
-               type constructor *)
-            replaceVars (replacements params tyargs) ty
-        else
-            raise Fail "Type constructor arity error"
-
-    and resolveDisjunction name params tyargs ty =
-        if sameSize params tyargs then
-            (* Replace parameters in the type with arguments from the type
-               constructor *)
-            let val m = replacements params tyargs
-            in
-                Disjunction (name,
-                             tyargs)
-            end
-        else
-            raise Fail "Type constructor arity error"
 
     and resolveStaticArray tenv params [typespec] =
         StaticArray (resolve tenv params typespec)
