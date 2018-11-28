@@ -282,10 +282,10 @@ structure Type :> TYPE = struct
         if sameSize params tyargs then
             (* Replace parameters in the type with arguments from the type
                constructor *)
-            let val m = replacements params tyargs'
+            let val m = replacements params tyargs
             in
                 Disjunction (name,
-                             tyargs',
+                             tyargs,
                              map (replaceVariant m) variants)
             end
         else
