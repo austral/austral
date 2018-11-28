@@ -51,4 +51,5 @@ signature MONO_TYPE = sig
     type replacements = (name, ty) Map.map
 
     val monomorphize : type_monomorphs -> replacements -> Type.ty -> (ty * type_monomorphs)
+    val monomorphizeVariants : type_monomorphs -> replacements -> Type.variant list -> (variant list * type_monomorphs)
 end
