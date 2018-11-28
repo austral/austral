@@ -256,13 +256,13 @@ structure Type :> TYPE = struct
                    dealing with a user-defined type. Try to find if it exists. *)
                 let val tyargs' = map (resolve tenv params) tyargs
                 in
-                    (case (getDeclaration tenv name) of
-                         (SOME (typarams, decltype)) =>
+                    (case (getDefinition tenv name) of
+                         (SOME (typarams, ty, decltype)) =>
                          (case decltype of
                               (* The name refers to an alias of another
                                  type. Ensure the type constructor has as many
                                  arguments as the type alias has parameters *)
-                              AliasDecl => raise Fail "idk"
+                              AliasDecl => ty
                               (* The name refers to an algebraic data
                                  type. Ensure the type constructor has as many
                                  arguments as the type alias has parameters *)
