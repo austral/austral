@@ -131,11 +131,16 @@ structure Type :> TYPE = struct
 
     type typarams = param OrderedSet.set
 
-    datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * typarams * ty
-                     | Datatype of name * typarams * variant list
+    (* Type environment *)
 
-    type tenv = (Symbol.symbol, typedef) Map.map
+    datatype decltype = AliasDecl
+                      | DisjunctionDecl
+
+    type declmap = (name, (typarams, decltype)) Map.map
+
+    type defmap = (name, (typarams, ty)) Map.map
+
+    type tenv = { decls : declmap, defs: defmap }
 
     val defaultTenv =
         let fun toMap l = Map.fromList (map (fn (n, t) =>
