@@ -61,7 +61,16 @@ signature TYPE = sig
        parameters, a `ty` instance which is the type definition, and decltype
        instance that again specifies whether they are an alias or a
        disjunction. *)
-    type tenv type decltype
+    type tenv
+    type decltype
+
+    (* Type specifiers *)
+
+    datatype typespec = TypeCons of name * (typespec list)
+
+    val parseTypespec : RCST.rcst -> typespec
+
+    (* Resolution *)
 
     val defaultTenv : tenv
     val addDeclaration : tenv -> (name * typarams * decltype) -> tenv
@@ -80,10 +89,4 @@ signature TYPE = sig
     (* Given a type environment, a set of generic type parameters, and a type
        specifier, resolve the type specifier to a type *)
     val resolve : tenv -> param Set.set -> typespec -> ty
-
-    (* Type specifiers *)
-
-    datatype typespec = TypeCons of name * (typespec list)
-
-    val parseTypespec : RCST.rcst -> typespec
 end
