@@ -238,9 +238,17 @@ structure Type :> TYPE = struct
 
     fun resolve tenv params (TypeCons (name, tyargs)) =
         if isBuiltin name then
+            (* If the type specifier names a built-in type or built-in type
+               constructor, call resolveBuiltin *)
             resolveBuiltin tenv params name tyargs
         else
+            (* Otherwise, we're dealing with (potentially) a user-defined type
+               or type variable. *)
             if Set.isIn params (TypeParam name) then
+                (* If the constructor name is in the set of type parameters,
+                   it's a type variable. We also have to make sure that there
+                   are no args, that is, that this type variable doesn't appear
+                   as a constructor, *)
                 TypeVariable name
             else
                 let val tyargs' = map (resolve tenv params) tyargs
