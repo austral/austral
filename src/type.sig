@@ -59,6 +59,7 @@ signature TYPE = sig
        disjunction. *)
     type tenv
     type decltype
+    type typedef
     datatype variant = Variant of name * ty option
 
     val defaultTenv : tenv
