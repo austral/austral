@@ -67,8 +67,8 @@ signature TYPE = sig
 
     val defaultTenv : tenv
     val addDeclaration : tenv -> (name * typarams * decltype) -> tenv
-    val addTypeAlias : tenv -> (name * typarams * ty) -> tenv option
-    val addDisjunction : tenv -> (name * typarams * variant list) -> tenv option
+    val defineTypeAlias : tenv -> (name * typarams * ty) -> tenv option
+    val defineDisjunction : tenv -> (name * typarams * variant list) -> tenv option
 
     (* Given a map of type variable names to types, and a type, replace all type
        variables in the given type with the given names with the
