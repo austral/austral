@@ -64,6 +64,10 @@ signature TYPE = sig
     type tenv
     type decltype
 
+    val defaultTenv : tenv
+    val addDeclaration : tenv -> (name * typarams * decltype) -> tenv
+    val addDefinition : tenv -> (name * typarams * ty * decltype) -> tenv
+
     (* Type specifiers *)
 
     datatype typespec = TypeCons of name * (typespec list)
@@ -71,10 +75,6 @@ signature TYPE = sig
     val parseTypespec : RCST.rcst -> typespec
 
     (* Resolution *)
-
-    val defaultTenv : tenv
-    val addDeclaration : tenv -> (name * typarams * decltype) -> tenv
-    val addDefinition : tenv -> (name * typarams * ty * decltype) -> tenv
 
     (* Given a map of type variable names to types, and a type, replace all type
        variables in the given type with the given names with the
