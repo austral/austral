@@ -127,7 +127,7 @@ structure Type :> TYPE = struct
                      | DisjunctionDef of variant list
          and variant = Variant of name * ty option
 
-    type defmap = (name, (typarams * ty * decltype)) Map.map
+    type defmap = (name, (typarams * typedef)) Map.map
 
     type tenv = { decls : declmap, defs : defmap }
 
