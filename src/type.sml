@@ -153,6 +153,14 @@ structure Type :> TYPE = struct
               | (SOME decls) => { decls = decls, defs = defs }
         end
 
+    fun addDefinition tenv (name, typarams, ty, decltype) =
+        let val { decls, defs } = tenv
+        in
+            case Map.add defs (name, (typarams, decltype)) of
+                NONE => raise Fail "Duplicate type declaration"
+              | (SOME defs) => { decls = decls, defs = defs }
+        end
+
     fun parseTypespec (RCST.Symbol s) = TypeCons (s, [])
       | parseTypespec (RCST.List l) = parseTypespecList l
       | parseTypespec _ = raise Fail "Invalid type specifier"
