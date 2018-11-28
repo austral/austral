@@ -252,40 +252,44 @@ structure Type :> TYPE = struct
                    dealing with a user-defined type. Try to find if it exists. *)
                 let val tyargs' = map (resolve tenv params) tyargs
                 in
-                    (case (Typedef tenv name) of
-                         SOME (BuiltInType (_, ty)) =>
-                         ty
-                       | SOME (TypeAlias (_, params, ty)) =>
-                         (* The name refers to an alias of another type. Ensure the type
-                            constructor has as many arguments as the type alias has
-                            parameters *)
-                         if sameSize params tyargs' then
-                             (* Replace parameters in the aliased type with arguments from
-                                the type constructor *)
-                             replaceVars (replacements params tyargs') ty
-                         else
-                             raise Fail "Type constructor arity error"
-                       | SOME (Datatype (_, params, variants)) =>
-                         (* The name refers to an algebraic data type. Ensure the type
-                            constructor has as many arguments as the type alias has
-                            parameters *)
-                         if sameSize params tyargs' then
-                             (* Replace parameters in the type with arguments from
-                                the type constructor *)
-                             let val m = replacements params tyargs'
-                             in
-                                 Disjunction (name,
-                                              tyargs',
-                                              map (replaceVariant m) variants)
-                             end
-                         else
-                             raise Fail "Type constructor arity error"
-                       | NONE =>
-                         raise Fail ("No type named " ^ (Symbol.toString name)))
-                end
+                    (case (getDefinition tenv name) of
+                         SOME (typarams, ty, decltype)) =>
+                        (* The name refers to an alias of another type. Ensure the type
+                           constructor has as many arguments as the type alias has
+                           parameters *)
+                    resolveAlias params tyargs' ty
+                      | DisjunctionDecl =>
+                        (* The name refers to an algebraic data type. Ensure the type
+                           constructor has as many arguments as the type alias has
+                           parameters *)
+                        resolveDisjunction params tyargs' ty
+                      | NONE =>
+                        raise Fail ("No type named " ^ (Symbol.toString name)))
+end
 
     and resolveBuiltin tenv params name args =
         raise Fail "Not done yet"
+
+    and resolveAlias params tyargs ty =
+        if sameSize params tyargs then
+            (* Replace parameters in the aliased type with arguments from the
+               type constructor *)
+            replaceVars (replacements params tyargs) ty
+        else
+            raise Fail "Type constructor arity error"
+
+    and resolveDisjunction params tyargs ty =
+        if sameSize params tyargs then
+            (* Replace parameters in the type with arguments from the type
+               constructor *)
+            let val m = replacements params tyargs'
+            in
+                Disjunction (name,
+                             tyargs,
+                             map (replaceVariant m) variants)
+            end
+        else
+            raise Fail "Type constructor arity error"
 
     and resolveStaticArray tenv params [typespec] =
         StaticArray (resolve tenv params typespec)
