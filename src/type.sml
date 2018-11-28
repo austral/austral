@@ -280,8 +280,13 @@ structure Type :> TYPE = struct
         end
 
     and resolveBuiltin tenv name args =
-
-        raise Fail "Not done yet"
+        (case Map.get builtInScalars of
+             (SOME t) => t
+           | NONE =>
+             if List.exists (fn n => n = name) builtInAggregateNames then
+                 raise Fail "Not done yet"
+             else
+                 raise Fail "Internal compiler error: not a builtin")
 
     and resolveAlias (tenv: tenv) (name: name) (tyargs: ty list) =
         (case getDefinition tenv name of
