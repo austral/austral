@@ -122,14 +122,11 @@ structure MonoType :> MONO_TYPE = struct
                     (SOME (ty, _)) => (ty, tm)
                   | NONE => let val id = freshId ()
                             in
-                                let val (variants', tm) = monomorphizeVariants tm rs variants
+                                let val disj = Disjunction (name, id)
                                 in
-                                    let val disj = Disjunction (name, id, variants')
+                                    let val tm = addMonomorph tm name tyargs' disj id
                                     in
-                                        let val tm = addMonomorph tm name tyargs' disj id
-                                        in
-                                            (disj, tm)
-                                        end
+                                        (disj, tm)
                                     end
                                 end
                             end
