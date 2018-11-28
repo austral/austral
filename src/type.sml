@@ -258,11 +258,13 @@ structure Type :> TYPE = struct
                 in
                     (case (getDefinition tenv name) of
                          (SOME (typarams, ty, decltype)) =>
-                         (* First, check the arity matches *)
                          if sameSize typarams tyargs' then
+                             (* The arity matches, that is, we have exactly as
+                                many type arguments as type parameters in the
+                                definition of this type. *)
                              (case decltype of
                                   AliasDecl => ty
-                                | DisjunctionDecl => raise Fail "idk")
+                                | DisjunctionDecl => ty)
                          else
                              raise Fail "Type arity error"
                        | NONE =>
