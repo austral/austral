@@ -315,10 +315,13 @@ structure Compiler : COMPILER = struct
     fun defineType c (DAST.Deftype (name, typarams, _, ty)) =
         let val tenv = compilerTenv c
         in
-            compilerFromTenv c (Type.addDefinition tenv (name, params, Type.AliasDef ty))
+            compilerFromTenv c (Type.addDefinition tenv (name, typarams, Type.AliasDef ty))
         end
       | defineType c (DAST.Defdatatype (name, typarams, _, variants)) =
-        c
+        let val tenv = compilerTenv c
+        in
+            compilerFromTenv c (Type.addDefinition tenv (name, typarams, Type.DisjunctionDef variants))
+        end
       | defineType c _ =
         c
 
