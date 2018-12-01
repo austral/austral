@@ -620,6 +620,11 @@ structure MTAST :> MTAST = struct
                     end
                   | _ => raise Fail "expandDefdisjunction: not a disjunction"
 
+            and isDisj ty =
+                case ty of
+                    (MonoType.Disjunction (name, _)) => true
+                  | _ => false
+
             and getTyparams tenv name =
                 (case Type.getDefinition tenv name of
                      SOME (typarams, _) => typarams
