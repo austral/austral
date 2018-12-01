@@ -88,7 +88,7 @@ structure HirPass :> HIR_PASS = struct
         in
             Let (tupvar,
                  transform e tup,
-                 transformBind (transformType (M.typeOf tup)) vars tupvar body)
+                 transformBind e (transformType (M.typeOf tup)) vars tupvar body)
         end
       | transform e (M.Cond (t, c, a)) =
         Cond (transform e t, transform e c, transform e a)
