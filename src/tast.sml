@@ -482,8 +482,8 @@ structure TAST :> TAST = struct
                                              (case getVariantByName variants casename of
                                                   (SOME variant) =>
                                                   (* Since this case has a binding,
-                                                 the variant must have an
-                                                 associated value *)
+                                                     the variant must have an
+                                                     associated value *)
                                                   (case variant of
                                                        (Type.Variant (_, SOME ty)) =>
                                                        let val s' = Map.iadd (ctxBindings c)
