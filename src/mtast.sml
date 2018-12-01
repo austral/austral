@@ -598,8 +598,7 @@ structure MTAST :> MTAST = struct
 
     and expandDefdisjunction ctx tenv name tyargs id ty =
         let fun monomorphizeVariants typarams =
-                case ty of
-                    (MonoType.Disjunction (name, _)) =>
+                if isDisj ty then
                     (* Monomorphize the variants *)
                     let val variants = Type.getDisjunctionVariants tenv name
                         and (rs, ctx) = monoReplacements ctx Map.empty tyargs
@@ -618,7 +617,8 @@ structure MTAST :> MTAST = struct
                             end
                         end
                     end
-                  | _ => raise Fail "expandDefdisjunction: not a disjunction"
+                else
+                    raise Fail "expandDefdisjunction: not a disjunction"
 
             and isDisj ty =
                 case ty of
