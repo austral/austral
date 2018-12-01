@@ -102,11 +102,6 @@ structure Type :> TYPE = struct
       | widthToString IntSize =
         "size"
 
-    fun disjName (Disjunction (name, _)) =
-        name
-      | disjName _ =
-        raise Fail "Internal compiler error: not a disjunction"
-
     fun tyVars Unit = Set.empty
       | tyVars Bool = Set.empty
       | tyVars (Integer _) = Set.empty

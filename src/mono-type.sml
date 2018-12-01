@@ -35,6 +35,11 @@ structure MonoType :> MONO_TYPE = struct
 
     datatype variant = Variant of name * ty option
 
+    fun disjName (Disjunction (name, _)) =
+        name
+      | disjName _ =
+        raise Fail "Internal compiler error: not a disjunction"
+
     (* Fresh monomorph ids *)
 
     val id = ref 0
