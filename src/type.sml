@@ -288,7 +288,12 @@ structure Type :> TYPE = struct
              (SOME t) => t
            | NONE =>
              if List.exists (fn n => n = name) builtInAggregateNames then
-                 raise Fail "Not done yet"
+                 if name = au "address" then
+                     resolveAddress tenv params args
+                 else name = au "paddress" then
+                     resolvePAddress tenv params args
+                 else
+                     raise Fail "Unknown builtin"
              else
                  raise Fail "Internal compiler error: not a builtin")
 
