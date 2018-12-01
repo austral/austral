@@ -133,7 +133,7 @@ structure HirPass :> HIR_PASS = struct
         Cast (transformType ty, transform exp)
       | transform (M.Construct (ty, name, value)) =
         Construct (transformType ty,
-                   caseNameIdx ty name,
+                   caseNameIdx tenv ty name,
                    Option.map transform value)
       | transform (M.Case (exp, cases, ty)) =
         let val expTy = MTAST.typeOf exp
@@ -144,7 +144,7 @@ structure HirPass :> HIR_PASS = struct
                 let val expvarVar = Variable (expvar, transformType ty)
                 in
                     let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
-                            VariantCase (caseNameIdx expTy name, transform body)
+                            VariantCase (caseNameIdx tenv expTy name, transform body)
                           | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
                             let val id = caseNameIdx expTy casename
                             in
