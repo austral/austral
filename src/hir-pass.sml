@@ -106,7 +106,7 @@ structure HirPass :> HIR_PASS = struct
         ArrayPointer (transform e arr)
       | transform e (M.Malloc (ty, len)) =
         let val ty' = transformType ty
-            and len' = transform len
+            and len' = transform e len
         in
             Cast (Pointer ty',
                   ForeignFuncall ("malloc",
