@@ -334,11 +334,6 @@ structure Type :> TYPE = struct
       | resolvePAddress _ _ _ =
         raise Fail "Bad paddress type specifier"
 
-    and replaceVariant m (Variant (name, SOME ty)) =
-        Variant (name, SOME (replaceVars m ty))
-      | replaceVariant _ (Variant (name, NONE)) =
-        Variant (name, NONE)
-
     (* Utilities *)
 
     fun getDisjunctionVariants tenv name =
