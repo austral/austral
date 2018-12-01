@@ -42,7 +42,6 @@ signature TYPE = sig
     val isNumeric : ty -> bool
     val isComparable : ty -> bool
     val toString : ty -> string
-    val disjName : ty -> name
 
     val tyVars : ty -> param Set.set
 
