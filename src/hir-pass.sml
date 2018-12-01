@@ -185,22 +185,22 @@ structure HirPass :> HIR_PASS = struct
                         map (transform e) args,
                         transformType ty)
 
-    and transformBind tupty (vars: Symbol.variable list) (tupvar: Symbol.variable) (body: MTAST.ast) =
+    and transformBind tenv tupty (vars: Symbol.variable list) (tupvar: Symbol.variable) (body: MTAST.ast) =
         let fun transformInner (head::tail) tupvar body i =
                 Let (head,
                      TupleProj (Variable (tupvar, tupty), i),
                      transformInner tail tupvar body (i + 1))
               | transformInner nil _ body _ =
-                transform e body
+                transform tenv body
         in
             transformInner vars tupvar body 0
         end
 
-    fun transformTop (M.Defun (name, params, ty, body)) =
+    fun transformTop tenv (M.Defun (name, params, ty, body)) =
         Defun (name,
                mapParams params,
                transformType ty,
-               transform e body)
+               transform tenv body)
       | transformTop (M.DefunMonomorph (name, params, ty, body, id)) =
         DefunMonomorph (name,
                         mapParams params,
