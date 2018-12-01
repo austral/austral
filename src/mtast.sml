@@ -597,11 +597,11 @@ structure MTAST :> MTAST = struct
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
     and expandDefdisjunction ctx tenv name tyargs id ty =
-        let fun monomorphizeVariants typarams =
+        let fun monomorphizeVariants (typarams: Type.typarams): ty list =
                 if isDisj ty then
                     (* Monomorphize the variants *)
                     let val variants = Type.getDisjunctionVariants tenv name
-                        and (rs, ctx) = monoReplacements ctx Map.empty tyargs
+                        and rs = makeReplacements typarams tyargs
                     in
                         let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
                                 monoType ctx rs ty
