@@ -593,7 +593,7 @@ structure MTAST :> MTAST = struct
              (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
-    and expandDefdisjunction ctx' tenv name id ty =
+    and expandDefdisjunction ctx tenv name id ty =
         let val variants = case ty of
                                (MonoType.Disjunction (name, _)) =>
                                (* Monomorphize the variants *)
@@ -605,12 +605,12 @@ structure MTAST :> MTAST = struct
                                          | mapVariant ctx (Type.Variant (_, NONE)) =
                                            (MonoType.Unit, ctx)
                                    in
-                                       let val variants' = Util.foldThread (fn (var, ctx) =>
-                                                                               mapVariant (ctx, var))
-                                                                           variants
-                                                                           ctx'
+                                       let val (variants', ctx) = Util.foldThread (fn (var, ctx) =>
+                                                                                      mapVariant ctx var)
+                                                                                  variants
+                                                                                  ctx
                                        in
-                                           map (fn (v, _) => v) variants'
+                                           variants'
                                        end
                                    end
                                end
