@@ -201,11 +201,11 @@ structure HirPass :> HIR_PASS = struct
                mapParams params,
                transformType ty,
                transform tenv body)
-      | transformTop (M.DefunMonomorph (name, params, ty, body, id)) =
+      | transformTop tenv (M.DefunMonomorph (name, params, ty, body, id)) =
         DefunMonomorph (name,
                         mapParams params,
                         transformType ty,
-                        transform e body,
+                        transform tenv body,
                         id)
       | transformTop (M.DefdatatypeMono (name, id, tys)) =
         DefdatatypeMono (name,
