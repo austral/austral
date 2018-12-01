@@ -1,6 +1,5 @@
 TODO:
 
-- Separate type decl environment from datatype def environment
 - Define constructor generic functions for datatypes
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
@@ -185,3 +184,4 @@ DONE:
 - Lift static arrays to (length, ptr) tuples in the LIR pass
 - String literals
 - Compile defcfun all the way down to extern
+- Separate type decl environment from datatype def environment
