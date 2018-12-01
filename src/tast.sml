@@ -79,6 +79,8 @@ structure TAST :> TAST = struct
          and method_def = MethodDef of name * param list * ty * docstring * ast
          and instance_arg = InstanceArg of name * Type.typarams
 
+    val sizeType = Integer (Type.Unsigned, Type.IntSize)
+
     local
         open Type
     in
@@ -190,7 +192,6 @@ structure TAST :> TAST = struct
         open Type
     in
         val defaultIntType = Integer (Signed, Int32)
-        val sizeType = Integer (Unsigned, IntSize)
         val defaultFloatType = Float Double)
 
         fun augment AST.UnitConstant _ = UnitConstant
