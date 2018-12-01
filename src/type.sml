@@ -99,6 +99,8 @@ structure Type :> TYPE = struct
         "32"
       | widthToString Int64 =
         "64"
+      | widthToString IntSize =
+        "size"
 
     fun tyVars Unit = Set.empty
       | tyVars Bool = Set.empty
