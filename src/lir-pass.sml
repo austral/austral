@@ -65,7 +65,7 @@ structure LirPass :> LIR_PASS = struct
 
     (* Transform types *)
 
-    val sizeType = L.Integer (Type.Unsigned, Type.Int64)
+    val sizeType = L.Integer (Type.Unsigned, Type.IntSize)
 
     fun transformType tt MIR.Bool =
         (L.Bool, tt)
