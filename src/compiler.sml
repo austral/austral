@@ -324,6 +324,8 @@ structure Compiler : COMPILER = struct
                         forms
                         c
 
+    (* Definition extraction pass *)
+
     fun extractDefinition c (TAST.Defgeneric (name, typarams, params, ty, _, ast)) =
         addFundef c name params ast
       | extractDefinition c _ =
