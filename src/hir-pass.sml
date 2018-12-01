@@ -58,9 +58,9 @@ structure HirPass :> HIR_PASS = struct
         Disjunction (name, id)
 
     fun caseNameIdx tenv ty name =
-        let variants = Type.getDisjunctionVariants tenv name
+        let val variants = Type.getDisjunctionVariants tenv name
         in
-            case posInVariants variants name of
+            case Type.posInVariants variants name of
                 SOME idx => idx
               | NONE => raise Fail "Internal error: no such name"
         end
