@@ -579,7 +579,7 @@ structure MTAST :> MTAST = struct
                                          expandDefgeneric ctx' fenv fdefenv name args id)
                                      newFuncs
                     and deftypes = map (fn (name, _, ty, id) =>
-                                           expandDefdisjunction tenv name id ty)
+                                           expandDefdisjunction ctx' tenv name id ty)
                                        newTypes
                 in
                     (ToplevelProgn (defuns @ deftypes @ [node]),
@@ -593,13 +593,23 @@ structure MTAST :> MTAST = struct
              (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
-    and expandDefdisjunction tenv name id ty =
+    and expandDefdisjunction ctx' tenv name id ty =
         let val variants = case ty of
                                (MonoType.Disjunction (name, _)) =>
                                (* Monomorphize the variants *)
                                let val variants = Type.getDisjunctionVariants tenv name
+                                   and rs = Map.empty
                                in
-                                   raise Fail "Not done yet"
+                                   let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
+                                           monoType ctx ty
+                                         | mapVariant ctx (Type.Variant (_, NONE)) =
+                                           (MonoType.Unit, ctx)
+                                   in
+                                       Util.foldThread (fn (var, ctx) =>
+                                                           mapVariant (ctx, var))
+                                                       variants
+                                                       ctx'
+                                   end
                                end
                              | _ => raise Fail "expandDefdisjunction: not a disjunction"
         in
