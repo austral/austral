@@ -335,7 +335,8 @@ structure Compiler : COMPILER = struct
         end
 
     fun compileForm c node =
-        let val (mtastNode, ctx) = MTAST.monomorphizeTop (compilerFenv c)
+        let val (mtastNode, ctx) = MTAST.monomorphizeTop (compilerTenv c)
+                                                         (compilerFenv c)
                                                          (compilerFdefs c)
                                                          (compilerMonoCtx c)
                                                          node
