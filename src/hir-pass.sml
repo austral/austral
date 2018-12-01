@@ -67,44 +67,44 @@ structure HirPass :> HIR_PASS = struct
 
     structure M = MTAST
 
-    fun transform M.UnitConstant =
+    fun transform _ M.UnitConstant =
         UnitConstant
-      | transform (M.BoolConstant b) =
+      | transform _ (M.BoolConstant b) =
         BoolConstant b
-      | transform (M.IntConstant (i, ty)) =
+      | transform _(M.IntConstant (i, ty)) =
         IntConstant (i, transformType ty)
-      | transform (M.FloatConstant (f, ty)) =
+      | transform _ (M.FloatConstant (f, ty)) =
         FloatConstant (f, transformType ty)
-      | transform (M.StringConstant s) =
+      | transform _ (M.StringConstant s) =
         StringConstant s
-      | transform (M.Variable (var, ty)) =
+      | transform _ (M.Variable (var, ty)) =
         Variable (var, transformType ty)
-      | transform (M.Let (var, value, body)) =
-        Let (var, transform value, transform body)
-      | transform (M.Bind (vars, tup, body)) =
+      | transform e (M.Let (var, value, body)) =
+        Let (var, transform e value, transform e body)
+      | transform e (M.Bind (vars, tup, body)) =
         (* Since we drop linearity in HIR, we can turn bind expressions into a
            Let that simply projects each tuple element. *)
         let val tupvar = freshVar ()
         in
             Let (tupvar,
-                 transform tup,
+                 transform e tup,
                  transformBind (transformType (M.typeOf tup)) vars tupvar body)
         end
-      | transform (M.Cond (t, c, a)) =
-        Cond (transform t, transform c, transform a)
-      | transform (M.ArithOp (kind, oper, lhs, rhs)) =
-        ArithOp (kind, oper, transform lhs, transform rhs)
-      | transform (M.CompOp (oper, lhs, rhs)) =
-        CompOp (oper, transform lhs, transform rhs)
-      | transform (M.TupleCreate elems) =
-        TupleCreate (map transform elems)
-      | transform (M.TupleProj (tup, idx)) =
-        TupleProj (transform tup, idx)
-      | transform (M.ArrayLength arr) =
-        ArrayLength (transform arr)
-      | transform (M.ArrayPointer arr) =
-        ArrayPointer (transform arr)
-      | transform (M.Malloc (ty, len)) =
+      | transform e (M.Cond (t, c, a)) =
+        Cond (transform e t, transform e c, transform e a)
+      | transform e (M.ArithOp (kind, oper, lhs, rhs)) =
+        ArithOp (kind, oper, transform e lhs, transform e rhs)
+      | transform e (M.CompOp (oper, lhs, rhs)) =
+        CompOp (oper, transform e lhs, transform e rhs)
+      | transform e (M.TupleCreate elems) =
+        TupleCreate (map (transform e) elems)
+      | transform e (M.TupleProj (tup, idx)) =
+        TupleProj (transform e tup, idx)
+      | transform e (M.ArrayLength arr) =
+        ArrayLength (transform e arr)
+      | transform e (M.ArrayPointer arr) =
+        ArrayPointer (transform e arr)
+      | transform e (M.Malloc (ty, len)) =
         let val ty' = transformType ty
             and len' = transform len
         in
@@ -116,26 +116,26 @@ structure HirPass :> HIR_PASS = struct
                                             SizeOf ty')],
                                   Pointer ty'))
         end
-      | transform (M.Free ptr) =
-        ForeignFuncall ("free", [transform ptr], Unit)
-      | transform (M.Load exp) =
-        Load (transform exp)
-      | transform (M.Store (ptr, value)) =
-        Store (transform ptr, transform value)
-      | transform (M.CoerceAddress addr) =
+      | transform e (M.Free ptr) =
+        ForeignFuncall ("free", [transform e ptr], Unit)
+      | transform e (M.Load exp) =
+        Load (transform e exp)
+      | transform e (M.Store (ptr, value)) =
+        Store (transform e ptr, transform e value)
+      | transform e (M.CoerceAddress addr) =
         let val ty = transformType (M.typeOf (M.CoerceAddress addr))
         in
-            Cast (ty, transform addr)
+            Cast (ty, transform e addr)
         end
-      | transform (M.AddressOffset (addr, offset)) =
-        AddressOffset (transform addr, transform offset)
-      | transform (M.The (ty, exp)) =
-        Cast (transformType ty, transform exp)
-      | transform (M.Construct (ty, name, value)) =
+      | transform e (M.AddressOffset (addr, offset)) =
+        AddressOffset (transform e addr, transform e offset)
+      | transform e (M.The (ty, exp)) =
+        Cast (transformType ty, transform e exp)
+      | transform e (M.Construct (ty, name, value)) =
         Construct (transformType ty,
-                   caseNameIdx tenv ty name,
-                   Option.map transform value)
-      | transform (M.Case (exp, cases, ty)) =
+                   caseNameIdx e ty name,
+                   Option.map (transform e) value)
+      | transform e (M.Case (exp, cases, ty)) =
         let val expTy = MTAST.typeOf exp
         in
             let val expvar = freshVar ()
@@ -144,9 +144,9 @@ structure HirPass :> HIR_PASS = struct
                 let val expvarVar = Variable (expvar, transformType ty)
                 in
                     let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
-                            VariantCase (caseNameIdx tenv expTy name, transform body)
+                            VariantCase (caseNameIdx e expTy name, transform body)
                           | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
-                            let val id = caseNameIdx expTy casename
+                            let val id = caseNameIdx e expTy casename
                             in
                                 VariantCase (id,
                                              Let (var,
@@ -165,24 +165,24 @@ structure HirPass :> HIR_PASS = struct
                 end
             end
         end
-      | transform (M.ForeignFuncall (name, args, ty)) =
-        ForeignFuncall (name, map transform args, transformType ty)
-      | transform (M.NullPointer ty) =
+      | transform e (M.ForeignFuncall (name, args, ty)) =
+        ForeignFuncall (name, map (transform e) args, transformType ty)
+      | transform _ (M.NullPointer ty) =
         NullPointer (transformType ty)
-      | transform (M.SizeOf ty) =
+      | transform _ (M.SizeOf ty) =
         SizeOf (transformType ty)
-      | transform (M.AddressOf (var, ty)) =
+      | transform _ (M.AddressOf (var, ty)) =
         AddressOf (var, transformType ty)
-      | transform (M.Cast (ty, exp)) =
-        Cast (transformType ty, transform exp)
-      | transform (M.Seq (a, b)) =
-        Seq (transform a, transform b)
-      | transform (M.ConcreteFuncall (name, args, ty)) =
-        ConcreteFuncall (name, map transform args, transformType ty)
-      | transform (M.GenericFuncall (name, id, args, ty)) =
+      | transform e (M.Cast (ty, exp)) =
+        Cast (transformType ty, transform e exp)
+      | transform e (M.Seq (a, b)) =
+        Seq (transform e a, transform e b)
+      | transform e (M.ConcreteFuncall (name, args, ty)) =
+        ConcreteFuncall (name, map (transform e) args, transformType ty)
+      | transform e (M.GenericFuncall (name, id, args, ty)) =
         GenericFuncall (name,
                         id,
-                        map transform args,
+                        map (transform e) args,
                         transformType ty)
 
     and transformBind tupty (vars: Symbol.variable list) (tupvar: Symbol.variable) (body: MTAST.ast) =
