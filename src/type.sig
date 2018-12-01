@@ -59,7 +59,7 @@ signature TYPE = sig
        disjunction. *)
     type tenv
 
-    datatype decltype = AliasDecl
+    datatype decltype = AliasDecl of ty
                       | DisjunctionDecl
 
     datatype typedef = AliasDef of ty

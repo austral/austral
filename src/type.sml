@@ -120,7 +120,7 @@ structure Type :> TYPE = struct
 
     (* Type environment *)
 
-    datatype decltype = AliasDecl
+    datatype decltype = AliasDecl of ty
                       | DisjunctionDecl
 
     type declmap = (name, (typarams * decltype)) Map.map
