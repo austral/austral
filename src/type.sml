@@ -193,6 +193,8 @@ structure Type :> TYPE = struct
                                    ("i32", Integer (Signed, Int32)),
                                    ("u64", Integer (Unsigned, Int64)),
                                    ("i64", Integer (Signed, Int64)),
+                                   ("usize", Integer (Unsigned, IntSize)),
+                                   ("isize", Integer (Signed, IntSize)),
                                    ("f32", Float Single),
                                    ("f64", Float Double)
                                ])
