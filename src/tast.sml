@@ -192,7 +192,7 @@ structure TAST :> TAST = struct
         open Type
     in
         val defaultIntType = Integer (Signed, Int32)
-        val defaultFloatType = Float Double)
+        val defaultFloatType = Float Double
 
         fun augment AST.UnitConstant _ = UnitConstant
           | augment (AST.BoolConstant b) _ = BoolConstant b
