@@ -269,11 +269,7 @@ structure Type :> TYPE = struct
                                 many type arguments as type parameters in the
                                 definition of this type. *)
                              (case decltype of
-                                  (* If it's an alias, look up its
-                                     definition. The definition must exist since
-                                     type declarations cannot be mutually
-                                     recursive. *)
-                                  AliasDecl => resolveAlias tenv name tyargs'
+                                  (AliasDecl ty) => ty
                                 (* If it's a disjunction, construct a ty
                                    instance from the name and args *)
                                 | (DisjunctionDecl) => resolveDisjunction name typarams tyargs')
