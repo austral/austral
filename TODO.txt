@@ -1,6 +1,9 @@
 TODO:
 
-- defrecord
+- Record types
+- defrecord toplevel form
+- record constructor form
+- slot accessor
 - Define constructor generic functions for datatypes
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
