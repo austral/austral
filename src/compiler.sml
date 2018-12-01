@@ -245,7 +245,7 @@ structure Compiler : COMPILER = struct
       | declareTopForm c (DAST.Defdatatype (name, params, docstring, variants)) =
         let val tenv = compilerTenv c
         in
-            Type.addDeclaration tenv (name, params, Type.DisjunctionDecl)
+            compilerFromTenv (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl))
         end
       | declareTopForm c (DAST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
