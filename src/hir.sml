@@ -63,7 +63,7 @@ structure HIR :> HIR = struct
                  | GenericFuncall of name * int * ast list * ty
          and variant_case = VariantCase of int * ast
 
-    val sizeType = Type.Integer (Type.Unsigned, Type.IntSize)
+    val sizeType = Integer (Type.Unsigned, Type.IntSize)
 
     fun typeOf UnitConstant =
         Unit
