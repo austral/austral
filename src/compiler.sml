@@ -319,6 +319,12 @@ structure Compiler : COMPILER = struct
       | defineType c _ =
         c
 
+    fun defineTypePass c nodes =
+        Util.foldThread (fn (node, c) =>
+                            defineType c node)
+                        nodes
+                        c
+
     (* Augmentation pass *)
 
     fun augmentForm c node =
