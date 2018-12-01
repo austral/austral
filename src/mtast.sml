@@ -602,7 +602,7 @@ structure MTAST :> MTAST = struct
                     (MonoType.Disjunction (name, _)) =>
                     (* Monomorphize the variants *)
                     let val variants = Type.getDisjunctionVariants tenv name
-                        and rs = Map.empty
+                        and rs = Type.replacements typarams tyargs
                     in
                         let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
                                 monoType ctx rs ty
