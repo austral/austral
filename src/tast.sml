@@ -411,7 +411,10 @@ structure TAST :> TAST = struct
                                                             if typeOf exp'' = caseTy then
                                                                 Construct (ty, label, SOME exp'')
                                                             else
-                                                                raise Fail "construct: type mismatch"
+                                                                raise Fail ("construct: type mismatch: the type of the expression is "
+                                                                            ^ (Type.toString (typeOf exp''))
+                                                                            ^ " while the type of the case is "
+                                                                            ^ (Type.toString caseTy))
                                                         end
                                                       | NONE => raise Fail "construct: missing value")
                                 | NONE => (case exp of
