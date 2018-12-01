@@ -140,6 +140,8 @@ structure Compiler : COMPILER = struct
     fun unitForms (FileUnit path) = Parser.parseFile path
       | unitForms (ReplUnit string) = [Parser.parseString string]
 
+    (* Declaration pass *)
+
     fun declareForm compiler form =
         let val resolved = Util.valOf (RCST.resolve (compilerMenv compiler)
                                                     (currentModule compiler)
