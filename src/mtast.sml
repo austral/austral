@@ -121,7 +121,7 @@ structure MTAST :> MTAST = struct
           | typeOf (Case (_, _, t)) =
             t
           | typeOf (SizeOf _) =
-            Integer (Type.Unsigned, Type.Int64)
+            Integer (Type.Unsigned, Type.IntSize)
           | typeOf (AddressOf (_, ty)) =
             ty
           | typeOf (Cast (ty, _)) =

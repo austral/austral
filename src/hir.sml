@@ -112,7 +112,7 @@ structure HIR :> HIR = struct
       | typeOf (UnsafeExtractCase (_, _, t)) =
         t
       | typeOf (SizeOf _) =
-        Integer (Type.Unsigned, Type.Int64)
+        Integer (Type.Unsigned, Type.IntSize)
       | typeOf (AddressOf (_, ty)) =
         ty
       | typeOf (Cast (ty, _)) =
