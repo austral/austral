@@ -288,7 +288,9 @@ structure Type :> TYPE = struct
              (SOME t) => t
            | NONE =>
              if List.exists (fn n => n = name) builtInAggregateNames then
-                 if name = Symbol.au "address" then
+                 if name = Symbol.au "tuple" then
+                     resolveTuple tenv params args
+                 else if name = Symbol.au "address" then
                      resolveAddress tenv params args
                  else if name = Symbol.au "paddress" then
                      resolvePAddress tenv params args
