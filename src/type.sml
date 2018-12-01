@@ -319,6 +319,9 @@ structure Type :> TYPE = struct
             end
         end
 
+    and resolveTuple tenv params tys =
+        Tuple (map (resolve tenv params) tys)
+
     and resolveStaticArray tenv params [typespec] =
         StaticArray (resolve tenv params typespec)
       | resolveStaticArray _ _ _ =
