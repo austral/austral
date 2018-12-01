@@ -153,7 +153,7 @@ structure HirPass :> HIR_PASS = struct
                                                   UnsafeExtractCase (expvarVar,
                                                                      id,
                                                                      transformType ty),
-                                                  transform body))
+                                                  transform e body))
                             end
                     in
                         Let (expvar,
