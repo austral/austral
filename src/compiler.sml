@@ -343,7 +343,7 @@ structure Compiler : COMPILER = struct
         in
             let val c = compilerFromMonoCtx c ctx
             in
-                let val hirNode = HirPass.transformTop mtastNode
+                let val hirNode = HirPass.transformTop (compilerTenv c) mtastNode
                 in
                     let val mirNode = MirPass.transformTop hirNode
                     in
