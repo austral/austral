@@ -6,4 +6,10 @@
 
 (defun main () i32
   (let ((c (austral.kernel:construct (maybe i32) some 10)))
-    0))
+    (case c
+      ((some n)
+       (if (austral.kernel:eq n 10)
+           0
+           -1))
+      (none
+       -1))))
