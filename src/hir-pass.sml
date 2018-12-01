@@ -157,7 +157,7 @@ structure HirPass :> HIR_PASS = struct
                             end
                     in
                         Let (expvar,
-                             transform exp,
+                             transform e exp,
                              Case (expvarVar,
                                    map transformCase cases,
                                    transformType ty))
@@ -191,7 +191,7 @@ structure HirPass :> HIR_PASS = struct
                      TupleProj (Variable (tupvar, tupty), i),
                      transformInner tail tupvar body (i + 1))
               | transformInner nil _ body _ =
-                transform body
+                transform e body
         in
             transformInner vars tupvar body 0
         end
