@@ -283,7 +283,7 @@ structure Type :> TYPE = struct
                          raise Fail ("No type named " ^ (Symbol.toString name)))
         end
 
-    and resolveBuiltin tenv name args =
+    and resolveBuiltin tenv params name args =
         (case Map.get builtInScalars name of
              (SOME t) => t
            | NONE =>
