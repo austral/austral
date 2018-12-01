@@ -34,7 +34,7 @@ structure Type :> TYPE = struct
                 | Disjunction of name * ty list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
-         and width = Int8 | Int16 | Int32 | Int64
+         and width = Int8 | Int16 | Int32 | Int64 | IntSize
          and float_type = Single | Double
 
     fun isInteger (Integer _) = true
