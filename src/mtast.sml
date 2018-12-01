@@ -605,10 +605,13 @@ structure MTAST :> MTAST = struct
                                          | mapVariant ctx (Type.Variant (_, NONE)) =
                                            (MonoType.Unit, ctx)
                                    in
-                                       Util.foldThread (fn (var, ctx) =>
-                                                           mapVariant (ctx, var))
-                                                       variants
-                                                       ctx'
+                                       let val variants' = Util.foldThread (fn (var, ctx) =>
+                                                                               mapVariant (ctx, var))
+                                                                           variants
+                                                                           ctx'
+                                       in
+                                           map (fn (v, _) => v) variants'
+                                       end
                                    end
                                end
                              | _ => raise Fail "expandDefdisjunction: not a disjunction"
