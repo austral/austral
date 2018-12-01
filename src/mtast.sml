@@ -601,7 +601,7 @@ structure MTAST :> MTAST = struct
                                    and rs = Map.empty
                                in
                                    let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
-                                           monoType ctx ty
+                                           monoType ctx rs ty
                                          | mapVariant ctx (Type.Variant (_, NONE)) =
                                            (MonoType.Unit, ctx)
                                    in
