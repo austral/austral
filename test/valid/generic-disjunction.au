@@ -1,0 +1,9 @@
+;; -*- mode: lisp -*-
+
+(defdatatype maybe (tau)
+  (some tau)
+  (none))
+
+(defun main () i32
+  (let ((c (austral.kernel:construct (maybe i32) some 10)))
+    0))
