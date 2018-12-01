@@ -408,13 +408,15 @@ structure TAST :> TAST = struct
                                                         (SOME exp') =>
                                                         let val exp'' = augment exp' c
                                                         in
-                                                            if typeOf exp'' = caseTy then
-                                                                Construct (ty, label, SOME exp'')
-                                                            else
-                                                                raise Fail ("construct: type mismatch: the type of the expression is "
-                                                                            ^ (Type.toString (typeOf exp''))
-                                                                            ^ " while the type of the case is "
-                                                                            ^ (Type.toString caseTy))
+                                                            let val expTy = typeOf exp''
+                                                            in
+                                                                case TypeMatch.matchType expTy caseTy of
+                                                                    (TypeMatch.Bindings _) => Construct (ty, label, SOME exp'')
+                                                                  | _ => raise Fail ("construct: type mismatch: the type of the expression is "
+                                                                                     ^ (Type.toString expTy)
+                                                                                     ^ " while the type of the case is "
+                                                                                     ^ (Type.toString caseTy))
+                                                            end
                                                         end
                                                       | NONE => raise Fail "construct: missing value")
                                 | NONE => (case exp of
