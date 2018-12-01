@@ -117,6 +117,10 @@ structure CBackend :> C_BACKEND = struct
         "uint64_t"
       | intTypeName Type.Signed   Type.Int64 =
         "int64_t"
+      | intTypeName Type.Unsigned Type.IntSize =
+        "size_t"
+      | intTypeName Type.Signed   Type.IntSize =
+        "ssize_t"
 
     (* Transform code *)
 
