@@ -211,7 +211,7 @@ structure Type :> TYPE = struct
 
     fun isBuiltin name =
         List.exists (fn n => n = name)
-                    (scalarTypeNames @ scalarTypeNames)
+                    (scalarTypeNames @ builtInAggregateNames)
 
     (* Resolution *)
 
