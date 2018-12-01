@@ -391,7 +391,7 @@ structure TAST :> TAST = struct
                 end
             end
           | augment (AST.Construct (typespec, label, exp)) c =
-            (* Three things: verify that the type is indeed a datatype,
+            (* Three things: verify that the type is indeed a disjunction,
                verify that the label is a valid variant name, and check that the
                expression (if the variant carries a value) is of the correct
                type. *)
