@@ -312,6 +312,13 @@ structure Compiler : COMPILER = struct
 
     (* Type definition extraction pass *)
 
+    fun defineType c (DAST.Deftype (name, typarams, _, ty)) =
+        c
+      | defineType c (DAST.Defdatatype (name, typarams, _, variants)) =
+        c
+      | defineType c _ =
+        c
+
     (* Augmentation pass *)
 
     fun augmentForm c node =
