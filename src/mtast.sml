@@ -602,7 +602,7 @@ structure MTAST :> MTAST = struct
                     (MonoType.Disjunction (name, _)) =>
                     (* Monomorphize the variants *)
                     let val variants = Type.getDisjunctionVariants tenv name
-                        and rs = Type.replacements typarams tyargs
+                        and (rs, ctx) = monoReplacements ctx Map.empty tyargs
                     in
                         let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
                                 monoType ctx rs ty
@@ -619,12 +619,18 @@ structure MTAST :> MTAST = struct
                         end
                     end
                   | _ => raise Fail "expandDefdisjunction: not a disjunction"
+
+            and getTyparams tenv name =
+                (case Type.getDefinition tenv name of
+                     SOME (typarams, _) => typarams
+                   | NONE => raise Fail "Internal error")
         in
-            case Type.getDefinition tenv name of
-                SOME (typarams, _) => DefdatatypeMono (name,
-                                                       id,
-                                                       monomorphizeVariants typarams)
-              | NONE => raise Fail "Internal error"
+            let val typarams = getTyparams tenv name
+            in
+                DefdatatypeMono (name,
+                                 id,
+                                 monomorphizeVariants typarams)
+            end
         end
 
     and expandGf ctx gf fdefenv name tyargs id =
