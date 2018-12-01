@@ -340,17 +340,11 @@ structure Type :> TYPE = struct
     (* Utilities *)
 
     fun getDisjunctionVariants tenv name =
-        let val { decls, defs } = tenv
-        in
-            print "DEFS: ";
-            (print (String.concatWith ", " (map Symbol.toString (Set.toList (Map.keys defs)))));
-            print "\n";
-            (case getDefinition tenv name of
-                 (SOME (_, (DisjunctionDef vs))) => vs
-               | _ => raise Fail ("Internal compiler error: getDisjunctionVariants: definition for type "
-                                  ^ (Symbol.toString name)
-                                  ^ " not found in the tenv"))
-        end
+        (case getDefinition tenv name of
+             (SOME (_, (DisjunctionDef vs))) => vs
+           | _ => raise Fail ("Internal compiler error: getDisjunctionVariants: definition for type "
+                              ^ (Symbol.toString name)
+                              ^ " not found in the tenv"))
 
     fun getVariantByName variants name =
         List.find (fn (Variant (n, _)) => n = name) variants
