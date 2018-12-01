@@ -58,7 +58,10 @@ signature TYPE = sig
        instance that again specifies whether they are an alias or a
        disjunction. *)
     type tenv
-    type decltype
+
+    datatype decltype = AliasDecl
+           | DisjunctionDecl
+
     type typedef
     datatype variant = Variant of name * ty option
 
