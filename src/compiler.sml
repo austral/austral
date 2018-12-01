@@ -398,11 +398,14 @@ structure Compiler : COMPILER = struct
     fun compileUnit c u =
         let val (forms, c) = (declarationPass c (unitForms u))
         in
-            let val (forms, c) = augmentationPass c forms
+            let val (forms, c) = defineTypePass c forms
             in
-                let val c = extractionPass c forms
+                let val (forms, c) = augmentationPass c forms
                 in
-                    compilationPass c forms
+                    let val c = extractionPass c forms
+                    in
+                        compilationPass c forms
+                    end
                 end
             end
         end
