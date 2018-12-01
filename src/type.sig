@@ -62,8 +62,9 @@ signature TYPE = sig
     datatype decltype = AliasDecl
                       | DisjunctionDecl
 
-    type typedef
-    datatype variant = Variant of name * ty option
+    datatype typedef = AliasDef of ty
+                     | DisjunctionDef of variant list
+         and variant = Variant of name * ty option
 
     val defaultTenv : tenv
 
