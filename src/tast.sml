@@ -283,7 +283,10 @@ structure TAST :> TAST = struct
                         else
                             raise Fail "Both arguments to a comparison operation must be comparable"
                     else
-                        raise Fail "Both arguments to a comparison operator must be of the same type"
+                        raise Fail ("Both arguments to a comparison operator must be of the same type: "
+                                    ^ (Type.toString lhsTy)
+                                    ^ ", "
+                                    ^ (Type.toString rhsTy))
                 end
             end
           | augment (AST.TupleCreate exps) c =
