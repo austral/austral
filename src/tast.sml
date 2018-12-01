@@ -146,7 +146,7 @@ structure TAST :> TAST = struct
           | typeOf (Case (_, _, t)) =
             t
           | typeOf (SizeOf _) =
-            Integer (Unsigned, IntSize)
+            sizeType
           | typeOf (AddressOf (_, ty)) =
             ty
           | typeOf (Cast (ty, _)) =
