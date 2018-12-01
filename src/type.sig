@@ -60,7 +60,7 @@ signature TYPE = sig
     type tenv
 
     datatype decltype = AliasDecl
-           | DisjunctionDecl
+                      | DisjunctionDecl
 
     type typedef
     datatype variant = Variant of name * ty option
