@@ -57,13 +57,12 @@ structure HirPass :> HIR_PASS = struct
       | transformType (MT.Disjunction (name, id)) =
         Disjunction (name, id)
 
-    fun caseNameIdx ty name =
-        let fun nameVariantsIdx variants name =
-                Option.valOf (Util.position name (map (fn (MonoType.Variant (name, _)) => name) variants))
+    fun caseNameIdx tenv ty name =
+        let variants = Type.getDisjunctionVariants tenv name
         in
-            case ty of
-                (MonoType.Disjunction (_, _)) => nameVariantsIdx variants name
-              | _ => raise Fail "Internal error: not a disjunction"
+            case posInVariants variants name of
+                SOME idx => idx
+              | NONE => raise Fail "Internal error: no such name"
         end
 
     structure M = MTAST
