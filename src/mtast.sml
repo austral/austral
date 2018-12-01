@@ -618,11 +618,7 @@ structure MTAST :> MTAST = struct
         in
             DefdatatypeMono (name,
                              id,
-                             map (fn (MonoType.Variant (_, to)) =>
-                                     case to of
-                                         SOME t => t
-                                       | NONE => MonoType.Unit)
-                                 variants)
+                             variants)
         end
 
     and expandGf ctx gf fdefenv name tyargs id =
