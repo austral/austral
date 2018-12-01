@@ -62,6 +62,8 @@ structure MTAST :> MTAST = struct
     local
         open MonoType
     in
+        val sizeType = Integer (Type.Unsigned, Type.IntSize)
+
         fun typeOf UnitConstant =
             Unit
           | typeOf (BoolConstant _) =
@@ -93,7 +95,7 @@ structure MTAST :> MTAST = struct
                  Tuple tys => List.nth (tys, idx)
                | _ => raise Fail "Not a tuple")
           | typeOf (ArrayLength _) =
-            Integer (Type.Unsigned, Type.IntSize)
+            sizeType
           | typeOf (ArrayPointer arr) =
             (case (typeOf arr) of
                  (StaticArray ty) => PositiveAddress ty
@@ -121,7 +123,7 @@ structure MTAST :> MTAST = struct
           | typeOf (Case (_, _, t)) =
             t
           | typeOf (SizeOf _) =
-            Integer (Type.Unsigned, Type.IntSize)
+            sizeType
           | typeOf (AddressOf (_, ty)) =
             ty
           | typeOf (Cast (ty, _)) =
