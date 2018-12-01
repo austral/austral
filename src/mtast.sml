@@ -356,15 +356,18 @@ structure MTAST :> MTAST = struct
             end
         end
       | monomorphize ctx rs (TAST.Construct (ty, name, expOpt)) =
-        let val (ty', ctx) = monoType ctx rs ty
-        in
-            case expOpt of
-                (SOME exp) => let val (exp', ctx) = monomorphize ctx rs exp
-                              in
-                                  (Construct (ty', name, SOME exp'), ctx)
-                              end
-              | NONE => (Construct (ty', name, NONE), ctx)
-        end
+        (case expOpt of
+             (SOME exp) => let val (exp', ctx) = monomorphize ctx rs exp
+                           in
+                               let val (ty', ctx) = monoType ctx rs ty
+                               in
+                                   (Construct (ty', name, SOME exp'), ctx)
+                               end
+                           end
+           | NONE => let val (ty', ctx) = monoType ctx rs ty
+                     in
+                         (Construct (ty', name, NONE), ctx)
+                     end)
       | monomorphize ctx rs (TAST.Case (exp, cases, ty)) =
         let val (exp', ctx) = monomorphize ctx rs exp
         in
