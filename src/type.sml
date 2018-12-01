@@ -244,7 +244,7 @@ structure Type :> TYPE = struct
             if isBuiltin name then
                 (* If the type specifier names a built-in type or built-in type
                    constructor, call resolveBuiltin *)
-                resolveBuiltin tenv name tyargs
+                resolveBuiltin tenv params name tyargs
             else
                 (* Otherwise, we're dealing with (potentially) a user-defined
                    type or type variable. *)
