@@ -310,6 +310,8 @@ structure Compiler : COMPILER = struct
       | declarationPass c nil =
         ([], c)
 
+    (* Augmentation pass *)
+
     fun augmentForm c node =
         (TAST.augmentTop node
                          (compilerTenv c)
