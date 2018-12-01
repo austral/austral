@@ -310,6 +310,8 @@ structure Compiler : COMPILER = struct
       | declarationPass c nil =
         ([], c)
 
+    (* Type definition extraction pass *)
+
     (* Augmentation pass *)
 
     fun augmentForm c node =
