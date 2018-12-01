@@ -118,7 +118,7 @@ structure TAST :> TAST = struct
                  Tuple tys => List.nth (tys, idx)
                | _ => raise Fail "Not a tuple")
           | typeOf (ArrayLength _) =
-            Integer (Unsigned, IntSize)
+            sizeType
           | typeOf (ArrayPointer arr) =
             (case (typeOf arr) of
                  (StaticArray ty) => PositiveAddress ty
