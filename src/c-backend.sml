@@ -84,8 +84,6 @@ structure CBackend :> C_BACKEND = struct
 
     val boolType = C.NamedType "bool"
 
-    val sizeType = C.NamedType "size_t"
-
     fun transformType LIR.Bool =
         boolType
       | transformType (LIR.Integer (s, w)) =
@@ -117,6 +115,10 @@ structure CBackend :> C_BACKEND = struct
         "uint64_t"
       | intTypeName Type.Signed   Type.Int64 =
         "int64_t"
+      | intTypeName Type.Unsigned Type.IntSize =
+        "size_t"
+      | intTypeName Type.Signed   Type.IntSize =
+        "ssize_t"
 
     (* Transform code *)
 

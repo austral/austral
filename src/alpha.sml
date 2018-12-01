@@ -95,6 +95,7 @@ structure Alpha :> ALPHA = struct
 
     (* Special symbols *)
 
+    (* Return whether a symbol is a special symbol *)
     fun specialSymbol name =
         let val syms = ["nil", "true", "false"]
         in

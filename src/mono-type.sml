@@ -31,8 +31,14 @@ structure MonoType :> MONO_TYPE = struct
                 | PositiveAddress of ty
                 | StaticArray of ty
                 | Pointer of ty
-                | Disjunction of name * int * variant list
-         and variant = Variant of name * ty option
+                | Disjunction of name * int
+
+    datatype variant = Variant of name * ty option
+
+    fun disjName (Disjunction (name, _)) =
+        name
+      | disjName _ =
+        raise Fail "Internal compiler error: not a disjunction"
 
     (* Fresh monomorph ids *)
 
@@ -110,11 +116,9 @@ structure MonoType :> MONO_TYPE = struct
         in
             (StaticArray ty', tm')
         end
-      | monomorphize tm rs (Type.Disjunction (name, tyargs, variants)) =
+      | monomorphize tm rs (Type.Disjunction (name, tyargs)) =
         let val (tyargs', tm) = monomorphizeList tm rs tyargs
         in
-            (*print ("SEARCH FOR MONOMORPH " ^ (Symbol.toString name) ^ " with args: {" ^ (String.concatWith ", " (map Type.toString tyargs)) ^ "}\n");*)
-            (* Check the table of type monomorphs for this name and type arguments *)
             case getMonomorph tm name tyargs' of
                 SOME (ty, _) => (ty, tm)
               | NONE =>
@@ -124,15 +128,11 @@ structure MonoType :> MONO_TYPE = struct
                     (SOME (ty, _)) => (ty, tm)
                   | NONE => let val id = freshId ()
                             in
-                                (*print ("NEW MONOMORPH: " ^ (Int.toString id) ^ "\n");*)
-                                let val (variants', tm) = monomorphizeVariants tm rs variants
+                                let val disj = Disjunction (name, id)
                                 in
-                                    let val disj = Disjunction (name, id, variants')
+                                    let val tm = addMonomorph tm name tyargs' disj id
                                     in
-                                        let val tm = addMonomorph tm name tyargs' disj id
-                                        in
-                                            (disj, tm)
-                                        end
+                                        (disj, tm)
                                     end
                                 end
                             end

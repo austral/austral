@@ -31,12 +31,11 @@ signature TYPE = sig
                 | PositiveAddress of ty
                 | StaticArray of ty
                 | Pointer of ty
-                | Disjunction of name * ty list * variant list
+                | Disjunction of name * ty list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
-         and width = Int8 | Int16 | Int32 | Int64
+         and width = Int8 | Int16 | Int32 | Int64 | IntSize
          and float_type = Single | Double
-         and variant = Variant of name * ty option
 
     val isInteger : ty -> bool
     val isFloat : ty -> bool
@@ -46,16 +45,7 @@ signature TYPE = sig
 
     val tyVars : ty -> param Set.set
 
-    val getVariantByName : variant list -> name -> variant option
-    val posInVariants : variant list -> name -> int option
-
-    datatype typespec = TypeCons of name * (typespec list)
-
     type typarams = param OrderedSet.set
-
-    datatype typedef = BuiltInType of name * ty
-                     | TypeAlias of name * typarams * ty
-                     | Datatype of name * typarams * variant list
 
     (* The type environment has two components: declarations and definitions.
 
@@ -64,15 +54,32 @@ signature TYPE = sig
        type alias or a disjunction.
 
        The definitions part is a map from type names to: an ordered set of type
-       parameters, and a `ty` instance which is the type definition. Type
-       aliases are not included in the definition map because they are expanded
-       at resolution time. *)
+       parameters, a `ty` instance which is the type definition, and decltype
+       instance that again specifies whether they are an alias or a
+       disjunction. *)
     type tenv
 
+    datatype decltype = AliasDecl of ty
+                      | DisjunctionDecl
+
+    datatype typedef = AliasDef of ty
+                     | DisjunctionDef of variant list
+         and variant = Variant of name * ty option
+
     val defaultTenv : tenv
-    val getTypedef : tenv -> name -> typedef option
-    val addTypeAlias : tenv -> (name * typarams * ty) -> tenv option
-    val addDisjunction : tenv -> (name * typarams * variant list) -> tenv option
+
+    val getDeclaration : tenv -> name -> (typarams * decltype) option
+    val getDefinition : tenv -> name -> (typarams * typedef) option
+    val addDeclaration : tenv -> (name * typarams * decltype) -> tenv
+    val addDefinition : tenv -> (name * typarams * typedef) -> tenv
+
+    (* Type specifiers *)
+
+    datatype typespec = TypeCons of name * (typespec list)
+
+    val parseTypespec : RCST.rcst -> typespec
+
+    (* Resolution *)
 
     (* Given a map of type variable names to types, and a type, replace all type
        variables in the given type with the given names with the
@@ -88,5 +95,9 @@ signature TYPE = sig
        specifier, resolve the type specifier to a type *)
     val resolve : tenv -> param Set.set -> typespec -> ty
 
-    val parseTypespec : RCST.rcst -> typespec
+    (* Utilities *)
+
+    val getDisjunctionVariants : tenv -> name -> variant list
+    val getVariantByName : variant list -> name -> variant option
+    val posInVariants : variant list -> name -> int option
 end

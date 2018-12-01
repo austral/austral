@@ -20,7 +20,7 @@
 signature HIR_PASS = sig
     val transformType : MonoType.ty -> HIR.ty
 
-    val transform : MTAST.ast -> HIR.ast
+    val transform : Type.tenv -> MTAST.ast -> HIR.ast
 
-    val transformTop : MTAST.top_ast -> HIR.top_ast
+    val transformTop : Type.tenv -> MTAST.top_ast -> HIR.top_ast
 end

@@ -140,6 +140,8 @@ structure Compiler : COMPILER = struct
     fun unitForms (FileUnit path) = Parser.parseFile path
       | unitForms (ReplUnit string) = [Parser.parseString string]
 
+    (* Declaration pass *)
+
     fun declareForm compiler form =
         let val resolved = Util.valOf (RCST.resolve (compilerMenv compiler)
                                                     (currentModule compiler)
@@ -240,16 +242,12 @@ structure Compiler : COMPILER = struct
       | declareTopForm c (DAST.Deftype (name, params, docstring, ty)) =
         let val tenv = compilerTenv c
         in
-            case (Type.addTypeAlias tenv (name, params, ty)) of
-                SOME tenv' => compilerFromTenv c tenv'
-              | NONE => raise Fail "Duplicate type definition"
+            compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.AliasDecl ty))
         end
       | declareTopForm c (DAST.Defdatatype (name, params, docstring, variants)) =
         let val tenv = compilerTenv c
         in
-            case (Type.addDisjunction tenv (name, params, variants)) of
-                SOME tenv' => compilerFromTenv c tenv'
-              | NONE => raise Fail "Duplicate type definition"
+            compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl))
         end
       | declareTopForm c (DAST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
@@ -312,6 +310,29 @@ structure Compiler : COMPILER = struct
       | declarationPass c nil =
         ([], c)
 
+    (* Type definition extraction pass *)
+
+    fun defineType c (DAST.Deftype (name, typarams, _, ty)) =
+        let val tenv = compilerTenv c
+        in
+            compilerFromTenv c (Type.addDefinition tenv (name, typarams, Type.AliasDef ty))
+        end
+      | defineType c (DAST.Defdatatype (name, typarams, _, variants)) =
+        let val tenv = compilerTenv c
+        in
+            compilerFromTenv c (Type.addDefinition tenv (name, typarams, Type.DisjunctionDef variants))
+        end
+      | defineType c _ =
+        c
+
+    fun defineTypePass c nodes =
+        Util.foldThread (fn (node, c) =>
+                            (node, defineType c node))
+                        nodes
+                        c
+
+    (* Augmentation pass *)
+
     fun augmentForm c node =
         (TAST.augmentTop node
                          (compilerTenv c)
@@ -323,6 +344,8 @@ structure Compiler : COMPILER = struct
                             augmentForm c form)
                         forms
                         c
+
+    (* Definition extraction pass *)
 
     fun extractDefinition c (TAST.Defgeneric (name, typarams, params, ty, _, ast)) =
         addFundef c name params ast
@@ -339,14 +362,15 @@ structure Compiler : COMPILER = struct
         end
 
     fun compileForm c node =
-        let val (mtastNode, ctx) = MTAST.monomorphizeTop (compilerFenv c)
+        let val (mtastNode, ctx) = MTAST.monomorphizeTop (compilerTenv c)
+                                                         (compilerFenv c)
                                                          (compilerFdefs c)
                                                          (compilerMonoCtx c)
                                                          node
         in
             let val c = compilerFromMonoCtx c ctx
             in
-                let val hirNode = HirPass.transformTop mtastNode
+                let val hirNode = HirPass.transformTop (compilerTenv c) mtastNode
                 in
                     let val mirNode = MirPass.transformTop hirNode
                     in
@@ -380,11 +404,14 @@ structure Compiler : COMPILER = struct
     fun compileUnit c u =
         let val (forms, c) = (declarationPass c (unitForms u))
         in
-            let val (forms, c) = augmentationPass c forms
+            let val (forms, c) = defineTypePass c forms
             in
-                let val c = extractionPass c forms
+                let val (forms, c) = augmentationPass c forms
                 in
-                    compilationPass c forms
+                    let val c = extractionPass c forms
+                    in
+                        compilationPass c forms
+                    end
                 end
             end
         end

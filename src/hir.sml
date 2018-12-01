@@ -63,6 +63,8 @@ structure HIR :> HIR = struct
                  | GenericFuncall of name * int * ast list * ty
          and variant_case = VariantCase of int * ast
 
+    val sizeType = Integer (Type.Unsigned, Type.IntSize)
+
     fun typeOf UnitConstant =
         Unit
       | typeOf (BoolConstant _) =
@@ -92,7 +94,7 @@ structure HIR :> HIR = struct
              Tuple tys => List.nth (tys, idx)
            | _ => raise Fail "HIR: Not a tuple")
       | typeOf (ArrayLength _) =
-        Integer (Type.Unsigned, Type.Int64)
+        sizeType
       | typeOf (ArrayPointer arr) =
         (case (typeOf arr) of
              (StaticArray ty) => Pointer ty
@@ -112,7 +114,7 @@ structure HIR :> HIR = struct
       | typeOf (UnsafeExtractCase (_, _, t)) =
         t
       | typeOf (SizeOf _) =
-        Integer (Type.Unsigned, Type.Int64)
+        sizeType
       | typeOf (AddressOf (_, ty)) =
         ty
       | typeOf (Cast (ty, _)) =

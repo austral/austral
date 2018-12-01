@@ -31,8 +31,11 @@ signature MONO_TYPE = sig
                 | PositiveAddress of ty
                 | StaticArray of ty
                 | Pointer of ty
-                | Disjunction of name * int * variant list
-         and variant = Variant of name * ty option
+                | Disjunction of name * int
+
+    datatype variant = Variant of name * ty option
+
+    val disjName : ty -> name
 
     (* Type monomorphization *)
 
@@ -50,4 +53,5 @@ signature MONO_TYPE = sig
     type replacements = (name, ty) Map.map
 
     val monomorphize : type_monomorphs -> replacements -> Type.ty -> (ty * type_monomorphs)
+    val monomorphizeVariants : type_monomorphs -> replacements -> Type.variant list -> (variant list * type_monomorphs)
 end

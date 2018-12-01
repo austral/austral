@@ -79,6 +79,8 @@ structure TAST :> TAST = struct
          and method_def = MethodDef of name * param list * ty * docstring * ast
          and instance_arg = InstanceArg of name * Type.typarams
 
+    val sizeType = Type.Integer (Type.Unsigned, Type.IntSize)
+
     local
         open Type
     in
@@ -116,7 +118,7 @@ structure TAST :> TAST = struct
                  Tuple tys => List.nth (tys, idx)
                | _ => raise Fail "Not a tuple")
           | typeOf (ArrayLength _) =
-            Integer (Unsigned, Int64)
+            sizeType
           | typeOf (ArrayPointer arr) =
             (case (typeOf arr) of
                  (StaticArray ty) => PositiveAddress ty
@@ -144,7 +146,7 @@ structure TAST :> TAST = struct
           | typeOf (Case (_, _, t)) =
             t
           | typeOf (SizeOf _) =
-            Integer (Unsigned, Int64)
+            sizeType
           | typeOf (AddressOf (_, ty)) =
             ty
           | typeOf (Cast (ty, _)) =
@@ -190,7 +192,6 @@ structure TAST :> TAST = struct
         open Type
     in
         val defaultIntType = Integer (Signed, Int32)
-        val sizeType = Integer (Unsigned, Int64)
         val defaultFloatType = Float Double
 
         fun augment AST.UnitConstant _ = UnitConstant
@@ -397,28 +398,31 @@ structure TAST :> TAST = struct
             let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
             in
                 case ty of
-                    (Disjunction (name, tyargs, variants)) =>
-                    (case getVariantByName variants label of
-                         (SOME (Variant (_, tyOpt))) =>
-                         (case tyOpt of
-                              (SOME caseTy) => (case exp of
-                                                    (SOME exp') =>
-                                                    let val exp'' = augment exp' c
-                                                    in
-                                                        if typeOf exp'' = caseTy then
-                                                            Construct (ty, label, SOME exp'')
-                                                        else
-                                                            raise Fail "construct: type mismatch"
-                                                    end
-                                                  | NONE => raise Fail "construct: missing value")
-                            | NONE => (case exp of
-                                           (SOME _) => raise Fail "construct: superfluous value"
-                                         | NONE => Construct (ty, label, NONE)))
-                       | _ => raise Fail ("construct: not a valid variant name: "
-                                          ^ (Symbol.toString label)
-                                          ^ ". Valid variant names for this type: \n  "
-                                          ^ (String.concatWith "\n  " (map (fn (Variant (name, _)) => Symbol.toString name) variants))
-                                          ^ "\n"))
+                    (Disjunction (name, tyargs)) =>
+                    let val variants = Type.getDisjunctionVariants (ctxTenv c) name
+                    in
+                        (case getVariantByName variants label of
+                             (SOME (Variant (_, tyOpt))) =>
+                             (case tyOpt of
+                                  (SOME caseTy) => (case exp of
+                                                        (SOME exp') =>
+                                                        let val exp'' = augment exp' c
+                                                        in
+                                                            if typeOf exp'' = caseTy then
+                                                                Construct (ty, label, SOME exp'')
+                                                            else
+                                                                raise Fail "construct: type mismatch"
+                                                        end
+                                                      | NONE => raise Fail "construct: missing value")
+                                | NONE => (case exp of
+                                               (SOME _) => raise Fail "construct: superfluous value"
+                                             | NONE => Construct (ty, label, NONE)))
+                           | _ => raise Fail ("construct: not a valid variant name: "
+                                              ^ (Symbol.toString label)
+                                              ^ ". Valid variant names for this type: \n  "
+                                              ^ (String.concatWith "\n  " (map (fn (Variant (name, _)) => Symbol.toString name) variants))
+                                              ^ "\n"))
+                     end
                   | _ => raise Fail "construct: not a datatype"
             end
           | augment (AST.Case (exp, cases)) c =
@@ -442,63 +446,66 @@ structure TAST :> TAST = struct
             let val exp' = augment exp c
             in
                 case typeOf exp' of
-                    (Disjunction (_, tyargs, variants)) =>
-                    let val caseNames = map (fn (AST.VariantCase (name, _)) =>
-                                                case name of
-                                                    (AST.NameOnly n) => n
-                                                 | (AST.NameBinding { casename = n, var = _ }) => n)
-                                            cases
-                        and variantNames = map (fn (Type.Variant (name, _)) => name) variants
+                    (Disjunction (name, tyargs)) =>
+                    let val variants = Type.getDisjunctionVariants (ctxTenv c) name
                     in
-                        if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
-                            let fun transformCase (AST.VariantCase (name, body)) =
-                                    (case name of
-                                         (AST.NameOnly name') =>
-                                         (case getVariantByName variants name' of
-                                              (SOME variant) =>
-                                              (* Since this is a name-only case,
+                        let val caseNames = map (fn (AST.VariantCase (name, _)) =>
+                                                    case name of
+                                                        (AST.NameOnly n) => n
+                                                      | (AST.NameBinding { casename = n, var = _ }) => n)
+                                                cases
+                            and variantNames = map (fn (Type.Variant (name, _)) => name) variants
+                        in
+                            if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
+                                let fun transformCase (AST.VariantCase (name, body)) =
+                                        (case name of
+                                             (AST.NameOnly name') =>
+                                             (case getVariantByName variants name' of
+                                                  (SOME variant) =>
+                                                  (* Since this is a name-only case,
                                                  the variant must have no associated
                                                  value *)
-                                              (case variant of
-                                                   (Type.Variant (_, NONE)) => VariantCase (NameOnly name',
-                                                                                            augment body c)
-                                                 | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
-                                            | _ => raise Fail "no variant with this name")
-                                       | (AST.NameBinding { casename = casename, var = var }) =>
-                                         (case getVariantByName variants casename of
-                                              (SOME variant) =>
-                                              (* Since this case has a binding,
+                                                  (case variant of
+                                                       (Type.Variant (_, NONE)) => VariantCase (NameOnly name',
+                                                                                                augment body c)
+                                                     | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
+                                                | _ => raise Fail "no variant with this name")
+                                           | (AST.NameBinding { casename = casename, var = var }) =>
+                                             (case getVariantByName variants casename of
+                                                  (SOME variant) =>
+                                                  (* Since this case has a binding,
                                                  the variant must have an
                                                  associated value *)
-                                              (case variant of
-                                                   (Type.Variant (_, SOME ty)) =>
-                                                   let val s' = Map.iadd (ctxBindings c)
-                                                                         (var, (Binding (ty, Immutable)))
-                                                   in
-                                                       let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                                  (case variant of
+                                                       (Type.Variant (_, SOME ty)) =>
+                                                       let val s' = Map.iadd (ctxBindings c)
+                                                                             (var, (Binding (ty, Immutable)))
                                                        in
-                                                           VariantCase (NameBinding { casename = casename, var = var, ty = ty },
-                                                                        augment body c')
+                                                           let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                                           in
+                                                               VariantCase (NameBinding { casename = casename, var = var, ty = ty },
+                                                                            augment body c')
+                                                           end
                                                        end
-                                                   end
-                                                 | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
-                                            | _ => raise Fail "no variant with this name"))
+                                                     | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
+                                                | _ => raise Fail "no variant with this name"))
 
-                                     and caseType (VariantCase (_, body)) =
-                                         typeOf body
-                            in
-                                let val cases' = map transformCase cases
+                                    and caseType (VariantCase (_, body)) =
+                                        typeOf body
                                 in
-                                    if (Set.size (Set.fromList (map (fn (VariantCase (_, b)) => typeOf b) cases'))) = 1 then
-                                        Case (exp',
-                                              cases',
-                                              caseType (List.hd cases'))
-                                    else
-                                        raise Fail "case: not all cases have the same type"
+                                    let val cases' = map transformCase cases
+                                    in
+                                        if (Set.size (Set.fromList (map (fn (VariantCase (_, b)) => typeOf b) cases'))) = 1 then
+                                            Case (exp',
+                                                  cases',
+                                                  caseType (List.hd cases'))
+                                        else
+                                            raise Fail "case: not all cases have the same type"
+                                    end
                                 end
-                            end
-                        else
-                            raise Fail "case: the set of case names in the datatype is not equal to the set of case names in the expression"
+                            else
+                                raise Fail "case: the set of case names in the datatype is not equal to the set of case names in the expression"
+                        end
                     end
                   | _ => raise Fail "case: the type of the expression is not a datatype"
             end

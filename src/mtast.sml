@@ -62,6 +62,8 @@ structure MTAST :> MTAST = struct
     local
         open MonoType
     in
+        val sizeType = Integer (Type.Unsigned, Type.IntSize)
+
         fun typeOf UnitConstant =
             Unit
           | typeOf (BoolConstant _) =
@@ -93,7 +95,7 @@ structure MTAST :> MTAST = struct
                  Tuple tys => List.nth (tys, idx)
                | _ => raise Fail "Not a tuple")
           | typeOf (ArrayLength _) =
-            Integer (Type.Unsigned, Type.Int64)
+            sizeType
           | typeOf (ArrayPointer arr) =
             (case (typeOf arr) of
                  (StaticArray ty) => PositiveAddress ty
@@ -121,7 +123,7 @@ structure MTAST :> MTAST = struct
           | typeOf (Case (_, _, t)) =
             t
           | typeOf (SizeOf _) =
-            Integer (Type.Unsigned, Type.Int64)
+            sizeType
           | typeOf (AddressOf (_, ty)) =
             ty
           | typeOf (Cast (ty, _)) =
@@ -561,7 +563,7 @@ structure MTAST :> MTAST = struct
                                 params
                                 ctx
 
-    and monomorphizeTop fenv fdefenv ctx node =
+    and monomorphizeTop tenv fenv fdefenv ctx node =
         let val (node, ctx') = monomorphizeTop' ctx node
         in
             (* When we monomorphize a toplevel node, we have two contents: the
@@ -577,7 +579,7 @@ structure MTAST :> MTAST = struct
                                          expandDefgeneric ctx' fenv fdefenv name args id)
                                      newFuncs
                     and deftypes = map (fn (name, _, ty, id) =>
-                                           expandDefdatatype name id ty)
+                                           expandDefdisjunction ctx' tenv name id ty)
                                        newTypes
                 in
                     (ToplevelProgn (defuns @ deftypes @ [node]),
@@ -591,18 +593,32 @@ structure MTAST :> MTAST = struct
              (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
-    and expandDefdatatype name id ty =
+    and expandDefdisjunction ctx tenv name id ty =
         let val variants = case ty of
-                               (MonoType.Disjunction (_, _, vs)) => vs
+                               (MonoType.Disjunction (name, _)) =>
+                               (* Monomorphize the variants *)
+                               let val variants = Type.getDisjunctionVariants tenv name
+                                   and rs = Map.empty
+                               in
+                                   let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
+                                           monoType ctx rs ty
+                                         | mapVariant ctx (Type.Variant (_, NONE)) =
+                                           (MonoType.Unit, ctx)
+                                   in
+                                       let val (variants', ctx) = Util.foldThread (fn (var, ctx) =>
+                                                                                      mapVariant ctx var)
+                                                                                  variants
+                                                                                  ctx
+                                       in
+                                           variants'
+                                       end
+                                   end
+                               end
                              | _ => raise Fail "expandDefdisjunction: not a disjunction"
         in
             DefdatatypeMono (name,
                              id,
-                             map (fn (MonoType.Variant (_, to)) =>
-                                     case to of
-                                         SOME t => t
-                                       | NONE => MonoType.Unit)
-                                 variants)
+                             variants)
         end
 
     and expandGf ctx gf fdefenv name tyargs id =
