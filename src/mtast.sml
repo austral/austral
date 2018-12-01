@@ -93,7 +93,7 @@ structure MTAST :> MTAST = struct
                  Tuple tys => List.nth (tys, idx)
                | _ => raise Fail "Not a tuple")
           | typeOf (ArrayLength _) =
-            Integer (Type.Unsigned, Type.Int64)
+            Integer (Type.Unsigned, Type.IntSize)
           | typeOf (ArrayPointer arr) =
             (case (typeOf arr) of
                  (StaticArray ty) => PositiveAddress ty
