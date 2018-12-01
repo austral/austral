@@ -410,7 +410,7 @@ structure TAST :> TAST = struct
                                                         in
                                                             let val expTy = typeOf exp''
                                                             in
-                                                                case TypeMatch.matchType expTy caseTy of
+                                                                case TypeMatch.matchType caseTy expTy of
                                                                     (TypeMatch.Bindings _) => Construct (ty, label, SOME exp'')
                                                                   | _ => raise Fail ("construct: type mismatch: the type of the expression is "
                                                                                      ^ (Type.toString expTy)
