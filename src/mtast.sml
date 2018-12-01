@@ -581,8 +581,8 @@ structure MTAST :> MTAST = struct
                 let val defuns = map (fn (name, args, id) =>
                                          expandDefgeneric ctx' fenv fdefenv name args id)
                                      newFuncs
-                    and deftypes = map (fn (name, _, ty, id) =>
-                                           expandDefdisjunction ctx' tenv name id ty)
+                    and deftypes = map (fn (name, tyargs, ty, id) =>
+                                           expandDefdisjunction ctx' tenv name tyargs id ty)
                                        newTypes
                 in
                     (ToplevelProgn (defuns @ deftypes @ [node]),
@@ -596,7 +596,7 @@ structure MTAST :> MTAST = struct
              (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
-    and expandDefdisjunction ctx tenv name id ty =
+    and expandDefdisjunction ctx tenv name tyargs id ty =
         let val variants = case ty of
                                (MonoType.Disjunction (name, _)) =>
                                (* Monomorphize the variants *)
