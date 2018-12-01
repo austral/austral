@@ -321,7 +321,7 @@ structure Compiler : COMPILER = struct
 
     fun defineTypePass c nodes =
         Util.foldThread (fn (node, c) =>
-                            defineType c node)
+                            (node, defineType c node))
                         nodes
                         c
 
