@@ -207,17 +207,17 @@ structure HirPass :> HIR_PASS = struct
                         transformType ty,
                         transform tenv body,
                         id)
-      | transformTop (M.DefdatatypeMono (name, id, tys)) =
+      | transformTop _ (M.DefdatatypeMono (name, id, tys)) =
         DefdatatypeMono (name,
                          id,
                          map transformType tys)
-      | transformTop (M.Defcfun (_, rawname, params, arity, rt)) =
+      | transformTop _ (M.Defcfun (_, rawname, params, arity, rt)) =
         Defcfun (rawname,
                  map (fn (M.Param (_, t)) => transformType t) params,
                  arity,
                  transformType rt)
-      | transformTop (M.ToplevelProgn l) =
-        ToplevelProgn (map transformTop l)
+      | transformTop e (M.ToplevelProgn l) =
+        ToplevelProgn (map (transformTop e) l)
 
     and mapParams l =
         map mapParam l
