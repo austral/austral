@@ -58,7 +58,7 @@ structure HirPass :> HIR_PASS = struct
         Disjunction (name, id)
 
     fun caseNameIdx tenv ty name =
-        let val variants = Type.getDisjunctionVariants tenv name
+        let val variants = Type.getDisjunctionVariants tenv (Type.disjName ty)
         in
             case Type.posInVariants variants name of
                 SOME idx => idx
