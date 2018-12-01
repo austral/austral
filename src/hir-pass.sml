@@ -144,7 +144,7 @@ structure HirPass :> HIR_PASS = struct
                 let val expvarVar = Variable (expvar, transformType ty)
                 in
                     let fun transformCase (M.VariantCase (M.NameOnly name, body)) =
-                            VariantCase (caseNameIdx e expTy name, transform body)
+                            VariantCase (caseNameIdx e expTy name, transform e body)
                           | transformCase (M.VariantCase (M.NameBinding { casename, var, ty }, body)) =
                             let val id = caseNameIdx e expTy casename
                             in
