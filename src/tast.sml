@@ -492,8 +492,14 @@ structure TAST :> TAST = struct
                                                        let val s' = Map.iadd (ctxBindings c)
                                                                              (var, (Binding (ty, Immutable)))
                                                        in
+                                                           print "TY: ";
+                                                           print (Type.toString ty);
+                                                           print "\n";
                                                            let val ty = replaceVars (replacements typarams tyargs) ty
                                                            in
+                                                               print "TY: ";
+                                                               print (Type.toString ty);
+                                                               print "\n";
                                                                let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                                                in
                                                                    VariantCase (NameBinding { casename = casename, var = var, ty = ty },
