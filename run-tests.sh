@@ -73,6 +73,11 @@ echo "case.au"
 gcc test/valid/case.c -o test/valid/case.bin
 ./test/valid/case.bin
 
+echo "generic-disjunction.au"
+./austral test/valid/generic-disjunction.au --output=test/valid/generic-disjunction.c --entrypoint=austral-user:main
+gcc test/valid/generic-disjunction.c -o test/valid/generic-disjunction.bin
+./test/valid/generic-disjunction.bin
+
 echo "sqlite3.au"
 ./austral test/valid/sqlite3.au --output=test/valid/sqlite3.c --entrypoint=sqlite3-test:main
 gcc test/valid/sqlite3.c -o test/valid/sqlite3.bin -lsqlite3

@@ -195,7 +195,8 @@ structure CBackend :> C_BACKEND = struct
                              [(disjTagFieldName, C.IntConstant (Int.toString id)),
                               (disjDataFieldName, C.IntConstant "0")])
       | transform (LIR.UnsafeExtractCase (oper, id)) ty =
-        C.StructAccess (transformOperand oper, disjDataFieldName)
+        C.StructAccess (C.StructAccess (transformOperand oper, disjDataFieldName),
+                        tupleIdxName id)
       | transform (LIR.ForeignFuncall (name, args)) ty =
         C.Funcall (name, map transformOperand args)
       | transform (LIR.NullPointer ty) _ =

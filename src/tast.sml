@@ -283,7 +283,10 @@ structure TAST :> TAST = struct
                         else
                             raise Fail "Both arguments to a comparison operation must be comparable"
                     else
-                        raise Fail "Both arguments to a comparison operator must be of the same type"
+                        raise Fail ("Both arguments to a comparison operator must be of the same type: "
+                                    ^ (Type.toString lhsTy)
+                                    ^ ", "
+                                    ^ (Type.toString rhsTy))
                 end
             end
           | augment (AST.TupleCreate exps) c =
@@ -391,7 +394,7 @@ structure TAST :> TAST = struct
                 end
             end
           | augment (AST.Construct (typespec, label, exp)) c =
-            (* Three things: verify that the type is indeed a datatype,
+            (* Three things: verify that the type is indeed a disjunction,
                verify that the label is a valid variant name, and check that the
                expression (if the variant carries a value) is of the correct
                type. *)
@@ -408,10 +411,15 @@ structure TAST :> TAST = struct
                                                         (SOME exp') =>
                                                         let val exp'' = augment exp' c
                                                         in
-                                                            if typeOf exp'' = caseTy then
-                                                                Construct (ty, label, SOME exp'')
-                                                            else
-                                                                raise Fail "construct: type mismatch"
+                                                            let val expTy = typeOf exp''
+                                                            in
+                                                                case TypeMatch.matchType caseTy expTy of
+                                                                    (TypeMatch.Bindings _) => Construct (ty, label, SOME exp'')
+                                                                  | _ => raise Fail ("construct: type mismatch: the type of the expression is "
+                                                                                     ^ (Type.toString expTy)
+                                                                                     ^ " while the type of the case is "
+                                                                                     ^ (Type.toString caseTy))
+                                                            end
                                                         end
                                                       | NONE => raise Fail "construct: missing value")
                                 | NONE => (case exp of
@@ -448,6 +456,9 @@ structure TAST :> TAST = struct
                 case typeOf exp' of
                     (Disjunction (name, tyargs)) =>
                     let val variants = Type.getDisjunctionVariants (ctxTenv c) name
+                        and typarams = case Type.getDeclaration (ctxTenv c) name of
+                                           (SOME (typarams, _)) => typarams
+                                         | _ => raise Fail "Internal error"
                     in
                         let val caseNames = map (fn (AST.VariantCase (name, _)) =>
                                                     case name of
@@ -457,14 +468,17 @@ structure TAST :> TAST = struct
                             and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                         in
                             if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
+                                (* The set of casenames in the type definition
+                                   is the same as that in the case expression,
+                                   that is, we're not missing any case. *)
                                 let fun transformCase (AST.VariantCase (name, body)) =
                                         (case name of
                                              (AST.NameOnly name') =>
                                              (case getVariantByName variants name' of
                                                   (SOME variant) =>
                                                   (* Since this is a name-only case,
-                                                 the variant must have no associated
-                                                 value *)
+                                                     the variant must have no associated
+                                                     value *)
                                                   (case variant of
                                                        (Type.Variant (_, NONE)) => VariantCase (NameOnly name',
                                                                                                 augment body c)
@@ -474,17 +488,20 @@ structure TAST :> TAST = struct
                                              (case getVariantByName variants casename of
                                                   (SOME variant) =>
                                                   (* Since this case has a binding,
-                                                 the variant must have an
-                                                 associated value *)
+                                                     the variant must have an
+                                                     associated value *)
                                                   (case variant of
                                                        (Type.Variant (_, SOME ty)) =>
-                                                       let val s' = Map.iadd (ctxBindings c)
-                                                                             (var, (Binding (ty, Immutable)))
+                                                       let val ty = replaceVars (replacements typarams tyargs) ty
                                                        in
-                                                           let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                                           let val s' = Map.iadd (ctxBindings c)
+                                                                                 (var, (Binding (ty, Immutable)))
                                                            in
-                                                               VariantCase (NameBinding { casename = casename, var = var, ty = ty },
-                                                                            augment body c')
+                                                               let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                                               in
+                                                                   VariantCase (NameBinding { casename = casename, var = var, ty = ty },
+                                                                                augment body c')
+                                                               end
                                                            end
                                                        end
                                                      | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
