@@ -309,9 +309,9 @@ structure Type :> TYPE = struct
     and resolveDisjunction name typarams tyargs =
         let val rs = replacements typarams tyargs
         in
-            let val tyargs = map (replaceVars rs) tyargs
+            let val tyargs' = map (replaceVars rs) tyargs
             in
-                Disjunction (name, tyargs)
+                Disjunction (name, tyargs')
             end
         end
 
