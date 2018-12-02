@@ -160,7 +160,7 @@ structure CRenderer :> C_RENDERER = struct
                           (pad (indent d)) ^ "case " ^ (Int.toString id) ^ ":\n"
                           ^ (renderBlock' (indent (indent d)) block))
                       cases))
-        ^ (pad d) ^ "}"
+        ^ "\n" ^ (pad d) ^ "}"
 
       | renderBlock' d (C.VoidFuncall (name, args)) =
         (pad d) ^ name ^ "(" ^ (commaSep (map renderExp args)) ^ "));"
