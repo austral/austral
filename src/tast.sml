@@ -468,6 +468,9 @@ structure TAST :> TAST = struct
                             and variantNames = map (fn (Type.Variant (name, _)) => name) variants
                         in
                             if Set.eq (Set.fromList caseNames) (Set.fromList variantNames) then
+                                (* The set of casenames in the type definition
+                                   is the same as that in the case expression,
+                                   that is, we're not missing any case. *)
                                 let fun transformCase (AST.VariantCase (name, body)) =
                                         (case name of
                                              (AST.NameOnly name') =>
