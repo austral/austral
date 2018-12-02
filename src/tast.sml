@@ -492,10 +492,10 @@ structure TAST :> TAST = struct
                                                      associated value *)
                                                   (case variant of
                                                        (Type.Variant (_, SOME ty)) =>
-                                                       let val s' = Map.iadd (ctxBindings c)
-                                                                             (var, (Binding (ty, Immutable)))
+                                                       let val ty = replaceVars (replacements typarams tyargs) ty
                                                        in
-                                                           let val ty = replaceVars (replacements typarams tyargs) ty
+                                                           let val s' = Map.iadd (ctxBindings c)
+                                                                                 (var, (Binding (ty, Immutable)))
                                                            in
                                                                let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                                                in
