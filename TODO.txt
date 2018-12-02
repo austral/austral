@@ -189,3 +189,4 @@ DONE:
 - String literals
 - Compile defcfun all the way down to extern
 - Separate type decl environment from datatype def environment
+- Fix typechecking of generic disjunctiom instances
