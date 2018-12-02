@@ -456,6 +456,9 @@ structure TAST :> TAST = struct
                 case typeOf exp' of
                     (Disjunction (name, tyargs)) =>
                     let val variants = Type.getDisjunctionVariants (ctxTenv c) name
+                        and typarams = case Type.getDeclaration (ctxTenv c) name of
+                                           (SOME (typarams, _)) => typarams
+                                         | _ => raise Fail "Internal error"
                     in
                         let val caseNames = map (fn (AST.VariantCase (name, _)) =>
                                                     case name of
