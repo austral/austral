@@ -155,12 +155,12 @@ structure CRenderer :> C_RENDERER = struct
 
       | renderBlock' d (C.Switch (exp, cases)) =
         (pad d) ^ "switch (" ^ (renderExp exp) ^ ") {\n"
-        ^ (sepBy ("\n" ^ (pad (indent (indent d))) ^ "break;\n")
+        ^ (sepBy ("\n" ^ (pad (indent (indent d))) ^ "break;\n" ^ (pad d) ^ "}\n")
                  (map (fn (id, block) =>
-                          (pad (indent d)) ^ "case " ^ (Int.toString id) ^ ":\n"
+                          (pad (indent d)) ^ "case " ^ (Int.toString id) ^ ": {\n"
                           ^ (renderBlock' (indent (indent d)) block))
                       cases))
-        ^ "\n" ^ (pad d) ^ "}"
+        ^ "\n" ^ (pad (indent d)) ^ "}\n" ^ (pad d) ^ "}"
 
       | renderBlock' d (C.VoidFuncall (name, args)) =
         (pad d) ^ name ^ "(" ^ (commaSep (map renderExp args)) ^ "));"
