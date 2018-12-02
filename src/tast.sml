@@ -489,10 +489,13 @@ structure TAST :> TAST = struct
                                                        let val s' = Map.iadd (ctxBindings c)
                                                                              (var, (Binding (ty, Immutable)))
                                                        in
-                                                           let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                                           let val ty = replaceVars (replacements typarams tyargs) ty
                                                            in
-                                                               VariantCase (NameBinding { casename = casename, var = var, ty = ty },
-                                                                            augment body c')
+                                                               let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
+                                                               in
+                                                                   VariantCase (NameBinding { casename = casename, var = var, ty = ty },
+                                                                                augment body c')
+                                                               end
                                                            end
                                                        end
                                                      | _ => raise Fail "case: this case has no binding, but the associated variant has an associated value")
