@@ -471,8 +471,8 @@ structure TAST :> TAST = struct
                                              (case getVariantByName variants name' of
                                                   (SOME variant) =>
                                                   (* Since this is a name-only case,
-                                                 the variant must have no associated
-                                                 value *)
+                                                     the variant must have no associated
+                                                     value *)
                                                   (case variant of
                                                        (Type.Variant (_, NONE)) => VariantCase (NameOnly name',
                                                                                                 augment body c)
