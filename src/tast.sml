@@ -413,12 +413,6 @@ structure TAST :> TAST = struct
                                                         in
                                                             let val expTy = typeOf exp''
                                                             in
-                                                                print "CONSTRUCT WITH VALUE\n";
-                                                                print "Tyargs:\n";
-                                                                print (String.concatWith ", " (map Type.toString tyargs));
-                                                                print "\ntype:\n";
-                                                                print (Type.toString ty);
-                                                                print "\n";
                                                                 case TypeMatch.matchType caseTy expTy of
                                                                     (TypeMatch.Bindings _) => Construct (ty, label, SOME exp'')
                                                                   | _ => raise Fail ("construct: type mismatch: the type of the expression is "
