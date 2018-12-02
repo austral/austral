@@ -495,11 +495,11 @@ structure TAST :> TAST = struct
                                                        let val s' = Map.iadd (ctxBindings c)
                                                                              (var, (Binding (ty, Immutable)))
                                                        in
-                                                           let val ty' = replaceVars (replacements typarams tyargs) ty
+                                                           let val ty = replaceVars (replacements typarams tyargs) ty
                                                            in
                                                                let val c' = mkContext s' (ctxTenv c) (ctxTyParams c) (ctxFenv c)
                                                                in
-                                                                   VariantCase (NameBinding { casename = casename, var = var, ty = ty' },
+                                                                   VariantCase (NameBinding { casename = casename, var = var, ty = ty },
                                                                                 augment body c')
                                                                end
                                                            end
