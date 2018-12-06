@@ -403,6 +403,9 @@ structure TAST :> TAST = struct
                 case ty of
                     (Disjunction (name, tyargs)) =>
                     let val variants = Type.getDisjunctionVariants (ctxTenv c) name
+                        and typarams = case Type.getDeclaration (ctxTenv c) name of
+                                           (SOME (typarams, _)) => typarams
+                                         | _ => raise Fail "Internal error"
                     in
                         (case getVariantByName variants label of
                              (SOME (Variant (_, tyOpt))) =>
@@ -414,7 +417,10 @@ structure TAST :> TAST = struct
                                                             let val expTy = typeOf exp''
                                                             in
                                                                 case TypeMatch.matchType caseTy expTy of
-                                                                    (TypeMatch.Bindings _) => Construct (ty, label, SOME exp'')
+                                                                    (TypeMatch.Bindings _) => let val ty = replaceVars (replacements typarams tyargs) ty
+                                                                                              in
+                                                                                                  Construct (ty, label, SOME exp'')
+                                                                                              end
                                                                   | _ => raise Fail ("construct: type mismatch: the type of the expression is "
                                                                                      ^ (Type.toString expTy)
                                                                                      ^ " while the type of the case is "
