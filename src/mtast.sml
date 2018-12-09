@@ -602,12 +602,12 @@ structure MTAST :> MTAST = struct
             case ty of
                 (MonoType.Disjunction (name, _)) => let val variants = Type.getDisjunctionVariants tenv name
                                                     in
-                                                        expandDefdisjunction ctx variants
+                                                        expandDefdisjunction ctx name id typarams tyargs variants
                                                     end
               | _ => raise Fail "Internal compiler error"
         end
 
-    and expandDefdisjunction ctx name id variants =
+    and expandDefdisjunction ctx name id typarams tyargs variants =
         (* Monomorphize the variants *)
         let val rs = makeReplacements typarams tyargs
         in
