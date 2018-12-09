@@ -128,6 +128,20 @@ structure DAST :> DAST = struct
                              map mapVariant variants)
             end
         end
+      | transformTop (AST.Defrecord (name, params, docstring, slots)) tenv _ =
+        let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
+        in
+            let fun mapSlot (AST.Slot (name, typespec, docstring)) =
+                    Slot (name,
+                          Type.resolve tenv (OrderedSet.toUnordered params') typespec,
+                          docstring)
+            in
+                Defrecord (name,
+                           params',
+                           docstring,
+                           map mapSlot variants)
+            end
+        end
       | transformTop (AST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
       | transformTop (AST.DefineSymbolMacro (name, exp, docstring)) _ _ =
