@@ -604,6 +604,10 @@ structure MTAST :> MTAST = struct
                                             in
                                                 expandDefdisjunction ctx name id typarams tyargs variants
                                             end
+              | (MonoType.Record _) => let val slots = Type.getRecordSlots tenv name
+                                       in
+                                           raise Fail "Not done yet"
+                                       end
               | _ => raise Fail "Internal compiler error"
         end
 
