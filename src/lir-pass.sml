@@ -384,6 +384,21 @@ structure LirPass :> LIR_PASS = struct
         in
             (LIR.DefdatatypeMono (name, id, tys), tt)
         end
+      | transformTop' tt (MIR.DefrecordMono (name, id, slots)) =
+        let fun mapSlot (name, ty) tt =
+                let val (ty, tt) = transformType tt ty
+                in
+                    ((name, ty), tt)
+                end
+        in
+            let val (slots', tt) = Util.foldThread (fn (slot, tt) =>
+                                                       mapSlot slot tt)
+                                                   slots
+                                                   tt
+            in
+                (LIR.DefrecordMono (name, id, slots'), tt)
+            end
+        end
       | transformTop' tt (MIR.Defcfun (rawname, tys, arity, rt)) =
         let val (tys, tt) = transformTypes tt tys
         in
