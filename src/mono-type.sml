@@ -217,4 +217,5 @@ structure MonoType :> MONO_TYPE = struct
         let val (ty', tm') = monomorphize tm rs ty
         in
             (Slot (name, ty'), tm')
+        end
 end
