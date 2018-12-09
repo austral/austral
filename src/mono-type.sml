@@ -179,6 +179,8 @@ structure MonoType :> MONO_TYPE = struct
       | monomorphizeList tm rs nil =
         (nil, tm)
 
+    (* Monomorphize variants *)
+
     and monomorphizeVariants tm rs (head::tail) =
         let val (variant, tm') = monomorphizeVariant tm rs head
         in
@@ -197,4 +199,8 @@ structure MonoType :> MONO_TYPE = struct
         end
       | monomorphizeVariant tm _ (Type.Variant (name, NONE)) =
         (Variant (name, NONE), tm)
+
+    (* Monomorphize records *)
+
+
 end
