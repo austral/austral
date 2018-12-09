@@ -632,6 +632,26 @@ structure MTAST :> MTAST = struct
             end
         end
 
+    and expandDefrecord ctx name id typarams tyargs slots =
+        (* Monomorphize the slots *)
+        let val rs = makeReplacements typarams tyargs
+        in
+            let fun mapSlot ctx (Type.Slot (name, ty)) =
+                    let val (ty, ctx) = monoType ctx rs ty
+                    in
+                        (MonoType.Slot (name, ty), ctx)
+                    end
+            in
+                let val (slots', ctx) = Util.foldThread (fn (var, ctx) =>
+                                                            mapSlot ctx var)
+                                                        slots
+                                                        ctx
+                in
+                    raise Fail "Not done yet"
+                end
+            end
+        end
+
     and getTyparams tenv name =
         (case Type.getDefinition tenv name of
              SOME (typarams, _) => typarams
