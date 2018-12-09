@@ -36,6 +36,8 @@ signature MONO_TYPE = sig
 
     datatype variant = Variant of name * ty option
 
+    datatype slot = Slot of name * ty
+
     val disjName : ty -> name
 
     (* Type monomorphization *)
