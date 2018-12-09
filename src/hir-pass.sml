@@ -217,9 +217,9 @@ structure HirPass :> HIR_PASS = struct
         let fun mapSlot (MonoType.Slot (name, ty)) =
                 (name, transformType ty)
         in
-            DefdatatypeMono (name,
-                             id,
-                             map mapSlot slots)
+            DefrecordMono (name,
+                           id,
+                           map mapSlot slots)
         end
       | transformTop _ (M.Defcfun (_, rawname, params, arity, rt)) =
         Defcfun (rawname,
