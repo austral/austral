@@ -375,6 +375,10 @@ structure MirPass :> MIR_PASS = struct
         MIR.DefdatatypeMono (name,
                              id,
                              map transformType tys)
+      | transformTop _ (M.DefrecordMono (name, id, slots)) =
+        MIR.DefrecordMono (name,
+                           id,
+                           map (fn (n, t) => (n, transformType t)) slots)
       | transformTop (HIR.Defcfun (rawname, tys, arity, rt)) =
         Defcfun (rawname,
                  map transformType tys,
