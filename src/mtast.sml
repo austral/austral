@@ -600,10 +600,10 @@ structure MTAST :> MTAST = struct
         let val typarams = getTyparams tenv name
         in
             case ty of
-                (MonoType.Disjunction (name, _)) => let val variants = Type.getDisjunctionVariants tenv name
-                                                    in
-                                                        expandDefdisjunction ctx name id typarams tyargs variants
-                                                    end
+                (MonoType.Disjunction (_, _)) => let val variants = Type.getDisjunctionVariants tenv name
+                                                 in
+                                                     expandDefdisjunction ctx name id typarams tyargs variants
+                                                 end
               | _ => raise Fail "Internal compiler error"
         end
 
