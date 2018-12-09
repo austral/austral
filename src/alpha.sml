@@ -256,6 +256,11 @@ structure Alpha :> ALPHA = struct
                      typarams,
                      docstring,
                      map (fn (OAST.Variant v) => Variant v) variants)
+      | transformTop' (OAST.Defrecord (name, typarams, docstring, slots)) =
+        Defrecord (name,
+                   typarams,
+                   docstring,
+                   map (fn (OAST.Slot (name, ty, docstring)) => Slot (name, ty, docstring)) slots)
       | transformTop' (OAST.Deftemplate template) =
         Deftemplate template
       | transformTop' (OAST.DefineSymbolMacro mac) =
