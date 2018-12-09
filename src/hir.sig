@@ -30,6 +30,7 @@ signature HIR = sig
                 | Pointer of ty
                 | StaticArray of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     (* Expression AST *)
 
@@ -70,6 +71,7 @@ signature HIR = sig
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
                      | DefdatatypeMono of name * int * ty list
+                     | DefrecordMono of name * int * (name * ty) list
                      | Defcfun of string * ty list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty

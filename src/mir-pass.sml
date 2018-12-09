@@ -40,6 +40,8 @@ structure MirPass :> MIR_PASS = struct
         StaticArray (transformType t)
       | transformType (HIR.Disjunction (name, id)) =
         Disjunction (name, id)
+      | transformType (HIR.Record (name, id)) =
+        Record (name, id)
 
     (* Transform HIR expressions to MIR basic blocks *)
 
@@ -373,6 +375,10 @@ structure MirPass :> MIR_PASS = struct
         MIR.DefdatatypeMono (name,
                              id,
                              map transformType tys)
+      | transformTop (HIR.DefrecordMono (name, id, slots)) =
+        MIR.DefrecordMono (name,
+                           id,
+                           map (fn (n, t) => (n, transformType t)) slots)
       | transformTop (HIR.Defcfun (rawname, tys, arity, rt)) =
         Defcfun (rawname,
                  map transformType tys,

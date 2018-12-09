@@ -32,6 +32,7 @@ structure Type :> TYPE = struct
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * ty list
+                | Record of name * ty list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64 | IntSize
@@ -83,6 +84,12 @@ structure Type :> TYPE = struct
         ^ " "
         ^ (String.concatWith " " (map toString tyargs))
         ^ ")"
+      | toString (Record (name, tyargs)) =
+        "("
+        ^ (Symbol.toString name)
+        ^ " "
+        ^ (String.concatWith " " (map toString tyargs))
+        ^ ")"
       | toString (TypeVariable name) =
         Symbol.toString name
 
@@ -113,6 +120,8 @@ structure Type :> TYPE = struct
       | tyVars (Pointer ty) = tyVars ty
       | tyVars (Disjunction (_, tys)) =
         (Set.unionList (map tyVars tys))
+      | tyVars (Record (_, tys)) =
+        (Set.unionList (map tyVars tys))
       | tyVars (TypeVariable name) =
         Set.singleton (TypeParam name)
 
@@ -122,12 +131,15 @@ structure Type :> TYPE = struct
 
     datatype decltype = AliasDecl of ty
                       | DisjunctionDecl
+                      | RecordDecl
 
     type declmap = (name, (typarams * decltype)) Map.map
 
     datatype typedef = AliasDef of ty
                      | DisjunctionDef of variant list
+                     | RecordDef of slot list
          and variant = Variant of name * ty option
+         and slot = Slot of name * ty
 
     type defmap = (name, (typarams * typedef)) Map.map
 
@@ -249,34 +261,12 @@ structure Type :> TYPE = struct
                 (* Otherwise, we're dealing with (potentially) a user-defined
                    type or type variable. *)
                 if Set.isIn params (TypeParam name) then
-                    (* If the constructor name is in the set of type parameters,
-                       it's a type variable. We also have to make sure that
-                       there are no args, that is, that this type variable
-                       doesn't appear as a constructor, *)
-                    if List.length tyargs = 0 then
-                        TypeVariable name
-                    else
-                        (* TODO: higher-kinded types would be nice *)
-                        raise Fail "Type variables cannot be constructors"
+                    resolveTypeVariable name tyargs
                 else
                     (* Since it's not a builtin and not a type variable, we're
                        dealing with a user-defined type. Try to find if it
                        exists. *)
-                    (case (getDeclaration tenv name) of
-                         (SOME (typarams, decltype)) =>
-                         if sameSize typarams tyargs' then
-                             (* The arity matches, that is, we have exactly as
-                                many type arguments as type parameters in the
-                                definition of this type. *)
-                             (case decltype of
-                                  (AliasDecl ty) => ty
-                                (* If it's a disjunction, construct a ty
-                                   instance from the name and args *)
-                                | (DisjunctionDecl) => resolveDisjunction name typarams tyargs')
-                         else
-                             raise Fail "Type arity error"
-                       | NONE =>
-                         raise Fail ("No type named " ^ (Symbol.toString name)))
+                    resolveUserDefined tenv params name tyargs tyargs'
         end
 
     and resolveBuiltin tenv params name args =
@@ -295,6 +285,36 @@ structure Type :> TYPE = struct
              else
                  raise Fail "Internal compiler error: not a builtin")
 
+    and resolveTypeVariable name tyargs =
+        (* If the constructor name is in the set of type parameters, it's a type
+           variable. We also have to make sure that there are no args, that is,
+           that this type variable doesn't appear as a constructor, *)
+        if List.length tyargs = 0 then
+            TypeVariable name
+        else
+            (* TODO: higher-kinded types would be nice *)
+            raise Fail "Type variables cannot be constructors"
+
+    and resolveUserDefined tenv params name tyargs tyargs' =
+        (case (getDeclaration tenv name) of
+             (SOME (typarams, decltype)) =>
+             if sameSize typarams tyargs' then
+                 (* The arity matches, that is, we have exactly as many type
+                    arguments as type parameters in the definition of this
+                    type. *)
+                 (case decltype of
+                      (AliasDecl ty) => ty
+                    (* If it's a disjunction, construct a ty instance from the
+                       name and args *)
+                    | (DisjunctionDecl) => resolveDisjunction name typarams tyargs'
+                    (* If it's a record, construct a ty instance from the name
+                       and args *)
+                    | (RecordDecl) => resolveRecord name typarams tyargs')
+             else
+                 raise Fail "Type arity error"
+           | NONE =>
+             raise Fail ("No type named " ^ (Symbol.toString name)))
+
     and resolveAlias (tenv: tenv) (name: name) (tyargs: ty list) =
         (case getDefinition tenv name of
              (SOME (typarams, typedef)) =>
@@ -312,6 +332,15 @@ structure Type :> TYPE = struct
             let val tyargs' = map (replaceVars rs) tyargs
             in
                 Disjunction (name, tyargs')
+            end
+        end
+
+    and resolveRecord name typarams tyargs =
+        let val rs = replacements typarams tyargs
+        in
+            let val tyargs' = map (replaceVars rs) tyargs
+            in
+                Record (name, tyargs')
             end
         end
 
@@ -347,4 +376,11 @@ structure Type :> TYPE = struct
 
     fun posInVariants variants name =
         Util.position name (map (fn (Variant (name, _)) => name) variants)
+
+    fun getRecordSlots tenv name =
+        (case getDefinition tenv name of
+             (SOME (_, (RecordDef slots))) => slots
+           | _ => raise Fail ("Internal compiler error: getRecordSlots: definition for type "
+                              ^ (Symbol.toString name)
+                              ^ " not found in the tenv"))
 end

@@ -145,6 +145,7 @@ structure MTAST :> MTAST = struct
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
                      | DefdatatypeMono of name * int * ty list
+                     | DefrecordMono of name * int * MonoType.slot list
                      | Defcfun of name * string * param list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
@@ -582,7 +583,7 @@ structure MTAST :> MTAST = struct
                                          expandDefgeneric ctx' fenv fdefenv name args id)
                                      newFuncs
                     and deftypes = map (fn (name, tyargs, ty, id) =>
-                                           expandDefdisjunction ctx' tenv name tyargs id ty)
+                                           expandType ctx' tenv name tyargs id ty)
                                        newTypes
                 in
                     (ToplevelProgn (defuns @ deftypes @ [node]),
@@ -596,47 +597,66 @@ structure MTAST :> MTAST = struct
              (SOME (Function.CallableGFunc gf)) => expandGf ctx gf fdefenv name args id
            | _ => raise Fail "Internal compiler error: alleged generic function is not a gf")
 
-    and expandDefdisjunction ctx tenv name tyargs id ty =
-        let fun monomorphizeVariants (typarams: Type.typarams): ty list =
-                if isDisj ty then
-                    (* Monomorphize the variants *)
-                    let val variants = Type.getDisjunctionVariants tenv name
-                        and rs = makeReplacements typarams tyargs
-                    in
-                        let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
-                                monoType ctx rs ty
-                              | mapVariant ctx (Type.Variant (_, NONE)) =
-                                (MonoType.Unit, ctx)
-                        in
-                            let val (variants', ctx) = Util.foldThread (fn (var, ctx) =>
-                                                                           mapVariant ctx var)
-                                                                       variants
-                                                                       ctx
-                            in
-                                variants'
-                            end
-                        end
-                    end
-                else
-                    raise Fail "expandDefdisjunction: not a disjunction"
-
-            and isDisj ty =
-                case ty of
-                    (MonoType.Disjunction (name, _)) => true
-                  | _ => false
-
-            and getTyparams tenv name =
-                (case Type.getDefinition tenv name of
-                     SOME (typarams, _) => typarams
-                   | NONE => raise Fail "Internal error")
+    and expandType ctx tenv name tyargs id ty =
+        let val typarams = getTyparams tenv name
         in
-            let val typarams = getTyparams tenv name
+            case ty of
+                (MonoType.Disjunction _) => let val variants = Type.getDisjunctionVariants tenv name
+                                            in
+                                                expandDefdisjunction ctx name id typarams tyargs variants
+                                            end
+              | (MonoType.Record _) => let val slots = Type.getRecordSlots tenv name
+                                       in
+                                           expandDefrecord ctx name id typarams tyargs slots
+                                       end
+              | _ => raise Fail "Internal compiler error"
+        end
+
+    and expandDefdisjunction ctx name id typarams tyargs variants =
+        (* Monomorphize the variants *)
+        let val rs = makeReplacements typarams tyargs
+        in
+            let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
+                    monoType ctx rs ty
+                  | mapVariant ctx (Type.Variant (_, NONE)) =
+                    (MonoType.Unit, ctx)
             in
-                DefdatatypeMono (name,
-                                 id,
-                                 monomorphizeVariants typarams)
+                let val (variants', ctx) = Util.foldThread (fn (var, ctx) =>
+                                                               mapVariant ctx var)
+                                                           variants
+                                                           ctx
+                in
+                    DefdatatypeMono (name,
+                                     id,
+                                     variants')
+                end
             end
         end
+
+    and expandDefrecord ctx name id typarams tyargs slots =
+        (* Monomorphize the slots *)
+        let val rs = makeReplacements typarams tyargs
+        in
+            let fun mapSlot ctx (Type.Slot (name, ty)) =
+                    let val (ty, ctx) = monoType ctx rs ty
+                    in
+                        (MonoType.Slot (name, ty), ctx)
+                    end
+            in
+                let val (slots', ctx) = Util.foldThread (fn (var, ctx) =>
+                                                            mapSlot ctx var)
+                                                        slots
+                                                        ctx
+                in
+                    DefrecordMono (name, id, slots')
+                end
+            end
+        end
+
+    and getTyparams tenv name =
+        (case Type.getDefinition tenv name of
+             SOME (typarams, _) => typarams
+           | NONE => raise Fail "Internal error")
 
     and expandGf ctx gf fdefenv name tyargs id =
         let val (params, body) = Option.valOf (FDefs.getDefinition fdefenv name)

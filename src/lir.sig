@@ -28,6 +28,7 @@ signature LIR = sig
                 | Tuple of int
                 | Pointer of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     (* AST *)
 
@@ -76,6 +77,7 @@ signature LIR = sig
     datatype top_ast = Defun of name * param list * ty * instruction list * operand
                      | DefunMonomorph of name * param list * ty * instruction list * operand * int
                      | DefdatatypeMono of name * int * ty list
+                     | DefrecordMono of name * int * (name * ty) list
                      | Deftuple of int * ty list
                      | Defcfun of string * ty list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list

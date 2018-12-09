@@ -65,6 +65,9 @@ structure CBackend :> C_BACKEND = struct
     fun disjName name id =
         "_A_type_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
 
+    fun recordName name id =
+        "_A_type_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
+
     val disjTagFieldName = "tag"
 
     val disjDataFieldName = "data"
@@ -98,6 +101,8 @@ structure CBackend :> C_BACKEND = struct
         C.Pointer (transformType t)
       | transformType (LIR.Disjunction (name, id)) =
         C.NamedType (disjName name id)
+      | transformType (LIR.Record (name, id)) =
+        C.NamedType (recordName name id)
 
     and intTypeName Type.Unsigned Type.Int8 =
         "uint8_t"
@@ -328,6 +333,14 @@ structure CBackend :> C_BACKEND = struct
             C.TypeDef (name,
                        C.Struct [(C.NamedType "uint8_t", disjTagFieldName),
                                  (C.Union slots, disjDataFieldName)])
+        end
+      | transformTop (LIR.DefrecordMono (name, id, slots)) =
+        let val name = disjName name id
+            and slots = map (fn (name, ty) =>
+                                (transformType ty, escapeSymbol name))
+                            slots
+        in
+            C.TypeDef (name, C.Struct slots)
         end
       | transformTop (LIR.Deftuple (id, tys)) =
         let val name = tupleName id

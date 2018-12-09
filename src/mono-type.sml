@@ -32,8 +32,11 @@ structure MonoType :> MONO_TYPE = struct
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     datatype variant = Variant of name * ty option
+
+    datatype slot = Slot of name * ty
 
     fun disjName (Disjunction (name, _)) =
         name
@@ -137,6 +140,27 @@ structure MonoType :> MONO_TYPE = struct
                                 end
                             end
         end
+      | monomorphize tm rs (Type.Record (name, tyargs)) =
+        let val (tyargs', tm) = monomorphizeList tm rs tyargs
+        in
+            case getMonomorph tm name tyargs' of
+                SOME (ty, _) => (ty, tm)
+              | NONE =>
+                (* If this pair of name+type args is not present in the table of
+                   monomorphs, add it *)
+                case getMonomorph tm name tyargs' of
+                    (SOME (ty, _)) => (ty, tm)
+                  | NONE => let val id = freshId ()
+                            in
+                                let val disj = Record (name, id)
+                                in
+                                    let val tm = addMonomorph tm name tyargs' disj id
+                                    in
+                                        (disj, tm)
+                                    end
+                                end
+                            end
+        end
       | monomorphize tm rs (Type.TypeVariable name) =
         (case Map.get rs name of
              SOME ty => (ty, tm)
@@ -155,16 +179,13 @@ structure MonoType :> MONO_TYPE = struct
       | monomorphizeList tm rs nil =
         (nil, tm)
 
-    and monomorphizeVariants tm rs (head::tail) =
-        let val (variant, tm') = monomorphizeVariant tm rs head
-        in
-            let val (rest, tm'') = monomorphizeVariants tm' rs tail
-            in
-                (variant :: rest, tm'')
-            end
-        end
-      | monomorphizeVariants tm rs nil =
-        (nil, tm)
+    (* Monomorphize variants *)
+
+    and monomorphizeVariants tm rs variants =
+        Util.foldThread (fn (variant, tm) =>
+                            monomorphizeVariant tm rs variant)
+                        variants
+                        tm
 
     and monomorphizeVariant tm rs (Type.Variant (name, SOME ty)) =
         let val (ty', tm') = monomorphize tm rs ty
@@ -173,4 +194,18 @@ structure MonoType :> MONO_TYPE = struct
         end
       | monomorphizeVariant tm _ (Type.Variant (name, NONE)) =
         (Variant (name, NONE), tm)
+
+    (* Monomorphize slots *)
+
+    and monomorphizeSlots tm rs slots =
+        Util.foldThread (fn (slot, tm) =>
+                            monomorphizeSlot tm rs slot)
+                        slots
+                        tm
+
+    and monomorphizeSlot tm rs (Type.Slot (name, ty)) =
+        let val (ty', tm') = monomorphize tm rs ty
+        in
+            (Slot (name, ty'), tm')
+        end
 end

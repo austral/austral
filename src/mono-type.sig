@@ -32,8 +32,11 @@ signature MONO_TYPE = sig
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     datatype variant = Variant of name * ty option
+
+    datatype slot = Slot of name * ty
 
     val disjName : ty -> name
 
@@ -54,4 +57,5 @@ signature MONO_TYPE = sig
 
     val monomorphize : type_monomorphs -> replacements -> Type.ty -> (ty * type_monomorphs)
     val monomorphizeVariants : type_monomorphs -> replacements -> Type.variant list -> (variant list * type_monomorphs)
+    val monomorphizeSlots : type_monomorphs -> replacements -> Type.slot list -> (slot list * type_monomorphs)
 end

@@ -56,6 +56,8 @@ structure HirPass :> HIR_PASS = struct
         StaticArray (transformType ty)
       | transformType (MT.Disjunction (name, id)) =
         Disjunction (name, id)
+      | transformType (MT.Record (name, id)) =
+        Record (name, id)
 
     fun caseNameIdx tenv ty name =
         let val variants = Type.getDisjunctionVariants tenv (MonoType.disjName ty)
@@ -211,6 +213,14 @@ structure HirPass :> HIR_PASS = struct
         DefdatatypeMono (name,
                          id,
                          map transformType tys)
+      | transformTop _ (M.DefrecordMono (name, id, slots)) =
+        let fun mapSlot (MonoType.Slot (name, ty)) =
+                (name, transformType ty)
+        in
+            DefrecordMono (name,
+                           id,
+                           map mapSlot slots)
+        end
       | transformTop _ (M.Defcfun (_, rawname, params, arity, rt)) =
         Defcfun (rawname,
                  map (fn (M.Param (_, t)) => transformType t) params,

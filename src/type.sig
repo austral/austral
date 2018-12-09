@@ -32,6 +32,7 @@ signature TYPE = sig
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * ty list
+                | Record of name * ty list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64 | IntSize
@@ -61,10 +62,13 @@ signature TYPE = sig
 
     datatype decltype = AliasDecl of ty
                       | DisjunctionDecl
+                      | RecordDecl
 
     datatype typedef = AliasDef of ty
                      | DisjunctionDef of variant list
+                     | RecordDef of slot list
          and variant = Variant of name * ty option
+         and slot = Slot of name * ty
 
     val defaultTenv : tenv
 
@@ -100,4 +104,6 @@ signature TYPE = sig
     val getDisjunctionVariants : tenv -> name -> variant list
     val getVariantByName : variant list -> name -> variant option
     val posInVariants : variant list -> name -> int option
+
+    val getRecordSlots : tenv -> name -> slot list
 end
