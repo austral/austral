@@ -80,6 +80,7 @@ structure MIR :> MIR = struct
     datatype top_ast = Defun of name * param list * ty * instruction list * operand
                      | DefunMonomorph of name * param list * ty * instruction list * operand * int
                      | DefdatatypeMono of name * int * ty list
+                     | DefrecordMono of name * int * (name * ty) list
                      | Defcfun of string * ty list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
