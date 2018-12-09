@@ -449,7 +449,8 @@ structure OAST :> OAST = struct
                              map parseVariant variants)
             end
         end
-      | transformDefdatatype _ = raise Fail "Bad defdatatype form"
+      | transformDefdatatype _ =
+        raise Fail "Bad defdatatype form"
 
     and transformDefrecord ((RCST.Symbol name)::(RCST.List params)::body) =
         let fun parseBody ((RCST.StringConstant s)::def) =
