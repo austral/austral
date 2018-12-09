@@ -31,7 +31,7 @@ structure DAST :> DAST = struct
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
                      | Defdatatype of name * Type.typarams * docstring * Type.variant list
-                     | Defrecord of name * param_name list * docstring * slot list
+                     | Defrecord of name * Type.typarams * docstring * slot list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
