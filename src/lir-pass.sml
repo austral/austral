@@ -93,6 +93,8 @@ structure LirPass :> LIR_PASS = struct
         end
       | transformType tt (MIR.Disjunction (name, id)) =
         (L.Disjunction (name, id), tt)
+      | transformType tt (MIR.Record (name, id)) =
+        (L.Record (name, id), tt)
 
     and transformTypes tt tys =
         Util.foldThread (fn (ty, tt) =>
