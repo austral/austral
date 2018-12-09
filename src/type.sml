@@ -261,15 +261,7 @@ structure Type :> TYPE = struct
                 (* Otherwise, we're dealing with (potentially) a user-defined
                    type or type variable. *)
                 if Set.isIn params (TypeParam name) then
-                    (* If the constructor name is in the set of type parameters,
-                       it's a type variable. We also have to make sure that
-                       there are no args, that is, that this type variable
-                       doesn't appear as a constructor, *)
-                    if List.length tyargs = 0 then
-                        TypeVariable name
-                    else
-                        (* TODO: higher-kinded types would be nice *)
-                        raise Fail "Type variables cannot be constructors"
+                    resolveTypeVariable name tyargs
                 else
                     (* Since it's not a builtin and not a type variable, we're
                        dealing with a user-defined type. Try to find if it
@@ -292,6 +284,16 @@ structure Type :> TYPE = struct
                      raise Fail "Unknown builtin"
              else
                  raise Fail "Internal compiler error: not a builtin")
+
+    and resolveTypeVariable name tyargs =
+        (* If the constructor name is in the set of type parameters, it's a type
+           variable. We also have to make sure that there are no args, that is,
+           that this type variable doesn't appear as a constructor, *)
+        if List.length tyargs = 0 then
+            TypeVariable name
+        else
+            (* TODO: higher-kinded types would be nice *)
+            raise Fail "Type variables cannot be constructors"
 
     and resolveUserDefined tenv params name tyargs tyargs' =
         (case (getDeclaration tenv name) of
