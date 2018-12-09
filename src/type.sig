@@ -32,6 +32,7 @@ signature TYPE = sig
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * ty list
+                | Record of name * ty list
                 | TypeVariable of name
          and signedness = Unsigned | Signed
          and width = Int8 | Int16 | Int32 | Int64 | IntSize
