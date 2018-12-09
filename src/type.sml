@@ -330,6 +330,15 @@ structure Type :> TYPE = struct
             end
         end
 
+    and resolveRecord name typarams tyargs =
+        let val rs = replacements typarams tyargs
+        in
+            let val tyargs' = map (replaceVars rs) tyargs
+            in
+                Record (name, tyargs')
+            end
+        end
+
     and resolveTuple tenv params tys =
         Tuple (map (resolve tenv params) tys)
 
