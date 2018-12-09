@@ -104,4 +104,6 @@ signature TYPE = sig
     val getDisjunctionVariants : tenv -> name -> variant list
     val getVariantByName : variant list -> name -> variant option
     val posInVariants : variant list -> name -> int option
+
+    val getRecordSlots : tenv -> name -> slot list
 end
