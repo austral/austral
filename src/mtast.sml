@@ -648,7 +648,7 @@ structure MTAST :> MTAST = struct
                                                         slots
                                                         ctx
                 in
-                    raise Fail "Not done yet"
+                    DefrecordMono (name, id, slots')
                 end
             end
         end
