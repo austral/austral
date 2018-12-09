@@ -98,6 +98,8 @@ structure CBackend :> C_BACKEND = struct
         C.Pointer (transformType t)
       | transformType (LIR.Disjunction (name, id)) =
         C.NamedType (disjName name id)
+      | transformType (LIR.Record (name, id)) =
+        C.NamedType (recordName name id)
 
     and intTypeName Type.Unsigned Type.Int8 =
         "uint8_t"
