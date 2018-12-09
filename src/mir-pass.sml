@@ -40,6 +40,8 @@ structure MirPass :> MIR_PASS = struct
         StaticArray (transformType t)
       | transformType (HIR.Disjunction (name, id)) =
         Disjunction (name, id)
+      | transformType (HIR.Record (name, id)) =
+        Record (name, id)
 
     (* Transform HIR expressions to MIR basic blocks *)
 
