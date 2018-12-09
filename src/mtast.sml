@@ -509,7 +509,7 @@ structure MTAST :> MTAST = struct
 
     fun monomorphizeTop' ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
-      | monomorphizeTop' ctx (TAST.Defgeneric (name, typarams, params, rt, docstring, body)) =
+      | monomorphizeTop' ctx (TAST.Defgeneric _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Defclass _) =
         (ToplevelProgn [], ctx)
