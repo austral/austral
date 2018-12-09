@@ -763,7 +763,7 @@ structure TAST :> TAST = struct
                      params,
                      docstring,
                      ty)
-      | augmentTop (DAST.Defdatatype (name, params, docstring, variants)) tenv _ =
+      | augmentTop (DAST.Defdatatype (name, params, docstring, variants)) _ _ =
         Defdatatype (name,
                      params,
                      docstring,
