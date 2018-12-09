@@ -68,6 +68,7 @@ signature TYPE = sig
                      | DisjunctionDef of variant list
                      | RecordDef of slot list
          and variant = Variant of name * ty option
+         and slot = Slot of name * ty
 
     val defaultTenv : tenv
 
