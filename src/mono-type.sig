@@ -32,6 +32,7 @@ signature MONO_TYPE = sig
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     datatype variant = Variant of name * ty option
 
