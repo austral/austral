@@ -376,4 +376,11 @@ structure Type :> TYPE = struct
 
     fun posInVariants variants name =
         Util.position name (map (fn (Variant (name, _)) => name) variants)
+
+    fun getRecordSlots tenv name =
+        (case getDefinition tenv name of
+             (SOME (_, (RecordDef slots))) => slots
+           | _ => raise Fail ("Internal compiler error: getRecordSlots: definition for type "
+                              ^ (Symbol.toString name)
+                              ^ " not found in the tenv"))
 end
