@@ -139,6 +139,7 @@ structure Type :> TYPE = struct
                      | DisjunctionDef of variant list
                      | RecordDef of slot list
          and variant = Variant of name * ty option
+         and slot = Slot of name * ty
 
     type defmap = (name, (typarams * typedef)) Map.map
 
