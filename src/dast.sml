@@ -139,7 +139,7 @@ structure DAST :> DAST = struct
                 Defrecord (name,
                            params',
                            docstring,
-                           map mapSlot variants)
+                           map mapSlot slots)
             end
         end
       | transformTop (AST.Deftemplate tmpl) _ _ =
