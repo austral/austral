@@ -768,6 +768,11 @@ structure TAST :> TAST = struct
                      params,
                      docstring,
                      variants)
+      | augmentTop (DAST.Defrecord (name, params, docstring, slots)) _ _ =
+        Defrecord (name,
+                   params,
+                   docstring,
+                   slots)
       | augmentTop (DAST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
       | augmentTop (DAST.DefineSymbolMacro (name, exp, docstring)) _ _ =
