@@ -600,7 +600,7 @@ structure MTAST :> MTAST = struct
         let val typarams = getTyparams tenv name
         in
             case ty of
-                (MonoType.Disjunction (_, _)) => let val variants = Type.getDisjunctionVariants tenv name
+                (MonoType.Disjunction _) => let val variants = Type.getDisjunctionVariants tenv name
                                                  in
                                                      expandDefdisjunction ctx name id typarams tyargs variants
                                                  end
