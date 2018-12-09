@@ -244,7 +244,7 @@ structure Compiler : COMPILER = struct
         in
             compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.AliasDecl ty))
         end
-      | declareTopForm c (DAST.Defdatatype (name, params, docstring, variants)) =
+      | declareTopForm c (DAST.Defdatatype (name, params, _, _)) =
         let val tenv = compilerTenv c
         in
             compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl))
