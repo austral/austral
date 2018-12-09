@@ -249,6 +249,11 @@ structure Compiler : COMPILER = struct
         in
             compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl))
         end
+      | declareTopForm c (DAST.Defrecord (name, params, docstring, slots)) =
+        let val tenv = compilerTenv c
+        in
+            compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.RecordDecl))
+        end
       | declareTopForm c (DAST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
       | declareTopForm c (DAST.DefineSymbolMacro mac) =
