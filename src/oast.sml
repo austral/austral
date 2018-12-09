@@ -475,6 +475,8 @@ structure OAST :> OAST = struct
                            map parseSlot slots)
             end
         end
+      | transformDefrecord _ =
+        raise Fail "Bad defrecord form"
 
     and transformDeftemplate ((RCST.Symbol name)::body) =
         raise Fail "deftemplate not implemented"
