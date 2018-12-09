@@ -310,6 +310,11 @@ structure AST :> AST = struct
                      typarams,
                      docstring,
                      map (fn (Alpha.Variant v) => Variant v) variants)
+      | transformTop (Alpha.Defrecord (name, typarams, docstring, slots)) =
+        Defrecord (name,
+                   typarams,
+                   docstring,
+                   map (fn (Alpha.Slot (name, ty, docstring)) => Slot (name, ty, docstring)) slots)
       | transformTop (Alpha.Deftemplate template) =
         Deftemplate template
       | transformTop (Alpha.DefineSymbolMacro mac) =
