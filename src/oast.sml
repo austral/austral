@@ -451,6 +451,29 @@ structure OAST :> OAST = struct
         end
       | transformDefdatatype _ = raise Fail "Bad defdatatype form"
 
+    and transformDefrecord ((RCST.Symbol name)::(RCST.List params)::body) =
+        let fun parseBody ((RCST.StringConstant s)::def) =
+                (SOME (CST.escapedToString s), def)
+              | parseBody def =
+                (NONE, def)
+
+            and parseParam (RCST.Symbol s) = s
+              | parseParam _ = raise Fail "Type parameter must be a symbol"
+
+            and parseSlot (RCST.List [RCST.Symbol name, typespec]) =
+                Slot (name, Type.parseTypespec typespec, NONE)
+              | parseSlot (RCST.List [RCST.Symbol name, typespec, RCST.StringConstant docstring]) =
+                Slot (name, Type.parseTypespec typespec, SOME (CST.escapedToString docstring))
+        in
+            let val (docstring, slots) = parseBody body
+            in
+                Defrecord (name,
+                           map parseParam params,
+                           docstring,
+                           map parseSlot slots)
+            end
+        end
+
     and transformDeftemplate ((RCST.Symbol name)::body) =
         raise Fail "deftemplate not implemented"
       | transformDeftemplate _ = raise Fail "Bad deftemplate form"
