@@ -509,16 +509,18 @@ structure MTAST :> MTAST = struct
 
     fun monomorphizeTop' ctx (TAST.Defun (name, params, rt, _, body)) =
         monomorphizeDefun ctx name params rt body
-      | monomorphizeTop' ctx (TAST.Defgeneric (name, typarams, params, rt, docstring, body)) =
+      | monomorphizeTop' ctx (TAST.Defgeneric _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Defclass _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' _ (TAST.Definstance (name, arg, docstring, methods)) =
         raise Fail "definstance: not implemented yet"
-      | monomorphizeTop' ctx (TAST.Deftype (name, params, _, ty)) =
+      | monomorphizeTop' ctx (TAST.Deftype _) =
         (* Type aliases don't need to be compiled to anything *)
         (ToplevelProgn [], ctx)
-      | monomorphizeTop' ctx (TAST.Defdatatype (name, params, _, variants)) =
+      | monomorphizeTop' ctx (TAST.Defdatatype _) =
+        (ToplevelProgn [], ctx)
+      | monomorphizeTop' ctx (TAST.Defrecord _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Deftemplate _) =
         (ToplevelProgn [], ctx)

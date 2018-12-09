@@ -1,0 +1,8 @@
+;; -*- mode: lisp -*-
+
+(defrecord pair ()
+  (a i32)
+  (b f32))
+
+(defun main () i32
+  0)

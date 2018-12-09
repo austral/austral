@@ -54,6 +54,7 @@ structure OAST :> OAST = struct
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * param_name list * docstring * typespec
                      | Defdatatype of name * param_name list * docstring * variant list
+                     | Defrecord of name * param_name list * docstring * slot list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -64,6 +65,7 @@ structure OAST :> OAST = struct
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and instance_arg = InstanceArg of name * name list
          and variant = Variant of name * typespec option
+         and slot = Slot of name * typespec * docstring
 
     (* Parameter list parsing *)
 
@@ -242,6 +244,8 @@ structure OAST :> OAST = struct
                 transformDeftype args
             else if f = au "defdatatype" then
                 transformDefdatatype args
+            else if f = au "defrecord" then
+                transformDefrecord args
             else if f = au "deftemplate" then
                 transformDeftemplate args
             else if f = au "define-symbol-macro" then
@@ -445,7 +449,35 @@ structure OAST :> OAST = struct
                              map parseVariant variants)
             end
         end
-      | transformDefdatatype _ = raise Fail "Bad defdatatype form"
+      | transformDefdatatype _ =
+        raise Fail "Bad defdatatype form"
+
+    and transformDefrecord ((RCST.Symbol name)::(RCST.List params)::body) =
+        let fun parseBody ((RCST.StringConstant s)::def) =
+                (SOME (CST.escapedToString s), def)
+              | parseBody def =
+                (NONE, def)
+
+            and parseParam (RCST.Symbol s) = s
+              | parseParam _ = raise Fail "Type parameter must be a symbol"
+
+            and parseSlot (RCST.List [RCST.Symbol name, typespec]) =
+                Slot (name, Type.parseTypespec typespec, NONE)
+              | parseSlot (RCST.List [RCST.Symbol name, typespec, RCST.StringConstant docstring]) =
+                Slot (name, Type.parseTypespec typespec, SOME (CST.escapedToString docstring))
+              | parseSlot _ =
+                raise Fail "defrecord: invalid slot definition"
+        in
+            let val (docstring, slots) = parseBody body
+            in
+                Defrecord (name,
+                           map parseParam params,
+                           docstring,
+                           map parseSlot slots)
+            end
+        end
+      | transformDefrecord _ =
+        raise Fail "Bad defrecord form"
 
     and transformDeftemplate ((RCST.Symbol name)::body) =
         raise Fail "deftemplate not implemented"

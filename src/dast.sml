@@ -31,6 +31,7 @@ structure DAST :> DAST = struct
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
                      | Defdatatype of name * Type.typarams * docstring * Type.variant list
+                     | Defrecord of name * Type.typarams * docstring * Type.slot list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -124,6 +125,19 @@ structure DAST :> DAST = struct
                              params',
                              docstring,
                              map mapVariant variants)
+            end
+        end
+      | transformTop (AST.Defrecord (name, params, docstring, slots)) tenv _ =
+        let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
+        in
+            let fun mapSlot (AST.Slot (name, typespec, _)) =
+                    Type.Slot (name,
+                               Type.resolve tenv (OrderedSet.toUnordered params') typespec)
+            in
+                Defrecord (name,
+                           params',
+                           docstring,
+                           map mapSlot slots)
             end
         end
       | transformTop (AST.Deftemplate tmpl) _ _ =

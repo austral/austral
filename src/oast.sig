@@ -52,6 +52,7 @@ signature OAST = sig
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * param_name list * docstring * typespec
                      | Defdatatype of name * param_name list * docstring * variant list
+                     | Defrecord of name * param_name list * docstring * slot list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -62,6 +63,7 @@ signature OAST = sig
          and method_def = MethodDef of name * param list * typespec * docstring * ast
          and instance_arg = InstanceArg of name * name list
          and variant = Variant of name * typespec option
+         and slot = Slot of name * typespec * docstring
 
     val parseForeignParamList : RCST.rcst -> (Function.foreign_arity * param list)
 

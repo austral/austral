@@ -63,6 +63,11 @@ echo "defdatatype.au"
 gcc test/valid/defdatatype.c -o test/valid/defdatatype.bin
 ./test/valid/defdatatype.bin
 
+echo "defrecord.au"
+./austral test/valid/defrecord.au --output=test/valid/defrecord.c --entrypoint=austral-user:main
+gcc test/valid/defrecord.c -o test/valid/defrecord.bin
+./test/valid/defrecord.bin
+
 echo "bind.au"
 ./austral test/valid/bind.au --output=test/valid/bind.c --entrypoint=austral-user:main
 gcc test/valid/bind.c -o test/valid/bind.bin

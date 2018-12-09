@@ -69,6 +69,7 @@ structure TAST :> TAST = struct
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
                      | Defdatatype of name * Type.typarams * docstring * Type.variant list
+                     | Defrecord of name * Type.typarams * docstring * Type.slot list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -762,11 +763,16 @@ structure TAST :> TAST = struct
                      params,
                      docstring,
                      ty)
-      | augmentTop (DAST.Defdatatype (name, params, docstring, variants)) tenv _ =
+      | augmentTop (DAST.Defdatatype (name, params, docstring, variants)) _ _ =
         Defdatatype (name,
                      params,
                      docstring,
                      variants)
+      | augmentTop (DAST.Defrecord (name, params, docstring, slots)) _ _ =
+        Defrecord (name,
+                   params,
+                   docstring,
+                   slots)
       | augmentTop (DAST.Deftemplate tmpl) _ _ =
         Deftemplate tmpl
       | augmentTop (DAST.DefineSymbolMacro (name, exp, docstring)) _ _ =
