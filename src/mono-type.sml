@@ -36,6 +36,8 @@ structure MonoType :> MONO_TYPE = struct
 
     datatype variant = Variant of name * ty option
 
+    datatype slot = Slot of name * ty
+
     fun disjName (Disjunction (name, _)) =
         name
       | disjName _ =
