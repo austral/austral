@@ -181,16 +181,11 @@ structure MonoType :> MONO_TYPE = struct
 
     (* Monomorphize variants *)
 
-    and monomorphizeVariants tm rs (head::tail) =
-        let val (variant, tm') = monomorphizeVariant tm rs head
-        in
-            let val (rest, tm'') = monomorphizeVariants tm' rs tail
-            in
-                (variant :: rest, tm'')
-            end
-        end
-      | monomorphizeVariants tm rs nil =
-        (nil, tm)
+    and monomorphizeVariants tm rs variants =
+        Util.foldThread (fn (variant, tm) =>
+                            monomorphizeVariant tm rs variant)
+                        variants
+                        tm
 
     and monomorphizeVariant tm rs (Type.Variant (name, SOME ty)) =
         let val (ty', tm') = monomorphize tm rs ty
