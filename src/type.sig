@@ -62,6 +62,7 @@ signature TYPE = sig
 
     datatype decltype = AliasDecl of ty
                       | DisjunctionDecl
+                      | RecordDecl
 
     datatype typedef = AliasDef of ty
                      | DisjunctionDef of variant list
