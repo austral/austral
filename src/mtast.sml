@@ -515,7 +515,7 @@ structure MTAST :> MTAST = struct
         (ToplevelProgn [], ctx)
       | monomorphizeTop' _ (TAST.Definstance (name, arg, docstring, methods)) =
         raise Fail "definstance: not implemented yet"
-      | monomorphizeTop' ctx (TAST.Deftype (name, params, _, ty)) =
+      | monomorphizeTop' ctx (TAST.Deftype _) =
         (* Type aliases don't need to be compiled to anything *)
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Defdatatype _) =
