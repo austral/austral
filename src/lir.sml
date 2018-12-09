@@ -28,6 +28,7 @@ structure LIR :> LIR = struct
                 | Tuple of int
                 | Pointer of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     (* AST *)
 
