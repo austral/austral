@@ -609,7 +609,7 @@ structure MTAST :> MTAST = struct
 
     and expandDefdisjunction ctx name id variants =
         (* Monomorphize the variants *)
-        let rs = makeReplacements typarams tyargs
+        let val rs = makeReplacements typarams tyargs
         in
             let fun mapVariant ctx (Type.Variant (_, SOME ty)) =
                     monoType ctx rs ty
