@@ -274,24 +274,7 @@ structure Type :> TYPE = struct
                     (* Since it's not a builtin and not a type variable, we're
                        dealing with a user-defined type. Try to find if it
                        exists. *)
-                    (case (getDeclaration tenv name) of
-                         (SOME (typarams, decltype)) =>
-                         if sameSize typarams tyargs' then
-                             (* The arity matches, that is, we have exactly as
-                                many type arguments as type parameters in the
-                                definition of this type. *)
-                             (case decltype of
-                                  (AliasDecl ty) => ty
-                                (* If it's a disjunction, construct a ty
-                                   instance from the name and args *)
-                                | (DisjunctionDecl) => resolveDisjunction name typarams tyargs'
-                                (* If it's a record, construct a ty instance
-                                   from the name and args *)
-                                | (RecordDecl) => resolveRecord name typarams tyargs')
-                         else
-                             raise Fail "Type arity error"
-                       | NONE =>
-                         raise Fail ("No type named " ^ (Symbol.toString name)))
+                    resolveUserDefined tenv params name tyargs tyargs'
         end
 
     and resolveBuiltin tenv params name args =
@@ -309,6 +292,26 @@ structure Type :> TYPE = struct
                      raise Fail "Unknown builtin"
              else
                  raise Fail "Internal compiler error: not a builtin")
+
+    and resolveUserDefined tenv params name tyargs tyargs' =
+        (case (getDeclaration tenv name) of
+             (SOME (typarams, decltype)) =>
+             if sameSize typarams tyargs' then
+                 (* The arity matches, that is, we have exactly as many type
+                    arguments as type parameters in the definition of this
+                    type. *)
+                 (case decltype of
+                      (AliasDecl ty) => ty
+                    (* If it's a disjunction, construct a ty instance from the
+                       name and args *)
+                    | (DisjunctionDecl) => resolveDisjunction name typarams tyargs'
+                    (* If it's a record, construct a ty instance from the name
+                       and args *)
+                    | (RecordDecl) => resolveRecord name typarams tyargs')
+             else
+                 raise Fail "Type arity error"
+           | NONE =>
+             raise Fail ("No type named " ^ (Symbol.toString name)))
 
     and resolveAlias (tenv: tenv) (name: name) (tyargs: ty list) =
         (case getDefinition tenv name of
