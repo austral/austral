@@ -56,6 +56,8 @@ structure HirPass :> HIR_PASS = struct
         StaticArray (transformType ty)
       | transformType (MT.Disjunction (name, id)) =
         Disjunction (name, id)
+      | transformType (MT.Record (name, id)) =
+        Record (name, id)
 
     fun caseNameIdx tenv ty name =
         let val variants = Type.getDisjunctionVariants tenv (MonoType.disjName ty)
