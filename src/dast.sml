@@ -130,7 +130,7 @@ structure DAST :> DAST = struct
       | transformTop (AST.Defrecord (name, params, docstring, slots)) tenv _ =
         let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
         in
-            let fun mapSlot (AST.Slot (name, typespec, docstring)) =
+            let fun mapSlot (AST.Slot (name, typespec, _)) =
                     Type.Slot (name,
                                Type.resolve tenv (OrderedSet.toUnordered params') typespec)
             in
