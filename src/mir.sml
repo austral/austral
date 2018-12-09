@@ -29,6 +29,7 @@ structure MIR :> MIR = struct
                 | Pointer of ty
                 | StaticArray of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     (* AST *)
 
