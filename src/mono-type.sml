@@ -140,6 +140,27 @@ structure MonoType :> MONO_TYPE = struct
                                 end
                             end
         end
+      | monomorphize tm rs (Type.Record (name, tyargs)) =
+        let val (tyargs', tm) = monomorphizeList tm rs tyargs
+        in
+            case getMonomorph tm name tyargs' of
+                SOME (ty, _) => (ty, tm)
+              | NONE =>
+                (* If this pair of name+type args is not present in the table of
+                   monomorphs, add it *)
+                case getMonomorph tm name tyargs' of
+                    (SOME (ty, _)) => (ty, tm)
+                  | NONE => let val id = freshId ()
+                            in
+                                let val disj = Record (name, id)
+                                in
+                                    let val tm = addMonomorph tm name tyargs' disj id
+                                    in
+                                        (disj, tm)
+                                    end
+                                end
+                            end
+        end
       | monomorphize tm rs (Type.TypeVariable name) =
         (case Map.get rs name of
              SOME ty => (ty, tm)
