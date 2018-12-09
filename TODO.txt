@@ -1,9 +1,8 @@
 TODO:
 
-- Record types
 - defrecord toplevel form
 - record constructor form
-- slot accessor
+- slot getter
 - Define constructor generic functions for datatypes
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
@@ -191,3 +190,4 @@ DONE:
 - Separate type decl environment from datatype def environment
 - Fix typechecking of generic disjunctiom instances
 - Fix disjunction data access
+- Record types
