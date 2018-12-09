@@ -520,6 +520,8 @@ structure MTAST :> MTAST = struct
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Defdatatype (name, params, _, variants)) =
         (ToplevelProgn [], ctx)
+      | monomorphizeTop' ctx (TAST.Defrecord _) =
+        (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Deftemplate _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.DefineSymbolMacro _) =
