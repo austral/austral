@@ -200,7 +200,21 @@ structure MonoType :> MONO_TYPE = struct
       | monomorphizeVariant tm _ (Type.Variant (name, NONE)) =
         (Variant (name, NONE), tm)
 
-    (* Monomorphize records *)
+    (* Monomorphize slots *)
 
+    and monomorphizeSlots tm rs (head::tail) =
+        let val (slot, tm') = monomorphizeSlot tm rs head
+        in
+            let val (rest, tm'') = monomorphizeSlots tm' rs tail
+            in
+                (slot :: rest, tm'')
+            end
+        end
+      | monomorphizeVariants tm rs nil =
+        (nil, tm)
 
+    and monomorphizeSlot tm rs (Type.Slot (name, ty)) =
+        let val (ty', tm') = monomorphize tm rs ty
+        in
+            (Slot (name, ty'), tm')
 end
