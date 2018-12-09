@@ -32,6 +32,7 @@ structure MonoType :> MONO_TYPE = struct
                 | StaticArray of ty
                 | Pointer of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     datatype variant = Variant of name * ty option
 
