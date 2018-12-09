@@ -518,7 +518,7 @@ structure MTAST :> MTAST = struct
       | monomorphizeTop' ctx (TAST.Deftype (name, params, _, ty)) =
         (* Type aliases don't need to be compiled to anything *)
         (ToplevelProgn [], ctx)
-      | monomorphizeTop' ctx (TAST.Defdatatype (name, params, _, variants)) =
+      | monomorphizeTop' ctx (TAST.Defdatatype _) =
         (ToplevelProgn [], ctx)
       | monomorphizeTop' ctx (TAST.Defrecord _) =
         (ToplevelProgn [], ctx)
