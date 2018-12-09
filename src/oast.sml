@@ -244,6 +244,8 @@ structure OAST :> OAST = struct
                 transformDeftype args
             else if f = au "defdatatype" then
                 transformDefdatatype args
+            else if f = au "defrecord" then
+                transformDefrecord args
             else if f = au "deftemplate" then
                 transformDeftemplate args
             else if f = au "define-symbol-macro" then
