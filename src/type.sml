@@ -287,7 +287,7 @@ structure Type :> TYPE = struct
                                 | (DisjunctionDecl) => resolveDisjunction name typarams tyargs'
                                 (* If it's a record, construct a ty instance
                                    from the name and args *)
-                                | (RecordDecl) => resolveRecord name typarams tyargs'
+                                | (RecordDecl) => resolveRecord name typarams tyargs')
                          else
                              raise Fail "Type arity error"
                        | NONE =>
