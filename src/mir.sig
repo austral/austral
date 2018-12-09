@@ -29,6 +29,7 @@ signature MIR = sig
                 | Pointer of ty
                 | StaticArray of ty
                 | Disjunction of name * int
+                | Record of name * int
 
     (* AST *)
 
