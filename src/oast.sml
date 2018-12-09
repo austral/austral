@@ -464,6 +464,8 @@ structure OAST :> OAST = struct
                 Slot (name, Type.parseTypespec typespec, NONE)
               | parseSlot (RCST.List [RCST.Symbol name, typespec, RCST.StringConstant docstring]) =
                 Slot (name, Type.parseTypespec typespec, SOME (CST.escapedToString docstring))
+              | parseSlot _ =
+                raise Fail "defrecord: invalid slot definition"
         in
             let val (docstring, slots) = parseBody body
             in
