@@ -109,6 +109,7 @@ structure Module : MODULE = struct
                 "defgeneric",
                 "deftype",
                 "defdatatype",
+                "defrecord",
                 "defclass",
                 "definstance",
                 "deftemplate",
