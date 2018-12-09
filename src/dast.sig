@@ -31,6 +31,7 @@ signature DAST = sig
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
                      | Defdatatype of name * Type.typarams * docstring * Type.variant list
+                     | Defrecord of name * param_name list * docstring * slot list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -40,6 +41,7 @@ signature DAST = sig
          and method_decl = MethodDecl of name * param list * ty * docstring
          and method_def = MethodDef of name * param list * ty * docstring * ast
          and instance_arg = InstanceArg of name * Type.typarams
+         and slot = Slot of name * ty * docstring
 
     type tenv = Type.tenv
     type fenv = Function.fenv
