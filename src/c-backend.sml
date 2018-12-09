@@ -65,6 +65,9 @@ structure CBackend :> C_BACKEND = struct
     fun disjName name id =
         "_A_type_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
 
+    fun recordName name id =
+        "_A_type_" ^ (escapeSymbol name) ^ "_" ^ (Int.toString id)
+
     val disjTagFieldName = "tag"
 
     val disjDataFieldName = "data"
