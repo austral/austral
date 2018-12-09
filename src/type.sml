@@ -131,6 +131,7 @@ structure Type :> TYPE = struct
 
     datatype decltype = AliasDecl of ty
                       | DisjunctionDecl
+                      | RecordDecl
 
     type declmap = (name, (typarams * decltype)) Map.map
 
