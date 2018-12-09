@@ -131,9 +131,8 @@ structure DAST :> DAST = struct
         let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
         in
             let fun mapSlot (AST.Slot (name, typespec, docstring)) =
-                    Slot (name,
-                          Type.resolve tenv (OrderedSet.toUnordered params') typespec,
-                          docstring)
+                    Type.Slot (name,
+                               Type.resolve tenv (OrderedSet.toUnordered params') typespec)
             in
                 Defrecord (name,
                            params',
