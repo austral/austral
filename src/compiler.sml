@@ -327,6 +327,11 @@ structure Compiler : COMPILER = struct
         in
             compilerFromTenv c (Type.addDefinition tenv (name, typarams, Type.DisjunctionDef variants))
         end
+      | defineType c (DAST.Defrecord (name, typarams, _, slots)) =
+        let val tenv = compilerTenv c
+        in
+            compilerFromTenv c (Type.addDefinition tenv (name, typarams, Type.RecordDef slots))
+        end
       | defineType c _ =
         c
 
