@@ -84,6 +84,8 @@ structure MonoType :> MONO_TYPE = struct
 
     type replacements = (name, ty) Map.map
 
+    type slots = (name, ty) Map.map
+
     fun monomorphize tm _ Type.Unit =
         (Unit, tm)
       | monomorphize tm _ Type.Bool =
