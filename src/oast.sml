@@ -119,6 +119,8 @@ structure OAST :> OAST = struct
             transformLet args
         else if f = au "bind" then
             transformBind args
+        else if f = au "record" then
+            transformRecord args
         else if f = au "malloc" then
             transformMalloc args
         else if f = au "the" then
