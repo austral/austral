@@ -372,6 +372,20 @@ structure MTAST :> MTAST = struct
                      in
                          (Construct (ty', name, NONE), ctx)
                      end)
+      | monomorphize ctx rs (TAST.MakeRecord (ty, slots)) =
+        let val (ty, ctx) = monoType ctx rs ty
+        in
+            let val (slots, ctx) = Util.foldThread (fn ((name, ty), ctx) =>
+                                                       let val (ty, ctx) = monoType ctx rs ty
+                                                       in
+                                                           ((name, ty), ctx)
+                                                       end)
+                                                   slots
+                                                   ctx
+            in
+                (MakeRecord (ty, slots), ctx)
+            end
+        end
       | monomorphize ctx rs (TAST.Case (exp, cases, ty)) =
         let val (exp', ctx) = monomorphize ctx rs exp
         in
