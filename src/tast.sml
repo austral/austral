@@ -457,7 +457,7 @@ structure TAST :> TAST = struct
 
              *)
             let fun augment' name tyargs slots =
-                    let val slotNames = Set.fromList (map (fn (Type.Slot (n, _)) => n) slots)
+                    let val slotNames = Map.keys slots
                         and consNames = Set.fromList (map (fn (n, _) => n) cslots)
                     in
                         if Set.eq slotNames consNames then
