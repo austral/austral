@@ -111,6 +111,8 @@ structure HIR :> HIR = struct
         typeOf addr
       | typeOf (Construct (t, _, _)) =
         t
+      | typeOf (MakeRecord (t, _)) =
+        t
       | typeOf (Case (_, _, t)) =
         t
       | typeOf (UnsafeExtractCase (_, _, t)) =
