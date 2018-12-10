@@ -393,10 +393,10 @@ structure LirPass :> LIR_PASS = struct
         in
             let val (slots', tt) = Util.foldThread (fn (slot, tt) =>
                                                        mapSlot slot tt)
-                                                   slots
+                                                   (Map.toList slots)
                                                    tt
             in
-                (LIR.DefrecordMono (name, id, slots'), tt)
+                (LIR.DefrecordMono (name, id, Map.fromList slots'), tt)
             end
         end
       | transformTop' tt (MIR.Defcfun (rawname, tys, arity, rt)) =
