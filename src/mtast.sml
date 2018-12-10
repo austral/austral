@@ -121,6 +121,8 @@ structure MTAST :> MTAST = struct
             t
           | typeOf (Construct (t, _, _)) =
             t
+          | typeOf (MakeRecord (t, _)) =
+            t
           | typeOf (Case (_, _, t)) =
             t
           | typeOf (SizeOf _) =
