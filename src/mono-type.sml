@@ -36,8 +36,6 @@ structure MonoType :> MONO_TYPE = struct
 
     datatype variant = Variant of name * ty option
 
-    datatype slot = Slot of name * ty
-
     fun disjName (Disjunction (name, _)) =
         name
       | disjName _ =
@@ -85,6 +83,8 @@ structure MonoType :> MONO_TYPE = struct
         end
 
     type replacements = (name, ty) Map.map
+
+    type slots = (name, ty) Map.map
 
     fun monomorphize tm _ Type.Unit =
         (Unit, tm)
@@ -198,14 +198,17 @@ structure MonoType :> MONO_TYPE = struct
     (* Monomorphize slots *)
 
     and monomorphizeSlots tm rs slots =
-        Util.foldThread (fn (slot, tm) =>
-                            monomorphizeSlot tm rs slot)
-                        slots
-                        tm
+        let val (slots', tm) = Util.foldThread (fn (slot, tm) =>
+                                                   monomorphizeSlot tm rs slot)
+                                               (Map.toList slots)
+                                               tm
+        in
+            (Map.fromList slots', tm)
+        end
 
-    and monomorphizeSlot tm rs (Type.Slot (name, ty)) =
+    and monomorphizeSlot tm rs (name, ty) =
         let val (ty', tm') = monomorphize tm rs ty
         in
-            (Slot (name, ty'), tm')
+            ((name, ty'), tm')
         end
 end

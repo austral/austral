@@ -137,9 +137,8 @@ structure Type :> TYPE = struct
 
     datatype typedef = AliasDef of ty
                      | DisjunctionDef of variant list
-                     | RecordDef of slot list
+                     | RecordDef of (name, ty) Map.map
          and variant = Variant of name * ty option
-         and slot = Slot of name * ty
 
     type defmap = (name, (typarams * typedef)) Map.map
 

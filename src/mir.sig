@@ -51,6 +51,7 @@ signature MIR = sig
                        | Load of operand
                        | AddressOffset of operand * operand
                        | Construct of ty * int * operand option
+                       | MakeRecord of ty * (name * operand) list
                        | UnsafeExtractCase of operand * int
                        | ForeignFuncall of string * operand list
                        | NullPointer of ty
@@ -80,7 +81,7 @@ signature MIR = sig
     datatype top_ast = Defun of name * param list * ty * instruction list * operand
                      | DefunMonomorph of name * param list * ty * instruction list * operand * int
                      | DefdatatypeMono of name * int * ty list
-                     | DefrecordMono of name * int * (name * ty) list
+                     | DefrecordMono of name * int * (name, ty) Map.map
                      | Defcfun of string * ty list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty

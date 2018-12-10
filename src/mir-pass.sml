@@ -212,6 +212,25 @@ structure MirPass :> MIR_PASS = struct
             ([Assignment (result, Construct (transformType ty, caseId, NONE), ty')],
              RegisterOp result)
         end
+      | transform (HIR.MakeRecord (ty, slots)) =
+        let val slots' = map (fn (name, exp) =>
+                                 (name, transform exp))
+                             slots
+            and result = freshRegister ()
+            and ty = transformType ty
+        in
+            let val expBlocks = map (fn (_, (is, _)) => is) slots'
+                and cslots = map (fn (name, (_, oper)) =>
+                                     (name, oper))
+                                 slots'
+            in
+                let val nodes = (List.concat expBlocks)
+                                @ [Assignment (result, MakeRecord (ty, cslots), ty)]
+                in
+                    (nodes, RegisterOp result)
+                end
+            end
+        end
       | transform (HIR.Case (exp, cases, ty)) =
         transformCases exp cases ty
       | transform (HIR.UnsafeExtractCase (exp, caseId, ty)) =
@@ -376,9 +395,13 @@ structure MirPass :> MIR_PASS = struct
                              id,
                              map transformType tys)
       | transformTop (HIR.DefrecordMono (name, id, slots)) =
-        MIR.DefrecordMono (name,
-                           id,
-                           map (fn (n, t) => (n, transformType t)) slots)
+        let val slots = map (fn (n, t) => (n, transformType t))
+                            (Map.toList slots)
+        in
+            MIR.DefrecordMono (name,
+                               id,
+                               Map.fromList slots)
+        end
       | transformTop (HIR.Defcfun (rawname, tys, arity, rt)) =
         Defcfun (rawname,
                  map transformType tys,

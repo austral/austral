@@ -46,6 +46,7 @@ structure MTAST :> MTAST = struct
                  | AddressOffset of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
+                 | MakeRecord of ty * (name * ast) list
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
                  | NullPointer of ty
@@ -120,6 +121,8 @@ structure MTAST :> MTAST = struct
             t
           | typeOf (Construct (t, _, _)) =
             t
+          | typeOf (MakeRecord (t, _)) =
+            t
           | typeOf (Case (_, _, t)) =
             t
           | typeOf (SizeOf _) =
@@ -145,7 +148,7 @@ structure MTAST :> MTAST = struct
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
                      | DefdatatypeMono of name * int * ty list
-                     | DefrecordMono of name * int * MonoType.slot list
+                     | DefrecordMono of name * int * MonoType.slots
                      | Defcfun of name * string * param list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty
@@ -369,6 +372,20 @@ structure MTAST :> MTAST = struct
                      in
                          (Construct (ty', name, NONE), ctx)
                      end)
+      | monomorphize ctx rs (TAST.MakeRecord (ty, slots)) =
+        let val (ty, ctx) = monoType ctx rs ty
+        in
+            let val (slots, ctx) = Util.foldThread (fn ((name, exp), ctx) =>
+                                                       let val (exp, ctx) = monomorphize ctx rs exp
+                                                       in
+                                                           ((name, exp), ctx)
+                                                       end)
+                                                   slots
+                                                   ctx
+            in
+                (MakeRecord (ty, slots), ctx)
+            end
+        end
       | monomorphize ctx rs (TAST.Case (exp, cases, ty)) =
         let val (exp', ctx) = monomorphize ctx rs exp
         in
@@ -639,18 +656,18 @@ structure MTAST :> MTAST = struct
         (* Monomorphize the slots *)
         let val rs = makeReplacements typarams tyargs
         in
-            let fun mapSlot ctx (Type.Slot (name, ty)) =
+            let fun mapSlot ctx (name, ty) =
                     let val (ty, ctx) = monoType ctx rs ty
                     in
-                        (MonoType.Slot (name, ty), ctx)
+                        ((name, ty), ctx)
                     end
             in
                 let val (slots', ctx) = Util.foldThread (fn (var, ctx) =>
                                                             mapSlot ctx var)
-                                                        slots
+                                                        (Map.toList slots)
                                                         ctx
                 in
-                    DefrecordMono (name, id, slots')
+                    DefrecordMono (name, id, Map.fromList slots')
                 end
             end
         end

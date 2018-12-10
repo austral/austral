@@ -44,6 +44,7 @@ structure TAST :> TAST = struct
                  | AddressOffset of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
+                 | MakeRecord of ty * (name * ast) list
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
                  | NullPointer of ty
@@ -69,7 +70,7 @@ structure TAST :> TAST = struct
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
                      | Defdatatype of name * Type.typarams * docstring * Type.variant list
-                     | Defrecord of name * Type.typarams * docstring * Type.slot list
+                     | Defrecord of name * Type.typarams * docstring * (name * ty) list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
@@ -143,6 +144,8 @@ structure TAST :> TAST = struct
           | typeOf (The (t, _)) =
             t
           | typeOf (Construct (t, _, _)) =
+            t
+          | typeOf (MakeRecord (t, _)) =
             t
           | typeOf (Case (_, _, t)) =
             t
@@ -439,6 +442,65 @@ structure TAST :> TAST = struct
                                               ^ "\n"))
                      end
                   | _ => raise Fail "construct: not a datatype"
+            end
+          | augment (AST.MakeRecord (typespec, cslots)) c =
+            (*
+               Steps:
+
+               1. Resolve the type specifier, and ensure it is a record.
+
+               2. Ensure the set of slot names in the type definition is the
+                  same as the set of slot names in the constructor.
+
+               3. For each slot value in the constructor, ensure the associated
+                  slot has the same type.
+
+             *)
+            let fun augment' name typarams tyargs slots =
+                    let val slotNames = Map.keys slots
+                        and consNames = Set.fromList (map (fn (n, _) => n) cslots)
+                    in
+                        if Set.eq slotNames consNames then
+                            let val slots = map (fn (name, exp) =>
+                                                    let val exp' = augment exp c
+                                                    in
+                                                        let val ty = Option.valOf (Map.get slots name)
+                                                        in
+                                                            if typeOf exp' = ty then
+                                                                (name, exp')
+                                                            else
+                                                                raise Fail ("Record constructor type mismatch: "
+                                                                            ^ (Type.toString (typeOf exp'))
+                                                                            ^ ", "
+                                                                            ^ (Type.toString ty))
+                                                        end
+                                                    end)
+                                                cslots
+                            in
+                                let val ty = Type.Record (name, tyargs)
+                                in
+                                    let val ty = replaceVars (replacements typarams tyargs) ty
+                                    in
+                                        MakeRecord (ty, slots)
+                                    end
+                                end
+                            end
+                        else
+                            raise Fail "Set of slot names and set of constructor slot names differs"
+                    end
+            in
+                let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
+                in
+                    case ty of
+                        (Record (name, tyargs)) => let val slots = Type.getRecordSlots (ctxTenv c) name
+                                                       and typarams = case Type.getDeclaration (ctxTenv c) name of
+                                                                          (SOME (typarams, _)) => typarams
+                                                                        | _ => raise Fail "Internal error"
+                                                   in
+                                                       augment' name typarams tyargs slots
+                                                   end
+                      | _ => raise Fail ("record: not a record: " ^ (Type.toString ty))
+                end
             end
           | augment (AST.Case (exp, cases)) c =
             (*

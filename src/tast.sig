@@ -44,6 +44,7 @@ signature TAST = sig
                  | AddressOffset of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
+                 | MakeRecord of ty * (name * ast) list
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
                  | NullPointer of ty
@@ -69,7 +70,7 @@ signature TAST = sig
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
                      | Defdatatype of name * Type.typarams * docstring * Type.variant list
-                     | Defrecord of name * Type.typarams * docstring * Type.slot list
+                     | Defrecord of name * Type.typarams * docstring * (name * ty) list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list

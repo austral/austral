@@ -46,6 +46,7 @@ signature MTAST = sig
                  | AddressOffset of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
+                 | MakeRecord of ty * (name * ast) list
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
                  | NullPointer of ty
@@ -66,7 +67,7 @@ signature MTAST = sig
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
                      | DefdatatypeMono of name * int * ty list
-                     | DefrecordMono of name * int * MonoType.slot list
+                     | DefrecordMono of name * int * MonoType.slots
                      | Defcfun of name * string * param list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty

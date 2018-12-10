@@ -199,6 +199,11 @@ structure CBackend :> C_BACKEND = struct
         C.StructInitializer (transformType ty,
                              [(disjTagFieldName, C.IntConstant (Int.toString id)),
                               (disjDataFieldName, C.IntConstant "0")])
+      | transform (LIR.MakeRecord (ty, slots)) _ =
+        C.StructInitializer (transformType ty,
+                             map (fn (name, oper) =>
+                                     (escapeSymbol name, transformOperand oper))
+                                 slots)
       | transform (LIR.UnsafeExtractCase (oper, id)) ty =
         C.StructAccess (C.StructAccess (transformOperand oper, disjDataFieldName),
                         tupleIdxName id)
@@ -338,7 +343,7 @@ structure CBackend :> C_BACKEND = struct
         let val name = disjName name id
             and slots = map (fn (name, ty) =>
                                 (transformType ty, escapeSymbol name))
-                            slots
+                            (Map.toList slots)
         in
             C.TypeDef (name, C.Struct slots)
         end

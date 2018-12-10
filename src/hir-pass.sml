@@ -137,6 +137,11 @@ structure HirPass :> HIR_PASS = struct
         Construct (transformType ty,
                    caseNameIdx e ty name,
                    Option.map (transform e) value)
+      | transform e (M.MakeRecord (ty, slots)) =
+        MakeRecord (transformType ty,
+                    map (fn (name, exp) =>
+                            (name, transform e exp))
+                        slots)
       | transform e (M.Case (exp, cases, ty)) =
         let val expTy = MTAST.typeOf exp
         in
@@ -214,12 +219,12 @@ structure HirPass :> HIR_PASS = struct
                          id,
                          map transformType tys)
       | transformTop _ (M.DefrecordMono (name, id, slots)) =
-        let fun mapSlot (MonoType.Slot (name, ty)) =
+        let fun mapSlot (name, ty) =
                 (name, transformType ty)
         in
             DefrecordMono (name,
                            id,
-                           map mapSlot slots)
+                           Map.fromList (map mapSlot (Map.toList slots)))
         end
       | transformTop _ (M.Defcfun (_, rawname, params, arity, rt)) =
         Defcfun (rawname,

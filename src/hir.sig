@@ -52,6 +52,7 @@ signature HIR = sig
                  | Store of ast * ast
                  | AddressOffset of ast * ast
                  | Construct of ty * int * ast option
+                 | MakeRecord of ty * (name * ast) list
                  | Case of ast * variant_case list * ty
                  | UnsafeExtractCase of ast * int * ty
                  | ForeignFuncall of string * ast list * ty
@@ -71,7 +72,7 @@ signature HIR = sig
     datatype top_ast = Defun of name * param list * ty * ast
                      | DefunMonomorph of name * param list * ty * ast * int
                      | DefdatatypeMono of name * int * ty list
-                     | DefrecordMono of name * int * (name * ty) list
+                     | DefrecordMono of name * int * (name, ty) Map.map
                      | Defcfun of string * ty list * Function.foreign_arity * ty
                      | ToplevelProgn of top_ast list
          and param = Param of Symbol.variable * ty

@@ -47,6 +47,7 @@ structure AST :> AST = struct
                  | AddressOffset of ast * ast
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
+                 | MakeRecord of typespec * (name * ast) list
                  | Case of ast * variant_case list
                  | SizeOf of typespec
                  | AddressOf of Symbol.variable
@@ -107,6 +108,11 @@ structure AST :> AST = struct
         The (ty, transform exp)
       | transform (Alpha.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map transform exp)
+      | transform (Alpha.MakeRecord (ty, slots)) =
+        MakeRecord (ty,
+                    map (fn (name, exp) =>
+                            (name, transform exp))
+                        slots)
       | transform (Alpha.Case (exp, cases)) =
         let fun transformCase (Alpha.VariantCase (name, body)) =
                 VariantCase (transformCaseName name, transform body)

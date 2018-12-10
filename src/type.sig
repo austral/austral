@@ -66,9 +66,8 @@ signature TYPE = sig
 
     datatype typedef = AliasDef of ty
                      | DisjunctionDef of variant list
-                     | RecordDef of slot list
+                     | RecordDef of (name, ty) Map.map
          and variant = Variant of name * ty option
-         and slot = Slot of name * ty
 
     val defaultTenv : tenv
 
@@ -105,5 +104,5 @@ signature TYPE = sig
     val getVariantByName : variant list -> name -> variant option
     val posInVariants : variant list -> name -> int option
 
-    val getRecordSlots : tenv -> name -> slot list
+    val getRecordSlots : tenv -> name -> (name, ty) Map.map
 end

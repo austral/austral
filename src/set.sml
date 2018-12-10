@@ -37,7 +37,8 @@ structure Set :> SET = struct
     fun isIn set elem = Util.member elem set
 
     fun eq a b =
-        List.all (fn aelem => isIn b aelem) a
+        (List.all (fn aelem => isIn b aelem) a)
+        andalso (length a = length b)
 
     fun union a b = addList (addList empty a) b
 
