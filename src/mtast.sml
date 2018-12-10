@@ -46,6 +46,7 @@ structure MTAST :> MTAST = struct
                  | AddressOffset of ast * ast
                  | The of ty * ast
                  | Construct of ty * name * ast option
+                 | MakeRecord of ty * (name * ast) list
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
                  | NullPointer of ty
