@@ -45,6 +45,7 @@ signature AST = sig
                  | AddressOffset of ast * ast
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
+                 | MakeRecord of typespec * (name * ast) list
                  | Case of ast * variant_case list
                  | SizeOf of typespec
                  | AddressOf of Symbol.variable
