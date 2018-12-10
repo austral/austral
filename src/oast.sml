@@ -171,8 +171,10 @@ structure OAST :> OAST = struct
         raise Fail "Invalid `bind` form"
 
     and transformRecord (ty::slots) =
-        let fun transformSlot _ =
-                raise Fail "Not done yet"
+        let fun transformSlot (RCST.List [RCST.Symbol name, value]) =
+                (name, transform value)
+              | transformSlot _ =
+                raise Fail "Invalid `record` form slot value"
         in
             MakeRecord (Type.parseTypespec ty,
                         map transformSlot slots)
