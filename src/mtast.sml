@@ -375,10 +375,10 @@ structure MTAST :> MTAST = struct
       | monomorphize ctx rs (TAST.MakeRecord (ty, slots)) =
         let val (ty, ctx) = monoType ctx rs ty
         in
-            let val (slots, ctx) = Util.foldThread (fn ((name, ty), ctx) =>
-                                                       let val (ty, ctx) = monoType ctx rs ty
+            let val (slots, ctx) = Util.foldThread (fn ((name, exp), ctx) =>
+                                                       let val (exp, ctx) = monomorphize ctx rs exp
                                                        in
-                                                           ((name, ty), ctx)
+                                                           ((name, exp), ctx)
                                                        end)
                                                    slots
                                                    ctx
