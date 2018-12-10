@@ -461,18 +461,23 @@ structure TAST :> TAST = struct
                         and consNames = Set.fromList (map (fn (n, _) => n) cslots)
                     in
                         if Set.eq slotNames consNames then
-                            let val slots' = map (fn (name, exp) =>
-                                                     let val exp' = augment exp c
-                                                     in
-                                                         let val ty = Option.valOf (Map.get slots name)
-                                                         in
-                                                             raise Fail "Not done yet"
-                                                         end
-                                                     end)
-                                                 cslots
+                            let val slots = map (fn (name, exp) =>
+                                                    let val exp' = augment exp c
+                                                    in
+                                                        let val ty = Option.valOf (Map.get slots name)
+                                                        in
+                                                            raise Fail "Not done yet"
+                                                        end
+                                                    end)
+                                                cslots
                             in
-                                MakeRecord (Type.Record (name, tyargs),
-                                            slots')
+                                let val ty = Type.Record (name, tyargs)
+                                in
+                                    let val ty = replaceVars (replacements typarams tyargs) ty
+                                    in
+                                        MakeRecord (ty, slots)
+                                    end
+                                end
                             end
                         else
                             raise Fail "Set of slot names and set of constructor slot names differs"
