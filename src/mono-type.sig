@@ -52,8 +52,9 @@ signature MONO_TYPE = sig
     val newMonomorphs : type_monomorphs -> type_monomorphs -> (name * ty list * ty * int) list
 
     type replacements = (name, ty) Map.map
+    type slots = (name, ty) Map.map
 
     val monomorphize : type_monomorphs -> replacements -> Type.ty -> (ty * type_monomorphs)
     val monomorphizeVariants : type_monomorphs -> replacements -> Type.variant list -> (variant list * type_monomorphs)
-    val monomorphizeSlots : type_monomorphs -> replacements -> (name, ty) Map.map -> (slot list * type_monomorphs)
+    val monomorphizeSlots : type_monomorphs -> replacements -> slots -> (slots * type_monomorphs)
 end
