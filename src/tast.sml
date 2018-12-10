@@ -469,7 +469,10 @@ structure TAST :> TAST = struct
                                                             if typeOf exp' = ty then
                                                                 (name, exp')
                                                             else
-                                                                raise Fail "Record constructor type mismatch"
+                                                                raise Fail ("Record constructor type mismatch: "
+                                                                            ^ (Type.toString (typeOf exp'))
+                                                                            ^ ", "
+                                                                            ^ (Type.toString ty))
                                                         end
                                                     end)
                                                 cslots
