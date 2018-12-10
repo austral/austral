@@ -482,6 +482,9 @@ structure TAST :> TAST = struct
                 in
                     case ty of
                         (Record (name, tyargs)) => let val slots = Type.getRecordSlots (ctxTenv c) name
+                                                       and typarams = case Type.getDeclaration (ctxTenv c) name of
+                                                                          (SOME (typarams, _)) => typarams
+                                                                        | _ => raise Fail "Internal error"
                                                    in
                                                        augment' name tyargs slots
                                                    end
