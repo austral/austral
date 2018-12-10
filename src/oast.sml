@@ -170,6 +170,16 @@ structure OAST :> OAST = struct
       | transformBind _ =
         raise Fail "Invalid `bind` form"
 
+    and transformRecord (ty::slots) =
+        let fun transformSlot _ =
+                raise Fail "Not done yet"
+        in
+            MakeRecord (Type.parseTypespec ty,
+                        map transformSlot slots)
+        end
+      | transformRecord _ =
+        raise Fail "Invalid `record` form"
+
     and transformMalloc [ty, len] =
         Malloc (Type.parseTypespec ty, transform len)
       | transformMalloc _ =
