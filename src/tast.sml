@@ -454,13 +454,16 @@ structure TAST :> TAST = struct
                3. For each slot value in the constructor, ensure the associated
                   slot has the same type.
              *)
-            let fun augment' name tyargs =
-                    raise Fail "Not done yet"
+            let fun augment' name tyargs slots =
+                    raise Fail "Not done"
             in
                 let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
                 in
                     case ty of
-                        (Record (name, tyargs)) => augment' name tyargs
+                        (Record (name, tyargs)) => let val slots = Type.getRecordSlots (ctxTenv c) name
+                                                   in
+                                                       augment' name tyargs slots
+                                                   end
                       | _ => raise Fail ("record: not a record: " ^ (Type.toString ty))
                 end
             end
