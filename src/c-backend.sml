@@ -199,6 +199,11 @@ structure CBackend :> C_BACKEND = struct
         C.StructInitializer (transformType ty,
                              [(disjTagFieldName, C.IntConstant (Int.toString id)),
                               (disjDataFieldName, C.IntConstant "0")])
+      | transform (LIR.MakeRecord (ty, slots)) _ =
+        C.StructInitializer (transformType ty,
+                             map (fn (name, oper) =>
+                                     (escapeSymbol name, transformOperand oper))
+                                 slots)
       | transform (LIR.UnsafeExtractCase (oper, id)) ty =
         C.StructAccess (C.StructAccess (transformOperand oper, disjDataFieldName),
                         tupleIdxName id)
