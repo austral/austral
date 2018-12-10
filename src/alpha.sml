@@ -159,6 +159,11 @@ structure Alpha :> ALPHA = struct
         The (ty, alphaRename s exp)
       | alphaRename s (OAST.Construct (ty, label, exp)) =
         Construct (ty, label, Option.map (alphaRename s) exp)
+      | alphaRename s (OAST.MakeRecord (ty, slots)) =
+        MakeRecord (ty,
+                    map (fn (n, exp) =>
+                            (n, alphaRename s exp))
+                        slots)
       | alphaRename s (OAST.Case (exp, cases)) =
         let val exp' = alphaRename s exp
         in
