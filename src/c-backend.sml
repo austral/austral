@@ -338,7 +338,7 @@ structure CBackend :> C_BACKEND = struct
         let val name = disjName name id
             and slots = map (fn (name, ty) =>
                                 (transformType ty, escapeSymbol name))
-                            slots
+                            (Map.toList slots)
         in
             C.TypeDef (name, C.Struct slots)
         end
