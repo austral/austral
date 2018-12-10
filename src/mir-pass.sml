@@ -376,9 +376,13 @@ structure MirPass :> MIR_PASS = struct
                              id,
                              map transformType tys)
       | transformTop (HIR.DefrecordMono (name, id, slots)) =
-        MIR.DefrecordMono (name,
-                           id,
-                           map (fn (n, t) => (n, transformType t)) slots)
+        let val slots = map (fn (n, t) => (n, transformType t))
+                            (Map.toList slots)
+        in
+            MIR.DefrecordMono (name,
+                               id,
+                               Map.fromList slots)
+        end
       | transformTop (HIR.Defcfun (rawname, tys, arity, rt)) =
         Defcfun (rawname,
                  map transformType tys,
