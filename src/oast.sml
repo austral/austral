@@ -35,6 +35,7 @@ structure OAST :> OAST = struct
                  | Malloc of typespec * ast
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
+                 | MakeRecord of typespec * (name * ast) list
                  | Case of ast * variant_case list
                  | NullPointer of typespec
                  | SizeOf of typespec
