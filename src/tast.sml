@@ -443,6 +443,18 @@ structure TAST :> TAST = struct
                      end
                   | _ => raise Fail "construct: not a datatype"
             end
+          | augment (AST.MakeRecord (typespec, slots)) c =
+            (* Steps:
+
+               1. Resolve the type specifier, and ensure it is a record.
+
+               2. Ensure the set of slot names in the type definition is the
+                  same as the set of slot names in the constructor.
+
+               3. For each slot value in the constructor, ensure the associated
+                  slot has the same type.
+             *)
+
           | augment (AST.Case (exp, cases)) c =
             (*
                Things we have to verify:
