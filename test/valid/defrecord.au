@@ -5,4 +5,5 @@
   (b f32))
 
 (defun main () i32
-  0)
+  (let ((p (record pair (a 10) (b 3.14))))
+    0))
