@@ -137,6 +137,11 @@ structure HirPass :> HIR_PASS = struct
         Construct (transformType ty,
                    caseNameIdx e ty name,
                    Option.map (transform e) value)
+      | transform e (M.MakeRecord (ty, slots)) =
+        MakeRecord (transformType ty,
+                    map (fn (name, exp) =>
+                            (name, transform e exp))
+                        slots)
       | transform e (M.Case (exp, cases, ty)) =
         let val expTy = MTAST.typeOf exp
         in
