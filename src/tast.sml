@@ -443,8 +443,9 @@ structure TAST :> TAST = struct
                      end
                   | _ => raise Fail "construct: not a datatype"
             end
-          | augment (AST.MakeRecord (typespec, slots)) c =
-            (* Steps:
+          | augment (AST.MakeRecord (typespec, cslots)) c =
+            (*
+               Steps:
 
                1. Resolve the type specifier, and ensure it is a record.
 
@@ -453,9 +454,17 @@ structure TAST :> TAST = struct
 
                3. For each slot value in the constructor, ensure the associated
                   slot has the same type.
+
              *)
             let fun augment' name tyargs slots =
-                    raise Fail "Not done"
+                    let val slotNames = Set.fromList (map (fn (n, _) => n) slots)
+                        and consNames = Set.fromList (map (fn (n, _) => n) cslots)
+                    in
+                        if Set.eq slotNames consNames then
+                            raise Fail "Not done yet"
+                        else
+                            raise Fail "Set of slot names and set of constructor slot names differs"
+                    end
             in
                 let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
                 in
