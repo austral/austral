@@ -197,6 +197,20 @@ structure LirPass :> LIR_PASS = struct
         in
             (L.Construct (ty, id, NONE), tt)
         end
+      | transformOperation tt (MIR.MakeRecord (ty, slots)) =
+        let val (ty, tt) = transformType tt ty
+        in
+            let val (slots, tt) = Util.foldThread (fn ((name, oper), tt) =>
+                                                      let val (oper, tt) = transformOperand tt oper
+                                                      in
+                                                          ((name, oper), tt)
+                                                      end)
+                                                  slots
+                                                  tt
+            in
+                (L.MakeRecord (ty, slots), tt)
+            end
+        end
       | transformOperation tt (MIR.UnsafeExtractCase (oper, id)) =
         let val (oper, tt) = transformOperand tt oper
         in
