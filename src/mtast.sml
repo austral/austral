@@ -642,10 +642,10 @@ structure MTAST :> MTAST = struct
         (* Monomorphize the slots *)
         let val rs = makeReplacements typarams tyargs
         in
-            let fun mapSlot ctx (Type.Slot (name, ty)) =
+            let fun mapSlot ctx (name, ty) =
                     let val (ty, ctx) = monoType ctx rs ty
                     in
-                        (MonoType.Slot (name, ty), ctx)
+                        ((name, ty), ctx)
                     end
             in
                 let val (slots', ctx) = Util.foldThread (fn (var, ctx) =>
