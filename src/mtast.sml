@@ -650,10 +650,10 @@ structure MTAST :> MTAST = struct
             in
                 let val (slots', ctx) = Util.foldThread (fn (var, ctx) =>
                                                             mapSlot ctx var)
-                                                        slots
+                                                        (Map.toList slots)
                                                         ctx
                 in
-                    DefrecordMono (name, id, slots')
+                    DefrecordMono (name, id, Map.fromList slots')
                 end
             end
         end
