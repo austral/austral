@@ -2,7 +2,7 @@
 
 (defrecord pair ()
   (a i32)
-  (b f32))
+  (b f64))
 
 (defun main () i32
   (let ((p (record pair (a 10) (b 3.14))))
