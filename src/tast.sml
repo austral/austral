@@ -466,7 +466,10 @@ structure TAST :> TAST = struct
                                                     in
                                                         let val ty = Option.valOf (Map.get slots name)
                                                         in
-                                                            raise Fail "Not done yet"
+                                                            if typeOf exp' = ty then
+                                                                (name, exp')
+                                                            else
+                                                                raise Fail "Record constructor type mismatch"
                                                         end
                                                     end)
                                                 cslots
