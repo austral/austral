@@ -198,14 +198,17 @@ structure MonoType :> MONO_TYPE = struct
     (* Monomorphize slots *)
 
     and monomorphizeSlots tm rs slots =
-        Util.foldThread (fn (slot, tm) =>
-                            monomorphizeSlot tm rs slot)
-                        slots
-                        tm
+        let val (slots', tm) = Util.foldThread (fn (slot, tm) =>
+                                                   monomorphizeSlot tm rs slot)
+                                               (Map.toList slots)
+                                               tm
+        in
+            (Map.fromList slots', tm)
+        end
 
-    and monomorphizeSlot tm rs (Type.Slot (name, ty)) =
+    and monomorphizeSlot tm rs (name, ty) =
         let val (ty', tm') = monomorphize tm rs ty
         in
-            (Slot (name, ty'), tm')
+            ((name, ty'), tm')
         end
 end
