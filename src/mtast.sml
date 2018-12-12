@@ -47,6 +47,7 @@ structure MTAST :> MTAST = struct
                  | The of ty * ast
                  | Construct of ty * name * ast option
                  | MakeRecord of ty * (name * ast) list
+                 | ReadSlot of ast * name * ty
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
                  | NullPointer of ty
@@ -122,6 +123,8 @@ structure MTAST :> MTAST = struct
           | typeOf (Construct (t, _, _)) =
             t
           | typeOf (MakeRecord (t, _)) =
+            t
+          | typeOf (ReadSlot (_, _, t)) =
             t
           | typeOf (Case (_, _, t)) =
             t
@@ -384,6 +387,14 @@ structure MTAST :> MTAST = struct
                                                    ctx
             in
                 (MakeRecord (ty, slots), ctx)
+            end
+        end
+      | monomorphize ctx rs (TAST.ReadSlot (r, name, ty)) =
+        let val (ty, ctx) = monoType ctx rs ty
+        in
+            let val (r, ctx) = monomorphize ctx rs r
+            in
+                (ReadSlot (r, name, ty), ctx)
             end
         end
       | monomorphize ctx rs (TAST.Case (exp, cases, ty)) =

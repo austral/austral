@@ -52,6 +52,7 @@ signature MIR = sig
                        | AddressOffset of operand * operand
                        | Construct of ty * int * operand option
                        | MakeRecord of ty * (name * operand) list
+                       | ReadSlot of operand * name * ty
                        | UnsafeExtractCase of operand * int
                        | ForeignFuncall of string * operand list
                        | NullPointer of ty

@@ -48,6 +48,7 @@ structure AST :> AST = struct
                  | The of Type.typespec * ast
                  | Construct of typespec * name * ast option
                  | MakeRecord of typespec * (name * ast) list
+                 | ReadSlot of ast * name
                  | Case of ast * variant_case list
                  | SizeOf of typespec
                  | AddressOf of Symbol.variable
@@ -113,6 +114,8 @@ structure AST :> AST = struct
                     map (fn (name, exp) =>
                             (name, transform exp))
                         slots)
+      | transform (Alpha.ReadSlot (r, name)) =
+        ReadSlot (transform r, name)
       | transform (Alpha.Case (exp, cases)) =
         let fun transformCase (Alpha.VariantCase (name, body)) =
                 VariantCase (transformCaseName name, transform body)

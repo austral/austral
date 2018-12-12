@@ -45,6 +45,7 @@ structure TAST :> TAST = struct
                  | The of ty * ast
                  | Construct of ty * name * ast option
                  | MakeRecord of ty * (name * ast) list
+                 | ReadSlot of ast * name * ty
                  | Case of ast * variant_case list * ty
                  | ForeignFuncall of string * ast list * ty
                  | NullPointer of ty
@@ -146,6 +147,8 @@ structure TAST :> TAST = struct
           | typeOf (Construct (t, _, _)) =
             t
           | typeOf (MakeRecord (t, _)) =
+            t
+          | typeOf (ReadSlot (_, _, t)) =
             t
           | typeOf (Case (_, _, t)) =
             t
@@ -501,6 +504,19 @@ structure TAST :> TAST = struct
                                                    end
                       | _ => raise Fail ("record: not a record: " ^ (Type.toString ty))
                 end
+            end
+          | augment (AST.ReadSlot (r, name)) c =
+            let val r' = augment r c
+            in
+                case typeOf r' of
+                    (Type.Record (tyname, _)) => let val slots = Type.getRecordSlots (ctxTenv c)
+                                                                                     tyname
+                                                 in
+                                                     case Map.get slots name of
+                                                         (SOME ty) => ReadSlot (r', name, ty)
+                                                       | _ => raise Fail ("slot: no slot with this name: " ^ (Symbol.toString name))
+                                                 end
+                  | _ => raise Fail ("slot: not a record: " ^ (Type.toString (typeOf r')))
             end
           | augment (AST.Case (exp, cases)) c =
             (*

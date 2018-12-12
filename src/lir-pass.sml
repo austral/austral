@@ -211,6 +211,14 @@ structure LirPass :> LIR_PASS = struct
                 (L.MakeRecord (ty, slots), tt)
             end
         end
+      | transformOperation tt (MIR.ReadSlot (r, name, ty)) =
+        let val (ty, tt) = transformType tt ty
+        in
+            let val (r, tt) = transformOperand tt r
+            in
+                (L.ReadSlot (r, name, ty), tt)
+            end
+        end
       | transformOperation tt (MIR.UnsafeExtractCase (oper, id)) =
         let val (oper, tt) = transformOperand tt oper
         in

@@ -204,6 +204,8 @@ structure CBackend :> C_BACKEND = struct
                              map (fn (name, oper) =>
                                      (escapeSymbol name, transformOperand oper))
                                  slots)
+      | transform (LIR.ReadSlot (r, name, ty)) _ =
+        C.StructAccess (transformOperand r, escapeSymbol name)
       | transform (LIR.UnsafeExtractCase (oper, id)) ty =
         C.StructAccess (C.StructAccess (transformOperand oper, disjDataFieldName),
                         tupleIdxName id)

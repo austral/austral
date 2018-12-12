@@ -142,6 +142,10 @@ structure HirPass :> HIR_PASS = struct
                     map (fn (name, exp) =>
                             (name, transform e exp))
                         slots)
+      | transform e (M.ReadSlot (r, name, ty)) =
+        ReadSlot (transform e r,
+                  name,
+                  transformType ty)
       | transform e (M.Case (exp, cases, ty)) =
         let val expTy = MTAST.typeOf exp
         in

@@ -36,6 +36,7 @@ structure OAST :> OAST = struct
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | MakeRecord of typespec * (name * ast) list
+                 | ReadSlot of ast * name
                  | Case of ast * variant_case list
                  | NullPointer of typespec
                  | SizeOf of typespec
@@ -121,6 +122,8 @@ structure OAST :> OAST = struct
             transformBind args
         else if f = au "record" then
             transformRecord args
+        else if f = au "slot" then
+            transformSlot args
         else if f = au "malloc" then
             transformMalloc args
         else if f = au "the" then
@@ -181,6 +184,11 @@ structure OAST :> OAST = struct
         end
       | transformRecord _ =
         raise Fail "Invalid `record` form"
+
+    and transformSlot [exp, RCST.Symbol name] =
+        ReadSlot (transform exp, name)
+      | transformSlot _ =
+        raise Fail "Invalid `slot` form"
 
     and transformMalloc [ty, len] =
         Malloc (Type.parseTypespec ty, transform len)

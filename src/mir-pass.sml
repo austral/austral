@@ -231,6 +231,14 @@ structure MirPass :> MIR_PASS = struct
                 end
             end
         end
+      | transform (HIR.ReadSlot (r, name, ty)) =
+        let val (rBlock, rValue) = transform r
+            and result = freshRegister ()
+            and ty' = transformType ty
+        in
+            (rBlock @ [Assignment (result, ReadSlot (rValue, name, ty'), ty')],
+             RegisterOp result)
+        end
       | transform (HIR.Case (exp, cases, ty)) =
         transformCases exp cases ty
       | transform (HIR.UnsafeExtractCase (exp, caseId, ty)) =

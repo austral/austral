@@ -6,4 +6,6 @@
 
 (defun main () i32
   (let ((p (record pair (a 10) (b 3.14))))
-    0))
+    (if (austral.kernel:eq (slot p a) 10)
+        0
+        -1)))

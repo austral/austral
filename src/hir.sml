@@ -53,6 +53,7 @@ structure HIR :> HIR = struct
                  | AddressOffset of ast * ast
                  | Construct of ty * int * ast option
                  | MakeRecord of ty * (name * ast) list
+                 | ReadSlot of ast * name * ty
                  | Case of ast * variant_case list * ty
                  | UnsafeExtractCase of ast * int * ty
                  | ForeignFuncall of string * ast list * ty
@@ -112,6 +113,8 @@ structure HIR :> HIR = struct
       | typeOf (Construct (t, _, _)) =
         t
       | typeOf (MakeRecord (t, _)) =
+        t
+      | typeOf (ReadSlot (_, _, t)) =
         t
       | typeOf (Case (_, _, t)) =
         t

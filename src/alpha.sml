@@ -37,6 +37,7 @@ structure Alpha :> ALPHA = struct
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | MakeRecord of typespec * (name * ast) list
+                 | ReadSlot of ast * name
                  | Case of ast * variant_case list
                  | NullPointer of typespec
                  | SizeOf of typespec
@@ -164,6 +165,8 @@ structure Alpha :> ALPHA = struct
                     map (fn (n, exp) =>
                             (n, alphaRename s exp))
                         slots)
+      | alphaRename s (OAST.ReadSlot (record, name)) =
+        ReadSlot (alphaRename s record, name)
       | alphaRename s (OAST.Case (exp, cases)) =
         let val exp' = alphaRename s exp
         in

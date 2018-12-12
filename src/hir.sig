@@ -53,6 +53,7 @@ signature HIR = sig
                  | AddressOffset of ast * ast
                  | Construct of ty * int * ast option
                  | MakeRecord of ty * (name * ast) list
+                 | ReadSlot of ast * name * ty
                  | Case of ast * variant_case list * ty
                  | UnsafeExtractCase of ast * int * ty
                  | ForeignFuncall of string * ast list * ty
