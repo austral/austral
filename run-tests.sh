@@ -24,10 +24,10 @@ gcc test/valid/tuple.c -o test/valid/tuple.bin
 #./austral test/valid/class.au --output=test/valid/class.c
 # clang++ -shared -fPIC -std=c++11 test/valid/class.cpp
 
-echo "string.au"
-./austral test/valid/string.au --output=test/valid/string.c --entrypoint=austral-user:main
-gcc test/valid/string.c -o test/valid/string.bin
-./test/valid/string.bin
+echo "string-literal.au"
+./austral test/valid/string-literal.au --output=test/valid/string-literal.c --entrypoint=austral-user:main
+gcc test/valid/string-literal.c -o test/valid/string-literal.bin
+./test/valid/string-literal.bin
 
 echo "hello-world.au"
 ./austral test/valid/hello-world.au --output=test/valid/hello-world.c --entrypoint=austral-user:main
