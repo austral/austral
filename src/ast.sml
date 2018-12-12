@@ -114,6 +114,8 @@ structure AST :> AST = struct
                     map (fn (name, exp) =>
                             (name, transform exp))
                         slots)
+      | transform (Alpha.ReadSlot (r, name)) =
+        ReadSlot (transform r, name)
       | transform (Alpha.Case (exp, cases)) =
         let fun transformCase (Alpha.VariantCase (name, body)) =
                 VariantCase (transformCaseName name, transform body)
