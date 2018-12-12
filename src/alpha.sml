@@ -37,6 +37,7 @@ structure Alpha :> ALPHA = struct
                  | The of typespec * ast
                  | Construct of typespec * name * ast option
                  | MakeRecord of typespec * (name * ast) list
+                 | ReadSlot of ast * name
                  | Case of ast * variant_case list
                  | NullPointer of typespec
                  | SizeOf of typespec
