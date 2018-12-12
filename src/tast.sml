@@ -505,6 +505,19 @@ structure TAST :> TAST = struct
                       | _ => raise Fail ("record: not a record: " ^ (Type.toString ty))
                 end
             end
+          | augment (AST.ReadSlot (r, name)) c =
+            let val r' = augment r c
+            in
+                case typeOf r' of
+                    (Type.Record (name, _)) => let val slots = Type.getRecordSlots (ctxTenv c)
+                                                                                   name
+                                               in
+                                                   case Map.get slots name of
+                                                       (SOME ty) => ReadSlot (r', name, ty)
+                                                     | _ => raise Fail "slot: no slot with this name"
+                                               end
+                  | _ => raise Fail ("slot: not a record: " ^ (Type.toString (typeOf r')))
+            end
           | augment (AST.Case (exp, cases)) c =
             (*
                Things we have to verify:
