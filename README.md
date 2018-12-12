@@ -52,8 +52,9 @@ To build the executable:
 $ make austral
 ```
 
-To compile in "development mode" we use [SML/NJ][smlnj], which is faster and
-features a REPL. You can install it in Debian/Ubuntu with:
+To compile in "development mode" (which does not produce an executable binary)
+we use [SML/NJ][smlnj], which is faster than MLton and features a REPL. You can
+install it in Debian/Ubuntu with:
 
 ```bash
 $ sudo apt-get install -y smlnj
