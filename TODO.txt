@@ -1,6 +1,5 @@
 TODO:
 
-- record constructor form
 - slot getter
 - Define constructor generic functions for datatypes
 - Linearity: extract all bindings out of an expression
@@ -191,3 +190,4 @@ DONE:
 - Fix disjunction data access
 - Record types
 - defrecord toplevel form
+- record constructor form
