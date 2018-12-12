@@ -122,6 +122,8 @@ structure OAST :> OAST = struct
             transformBind args
         else if f = au "record" then
             transformRecord args
+        else if f = au "slot" then
+            transformSlot args
         else if f = au "malloc" then
             transformMalloc args
         else if f = au "the" then
