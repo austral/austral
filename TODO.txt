@@ -1,6 +1,5 @@
 TODO:
 
-- defrecord toplevel form
 - record constructor form
 - slot getter
 - Define constructor generic functions for datatypes
@@ -191,3 +190,4 @@ DONE:
 - Fix typechecking of generic disjunctiom instances
 - Fix disjunction data access
 - Record types
+- defrecord toplevel form
