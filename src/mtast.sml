@@ -389,6 +389,14 @@ structure MTAST :> MTAST = struct
                 (MakeRecord (ty, slots), ctx)
             end
         end
+      | monomorphize ctx rs (TAST.ReadSlot (r, name, ty)) =
+        let val (ty, ctx) = monoType ctx rs ty
+        in
+            let val (r, ctx) = monomorphize ctx rs r
+            in
+                (ReadSlot (r, name, ty), ctx)
+            end
+        end
       | monomorphize ctx rs (TAST.Case (exp, cases, ty)) =
         let val (exp', ctx) = monomorphize ctx rs exp
         in
