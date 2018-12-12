@@ -10,5 +10,8 @@
           (length length)
           (data data)))
 
+(defun string-length ((string string)) usize
+  (slot string length))
+
 (defun main () i32
   0)
