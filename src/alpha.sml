@@ -165,6 +165,8 @@ structure Alpha :> ALPHA = struct
                     map (fn (n, exp) =>
                             (n, alphaRename s exp))
                         slots)
+      | alphaRename s (OAST.ReadSlot (record, name)) =
+        ReadSlot (alphaRename s record, name)
       | alphaRename s (OAST.Case (exp, cases)) =
         let val exp' = alphaRename s exp
         in
