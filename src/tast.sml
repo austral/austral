@@ -148,6 +148,8 @@ structure TAST :> TAST = struct
             t
           | typeOf (MakeRecord (t, _)) =
             t
+          | typeOf (ReadSlot (_, _, t)) =
+            t
           | typeOf (Case (_, _, t)) =
             t
           | typeOf (SizeOf _) =
