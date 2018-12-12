@@ -87,3 +87,8 @@ echo "sqlite3.au"
 ./austral test/valid/sqlite3.au --output=test/valid/sqlite3.c --entrypoint=sqlite3-test:main
 gcc test/valid/sqlite3.c -o test/valid/sqlite3.bin -lsqlite3
 ./test/valid/sqlite3.bin
+
+echo "string.au"
+./austral test/valid/string.au --output=test/valid/string.c --entrypoint=austral-user:main
+gcc test/valid/string.c -o test/valid/string.bin
+./test/valid/string.bin
