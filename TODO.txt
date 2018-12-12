@@ -1,6 +1,5 @@
 TODO:
 
-- slot getter
 - Define constructor generic functions for datatypes
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
@@ -191,3 +190,4 @@ DONE:
 - Record types
 - defrecord toplevel form
 - record constructor form
+- slot getter
