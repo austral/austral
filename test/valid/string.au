@@ -1,0 +1,14 @@
+;; -*- mode: lisp -*-
+
+(defrecord string ()
+  (length usize)
+  (data   (paddress u8)))
+
+(defun make-string ((length usize) (data (paddress u8))) string
+  "Construct a string from its size and address in memory."
+  (record string
+          (length length)
+          (data data)))
+
+(defun main () i32
+  0)
