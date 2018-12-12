@@ -35,8 +35,47 @@ Anti-features:
 - No global variables.
 - No type inference, type information flows in one direction.
 
+# Building
+
+Building the `austral` executable requires `make`, [MLton][mlton], and a C
+compiler for building the resulting output.
+
+On Debian/Ubuntu, you can install the requisite dependencies with:
+
+```bash
+$ sudo apt-get install -y make mlton gcc
+```
+
+To build the executable:
+
+```bash
+$ make austral
+```
+
+To compile in "development mode" we use [SML/NJ][smlnj], which is faster and
+features a REPL. You can install it in Debian/Ubuntu with:
+
+```bash
+$ sudo apt-get install -y smlnj
+```
+
+Then, to compile the source code and load up a REPL, run:
+
+```bash
+$ make
+```
+
+Finally, to run the tests, you need both MLton and SML/NJ. Run this:
+
+```bash
+$ ./run-tests.sh
+```
+
 # License
 
 Copyright 2018 Fernando Borretti.
 
 Licensed under the GPLv3 license. See the COPYING file for details.
+
+[mlton]: http://www.mlton.org/
+[smlnj]: https://www.smlnj.org/
