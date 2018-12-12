@@ -13,5 +13,8 @@
 (defun string-length ((string string)) usize
   (slot string length))
 
+(defun string-address ((string string)) (paddress u8)
+  (slot string data))
+
 (defun main () i32
   0)
