@@ -185,6 +185,11 @@ structure OAST :> OAST = struct
       | transformRecord _ =
         raise Fail "Invalid `record` form"
 
+    and transformSlot [exp, RCST.Symbol name] =
+        ReadSlot (transform exp, name)
+      | transformSlot _ =
+        raise Fail "Invalid `slot` form"
+
     and transformMalloc [ty, len] =
         Malloc (Type.parseTypespec ty, transform len)
       | transformMalloc _ =
