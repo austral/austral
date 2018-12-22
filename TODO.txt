@@ -42,6 +42,7 @@ LONG-TERM TODO:
 - Prelude: equality and comparison instances
 - JavaScript backend
 - CUDA backend
+- C+OpenMP backend
 
 DONE:
 
