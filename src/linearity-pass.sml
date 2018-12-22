@@ -18,4 +18,7 @@
 *)
 
 structure LinearityPass :> LINEARITY_PASS = struct
+    type name = Symbol.symbol
+
+    type frequency_table = (name, int) Map.map
 end
