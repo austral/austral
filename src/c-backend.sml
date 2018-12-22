@@ -314,7 +314,7 @@ structure CBackend :> C_BACKEND = struct
                               variants)
             ]
         end
-      | transformInst (LIR.While { test, body, result, ty }) =
+      | transformInst (LIR.While { test, body, body_res, result, ty }) =
         let val result' = regName result
             and ty' = transformType ty
         in
@@ -323,7 +323,7 @@ structure CBackend :> C_BACKEND = struct
                 C.While (transformOperand test,
                          C.Sequence [
                              C.Sequence (map transformInst consequent),
-                             C.Assign (C.Variable result', _)
+                             C.Assign (C.Variable result', transformOperand body_res)
                          ])
             ]
         end
