@@ -243,7 +243,7 @@ structure Type :> TYPE = struct
            | NONE => raise Fail "Type parameter not present in replacements")
       | replaceVars m (Tuple tys) =
         Tuple (map (replaceVars m) tys)
-      | replaceVars m (Disjunction (name, args)) =
+      | replaceVars m (Disjunction (name, _, args)) =
         Disjunction (name, map (replaceVars m) args)
       | replaceVars _ ty =
         ty
