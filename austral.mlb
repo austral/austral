@@ -70,6 +70,9 @@ src/dast.sml
 src/tast.sig
 src/tast.sml
 
+src/linearity-pass.sig
+src/linearity-pass.sml
+
 src/fdefs.sig
 src/fdefs.sml
 
