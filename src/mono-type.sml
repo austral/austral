@@ -119,7 +119,7 @@ structure MonoType :> MONO_TYPE = struct
         in
             (StaticArray ty', tm')
         end
-      | monomorphize tm rs (Type.Disjunction (name, tyargs)) =
+      | monomorphize tm rs (Type.Disjunction (name, _, tyargs)) =
         let val (tyargs', tm) = monomorphizeList tm rs tyargs
         in
             case getMonomorph tm name tyargs' of
