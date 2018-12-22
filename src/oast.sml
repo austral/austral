@@ -471,6 +471,7 @@ structure OAST :> OAST = struct
                 let val (docstring, variants) = parseBody body
                 in
                     Defdatatype (name,
+                                 kind,
                                  map parseParam params,
                                  docstring,
                                  map parseVariant variants)
