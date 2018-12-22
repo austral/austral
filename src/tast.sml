@@ -71,7 +71,7 @@ structure TAST :> TAST = struct
                      | Defclass of name * param_name * docstring * method_decl list
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * Type.typarams * docstring * ty
-                     | Defdatatype of name * Type.typarams * docstring * Type.variant list
+                     | Defdatatype of name * Type.kind * Type.typarams * docstring * Type.variant list
                      | Defrecord of name * Type.typarams * docstring * (name * ty) list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
