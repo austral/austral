@@ -155,7 +155,14 @@ structure Type :> TYPE = struct
         if kind = Linear then
             Linear
         else
+            kindOfList tys
+      | kindOf (Record (_, kind, tys)) =
+        if kind = Linear then
+            Linear
+        else
             kindOfList l
+      | kindOf (TypeVariable _) =
+        _
 
     and kindOfList l =
         (* This is like inclusive or: if any type is linear, we return linear,
