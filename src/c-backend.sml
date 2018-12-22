@@ -314,19 +314,9 @@ structure CBackend :> C_BACKEND = struct
                               variants)
             ]
         end
-      | transformInst (LIR.While { test, body, body_res, result, ty }) =
-        let val result' = regName result
-            and ty' = transformType ty
-        in
-            C.Sequence [
-                C.Declare (ty', result'),
-                C.While (transformOperand test,
-                         C.Sequence [
-                             C.Sequence (map transformInst body),
-                             C.Assign (C.Variable result', transformOperand body_res)
-                         ])
-            ]
-        end
+      | transformInst (LIR.While { test, body }) =
+        C.While (transformOperand test,
+                 C.Sequence (map transformInst body))
       | transformInst (LIR.VoidForeignFuncall (name, args)) =
         (C.VoidFuncall (name, map transformOperand args))
 
