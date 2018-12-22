@@ -453,8 +453,11 @@ structure OAST :> OAST = struct
     and transformDefdatatype (name::(RCST.List params)::body) =
         let fun parseName (RCST.Symbol n) =
                 (n, Type.Unrestricted)
-              | parseName (RCST.List [RCST.Symbol n, RCST.Keyword (Ident.mkIdentEx "kind"), RCST.Symbol k]) =
-                (n, Type.parseKind k)
+              | parseName (RCST.List [RCST.Symbol n, RCST.Keyword keyword, RCST.Symbol k]) =
+                if keyword = Ident.mkIdentEx "kind" then
+                    (n, Type.parseKind k)
+                else
+                    raise Fail "Unknown definition keyword"
             and parseBody ((RCST.StringConstant s)::def) =
                 (SOME (CST.escapedToString s), def)
               | parseBody def =
