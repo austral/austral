@@ -160,7 +160,7 @@ structure Type :> TYPE = struct
         if kind = Linear then
             Linear
         else
-            kindOfList l
+            kindOfList tys
       | kindOf (TypeVariable _) =
         raise Fail "Not implemented yet"
 
