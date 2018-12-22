@@ -213,6 +213,8 @@ structure AST :> AST = struct
                 transformLoad args
             else if f = au "store" then
                 transformStore args
+            else if f = au "while" then
+                parseWhile args
             else
                 Funcall (f, args)
         end
