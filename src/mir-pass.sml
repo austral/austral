@@ -311,6 +311,7 @@ structure MirPass :> MIR_PASS = struct
             let val nodes = testBlock
                             @ [While { test = testVal,
                                        body = bodyBlock,
+                                       body_res = bodyVal,
                                        result = result,
                                        ty = ty }]
             in
