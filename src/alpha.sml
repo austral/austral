@@ -260,8 +260,9 @@ structure Alpha :> ALPHA = struct
                          methods)
       | transformTop' (OAST.Deftype tydef) =
         Deftype tydef
-      | transformTop' (OAST.Defdatatype (name, typarams, docstring, variants)) =
+      | transformTop' (OAST.Defdatatype (name, kind, typarams, docstring, variants)) =
         Defdatatype (name,
+                     kind,
                      typarams,
                      docstring,
                      map (fn (OAST.Variant v) => Variant v) variants)
