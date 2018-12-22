@@ -330,6 +330,7 @@ structure AST :> AST = struct
                      map (fn (Alpha.Variant v) => Variant v) variants)
       | transformTop (Alpha.Defrecord (name, kind, typarams, docstring, slots)) =
         Defrecord (name,
+                   kind,
                    typarams,
                    docstring,
                    map (fn (Alpha.Slot (name, ty, docstring)) => Slot (name, ty, docstring)) slots)
