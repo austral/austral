@@ -107,6 +107,7 @@ structure Module : MODULE = struct
                 "store",
                 "address-offset",
                 "size-of",
+                "while",
                 "defun",
                 "defgeneric",
                 "deftype",

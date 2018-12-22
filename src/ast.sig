@@ -52,6 +52,7 @@ signature AST = sig
                  | AddressOf of Symbol.variable
                  | Cast of typespec * ast
                  | Seq of ast * ast
+                 | While of ast * ast
                  | Funcall of Symbol.symbol * ast list
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name

@@ -188,6 +188,8 @@ structure HirPass :> HIR_PASS = struct
         Cast (transformType ty, transform e exp)
       | transform e (M.Seq (a, b)) =
         Seq (transform e a, transform e b)
+      | transform e (M.While (test, body)) =
+        While (transform e test, transform e body)
       | transform e (M.ConcreteFuncall (name, args, ty)) =
         ConcreteFuncall (name, map (transform e) args, transformType ty)
       | transform e (M.GenericFuncall (name, id, args, ty)) =

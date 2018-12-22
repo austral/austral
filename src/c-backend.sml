@@ -314,6 +314,9 @@ structure CBackend :> C_BACKEND = struct
                               variants)
             ]
         end
+      | transformInst (LIR.While { test, body }) =
+        C.While (transformOperand test,
+                 C.Sequence (map transformInst body))
       | transformInst (LIR.VoidForeignFuncall (name, args)) =
         (C.VoidFuncall (name, map transformOperand args))
 

@@ -1,7 +1,6 @@
 TODO:
 
 - Define constructor generic functions for datatypes
-- Imperative iteration constructs
 - Syntax for linear disjunctions and records
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
@@ -197,3 +196,5 @@ DONE:
 - defrecord toplevel form
 - record constructor form
 - slot getter
+- while special operator
+- parse while special forms

@@ -62,6 +62,7 @@ structure HIR :> HIR = struct
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
                  | Seq of ast * ast
+                 | While of ast * ast
                  | ConcreteFuncall of name * ast list * ty
                  | GenericFuncall of name * int * ast list * ty
          and variant_case = VariantCase of int * ast
@@ -132,6 +133,8 @@ structure HIR :> HIR = struct
         Pointer ty
       | typeOf (Seq (_, v)) =
         typeOf v
+      | typeOf (While (_, b)) =
+        Unit
       | typeOf (ConcreteFuncall (_, _, ty)) =
         ty
       | typeOf (GenericFuncall (_, _, _, ty)) =

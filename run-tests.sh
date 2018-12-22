@@ -92,3 +92,8 @@ echo "string.au"
 ./austral test/valid/string.au --output=test/valid/string.c --entrypoint=austral-user:main
 gcc test/valid/string.c -o test/valid/string.bin
 ./test/valid/string.bin
+
+echo "while.au"
+./austral test/valid/while.au --output=test/valid/while.c --entrypoint=austral-user:main
+gcc test/valid/while.c -o test/valid/while.bin
+./test/valid/while.bin

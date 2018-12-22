@@ -53,6 +53,7 @@ structure TAST :> TAST = struct
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
                  | Seq of ast * ast
+                 | While of ast * ast
                  | ConcreteFuncall of name * ast list * ty
                  | GenericFuncall of name * Type.typarams * (name, ty) Map.map * ast list * ty
                  | MethodFuncall of name * ty list * ast list * ty
@@ -164,6 +165,8 @@ structure TAST :> TAST = struct
             Address ty
           | typeOf (Seq (_, v)) =
             typeOf v
+          | typeOf (While (_, b)) =
+            Type.Unit
           | typeOf (ConcreteFuncall (_, _, ty)) =
             ty
           | typeOf (GenericFuncall (_, _, _, _, ty)) =
@@ -646,6 +649,15 @@ structure TAST :> TAST = struct
           | augment (AST.Seq (a, b)) c =
             Seq (augment a c,
                  augment b c)
+          | augment (AST.While (test, body)) c =
+            let val test' = augment test c
+                and body' = augment body c
+            in
+                if typeOf test' = Type.Bool then
+                    While (test', body')
+                else
+                    raise Fail "while: the type of the test must be a boolean"
+            end
           | augment (AST.Funcall (name, args)) c =
             augmentFuncall name args c NONE
 

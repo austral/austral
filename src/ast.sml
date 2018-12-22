@@ -54,6 +54,7 @@ structure AST :> AST = struct
                  | AddressOf of Symbol.variable
                  | Cast of typespec * ast
                  | Seq of ast * ast
+                 | While of ast * ast
                  | Funcall of Symbol.symbol * ast list
          and variant_case = VariantCase of case_name * ast
          and case_name = NameOnly of name
@@ -212,6 +213,8 @@ structure AST :> AST = struct
                 transformLoad args
             else if f = au "store" then
                 transformStore args
+            else if f = au "while" then
+                transformWhile args
             else
                 Funcall (f, args)
         end
@@ -278,6 +281,11 @@ structure AST :> AST = struct
         Store (ptr, v)
       | transformStore _ =
         raise Fail "Bad `store` form"
+
+    and transformWhile (test::body) =
+        While (test, transformProgn body)
+      | transformWhile _ =
+        raise Fail "Bad `while` form"
 
     (* Parse toplevel forms into the toplevel AST *)
 

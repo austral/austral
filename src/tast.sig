@@ -53,6 +53,7 @@ signature TAST = sig
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
                  | Seq of ast * ast
+                 | While of ast * ast
                  | ConcreteFuncall of name * ast list * ty
                  | GenericFuncall of name * Type.typarams * (name, ty) Map.map * ast list * ty
                  | MethodFuncall of name * ty list * ast list * ty

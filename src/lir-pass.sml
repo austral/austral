@@ -330,6 +330,16 @@ structure LirPass :> LIR_PASS = struct
                 end
             end
         end
+      | transformInstruction tt (MIR.While { test, body }) =
+        let val (test, tt) = transformOperand tt test
+        in
+            let val (body, tt) = transformInstructions tt body
+            in
+                (L.While { test = test,
+                           body = body },
+                         tt)
+            end
+        end
       | transformInstruction tt (MIR.VoidForeignFuncall (name, args)) =
         let val (args, tt) = transformOperands tt args
         in

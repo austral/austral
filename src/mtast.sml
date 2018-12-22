@@ -55,6 +55,7 @@ structure MTAST :> MTAST = struct
                  | AddressOf of Symbol.variable * ty
                  | Cast of ty * ast
                  | Seq of ast * ast
+                 | While of ast * ast
                  | ConcreteFuncall of name * ast list * ty
                  | GenericFuncall of name * int * ast list * ty
          and variant_case = VariantCase of case_name * ast
@@ -140,6 +141,8 @@ structure MTAST :> MTAST = struct
             Address ty
           | typeOf (Seq (_, v)) =
             typeOf v
+          | typeOf (While (_, b)) =
+            MonoType.Unit
           | typeOf (ConcreteFuncall (_, _, ty)) =
             ty
           | typeOf (GenericFuncall (_, _, _, ty)) =
@@ -470,6 +473,14 @@ structure MTAST :> MTAST = struct
             let val (b', ctx) = monomorphize ctx rs b
             in
                 (Seq (a', b'), ctx)
+            end
+        end
+      | monomorphize ctx rs (TAST.While (test, body)) =
+        let val (test', ctx) = monomorphize ctx rs test
+        in
+            let val (body', ctx) = monomorphize ctx rs body
+            in
+                (While (test', body'), ctx)
             end
         end
       | monomorphize ctx rs (TAST.ConcreteFuncall (name, args, ty)) =

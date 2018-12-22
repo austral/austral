@@ -1,0 +1,8 @@
+;; -*- mode: lisp -*-
+
+(austral.ext.cffi:defcfun (puts "puts") ((ptr (paddress u8))) i32)
+
+(defun main () i32
+  (while false
+    (puts (static-array-pointer "Hello, world!")))
+  0)
