@@ -121,7 +121,7 @@ structure Type :> TYPE = struct
       | tyVars (PositiveAddress ty) = tyVars ty
       | tyVars (StaticArray ty) = tyVars ty
       | tyVars (Pointer ty) = tyVars ty
-      | tyVars (Disjunction (_, tys)) =
+      | tyVars (Disjunction (_, _, tys)) =
         (Set.unionList (map tyVars tys))
       | tyVars (Record (_, tys)) =
         (Set.unionList (map tyVars tys))
