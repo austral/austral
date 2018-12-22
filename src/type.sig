@@ -22,6 +22,9 @@ signature TYPE = sig
 
     datatype param = TypeParam of name
 
+    datatype kind = Linear
+                  | Unrestricted
+
     datatype ty = Unit
                 | Bool
                 | Integer of signedness * width
