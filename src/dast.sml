@@ -113,7 +113,7 @@ structure DAST :> DAST = struct
                      docstring,
                      Type.resolve tenv (OrderedSet.toUnordered params') tys)
         end
-      | transformTop (AST.Defdatatype (name, params, docstring, variants)) tenv _ =
+      | transformTop (AST.Defdatatype (name, kind, params, docstring, variants)) tenv _ =
         let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
         in
             let fun mapVariant (AST.Variant (name, SOME tys)) =
@@ -122,6 +122,7 @@ structure DAST :> DAST = struct
                     Type.Variant (name, NONE)
             in
                 Defdatatype (name,
+                             kind,
                              params',
                              docstring,
                              map mapVariant variants)
