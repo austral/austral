@@ -165,6 +165,8 @@ structure TAST :> TAST = struct
             Address ty
           | typeOf (Seq (_, v)) =
             typeOf v
+          | typeOf (While (_, b)) =
+            typeOf b
           | typeOf (ConcreteFuncall (_, _, ty)) =
             ty
           | typeOf (GenericFuncall (_, _, _, _, ty)) =
