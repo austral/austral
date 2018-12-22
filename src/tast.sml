@@ -462,7 +462,7 @@ structure TAST :> TAST = struct
                   slot has the same type.
 
              *)
-            let fun augment' name typarams tyargs slots =
+            let fun augment' name kind typarams tyargs slots =
                     let val slotNames = Map.keys slots
                         and consNames = Set.fromList (map (fn (n, _) => n) cslots)
                     in
@@ -498,13 +498,13 @@ structure TAST :> TAST = struct
                 let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
                 in
                     case ty of
-                        (Record (name, tyargs)) => let val slots = Type.getRecordSlots (ctxTenv c) name
-                                                       and typarams = case Type.getDeclaration (ctxTenv c) name of
-                                                                          (SOME (typarams, _)) => typarams
-                                                                        | _ => raise Fail "Internal error"
-                                                   in
-                                                       augment' name typarams tyargs slots
-                                                   end
+                        (Record (name, kind, tyargs)) => let val slots = Type.getRecordSlots (ctxTenv c) name
+                                                             and typarams = case Type.getDeclaration (ctxTenv c) name of
+                                                                                (SOME (typarams, _)) => typarams
+                                                                              | _ => raise Fail "Internal error"
+                                                         in
+                                                             augment' name kind typarams tyargs slots
+                                                         end
                       | _ => raise Fail ("record: not a record: " ^ (Type.toString ty))
                 end
             end
