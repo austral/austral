@@ -73,6 +73,13 @@ structure AustralTest = struct
             in
                 isSome (get m "A") "get"
             end
+            let val m = fromList [("A", 1)]
+            in
+                let val m = set m "A" 2
+                in
+                    isEqual (Option.valOf (get m "A")) 2 "get"
+                end
+            end
         ]
     end
 
