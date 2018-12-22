@@ -47,6 +47,7 @@ signature TYPE = sig
     val isComparable : ty -> bool
     val toString : ty -> string
 
+    (* Return the set of type variables in a type *)
     val tyVars : ty -> param Set.set
 
     type typarams = param OrderedSet.set
