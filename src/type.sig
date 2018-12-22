@@ -64,8 +64,8 @@ signature TYPE = sig
     type tenv
 
     datatype decltype = AliasDecl of ty
-                      | DisjunctionDecl
-                      | RecordDecl
+                      | DisjunctionDecl of kind
+                      | RecordDecl of kind
 
     datatype typedef = AliasDef of ty
                      | DisjunctionDef of variant list
