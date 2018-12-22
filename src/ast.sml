@@ -328,7 +328,7 @@ structure AST :> AST = struct
                      typarams,
                      docstring,
                      map (fn (Alpha.Variant v) => Variant v) variants)
-      | transformTop (Alpha.Defrecord (name, typarams, docstring, slots)) =
+      | transformTop (Alpha.Defrecord (name, kind, typarams, docstring, slots)) =
         Defrecord (name,
                    typarams,
                    docstring,
