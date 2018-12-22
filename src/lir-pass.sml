@@ -337,10 +337,10 @@ structure LirPass :> LIR_PASS = struct
             in
                 let val (ty, tt) = transformType tt ty
                 in
-                    (L.Cond { test = test,
-                              body = body,
-                              result = result,
-                              ty = ty },
+                    (L.While { test = test,
+                               body = body,
+                               result = result,
+                               ty = ty },
                      tt)
                 end
             end
