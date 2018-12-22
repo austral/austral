@@ -1,6 +1,5 @@
 TODO:
 
-- Linearity: all type variables are linear
 - Linearity: Syntax for specifying kinds in disjunctions and records
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
@@ -203,3 +202,4 @@ DONE:
 - parse while special forms
 - Linearity: define linear and unrestricted kinds
 - Linearity: store kind information in disjunction/record types
+- Linearity: all type variables are linear
