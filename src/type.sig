@@ -50,6 +50,9 @@ signature TYPE = sig
     (* Return the set of type variables in a type *)
     val tyVars : ty -> param Set.set
 
+    (* Determine the kind of a type *)
+    val kindOf : ty -> kind
+
     type typarams = param OrderedSet.set
 
     (* The type environment has two components: declarations and definitions.
