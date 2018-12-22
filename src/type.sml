@@ -138,6 +138,24 @@ structure Type :> TYPE = struct
         Unrestricted
       | kindOf (Tuple tys) =
         kindOfList tys
+      | kindOf (Address t) =
+        kindOf t
+      | kindOf (PositiveAddress t) =
+        kindOf t
+      | kindOf (StaticArray t) =
+        kindOf t
+      | kindOf (Pointer t) =
+        Linear
+      | kindOf (Disjunction (_, kind, tys)) =
+        (* So, the idea here is that even if the asserted kind is unrestricted,
+           if a generic disjunction is applied to a linear argument, the whole
+           thing is linear. This is a design flaw, I think. One possible
+           approach might be to fail if the user tries to declare a generic and
+           universally-quantified disjunction and assert its kind as linear. *)
+        if kind = Linear then
+            Linear
+        else
+            kindOfList l
 
     and kindOfList l =
         (* This is like inclusive or: if any type is linear, we return linear,
