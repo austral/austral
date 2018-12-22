@@ -166,7 +166,7 @@ structure TAST :> TAST = struct
           | typeOf (Seq (_, v)) =
             typeOf v
           | typeOf (While (_, b)) =
-            typeOf b
+            Type.Unit
           | typeOf (ConcreteFuncall (_, _, ty)) =
             ty
           | typeOf (GenericFuncall (_, _, _, _, ty)) =
