@@ -451,17 +451,7 @@ structure OAST :> OAST = struct
       | transformDeftype _ = raise Fail "Bad deftype form"
 
     and transformDefdatatype (name::(RCST.List params)::body) =
-        let fun parseName (RCST.Symbol n) =
-                (n, Type.Unrestricted)
-              | parseName (RCST.List [RCST.Symbol n, RCST.Keyword keyword, RCST.Symbol k]) =
-                if keyword = Ident.mkIdentEx "kind" then
-                    (n, parseKind k)
-                else
-                    raise Fail "Unknown definition keyword"
-              | parseName _ =
-                raise Fail "Invalid disjunction name"
-
-            and parseBody ((RCST.StringConstant s)::def) =
+        let fun parseBody ((RCST.StringConstant s)::def) =
                 (SOME (CST.escapedToString s), def)
               | parseBody def =
                 (NONE, def)
@@ -516,6 +506,16 @@ structure OAST :> OAST = struct
         end
       | transformDefrecord _ =
         raise Fail "Bad defrecord form"
+
+    and parseDatatypeName (RCST.Symbol n) =
+        (n, Type.Unrestricted)
+      | parseName (RCST.List [RCST.Symbol n, RCST.Keyword keyword, RCST.Symbol k]) =
+        if keyword = Ident.mkIdentEx "kind" then
+            (n, parseKind k)
+        else
+            raise Fail "Unknown definition keyword"
+      | parseName _ =
+        raise Fail "Invalid disjunction name"
 
     and parseKind k =
         if k = au "linear" then
