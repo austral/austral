@@ -466,7 +466,7 @@ structure OAST :> OAST = struct
               | parseVariant _ =
                 raise Fail "defdatatype: bad variant definition"
         in
-            let val (name, kind) = parseName name
+            let val (name, kind) = parseDatatypeName name
             in
                 let val (docstring, variants) = parseBody body
                 in
