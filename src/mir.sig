@@ -76,6 +76,7 @@ signature MIR = sig
                          | Case of operand * variant_case list * register * ty
                          | While of { test : operand,
                                       body : instruction list,
+                                      body_res : operand,
                                       result : register,
                                       ty : ty }
                          | VoidForeignFuncall of string * operand list
