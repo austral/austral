@@ -653,7 +653,7 @@ structure TAST :> TAST = struct
             let val test' = augment test c
                 and body' = augment body c
             in
-                if typeOf test' == Type.Bool then
+                if typeOf test' = Type.Bool then
                     While (test', body')
                 else
                     raise Fail "while: the type of the test must be a boolean"
