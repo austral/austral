@@ -140,7 +140,7 @@ structure MonoType :> MONO_TYPE = struct
                                 end
                             end
         end
-      | monomorphize tm rs (Type.Record (name, tyargs)) =
+      | monomorphize tm rs (Type.Record (name, _, tyargs)) =
         let val (tyargs', tm) = monomorphizeList tm rs tyargs
         in
             case getMonomorph tm name tyargs' of
