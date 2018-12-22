@@ -244,13 +244,10 @@ structure Compiler : COMPILER = struct
         in
             compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.AliasDecl ty))
         end
-      | declareTopForm c (DAST.Defdatatype (name, params, _, _)) =
+      | declareTopForm c (DAST.Defdatatype (name, kind, params, _, _)) =
         let val tenv = compilerTenv c
         in
-            let val kind = Type.Unrestricted (* TODO FIX ME *)
-            in
-                compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl kind))
-            end
+            compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl kind))
         end
       | declareTopForm c (DAST.Defrecord (name, params, _, _)) =
         let val tenv = compilerTenv c
@@ -328,7 +325,7 @@ structure Compiler : COMPILER = struct
         in
             compilerFromTenv c (Type.addDefinition tenv (name, typarams, Type.AliasDef ty))
         end
-      | defineType c (DAST.Defdatatype (name, typarams, _, variants)) =
+      | defineType c (DAST.Defdatatype (name, _, typarams, _, variants)) =
         let val tenv = compilerTenv c
         in
             compilerFromTenv c (Type.addDefinition tenv (name, typarams, Type.DisjunctionDef variants))

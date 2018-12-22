@@ -853,8 +853,9 @@ structure TAST :> TAST = struct
                      params,
                      docstring,
                      ty)
-      | augmentTop (DAST.Defdatatype (name, params, docstring, variants)) _ _ =
+      | augmentTop (DAST.Defdatatype (name, kind, params, docstring, variants)) _ _ =
         Defdatatype (name,
+                     kind,
                      params,
                      docstring,
                      variants)
