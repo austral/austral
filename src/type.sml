@@ -337,12 +337,12 @@ structure Type :> TYPE = struct
             end
         end
 
-    and resolveRecord name typarams tyargs =
+    and resolveRecord name kind typarams tyargs =
         let val rs = replacements typarams tyargs
         in
             let val tyargs' = map (replaceVars rs) tyargs
             in
-                Record (name, tyargs')
+                Record (name, kind, tyargs')
             end
         end
 
