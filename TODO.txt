@@ -41,6 +41,7 @@ LONG-TERM TODO:
 - Verify if an expression is a valid static array element
 - Prelude: equality and comparison instances
 - JavaScript backend
+- CUDA backend
 
 DONE:
 
