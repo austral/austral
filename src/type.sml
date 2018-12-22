@@ -328,12 +328,12 @@ structure Type :> TYPE = struct
                 | _ => raise Fail "Internal compiler error: not a type alias")
            | NONE => raise Fail "Internal compiler error: no such type")
 
-    and resolveDisjunction name typarams tyargs =
+    and resolveDisjunction name kind typarams tyargs =
         let val rs = replacements typarams tyargs
         in
             let val tyargs' = map (replaceVars rs) tyargs
             in
-                Disjunction (name, tyargs')
+                Disjunction (name, kind, tyargs')
             end
         end
 
