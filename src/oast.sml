@@ -450,13 +450,19 @@ structure OAST :> OAST = struct
         end
       | transformDeftype _ = raise Fail "Bad deftype form"
 
-    and transformDefdatatype ((RCST.Symbol name)::(RCST.List params)::body) =
-        let fun parseBody ((RCST.StringConstant s)::def) =
+    and transformDefdatatype (name::(RCST.List params)::body) =
+        let fun parseName (RCST.Symbol n) =
+                (n, Type.Unrestricted)
+              | parseName (RCST.List [RCST.Symbol n, RCST.Keyword (Ident.mkIdentEx "kind"), RCST.Symbol k]) =
+                (n, Type.parseKind k)
+            and parseBody ((RCST.StringConstant s)::def) =
                 (SOME (CST.escapedToString s), def)
               | parseBody def =
                 (NONE, def)
+
             and parseParam (RCST.Symbol s) = s
               | parseParam _ = raise Fail "Type parameter must be a symbol"
+
             and parseVariant (RCST.List [RCST.Symbol name, tyspec]) =
                 Variant (name, SOME (Type.parseTypespec tyspec))
               | parseVariant (RCST.List [RCST.Symbol name]) =
@@ -464,12 +470,15 @@ structure OAST :> OAST = struct
               | parseVariant _ =
                 raise Fail "defdatatype: bad variant definition"
         in
-            let val (docstring, variants) = parseBody body
+            let val (name, kind) = parseName name
             in
-                Defdatatype (name,
-                             map parseParam params,
-                             docstring,
-                             map parseVariant variants)
+                let val (docstring, variants) = parseBody body
+                in
+                    Defdatatype (name,
+                                 map parseParam params,
+                                 docstring,
+                                 map parseVariant variants)
+                end
             end
         end
       | transformDefdatatype _ =
