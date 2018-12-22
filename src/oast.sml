@@ -458,6 +458,9 @@ structure OAST :> OAST = struct
                     (n, parseKind k)
                 else
                     raise Fail "Unknown definition keyword"
+              | parseName _ =
+                raise Fail "Invalid disjunction name"
+
             and parseBody ((RCST.StringConstant s)::def) =
                 (SOME (CST.escapedToString s), def)
               | parseBody def =
