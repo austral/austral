@@ -266,7 +266,7 @@ structure Alpha :> ALPHA = struct
                      typarams,
                      docstring,
                      map (fn (OAST.Variant v) => Variant v) variants)
-      | transformTop' (OAST.Defrecord (name, typarams, docstring, slots)) =
+      | transformTop' (OAST.Defrecord (name, kind, typarams, docstring, slots)) =
         Defrecord (name,
                    typarams,
                    docstring,
