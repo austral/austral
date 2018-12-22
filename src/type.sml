@@ -140,6 +140,8 @@ structure Type :> TYPE = struct
         kindOfList tys
 
     and kindOfList l =
+        (* This is like inclusive or: if any type is linear, we return linear,
+           otherwise, unrestricted *)
         let val kinds = map kindOf l
         in
             let fun discriminator Linear =
