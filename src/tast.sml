@@ -512,13 +512,13 @@ structure TAST :> TAST = struct
             let val r' = augment r c
             in
                 case typeOf r' of
-                    (Type.Record (tyname, _)) => let val slots = Type.getRecordSlots (ctxTenv c)
-                                                                                     tyname
-                                                 in
-                                                     case Map.get slots name of
-                                                         (SOME ty) => ReadSlot (r', name, ty)
-                                                       | _ => raise Fail ("slot: no slot with this name: " ^ (Symbol.toString name))
-                                                 end
+                    (Type.Record (tyname, kind, _)) => let val slots = Type.getRecordSlots (ctxTenv c)
+                                                                                           tyname
+                                                       in
+                                                           case Map.get slots name of
+                                                               (SOME ty) => ReadSlot (r', name, ty)
+                                                             | _ => raise Fail ("slot: no slot with this name: " ^ (Symbol.toString name))
+                                                       end
                   | _ => raise Fail ("slot: not a record: " ^ (Type.toString (typeOf r')))
             end
           | augment (AST.Case (exp, cases)) c =
