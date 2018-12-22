@@ -136,6 +136,7 @@ structure DAST :> DAST = struct
                      Type.resolve tenv (OrderedSet.toUnordered params') typespec)
             in
                 Defrecord (name,
+                           kind,
                            params',
                            docstring,
                            map mapSlot slots)
