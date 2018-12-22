@@ -247,7 +247,10 @@ structure Compiler : COMPILER = struct
       | declareTopForm c (DAST.Defdatatype (name, params, _, _)) =
         let val tenv = compilerTenv c
         in
-            compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl))
+            let val kind = Unrestricted (* TODO FIX ME *)
+            in
+                compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl kind))
+            end
         end
       | declareTopForm c (DAST.Defrecord (name, params, _, _)) =
         let val tenv = compilerTenv c
