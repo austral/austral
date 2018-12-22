@@ -18,4 +18,7 @@
 *)
 
 signature LINEARITY_PASS = sig
+    (* A frequency table is a map that associates a linear binding's name to the
+       number of times it appears in an expression *)
+    type frequency_table
 end
