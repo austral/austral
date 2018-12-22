@@ -75,10 +75,7 @@ structure MIR :> MIR = struct
                                       value : operand }
                          | Case of operand * variant_case list * register * ty
                          | While of { test : operand,
-                                      body : instruction list,
-                                      body_res : operand,
-                                      result : register,
-                                      ty : ty }
+                                      body : instruction list }
                          | VoidForeignFuncall of string * operand list
          and variant_case = VariantCase of int * instruction list * operand * ty
 
