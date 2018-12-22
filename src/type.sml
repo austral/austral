@@ -123,7 +123,7 @@ structure Type :> TYPE = struct
       | tyVars (Pointer ty) = tyVars ty
       | tyVars (Disjunction (_, _, tys)) =
         (Set.unionList (map tyVars tys))
-      | tyVars (Record (_, tys)) =
+      | tyVars (Record (_, _, tys)) =
         (Set.unionList (map tyVars tys))
       | tyVars (TypeVariable name) =
         Set.singleton (TypeParam name)
