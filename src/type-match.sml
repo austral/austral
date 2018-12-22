@@ -104,7 +104,7 @@ structure TypeMatch = struct
           (case matchType t t' of
                (Bindings l) => Bindings l
              | (Failure f) => Failure f)
-        | matchType (Disjunction (n, args)) (Disjunction (n', args')) =
+        | matchType (Disjunction (n, _, args)) (Disjunction (n', _, args')) =
           if n = n' then
               matchTypeLists args args'
           else
