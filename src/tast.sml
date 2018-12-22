@@ -483,7 +483,7 @@ structure TAST :> TAST = struct
                                                     end)
                                                 cslots
                             in
-                                let val ty = Type.Record (name, tyargs)
+                                let val ty = Type.Record (name, kind, tyargs)
                                 in
                                     let val ty = replaceVars (replacements typarams tyargs) ty
                                     in
