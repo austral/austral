@@ -87,7 +87,7 @@ structure Type :> TYPE = struct
         ^ " "
         ^ (String.concatWith " " (map toString tyargs))
         ^ ")"
-      | toString (Record (name, tyargs)) =
+      | toString (Record (name, _, tyargs)) =
         "("
         ^ (Symbol.toString name)
         ^ " "
