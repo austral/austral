@@ -128,7 +128,7 @@ structure DAST :> DAST = struct
                              map mapVariant variants)
             end
         end
-      | transformTop (AST.Defrecord (name, params, docstring, slots)) tenv _ =
+      | transformTop (AST.Defrecord (name, kind, params, docstring, slots)) tenv _ =
         let val params' = OrderedSet.fromList (map (fn name => Type.TypeParam name) params)
         in
             let fun mapSlot (AST.Slot (name, typespec, _)) =
