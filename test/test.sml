@@ -66,7 +66,11 @@ structure AustralTest = struct
     in
     val mapSuite = suite "Map" [
             isEqual (size empty) 0 "empty",
-            isEqual (size (iadd empty ("A", 1))) 1 "iadd"
+            isEqual (size (iadd empty ("A", 1))) 1 "iadd",
+            let val m = empty
+            in
+                isEqual (size (set m "A" 1)) 1 "set"
+            end
         ]
     end
 
