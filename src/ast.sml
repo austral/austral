@@ -322,8 +322,9 @@ structure AST :> AST = struct
                          methods)
       | transformTop (Alpha.Deftype tydef) =
         Deftype tydef
-      | transformTop (Alpha.Defdatatype (name, typarams, docstring, variants)) =
+      | transformTop (Alpha.Defdatatype (name, kind, typarams, docstring, variants)) =
         Defdatatype (name,
+                     kind,
                      typarams,
                      docstring,
                      map (fn (Alpha.Variant v) => Variant v) variants)
