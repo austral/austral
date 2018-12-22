@@ -1,9 +1,11 @@
 TODO:
 
-- Define constructor generic functions for datatypes
-- Syntax for linear disjunctions and records
+- Linearity: define linear and unrestricted kinds
+- Linearity: store kind information in disjunction/record types
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
+- Syntax for specifying kinds in disjunctions and records
+- Define constructor generic functions for datatypes
 - Warn when not using the result value of a progn (any expression with type other than unit)
 - Expand monomorphs recursively
 - abort builtin
