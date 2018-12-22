@@ -322,7 +322,7 @@ structure CBackend :> C_BACKEND = struct
                 C.Declare (ty', result'),
                 C.While (transformOperand test,
                          C.Sequence [
-                             C.Sequence (map transformInst consequent),
+                             C.Sequence (map transformInst body),
                              C.Assign (C.Variable result', transformOperand body_res)
                          ])
             ]
