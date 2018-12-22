@@ -133,8 +133,8 @@ structure Type :> TYPE = struct
     (* Type environment *)
 
     datatype decltype = AliasDecl of ty
-                      | DisjunctionDecl
-                      | RecordDecl
+                      | DisjunctionDecl of kind
+                      | RecordDecl of kind
 
     type declmap = (name, (typarams * decltype)) Map.map
 
