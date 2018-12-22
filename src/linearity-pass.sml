@@ -23,4 +23,9 @@ structure LinearityPass :> LINEARITY_PASS = struct
     type frequency_table = (name, int) Map.map
 
     val emptyTable = Map.empty
+
+    fun addAppearance table name =
+        case Map.get table name of
+            SOME appearances => Map.iadd table (name, appearances + 1)
+          | NONE => Map.iadd table (name, 0)
 end
