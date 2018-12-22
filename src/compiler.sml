@@ -249,13 +249,10 @@ structure Compiler : COMPILER = struct
         in
             compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.DisjunctionDecl kind))
         end
-      | declareTopForm c (DAST.Defrecord (name, params, _, _)) =
+      | declareTopForm c (DAST.Defrecord (name, kind, params, _, _)) =
         let val tenv = compilerTenv c
         in
-            let val kind = Type.Unrestricted (* TODO FIX ME *)
-            in
-                compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.RecordDecl kind))
-            end
+            compilerFromTenv c (Type.addDeclaration tenv (name, params, Type.RecordDecl kind))
         end
       | declareTopForm c (DAST.Deftemplate _) =
         raise Fail "declare deftemplate not implemented"
