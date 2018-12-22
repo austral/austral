@@ -69,7 +69,7 @@ signature AST = sig
                      | Definstance of name * instance_arg * docstring * method_def list
                      | Deftype of name * name list * docstring * typespec
                      | Defdatatype of name * Type.kind * name list * docstring * variant list
-                     | Defrecord of name * param_name list * docstring * slot list
+                     | Defrecord of name * Type.kind * param_name list * docstring * slot list
                      | Deftemplate of Macro.template
                      | DefineSymbolMacro of name * RCST.rcst * docstring
                      | Defmodule of Symbol.module_name * Module.defmodule_clause list
