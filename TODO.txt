@@ -1,7 +1,6 @@
 TODO:
 
 - Define constructor generic functions for datatypes
-- while special operator
 - parse while special forms
 - Syntax for linear disjunctions and records
 - Linearity: extract all bindings out of an expression
@@ -198,3 +197,4 @@ DONE:
 - defrecord toplevel form
 - record constructor form
 - slot getter
+- while special operator
