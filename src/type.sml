@@ -162,7 +162,7 @@ structure Type :> TYPE = struct
         else
             kindOfList tys
       | kindOf (TypeVariable _) =
-        raise Fail "Not implemented yet"
+        Linear
 
     and kindOfList l =
         (* This is like inclusive or: if any type is linear, we return linear,
