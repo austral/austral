@@ -214,7 +214,7 @@ structure AST :> AST = struct
             else if f = au "store" then
                 transformStore args
             else if f = au "while" then
-                parseWhile args
+                transformWhile args
             else
                 Funcall (f, args)
         end
@@ -281,6 +281,11 @@ structure AST :> AST = struct
         Store (ptr, v)
       | transformStore _ =
         raise Fail "Bad `store` form"
+
+    and transformWhile (test::body) =
+        While (test, transformProgn body)
+      | transformWhile _ =
+        raise Fail "Bad `while` form"
 
     (* Parse toplevel forms into the toplevel AST *)
 
