@@ -71,6 +71,10 @@ signature LIR = sig
                          | Store of { ptr : operand,
                                       value : operand }
                          | Case of operand * variant_case list * register * ty
+                         | While of { test : operand,
+                                      body : instruction list,
+                                      result : operand,
+                                      ty : ty }
                          | VoidForeignFuncall of string * operand list
          and variant_case = VariantCase of int * instruction list * operand * ty
 
