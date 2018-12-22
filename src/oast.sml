@@ -514,7 +514,7 @@ structure OAST :> OAST = struct
       | transformDefrecord _ =
         raise Fail "Bad defrecord form"
 
-    and parseKind (RCST.Symbol k) =
+    and parseKind k =
         if k = au "linear" then
             Type.Linear
         else if k = au "unrestricted" then
