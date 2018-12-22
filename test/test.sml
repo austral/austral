@@ -62,6 +62,14 @@ structure AustralTest = struct
     (* Test suites *)
 
     local
+        open Map
+    in
+    val mapSuite = suite "Map" [
+            isEqual (size empty) 0 "empty"
+        ]
+    end
+
+    local
         open CST
     in
     val parserSuite = suite "Parser" [
