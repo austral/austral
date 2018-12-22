@@ -72,12 +72,12 @@ structure AustralTest = struct
             let val m = fromList [("A", 1)]
             in
                 isSome (get m "A") "get"
-            end
+            end,
             let val m = fromList [("A", 1)]
             in
                 let val m = set m "A" 2
                 in
-                    isEqual (Option.valOf (get m "A")) 2 "get"
+                    isEqual (valOf (get m "A")) 2 "get"
                 end
             end
         ]
