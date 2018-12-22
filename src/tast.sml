@@ -861,6 +861,7 @@ structure TAST :> TAST = struct
                      variants)
       | augmentTop (DAST.Defrecord (name, kind, params, docstring, slots)) _ _ =
         Defrecord (name,
+                   kind,
                    params,
                    docstring,
                    slots)
