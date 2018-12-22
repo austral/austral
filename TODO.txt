@@ -43,6 +43,7 @@ LONG-TERM TODO:
 - JavaScript backend
 - CUDA backend
 - C+OpenMP backend
+- Fortran backend?
 
 DONE:
 
