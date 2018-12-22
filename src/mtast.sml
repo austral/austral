@@ -475,6 +475,14 @@ structure MTAST :> MTAST = struct
                 (Seq (a', b'), ctx)
             end
         end
+      | monomorphize ctx rs (TAST.While (test, body)) =
+        let val (test', ctx) = monomorphize ctx rs test
+        in
+            let val (body', ctx) = monomorphize ctx rs body
+            in
+                (While (test', body'), ctx)
+            end
+        end
       | monomorphize ctx rs (TAST.ConcreteFuncall (name, args, ty)) =
         let val (args', ctx) = monomorphizeList ctx rs args
         in
