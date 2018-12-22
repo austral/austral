@@ -502,6 +502,7 @@ structure OAST :> OAST = struct
                 let val (docstring, slots) = parseBody body
                 in
                     Defrecord (name,
+                               kind,
                                map parseParam params,
                                docstring,
                                map parseSlot slots)
