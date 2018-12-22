@@ -37,6 +37,16 @@ structure Map :> MAP = struct
             SOME _ => m
           | NONE => Map ((k, v) :: (mapl m))
 
+    fun set (Map m) k v =
+        case get (Map m) k of
+            SOME _ => Map (map (fn (k', v') =>
+                                   if k' = k then
+                                       (k, v)
+                                   else
+                                       (k', v))
+                               m)
+          | NONE => iadd (Map m) (k, v)
+
     fun iaddList m (head::tail) =
         iadd (iaddList m tail) head
       | iaddList m nil = m
