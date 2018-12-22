@@ -59,6 +59,7 @@ signature MIR = sig
                        | SizeOf of ty
                        | AddressOf of Symbol.variable
                        | Cast of ty * operand
+                       | While of operand * instruction list * operand * ty
                        | ConcreteFuncall of name * operand list
                        | GenericFuncall of name * int * operand list
 
