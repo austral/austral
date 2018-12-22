@@ -649,6 +649,15 @@ structure TAST :> TAST = struct
           | augment (AST.Seq (a, b)) c =
             Seq (augment a c,
                  augment b c)
+          | augment (AST.While (test, body)) c =
+            let val test' = augment test c
+                and body' = augment body c
+            in
+                if typeOf test' == Type.Bool then
+                    While (test', body')
+                else
+                    raise Fail "while: the type of the test must be a boolean"
+            end
           | augment (AST.Funcall (name, args)) c =
             augmentFuncall name args c NONE
 
