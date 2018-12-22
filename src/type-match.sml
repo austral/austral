@@ -109,6 +109,11 @@ structure TypeMatch = struct
               matchTypeLists args args'
           else
               Failure "Disjunction names don't match"
+        | matchType (Record (n, _, args)) (Record (n', _, args')) =
+          if n = n' then
+              matchTypeLists args args'
+          else
+              Failure "Record names don't match"
         | matchType (TypeVariable n) (TypeVariable n') =
           if n = n' then
               emptyBindings
