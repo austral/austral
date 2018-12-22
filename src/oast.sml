@@ -481,7 +481,7 @@ structure OAST :> OAST = struct
       | transformDefdatatype _ =
         raise Fail "Bad defdatatype form"
 
-    and transformDefrecord ((RCST.Symbol name)::(RCST.List params)::body) =
+    and transformDefrecord (name::(RCST.List params)::body) =
         let fun parseBody ((RCST.StringConstant s)::def) =
                 (SOME (CST.escapedToString s), def)
               | parseBody def =
@@ -497,12 +497,15 @@ structure OAST :> OAST = struct
               | parseSlot _ =
                 raise Fail "defrecord: invalid slot definition"
         in
-            let val (docstring, slots) = parseBody body
+            let val (name, kind) = parseDatatypeName name
             in
-                Defrecord (name,
-                           map parseParam params,
-                           docstring,
-                           map parseSlot slots)
+                let val (docstring, slots) = parseBody body
+                in
+                    Defrecord (name,
+                               map parseParam params,
+                               docstring,
+                               map parseSlot slots)
+                end
             end
         end
       | transformDefrecord _ =
