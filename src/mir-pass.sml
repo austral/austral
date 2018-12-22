@@ -302,6 +302,21 @@ structure MirPass :> MIR_PASS = struct
                 (nodes, b')
             end
         end
+      | transform (HIR.While (test, body)) =
+        let val (testBlock, testVal) = transform test
+            and (bodyBlock, bodyVal) = transform body
+            and result = freshRegister ()
+            and ty = transformType (HIR.typeOf body)
+        in
+            let val nodes = testBlock
+                            @ [While { test = testVal,
+                                       body = bodyBlock,
+                                       result = result,
+                                       ty = ty }]
+            in
+                (nodes, RegisterOp result)
+            end
+        end
       | transform (HIR.ConcreteFuncall (name, args, rt)) =
         let val (argBlocks, argOps) = transformArgs args
             and result = freshRegister ()
