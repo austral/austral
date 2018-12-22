@@ -509,12 +509,12 @@ structure OAST :> OAST = struct
 
     and parseDatatypeName (RCST.Symbol n) =
         (n, Type.Unrestricted)
-      | parseName (RCST.List [RCST.Symbol n, RCST.Keyword keyword, RCST.Symbol k]) =
+      | parseDatatypeName (RCST.List [RCST.Symbol n, RCST.Keyword keyword, RCST.Symbol k]) =
         if keyword = Ident.mkIdentEx "kind" then
             (n, parseKind k)
         else
             raise Fail "Unknown definition keyword"
-      | parseName _ =
+      | parseDatatypeName _ =
         raise Fail "Invalid disjunction name"
 
     and parseKind k =
