@@ -455,7 +455,7 @@ structure OAST :> OAST = struct
                 (n, Type.Unrestricted)
               | parseName (RCST.List [RCST.Symbol n, RCST.Keyword keyword, RCST.Symbol k]) =
                 if keyword = Ident.mkIdentEx "kind" then
-                    (n, Type.parseKind k)
+                    (n, parseKind k)
                 else
                     raise Fail "Unknown definition keyword"
             and parseBody ((RCST.StringConstant s)::def) =
@@ -513,6 +513,14 @@ structure OAST :> OAST = struct
         end
       | transformDefrecord _ =
         raise Fail "Bad defrecord form"
+
+    and parseKind (RCST.Symbol k) =
+        if k = au "linear" then
+            Type.Linear
+        else if k = au "unrestricted" then
+            Type.Unrestricted
+        else
+            raise Fail "Unknown kind specifier"
 
     and transformDeftemplate ((RCST.Symbol name)::body) =
         raise Fail "deftemplate not implemented"
@@ -602,5 +610,4 @@ structure OAST :> OAST = struct
         end
       | transformDefcfun _ =
         raise Fail "Invalid defcfun form"
-
 end
