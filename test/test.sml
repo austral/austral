@@ -234,6 +234,7 @@ structure AustralTest = struct
         end
 
     val tests = suite "Austral Tests" [
+            mapSuite,
             parserSuite,
             moduleSuite,
             astSuite
