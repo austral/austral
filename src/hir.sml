@@ -134,7 +134,7 @@ structure HIR :> HIR = struct
       | typeOf (Seq (_, v)) =
         typeOf v
       | typeOf (While (_, b)) =
-        typeOf b
+        Unit
       | typeOf (ConcreteFuncall (_, _, ty)) =
         ty
       | typeOf (GenericFuncall (_, _, _, ty)) =
