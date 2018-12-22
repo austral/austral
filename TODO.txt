@@ -1,8 +1,8 @@
 TODO:
 
+- Linearity: Syntax for specifying kinds in disjunctions and records
 - Linearity: extract all bindings out of an expression
 - Linearity: count appearances of bindings in expressions
-- Linearity: Syntax for specifying kinds in disjunctions and records
 - Define constructor generic functions for datatypes
 - Warn when not using the result value of a progn (any expression with type other than unit)
 - Expand monomorphs recursively
