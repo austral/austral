@@ -135,7 +135,9 @@ structure Module : MODULE = struct
                 "f64",
                 "address",
                 "paddress",
-                "static-array"
+                "static-array",
+                "linear",
+                "unrestricted"
             ]
             and kernelExports = [
                 "eq",
