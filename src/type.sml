@@ -128,6 +128,32 @@ structure Type :> TYPE = struct
       | tyVars (TypeVariable name) =
         Set.singleton (TypeParam name)
 
+    fun kindOf Unit =
+        Unrestricted
+      | kindOf Bool =
+        Unrestricted
+      | kindOf (Integer _) =
+        Unrestricted
+      | kindOf (Float _) =
+        Unrestricted
+      | kindOf (Tuple tys) =
+        kindOfList tys
+
+    and kindOfList l =
+        let val kinds = map kindOf l
+        in
+            let fun discriminator Linear =
+                    true
+                  | discriminator Unrestricted =
+                    false
+            in
+                if List.exists discriminator kinds then
+                    Linear
+                else
+                    Unrestricted
+            end
+        end
+
     type typarams = param OrderedSet.set
 
     (* Type environment *)
