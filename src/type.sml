@@ -81,7 +81,7 @@ structure Type :> TYPE = struct
         "(paddress " ^ (toString t) ^ ")"
       | toString (StaticArray t) =
         "(static-array " ^ (toString t) ^ ")"
-      | toString (Disjunction (name, tyargs)) =
+      | toString (Disjunction (name, _, tyargs)) =
         "("
         ^ (Symbol.toString name)
         ^ " "
