@@ -308,10 +308,10 @@ structure Type :> TYPE = struct
                       (AliasDecl ty) => ty
                     (* If it's a disjunction, construct a ty instance from the
                        name and args *)
-                    | (DisjunctionDecl) => resolveDisjunction name typarams tyargs'
+                    | (DisjunctionDecl kind) => resolveDisjunction name kind typarams tyargs'
                     (* If it's a record, construct a ty instance from the name
                        and args *)
-                    | (RecordDecl) => resolveRecord name typarams tyargs')
+                    | (RecordDecl kind) => resolveRecord name kind typarams tyargs')
              else
                  raise Fail "Type arity error"
            | NONE =>
