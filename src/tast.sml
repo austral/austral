@@ -411,7 +411,7 @@ structure TAST :> TAST = struct
             let val ty = resolve (ctxTenv c) (ctxTyParams c) typespec
             in
                 case ty of
-                    (Disjunction (name, tyargs)) =>
+                    (Disjunction (name, kind, tyargs)) =>
                     let val variants = Type.getDisjunctionVariants (ctxTenv c) name
                         and typarams = case Type.getDeclaration (ctxTenv c) name of
                                            (SOME (typarams, _)) => typarams
