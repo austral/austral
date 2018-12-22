@@ -40,6 +40,7 @@ LONG-TERM TODO:
 - Lift static array constructors to global constants
 - Verify if an expression is a valid static array element
 - Prelude: equality and comparison instances
+- JavaScript backend
 
 DONE:
 
