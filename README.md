@@ -35,7 +35,7 @@ Anti-features:
 - No global variables.
 - No type inference, type information flows in one direction.
 
-# Building
+## Building
 
 Building the `austral` executable requires `make`, [MLton][mlton], and a C
 compiler for building the resulting output.
