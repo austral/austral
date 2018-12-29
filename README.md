@@ -72,6 +72,32 @@ Finally, to run the tests, you need both MLton and SML/NJ. Run this:
 $ ./run-tests.sh
 ```
 
+## Examples
+
+### Hello, World
+
+This example uses the CFFI extension to call the foreign `puts` function.
+
+```lisp
+(austral.ext.cffi:defcfun (puts "puts") ((ptr (paddress u8))) i32)
+
+(defun main () i32
+  (puts (static-array-pointer "Hello, world!"))
+  0)
+```
+
+The first line uses the `defcfun` toplevel form to define an Austral function,
+`puts`, that calls the C function `puts`. It defines the argument list, a single
+argument of type `(paddress u8)`, and the return type, a 32-bit signed integer.
+
+The second toplevel form defines the program's entrypoint, the traditional
+`main` function. The type of string constants is `(static-array u8)`, so we have
+to call the `static-array-pointer` function to extract the array's pointer.
+
+### Factorial
+
+### Fibonacci
+
 # License
 
 Copyright 2018 Fernando Borretti.
