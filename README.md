@@ -98,6 +98,14 @@ to call the `static-array-pointer` function to extract the array's pointer.
 
 ### Fibonacci
 
+```lisp
+(defun fib ((n i32)) i32
+  (if (< n 2)
+      n
+      (+ (fib (- n 1))
+         (fib (- n 2)))))
+```
+
 # License
 
 Copyright 2018 Fernando Borretti.
