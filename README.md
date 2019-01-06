@@ -138,7 +138,7 @@ close db;
 
 These errors are similar to use-after-`free` and double-`free` errors in memory management, respectively. Linear types can help us eliminate this category of errors entirely.
 
-Consider the same API, but in a slightly different type system where prefixing a type name with `!` means it is linear. Then:
+Consider the same API, but in a slightly different type system where prefixing a type name with `!` denotes a linear type. Then:
 
 ```sml
 val connect : string -> !database
