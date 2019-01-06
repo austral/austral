@@ -120,7 +120,7 @@ val close : database -> unit
 
 Briefly, the `connect` function takes a connection URI and returns a `database` instance, the `query` function takes a database instance and a query string and returns the result list of that query, and `close` closes a database connection.
 
-Correct usage is: we open a database connection, make any number of queries, then close it. But SML's type system does not prevent certain kinds of API errors.
+The correct usage pattern is: we open a database connection, make zero or more queries, then close it. But SML's type system does not allow us to enforce this.
 
 For instance, we can use the database after it's been closed:
 
