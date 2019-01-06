@@ -108,7 +108,7 @@ to call the `static-array-pointer` function to extract the array's pointer.
 
 ## Practical Linear Types
 
-Regular type systems help us find errors in the shape of data: trying to fit a square peg in a round hole. Linear types augment this by helping us prevent errors around *order* and *repetition*.
+A simple type system like that of C helps us by pointing out errors concerning the shape of data: trying to fit a square peg in a round hole. More advanced type systems help us express the semantic role of data in our types. Linear types go further, and help us prevent a whole category of defects along the lines of use-after-`free` and double-`free` errors.
 
 Consider a database API like this, using SML notation:
 
