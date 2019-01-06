@@ -166,6 +166,21 @@ in
 end
 ```
 
+But we can still make multiple queries with the linearly-typed API, because the `query` function returns a tuple of the result set and the new database object. In SML notation:
+
+```sml
+let val db = connect "my_database"
+in
+  let val (results, db') = query "INSERT ..." db
+  in
+    let val (results, db'') = query "SELECT ..." db'
+    in
+      close db''
+    end
+  end
+end
+```
+
 # License
 
 Copyright 2018–2019 Fernando Borretti.
