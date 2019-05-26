@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Escape :> ESCAPE = struct
+structure Escape : ESCAPE = struct
     datatype escaped_string = EscapedString of string
 
     fun escapeString s =
