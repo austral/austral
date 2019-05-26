@@ -24,7 +24,7 @@ structure Parser :> PARSER = struct
 
     val identCharParser = ps.anyOfString Ident.alphabet
 
-    val identParser = pmap (Ident.mkIdentEx o String.implode) (many1 identCharParser)
+    val identParser = ps.pmap (Ident.mkIdentEx o String.implode) (ps.many1 identCharParser)
 
     (* Parsing declarations *)
 
