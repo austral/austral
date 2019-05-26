@@ -21,4 +21,5 @@ structure Syntax :> SYNTAX = struct
     type name = string
 
     datatype module = Module of name
+         and import = Import of name * name list
 end
