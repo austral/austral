@@ -53,7 +53,10 @@ structure Syntax :> SYNTAX = struct
 
     datatype module = Module of name * import list * declaration list
 
-         and import = Import of name * name list
+         and import = Import of name * imported_name list
+
+         and imported_name = ImportedName of name
+                           | ImportedNameAs of name * name
 
          and declaration = TypeDeclaration of name * type_visibility * type_definition
 
