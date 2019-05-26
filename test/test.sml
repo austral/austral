@@ -157,7 +157,11 @@ structure AustralTest = struct
                                               ImportedName (i "c"),
                                               ImportedName (i "d"),
                                               ImportedName (i "e"),
-                                              ImportedName (i "f")]))
+                                              ImportedName (i "f")])),
+                            isParse "from mod import a as b, c as d"
+                                    (Import (i "mod",
+                                             [ImportedNameAs { original = i "a", rename = i "b" },
+                                              ImportedNameAs { original = i "c", rename = i "d" }]))
                           ]
                       end
             ]
