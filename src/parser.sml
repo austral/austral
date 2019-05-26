@@ -56,7 +56,7 @@ structure Parser : PARSER = struct
 
     (* Parsing type specifiers *)
 
-    val namedTypeParser = identParser
+    val namedTypeParser = ps.pmap Syntax.NamedType identParser
 
     fun defineTypeSpecifierParser addressParser pointerParser tupleTypeParser =
         ps.choice [tupleTypeParser,
