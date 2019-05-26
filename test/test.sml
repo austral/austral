@@ -126,7 +126,7 @@ structure AustralTest = struct
                 isParse ",123" (Splice (IntConstant "123"))
             ],
             suite "S-expressions" [
-                isParse "()" (List nil),
+                (*isParse "()" (List nil),
                 isParse "(())" (List [List nil]),
                 isParse "((()))" (List [List [List nil]]),
                 isParse "(((())))" (List [List [List [List nil]]]),
@@ -152,7 +152,7 @@ structure AustralTest = struct
                 suite "Bad forms" [
                     isNotParse "(",
                     isNotParse ")"
-                ]
+                ]*)
             ]
         ]
     end
