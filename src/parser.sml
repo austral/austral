@@ -54,6 +54,19 @@ structure Parser : PARSER = struct
 
     val identParser = ps.pmap (Ident.mkIdentEx o String.implode) (ps.many1 identCharParser)
 
+    (* Parsing type specifiers *)
+
+    val namedTypeParser = identParser
+
+    val addressParser = ps.seq (ps.pchar "&") typeSpecifierParser
+
+    val pointerParser = ps.seq (ps.pchar "*") typeSpecifierParser
+
+    val tupleTypeParser =
+        ps.between (ps.pchar #"{")
+                   (commaSeparatedList1 typeSpecifierParser)
+                   (ps.pchar #"}")
+
     (* Parsing declarations *)
 
     (* Parsing imports *)
