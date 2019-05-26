@@ -96,6 +96,25 @@ structure Parser : PARSER = struct
 
     val integerParser = ps.pmap Syntax.IntConstant integerTextParser
 
+    (* Float Constants *)
+
+    val eParser = or (ps.pchar #"e") (ps.pchar #"E")
+
+    val exponentParser = ps.seqR eParser integerTextParser
+
+    fun toFloat (intPart, (decPart, exponent)) =
+        let val expStr = case exponent of
+                             SOME e => "e" ^ e
+                           | NONE => ""
+        in
+            intPart ^ "." ^ decPart ^ expStr
+        end
+
+    val floatParser = ps.pmap (Syntax.FloatConstant o toFloat)
+                              (ps.seq integerTextParser (ps.seqR (ps.pchar #".")
+                                                                 (ps.seq integerTextParser
+                                                                         (opt exponentParser))))
+
     (* Interface *)
 
     exception ParserException of string
