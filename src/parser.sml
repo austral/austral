@@ -109,6 +109,9 @@ structure Parser : PARSER = struct
                      raise ParserException msg
                  end
 
+    fun parseInteger s =
+        succeedOrDie (ps.run integerParser (ParsimonyStringInput.fromString s))
+
     fun parseImport s =
         succeedOrDie (ps.run importParser (ParsimonyStringInput.fromString s))
 
