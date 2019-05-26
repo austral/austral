@@ -113,7 +113,7 @@ structure Parser : PARSER = struct
     val floatParser = ps.pmap (Syntax.FloatConstant o toFloat)
                               (ps.seq integerTextParser (ps.seqR (ps.pchar #".")
                                                                  (ps.seq integerTextParser
-                                                                         (opt exponentParser))))
+                                                                         (ps.opt exponentParser))))
 
     (* Interface *)
 
