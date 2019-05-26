@@ -88,6 +88,7 @@ structure AustralTest = struct
                           [
                             isParse "test" (NamedType (i "test")),
                             isParse "&test" (Address (NamedType (i "test"))),
+                            isParse "&&test" (Address (Address (NamedType (i "test")))),
                             isParse "*test" (Pointer (NamedType (i "test"))),
                             isParse "**test" (Pointer (Pointer (NamedType (i "test")))),
                             isParse "***test" (Pointer (Pointer (Pointer (NamedType (i "test"))))),
