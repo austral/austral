@@ -40,7 +40,7 @@ structure Parser :> PARSER = struct
 
     val integerTextParser = pmap applySign (seq signParser naturalParser)
 
-    val integerParser = pmap CST.IntConstant integerTextParser
+    (*val integerParser = pmap CST.IntConstant integerTextParser*)
 
     (* Floats *)
 
@@ -56,16 +56,17 @@ structure Parser :> PARSER = struct
             intPart ^ "." ^ decPart ^ expStr
         end
 
-    val floatParser = pmap (CST.FloatConstant o toFloat)
+    (*val floatParser = pmap (CST.FloatConstant o toFloat)
                            (seq integerTextParser (seqR (pchar #".")
                                                         (seq integerTextParser (opt exponentParser))))
+*)
 
     (* Strings *)
 
     val stringChar = or (seqR (pchar #"\\") (pchar #"\"")) (noneOf [#"\""])
 
-    val quotedString = pmap (CST.StringConstant o CST.escapeString o String.implode)
-                            (between (pchar #"\"") (many stringChar) (pchar #"\""))
+    (*val quotedString = pmap (CST.StringConstant o CST.escapeString o String.implode)
+                            (between (pchar #"\"") (many stringChar) (pchar #"\"")) *)
 
     (* Symbols *)
 
@@ -73,13 +74,13 @@ structure Parser :> PARSER = struct
 
     val symbolNameParser = pmap (Ident.mkIdentEx o String.implode) (many1 symbolChar)
 
-    val unqualifiedSymbolParser = pmap CST.UnqualifiedSymbol symbolNameParser
+    (* val unqualifiedSymbolParser = pmap CST.UnqualifiedSymbol symbolNameParser *)
 
-    val qualifiedSymbolParser = pmap Symbol.mkSymbol
+(*    val qualifiedSymbolParser = pmap Symbol.mkSymbol
                                      (seq symbolNameParser
-                                          (seqR (pchar #":") symbolNameParser))
+                                          (seqR (pchar #":") symbolNameParser))*)
 
-    val keywordParser = pmap CST.Keyword (seqR (pchar #":") symbolNameParser)
+    (* val keywordParser = pmap CST.Keyword (seqR (pchar #":") symbolNameParser) *)
 
     (* Comments *)
 

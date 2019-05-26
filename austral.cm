@@ -27,6 +27,7 @@ is
   src/syntax.sml
 
   src/parser.sig
+  src/parser.sml
 
   (*src/symbol.sig
   src/symbol.sml
@@ -39,8 +40,6 @@ is
 
   src/cst.sig
   src/cst.sml
-
-  src/parser.sml
 
   src/rcst.sig
   src/rcst.sml
