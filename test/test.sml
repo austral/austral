@@ -91,16 +91,20 @@ structure AustralTest = struct
                         isParse "-10000" (IntConstant "-10000")
                       ]
                   end,
-            suite "Floats" [
-                (*isParse "0.0" (FloatConstant "0.0"),
-                isParse "-0.0" (FloatConstant "-0.0"),
-                isParse "123.0" (FloatConstant "123.0"),
-                isParse "-123.0" (FloatConstant "-123.0"),
-                isParse "123.456" (FloatConstant "123.456"),
-                isParse "-123.456" (FloatConstant "-123.456"),
-                isParse "123.456e3" (FloatConstant "123.456e3"),
-                isParse "-123.456e-3" (FloatConstant "-123.456e-3")*)
-            ],
+            suite "Floats"
+                  let val isParse = isParseFn Parser.parseFloat
+                  in
+                      [
+                        isParse "0.0" (FloatConstant "0.0"),
+                        isParse "-0.0" (FloatConstant "-0.0"),
+                        isParse "123.0" (FloatConstant "123.0"),
+                        isParse "-123.0" (FloatConstant "-123.0"),
+                        isParse "123.456" (FloatConstant "123.456"),
+                        isParse "-123.456" (FloatConstant "-123.456"),
+                        isParse "123.456e3" (FloatConstant "123.456e3"),
+                        isParse "-123.456e-3" (FloatConstant "-123.456e-3")
+                      ]
+                  end,
             suite "Strings" [
                 (*isParse "\"derp\"" (StringConstant (escapeString "derp")),
                 isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (escapeString "derp \"herp\" derp")),
