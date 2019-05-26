@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Parser :> PARSER = struct
+structure Parser : PARSER = struct
     structure ps = Parsimony(ParsimonyStringInput)
 
     (* Comments *)
@@ -43,11 +43,16 @@ structure Parser :> PARSER = struct
     (* Parsing imports *)
 
     val importParser =
-        let val fromParser = ps.seq (ps.pstring "from") whitespaceParser
+        let val from = ps.seq (ps.pstring "from") whitespaceParser
+            and modName = ps.seqL identParser whitespaceParser
+            and import = ps.seq (ps.pstring "import") whitespaceParser
             and importList = identParser
         in
-            ps.seq (ps.seqR fromParser (ps.seqL identParser whitespaceParser))
-                   importList
+            let val parser = (ps.seq (ps.seqL (ps.seqR from modName) import)
+                                     (ps.many importList))
+            in
+                ps.pmap Syntax.Import parser
+            end
         end
 
     (* Interface *)
@@ -59,6 +64,9 @@ structure Parser :> PARSER = struct
             (ps.Success (r, _)) => r
           | f => raise ParserException ("Bad parse: " ^ (ps.explain f))
 
-    fun parseModule s =
+    fun parseImport s =
         succeedOrDie (ps.run importParser (ParsimonyStringInput.fromString s))
+
+    fun parseModule s =
+        raise Fail "Not implemented just yet"
 end
