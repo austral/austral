@@ -5,6 +5,8 @@ TODO:
 - Parser: declarations
 - Parser: expressions
 - Parser: docstrings
+- Define syntax for linear iteration operators
+- Constrain identifier alphabet further
 
 LONG-TERM TODO:
 
