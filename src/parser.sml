@@ -58,14 +58,30 @@ structure Parser : PARSER = struct
 
     val namedTypeParser = identParser
 
-    val addressParser = ps.seq (ps.pchar "&") typeSpecifierParser
+    fun defineTypeSpecifierParser addressParser pointerParser tupleTypeParser =
+        ps.choice [tupleTypeParser,
+                   addressParser,
+                   pointerParser,
+                   namedTypeParser]
 
-    val pointerParser = ps.seq (ps.pchar "*") typeSpecifierParser
+    val (addressParser, pointerParser, tupleTypeParser) =
+        let val (typeSpecifierParser, r) = wrapper ()
+        in
+            let val addressParser = ps.seq (ps.pchar "&") typeSpecifierParser
 
-    val tupleTypeParser =
-        ps.between (ps.pchar #"{")
-                   (commaSeparatedList1 typeSpecifierParser)
-                   (ps.pchar #"}")
+                val pointerParser = ps.seq (ps.pchar "*") typeSpecifierParser
+
+                val tupleTypeParser =
+                    ps.between (ps.pchar #"{")
+                               (commaSeparatedList1 typeSpecifierParser)
+                               (ps.pchar #"}")
+            in
+                r := defineTypeSpecifierParser addressParser pointerParser tupleTypePArser;
+                (addressParser, pointerParser, tupleTypeParser)
+            end
+        end
+
+    val typeSpecifierParser = defineTypeSpecifierParser addressParser pointerParser tupleTypeParser
 
     (* Parsing declarations *)
 
