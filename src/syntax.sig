@@ -35,7 +35,7 @@ signature SYNTAX = sig
     datatype expr = BoolConstant of bool
                   | IntConstant of string
                   | FloatConstant of string
-                  | StringConstant of string
+                  | StringConstant of Escape.escaped_string
                   | Variable of name
                   | Let of binding list * expr
                   | If of expr * expr * expr
