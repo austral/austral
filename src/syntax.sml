@@ -42,7 +42,7 @@ structure Syntax :> SYNTAX = struct
                   | TupleProj of expr * int
                   | SizeOf of type_specifier
                   | Block of expr list
-                  | Funcall of symbol * expr list
+                  | Funcall of name * expr list
          and binding = VarBinding of name * expr
                      | TupBinding of name list * expr
 
