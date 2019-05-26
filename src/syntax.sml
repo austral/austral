@@ -20,6 +20,6 @@
 structure Syntax :> SYNTAX = struct
     type name = string
 
-    datatype module = Module of name
+    datatype module = Module of name * import list
          and import = Import of name * name list
 end
