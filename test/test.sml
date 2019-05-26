@@ -76,7 +76,7 @@ structure AustralTest = struct
     end
 
     local
-        open CST
+        open Syntax
     in
     val parserSuite = suite "Parser" [
             suite "Integers" [
