@@ -58,6 +58,7 @@ structure Syntax :> SYNTAX = struct
                            | ImportedNameAs of { original: name, rename: name }
 
          and declaration = TypeDeclaration of name * type_visibility * type_definition
+                         | FunctionDef of name * params * type_specifier * expr
 
          and type_visibility = PublicType
                              | OpaqueType
@@ -70,8 +71,6 @@ structure Syntax :> SYNTAX = struct
          and slot_definition = SlotDefinition of name * type_specifier
 
          and case_definition = CaseDefinition of name * type_specifier option
-
-         and function_definition = FunctionDef of name * params * type_specifier * expr
 
          and params = ParamList of param list
 
