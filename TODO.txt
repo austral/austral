@@ -2,9 +2,11 @@ TODO:
 
 - Syntax: docstrings
 - Syntax: declarations
-- Parser: declarations
 - Parser: expressions
 - Parser: docstrings
+- Parser: module definitions
+- Parser: type definitions
+- Parser: function definitions
 - Define syntax for linear iteration operators
 - Constrain identifier alphabet further
 - Error on user-defined identifiers that start with @
