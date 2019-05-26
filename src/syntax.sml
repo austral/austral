@@ -27,6 +27,8 @@ structure Syntax :> SYNTAX = struct
     datatype symbol = QualifiedSymbol of name * name
                     | UnqualifiedSymbol of name
 
+    datatype type_specifier = NamedType of symbol
+
     (* Declarations *)
 
     datatype module = Module of name * import list * declaration list
@@ -39,7 +41,11 @@ structure Syntax :> SYNTAX = struct
                              | OpaqueType
                              | PrivateType
 
-         and type_definition = NamedType of name
-                             | RecordDefinition
-                             | UnionDefinition
+         and type_definition = TypeAlias of type_specifier
+                             | RecordDefinition of name * slot_definition list
+                             | UnionDefinition of name * case_definition list
+
+         and slot_definition = SlotDefinition of name * type_specifier
+
+         and case_definition = CaseDefinition of name * type_specifier option
 end
