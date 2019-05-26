@@ -119,10 +119,7 @@ structure AustralTest = struct
                     isParse "test:test" (qsym "test" "test")*)
                 ],
                 suite "Unqualified Symbols" [
-                    isParse "test" (unsym "test")
-                ],
-                suite "Keywords" [
-                    isParse ":test" (Keyword (i "test"))
+                    (*isParse "test" (unsym "test")*)
                 ]
             ],
             suite "Splices" [
