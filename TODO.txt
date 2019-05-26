@@ -1,6 +1,5 @@
 TODO:
 
-- Parser: type specifiers
 - Syntax: declarations
 - Parser: declarations
 - Parser: expressions
@@ -209,3 +208,4 @@ DONE:
 - Syntax: expressions
 - Update parser tests
 - `import ... as` syntax
+- Parser: type specifiers
