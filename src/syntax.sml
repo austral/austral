@@ -21,6 +21,12 @@ structure Syntax :> SYNTAX = struct
     type name = string
 
     datatype module = Module of name * import list * declaration list
+
          and import = Import of name * name list
-         and declaration = TypeDeclaration
+
+         and declaration = TypeDeclaration of name * type_visibility * type_definition
+
+         and type_visibility = PublicType
+                             | OpaqueType
+                             | Private Type
 end
