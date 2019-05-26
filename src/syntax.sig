@@ -32,6 +32,21 @@ signature SYNTAX = sig
                             | Pointer of type_specifier
                             | TupleType of type_specifier list
 
+    datatype expr = BoolConstant of bool
+                  | IntConstant of string
+                  | FloatConstant of string
+                  | StringConstant of string
+                  | Variable of name
+                  | Let of (name * expr) list * expr
+                  | If of expr * expr * expr
+                  | ArithOp of Arith.kind * Arith.oper * expr * expr
+                  | CompOp of Builtin.comp_op * expr * expr
+                  | TupleCreate of expr list
+                  | TupleProj of expr * int
+                  | SizeOf of type_specifier
+                  | Block of expr list
+                  | Funcall of symbol * expr list
+
     (* Declarations *)
 
     datatype module = Module of name * import list * declaration list
