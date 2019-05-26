@@ -43,9 +43,11 @@ structure Parser :> PARSER = struct
     (* Parsing imports *)
 
     val importParser =
-        let val from = ps.seq (ps.pstring "from")
+        let val fromParser = ps.seq (ps.pstring "from") whitespaceParser
+            and importList = identParser
         in
-            from
+            ps.seq (ps.seqR fromParser (ps.seqL identParser whitespaceParser))
+                   importList
         end
 
     (* Interface *)
