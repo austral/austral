@@ -28,6 +28,8 @@ signature SYNTAX = sig
                     | UnqualifiedSymbol of name
 
     datatype type_specifier = NamedType of symbol
+                            | Address of type_specifier
+                            | Pointer of type_specifier
 
     (* Declarations *)
 
