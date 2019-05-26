@@ -20,6 +20,8 @@
 structure Parser :> PARSER = struct
     structure ps = Parsimony(ParsimonyStringInput)
 
+    (* Parsing declarations *)
+
     fun parseModule _ =
         raise Fail "Not implemented just yet"
 end
