@@ -74,15 +74,17 @@ structure Parser : PARSER = struct
     val (addressParser, pointerParser, tupleTypeParser) =
         let val (typeSpecifierParser, r) = ps.wrapper ()
         in
-            let val addressParser = ps.pmap Syntax.Address (ps.seqR (ps.pchar #"&") typeSpecifierParser)
+            let val addressParser =
+                    ps.pmap Syntax.Address (ps.seqR (ps.pchar #"&") typeSpecifierParser)
 
-                val pointerParser = ps.pmap Syntax.Pointer (ps.seqR (ps.pchar #"*") typeSpecifierParser)
+                val pointerParser =
+                    ps.pmap Syntax.Pointer (ps.seqR (ps.pchar #"*") typeSpecifierParser)
 
                 val tupleTypeParser =
                     ps.pmap Syntax.TupleType
-                            (ps.between (ps.pchar #"{")
+                            (ps.between (ps.seq (ps.pchar #"{") ws)
                                         (commaSeparatedList0 typeSpecifierParser)
-                                        (ps.pchar #"}"))
+                                        (ps.seq (ps.pchar #"}") ws))
             in
                 r := defineTypeSpecifierParser addressParser pointerParser tupleTypeParser;
                 (addressParser, pointerParser, tupleTypeParser)
