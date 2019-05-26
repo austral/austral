@@ -86,7 +86,8 @@ structure AustralTest = struct
                       let val isParse = isParseFn Parser.parseTypeSpecifier
                       in
                           [
-                            isParse "test" (NamedType (i "test"))
+                            isParse "test" (NamedType (i "test")),
+                            isParse "&test" (Address (NamedType (i "test")))
                           ]
                       end,
                 suite "Expressions" [
