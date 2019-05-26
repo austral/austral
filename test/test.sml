@@ -140,19 +140,19 @@ structure AustralTest = struct
                 ]
             ],
             suite "Declarations" [
-                suite "Imports" [
-                    let val isParse = isParseFn Parser.parseImport
-                    in
-                        [
-                          isParse "from a import b"
-                                  (Import ("a",
-                                           [ImportedName "b"])),
-                          isParse "from   a   import   b    "
-                                  (Import ("a",
-                                           [ImportedName "b"]))
-                        ]
-                    end
-                ]
+                suite "Imports"
+                      let val isParse = isParseFn Parser.parseImport
+                          and i = Ident.mkIdentEx
+                      in
+                          [
+                            isParse "from a import b"
+                                    (Import (i "a",
+                                             [ImportedName (i "b")])),
+                            isParse "from   a   import   b    "
+                                    (Import (i "a",
+                                             [ImportedName (i "b")]))
+                          ]
+                      end
             ]
         ]
     end
