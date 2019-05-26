@@ -180,8 +180,7 @@ structure Parser : PARSER = struct
 
     val parseTypeSpecifier = pf typeSpecifierParser
 
-    fun parseInteger s =
-        succeedOrDie (ps.run integerParser (ParsimonyStringInput.fromString s))
+    val parseInteger = pf integerParser
 
     fun parseFloat s =
         succeedOrDie (ps.run floatParser (ParsimonyStringInput.fromString s))
