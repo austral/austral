@@ -28,6 +28,16 @@ structure Parser :> PARSER = struct
 
     (* Parsing declarations *)
 
+    (* Parsing imports *)
+
+    val importParser =
+        let val from = ps.seq (ps.pstring "from")
+        in
+            from
+        end
+
+    (* Interface *)
+
     fun parseModule _ =
         raise Fail "Not implemented just yet"
 end
