@@ -122,7 +122,7 @@ structure AustralTest = struct
                         isEqual' (escape "line\\\n\\line") "lineline",
                         isEqual' (escape "line\\\n \n\\line") "lineline",
                         isEqual' (escape "line\\\n\n\n\\line") "lineline",
-                        isEqual' (escape "line\\\n\n\n   \\line") "lineline"*)
+                        isEqual' (escape "line\\\n\n\n   \\line") "lineline"
                       ]
                   end,
             suite "Symbols" [
