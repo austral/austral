@@ -124,7 +124,8 @@ structure Parser : PARSER = struct
     val typeVisibilityParser =
         ps.choice [ps.seqR (ps.pstring "public") (ps.preturn Syntax.PublicType),
                    ps.seqR (ps.pstring "opaque") (ps.preturn Syntax.OpaqueType),
-                   ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateType)]
+                   ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateType),
+                   ps.preeturn Syntax.PrivateType]
 
     val functionVisibilityParser =
         ps.choice [ps.seqR (ps.pstring "public") (ps.preturn Syntax.PublicFunction),
