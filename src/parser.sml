@@ -61,7 +61,8 @@ structure Parser : PARSER = struct
     val importedNameParser =
         ps.or (ps.pmap Syntax.ImportedName identParser)
               (ps.pmap (fn (n, rn) =>
-                           Syntax.ImportedNameAs (n, rn))
+                           Syntax.ImportedNameAs { original = n,
+                                                   rename = rn })
                        (ps.seq identParser
                                (ps.seqR (ps.between ws1 (ps.pstring "as") ws1)
                                         identParser)))
