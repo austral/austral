@@ -22,6 +22,8 @@ structure Syntax :> SYNTAX = struct
 
     type name = Ident.ident
 
+    datatype docstring = Docstring of string
+
     (* Expressions *)
 
     datatype type_specifier = NamedType of name
