@@ -150,7 +150,14 @@ structure AustralTest = struct
                                              [ImportedName (i "b")])),
                             isParse "from   a   import   b    "
                                     (Import (i "a",
-                                             [ImportedName (i "b")]))
+                                             [ImportedName (i "b")])),
+                            isParse "from a import b,c, d, e ,  f  "
+                                    (Import (i "a",
+                                             [ImportedName (i "b"),
+                                              ImportedName (i "c"),
+                                              ImportedName (i "d"),
+                                              ImportedName (i "e"),
+                                              ImportedName (i "f")]))
                           ]
                       end
             ]
