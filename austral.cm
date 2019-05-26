@@ -23,7 +23,7 @@ is
   src/arith.sig
   src/arith.sml
 
-  src/symbol.sig
+  (*src/symbol.sig
   src/symbol.sml
 
   src/builtin.sig
@@ -119,6 +119,6 @@ is
   src/repl.sml
 
   src/cli.sig
-  src/cli.sml
+  src/cli.sml*)
 
   $/basis.cm
