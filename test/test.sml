@@ -94,8 +94,11 @@ structure AustralTest = struct
                             isParse "{a,b}" (TupleType [NamedType (i "a"),
                                                         NamedType (i "b")]),
                             isParse "{a,b,c}" (TupleType [NamedType (i "a"),
-                                                        NamedType (i "b"),
-                                                        NamedType (i "c")])
+                                                          NamedType (i "b"),
+                                                          NamedType (i "c")])
+                            isParse "{a,b,c}" (TupleType [NamedType (i "a"),
+                                                          NamedType (i "b"),
+                                                          NamedType (i "c")])
                           ]
                       end,
                 suite "Expressions" [
