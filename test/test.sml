@@ -107,24 +107,26 @@ structure AustralTest = struct
                   end,
             suite "Strings"
                   let val isParse = isParseFn Parser.parseString
-                      and escape s = Escape.escapedToString (Escape.escapeString s)
                   in
-                      [
-                        isParse "\"derp\"" (StringConstant (Escape.escapeString "derp")),
-                        isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (Escape.escapeString "derp \"herp\" derp")),
-                        isEqual' (escape "line\\nline") "line\nline",
-                        isEqual' (escape "line\\rline") "line\rline",
-                        isEqual' (escape "line\\tline") "line\tline",
-                        isEqual' (escape "line\\\\line") "line\\line",
-                        isEqual' (escape "line\\ \\line") "lineline",
-                        isEqual' (escape "line\\  \\line") "lineline",
-                        isEqual' (escape "line\\   \\line") "lineline",
-                        isEqual' (escape "line\\    \\line") "lineline",
-                        isEqual' (escape "line\\\n\\line") "lineline",
-                        isEqual' (escape "line\\\n \n\\line") "lineline",
-                        isEqual' (escape "line\\\n\n\n\\line") "lineline",
-                        isEqual' (escape "line\\\n\n\n   \\line") "lineline"
-                      ]
+                      let fun escape s = Escape.escapedToString (Escape.escapeString s)
+                      in
+                          [
+                            isParse "\"derp\"" (StringConstant (Escape.escapeString "derp")),
+                            isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (Escape.escapeString "derp \"herp\" derp")),
+                            isEqual' (escape "line\\nline") "line\nline",
+                            isEqual' (escape "line\\rline") "line\rline",
+                            isEqual' (escape "line\\tline") "line\tline",
+                            isEqual' (escape "line\\\\line") "line\\line",
+                            isEqual' (escape "line\\ \\line") "lineline",
+                            isEqual' (escape "line\\  \\line") "lineline",
+                            isEqual' (escape "line\\   \\line") "lineline",
+                            isEqual' (escape "line\\    \\line") "lineline",
+                            isEqual' (escape "line\\\n\\line") "lineline",
+                            isEqual' (escape "line\\\n \n\\line") "lineline",
+                            isEqual' (escape "line\\\n\n\n\\line") "lineline",
+                            isEqual' (escape "line\\\n\n\n   \\line") "lineline"
+                          ]
+                      end
                   end,
             suite "Symbols" [
                 suite "Qualified Symbols" [
