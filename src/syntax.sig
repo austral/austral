@@ -39,7 +39,7 @@ signature SYNTAX = sig
                              | OpaqueType
                              | PrivateType
 
-         and type_definition = NamedType of symbol
+         and type_definition = NamedType of name
                              | StructDefinition
                              | UnionDefinition
 end
