@@ -18,7 +18,12 @@
 *)
 
 signature SYNTAX = sig
+    (* Type aliases *)
     type name = string
+
+    (* Expressions *)
+
+    (* Declarations *)
 
     datatype module = Module of name * import list * declaration list
 
@@ -29,4 +34,8 @@ signature SYNTAX = sig
          and type_visibility = PublicType
                              | OpaqueType
                              | PrivateType
+
+         and type_definition = NamedType of symbol
+                             | StructDefinition
+                             | UnionDefinition
 end
