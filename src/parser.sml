@@ -126,6 +126,10 @@ structure Parser : PARSER = struct
                    ps.pstring "opaque",
                    ps.pstring "public"]
 
+    val functionVisibilityParser =
+        ps.choice [ps.pstring "private",
+                   ps.pstring "public"]
+
     (* Parsing expressions *)
 
     (* Constants *)
