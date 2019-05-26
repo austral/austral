@@ -70,4 +70,6 @@ signature SYNTAX = sig
          and slot_definition = SlotDefinition of name * type_specifier
 
          and case_definition = CaseDefinition of name * type_specifier option
+
+         and function_definition = FunctionDef of name * params * type_specifier * expr
 end
