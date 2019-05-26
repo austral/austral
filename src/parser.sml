@@ -68,9 +68,9 @@ structure Parser : PARSER = struct
                                         identParser)))
 
     val importParser =
-        let val from = ps.seq (ps.pstring "from") whitespaceParser
-            and modName = ps.seqL identParser whitespaceParser
-            and import = ps.seq (ps.pstring "import") whitespaceParser
+        let val from = ps.seq (ps.pstring "from") ws1
+            and modName = ps.seqL identParser ws1
+            and import = ps.seq (ps.pstring "import") ws1
             and importList = commaSeparatedList1 importedNameParser
         in
             let val parser = (ps.seq (ps.seqL (ps.seqR from modName) import)
