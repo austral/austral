@@ -60,5 +60,5 @@ structure Parser :> PARSER = struct
           | f => raise ParserException ("Bad parse: " ^ (ps.explain f))
 
     fun parseModule s =
-        raise Fail "Not implemented just yet"
+        succeedOrDie (ps.run importParser (ParsimonyStringInput.fromString s))
 end
