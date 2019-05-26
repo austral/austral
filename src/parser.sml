@@ -65,7 +65,7 @@ structure Parser : PARSER = struct
                    namedTypeParser]
 
     val (addressParser, pointerParser, tupleTypeParser) =
-        let val (typeSpecifierParser, r) = wrapper ()
+        let val (typeSpecifierParser, r) = ps.wrapper ()
         in
             let val addressParser = pmap Syntax.Address (ps.seqR (ps.pchar #"&") typeSpecifierParser)
 
