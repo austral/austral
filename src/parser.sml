@@ -28,9 +28,15 @@ structure Parser : PARSER = struct
 
     (* Whitespace *)
 
+    (* A single whitespace character, or a comment *)
     val whitespaceParser = ps.choice [ps.pchar #" ",
                                       ps.pchar #"\n",
                                       singleLineComment]
+
+    (* Any positive amount of whitespace *)
+    val ws1 = many1 whitespaceParser
+    (* Any whitespace or none at all *)
+    val ws = many whitespaceParser
 
     (* Utilities *)
 
