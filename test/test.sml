@@ -157,27 +157,9 @@ structure AustralTest = struct
         ]
     end
 
-    val astSuite =
-        let val menv = Module.defaultMenv
-        in
-            let val module = valOf (Module.envGet menv (Ident.mkIdentEx "austral"))
-            in
-                let fun parse str = Parser.parseString str
-                    and resolve cst = Util.valOf (RCST.resolve menv module cst)
-                in
-                    suite "AST" [
-                        isEqual (resolve (parse "123")) (RCST.IntConstant "123")
-                                "IntConstant 123"
-                    ]
-                end
-            end
-        end
-
     val tests = suite "Austral Tests" [
             mapSuite,
-            parserSuite,
-            moduleSuite,
-            astSuite
+            parserSuite
         ]
 
     fun runTests () = runAndQuit tests defaultReporter
