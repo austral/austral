@@ -52,6 +52,13 @@ structure Parser :> PARSER = struct
 
     (* Interface *)
 
-    fun parseModule _ =
+    exception ParserException of string
+
+    fun succeedOrDie result =
+        case result of
+            (ps.Success (r, _)) => r
+          | f => raise ParserException ("Bad parse: " ^ (ps.explain f))
+
+    fun parseModule s =
         raise Fail "Not implemented just yet"
 end
