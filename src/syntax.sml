@@ -58,7 +58,7 @@ structure Syntax :> SYNTAX = struct
                            | ImportedNameAs of { original: name, rename: name }
 
          and declaration = TypeDeclaration of name * type_visibility * type_definition
-                         | FunctionDefinition of name * params * type_specifier * expr
+                         | FunctionDefinition of func_visibility * name * params * type_specifier * expr
 
          and type_visibility = PublicType
                              | OpaqueType
