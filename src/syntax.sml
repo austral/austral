@@ -28,5 +28,5 @@ structure Syntax :> SYNTAX = struct
 
          and type_visibility = PublicType
                              | OpaqueType
-                             | Private Type
+                             | PrivateType
 end

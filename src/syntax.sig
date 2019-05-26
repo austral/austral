@@ -28,5 +28,5 @@ signature SYNTAX = sig
 
          and type_visibility = PublicType
                              | OpaqueType
-                             | Private Type
+                             | PrivateType
 end
