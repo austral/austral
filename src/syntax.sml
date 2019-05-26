@@ -72,7 +72,7 @@ structure Syntax :> SYNTAX = struct
 
          and case_definition = CaseDefinition of name * type_specifier option
 
-         and type_visibility = PublicFunction
+         and func_visibility = PublicFunction
                              | PrivateFunction
 
          and params = ParamList of param list
