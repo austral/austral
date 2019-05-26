@@ -186,8 +186,7 @@ structure Parser : PARSER = struct
 
     val parseString = pf stringParser
 
-    fun parseImport s =
-        succeedOrDie (ps.run importParser (ParsimonyStringInput.fromString s))
+    val parseImport = pf importParser
 
     fun parseModule s =
         raise Fail "Not implemented just yet"
