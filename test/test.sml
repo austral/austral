@@ -79,6 +79,13 @@ structure AustralTest = struct
         open Syntax
     in
     val parserSuite = suite "Parser" [
+            suite "Type Specifiers"
+                  let val isParse = isParseFn Parser.parseTypeSpecifier
+                  in
+                      [
+                        isParser "test" (NamedType "test")
+                      ]
+                  end,
             suite "Expressions" [
                 suite "Integers"
                       let val isParse = isParseFn Parser.parseInteger
