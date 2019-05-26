@@ -23,6 +23,9 @@ is
   src/arith.sig
   src/arith.sml
 
+  src/syntax.sig
+  src/syntax.sml
+
   (*src/symbol.sig
   src/symbol.sml
 
