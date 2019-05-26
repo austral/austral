@@ -19,6 +19,7 @@
 
 signature SYNTAX = sig
     (* Type aliases *)
+
     type name = string
 
     (* Expressions *)
