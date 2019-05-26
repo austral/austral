@@ -1,6 +1,9 @@
 TODO:
 
 - Syntax: declarations
+- Syntax: expressions
+- Parser: declarations
+- Parser: expressions
 
 LONG-TERM TODO:
 
