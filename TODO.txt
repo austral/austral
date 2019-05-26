@@ -1,5 +1,6 @@
 TODO:
 
+- `import ... as` syntax
 - Syntax: declarations
 - Parser: declarations
 - Parser: expressions
@@ -206,3 +207,4 @@ DONE:
 - Linearity: all type variables are linear
 - Linearity: Syntax for specifying kinds in disjunctions and records
 - Syntax: expressions
+- Update parser tests
