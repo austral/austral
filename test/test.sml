@@ -136,35 +136,6 @@ structure AustralTest = struct
                 suite "Unqualified Symbols" [
                     (*isParse "test" (unsym "test")*)
                 ]
-            ],
-            suite "S-expressions" [
-                (*isParse "()" (List nil),
-                isParse "(())" (List [List nil]),
-                isParse "((()))" (List [List [List nil]]),
-                isParse "(((())))" (List [List [List [List nil]]]),
-                isParse "(test)" (List [unsym "test"]),
-                isParse "((a))" (List [List [unsym "a"]]),
-                isParse "(a b c)" (List [unsym "a", unsym "b", unsym "c"]),
-                isParse "(m:a n:b o:c)" (List [qsym "m" "a", qsym "n" "b", qsym "o" "c"]),
-                isParse "(a b (c d) e f)" (List [unsym "a",
-                                                 unsym "b",
-                                                 List [unsym "c", unsym "d"],
-                                                 unsym "e",
-                                                 unsym "f"]),
-                isParse "(123)" (List [IntConstant "123"]),
-                isParse "(\"test\")" (List [StringConstant (escapeString "test")]),
-                suite "Whitespace handling" [
-                    isParse "   ()" (List nil),
-                    isParse "()   " (List nil),
-                    isParse "(   test)" (List [unsym "test"]),
-                    isParse "(test   )" (List [unsym "test"]),
-                    isParse "(   test   )" (List [unsym "test"]),
-                    isParse "( a b c )" (List [unsym "a", unsym "b", unsym "c"])
-                ],
-                suite "Bad forms" [
-                    isNotParse "(",
-                    isNotParse ")"
-                ]*)
             ]
         ]
     end
