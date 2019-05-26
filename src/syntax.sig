@@ -20,7 +20,7 @@
 signature SYNTAX = sig
     (* Type aliases *)
 
-    type name = string
+    type name = Ident.ident
 
     (* Expressions *)
 

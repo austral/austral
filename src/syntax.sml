@@ -19,7 +19,8 @@
 
 structure Syntax :> SYNTAX = struct
     (* Type aliases *)
-    type name = string
+
+    type name = Ident.ident
 
     (* Expressions *)
 
