@@ -157,69 +157,6 @@ structure AustralTest = struct
         ]
     end
 
-    fun rqsym m s = RCST.Symbol (Symbol.mkSymbol (i m, i s))
-
-    local
-        open Module
-        open Map
-    in
-    val moduleSuite =
-        (* Module A exports 'test', module B imports A:test and exports test,
-           and also has the nickname 'nick' for modue A, and finally, module C
-           imports test from B. Among other things, we should test that
-           transitive resolution works: that is, C:test should resolve to
-           A:test, rather than B:test. *)
-        let val a = Module (i "A",
-                            empty,
-                            Imports empty,
-                            Exports (Set.add Set.empty (i "test")),
-                            NONE)
-            and b = Module (i "B",
-                            iadd empty (i "nick", i "A"),
-                            Imports (iadd empty (i "test", i "A")),
-                            Exports (Set.add Set.empty (i "test")),
-                            NONE)
-            and c = Module (i "C",
-                            empty,
-                            Imports (iadd empty (i "test", i "B")),
-                            Exports Set.empty,
-                            NONE)
-        in
-            let val menv = addModule (addModule (addModule emptyEnv a) b) c
-            in
-                suite "Module System" [
-                    isEqual (moduleName a) (i "A") "Module name",
-                    isEqual (moduleName b) (i "B") "Module name",
-                    isEqual (moduleName c) (i "C") "Module name",
-                    suite "Symbol resolution" [
-                        isEqual (RCST.resolve menv b (CST.IntConstant "10"))
-                                (Util.Result (RCST.IntConstant "10"))
-                                "Int constant",
-                        isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test")))
-                                (Util.Result (rqsym "A" "test"))
-                                "Unqualified symbol, imported",
-                        isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test2")))
-                                (Util.Result (rqsym "B" "test2"))
-                                "Unqualified symbol, internal",
-                        isEqual (RCST.resolve menv b (qsym "nick" "test"))
-                                (Util.Result (rqsym "A" "test"))
-                                "Qualified symbol, nickname, exported",
-                        isEqual (RCST.resolve menv b (qsym "A" "test"))
-                                (Util.Result (rqsym "A" "test"))
-                                "Qualified symbol, literal, exported",
-                        isFailure (RCST.resolve menv b (qsym "nick" "test1"))
-                                  "Qualified symbol, nickname, unexported",
-                        isFailure (RCST.resolve menv b (qsym "A" "test1"))
-                                  "Qualified symbol, literal, unexported",
-                        isEqual (RCST.resolve menv c (CST.UnqualifiedSymbol (i "test")))
-                                (Util.Result (rqsym "A" "test"))
-                                "Unqualified symbol, imported"
-                    ]
-                ]
-            end
-        end
-    end
-
     val astSuite =
         let val menv = Module.defaultMenv
         in
