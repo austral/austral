@@ -20,6 +20,10 @@
 structure Parser :> PARSER = struct
     structure ps = Parsimony(ParsimonyStringInput)
 
+    (* Identifiers *)
+
+    val identCharParser = ps.anyOfString Ident.alphabet
+
     (* Parsing declarations *)
 
     fun parseModule _ =
