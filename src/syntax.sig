@@ -42,7 +42,7 @@ signature SYNTAX = sig
                   | TupleProj of expr * int
                   | SizeOf of type_specifier
                   | Block of expr list
-                  | Funcall of ident * expr list
+                  | Funcall of name * expr list
          and binding = VarBinding of name * expr
                      | TupBinding of name list * expr
 
