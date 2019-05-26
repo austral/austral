@@ -18,6 +18,6 @@
 *)
 
 signature PARSER = sig
-    val test : string -> char list
+    val parseImport : string -> Syntax.import
     val parseModule : string -> Syntax.module
 end

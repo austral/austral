@@ -73,11 +73,6 @@ structure Parser : PARSER = struct
 
     (* Interface *)
 
-    val aParser = ps.pchar #"a"
-
-    val testParser =
-        ps.seqL (commaSeparatedList1 aParser) (ps.pchar #";")
-
     exception ParserException of string
 
     fun succeedOrDie result =
@@ -89,8 +84,8 @@ structure Parser : PARSER = struct
                      raise ParserException msg
                  end
 
-    fun test s =
-        succeedOrDie (ps.run testParser (ParsimonyStringInput.fromString s))
+    fun parseImport s =
+        succeedOrDie (ps.run importParser (ParsimonyStringInput.fromString s))
 
     fun parseModule s =
         raise Fail "Not implemented just yet"
