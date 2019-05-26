@@ -106,7 +106,7 @@ structure AustralTest = struct
                       ]
                   end,
             suite "Strings"
-                  let val isParse = isParseFn Parser.parseFloat
+                  let val isParse = isParseFn Parser.parseString
                       and escape s = Escape.escapedToString (Escape.escapeString s)
                   in
                       [
