@@ -18,5 +18,7 @@
 *)
 
 structure Syntax :> SYNTAX = struct
+    type name = string
 
+    datatype module = Module of name
 end

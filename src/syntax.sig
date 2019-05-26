@@ -18,5 +18,7 @@
 *)
 
 signature SYNTAX = sig
+    type name = string
 
+    datatype module = Module of name
 end
