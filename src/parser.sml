@@ -32,6 +32,16 @@ structure Parser : PARSER = struct
                                       ps.pchar #"\n",
                                       singleLineComment]
 
+    (* Utilities *)
+
+    fun commaSeparatedList1 p =
+        let val comma = ps.between (ps.opt whitespaceParser) (ps.pchar #",") (ps.opt whitespaceParser)
+        in
+            ps.pmap (fn (fst, rest) => fst :: rest)
+                    (ps.seq (ps.seqR (ps.opt whitespaceParser) p)
+                            (ps.many (ps.seqR comma (ps.seqL p (ps.opt whitespaceParser)))))
+        end
+
     (* Identifiers *)
 
     val identCharParser = ps.anyOfString Ident.alphabet
@@ -46,10 +56,10 @@ structure Parser : PARSER = struct
         let val from = ps.seq (ps.pstring "from") whitespaceParser
             and modName = ps.seqL identParser whitespaceParser
             and import = ps.seq (ps.pstring "import") whitespaceParser
-            and importList = identParser
+            and importList = commaSeparatedList1 identParser
         in
             let val parser = (ps.seq (ps.seqL (ps.seqR from modName) import)
-                                     (ps.many importList))
+                                     importList)
             in
                 ps.pmap Syntax.Import parser
             end
@@ -57,15 +67,24 @@ structure Parser : PARSER = struct
 
     (* Interface *)
 
+    val aParser = ps.pchar #"a"
+
+    val testParser =
+        ps.seqL (commaSeparatedList1 aParser) (ps.pchar #";")
+
     exception ParserException of string
 
     fun succeedOrDie result =
         case result of
             (ps.Success (r, _)) => r
-          | f => raise ParserException ("Bad parse: " ^ (ps.explain f))
+          | f => let val msg = "Bad parse: " ^ (ps.explain f)
+                 in
+                     print msg;
+                     raise ParserException msg
+                 end
 
-    fun parseImport s =
-        succeedOrDie (ps.run importParser (ParsimonyStringInput.fromString s))
+    fun test s =
+        succeedOrDie (ps.run testParser (ParsimonyStringInput.fromString s))
 
     fun parseModule s =
         raise Fail "Not implemented just yet"
