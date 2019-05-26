@@ -24,9 +24,6 @@ structure Syntax :> SYNTAX = struct
 
     (* Expressions *)
 
-    datatype symbol = QualifiedSymbol of name * name
-                    | UnqualifiedSymbol of name
-
     datatype type_specifier = NamedType of name
                             | Address of type_specifier
                             | Pointer of type_specifier
