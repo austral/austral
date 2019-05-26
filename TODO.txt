@@ -1,6 +1,7 @@
 TODO:
 
 - `import ... as` syntax
+- Parser: type specifiers
 - Syntax: declarations
 - Parser: declarations
 - Parser: expressions
