@@ -30,6 +30,7 @@ structure Syntax :> SYNTAX = struct
     datatype type_specifier = NamedType of symbol
                             | Address of type_specifier
                             | Pointer of type_specifier
+                            | TupleType of type_specifier list
 
     (* Declarations *)
 
