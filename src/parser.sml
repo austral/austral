@@ -49,7 +49,11 @@ structure Parser : PARSER = struct
         end
 
     fun commaSeparatedList0 p =
-        ps.opt (commaSeparatedList1 p)
+        ps.pmap (fn v =>
+                    case v of
+                        SOME l => l
+                      | NONE => [])
+                (ps.opt (commaSeparatedList1 p))
 
     (* Identifiers *)
 
