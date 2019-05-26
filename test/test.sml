@@ -108,7 +108,10 @@ structure AustralTest = struct
                                                               NamedType (i "c")]),
                             isParse "{  a  ,  b  ,  c  }" (TupleType [NamedType (i "a"),
                                                                       NamedType (i "b"),
-                                                                      NamedType (i "c")])
+                                                                      NamedType (i "c")]),
+                            isParse "{a,&b,*c}" (TupleType [NamedType (i "a"),
+                                                            Address (NamedType (i "b")),
+                                                            Pointer (NamedType (i "c")])),
                           ]
                       end,
                 suite "Expressions" [
