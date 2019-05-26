@@ -175,10 +175,11 @@ structure Parser : PARSER = struct
                      print msg;
                      raise ParserException msg
                  end
-
+    fun pf f s =
+        succeedOrDie (ps.run f (ParsimonyStringInput.fromString s))
 
     fun parseTypeSpecifier s =
-        succeedOrDie (ps.run typeSpecifierParser (ParsimonyStringInput.fromString s))
+        pf typeSpecifierParser
 
     fun parseInteger s =
         succeedOrDie (ps.run integerParser (ParsimonyStringInput.fromString s))
