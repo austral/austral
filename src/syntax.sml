@@ -56,7 +56,7 @@ structure Syntax :> SYNTAX = struct
          and import = Import of name * imported_name list
 
          and imported_name = ImportedName of name
-                           | ImportedNameAs of name * name
+                           | ImportedNameAs of { original: name, rename: name }
 
          and declaration = TypeDeclaration of name * type_visibility * type_definition
 
