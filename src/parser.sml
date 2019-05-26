@@ -184,8 +184,7 @@ structure Parser : PARSER = struct
 
     val parseFloat = pf floatParser
 
-    fun parseString s =
-        succeedOrDie (ps.run stringParser (ParsimonyStringInput.fromString s))
+    val parseString = pf stringParser
 
     fun parseImport s =
         succeedOrDie (ps.run importParser (ParsimonyStringInput.fromString s))
