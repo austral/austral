@@ -8,7 +8,6 @@ TODO:
 - Parser: function definitions
 - Parser: visibility declaration
 - Define syntax for linear iteration operators
-- Constrain identifier alphabet further
 - Error on user-defined identifiers that start with @
 
 LONG-TERM TODO:
@@ -217,3 +216,4 @@ DONE:
 - `import ... as` syntax
 - Parser: type specifiers
 - Syntax: declarations
+- Constrain identifier alphabet further
