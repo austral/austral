@@ -1,7 +1,6 @@
 TODO:
 
 - Syntax: docstrings
-- Syntax: declarations
 - Parser: expressions
 - Parser: docstrings
 - Parser: module definitions
@@ -217,3 +216,4 @@ DONE:
 - Update parser tests
 - `import ... as` syntax
 - Parser: type specifiers
+- Syntax: declarations
