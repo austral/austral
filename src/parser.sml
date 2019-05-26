@@ -83,7 +83,7 @@ structure Parser : PARSER = struct
 
     datatype sign = Positive | Negative
 
-    val signParser = let val posParser = ps.seqR (ps.opt (pchar #"+")) (ps.preturn Positive)
+    val signParser = let val posParser = ps.seqR (ps.opt (ps.pchar #"+")) (ps.preturn Positive)
                          val negParser = ps.seqR (ps.pchar #"-") (ps.preturn Negative)
                      in
                          ps.or negParser posParser
@@ -94,7 +94,7 @@ structure Parser : PARSER = struct
 
     val integerTextParser = ps.pmap applySign (ps.seq signParser naturalParser)
 
-    val integerParser = pmap Syntax.IntConstant integerTextParser
+    val integerParser = ps.pmap Syntax.IntConstant integerTextParser
 
     (* Interface *)
 
