@@ -1,8 +1,10 @@
 TODO:
 
+- Syntax: docstrings
 - Syntax: declarations
 - Parser: declarations
 - Parser: expressions
+- Parser: docstrings
 
 LONG-TERM TODO:
 
