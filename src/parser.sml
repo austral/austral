@@ -76,7 +76,7 @@ structure Parser : PARSER = struct
                                (commaSeparatedList1 typeSpecifierParser)
                                (ps.pchar #"}")
             in
-                r := defineTypeSpecifierParser addressParser pointerParser tupleTypePArser;
+                r := defineTypeSpecifierParser addressParser pointerParser tupleTypeParser;
                 (addressParser, pointerParser, tupleTypeParser)
             end
         end
