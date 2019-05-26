@@ -72,4 +72,8 @@ signature SYNTAX = sig
          and case_definition = CaseDefinition of name * type_specifier option
 
          and function_definition = FunctionDef of name * params * type_specifier * expr
+
+         and params = ParamList of param list
+
+         and param = Param of name * type_specifier
 end
