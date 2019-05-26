@@ -58,11 +58,19 @@ structure Parser : PARSER = struct
 
     (* Parsing imports *)
 
+    val importedNameParser =
+        ps.or (ps.pmap Syntax.ImportedName identParser)
+              (ps.pmap (fn (n, rn) =>
+                           Syntax.ImportedNameAs (n, rn))
+                       (ps.seq identParser
+                               (ps.seqR (ps.between ws1 (ps.pstring "as") ws1)
+                                        identParser)))
+
     val importParser =
         let val from = ps.seq (ps.pstring "from") whitespaceParser
             and modName = ps.seqL identParser whitespaceParser
             and import = ps.seq (ps.pstring "import") whitespaceParser
-            and importList = commaSeparatedList1 identParser
+            and importList = commaSeparatedList1 importedNameParser
         in
             let val parser = (ps.seq (ps.seqL (ps.seqR from modName) import)
                                      importList)
