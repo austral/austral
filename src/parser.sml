@@ -34,9 +34,9 @@ structure Parser : PARSER = struct
                                       singleLineComment]
 
     (* Any positive amount of whitespace *)
-    val ws1 = many1 whitespaceParser
+    val ws1 = ps.many1 whitespaceParser
     (* Any whitespace or none at all *)
-    val ws = many whitespaceParser
+    val ws = ps.many whitespaceParser
 
     (* Utilities *)
 
