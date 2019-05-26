@@ -98,7 +98,7 @@ structure AustralTest = struct
                 isParse "-123.456e-3" (FloatConstant "-123.456e-3")*)
             ],
             suite "Strings" [
-                isParse "\"derp\"" (StringConstant (escapeString "derp")),
+                (*isParse "\"derp\"" (StringConstant (escapeString "derp")),
                 isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (escapeString "derp \"herp\" derp")),
                 isEqual' (escape "line\\nline") "line\nline",
                 isEqual' (escape "line\\rline") "line\rline",
@@ -111,12 +111,12 @@ structure AustralTest = struct
                 isEqual' (escape "line\\\n\\line") "lineline",
                 isEqual' (escape "line\\\n \n\\line") "lineline",
                 isEqual' (escape "line\\\n\n\n\\line") "lineline",
-                isEqual' (escape "line\\\n\n\n   \\line") "lineline"
+                isEqual' (escape "line\\\n\n\n   \\line") "lineline"*)
             ],
             suite "Symbols" [
                 suite "Qualified Symbols" [
-                    isParse "a:b" (qsym "a" "b"),
-                    isParse "test:test" (qsym "test" "test")
+                    (*isParse "a:b" (qsym "a" "b"),
+                    isParse "test:test" (qsym "test" "test")*)
                 ],
                 suite "Unqualified Symbols" [
                     isParse "test" (unsym "test")
