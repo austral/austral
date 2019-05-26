@@ -178,8 +178,7 @@ structure Parser : PARSER = struct
     fun pf f s =
         succeedOrDie (ps.run f (ParsimonyStringInput.fromString s))
 
-    fun parseTypeSpecifier s =
-        pf typeSpecifierParser
+    val parseTypeSpecifier = pf typeSpecifierParser
 
     fun parseInteger s =
         succeedOrDie (ps.run integerParser (ParsimonyStringInput.fromString s))
