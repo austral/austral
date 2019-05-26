@@ -144,6 +144,9 @@ structure Parser : PARSER = struct
     fun parseFloat s =
         succeedOrDie (ps.run floatParser (ParsimonyStringInput.fromString s))
 
+    fun parseString s =
+        succeedOrDie (ps.run stringParser (ParsimonyStringInput.fromString s))
+
     fun parseImport s =
         succeedOrDie (ps.run importParser (ParsimonyStringInput.fromString s))
 
