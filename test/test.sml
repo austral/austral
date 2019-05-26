@@ -137,9 +137,6 @@ structure AustralTest = struct
                     (*isParse "test" (unsym "test")*)
                 ]
             ],
-            suite "Splices" [
-                (*isParse ",123" (Splice (IntConstant "123"))*)
-            ],
             suite "S-expressions" [
                 (*isParse "()" (List nil),
                 isParse "(())" (List [List nil]),
