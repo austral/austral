@@ -115,6 +115,16 @@ structure Parser : PARSER = struct
                                                                  (ps.seq integerTextParser
                                                                          (ps.opt exponentParser))))
 
+
+    (* Strings *)
+
+    val stringChar = ps.or (ps.seqR (ps.pchar #"\\") (ps.pchar #"\"")) (ps.noneOf [#"\""])
+
+    val quotedString = ps.pmap (Syntax.StringConstant o Escape.escapeString o String.implode)
+                               (ps.between (ps.pchar #"\"")
+                                           (ps.many stringChar)
+                                           (ps.pchar #"\""))
+
     (* Interface *)
 
     exception ParserException of string
