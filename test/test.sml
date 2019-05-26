@@ -26,7 +26,7 @@ structure AustralTest = struct
     fun strInput str =
         ParsimonyStringInput.fromString str
 
-    fun isParse f input output =
+    fun isParseFn f input output =
         is (fn () => let val v = f input
                      in
                          if v = output then
@@ -79,14 +79,18 @@ structure AustralTest = struct
         open Syntax
     in
     val parserSuite = suite "Parser" [
-            suite "Integers" [
-                isParse "123" (IntConstant "123"),
-                isParse "0" (IntConstant "0"),
-                isParse "00" (IntConstant "00"),
-                isParse "10000" (IntConstant "10000"),
-                isParse "10000" (IntConstant "10000"),
-                isParse "-10000" (IntConstant "-10000")
-            ],
+            suite "Integers"
+                  let val isParse = isParseFn Parser.parseInteger
+                  in
+                      [
+                        isParse "123" (IntConstant "123"),
+                        isParse "0" (IntConstant "0"),
+                        isParse "00" (IntConstant "00"),
+                        isParse "10000" (IntConstant "10000"),
+                        isParse "10000" (IntConstant "10000"),
+                        isParse "-10000" (IntConstant "-10000")
+                      ]
+                  end,
             suite "Floats" [
                 (*isParse "0.0" (FloatConstant "0.0"),
                 isParse "-0.0" (FloatConstant "-0.0"),
