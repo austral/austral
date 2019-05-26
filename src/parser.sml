@@ -73,6 +73,29 @@ structure Parser : PARSER = struct
 
     (* Parsing expressions *)
 
+    (* Constants *)
+
+    (* Integer constants *)
+
+    val digitParser = ps.anyOf [#"0", #"1", #"2", #"3", #"4", #"5", #"6", #"7", #"8", #"9"]
+
+    val naturalParser = ps.pmap String.implode (ps.many1 digitParser)
+
+    datatype sign = Positive | Negative
+
+    val signParser = let val posParser = ps.seqR (ps.opt (pchar #"+")) (ps.preturn Positive)
+                         val negParser = ps.seqR (ps.pchar #"-") (ps.preturn Negative)
+                     in
+                         ps.or negParser posParser
+                     end
+
+    fun applySign (Positive, int) = int
+      | applySign (Negative, int) = "-" ^ int
+
+    val integerTextParser = ps.pmap applySign (ps.seq signParser naturalParser)
+
+    val integerParser = pmap Syntax.IntConstant integerTextParser
+
     (* Interface *)
 
     exception ParserException of string
