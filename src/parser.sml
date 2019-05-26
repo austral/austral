@@ -115,7 +115,6 @@ structure Parser : PARSER = struct
                                                                  (ps.seq integerTextParser
                                                                          (ps.opt exponentParser))))
 
-
     (* Strings *)
 
     val stringChar = ps.or (ps.seqR (ps.pchar #"\\") (ps.pchar #"\"")) (ps.noneOf [#"\""])
