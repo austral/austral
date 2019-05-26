@@ -1,6 +1,5 @@
 TODO:
 
-- `import ... as` syntax
 - Parser: type specifiers
 - Syntax: declarations
 - Parser: declarations
@@ -209,3 +208,4 @@ DONE:
 - Linearity: Syntax for specifying kinds in disjunctions and records
 - Syntax: expressions
 - Update parser tests
+- `import ... as` syntax
