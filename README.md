@@ -94,8 +94,6 @@ The second toplevel form defines the program's entrypoint, the traditional
 `main` function. The type of string constants is `(static-array u8)`, so we have
 to call the `static-array-pointer` function to extract the array's pointer.
 
-### Factorial
-
 ### Fibonacci
 
 ```lisp
