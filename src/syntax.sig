@@ -23,6 +23,9 @@ signature SYNTAX = sig
 
     (* Expressions *)
 
+    datatype symbol = QualifiedSymbol of name * name
+                    | UnqualifiedSymbol of name
+
     (* Declarations *)
 
     datatype module = Module of name * import list * declaration list
