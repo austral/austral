@@ -40,6 +40,6 @@ signature SYNTAX = sig
                              | PrivateType
 
          and type_definition = NamedType of name
-                             | StructDefinition
+                             | RecordDefinition
                              | UnionDefinition
 end
