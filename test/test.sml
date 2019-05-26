@@ -51,14 +51,6 @@ structure AustralTest = struct
                        | Util.Failure _ => Pass)
            msg
 
-    val i = Ident.mkIdentEx
-
-    fun unsym s = CST.UnqualifiedSymbol (i s)
-
-    fun qsym m s = CST.QualifiedSymbol (Symbol.mkSymbol (i m, i s))
-
-    fun escape s = CST.escapedToString (CST.escapeString s)
-
     (* Test suites *)
 
     local
@@ -88,22 +80,22 @@ structure AustralTest = struct
     in
     val parserSuite = suite "Parser" [
             suite "Integers" [
-                isParse "123" (IntConstant "123"),
+                (*isParse "123" (IntConstant "123"),
                 isParse "0" (IntConstant "0"),
                 isParse "00" (IntConstant "00"),
                 isParse "10000" (IntConstant "10000"),
                 isParse "10000" (IntConstant "10000"),
-                isParse "-10000" (IntConstant "-10000")
+                isParse "-10000" (IntConstant "-10000")*)
             ],
             suite "Floats" [
-                isParse "0.0" (FloatConstant "0.0"),
+                (*isParse "0.0" (FloatConstant "0.0"),
                 isParse "-0.0" (FloatConstant "-0.0"),
                 isParse "123.0" (FloatConstant "123.0"),
                 isParse "-123.0" (FloatConstant "-123.0"),
                 isParse "123.456" (FloatConstant "123.456"),
                 isParse "-123.456" (FloatConstant "-123.456"),
                 isParse "123.456e3" (FloatConstant "123.456e3"),
-                isParse "-123.456e-3" (FloatConstant "-123.456e-3")
+                isParse "-123.456e-3" (FloatConstant "-123.456e-3")*)
             ],
             suite "Strings" [
                 isParse "\"derp\"" (StringConstant (escapeString "derp")),
