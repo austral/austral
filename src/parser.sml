@@ -20,6 +20,18 @@
 structure Parser :> PARSER = struct
     structure ps = Parsimony(ParsimonyStringInput)
 
+    (* Comments *)
+
+    val singleLineComment = ps.seqR (ps.seq (ps.pchar #"-") (ps.pchar #"-"))
+                                    (ps.seqR (ps.many (ps.noneOf [#"\n"]))
+                                             (ps.pchar #"\n"))
+
+    (* Whitespace *)
+
+    val whitespaceParser = ps.choice [ps.pchar #" ",
+                                      ps.pchar #"\n",
+                                      singleLineComment]
+
     (* Identifiers *)
 
     val identCharParser = ps.anyOfString Ident.alphabet
