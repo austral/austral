@@ -40,12 +40,6 @@ structure Parser : PARSER = struct
 
     (* Utilities *)
 
-    fun commaSeparatedList0 p =
-        let val comma = ps.between ws (ps.pchar #",") ws
-        in
-            ps.many (ps.seqR comma (ps.seqL p ws))
-        end
-
     fun commaSeparatedList1 p =
         let val comma = ps.between ws (ps.pchar #",") ws
         in
@@ -53,6 +47,9 @@ structure Parser : PARSER = struct
                     (ps.seq p
                             (ps.many (ps.seqR comma (ps.seqL p ws))))
         end
+
+    fun commaSeparatedList0 p =
+        ps.opt (commaSeparatedList1 p)
 
     (* Identifiers *)
 
