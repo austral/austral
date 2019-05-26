@@ -26,8 +26,8 @@ structure AustralTest = struct
     fun strInput str =
         ParsimonyStringInput.fromString str
 
-    (*fun isParse input output =
-        is (fn () => let val v = Parser.parseString input
+    fun isParse f input output =
+        is (fn () => let val v = f input
                      in
                          if v = output then
                              Pass
@@ -35,7 +35,7 @@ structure AustralTest = struct
                              Fail "Parse successful, but not equal to output"
                      end
                      handle _ => Fail "Bad parse")
-           input*)
+           input
 
     (*fun isNotParse input =
         is (fn () => let val v = Parser.parseString input
@@ -80,12 +80,12 @@ structure AustralTest = struct
     in
     val parserSuite = suite "Parser" [
             suite "Integers" [
-                (*isParse "123" (IntConstant "123"),
+                isParse "123" (IntConstant "123"),
                 isParse "0" (IntConstant "0"),
                 isParse "00" (IntConstant "00"),
                 isParse "10000" (IntConstant "10000"),
                 isParse "10000" (IntConstant "10000"),
-                isParse "-10000" (IntConstant "-10000")*)
+                isParse "-10000" (IntConstant "-10000")
             ],
             suite "Floats" [
                 (*isParse "0.0" (FloatConstant "0.0"),
