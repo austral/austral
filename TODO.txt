@@ -7,6 +7,7 @@ TODO:
 - Parser: docstrings
 - Define syntax for linear iteration operators
 - Constrain identifier alphabet further
+- Error on user-defined identifiers that start with @
 
 LONG-TERM TODO:
 
