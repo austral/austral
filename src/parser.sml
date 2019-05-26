@@ -98,7 +98,7 @@ structure Parser : PARSER = struct
 
     (* Float Constants *)
 
-    val eParser = or (ps.pchar #"e") (ps.pchar #"E")
+    val eParser = ps.or (ps.pchar #"e") (ps.pchar #"E")
 
     val exponentParser = ps.seqR eParser integerTextParser
 
