@@ -123,7 +123,7 @@ structure AustralTest = struct
                 ]
             ],
             suite "Splices" [
-                isParse ",123" (Splice (IntConstant "123"))
+                (*isParse ",123" (Splice (IntConstant "123"))*)
             ],
             suite "S-expressions" [
                 (*isParse "()" (List nil),
