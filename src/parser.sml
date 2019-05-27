@@ -240,9 +240,9 @@ structure Parser : PARSER = struct
                         floatParser,
                         integerParser,
                         stringParser,
-                        variableParser,
                         letParser,
-                        ifParser
+                        ifParser,
+                        variableParser
                     ]
                 in
                     r := defineExpressionParser expParsers;
