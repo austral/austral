@@ -37,10 +37,7 @@ LONG-TERM TODO:
 - handle defmacro declarations
 - Macro match
 - Macroexpansion
-- Macro and
-- Macro or
-- Function and*
-- Function or*
+- and, or operators
 - Bitwise operators
 - Runtime support for saturation arithmetic
 - CUDA backend
