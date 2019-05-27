@@ -22,7 +22,6 @@ LONG-TERM TODO:
 - Better error messages
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
-- and, or operators
 - Bitwise operators
 - Runtime support for saturation arithmetic
 - CUDA backend
@@ -194,3 +193,4 @@ DONE:
 - Constrain identifier alphabet further
 - Parser: visibility declaration
 - Separate IRs from passes
+- and, or operators
