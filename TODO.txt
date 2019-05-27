@@ -46,7 +46,6 @@ LONG-TERM TODO:
 - Implement static-array constructor
 - Lift static array constructors to global constants
 - Verify if an expression is a valid static array element
-- Prelude: equality and comparison instances
 - CUDA backend
 - C+OpenMP backend
 
