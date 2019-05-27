@@ -31,7 +31,8 @@ structure Syntax :> SYNTAX = struct
                             | Pointer of type_specifier
                             | TupleType of type_specifier list
 
-    datatype expr = BoolConstant of bool
+    datatype expr = UnitConstant
+                  | BoolConstant of bool
                   | IntConstant of string
                   | FloatConstant of string
                   | StringConstant of Escape.escaped_string
