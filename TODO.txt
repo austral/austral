@@ -44,7 +44,6 @@ LONG-TERM TODO:
 - Bitwise operators
 - Runtime support for saturation arithmetic
 - Implement static-array constructor
-- Lift static array constructors to global constants
 - CUDA backend
 - C+OpenMP backend
 
