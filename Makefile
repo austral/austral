@@ -44,12 +44,6 @@ mlton-test: $(TEST_BIN)
 .PHONY: docs
 docs: $(DOCS_HTML)
 
-$(DOCS_ARCH_PNG): $(DOCS_ARCH_SRC) $(MERMAID)
-	$(MERMAID) -i $(DOCS_ARCH_SRC) -o $(DOCS_ARCH_PNG) -t neutral -p $(MERMAID_P_CONFIG)
-
-$(DOCS_HTML): $(DOCS_SRC) $(DOCS_ARCH_PNG)
-	pandoc $(DOCS_SRC) -f markdown+smart -t html -s -o $(DOCS_HTML)
-
 clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(TEST_BIN) ]; then rm $(TEST_BIN); fi
