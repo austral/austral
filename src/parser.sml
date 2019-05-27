@@ -238,12 +238,6 @@ structure Parser : PARSER = struct
 
     val parseTypeSpecifier = pf typeSpecifierParser
 
-    val parseInteger = pf integerParser
-
-    val parseFloat = pf floatParser
-
-    val parseString = pf stringParser
-
     val parseExpression = pf expressionParser
 
     val parseImport = pf importParser
