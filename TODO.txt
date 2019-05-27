@@ -27,7 +27,6 @@ LONG-TERM TODO:
 - Implement static-array-index
 - Compile definstance methods to generic, not concrete, functions
 - Error on repeat type variables in an instance declaration
-- Error on phantom type parameters in a type alias
 - Better error messages
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
