@@ -208,7 +208,8 @@ structure Parser : PARSER = struct
                 let val expParsers = [
                         unitConstantParser,
                         boolConstantParser,
-                        integerParser
+                        integerParser,
+                        floatParser
                     ]
                 in
                     r := defineExpressionParser expParsers;
