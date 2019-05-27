@@ -28,7 +28,6 @@ LONG-TERM TODO:
 - Compile definstance methods to generic, not concrete, functions
 - Error on repeat type variables in an instance declaration
 - Error on phantom type parameters in a type alias
-- Parse nested comments
 - Better error messages
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
