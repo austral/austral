@@ -209,7 +209,8 @@ structure Parser : PARSER = struct
                         unitConstantParser,
                         boolConstantParser,
                         integerParser,
-                        floatParser
+                        floatParser,
+                        stringParser
                     ]
                 in
                     r := defineExpressionParser expParsers;
