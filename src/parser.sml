@@ -208,8 +208,8 @@ structure Parser : PARSER = struct
                 let val expParsers = [
                         unitConstantParser,
                         boolConstantParser,
-                        integerParser,
                         floatParser,
+                        integerParser,
                         stringParser
                     ]
                 in
