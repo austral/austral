@@ -48,8 +48,6 @@ clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(TEST_BIN) ]; then rm $(TEST_BIN); fi
 	if [ -f $(C_RUNTIME_ML) ]; then rm $(C_RUNTIME_ML); fi
-	if [ -f $(DOCS_HTML) ]; then rm $(DOCS_HTML); fi
-	if [ -f $(DOCS_ARCH_PNG) ]; then rm $(DOCS_ARCH_PNG); fi
 	if [ -d src/.cm/ ]; then rm -rf src/.cm/; fi
 	rm -f test/valid/*.c
 	rm -f test/valid/*.bin
