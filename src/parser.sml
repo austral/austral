@@ -205,7 +205,7 @@ structure Parser : PARSER = struct
                                    (ps.preturn (Syntax.BoolConstant false)))
 
                 and variableParser =
-                    identParser
+                    ps.pmap Syntax.Variable identParser
 
                 and letParser =
                     (* FIXME: NOT DONE YET *)
