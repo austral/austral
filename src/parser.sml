@@ -82,9 +82,9 @@ structure Parser : PARSER = struct
 
                 val tupleTypeParser =
                     ps.pmap Syntax.TupleType
-                            (ps.between (ps.seq (ps.pchar #"{") ws)
+                            (ps.between (ps.seq (ps.pchar #"(") ws)
                                         (commaSeparatedList0 typeSpecifierParser)
-                                        (ps.seq (ps.pchar #"}") ws))
+                                        (ps.seq (ps.pchar #")") ws))
             in
                 r := defineTypeSpecifierParser addressParser pointerParser tupleTypeParser;
                 (addressParser, pointerParser, tupleTypeParser)
