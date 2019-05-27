@@ -116,7 +116,7 @@ structure AustralTest = struct
                       end,
                 suite "Expressions" [
                     suite "Integers"
-                          let val isParse = isParseFn Parser.parseInteger
+                          let val isParse = isParseFn Parser.parseExpression
                           in
                               [
                                 isParse "123" (IntConstant "123"),
