@@ -157,8 +157,7 @@ structure AustralTest = struct
                                       ]
                                   end
                           ]
-                      end
-                ],
+                      end,
                 suite "Declarations" [
                     suite "Imports"
                           let val isParse = isParseFn Parser.parseImport
