@@ -194,9 +194,9 @@ structure Parser : PARSER = struct
         let val (expressionParser, r) = ps.wrapper ()
         in
             let val unitConstantParser =
-                    ps.seq (ps.seq (ps.pchar #"(")
-                                   (ps.seq ws (ps.pchar #")")))
-                           (ps.preturn Syntax.UnitConstant)
+                    ps.seqR (ps.seq (ps.pchar #"(")
+                                    (ps.seq ws (ps.pchar #")")))
+                            (ps.preturn Syntax.UnitConstant)
             in
                 let val expParsers = [
                         unitConstantParser
