@@ -197,6 +197,13 @@ structure Parser : PARSER = struct
                     ps.seqR (ps.seq (ps.pchar #"(")
                                     (ps.seq ws (ps.pchar #")")))
                             (ps.preturn Syntax.UnitConstant)
+
+                and boolConstantParser =
+                    ps.or (ps.seq (ps.pstring "true")
+                                  (ps.preturn (Syntax.BoolConstant true)))
+                          (ps.seq (ps.pstring "false")
+                                  (ps.preturn (Syntax.BoolConstant false)))
+
             in
                 let val expParsers = [
                         unitConstantParser
