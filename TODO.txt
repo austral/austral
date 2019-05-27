@@ -23,7 +23,6 @@ LONG-TERM TODO:
 - Define function pointer type
 - Define `function` operator
 - Static array constructors
-- Implement static-array-index
 - Better error messages
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
