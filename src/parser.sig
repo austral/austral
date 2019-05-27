@@ -20,7 +20,6 @@
 signature PARSER = sig
     val parseTypeSpecifier : string -> Syntax.type_specifier
 
-    val parseString : string -> Syntax.expr
     val parseExpression : string -> Syntax.expr
 
     val parseImport : string -> Syntax.import
