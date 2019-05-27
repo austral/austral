@@ -30,7 +30,6 @@ LONG-TERM TODO:
 - Error on phantom type parameters in a type alias
 - Parse nested comments
 - Better error messages
-- Separate IRs from passes
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
 - and, or operators
@@ -204,3 +203,4 @@ DONE:
 - Syntax: declarations
 - Constrain identifier alphabet further
 - Parser: visibility declaration
+- Separate IRs from passes
