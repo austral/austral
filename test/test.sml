@@ -128,7 +128,7 @@ structure AustralTest = struct
                               ]
                           end,
                     suite "Floats"
-                          let val isParse = isParseFn Parser.parseFloat
+                          let val isParse = isParseFn Parser.parseExpression
                           in
                               [
                                 isParse "0.0" (FloatConstant "0.0"),
