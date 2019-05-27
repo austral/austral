@@ -43,7 +43,6 @@ LONG-TERM TODO:
 - Function or*
 - Bitwise operators
 - Runtime support for saturation arithmetic
-- Implement static-array constructor
 - CUDA backend
 - C+OpenMP backend
 
