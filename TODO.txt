@@ -1,16 +1,24 @@
 TODO:
 
-- Parser: expressions
+- Parse let expressions
+- Parse arithmetic expressions
+- Parse comparison expressions
+- Parse logical expressions
+- Parse tuple expressions
+- Parse sizeOf expressions
+- Parse block expressions
+- Parse function calls
+- Expression parsing tests
 - Parser: module definitions
 - Parser: type definitions
 - Parser: function definitions
 - Define syntax for linear iteration operators
-- Error on user-defined identifiers that start with @
 - Syntax: docstrings
 - Parser: docstrings
 
 LONG-TERM TODO:
 
+- Error on user-defined identifiers that start with @
 - Linearity: count appearances of bindings in expressions
 - Warn when not using the result value of a progn (any expression with type other than unit)
 - Expand monomorphs recursively
