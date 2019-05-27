@@ -44,9 +44,6 @@ mlton-test: $(TEST_BIN)
 .PHONY: docs
 docs: $(DOCS_HTML)
 
-$(MERMAID):
-	npm install mermaid.cli
-
 $(DOCS_ARCH_PNG): $(DOCS_ARCH_SRC) $(MERMAID)
 	$(MERMAID) -i $(DOCS_ARCH_SRC) -o $(DOCS_ARCH_PNG) -t neutral -p $(MERMAID_P_CONFIG)
 
