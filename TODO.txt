@@ -25,7 +25,6 @@ LONG-TERM TODO:
 - Static array constructors
 - Implement static-array-pointer function
 - Implement static-array-index
-- Compile definstance methods to generic, not concrete, functions
 - Better error messages
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
