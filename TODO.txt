@@ -19,7 +19,6 @@ LONG-TERM TODO:
 - do special operator
 - doparallel special operator
 - Augment method calls
-- Monomorphize method calls
 - Define function pointer type
 - Define `function` operator
 - Better error messages
