@@ -142,7 +142,7 @@ structure AustralTest = struct
                               ]
                           end,
                     suite "Strings"
-                          let val isParse = isParseFn Parser.parseString
+                          let val isParse = isParseFn Parser.parseExpression
                           in
                               let fun escape s = Escape.escapedToString (Escape.escapeString s)
                               in
