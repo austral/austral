@@ -185,6 +185,30 @@ structure Parser : PARSER = struct
                                            (ps.many stringChar)
                                            (ps.pchar #"\""))
 
+    (* Expressions *)
+
+    fun defineExpressionParser parsers =
+        ps.choice parsers
+
+    val expParsers =
+        let val (expressionParser, r) = ps.wrapper ()
+        in
+            let val unitConstantParser =
+                    ps.seq (ps.pchar #"(")
+                           (ps.seq ws (ps.pchar #")"))
+            in
+                let val expParsers = [
+                        unitConstantParser
+                    ]
+                in
+                    r := defineExpressionParser expParsers;
+                    expParsers
+                end
+            end
+        end
+
+    val expressionParser = defineExpressionParser expParsers
+
     (* Interface *)
 
     exception ParserException of string
