@@ -35,7 +35,6 @@ LONG-TERM TODO:
 - Validate foreign function return types
 - Parse deftemplate declarations
 - handle defmacro declarations
-- Macro match
 - and, or operators
 - Bitwise operators
 - Runtime support for saturation arithmetic
