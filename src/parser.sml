@@ -232,6 +232,8 @@ structure Parser : PARSER = struct
 
     val parseString = pf stringParser
 
+    val parseExpression = pf expressionParser
+
     val parseImport = pf importParser
 
     fun parseModule s =
