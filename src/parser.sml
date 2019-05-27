@@ -204,13 +204,45 @@ structure Parser : PARSER = struct
                           (ps.seqR (ps.pstring "false")
                                    (ps.preturn (Syntax.BoolConstant false)))
 
+                and variableParser =
+                    identParser
+
+                and letParser =
+                    (* FIXME: NOT DONE YET *)
+                    ps.preturn Syntax.UnitConstant
+
+                and ifParser =
+                    let val If =
+                            ps.pseq (ps.pstring "if")
+                                    ws1
+                        and Then =
+                            ps.pseq (ps.pstring "then")
+                                    ws1
+                        and Else =
+                            ps.pseq (ps.pstring "else")
+                                    ws1
+                    in
+                        let val ifp = ps.seq (ps.seqR If
+                                                      expressionParser)
+                                             (ps.seq (ps.seqR Then
+                                                              expressionParser)
+                                                     (ps.seqR Else
+                                                              expressionParser))
+                        in
+                            ps.pmap (fn (t, (c, a)) => Syntax.If (t, c, a))
+                                    ifp
+                        end
+                    end
             in
                 let val expParsers = [
                         unitConstantParser,
                         boolConstantParser,
                         floatParser,
                         integerParser,
-                        stringParser
+                        stringParser,
+                        variableParser,
+                        letParser,
+                        ifParser
                     ]
                 in
                     r := defineExpressionParser expParsers;
