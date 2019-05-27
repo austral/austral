@@ -216,7 +216,7 @@ structure AustralTest = struct
                       let val isParse = isParseFn Parser.parseTypeSpecifier
                       in
                           [
-                            isParse "test ;; comment" (NamedType (i "test"))
+                            isParse "test ;; comment" (NamedType (i "test")),
                             isParse "(a, -- comment\n b)"
                                     (TupleType [NamedType (i "a"),
                                                 NamedType (i "b")])
