@@ -34,7 +34,6 @@ LONG-TERM TODO:
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
 - Parse deftemplate declarations
-- handle defmacro declarations
 - and, or operators
 - Bitwise operators
 - Runtime support for saturation arithmetic
