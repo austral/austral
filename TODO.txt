@@ -49,7 +49,6 @@ LONG-TERM TODO:
 - Prelude: equality and comparison instances
 - CUDA backend
 - C+OpenMP backend
-- Fortran backend?
 
 DONE:
 
