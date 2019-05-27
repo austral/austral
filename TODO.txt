@@ -36,7 +36,6 @@ LONG-TERM TODO:
 - Parse deftemplate declarations
 - handle defmacro declarations
 - Macro match
-- Macroexpansion
 - and, or operators
 - Bitwise operators
 - Runtime support for saturation arithmetic
