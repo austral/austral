@@ -40,6 +40,8 @@ structure Syntax :> SYNTAX = struct
                   | If of expr * expr * expr
                   | ArithOp of Arith.kind * Arith.oper * expr * expr
                   | CompOp of Builtin.comp_op * expr * expr
+                  | And of expr * expr
+                  | Or of expr * expr
                   | TupleCreate of expr list
                   | TupleProj of expr * int
                   | SizeOf of type_specifier
