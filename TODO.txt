@@ -33,7 +33,6 @@ LONG-TERM TODO:
 - Separate IRs from passes
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
-- Parse deftemplate declarations
 - and, or operators
 - Bitwise operators
 - Runtime support for saturation arithmetic
