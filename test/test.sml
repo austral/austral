@@ -211,7 +211,16 @@ structure AustralTest = struct
                                                   ImportedName (i "name2")]))
                               ]
                           end
-                ]
+                ],
+                suite "Comments"
+                      let val isParse = isParseFn Parser.parseTypeSpecifier
+                      in
+                          [
+                            isParse "(a, -- comment\n b)"
+                                    (TupleType [NamedType (i "a"),
+                                                NamedType (i "b")])
+                          ]
+                      end
             ]
         end
     end
