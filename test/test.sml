@@ -114,23 +114,19 @@ structure AustralTest = struct
                                                             Pointer (NamedType (i "c"))])
                           ]
                       end,
-                suite "Expressions" [
-                    suite "Integers"
-                          let val isParse = isParseFn Parser.parseExpression
-                          in
-                              [
+                suite "Expressions"
+                      let val isParse = isParseFn Parser.parseExpression
+                      in
+                          [
+                            suite "Integers" [
                                 isParse "123" (IntConstant "123"),
                                 isParse "0" (IntConstant "0"),
                                 isParse "00" (IntConstant "00"),
                                 isParse "10000" (IntConstant "10000"),
                                 isParse "10000" (IntConstant "10000"),
                                 isParse "-10000" (IntConstant "-10000")
-                              ]
-                          end,
-                    suite "Floats"
-                          let val isParse = isParseFn Parser.parseExpression
-                          in
-                              [
+                            ],
+                            suite "Floats" [
                                 isParse "0.0" (FloatConstant "0.0"),
                                 isParse "-0.0" (FloatConstant "-0.0"),
                                 isParse "123.0" (FloatConstant "123.0"),
@@ -139,40 +135,29 @@ structure AustralTest = struct
                                 isParse "-123.456" (FloatConstant "-123.456"),
                                 isParse "123.456e3" (FloatConstant "123.456e3"),
                                 isParse "-123.456e-3" (FloatConstant "-123.456e-3")
-                              ]
-                          end,
-                    suite "Strings"
-                          let val isParse = isParseFn Parser.parseExpression
-                          in
-                              let fun escape s = Escape.escapedToString (Escape.escapeString s)
-                              in
-                                  [
-                                    isParse "\"derp\"" (StringConstant (Escape.escapeString "derp")),
-                                    isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (Escape.escapeString "derp \"herp\" derp")),
-                                    isEqual' (escape "line\\nline") "line\nline",
-                                    isEqual' (escape "line\\rline") "line\rline",
-                                    isEqual' (escape "line\\tline") "line\tline",
-                                    isEqual' (escape "line\\\\line") "line\\line",
-                                    isEqual' (escape "line\\ \\line") "lineline",
-                                    isEqual' (escape "line\\  \\line") "lineline",
-                                    isEqual' (escape "line\\   \\line") "lineline",
-                                    isEqual' (escape "line\\    \\line") "lineline",
-                                    isEqual' (escape "line\\\n\\line") "lineline",
-                                    isEqual' (escape "line\\\n \n\\line") "lineline",
-                                    isEqual' (escape "line\\\n\n\n\\line") "lineline",
-                                    isEqual' (escape "line\\\n\n\n   \\line") "lineline"
-                                  ]
-                              end
-                          end,
-                    suite "Symbols" [
-                        suite "Qualified Symbols" [
-                            (*isParse "a:b" (qsym "a" "b"),
-                    isParse "test:test" (qsym "test" "test")*)
-                        ],
-                        suite "Unqualified Symbols" [
-                            (*isParse "test" (unsym "test")*)
-                        ]
-                    ]
+                            ],
+                            suite "Strings"
+                                  let fun escape s = Escape.escapedToString (Escape.escapeString s)
+                                  in
+                                      [
+                                        isParse "\"derp\"" (StringConstant (Escape.escapeString "derp")),
+                                        isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (Escape.escapeString "derp \"herp\" derp")),
+                                        isEqual' (escape "line\\nline") "line\nline",
+                                        isEqual' (escape "line\\rline") "line\rline",
+                                        isEqual' (escape "line\\tline") "line\tline",
+                                        isEqual' (escape "line\\\\line") "line\\line",
+                                        isEqual' (escape "line\\ \\line") "lineline",
+                                        isEqual' (escape "line\\  \\line") "lineline",
+                                        isEqual' (escape "line\\   \\line") "lineline",
+                                        isEqual' (escape "line\\    \\line") "lineline",
+                                        isEqual' (escape "line\\\n\\line") "lineline",
+                                        isEqual' (escape "line\\\n \n\\line") "lineline",
+                                        isEqual' (escape "line\\\n\n\n\\line") "lineline",
+                                        isEqual' (escape "line\\\n\n\n   \\line") "lineline"
+                                      ]
+                                  end
+                          ]
+                      end
                 ],
                 suite "Declarations" [
                     suite "Imports"
