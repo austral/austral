@@ -19,15 +19,6 @@ C_RUNTIME_ML := src/c-runtime.sml
 SRC := src/*.sig src/*.sml $(C_RUNTIME_ML)
 TEST_SRC := test/*.sml
 
-DOCS_DIR := docs
-DOCS_SRC := $(DOCS_DIR)/internals.md
-DOCS_HTML := $(DOCS_DIR)/internals.html
-
-DOCS_ARCH_SRC := $(DOCS_DIR)/architecture.mmd
-DOCS_ARCH_PNG := $(DOCS_DIR)/architecture.png
-MERMAID := ./node_modules/.bin/mmdc
-MERMAID_P_CONFIG := $(DOCS_DIR)/puppeteer-config.json
-
 all: compile
 
 $(C_RUNTIME_ML): $(C_RUNTIME_SRC) $(C_RUNTIME_SCRIPT)
