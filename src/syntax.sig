@@ -40,6 +40,7 @@ signature SYNTAX = sig
                   | If of expr * expr * expr
                   | ArithOp of Arith.kind * Arith.oper * expr * expr
                   | CompOp of Builtin.comp_op * expr * expr
+                  | Not of expr
                   | And of expr * expr
                   | Or of expr * expr
                   | TupleCreate of expr list
