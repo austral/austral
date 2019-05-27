@@ -213,13 +213,13 @@ structure Parser : PARSER = struct
 
                 and ifParser =
                     let val If =
-                            ps.pseq (ps.pstring "if")
+                            ps.seq (ps.pstring "if")
                                     ws1
                         and Then =
-                            ps.pseq (ps.pstring "then")
+                            ps.seq (ps.pstring "then")
                                     ws1
                         and Else =
-                            ps.pseq (ps.pstring "else")
+                            ps.seq (ps.pstring "else")
                                     ws1
                     in
                         let val ifp = ps.seq (ps.seqR If
