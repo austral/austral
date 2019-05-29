@@ -8,12 +8,12 @@ TODO:
 - Parse sizeOf expressions
 - Parse block expressions
 - Parse function calls
-- Expression parsing tests
 - Parser: module definitions
 - Parser: type definitions
 - Parser: function definitions
-- Define syntax for linear iteration operators
 - Parser: docstrings
+- Expression parsing tests
+- Define syntax for linear iteration operators
 
 LONG-TERM TODO:
 
