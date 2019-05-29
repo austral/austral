@@ -54,7 +54,7 @@ structure Syntax :> SYNTAX = struct
 
     (* Declarations *)
 
-    datatype module = Module of name * import list * declaration list
+    datatype module = Module of docstring * name * import list * declaration list
 
          and import = Import of name * imported_name list
 
