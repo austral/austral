@@ -81,5 +81,5 @@ signature SYNTAX = sig
 
          and params = ParamList of param list
 
-         and param = Param of name * type_specifier
+         and param = Param of name * type_specifier * docstring
 end
