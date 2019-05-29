@@ -74,7 +74,7 @@ signature SYNTAX = sig
 
          and slot_definition = SlotDefinition of name * type_specifier * docstring
 
-         and case_definition = CaseDefinition of name * type_specifier option
+         and case_definition = CaseDefinition of name * type_specifier option * docstring
 
          and func_visibility = PublicFunction
                              | PrivateFunction
