@@ -72,7 +72,7 @@ signature SYNTAX = sig
                              | RecordDefinition of name * slot_definition list
                              | UnionDefinition of name * case_definition list
 
-         and slot_definition = SlotDefinition of name * type_specifier
+         and slot_definition = SlotDefinition of name * type_specifier * docstring
 
          and case_definition = CaseDefinition of name * type_specifier option
 
