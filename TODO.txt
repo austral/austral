@@ -13,7 +13,6 @@ TODO:
 - Parser: type definitions
 - Parser: function definitions
 - Define syntax for linear iteration operators
-- Syntax: docstrings
 - Parser: docstrings
 
 LONG-TERM TODO:
@@ -202,3 +201,4 @@ DONE:
 - Parser: visibility declaration
 - Separate IRs from passes
 - and, or operators
+- Syntax: docstrings
