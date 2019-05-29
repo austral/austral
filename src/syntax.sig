@@ -61,7 +61,7 @@ signature SYNTAX = sig
          and imported_name = ImportedName of name
                            | ImportedNameAs of { original: name, rename: name }
 
-         and declaration = TypeDeclaration of name * type_visibility * type_definition
+         and declaration = TypeDefinition of name * type_visibility * type_definition
                          | FunctionDefinition of func_visibility * name * params * type_specifier * expr
 
          and type_visibility = PublicType
