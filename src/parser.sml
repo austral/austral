@@ -267,18 +267,18 @@ structure Parser : PARSER = struct
                                              expressionParser))
             in
                 let val expParsers = [
-                        unitConstantParser,
-                        boolConstantParser,
-                        floatParser,
-                        integerParser,
-                        stringParser,
                         (* FIXME: letParser, *)
                         ifParser,
                         comparisonParser,
                         notParser,
                         andParser,
                         orParser,
-                        variableParser
+                        variableParser,
+                        unitConstantParser,
+                        boolConstantParser,
+                        floatParser,
+                        integerParser,
+                        stringParser
                     ]
                 in
                     r := defineExpressionParser expParsers;
