@@ -241,7 +241,7 @@ structure Parser : PARSER = struct
                                        ps.seq (ps.pstring ">") (ps.preturn Builtin.GreaterThan),
                                        ps.seq (ps.pstring "<") (ps.preturn Builtin.LessThan),
                                        ps.seq (ps.pstring ">=") (ps.preturn Builtin.GreaterThanEq),
-                                       ps.seq (ps.pstring "<=") (ps.preturn Builtin.LessThanEq)
+                                       ps.seq (ps.pstring "<=") (ps.preturn Builtin.LessThanEq)]
                     in
                         ps.pmap (fn (lhs, (oper, rhs)) =>
                                   ComoOp (oper, lhs, rhs))
