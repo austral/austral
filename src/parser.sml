@@ -227,8 +227,9 @@ structure Parser : PARSER = struct
                                              (ps.seq (ps.seqR ws1
                                                               (ps.seqR Then
                                                                        expressionParser))
-                                                     (ps.seqR Else
-                                                              expressionParser))
+                                                     (ps.seqR ws1
+                                                              (ps.seqR Else
+                                                                       expressionParser)))
                         in
                             ps.pmap (fn (t, (c, a)) => Syntax.If (t, c, a))
                                     ifp
