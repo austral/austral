@@ -270,9 +270,9 @@ structure Parser : PARSER = struct
             in
                 let val expParsers = [
                         (* FIXME: letParser, *)
-                        boolConstantParser,
                         ifParser,
-                        comparisonParser
+                        comparisonParser,
+                        boolConstantParser
                         (*notParser,
                         andParser,
                         orParser,
