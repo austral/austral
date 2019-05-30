@@ -233,6 +233,22 @@ structure Parser : PARSER = struct
                                     ifp
                         end
                     end
+
+                and comparisonParser =
+                    let val compOpParser =
+                            ps.choice [ps.seq (ps.pstring "=") (ps.preturn Builtin.EqualTo),
+                                       ps.seq (ps.pstring "<>") (ps.preturn Builtin.NotEqualTo),
+                                       ps.seq (ps.pstring ">") (ps.preturn Builtin.GreaterThan),
+                                       ps.seq (ps.pstring "<") (ps.preturn Builtin.LessThan),
+                                       ps.seq (ps.pstring ">=)" (ps.preturn Builtin.GreaterThanEq),
+                                       ps.seq (ps.pstring "<=") (ps.preturn Builtin.LessThanEq)]
+                    in
+                        ps.pmap (fn (lhs, (oper, rhs)) =>
+                                  ComoOp (oper, lhs, rhs))
+                                (ps.seq expressionParser
+                                        (ps.seq compOpParser
+                                                expressionParser))
+                    end
             in
                 let val expParsers = [
                         unitConstantParser,
