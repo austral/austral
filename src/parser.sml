@@ -249,6 +249,10 @@ structure Parser : PARSER = struct
                                         (ps.seq compOpParser
                                                 expressionParser))
                     end
+
+                and notParser =
+                    ps.pmap (fn e => Syntax.Not e)
+                            expressionParser
             in
                 let val expParsers = [
                         unitConstantParser,
