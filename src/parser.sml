@@ -195,7 +195,7 @@ structure Parser : PARSER = struct
         in
             let val unitConstantParser =
                     ps.seqR (ps.seq (ps.pchar #"(")
-                                    (ps.seq ws (ps.pchar #")")))
+                                    (ps.pchar #")"))
                             (ps.preturn Syntax.UnitConstant)
 
                 and boolConstantParser =
@@ -268,6 +268,7 @@ structure Parser : PARSER = struct
             in
                 let val expParsers = [
                         (* FIXME: letParser, *)
+                        boolConstantParser,
                         ifParser,
                         comparisonParser,
                         notParser,
@@ -275,7 +276,6 @@ structure Parser : PARSER = struct
                         orParser,
                         variableParser,
                         unitConstantParser,
-                        boolConstantParser,
                         floatParser,
                         integerParser,
                         stringParser
