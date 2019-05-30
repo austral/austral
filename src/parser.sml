@@ -244,7 +244,7 @@ structure Parser : PARSER = struct
                                        ps.seq (ps.pstring "<=") (ps.preturn Builtin.LessThanEq)]
                     in
                         ps.pmap (fn (lhs, (oper, rhs)) =>
-                                  CompOp (oper, lhs, rhs))
+                                    Syntax.CompOp (oper, lhs, rhs))
                                 (ps.seq expressionParser
                                         (ps.seq compOpParser
                                                 expressionParser))
