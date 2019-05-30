@@ -272,7 +272,7 @@ structure Parser : PARSER = struct
                         floatParser,
                         integerParser,
                         stringParser,
-                        letParser,
+                        (* FIXME: letParser, *)
                         ifParser,
                         comparisonParser,
                         notParser,
