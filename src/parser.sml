@@ -253,6 +253,12 @@ structure Parser : PARSER = struct
                 and notParser =
                     ps.pmap (fn e => Syntax.Not e)
                             expressionParser
+
+                and andParser =
+                    ps.pmap (fn (lhs, (_, rhs)) => Syntax.Not e)
+                            (ps.seq expressionParser
+                                    (ps.seqR ws1
+                                             expressionParser))
             in
                 let val expParsers = [
                         unitConstantParser,
