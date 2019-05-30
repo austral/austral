@@ -224,8 +224,9 @@ structure Parser : PARSER = struct
                     in
                         let val ifp = ps.seq (ps.seqR If
                                                       expressionParser)
-                                             (ps.seq (ps.seqR Then
-                                                              expressionParser)
+                                             (ps.seq (ps.seqR ws1
+                                                              (ps.seqR Then
+                                                                       expressionParser))
                                                      (ps.seqR Else
                                                               expressionParser))
                         in
@@ -269,8 +270,8 @@ structure Parser : PARSER = struct
                 let val expParsers = [
                         (* FIXME: letParser, *)
                         boolConstantParser,
-                        ifParser,
-                        comparisonParser,
+                        ifParser
+                        (*comparisonParser,
                         notParser,
                         andParser,
                         orParser,
@@ -278,7 +279,7 @@ structure Parser : PARSER = struct
                         unitConstantParser,
                         floatParser,
                         integerParser,
-                        stringParser
+                        stringParser*)
                     ]
                 in
                     r := defineExpressionParser expParsers;
