@@ -255,7 +255,7 @@ structure Parser : PARSER = struct
                             expressionParser
 
                 and andParser =
-                    ps.pmap (fn (lhs, (_, rhs)) => Syntax.Not e)
+                    ps.pmap (fn (lhs, (_, rhs)) => Syntax.And (lhs, rhs))
                             (ps.seq expressionParser
                                     (ps.seqR ws1
                                              expressionParser))
