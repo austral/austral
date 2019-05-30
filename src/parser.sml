@@ -275,6 +275,9 @@ structure Parser : PARSER = struct
                         letParser,
                         ifParser,
                         comparisonParser,
+                        notParser,
+                        andParser,
+                        orParser,
                         variableParser
                     ]
                 in
