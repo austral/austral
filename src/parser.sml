@@ -258,6 +258,7 @@ structure Parser : PARSER = struct
                         stringParser,
                         letParser,
                         ifParser,
+                        comparisonParser,
                         variableParser
                     ]
                 in
