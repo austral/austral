@@ -155,7 +155,16 @@ structure AustralTest = struct
                                         isEqual' (escape "line\\\n\n\n\\line") "lineline",
                                         isEqual' (escape "line\\\n\n\n   \\line") "lineline"
                                       ]
-                                  end
+                                  end,
+                            suite "Arithmetic" [
+
+                            ],
+                            suite "Comparisons" [
+
+                            ],
+                            suite "Logical" [
+                                isParser "1 or 2" (Or (IntConstnat "1") (IntConstant "2"))
+                            ]
                           ]
                       end,
                 suite "Declarations" [
