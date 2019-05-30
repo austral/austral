@@ -163,7 +163,7 @@ structure AustralTest = struct
 
                             ],
                             suite "Logical" [
-                                isParser "1 or 2" (Or (IntConstant "1") (IntConstant "2"))
+                                isParser "1 or 2" (Or (IntConstant "1", IntConstant "2"))
                             ]
                           ]
                       end,
