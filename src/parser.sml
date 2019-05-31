@@ -266,12 +266,9 @@ structure Parser : PARSER = struct
                                              expressionParser))
 
                 and orParser =
-                    ps.pmap (fn (lhs, rhs) => Syntax.Or (lhs, rhs))
-                            (ps.seq expressionParser
-                                    (ps.seqR ws1
-                                             (ps.seqR (ps.pstring "or")
-                                                      (ps.seqR ws1
-                                                               expressionParser))))
+                    ps.pmap (fn l =>
+                                UnitConstant)
+                            (separatedList expressionParser (ps.pstring "or"))
             in
                 let val expParsers = [
                         (* FIXME: letParser, *)
