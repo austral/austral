@@ -267,7 +267,7 @@ structure Parser : PARSER = struct
 
                 and orParser =
                     ps.pmap (fn l =>
-                                UnitConstant)
+                                Syntax.UnitConstant)
                             (separatedList expressionParser (ps.pstring "or"))
             in
                 let val expParsers = [
