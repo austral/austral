@@ -271,7 +271,7 @@ structure Parser : PARSER = struct
                                                 cons (lhs, rhs))
                                             (ps.seq termParser
                                                     (ps.seqR ws1
-                                                             (ps.seqR (ps.pstring cons)
+                                                             (ps.seqR (ps.pstring sep)
                                                                       (ps.seqR ws1
                                                                                termParser))))
                             in
