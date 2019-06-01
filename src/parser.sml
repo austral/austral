@@ -287,12 +287,12 @@ structure Parser : PARSER = struct
                             (* FIXME: letParser, *)
                             ifParser,
                             orParser,
-                            unitConstantParser,
-                            boolConstantParser,
-                            variableParser,
                             floatParser,
                             integerParser,
                             stringParser,
+                            unitConstantParser,
+                            boolConstantParser,
+                            variableParser,
                             notParser,
                             andParser
                         ]
