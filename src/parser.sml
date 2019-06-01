@@ -292,10 +292,9 @@ structure Parser : PARSER = struct
                             variableParser,
                             floatParser,
                             integerParser,
-                            stringParser
-(*notParser,
-                        andParser,
-comparisonParser,*)
+                            stringParser,
+                            notParser,
+                            andParser
                         ]
                     in
                         r := defineExpressionParser expParsers;
