@@ -267,7 +267,7 @@ structure Parser : PARSER = struct
                                                                    (ps.pchar #")")]
                         in
                             ps.pmap (fn (lhs, rhs) =>
-                                        Or (lhs, rhs))
+                                        Syntax.Or (lhs, rhs))
                                     (ps.pseq termParser
                                              (ps.seqR ws1
                                                       (ps.seqR (ps.pstring "or")
