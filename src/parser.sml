@@ -258,29 +258,29 @@ structure Parser : PARSER = struct
                 and notParser =
                     ps.pmap (fn e => Syntax.Not e)
                             expressionParser
-
-                and orParser =
-                    let val termParser = ps.choice [boolConstantParser,
-                                                    variableParser,
-                                                    ps.between (ps.pchar #"(")
-                                                               expressionParser
-                                                               (ps.pchar #")")]
-                    in
-                        ps.pmap (fn (lhs, rhs) =>
-                                    Or (lhs, rhs))
-                                (ps.pseq termParser
-                                         (ps.seqR ws1
-                                                  (ps.seqR (ps.pstring "or")
-                                                           (ps.seqR ws1
-                                                                    termParser))))
-                    end
             in
-                let val expParsers = [
-                        (* FIXME: letParser, *)
-                        ifParser,
-                        orParser,
-                        boolConstantParser
-                        (*notParser,
+                let val orParser =
+                        let val termParser = ps.choice [boolConstantParser,
+                                                        variableParser,
+                                                        ps.between (ps.pchar #"(")
+                                                                   expressionParser
+                                                                   (ps.pchar #")")]
+                        in
+                            ps.pmap (fn (lhs, rhs) =>
+                                        Or (lhs, rhs))
+                                    (ps.pseq termParser
+                                             (ps.seqR ws1
+                                                      (ps.seqR (ps.pstring "or")
+                                                               (ps.seqR ws1
+                                                                        termParser))))
+                        end
+                in
+                    let val expParsers = [
+                            (* FIXME: letParser, *)
+                            ifParser,
+                            orParser,
+                            boolConstantParser
+(*notParser,
                         andParser,
 comparisonParser,
                         variableParser,
@@ -288,10 +288,11 @@ comparisonParser,
                         floatParser,
                         integerParser,
                         stringParser*)
-                    ]
-                in
-                    r := defineExpressionParser expParsers;
-                    expParsers
+                        ]
+                    in
+                        r := defineExpressionParser expParsers;
+                        expParsers
+                    end
                 end
             end
         end
