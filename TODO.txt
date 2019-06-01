@@ -202,3 +202,4 @@ DONE:
 - and, or operators
 - Syntax: docstrings
 - Parse comparison expressions
+- Lexer, or fix parser infinite recursion
