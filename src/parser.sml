@@ -259,12 +259,6 @@ structure Parser : PARSER = struct
                     ps.pmap (fn e => Syntax.Not e)
                             expressionParser
 
-                and andParser =
-                    ps.pmap (fn (lhs, rhs) => Syntax.And (lhs, rhs))
-                            (ps.seq expressionParser
-                                    (ps.seqR ws1
-                                             expressionParser))
-
                 and orParser =
                     let val termParser = ps.choice [boolConstantParser,
                                                     variableParser,
