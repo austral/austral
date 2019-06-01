@@ -1,6 +1,5 @@
 TODO:
 
-- Lexer, or fix parser infinite recursion
 - Parse let expressions
 - Parse arithmetic expressions
 - Parse logical expressions
