@@ -287,15 +287,15 @@ structure Parser : PARSER = struct
                             (* FIXME: letParser, *)
                             ifParser,
                             orParser,
-                            boolConstantParser
+                            unitConstantParser,
+                            boolConstantParser,
+                            variableParser,
+                            floatParser,
+                            integerParser,
+                            stringParser
 (*notParser,
                         andParser,
-comparisonParser,
-                        variableParser,
-                        unitConstantParser,
-                        floatParser,
-                        integerParser,
-                        stringParser*)
+comparisonParser,*)
                         ]
                     in
                         r := defineExpressionParser expParsers;
