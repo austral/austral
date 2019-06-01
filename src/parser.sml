@@ -259,20 +259,28 @@ structure Parser : PARSER = struct
                     ps.pmap (fn e => Syntax.Not e)
                             expressionParser
             in
-                let val orParser =
+                let val (orParser, andParser) =
                         let val termParser = ps.choice [boolConstantParser,
                                                         variableParser,
                                                         ps.between (ps.pchar #"(")
                                                                    expressionParser
                                                                    (ps.pchar #")")]
                         in
-                            ps.pmap (fn (lhs, rhs) =>
-                                        Syntax.Or (lhs, rhs))
-                                    (ps.seq termParser
-                                            (ps.seqR ws1
-                                                     (ps.seqR (ps.pstring "or")
-                                                              (ps.seqR ws1
-                                                                       termParser))))
+                            let fun mkparser sep cons =
+                                    ps.pmap (fn (lhs, rhs) =>
+                                                cons (lhs, rhs))
+                                            (ps.seq termParser
+                                                    (ps.seqR ws1
+                                                             (ps.seqR (ps.pstring cons)
+                                                                      (ps.seqR ws1
+                                                                               termParser))))
+                            in
+                                let val orParser "or" Syntax.Or
+                                    and andParser "and" Syntax.And
+                                in
+                                    (orParser, andParser)
+                                end
+                            end
                         end
                 in
                     let val expParsers = [
