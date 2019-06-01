@@ -275,8 +275,8 @@ structure Parser : PARSER = struct
                                                                       (ps.seqR ws1
                                                                                termParser))))
                             in
-                                let val orParser "or" Syntax.Or
-                                    and andParser "and" Syntax.And
+                                let val orParser = mkparser "or" Syntax.Or
+                                    and andParser = mkparser "and" Syntax.And
                                 in
                                     (orParser, andParser)
                                 end
