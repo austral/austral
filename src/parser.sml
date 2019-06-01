@@ -272,13 +272,13 @@ structure Parser : PARSER = struct
                                                                expressionParser
                                                                (ps.pchar #")")]
                     in
-                        pmap (fn (lhs, rhs) =>
-                                 Or (lhs, rhs))
-                             (ps.pseq termParser
-                                      (ps.seqR ws1
-                                               (ps.seqR (ps.pstring "or")
-                                                        (ps.seqR ws1
-                                                                 termParser))))
+                        ps.pmap (fn (lhs, rhs) =>
+                                    Or (lhs, rhs))
+                                (ps.pseq termParser
+                                         (ps.seqR ws1
+                                                  (ps.seqR (ps.pstring "or")
+                                                           (ps.seqR ws1
+                                                                    termParser))))
                     end
             in
                 let val expParsers = [
