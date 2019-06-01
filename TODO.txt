@@ -2,7 +2,6 @@ TODO:
 
 - Parse let expressions
 - Parse arithmetic expressions
-- Parse logical expressions
 - Parse tuple expressions
 - Parse sizeOf expressions
 - Parse block expressions
@@ -203,3 +202,4 @@ DONE:
 - Syntax: docstrings
 - Parse comparison expressions
 - Lexer, or fix parser infinite recursion
+- Parse logical expressions
