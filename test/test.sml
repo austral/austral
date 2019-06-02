@@ -167,7 +167,7 @@ structure AustralTest = struct
                                 isParse "true and false" (And (BoolConstant true, BoolConstant false))
                             ],
                             suite "Tuple" [
-                                isParse "(1,2,3)" (TupleCreate (IntConstant "1", IntConstant "2", IntConstant "3"))
+                                isParse "(1,2,3)" (TupleCreate [IntConstant "1", IntConstant "2", IntConstant "3"])
                             ]
                           ]
                       end,
