@@ -257,7 +257,7 @@ structure Parser : PARSER = struct
 
                 and tupleParser =
                     ps.pmap (fn exps =>
-                                Syntax.Tuple exps)
+                                Syntax.TupleCreate exps)
                             (ps.between (ps.pchar #"(")
                                         (commaSeparatedList0 expressionParser)
                                         (ps.pchar #")"))
