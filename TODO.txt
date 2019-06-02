@@ -21,7 +21,7 @@ LONG-TERM TODO:
 - Expand monomorphs recursively
 - abort builtin
 - do special operator
-- doparallel specialsl operator
+- doparallel special operator
 - Define function pointer type
 - Define `function` operator
 - Better error messages
