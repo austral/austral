@@ -163,7 +163,8 @@ structure AustralTest = struct
 
                             ],
                             suite "Logical" [
-                                isParse "true or false" (Or (BoolConstant true, BoolConstant false))
+                                isParse "true or false" (Or (BoolConstant true, BoolConstant false)),
+                                isParse "true and false" (And (BoolConstant true, BoolConstant false))
                             ]
                           ]
                       end,
