@@ -294,6 +294,7 @@ structure Parser : PARSER = struct
                             (* FIXME: letParser, *)
                             ifParser,
                             orParser,
+                            tupleParser,
                             floatParser,
                             integerParser,
                             stringParser,
