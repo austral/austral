@@ -255,6 +255,13 @@ structure Parser : PARSER = struct
                                                 expressionParser))
                     end
 
+                and tupleParser =
+                    ps.pmap (fn exps =>
+                                Syntax.Tuple exps)
+                            (ps.between (ps.pchar #"(")
+                                        (commaSeparatedList0 expressionParser)
+                                        (ps.pchar #")"))
+
                 and notParser =
                     ps.pmap (fn e => Syntax.Not e)
                             expressionParser
