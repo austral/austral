@@ -22,20 +22,26 @@ src/ident.sml
 src/arith.sig
 src/arith.sml
 
-src/symbol.sig
-src/symbol.sml
-
 src/builtin.sig
 src/builtin.sml
+
+src/escape.sig
+src/escape.sml
+
+src/syntax.sig
+src/syntax.sml
+
+src/parser.sig
+src/parser.sml
+
+(*src/symbol.sig
+src/symbol.sml
 
 src/module.sig
 src/module.sml
 
 src/cst.sig
 src/cst.sml
-
-src/parser.sig
-src/parser.sml
 
 src/rcst.sig
 src/rcst.sml
@@ -118,4 +124,4 @@ src/repl.sig
 src/repl.sml
 
 src/cli.sig
-src/cli.sml
+src/cli.sml*)
