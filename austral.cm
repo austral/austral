@@ -42,9 +42,6 @@ is
   src/arith.sig
   src/arith.sml
 
-  src/builtin.sig
-  src/builtin.sml
-
   src/escape.sig
   src/escape.sml
 
