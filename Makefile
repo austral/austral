@@ -5,10 +5,7 @@ MLTON := mlton
 
 CM_FILE := austral.cm
 MLB_FILE := austral.mlb
-
 CM_TEST_FILE := austral-test.cm
-MLB_TEST_FILE := austral-test.mlb
-TEST_BIN := austral-test
 
 BIN = austral
 
