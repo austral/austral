@@ -320,6 +320,7 @@ structure Parser : PARSER = struct
                             notParser,
                             tupleParser,
                             comparisonParser,
+                            blockParser,
                             (* Constants *)
                             floatParser,
                             integerParser,
