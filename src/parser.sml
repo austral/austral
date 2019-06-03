@@ -253,8 +253,10 @@ structure Parser : PARSER = struct
                         ps.pmap (fn (lhs, (oper, rhs)) =>
                                     Syntax.CompOp (oper, lhs, rhs))
                                 (ps.seq termParser
-                                        (ps.seq compOpParser
-                                                termParser))
+                                        (ps.seqR ws1
+                                                 (ps.seq (ps.pstring compOpParser)
+                                                         (ps.seqR ws1
+                                                                  termParser))))
                     end
 
                 and tupleParser =
