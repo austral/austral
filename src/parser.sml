@@ -301,20 +301,18 @@ structure Parser : PARSER = struct
                 in
                     let val expParsers = [
                             (* FIXME: letParser, *)
-                            (* Compound expressions *)
                             ifParser,
                             orParser,
                             andParser,
-                            notParser,
-                            comparisonParser,
                             tupleParser,
-                            (* Constants *)
                             floatParser,
                             integerParser,
                             stringParser,
                             unitConstantParser,
                             boolConstantParser,
-                            variableParser
+                            variableParser,
+                            notParser,
+                            andParser
                         ]
                     in
                         r := defineExpressionParser expParsers;
