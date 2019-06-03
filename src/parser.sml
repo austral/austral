@@ -251,6 +251,15 @@ structure Parser : PARSER = struct
                             (ps.seqR (ps.pstring "not")
                                      (ps.seqR ws1
                                               expressionParser))
+
+                and blockParser =
+                    ps.between (ps.seq (ps.pchar #"{")
+                                       ws1)
+                               (separatedList expressionParser
+                                              (ps.seq (ps.pchar #";")
+                                                      ws))
+                               (ps.seq (ps.pchar #"}")
+                                       ws1)
             in
                 let val (orParser, andParser) =
                         let val termParser = ps.choice [boolConstantParser,
