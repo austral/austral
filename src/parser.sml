@@ -304,6 +304,7 @@ structure Parser : PARSER = struct
                             ifParser,
                             orParser,
                             andParser,
+                            comparisonParser,
                             tupleParser,
                             floatParser,
                             integerParser,
