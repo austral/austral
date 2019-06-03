@@ -303,6 +303,7 @@ structure Parser : PARSER = struct
                 in
                     let val expParsers = [
                             (* FIXME: letParser, *)
+                            (* Compound expressions *)
                             ifParser,
                             orParser,
                             andParser,
