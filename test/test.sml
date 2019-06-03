@@ -160,6 +160,8 @@ structure AustralTest = struct
 
                             ],
                             suite "Comparisons" [
+                                isParse "1 < 2" (CompOp (LessThan, IntConstant "1", IntConstant "2")),
+                                isParse "x > y" (CompOp (GreaterThan, Variable (i "x"), Variable (i "y")))
 
                             ],
                             suite "Logical" [
