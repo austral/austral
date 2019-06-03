@@ -1,6 +1,5 @@
 TODO:
 
-- Parse comparison expressions
 - Parse let expressions
 - Parse arithmetic expressions
 - Parse sizeOf expressions
@@ -203,3 +202,4 @@ DONE:
 - Lexer, or fix parser infinite recursion
 - Parse logical expressions
 - Parse tuple expressions
+- Parse comparison expressions
