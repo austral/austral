@@ -177,12 +177,12 @@ structure AustralTest = struct
                                 isParse "{ 1; 2 }" (Block [IntConstant "1", IntConstant "2"])
                             ],
                             suite "Function Call" [
-                                isParser "f(1,2,3)" (Funcall (Identifier (i "f"),
-                                                              [
-                                                                IntConstant "1",
-                                                                IntConstant "2",
-                                                                IntConstant "3"
-                                                              ]))
+                                isParse "f(1,2,3)" (Funcall (Identifier (i "f"),
+                                                             [
+                                                               IntConstant "1",
+                                                               IntConstant "2",
+                                                               IntConstant "3"
+                                                   ]))
                             ]
                           ]
                       end,
