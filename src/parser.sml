@@ -241,12 +241,12 @@ structure Parser : PARSER = struct
 
                 and comparisonParser =
                     let val compOpParser =
-                            ps.choice [ps.seqR (ps.pstring "=") (ps.preturn Builtin.EqualTo),
-                                       ps.seqR (ps.pstring "<>") (ps.preturn Builtin.NotEqualTo),
-                                       ps.seqR (ps.pstring ">") (ps.preturn Builtin.GreaterThan),
-                                       ps.seqR (ps.pstring "<") (ps.preturn Builtin.LessThan),
-                                       ps.seqR (ps.pstring ">=") (ps.preturn Builtin.GreaterThanEq),
-                                       ps.seqR (ps.pstring "<=") (ps.preturn Builtin.LessThanEq)]
+                            ps.choice [ps.seqR (ps.pstring "=") (ps.preturn Syntax.EqualTo),
+                                       ps.seqR (ps.pstring "<>") (ps.preturn Syntax.NotEqualTo),
+                                       ps.seqR (ps.pstring ">") (ps.preturn Syntax.GreaterThan),
+                                       ps.seqR (ps.pstring "<") (ps.preturn Syntax.LessThan),
+                                       ps.seqR (ps.pstring ">=") (ps.preturn Syntax.GreaterThanEq),
+                                       ps.seqR (ps.pstring "<=") (ps.preturn Syntax.LessThanEq)]
                                        
                         and termParser = ps.choice [integerParser,
                                                     floatParser,
