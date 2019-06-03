@@ -2,4 +2,3 @@ vendor/mlunit/mlunit.mlb
 vendor/parsimony/parsimony.mlb
 
 austral.mlb
-src/main.sml

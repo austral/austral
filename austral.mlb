@@ -125,3 +125,4 @@ src/repl.sml
 
 src/cli.sig
 src/cli.sml*)
+src/main.sml
