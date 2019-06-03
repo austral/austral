@@ -239,31 +239,6 @@ structure Parser : PARSER = struct
                         end
                     end
 
-                and comparisonParser =
-                    let val compOpParser =
-                            ps.choice [ps.seqR (ps.pstring "=") (ps.preturn Syntax.EqualTo),
-                                       ps.seqR (ps.pstring "<>") (ps.preturn Syntax.NotEqualTo),
-                                       ps.seqR (ps.pstring ">") (ps.preturn Syntax.GreaterThan),
-                                       ps.seqR (ps.pstring "<") (ps.preturn Syntax.LessThan),
-                                       ps.seqR (ps.pstring ">=") (ps.preturn Syntax.GreaterThanEq),
-                                       ps.seqR (ps.pstring "<=") (ps.preturn Syntax.LessThanEq)]
-                                       
-                        and termParser = ps.choice [integerParser,
-                                                    floatParser,
-                                                    variableParser,
-                                                    ps.between (ps.pchar #"(")
-                                                               expressionParser
-                                                               (ps.pchar #")")]
-                    in
-                        ps.pmap (fn (lhs, (oper, rhs)) =>
-                                    Syntax.CompOp (oper, lhs, rhs))
-                                (ps.seq termParser
-                                        (ps.seqR ws1
-                                                 (ps.seq compOpParser
-                                                         (ps.seqR ws1
-                                                                  termParser))))
-                    end
-
                 and tupleParser =
                     ps.pmap (fn exps =>
                                 Syntax.TupleCreate exps)
@@ -298,6 +273,31 @@ structure Parser : PARSER = struct
                                 end
                             end
                         end
+                        
+                    and comparisonParser =
+                        let val compOpParser =
+                                ps.choice [ps.seqR (ps.pstring "=") (ps.preturn Syntax.EqualTo),
+                                           ps.seqR (ps.pstring "<>") (ps.preturn Syntax.NotEqualTo),
+                                           ps.seqR (ps.pstring ">") (ps.preturn Syntax.GreaterThan),
+                                           ps.seqR (ps.pstring "<") (ps.preturn Syntax.LessThan),
+                                           ps.seqR (ps.pstring ">=") (ps.preturn Syntax.GreaterThanEq),
+                                           ps.seqR (ps.pstring "<=") (ps.preturn Syntax.LessThanEq)]
+
+                            and termParser = ps.choice [integerParser,
+                                                        floatParser,
+                                                        variableParser,
+                                                        ps.between (ps.pchar #"(")
+                                                                   expressionParser
+                                                                   (ps.pchar #")")]
+                    in
+                        ps.pmap (fn (lhs, (oper, rhs)) =>
+                                    Syntax.CompOp (oper, lhs, rhs))
+                                (ps.seq termParser
+                                        (ps.seqR ws1
+                                                 (ps.seq compOpParser
+                                                         (ps.seqR ws1
+                                                                  termParser))))
+                    end
                 in
                     let val expParsers = [
                             (* FIXME: letParser, *)
