@@ -304,14 +304,14 @@ structure Parser : PARSER = struct
                             ifParser,
                             orParser,
                             andParser,
+                            notParser,
                             tupleParser,
                             floatParser,
                             integerParser,
                             stringParser,
                             unitConstantParser,
                             boolConstantParser,
-                            variableParser,
-                            notParser
+                            variableParser
                         ]
                     in
                         r := defineExpressionParser expParsers;
