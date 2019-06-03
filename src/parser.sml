@@ -248,7 +248,12 @@ structure Parser : PARSER = struct
                                        ps.seqR (ps.pstring ">=") (ps.preturn Builtin.GreaterThanEq),
                                        ps.seqR (ps.pstring "<=") (ps.preturn Builtin.LessThanEq)]
                                        
-                        and termParser = expressionParser
+                        and termParser = ps.choice [integerParser,
+                                                    floatParser,
+                                                    variableParser,
+                                                    ps.between (ps.pchar #"(")
+                                                               expressionParser
+                                                               (ps.pchar #")")]
                     in
                         ps.pmap (fn (lhs, (oper, rhs)) =>
                                     Syntax.CompOp (oper, lhs, rhs))
