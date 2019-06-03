@@ -175,6 +175,9 @@ structure AustralTest = struct
                             suite "Block" [
                                 isParse "{ 1 }" (Block [IntConstant "1"]),
                                 isParse "{ 1; 2 }" (Block [IntConstant "1", IntConstant "2"])
+                            ],
+                            suite "Function Call" [
+
                             ]
                           ]
                       end,
