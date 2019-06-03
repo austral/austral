@@ -309,6 +309,7 @@ structure Parser : PARSER = struct
                             andParser,
                             notParser,
                             tupleParser,
+                            comparisonParser,
                             (* Constants *)
                             floatParser,
                             integerParser,
