@@ -26,8 +26,8 @@ structure AustralTest = struct
     fun strInput str =
         ParsimonyStringInput.fromString str
 
-    fun isParse input output =
-        is (fn () => let val v = Parser.parseString input
+    fun isParseFn f input output =
+        is (fn () => let val v = f input
                      in
                          if v = output then
                              Pass
@@ -37,27 +37,19 @@ structure AustralTest = struct
                      handle _ => Fail "Bad parse")
            input
 
-    fun isNotParse input =
+    (*fun isNotParse input =
         is (fn () => let val v = Parser.parseString input
                      in
                        Fail "Parse successful, should have failed"
                      end
                      handle _ => Pass)
-           input
+           input*)
 
     fun isFailure value msg =
         is (fn () => case value of
                          (Util.Result v) => Fail "value is an instance of Util.Result"
                        | Util.Failure _ => Pass)
            msg
-
-    val i = Ident.mkIdentEx
-
-    fun unsym s = CST.UnqualifiedSymbol (i s)
-
-    fun qsym m s = CST.QualifiedSymbol (Symbol.mkSymbol (i m, i s))
-
-    fun escape s = CST.escapedToString (CST.escapeString s)
 
     (* Test suites *)
 
@@ -84,174 +76,156 @@ structure AustralTest = struct
     end
 
     local
-        open CST
+        open Syntax
     in
-    val parserSuite = suite "Parser" [
-            suite "Integers" [
-                isParse "123" (IntConstant "123"),
-                isParse "0" (IntConstant "0"),
-                isParse "00" (IntConstant "00"),
-                isParse "10000" (IntConstant "10000"),
-                isParse "10000" (IntConstant "10000"),
-                isParse "-10000" (IntConstant "-10000")
-            ],
-            suite "Floats" [
-                isParse "0.0" (FloatConstant "0.0"),
-                isParse "-0.0" (FloatConstant "-0.0"),
-                isParse "123.0" (FloatConstant "123.0"),
-                isParse "-123.0" (FloatConstant "-123.0"),
-                isParse "123.456" (FloatConstant "123.456"),
-                isParse "-123.456" (FloatConstant "-123.456"),
-                isParse "123.456e3" (FloatConstant "123.456e3"),
-                isParse "-123.456e-3" (FloatConstant "-123.456e-3")
-            ],
-            suite "Strings" [
-                isParse "\"derp\"" (StringConstant (escapeString "derp")),
-                isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (escapeString "derp \"herp\" derp")),
-                isEqual' (escape "line\\nline") "line\nline",
-                isEqual' (escape "line\\rline") "line\rline",
-                isEqual' (escape "line\\tline") "line\tline",
-                isEqual' (escape "line\\\\line") "line\\line",
-                isEqual' (escape "line\\ \\line") "lineline",
-                isEqual' (escape "line\\  \\line") "lineline",
-                isEqual' (escape "line\\   \\line") "lineline",
-                isEqual' (escape "line\\    \\line") "lineline",
-                isEqual' (escape "line\\\n\\line") "lineline",
-                isEqual' (escape "line\\\n \n\\line") "lineline",
-                isEqual' (escape "line\\\n\n\n\\line") "lineline",
-                isEqual' (escape "line\\\n\n\n   \\line") "lineline"
-            ],
-            suite "Symbols" [
-                suite "Qualified Symbols" [
-                    isParse "a:b" (qsym "a" "b"),
-                    isParse "test:test" (qsym "test" "test")
+    val parserSuite =
+        let val i = Ident.mkIdentEx
+        in
+            suite "Parser" [
+                suite "Type Specifiers"
+                      let val isParse = isParseFn Parser.parseTypeSpecifier
+                      in
+                          [
+                            isParse "test" (NamedType (i "test")),
+                            isParse "&test" (Address (NamedType (i "test"))),
+                            isParse "&&test" (Address (Address (NamedType (i "test")))),
+                            isParse "&&&test" (Address (Address (Address (NamedType (i "test"))))),
+                            isParse "*test" (Pointer (NamedType (i "test"))),
+                            isParse "**test" (Pointer (Pointer (NamedType (i "test")))),
+                            isParse "***test" (Pointer (Pointer (Pointer (NamedType (i "test"))))),
+                            isParse "()" (TupleType []),
+                            isParse "(a)" (TupleType [NamedType (i "a")]),
+                            isParse "(a,b)" (TupleType [NamedType (i "a"),
+                                                        NamedType (i "b")]),
+                            isParse "(a,b,c)" (TupleType [NamedType (i "a"),
+                                                          NamedType (i "b"),
+                                                          NamedType (i "c")]),
+                            isParse "( a,b,c )" (TupleType [NamedType (i "a"),
+                                                            NamedType (i "b"),
+                                                            NamedType (i "c")]),
+                            isParse "( a, b, c )" (TupleType [NamedType (i "a"),
+                                                              NamedType (i "b"),
+                                                              NamedType (i "c")]),
+                            isParse "(  a  ,  b  ,  c  )" (TupleType [NamedType (i "a"),
+                                                                      NamedType (i "b"),
+                                                                      NamedType (i "c")]),
+                            isParse "(a,&b,*c)" (TupleType [NamedType (i "a"),
+                                                            Address (NamedType (i "b")),
+                                                            Pointer (NamedType (i "c"))])
+                          ]
+                      end,
+                suite "Expressions"
+                      let val isParse = isParseFn Parser.parseExpression
+                      in
+                          [
+                            suite "Integers" [
+                                isParse "123" (IntConstant "123"),
+                                isParse "0" (IntConstant "0"),
+                                isParse "00" (IntConstant "00"),
+                                isParse "10000" (IntConstant "10000"),
+                                isParse "10000" (IntConstant "10000"),
+                                isParse "-10000" (IntConstant "-10000")
+                            ],
+                            suite "Floats" [
+                                isParse "0.0" (FloatConstant "0.0"),
+                                isParse "-0.0" (FloatConstant "-0.0"),
+                                isParse "123.0" (FloatConstant "123.0"),
+                                isParse "-123.0" (FloatConstant "-123.0"),
+                                isParse "123.456" (FloatConstant "123.456"),
+                                isParse "-123.456" (FloatConstant "-123.456"),
+                                isParse "123.456e3" (FloatConstant "123.456e3"),
+                                isParse "-123.456e-3" (FloatConstant "-123.456e-3")
+                            ],
+                            suite "Strings"
+                                  let fun escape s = Escape.escapedToString (Escape.escapeString s)
+                                  in
+                                      [
+                                        isParse "\"derp\"" (StringConstant (Escape.escapeString "derp")),
+                                        isParse "\"derp \\\"herp\\\" derp\"" (StringConstant (Escape.escapeString "derp \"herp\" derp")),
+                                        isEqual' (escape "line\\nline") "line\nline",
+                                        isEqual' (escape "line\\rline") "line\rline",
+                                        isEqual' (escape "line\\tline") "line\tline",
+                                        isEqual' (escape "line\\\\line") "line\\line",
+                                        isEqual' (escape "line\\ \\line") "lineline",
+                                        isEqual' (escape "line\\  \\line") "lineline",
+                                        isEqual' (escape "line\\   \\line") "lineline",
+                                        isEqual' (escape "line\\    \\line") "lineline",
+                                        isEqual' (escape "line\\\n\\line") "lineline",
+                                        isEqual' (escape "line\\\n \n\\line") "lineline",
+                                        isEqual' (escape "line\\\n\n\n\\line") "lineline",
+                                        isEqual' (escape "line\\\n\n\n   \\line") "lineline"
+                                      ]
+                                  end,
+                            suite "Arithmetic" [
+
+                            ],
+                            suite "Comparisons" [
+
+                            ],
+                            suite "Logical" [
+                                isParse "true or false" (Or (BoolConstant true, BoolConstant false)),
+                                isParse "true and false" (And (BoolConstant true, BoolConstant false))
+                            ],
+                            suite "Tuple" [
+                                isParse "(1,2,3)" (TupleCreate [IntConstant "1", IntConstant "2", IntConstant "3"])
+                            ]
+                          ]
+                      end,
+                suite "Declarations" [
+                    suite "Imports"
+                          let val isParse = isParseFn Parser.parseImport
+                          in
+                              [
+                                isParse "from a import b"
+                                        (Import (i "a",
+                                                 [ImportedName (i "b")])),
+                                isParse "from   a   import   b    "
+                                        (Import (i "a",
+                                                 [ImportedName (i "b")])),
+                                isParse "from a import b,c, d, e ,  f  "
+                                        (Import (i "a",
+                                                 [ImportedName (i "b"),
+                                                  ImportedName (i "c"),
+                                                  ImportedName (i "d"),
+                                                  ImportedName (i "e"),
+                                                  ImportedName (i "f")])),
+                                isParse "from    a   import    b,c, d, e ,  f  "
+                                        (Import (i "a",
+                                                 [ImportedName (i "b"),
+                                                  ImportedName (i "c"),
+                                                  ImportedName (i "d"),
+                                                  ImportedName (i "e"),
+                                                  ImportedName (i "f")])),
+                                isParse "from mod import a as b, c as d"
+                                        (Import (i "mod",
+                                                 [ImportedNameAs { original = i "a", rename = i "b" },
+                                                  ImportedNameAs { original = i "c", rename = i "d" }])),
+                                isParse "from mod import name, a as b, c as d, name2"
+                                        (Import (i "mod",
+                                                 [ImportedName (i "name"),
+                                                  ImportedNameAs { original = i "a", rename = i "b" },
+                                                  ImportedNameAs { original = i "c", rename = i "d" },
+                                                  ImportedName (i "name2")]))
+                              ]
+                          end
                 ],
-                suite "Unqualified Symbols" [
-                    isParse "test" (unsym "test")
-                ],
-                suite "Keywords" [
-                    isParse ":test" (Keyword (i "test"))
-                ]
-            ],
-            suite "Splices" [
-                isParse ",123" (Splice (IntConstant "123"))
-            ],
-            suite "S-expressions" [
-                isParse "()" (List nil),
-                isParse "(())" (List [List nil]),
-                isParse "((()))" (List [List [List nil]]),
-                isParse "(((())))" (List [List [List [List nil]]]),
-                isParse "(test)" (List [unsym "test"]),
-                isParse "((a))" (List [List [unsym "a"]]),
-                isParse "(a b c)" (List [unsym "a", unsym "b", unsym "c"]),
-                isParse "(m:a n:b o:c)" (List [qsym "m" "a", qsym "n" "b", qsym "o" "c"]),
-                isParse "(a b (c d) e f)" (List [unsym "a",
-                                                 unsym "b",
-                                                 List [unsym "c", unsym "d"],
-                                                 unsym "e",
-                                                 unsym "f"]),
-                isParse "(123)" (List [IntConstant "123"]),
-                isParse "(\"test\")" (List [StringConstant (escapeString "test")]),
-                suite "Whitespace handling" [
-                    isParse "   ()" (List nil),
-                    isParse "()   " (List nil),
-                    isParse "(   test)" (List [unsym "test"]),
-                    isParse "(test   )" (List [unsym "test"]),
-                    isParse "(   test   )" (List [unsym "test"]),
-                    isParse "( a b c )" (List [unsym "a", unsym "b", unsym "c"])
-                ],
-                suite "Bad forms" [
-                    isNotParse "(",
-                    isNotParse ")"
-                ]
+                suite "Comments"
+                      let val isParse = isParseFn Parser.parseTypeSpecifier
+                      in
+                          [
+                            isParse "test ;; comment" (NamedType (i "test")),
+                            isParse "(a, -- comment\n b)"
+                                    (TupleType [NamedType (i "a"),
+                                                NamedType (i "b")])
+                          ]
+                      end
             ]
-        ]
-    end
-
-    fun rqsym m s = RCST.Symbol (Symbol.mkSymbol (i m, i s))
-
-    local
-        open Module
-        open Map
-    in
-    val moduleSuite =
-        (* Module A exports 'test', module B imports A:test and exports test,
-           and also has the nickname 'nick' for modue A, and finally, module C
-           imports test from B. Among other things, we should test that
-           transitive resolution works: that is, C:test should resolve to
-           A:test, rather than B:test. *)
-        let val a = Module (i "A",
-                            empty,
-                            Imports empty,
-                            Exports (Set.add Set.empty (i "test")),
-                            NONE)
-            and b = Module (i "B",
-                            iadd empty (i "nick", i "A"),
-                            Imports (iadd empty (i "test", i "A")),
-                            Exports (Set.add Set.empty (i "test")),
-                            NONE)
-            and c = Module (i "C",
-                            empty,
-                            Imports (iadd empty (i "test", i "B")),
-                            Exports Set.empty,
-                            NONE)
-        in
-            let val menv = addModule (addModule (addModule emptyEnv a) b) c
-            in
-                suite "Module System" [
-                    isEqual (moduleName a) (i "A") "Module name",
-                    isEqual (moduleName b) (i "B") "Module name",
-                    isEqual (moduleName c) (i "C") "Module name",
-                    suite "Symbol resolution" [
-                        isEqual (RCST.resolve menv b (CST.IntConstant "10"))
-                                (Util.Result (RCST.IntConstant "10"))
-                                "Int constant",
-                        isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test")))
-                                (Util.Result (rqsym "A" "test"))
-                                "Unqualified symbol, imported",
-                        isEqual (RCST.resolve menv b (CST.UnqualifiedSymbol (i "test2")))
-                                (Util.Result (rqsym "B" "test2"))
-                                "Unqualified symbol, internal",
-                        isEqual (RCST.resolve menv b (qsym "nick" "test"))
-                                (Util.Result (rqsym "A" "test"))
-                                "Qualified symbol, nickname, exported",
-                        isEqual (RCST.resolve menv b (qsym "A" "test"))
-                                (Util.Result (rqsym "A" "test"))
-                                "Qualified symbol, literal, exported",
-                        isFailure (RCST.resolve menv b (qsym "nick" "test1"))
-                                  "Qualified symbol, nickname, unexported",
-                        isFailure (RCST.resolve menv b (qsym "A" "test1"))
-                                  "Qualified symbol, literal, unexported",
-                        isEqual (RCST.resolve menv c (CST.UnqualifiedSymbol (i "test")))
-                                (Util.Result (rqsym "A" "test"))
-                                "Unqualified symbol, imported"
-                    ]
-                ]
-            end
         end
     end
-
-    val astSuite =
-        let val menv = Module.defaultMenv
-        in
-            let val module = valOf (Module.envGet menv (Ident.mkIdentEx "austral"))
-            in
-                let fun parse str = Parser.parseString str
-                    and resolve cst = Util.valOf (RCST.resolve menv module cst)
-                in
-                    suite "AST" [
-                        isEqual (resolve (parse "123")) (RCST.IntConstant "123")
-                                "IntConstant 123"
-                    ]
-                end
-            end
-        end
 
     val tests = suite "Austral Tests" [
             mapSuite,
-            parserSuite,
-            moduleSuite,
-            astSuite
+            parserSuite
         ]
 
     fun runTests () = runAndQuit tests defaultReporter

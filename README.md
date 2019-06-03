@@ -4,7 +4,7 @@
 
 Not done yet.
 
-Austral is a new language in the Lisp family.
+Austral is a new language.
 
 Features:
 

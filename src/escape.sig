@@ -17,28 +17,16 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature SET = sig
-    type ''a set
+signature ESCAPE = sig
+    (* A string where escape characters have been processed into the characters they represent *)
+    type escaped_string
 
-    val empty : ''a set
-    val singleton : ''a -> ''a set
+    (* Given a string with escape characters, process the escape characters and return a escaped string *)
+    val escapeString : string -> escaped_string
 
-    val add : ''a set -> ''a -> ''a set
-    val addList : ''a set -> ''a list -> ''a set
+    (* Return a escaped string as a regular string *)
+    val escapedToString : escaped_string -> string
 
-    val eq : ''a set -> ''a set -> bool
-
-    val union : ''a set -> ''a set -> ''a set
-    val unionList : ''a set list -> ''a set
-
-    val intersection : ''a set -> ''a set -> ''a set
-
-    (* A-B : all the elements in A, except those also in B *)
-    val minus : ''a set -> ''a set -> ''a set
-
-    val isIn : ''a set -> ''a -> bool
-    val size : ''a set -> int
-
-    val fromList : ''a list -> ''a set
-    val toList : ''a set -> ''a list
+    (* Replace unrepresentable characters in a escaped string (e.g. newlines) with escape characters *)
+    val unescapeString : escaped_string -> string
 end

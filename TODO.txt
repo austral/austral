@@ -1,48 +1,35 @@
 TODO:
 
-- Linearity: count appearances of bindings in expressions
-- Define constructor generic functions for datatypes
-- Warn when not using the result value of a progn (any expression with type other than unit)
-- Expand monomorphs recursively
-- abort builtin
+- Parse let expressions
+- Parse arithmetic expressions
+- Parse sizeOf expressions
+- Parse block expressions
+- Parse function calls
+- Parser: module definitions
+- Parser: type definitions
+- Parser: function definitions
+- Parser: docstrings
+- Expression parsing tests
+- Define syntax for linear iteration operators
 
 LONG-TERM TODO:
 
+- Error on user-defined identifiers that start with @
+- Linearity: count appearances of bindings in expressions
+- Warn when not using the result value of a progn (any expression with type other than unit)
+- Expand monomorphs recursively
+- abort builtin
 - do special operator
 - doparallel special operator
-- Augment method calls
-- Monomorphize method calls
 - Define function pointer type
 - Define `function` operator
-- Static array constructors
-- Implement static-array-pointer function
-- Implement static-array-index
-- Compile definstance methods to generic, not concrete, functions
-- Error on repeat type variables in an instance declaration
-- Error on phantom type parameters in a type alias
-- Parse nested comments
 - Better error messages
-- Separate IRs from passes
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
-- Parse deftemplate declarations
-- handle defmacro declarations
-- Macro match
-- Macroexpansion
-- Macro and
-- Macro or
-- Function and*
-- Function or*
 - Bitwise operators
 - Runtime support for saturation arithmetic
-- Implement static-array constructor
-- Lift static array constructors to global constants
-- Verify if an expression is a valid static array element
-- Prelude: equality and comparison instances
-- JavaScript backend
 - CUDA backend
 - C+OpenMP backend
-- Fortran backend?
 
 DONE:
 
@@ -202,3 +189,17 @@ DONE:
 - Linearity: store kind information in disjunction/record types
 - Linearity: all type variables are linear
 - Linearity: Syntax for specifying kinds in disjunctions and records
+- Syntax: expressions
+- Update parser tests
+- `import ... as` syntax
+- Parser: type specifiers
+- Syntax: declarations
+- Constrain identifier alphabet further
+- Parser: visibility declaration
+- Separate IRs from passes
+- and, or operators
+- Syntax: docstrings
+- Parse comparison expressions
+- Lexer, or fix parser infinite recursion
+- Parse logical expressions
+- Parse tuple expressions

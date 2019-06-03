@@ -1,5 +1,5 @@
 (*
-    Copyright 2018 Fernando Borretti <fernando@borretti.me>
+    Copyright 2018–2019 Fernando Borretti <fernando@borretti.me>
 
     This file is part of Austral.
 
@@ -18,8 +18,10 @@
 *)
 
 signature PARSER = sig
-    val parseQualifiedSymbol : string -> Symbol.symbol
+    val parseTypeSpecifier : string -> Syntax.type_specifier
 
-    val parseString : string -> CST.cst
-    val parseFile : string -> CST.cst list
+    val parseExpression : string -> Syntax.expr
+
+    val parseImport : string -> Syntax.import
+    val parseModule : string -> Syntax.module
 end

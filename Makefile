@@ -19,15 +19,6 @@ C_RUNTIME_ML := src/c-runtime.sml
 SRC := src/*.sig src/*.sml $(C_RUNTIME_ML)
 TEST_SRC := test/*.sml
 
-DOCS_DIR := docs
-DOCS_SRC := $(DOCS_DIR)/internals.md
-DOCS_HTML := $(DOCS_DIR)/internals.html
-
-DOCS_ARCH_SRC := $(DOCS_DIR)/architecture.mmd
-DOCS_ARCH_PNG := $(DOCS_DIR)/architecture.png
-MERMAID := ./node_modules/.bin/mmdc
-MERMAID_P_CONFIG := $(DOCS_DIR)/puppeteer-config.json
-
 all: compile
 
 $(C_RUNTIME_ML): $(C_RUNTIME_SRC) $(C_RUNTIME_SCRIPT)
@@ -53,21 +44,10 @@ mlton-test: $(TEST_BIN)
 .PHONY: docs
 docs: $(DOCS_HTML)
 
-$(MERMAID):
-	npm install mermaid.cli
-
-$(DOCS_ARCH_PNG): $(DOCS_ARCH_SRC) $(MERMAID)
-	$(MERMAID) -i $(DOCS_ARCH_SRC) -o $(DOCS_ARCH_PNG) -t neutral -p $(MERMAID_P_CONFIG)
-
-$(DOCS_HTML): $(DOCS_SRC) $(DOCS_ARCH_PNG)
-	pandoc $(DOCS_SRC) -f markdown+smart -t html -s -o $(DOCS_HTML)
-
 clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(TEST_BIN) ]; then rm $(TEST_BIN); fi
 	if [ -f $(C_RUNTIME_ML) ]; then rm $(C_RUNTIME_ML); fi
-	if [ -f $(DOCS_HTML) ]; then rm $(DOCS_HTML); fi
-	if [ -f $(DOCS_ARCH_PNG) ]; then rm $(DOCS_ARCH_PNG); fi
 	if [ -d src/.cm/ ]; then rm -rf src/.cm/; fi
 	rm -f test/valid/*.c
 	rm -f test/valid/*.bin
