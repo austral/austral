@@ -273,7 +273,7 @@ structure Parser : PARSER = struct
                                 end
                             end
                         end
-                        
+
                     and comparisonParser =
                         let val compOpParser =
                                 ps.choice [ps.seqR (ps.pstring "=") (ps.preturn Syntax.EqualTo),
