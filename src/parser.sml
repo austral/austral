@@ -258,9 +258,8 @@ structure Parser : PARSER = struct
                                                 ws1)
                                         (separatedList expressionParser
                                                        (ps.seq (ps.pchar #";")
-                                                               ws))
-                                        (ps.seq (ps.pchar #"}")
-                                                ws1))
+                                                               ws1))
+                                        (ps.pchar #"}"))
             in
                 let val (orParser, andParser) =
                         let val termParser = ps.choice [boolConstantParser,
