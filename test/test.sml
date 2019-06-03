@@ -171,6 +171,9 @@ structure AustralTest = struct
                             ],
                             suite "Tuple" [
                                 isParse "(1,2,3)" (TupleCreate [IntConstant "1", IntConstant "2", IntConstant "3"])
+                            ],
+                            suite "Block" [
+                                isParser "{ 1 }" (Block [IntConstant "1"])
                             ]
                           ]
                       end,
