@@ -1,5 +1,6 @@
 TODO:
 
+- Parse comparison expressions
 - Parse let expressions
 - Parse arithmetic expressions
 - Parse sizeOf expressions
@@ -199,7 +200,6 @@ DONE:
 - Separate IRs from passes
 - and, or operators
 - Syntax: docstrings
-- Parse comparison expressions
 - Lexer, or fix parser infinite recursion
 - Parse logical expressions
 - Parse tuple expressions
