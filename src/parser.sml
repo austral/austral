@@ -261,6 +261,14 @@ structure Parser : PARSER = struct
                                                                ws1))
                                         (ps.seq ws
                                                 (ps.pchar #"}")))
+
+                and functionCallParser =
+                    ps.pmap (fn (name, args) =>
+                                Syntax.Funcall (name, args))
+                            (ps.seq identParser
+                                    (ps.between (ps.pchar #"(")
+                                                (commaSeparatedList0 expressionParser)
+                                                (ps.pchar #")")))
             in
                 let val (orParser, andParser) =
                         let val termParser = ps.choice [boolConstantParser,
