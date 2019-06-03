@@ -259,7 +259,7 @@ structure Parser : PARSER = struct
                                     Syntax.CompOp (oper, lhs, rhs))
                                 (ps.seq termParser
                                         (ps.seqR ws1
-                                                 (ps.seq (ps.pstring compOpParser)
+                                                 (ps.seq compOpParser
                                                          (ps.seqR ws1
                                                                   termParser))))
                     end
