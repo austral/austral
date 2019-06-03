@@ -30,10 +30,6 @@ $(BIN): $(SRC)
 test: $(SRC) $(TEST_SRC)
 	$(SML) $(SMLFLAGS) -m $(CM_TEST_FILE)
 
-
-.PHONY: docs
-docs: $(DOCS_HTML)
-
 clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(TEST_BIN) ]; then rm $(TEST_BIN); fi
