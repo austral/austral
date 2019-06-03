@@ -182,7 +182,8 @@ structure AustralTest = struct
                                                                IntConstant "1",
                                                                IntConstant "2",
                                                                IntConstant "3"
-                                                             ]))
+                                                             ])),
+                                isParse "f()" (Funcall (i "f", []))
                             ]
                           ]
                       end,
