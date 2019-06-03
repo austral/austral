@@ -5,3 +5,5 @@ is
 
   austral.cm
   test/test.sml
+
+  $/basis.cm
