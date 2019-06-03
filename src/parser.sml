@@ -248,13 +248,13 @@ structure Parser : PARSER = struct
                                        ps.seqR (ps.pstring ">=") (ps.preturn Builtin.GreaterThanEq),
                                        ps.seqR (ps.pstring "<=") (ps.preturn Builtin.LessThanEq)]
                                        
-                        and comparisonTerm = expressionParser
+                        and termParser = expressionParser
                     in
                         ps.pmap (fn (lhs, (oper, rhs)) =>
                                     Syntax.CompOp (oper, lhs, rhs))
-                                (ps.seq comparisonTerm
+                                (ps.seq termParser
                                         (ps.seq compOpParser
-                                                comparisonTerm))
+                                                termParser))
                     end
 
                 and tupleParser =
