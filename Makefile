@@ -5,7 +5,6 @@ MLTON := mlton
 
 CM_FILE := austral.cm
 MLB_FILE := austral.mlb
-MLB_EXE_FILE := austral-exe.mlb
 
 CM_TEST_FILE := austral-test.cm
 MLB_TEST_FILE := austral-test.mlb
