@@ -253,8 +253,7 @@ structure Parser : PARSER = struct
                                               expressionParser))
 
                 and blockParser =
-                    ps.pmap (exps =>
-                             Syntax.Block exps)
+                    ps.pmap (fn exps => Syntax.Block exps)
                             (ps.between (ps.seq (ps.pchar #"{")
                                                 ws1)
                                         (separatedList expressionParser
