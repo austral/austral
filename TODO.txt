@@ -2,7 +2,6 @@ TODO:
 
 - Parse let expressions
 - Parse arithmetic expressions
-- Parse sizeOf expressions
 - Parse block expressions
 - Parse function calls
 - Parser: module definitions
