@@ -248,7 +248,9 @@ structure Parser : PARSER = struct
 
                 and notParser =
                     ps.pmap (fn e => Syntax.Not e)
-                            expressionParser
+                            (ps.seqR (ps.pstring "not")
+                                     (ps.seqR ws1
+                                              expressionParser))
             in
                 let val (orParser, andParser) =
                         let val termParser = ps.choice [boolConstantParser,
