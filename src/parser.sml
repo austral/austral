@@ -253,13 +253,15 @@ structure Parser : PARSER = struct
                                               expressionParser))
 
                 and blockParser =
-                    ps.between (ps.seq (ps.pchar #"{")
-                                       ws1)
-                               (separatedList expressionParser
-                                              (ps.seq (ps.pchar #";")
-                                                      ws))
-                               (ps.seq (ps.pchar #"}")
-                                       ws1)
+                    ps.pmap (exps =>
+                             Syntax.Block exps)
+                            (ps.between (ps.seq (ps.pchar #"{")
+                                                ws1)
+                                        (separatedList expressionParser
+                                                       (ps.seq (ps.pchar #";")
+                                                               ws))
+                                        (ps.seq (ps.pchar #"}")
+                                                ws1))
             in
                 let val (orParser, andParser) =
                         let val termParser = ps.choice [boolConstantParser,
