@@ -30,9 +30,6 @@ $(BIN): $(SRC)
 test: $(SRC) $(TEST_SRC)
 	$(SML) $(SMLFLAGS) -m $(CM_TEST_FILE)
 
-$(TEST_BIN): $(SRC) $(TEST_SRC)
-	$(MLTON) $(MLB_TEST_FILE)
-
 .PHONY: mlton-test
 mlton-test: $(TEST_BIN)
 	./$(TEST_BIN)
