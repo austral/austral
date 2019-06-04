@@ -180,23 +180,6 @@ structure Parser : PARSER = struct
                 and variableParser =
                     ps.pmap Syntax.Variable identParser
 
-                and arithParser =
-                    let val termSepP =
-                            ps.between ws1
-                                       (ps.choice [ps.seq (ps.pchar #"+") (ps.preturn (Arith.Add, Arith.Modular)),
-                                                   ps.seq (ps.pchar #"-") (ps.preturn (Arith.Sub, Arith.Modular))])
-                                       ws1
-
-                        and termParser = ps.choice [integerParser,
-                                                    floatParser,
-                                                    variableParser,
-                                                    ps.between (ps.pchar #"(")
-                                                               expressionParser
-                                                               (ps.pchar #")")]
-                    in
-                        termSepP
-                    end
-
                 and letParser =
                     let val letP = ps.seq (ps.pstring "let")
                                           ws1
@@ -331,6 +314,23 @@ structure Parser : PARSER = struct
                                                      (ps.seq compOpParser
                                                              (ps.seqR ws1
                                                                       termParser))))
+                        end
+
+                    and arithParser =
+                        let val termSepP =
+                                ps.between ws1
+                                           (ps.choice [ps.seq (ps.pchar #"+") (ps.preturn (Arith.Add, Arith.Modular)),
+                                                       ps.seq (ps.pchar #"-") (ps.preturn (Arith.Sub, Arith.Modular))])
+                                           ws1
+
+                            and termParser = ps.choice [integerParser,
+                                                        floatParser,
+                                                        variableParser,
+                                                        ps.between (ps.pchar #"(")
+                                                                   expressionParser
+                                                                   (ps.pchar #")")]
+                        in
+                            termSepP
                         end
                 in
                     let val expParsers = [
