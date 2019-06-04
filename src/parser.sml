@@ -180,6 +180,16 @@ structure Parser : PARSER = struct
                 and variableParser =
                     ps.pmap Syntax.Variable identParser
 
+                and arithParser =
+                    let val termSepP =
+                            ps.between ws1
+                                       (ps.choice [ps.pchar #"+",
+                                                   ps.pchar #"-"])
+                                       ws1
+                    in
+                        termSepP
+                    end
+
                 and letParser =
                     let val letP = ps.seq (ps.pstring "let")
                                           ws1
