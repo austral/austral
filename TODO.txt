@@ -5,7 +5,6 @@ TODO:
 - Parser: type definitions
 - Parser: function definitions
 - Parser: docstrings
-- Expression parsing tests
 - Define syntax for linear iteration operators
 
 LONG-TERM TODO:
@@ -203,3 +202,4 @@ DONE:
 - Parse function calls
 - Parse tuple projections
 - Parse let expressions
+- Expression parsing tests
