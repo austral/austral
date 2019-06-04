@@ -96,45 +96,6 @@ structure Parser : PARSER = struct
 
     val typeSpecifierParser = defineTypeSpecifierParser addressParser pointerParser tupleTypeParser
 
-    (* Parsing declarations *)
-
-    (* Parsing imports *)
-
-    val importedNameParser =
-        ps.or (ps.pmap (fn (n, rn) =>
-                           Syntax.ImportedNameAs { original = n,
-                                                   rename = rn })
-                       (ps.seq identParser
-                               (ps.seqR (ps.between ws1 (ps.pstring "as") ws1)
-                                        identParser)))
-              (ps.pmap Syntax.ImportedName identParser)
-
-    val importParser =
-        let val from = ps.seq (ps.pstring "from") ws1
-            and modName = ps.seqL identParser ws1
-            and import = ps.seq (ps.pstring "import") ws1
-            and importList = commaSeparatedList1 importedNameParser
-        in
-            let val parser = (ps.seq (ps.seqL (ps.seqR from modName) import)
-                                     importList)
-            in
-                ps.pmap Syntax.Import parser
-            end
-        end
-
-    (* Visibility declarations *)
-
-    val typeVisibilityParser =
-        ps.choice [ps.seqR (ps.pstring "public") (ps.preturn Syntax.PublicType),
-                   ps.seqR (ps.pstring "opaque") (ps.preturn Syntax.OpaqueType),
-                   ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateType),
-                   ps.preturn Syntax.PrivateType]
-
-    val functionVisibilityParser =
-        ps.choice [ps.seqR (ps.pstring "public") (ps.preturn Syntax.PublicFunction),
-                   ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateFunction),
-                   ps.preturn Syntax.PrivateFunction]
-
     (* Parsing expressions *)
 
     (* Constants *)
@@ -383,6 +344,45 @@ structure Parser : PARSER = struct
         end
 
     val expressionParser = defineExpressionParser expParsers
+
+    (* Parsing declarations *)
+
+    (* Parsing imports *)
+
+    val importedNameParser =
+        ps.or (ps.pmap (fn (n, rn) =>
+                           Syntax.ImportedNameAs { original = n,
+                                                   rename = rn })
+                       (ps.seq identParser
+                               (ps.seqR (ps.between ws1 (ps.pstring "as") ws1)
+                                        identParser)))
+              (ps.pmap Syntax.ImportedName identParser)
+
+    val importParser =
+        let val from = ps.seq (ps.pstring "from") ws1
+            and modName = ps.seqL identParser ws1
+            and import = ps.seq (ps.pstring "import") ws1
+            and importList = commaSeparatedList1 importedNameParser
+        in
+            let val parser = (ps.seq (ps.seqL (ps.seqR from modName) import)
+                                     importList)
+            in
+                ps.pmap Syntax.Import parser
+            end
+        end
+
+    (* Visibility declarations *)
+
+    val typeVisibilityParser =
+        ps.choice [ps.seqR (ps.pstring "public") (ps.preturn Syntax.PublicType),
+                   ps.seqR (ps.pstring "opaque") (ps.preturn Syntax.OpaqueType),
+                   ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateType),
+                   ps.preturn Syntax.PrivateType]
+
+    val functionVisibilityParser =
+        ps.choice [ps.seqR (ps.pstring "public") (ps.preturn Syntax.PublicFunction),
+                   ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateFunction),
+                   ps.preturn Syntax.PrivateFunction]
 
     (* Interface *)
 
