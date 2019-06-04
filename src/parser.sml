@@ -320,7 +320,9 @@ structure Parser : PARSER = struct
                         let val termSepP =
                                 ps.between ws1
                                            (ps.choice [ps.seqR (ps.pchar #"+") (ps.preturn (Arith.Add, Arith.Modular)),
-                                                       ps.seqR (ps.pchar #"-") (ps.preturn (Arith.Sub, Arith.Modular))])
+                                                       ps.seqR (ps.pchar #"-") (ps.preturn (Arith.Sub, Arith.Modular)),
+                                                       ps.seqR (ps.pchar #"*") (ps.preturn (Arith.Mul, Arith.Modular)),
+                                                       ps.seqR (ps.pchar #"/") (ps.preturn (Arith.Div, Arith.Modular))])
                                            ws1
 
                             and termParser = ps.choice [integerParser,
