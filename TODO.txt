@@ -1,6 +1,5 @@
 TODO:
 
-- Parse arithmetic expressions
 - Parser: module definitions
 - Parser: record definitions
 - Parser: variant definitions
@@ -204,3 +203,4 @@ DONE:
 - Parse let expressions
 - Expression parsing tests
 - Parser: docstrings
+- Parse arithmetic expressions
