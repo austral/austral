@@ -230,8 +230,8 @@ structure Parser : PARSER = struct
                         in
                             let val bindListP = commaSeparatedList1 bindP
                             in
-                                ps.pmap (fn (derp, e) =>
-                                            Syntax.Let (derp, e))
+                                ps.pmap (fn (binds, e) =>
+                                            Syntax.Let (binds, e))
                                         (ps.seqR letP
                                                  (ps.seq bindListP
                                                          (ps.seqR inP
