@@ -346,6 +346,7 @@ structure Parser : PARSER = struct
                             notParser,
                             tupleParser,
                             comparisonParser,
+                            arithParser,
                             blockParser,
                             functionCallParser,
                             (* Constants *)
