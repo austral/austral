@@ -188,6 +188,15 @@ structure Parser : PARSER = struct
                                            (ps.many stringChar)
                                            (ps.pchar #"\""))
 
+    (* Documentation strings *)
+
+    val docstringChar = ps.or (ps.seqR (ps.pchar #"\\") (ps.pchar #"`")) (ps.noneOf [#"`"])
+
+    val docstringParser = ps.pmap (Syntax.Docstring o String.implode)
+                                  (ps.between (ps.pchar #"`")
+                                              (ps.many docstringChar)
+                                              (ps.pchar #"`"))
+
     (* Expressions *)
 
     fun defineExpressionParser parsers =
