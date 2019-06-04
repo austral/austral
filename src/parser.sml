@@ -371,6 +371,9 @@ structure Parser : PARSER = struct
             end
         end
 
+    val importListParser =
+        separatedList importParser ws1
+
     (* Visibility declarations *)
 
     val typeVisibilityParser =
