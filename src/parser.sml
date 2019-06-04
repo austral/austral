@@ -331,7 +331,7 @@ structure Parser : PARSER = struct
                                                                    (ps.pchar #")")]
                         in
                             ps.pmap (fn (lhs, ((oper, kind), rhs)) =>
-                                        Syntax.ArithOp (oper, kind, lhs, rhs))
+                                        Syntax.ArithOp (kind, oper, lhs, rhs))
                                     (ps.seq termParser
                                             (ps.seq termSepP
                                                     termParser))
