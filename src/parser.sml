@@ -319,8 +319,8 @@ structure Parser : PARSER = struct
                     and arithParser =
                         let val termSepP =
                                 ps.between ws1
-                                           (ps.choice [ps.seq (ps.pchar #"+") (ps.preturn (Arith.Add, Arith.Modular)),
-                                                       ps.seq (ps.pchar #"-") (ps.preturn (Arith.Sub, Arith.Modular))])
+                                           (ps.choice [ps.seqR (ps.pchar #"+") (ps.preturn (Arith.Add, Arith.Modular)),
+                                                       ps.seqR (ps.pchar #"-") (ps.preturn (Arith.Sub, Arith.Modular))])
                                            ws1
 
                             and termParser = ps.choice [integerParser,
