@@ -2,7 +2,8 @@ TODO:
 
 - Parse arithmetic expressions
 - Parser: module definitions
-- Parser: type definitions
+- Parser: record definitions
+- Parser: variant definitions
 - Parser: function definitions
 - Define syntax for linear iteration operators
 
