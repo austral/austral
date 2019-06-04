@@ -157,7 +157,7 @@ structure AustralTest = struct
                                       ]
                                   end,
                             suite "Arithmetic" [
-
+                                isParse "1 + 1" (ArithOp (Arith.Modular, Arith.Add, IntConstant "1", IntConstant "1"))
                             ],
                             suite "Comparisons" [
                                 isParse "1 < 2" (CompOp (LessThan, IntConstant "1", IntConstant "2")),
