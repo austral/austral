@@ -45,7 +45,6 @@ structure Syntax :> SYNTAX = struct
                   | And of expr * expr
                   | Or of expr * expr
                   | TupleCreate of expr list
-                  | TupleProj of expr * int
                   | SizeOf of type_specifier
                   | Block of expr list
                   | Funcall of name * expr list
