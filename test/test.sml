@@ -187,7 +187,9 @@ structure AustralTest = struct
                                 isParse "f()" (Funcall (i "f", []))
                             ],
                             suite "Let" [
-
+                                isParse "let x = 1 in 1"
+                                        (Let ([VarBinding (i "x", IntConstant "1")],
+                                              IntConstant "1"))
                             ]
                           ]
                       end,
