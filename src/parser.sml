@@ -211,8 +211,11 @@ structure Parser : PARSER = struct
                     ps.pmap Syntax.Variable identParser
 
                 and letParser =
-                    (* FIXME: NOT DONE YET *)
-                    ps.preturn Syntax.UnitConstant
+                    ps.seqR (ps.pstring "let")
+                            ws1
+                            (ps.seqR (ps.seqR (ps.pstring "in")
+                                              ws1)
+                                     expressionParser)
 
                 and ifParser =
                     let val If =
