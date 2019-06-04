@@ -216,7 +216,7 @@ structure Parser : PARSER = struct
 
                         and bindP = ps.seq identParser
                                            (ps.seqR ws1
-                                                    (ps.seqR ps.pchar #"="
+                                                    (ps.seqR (ps.pchar #"=")
                                                              (ps.seqR ws1
                                                                       expressionParser)))
 
