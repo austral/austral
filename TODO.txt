@@ -2,6 +2,7 @@ TODO:
 
 - Parse let expressions
 - Parse arithmetic expressions
+- Parse tuple projections
 - Parser: module definitions
 - Parser: type definitions
 - Parser: function definitions
