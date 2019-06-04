@@ -1,5 +1,5 @@
 (*
-    Copyright 2018 Fernando Borretti <fernando@borretti.me>
+    Copyright 2018–2019 Fernando Borretti <fernando@borretti.me>
 
     This file is part of Austral.
 
