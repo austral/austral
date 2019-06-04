@@ -174,7 +174,8 @@ structure AustralTest = struct
                             ],
                             suite "Block" [
                                 isParse "{ 1 }" (Block [IntConstant "1"]),
-                                isParse "{ 1; 2 }" (Block [IntConstant "1", IntConstant "2"])
+                                isParse "{ 1; 2 }" (Block [IntConstant "1", IntConstant "2"]),
+                                isParse "{ 1; 2; a }" (Block [IntConstant "1", IntConstant "2", Variable (i "a")])
                             ],
                             suite "Function Call" [
                                 isParse "f(1,2,3)" (Funcall (i "f",
