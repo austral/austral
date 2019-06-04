@@ -4,7 +4,6 @@ TODO:
 - Parser: module definitions
 - Parser: type definitions
 - Parser: function definitions
-- Parser: docstrings
 - Define syntax for linear iteration operators
 
 LONG-TERM TODO:
@@ -203,3 +202,4 @@ DONE:
 - Parse tuple projections
 - Parse let expressions
 - Expression parsing tests
+- Parser: docstrings
