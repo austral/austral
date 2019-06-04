@@ -330,7 +330,9 @@ structure Parser : PARSER = struct
                                                                    expressionParser
                                                                    (ps.pchar #")")]
                         in
-                            termSepP
+                            (ps.seq termParser
+                                    (ps.seq termSepP
+                                            termParser))
                         end
                 in
                     let val expParsers = [
