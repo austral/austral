@@ -214,23 +214,29 @@ structure Parser : PARSER = struct
                     let val letP = ps.seq (ps.pstring "let")
                                           ws1
 
-                        and bindP = ps.seq identParser
-                                           (ps.seqR ws1
-                                                    (ps.seqR (ps.pchar #"=")
-                                                             (ps.seqR ws1
-                                                                      expressionParser)))
+                        and varBindP =
+                            ps.pmap (fn (i, e) =>
+                                        Syntax.VarBinding (i, e))
+                                    (ps.seq identParser
+                                            (ps.seqR ws1
+                                                     (ps.seqR (ps.pchar #"=")
+                                                              (ps.seqR ws1
+                                                                       expressionParser))))
 
                         and inP = (ps.seq (ps.pstring "in")
                                           ws1)
                     in
-                        let val bindListP = commaSeparatedList1 bindP
+                        let val bindP = varBindP
                         in
-                            ps.pmap (fn (derp, e) =>
-                                        Syntax.Let (derp, e))
-                                    (ps.seqR letP
-                                             (ps.seq bindListP
-                                                     (ps.seqR inP
-                                                              expressionParser)))
+                            let val bindListP = commaSeparatedList1 bindP
+                            in
+                                ps.pmap (fn (derp, e) =>
+                                            Syntax.Let (derp, e))
+                                        (ps.seqR letP
+                                                 (ps.seq bindListP
+                                                         (ps.seqR inP
+                                                                  expressionParser)))
+                            end
                         end
                     end
 
