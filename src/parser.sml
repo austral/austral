@@ -306,15 +306,15 @@ structure Parser : PARSER = struct
                                                         ps.between (ps.pchar #"(")
                                                                    expressionParser
                                                                    (ps.pchar #")")]
-                    in
-                        ps.pmap (fn (lhs, (oper, rhs)) =>
-                                    Syntax.CompOp (oper, lhs, rhs))
-                                (ps.seq termParser
-                                        (ps.seqR ws1
-                                                 (ps.seq compOpParser
-                                                         (ps.seqR ws1
-                                                                  termParser))))
-                    end
+                        in
+                            ps.pmap (fn (lhs, (oper, rhs)) =>
+                                        Syntax.CompOp (oper, lhs, rhs))
+                                    (ps.seq termParser
+                                            (ps.seqR ws1
+                                                     (ps.seq compOpParser
+                                                             (ps.seqR ws1
+                                                                      termParser))))
+                        end
                 in
                     let val expParsers = [
                             (* Compound expressions *)
