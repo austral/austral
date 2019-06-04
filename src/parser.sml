@@ -211,11 +211,27 @@ structure Parser : PARSER = struct
                     ps.pmap Syntax.Variable identParser
 
                 and letParser =
-                    ps.seqR (ps.pstring "let")
-                            ws1
-                            (ps.seqR (ps.seqR (ps.pstring "in")
-                                              ws1)
-                                     expressionParser)
+                    let val letP = ps.seq (ps.pstring "let")
+                                          ws1
+
+                        and bindP = ps.seq identParser
+                                           (ps.seqR ws1
+                                                    (ps.seqR ps.pchar #"="
+                                                             (ps.seqR ws1
+                                                                      expressionParser)))
+
+                        and bindListP = commaSeparatedList1 bindP
+
+                        and inP = (ps.seq (ps.pstring "in")
+                                          ws1)
+                    in
+                        ps.pmap (fn (derp, e) =>
+                                    Syntax.Let (derp, e))
+                                (ps.seqR letP
+                                         (ps.seq bindListP
+                                                 (ps.seqR inP
+                                                          expressionParser)))
+                    end
 
                 and ifParser =
                     let val If =
