@@ -220,17 +220,18 @@ structure Parser : PARSER = struct
                                                              (ps.seqR ws1
                                                                       expressionParser)))
 
-                        and bindListP = commaSeparatedList1 bindP
-
                         and inP = (ps.seq (ps.pstring "in")
                                           ws1)
                     in
-                        ps.pmap (fn (derp, e) =>
-                                    Syntax.Let (derp, e))
-                                (ps.seqR letP
-                                         (ps.seq bindListP
-                                                 (ps.seqR inP
-                                                          expressionParser)))
+                        let val bindListP = commaSeparatedList1 bindP
+                        in
+                            ps.pmap (fn (derp, e) =>
+                                        Syntax.Let (derp, e))
+                                    (ps.seqR letP
+                                             (ps.seq bindListP
+                                                     (ps.seqR inP
+                                                              expressionParser)))
+                        end
                     end
 
                 and ifParser =
