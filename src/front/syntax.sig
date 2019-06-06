@@ -20,7 +20,7 @@
 signature SYNTAX = sig
     (* Type aliases *)
 
-    type name = Ident.ident
+    type name = Name.ident
 
     datatype docstring = Docstring of string
 
