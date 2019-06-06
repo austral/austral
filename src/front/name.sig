@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-signature IDENT = sig
+signature NAME = sig
     type ident
 
     val alphabet : string
