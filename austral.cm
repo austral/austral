@@ -33,8 +33,8 @@ is
   src/util/map.sig
   src/util/map.sml
 
-  src/ordered-map.sig
-  src/ordered-map.sml
+  src/util/ordered-map.sig
+  src/util/ordered-map.sml
 
   src/ident.sig
   src/ident.sml
