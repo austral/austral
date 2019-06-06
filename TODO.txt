@@ -1,5 +1,6 @@
 TODO:
 
+- Different alphabets for different types of identifiers
 - Parser: record definitions
 - Parser: variant definitions
 - Parser: function definitions
