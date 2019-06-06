@@ -429,7 +429,7 @@ structure Parser : PARSER = struct
         in
             let val modNameCharParser = ps.anyOfString alphabet
             in
-                s.pmap (String.implode) (ps.many1 modNameCharParser)
+                ps.pmap (String.implode) (ps.many1 modNameCharParser)
             end
         end
 
