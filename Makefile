@@ -34,5 +34,6 @@ clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(C_RUNTIME_ML) ]; then rm $(C_RUNTIME_ML); fi
 	if [ -d src/util/.cm/ ]; then rm -rf src/util/.cm/; fi
+	if [ -d src/front/.cm/ ]; then rm -rf src/front/.cm/; fi
 	rm -f test/valid/*.c
 	rm -f test/valid/*.bin
