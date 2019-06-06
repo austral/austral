@@ -36,11 +36,11 @@ is
   src/util/ordered-map.sig
   src/util/ordered-map.sml
 
-  src/ident.sig
-  src/ident.sml
+  src/front/ident.sig
+  src/front/ident.sml
 
-  src/arith.sig
-  src/arith.sml
+  src/front/arith.sig
+  src/front/arith.sml
 
   src/front/escape.sig
   src/front/escape.sml
