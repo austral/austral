@@ -30,8 +30,8 @@ is
   src/ordered-set.sig
   src/ordered-set.sml
 
-  src/map.sig
-  src/map.sml
+  src/util/map.sig
+  src/util/map.sml
 
   src/ordered-map.sig
   src/ordered-map.sml
