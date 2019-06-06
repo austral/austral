@@ -27,8 +27,8 @@ is
   src/util/set.sig
   src/util/set.sml
 
-  src/ordered-set.sig
-  src/ordered-set.sml
+  src/util/ordered-set.sig
+  src/util/ordered-set.sml
 
   src/util/map.sig
   src/util/map.sml
