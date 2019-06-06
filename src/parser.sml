@@ -411,6 +411,8 @@ structure Parser : PARSER = struct
                    ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateFunction),
                    ps.preturn Syntax.PrivateFunction]
 
+    (* Function definitions *)
+
     (* Interface *)
 
     exception ParserException of string
