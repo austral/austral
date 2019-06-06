@@ -21,11 +21,11 @@ Group
 is
   vendor/parsimony/parsimony.cm
 
-  src/util.sig
-  src/util.sml
+  src/util/util.sig
+  src/util/util.sml
 
-  src/set.sig
-  src/set.sml
+  src/util/set.sig
+  src/util/set.sml
 
   src/ordered-set.sig
   src/ordered-set.sml
