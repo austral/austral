@@ -3,7 +3,6 @@ TODO:
 - Parser: record definitions
 - Parser: variant definitions
 - Parser: function definitions
-- Define syntax for linear iteration operators
 
 LONG-TERM TODO:
 
@@ -23,6 +22,7 @@ LONG-TERM TODO:
 - Runtime support for saturation arithmetic
 - CUDA backend
 - C+OpenMP backend
+- Define syntax for linear iteration operators
 
 DONE:
 
