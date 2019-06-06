@@ -36,8 +36,8 @@ is
   src/util/ordered-map.sig
   src/util/ordered-map.sml
 
-  src/front/ident.sig
-  src/front/ident.sml
+  src/front/name.sig
+  src/front/name.sml
 
   src/front/arith.sig
   src/front/arith.sml
