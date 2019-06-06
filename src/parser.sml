@@ -417,6 +417,11 @@ structure Parser : PARSER = struct
 
     (* Modules *)
 
+    val moduleDeclarationParser =
+        ps.seqR ps.pstring "module"
+                (ps.seqR ws1
+                         moduleNameParser)
+
     (* Interface *)
 
     exception ParserException of string
