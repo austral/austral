@@ -411,7 +411,11 @@ structure Parser : PARSER = struct
                    ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateFunction),
                    ps.preturn Syntax.PrivateFunction]
 
+    (* Type definitions *)
+
     (* Function definitions *)
+
+    (* Modules *)
 
     (* Interface *)
 
