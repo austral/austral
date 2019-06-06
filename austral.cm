@@ -42,14 +42,14 @@ is
   src/arith.sig
   src/arith.sml
 
-  src/escape.sig
-  src/escape.sml
+  src/front/escape.sig
+  src/front/escape.sml
 
-  src/syntax.sig
-  src/syntax.sml
+  src/front/syntax.sig
+  src/front/syntax.sml
 
-  src/parser.sig
-  src/parser.sml
+  src/front/parser.sig
+  src/front/parser.sml
 
   (*src/symbol.sig
   src/symbol.sml
