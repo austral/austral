@@ -33,6 +33,6 @@ test: $(SRC) $(TEST_SRC)
 clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(C_RUNTIME_ML) ]; then rm $(C_RUNTIME_ML); fi
-	if [ -d src/.cm/ ]; then rm -rf src/.cm/; fi
+	if [ -d src/*/.cm/ ]; then rm -rf src/*/.cm/; fi
 	rm -f test/valid/*.c
 	rm -f test/valid/*.bin
