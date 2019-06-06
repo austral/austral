@@ -417,6 +417,22 @@ structure Parser : PARSER = struct
 
     (* Modules *)
 
+    val moduleNameParser =
+        let val alphabet =
+                let val alpha =   "abcdefghijklmnopqrstuvwxyz"
+                    and alphaup = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    and num = "0123456789"
+                    and sym = "-"
+                in
+                    alpha ^ alphaup ^ num ^ sym
+                end
+        in
+            let val modNameCharParser = ps.anyOfString alphabet
+            in
+                s.pmap (String.implode) (ps.many1 modNameCharParser)
+            end
+        end
+
     val moduleDeclarationParser =
         ps.seqR ps.pstring "module"
                 (ps.seqR ws1
