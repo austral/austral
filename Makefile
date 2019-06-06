@@ -13,8 +13,8 @@ C_RUNTIME_SRC := src/back/runtime.c
 C_RUNTIME_SCRIPT := src/back/runtime.awk
 C_RUNTIME_ML := src/c-runtime.sml
 SRC := src/util/*.sig src/util/*.sml \
-       src/front/*.sig src/front/*.sml
-       #$(C_RUNTIME_ML)
+       src/front/*.sig src/front/*.sml \
+       $(C_RUNTIME_ML)
 TEST_SRC := test/*.sml
 
 all: compile
