@@ -434,7 +434,7 @@ structure Parser : PARSER = struct
         end
 
     val moduleDeclarationParser =
-        ps.seqR ps.pstring "module"
+        ps.seqR (ps.pstring "module")
                 (ps.seqR ws1
                          moduleNameParser)
 
