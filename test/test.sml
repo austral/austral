@@ -79,7 +79,7 @@ structure AustralTest = struct
         open Syntax
     in
     val parserSuite =
-        let val i = Ident.mkIdentEx
+        let val i = Name.mkIdentEx
         in
             suite "Parser" [
                 suite "Type Specifiers"
