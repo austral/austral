@@ -462,6 +462,11 @@ structure Parser : PARSER = struct
 
     val functionDefinitionParser =
         let val paramParser =
+                (ps.seq identParser
+                        (ps.seqR (ps.pchar #":")
+                                 (ps.seqR ws1
+                                          (ps.seqR typeSpecifierParser
+                                                   docstringParserR))))
         in
             let val paramListParser =
                     ps.between (ps.pchar #"(")
