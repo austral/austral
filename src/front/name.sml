@@ -37,10 +37,7 @@ structure Name : NAME = struct
     datatype ident = Identifier of string
 
     val identAlphabet =
-        let val alpha =   "abcdefghijklmnopqrstuvwxyz"
-            and alphaup = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            and num = "0123456789"
-            and sym = "$#?@~^'."
+        let val sym = "$#?@~^'."
         in
             alpha ^ alphaup ^ num ^ sym
         end
