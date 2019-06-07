@@ -493,10 +493,10 @@ structure Parser : PARSER = struct
                                 (ps.seq functionVisibilityParser
                                         (ps.seqR (ps.pstring "function")
                                                  (ps.seqR ws1
-                                                          (ps.seqR identParser
-                                                                   (ps.seqR paramListParser
-                                                                            (ps.seqR rtParser
-                                                                                     bodyParser)))))))
+                                                          (ps.seq identParser
+                                                                  (ps.seq paramListParser
+                                                                          (ps.seq rtParser
+                                                                                  bodyParser)))))))
             end
         end
 
