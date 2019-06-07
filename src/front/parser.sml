@@ -413,7 +413,7 @@ structure Parser : PARSER = struct
 
     (* Type definitions *)
 
-    val structDefinitionParser =
+    val recordDefinitionParser =
         let val slotParser =
                 ps.pmap (fn (n, t) =>
                             Syntax.SlotDefinition (n, t, Syntax.Docstring NONE))
