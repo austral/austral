@@ -22,7 +22,7 @@ signature SYNTAX = sig
 
     type name = Name.ident
 
-    datatype docstring = Docstring of string
+    datatype docstring = Docstring of string option
 
     (* Expressions *)
 
