@@ -18,6 +18,8 @@
 *)
 
 structure Name : NAME = struct
+    (* Module names *)
+
     val moduleNameAlphabet =
         let val alpha =   "abcdefghijklmnopqrstuvwxyz"
             and alphaup = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
