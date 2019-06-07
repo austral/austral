@@ -1,6 +1,5 @@
 TODO:
 
-- Different alphabets for different types of identifiers
 - Parser: record definitions
 - Parser: variant definitions
 - Parser: function definitions
@@ -206,3 +205,4 @@ DONE:
 - Parser: docstrings
 - Parse arithmetic expressions
 - Parser: module definitions
+- Different alphabets for different types of identifiers
