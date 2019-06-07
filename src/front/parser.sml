@@ -414,11 +414,18 @@ structure Parser : PARSER = struct
     (* Type definitions *)
 
     val structDefinitionParser =
-        ps.seqR "struct"
-                (ps.seqR ws1
-                         (between (ps.pchar #"{")
-                                  (commaSeparatedList0 slotParser)
-                                  (ps.pchar #"}")))
+        let val slotParser =
+                ps.seq identParser
+                       (ps.seqR (ps.pchar #":")
+                                (ps.seqR ws1
+                                         typeSpecifierParser))
+        in
+            ps.seqR "struct"
+                    (ps.seqR ws1
+                             (between (ps.pchar #"{")
+                                      (commaSeparatedList0 slotParser)
+                                      (ps.pchar #"}")))
+        end
 
     (* Function definitions *)
 
