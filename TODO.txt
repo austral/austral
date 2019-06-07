@@ -1,6 +1,5 @@
 TODO:
 
-- Parser and syntax: type visibility
 - Resolve Syntax.module objects into actual module instances
 
 LONG-TERM TODO:
@@ -207,3 +206,4 @@ DONE:
 - Parser: record definitions
 - Parser: variant definitions
 - Parser: function definitions
+- Parser and syntax: type visibility
