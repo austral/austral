@@ -422,11 +422,13 @@ structure Parser : PARSER = struct
                                          (ps.seqR ws1
                                                   typeSpecifierParser)))
         in
-            ps.seqR (ps.pstring "struct")
-                    (ps.seqR ws1
-                             (ps.between (ps.pchar #"{")
-                                         (commaSeparatedList0 slotParser)
-                                         (ps.pchar #"}")))
+            ps.pmap (fn (name, slots) =>
+                        Syntax.RecordDefinition (name, slots))
+                    (ps.seqR (ps.pstring "struct")
+                             (ps.seqR ws1
+                                      (ps.between (ps.pchar #"{")
+                                                  (commaSeparatedList0 slotParser)
+                                                  (ps.pchar #"}"))))
         end
 
     (* Function definitions *)
