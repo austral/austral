@@ -27,10 +27,7 @@ structure Name : NAME = struct
     (* Module names *)
 
     val moduleNameAlphabet =
-        let val alpha =   "abcdefghijklmnopqrstuvwxyz"
-            and alphaup = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            and num = "0123456789"
-            and sym = "-"
+        let val sym = "-."
         in
             alpha ^ alphaup ^ num ^ sym
         end
