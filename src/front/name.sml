@@ -18,6 +18,12 @@
 *)
 
 structure Name : NAME = struct
+    (* Alphabet definition utilities *)
+
+    val alpha = "abcdefghijklmnopqrstuvwxyz"
+    val alphaup = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    val num = "0123456789"
+
     (* Module names *)
 
     val moduleNameAlphabet =
