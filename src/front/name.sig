@@ -18,6 +18,9 @@
 *)
 
 signature NAME = sig
+    (* Module names *)
+    val moduleNameAlphabet : string
+
     (* Identifiers: names of types, functions, variables *)
     type ident
 
