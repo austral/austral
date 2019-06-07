@@ -470,7 +470,7 @@ structure Parser : PARSER = struct
         in
             let val paramListParser =
                     ps.between (ps.pchar #"(")
-                               commaSeparatedList0 paramParser
+                               (commaSeparatedList0 paramParser)
                                (ps.pchar #")")
             in
                 ps.seq docstringParserL
