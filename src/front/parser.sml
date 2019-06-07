@@ -443,6 +443,10 @@ structure Parser : PARSER = struct
         recordLikeDefinitionParser Syntax.UnionDefinition
                                    Syntax.CaseDefinition
                                    "union"
+                                   (ps.opt
+                                        (ps.seqR (ps.pchar #":")
+                                                 (ps.seqR ws1
+                                                          typeSpecifierParser)))
 
     (* Function definitions *)
 
