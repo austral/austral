@@ -413,6 +413,26 @@ structure Parser : PARSER = struct
 
     (* Type definitions *)
 
+    fun recordLikeDefinitionParser constructor slotCons label =
+        let val slotParser =
+                ps.pmap (fn (n, t) =>
+                            slotCons (n, t, Syntax.Docstring NONE))
+                        (ps.seq identParser
+                                (ps.seqR (ps.pchar #":")
+                                         (ps.seqR ws1
+                                                  typeSpecifierParser)))
+        in
+            ps.pmap (fn (name, slots) =>
+                        Syntax.constructor (Syntax.Docstring NONE, name, slots))
+                    (ps.seqR (ps.pstring label)
+                             (ps.seq identParser
+                                     (ps.seqR ws1
+                                              (ps.seqR ws1
+                                                       (ps.between (ps.pchar #"{")
+                                                                   (commaSeparatedList0 slotParser)
+                                                                   (ps.pchar #"}"))))))
+        end
+
     val recordDefinitionParser =
         let val slotParser =
                 ps.pmap (fn (n, t) =>
