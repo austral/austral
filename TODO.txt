@@ -1,5 +1,6 @@
 TODO:
 
+- Module objects
 - Resolve Syntax.module objects into actual module instances
 
 LONG-TERM TODO:
