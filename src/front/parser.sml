@@ -464,7 +464,8 @@ structure Parser : PARSER = struct
         ps.seq docstringParserL
                (ps.seqR (ps.pstring "function")
                         (ps.seqR ws1
-                                 identParser))
+                                 (ps.seqR identParser
+                                          paramListParser)))
 
     (* Modules *)
 
