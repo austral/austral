@@ -30,7 +30,7 @@ structure Name : NAME = struct
         end
 
     fun isValid s =
-        let val sigma = explode alphabet
+        let val sigma = explode identAlphabet
         in
             List.all (fn c => Util.member c sigma) (explode s)
         end
