@@ -68,7 +68,7 @@ signature SYNTAX = sig
 
          and declaration = TypeAlias of docstring * name * type_visibility * type_specifier
                          | RecordDefinition of docstring * name * slot_definition list
-                         | UnionDefinition of name * case_definition list
+                         | UnionDefinition of docstring * name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * params * type_specifier * expr
 
          and type_visibility = PublicType
