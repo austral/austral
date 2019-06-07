@@ -415,10 +415,12 @@ structure Parser : PARSER = struct
 
     val structDefinitionParser =
         let val slotParser =
-                ps.seq identParser
-                       (ps.seqR (ps.pchar #":")
-                                (ps.seqR ws1
-                                         typeSpecifierParser))
+                ps.pmap (fn (n, t) =>
+                            SlotDefinition (n, t, NONE))
+                        (ps.seq identParser
+                                (ps.seqR (ps.pchar #":")
+                                         (ps.seqR ws1
+                                                  typeSpecifierParser)))
         in
             ps.seqR (ps.pstring "struct")
                     (ps.seqR ws1
