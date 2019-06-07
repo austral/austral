@@ -153,7 +153,7 @@ structure Parser : PARSER = struct
 
     val docstringChar = ps.or (ps.seqR (ps.pchar #"\\") (ps.pchar #"`")) (ps.noneOf [#"`"])
 
-    val docstringParser = ps.pmap (Syntax.Docstring o String.implode)
+    val docstringParser = ps.pmap (Syntax.Docstring o SOME o String.implode)
                                   (ps.between (ps.pchar #"`")
                                               (ps.many docstringChar)
                                               (ps.pchar #"`"))
