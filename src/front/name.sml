@@ -18,6 +18,15 @@
 *)
 
 structure Name : NAME = struct
+    val moduleNameAlphabet =
+        let val alpha =   "abcdefghijklmnopqrstuvwxyz"
+            and alphaup = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            and num = "0123456789"
+            and sym = "-"
+        in
+            alpha ^ alphaup ^ num ^ sym
+        end
+
     datatype ident = Identifier of string
 
     val identAlphabet =
