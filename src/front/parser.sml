@@ -420,7 +420,7 @@ structure Parser : PARSER = struct
                                 (ps.seqR ws1
                                          typeSpecifierParser))
         in
-            ps.seqR "struct"
+            ps.seqR (ps.pstring "struct")
                     (ps.seqR ws1
                              (between (ps.pchar #"{")
                                       (commaSeparatedList0 slotParser)
