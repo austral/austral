@@ -476,12 +476,17 @@ structure Parser : PARSER = struct
                             (ps.between (ps.pchar #"(")
                                         (commaSeparatedList0 paramParser)
                                         (ps.pchar #")"))
+
+                and rtParser =
+                    ps.seqR (ps.pchar #":")
+                            typeSpecifierParser
             in
                 ps.seq docstringParserL
                        (ps.seqR (ps.pstring "function")
                                 (ps.seqR ws1
                                          (ps.seqR identParser
-                                                  paramListParser)))
+                                                  (ps.seqR paramListParser
+                                                           rtParser))))
             end
         end
 
