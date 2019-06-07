@@ -60,7 +60,7 @@ structure Parser : PARSER = struct
 
     (* Identifiers *)
 
-    val identCharParser = ps.anyOfString Name.alphabet
+    val identCharParser = ps.anyOfString Name.identAlphabet
 
     val identParser = ps.pmap (Name.mkIdentEx o String.implode) (ps.many1 identCharParser)
 
