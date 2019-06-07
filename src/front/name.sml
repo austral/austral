@@ -29,6 +29,8 @@ structure Name : NAME = struct
             alpha ^ alphaup ^ num ^ sym
         end
 
+    (* Identifiers *)
+
     datatype ident = Identifier of string
 
     val identAlphabet =
