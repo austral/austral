@@ -66,16 +66,14 @@ structure Syntax :> SYNTAX = struct
          and imported_name = ImportedName of name
                            | ImportedNameAs of { original: name, rename: name }
 
-         and declaration = TypeDefinition of docstring * name * type_visibility * type_definition
+         and declaration = TypeAlias of docstring * name * type_visibility * type_specifier
+                         | RecordDefinition of name * slot_definition list
+                         | UnionDefinition of name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * params * type_specifier * expr
 
          and type_visibility = PublicType
                              | OpaqueType
                              | PrivateType
-
-         and type_definition = TypeAlias of type_specifier
-                             | RecordDefinition of name * slot_definition list
-                             | UnionDefinition of name * case_definition list
 
          and slot_definition = SlotDefinition of name * type_specifier * docstring
 
