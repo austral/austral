@@ -158,9 +158,13 @@ structure Parser : PARSER = struct
                                                   (ps.many docstringChar)
                                                   (ps.pchar #"`"))
 
-    val docstringParser =
+    val docstringParserL = (* When the docstring is followed by whitespace *)
         ps.pmap Syntax.Docstring
-                (ps.opt docstringTextParser)
+                (ps.opt (ps.seqL docstringTextParser ws1))
+
+    val docstringParserR = (* When the docstring is preceded by whitespace *)
+        ps.pmap Syntax.Docstring
+                (ps.opt (ps.seqR docstringTextParser ws1))
 
     (* Expressions *)
 
