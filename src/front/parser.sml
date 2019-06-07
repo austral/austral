@@ -461,11 +461,15 @@ structure Parser : PARSER = struct
     (* Function definitions *)
 
     val functionDefinitionParser =
-        ps.seq docstringParserL
-               (ps.seqR (ps.pstring "function")
-                        (ps.seqR ws1
-                                 (ps.seqR identParser
-                                          paramListParser)))
+        let val paramListParser =
+
+        in
+            ps.seq docstringParserL
+                   (ps.seqR (ps.pstring "function")
+                            (ps.seqR ws1
+                                     (ps.seqR identParser
+                                              paramListParser)))
+        end
 
     (* Modules *)
 
