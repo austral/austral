@@ -422,9 +422,9 @@ structure Parser : PARSER = struct
         in
             ps.seqR (ps.pstring "struct")
                     (ps.seqR ws1
-                             (between (ps.pchar #"{")
-                                      (commaSeparatedList0 slotParser)
-                                      (ps.pchar #"}")))
+                             (ps.between (ps.pchar #"{")
+                                         (commaSeparatedList0 slotParser)
+                                         (ps.pchar #"}")))
         end
 
     (* Function definitions *)
