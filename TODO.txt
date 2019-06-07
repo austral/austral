@@ -1,5 +1,6 @@
 TODO:
 
+- Parser and syntax: type visibility
 - Resolve Syntax.module objects into actual module instances
 
 LONG-TERM TODO:
