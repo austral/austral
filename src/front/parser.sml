@@ -436,6 +436,9 @@ structure Parser : PARSER = struct
     val recordDefinitionParser =
         recordLikeDefinitionParser Syntax.RecordDefinition Syntax.SlotDefinition "record"
 
+    val unionDefinitionParser =
+        recordLikeDefinitionParser Syntax.UnionDefinition Syntax.CaseDefinition "union"
+
     (* Function definitions *)
 
     (* Modules *)
