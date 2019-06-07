@@ -416,7 +416,7 @@ structure Parser : PARSER = struct
     val structDefinitionParser =
         let val slotParser =
                 ps.pmap (fn (n, t) =>
-                            SlotDefinition (n, t, NONE))
+                            Syntax.SlotDefinition (n, t, NONE))
                         (ps.seq identParser
                                 (ps.seqR (ps.pchar #":")
                                          (ps.seqR ws1
