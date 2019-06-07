@@ -462,7 +462,8 @@ structure Parser : PARSER = struct
 
     val functionDefinitionParser =
         ps.seq docstringParserL
-               (ps.pstring "function")
+               (ps.seqR (ps.pstring "function")
+                        ws1)
 
     (* Modules *)
 
