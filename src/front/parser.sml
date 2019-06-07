@@ -480,13 +480,20 @@ structure Parser : PARSER = struct
                 and rtParser =
                     ps.seqR (ps.pchar #":")
                             typeSpecifierParser
+
+                and bodyParser =
+                    ps.seqR ws1
+                            (ps.seqR (ps.pchar #"=")
+                                     (ps.seqR ws1
+                                              expressionParser))
             in
                 ps.seq docstringParserL
                        (ps.seqR (ps.pstring "function")
                                 (ps.seqR ws1
                                          (ps.seqR identParser
                                                   (ps.seqR paramListParser
-                                                           rtParser))))
+                                                           (ps.seqR rtParser
+                                                                    bodyParser)))))
             end
         end
 
