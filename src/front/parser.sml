@@ -429,16 +429,17 @@ structure Parser : PARSER = struct
                                 (ps.seq typeParser
                                         docstringParserR))
         in
-            ps.pmap (fn (ds, (name, slots)) =>
-                        constructor (ds, name, slots))
+            ps.pmap (fn (ds, (vis, (name, slots))) =>
+                        constructor (ds, vis, name, slots))
                     (ps.seq docstringParserL
-                            (ps.seqR (ps.pstring label)
-                                     (ps.seq identParser
-                                             (ps.seqR ws1
-                                                      (ps.seqR ws1
-                                                               (ps.between (ps.pchar #"{")
-                                                                           (commaSeparatedList0 slotParser)
-                                                                           (ps.pchar #"}")))))))
+                            (ps.seq typeVisibilityParser
+                                    (ps.seqR (ps.pstring label)
+                                             (ps.seq identParser
+                                                     (ps.seqR ws1
+                                                              (ps.seqR ws1
+                                                                       (ps.between (ps.pchar #"{")
+                                                                                   (commaSeparatedList0 slotParser)
+                                                                                   (ps.pchar #"}"))))))))
         end
 
     val recordDefinitionParser =
