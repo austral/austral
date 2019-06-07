@@ -462,7 +462,9 @@ structure Parser : PARSER = struct
 
     val functionDefinitionParser =
         let val paramListParser =
+                ps.between (ps.pchar #"(")
 
+                           (ps.pchar #")")
         in
             ps.seq docstringParserL
                    (ps.seqR (ps.pstring "function")
