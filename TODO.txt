@@ -1,6 +1,5 @@
 TODO:
 
-- Parser: function definitions
 - Resolve Syntax.module objects into actual module instances
 
 LONG-TERM TODO:
@@ -206,3 +205,4 @@ DONE:
 - Different alphabets for different types of identifiers
 - Parser: record definitions
 - Parser: variant definitions
+- Parser: function definitions
