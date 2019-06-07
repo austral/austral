@@ -409,7 +409,7 @@ structure Parser : PARSER = struct
     (* Visibility declarations *)
 
     val typeVisibilityParser =
-        ps.choice [ps.seqR (ps.pstring "public") (ps.preturn Syntax.PublicType),
+        ps.choice [ps.seqR (ps.seq (ps.pstring "public") ws1) (ps.preturn Syntax.PublicType),
                    ps.seqR (ps.pstring "opaque") (ps.preturn Syntax.OpaqueType),
                    ps.seqR (ps.pstring "private") (ps.preturn Syntax.PrivateType),
                    ps.preturn Syntax.PrivateType]
