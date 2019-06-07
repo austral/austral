@@ -21,7 +21,7 @@ signature NAME = sig
     (* Identifiers: names of types, functions, variables *)
     type ident
 
-    val alphabet : string
+    val identAlphabet : string
 
     val mkIdent : string -> ident option
     val mkIdentEx : string -> ident
