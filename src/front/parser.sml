@@ -166,8 +166,7 @@ structure Parser : PARSER = struct
         docstringParser' ps.seqL
 
     val docstringParserR = (* When the docstring is preceded by whitespace *)
-        ps.pmap Syntax.Docstring
-                (ps.opt (ps.seqR ws1 docstringTextParser))
+        docstringParser' ps.seqR
 
     (* Expressions *)
 
