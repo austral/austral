@@ -488,7 +488,7 @@ structure Parser : PARSER = struct
                                               expressionParser))
             in
                 ps.pmap (fn (ds, (vis, (name, (params, (rt, body))))) =>
-                            Syntax.FunctionDefinition (ds, name, params, rt, body))
+                            Syntax.FunctionDefinition (ds, vis, name, params, rt, body))
                         (ps.seq docstringParserL
                                 (ps.seq functionVisibilityParser
                                         (ps.seqR (ps.pstring "function")
