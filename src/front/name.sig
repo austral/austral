@@ -18,6 +18,7 @@
 *)
 
 signature NAME = sig
+    (* Identifiers: names of types, functions, variables *)
     type ident
 
     val alphabet : string
