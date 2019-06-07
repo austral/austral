@@ -158,6 +158,10 @@ structure Parser : PARSER = struct
                                                   (ps.many docstringChar)
                                                   (ps.pchar #"`"))
 
+    val docstringParser =
+        ps.pmap Syntax.Docstring
+                (ps.opt docstringTextParser)
+
     (* Expressions *)
 
     fun defineExpressionParser parsers =
