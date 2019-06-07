@@ -413,6 +413,13 @@ structure Parser : PARSER = struct
 
     (* Type definitions *)
 
+    val structDefinitionParser =
+        ps.seqR "struct"
+                (ps.seqR ws1
+                         (between (ps.pchar #"{")
+                                  (commaSeparatedList0 slotParser)
+                                  (ps.pchar #"}")))
+
     (* Function definitions *)
 
     (* Modules *)
