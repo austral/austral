@@ -423,7 +423,7 @@ structure Parser : PARSER = struct
                                                   typeSpecifierParser)))
         in
             ps.pmap (fn (name, slots) =>
-                        Syntax.RecordDefinition (name, slots))
+                        Syntax.RecordDefinition (name, slots, Syntax.Docstring NONE))
                     (ps.seqR (ps.pstring "struct")
                              (ps.seq identParser
                                      (ps.seqR ws1
