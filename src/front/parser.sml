@@ -158,7 +158,7 @@ structure Parser : PARSER = struct
                                                   (ps.many docstringChar)
                                                   (ps.pchar #"`"))
 
-    fun docstringParser# seqDir =
+    fun docstringParser' seqDir =
         ps.pmap Syntax.Docstring
                 (ps.opt (seqDir docstringTextParser ws1))
 
