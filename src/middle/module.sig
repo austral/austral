@@ -18,4 +18,5 @@
 *)
 
 signature MODULE = sig
+    type module
 end
