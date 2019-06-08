@@ -18,4 +18,5 @@
 *)
 
 structure Module :> MODULE = struct
+    datatype module = Module of unit
 end
