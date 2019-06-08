@@ -18,5 +18,7 @@
 *)
 
 signature MODULE = sig
+    type name = Name.module_name
+
     type module
 end
