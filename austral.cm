@@ -51,4 +51,6 @@ is
   src/front/parser.sig
   src/front/parser.sml
 
+  src/middle/module.sig
+
   $/basis.cm
