@@ -26,6 +26,8 @@ structure Module :> MODULE = struct
 
     type docstring = Syntax.docstring
 
+    type type_specifier = Syntax.type_specifier
+
     datatype module = Module of name * docstring * (Name.ident, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
