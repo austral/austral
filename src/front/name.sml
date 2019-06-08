@@ -26,13 +26,13 @@ structure Name : NAME = struct
 
     (* Module names *)
 
+    datatype module_name = ModuleName of string
+
     val moduleNameAlphabet =
         let val sym = "-."
         in
             alpha ^ alphaup ^ num ^ sym
         end
-
-    datatype module_name = ModuleName of string
 
     (* Identifiers *)
 
