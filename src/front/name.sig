@@ -23,6 +23,10 @@ signature NAME = sig
 
     val moduleNameAlphabet : string
 
+    val mkModuleName : string -> module_name option
+    val mkModuleNameEx : string -> module_name
+    val moduleNameString : module_name -> string
+
     (* Identifiers: names of types, functions, variables *)
     type ident
 
