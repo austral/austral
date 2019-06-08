@@ -18,5 +18,7 @@
 *)
 
 structure Module :> MODULE = struct
+    type name = Name.module_name
+
     datatype module = Module of unit
 end
