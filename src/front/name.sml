@@ -32,6 +32,24 @@ structure Name : NAME = struct
             alpha ^ alphaup ^ num ^ sym
         end
 
+    fun isValidModuleName s =
+        let val sigma = explode moduleNameAlphabet
+        in
+            List.all (fn c => Util.member c sigma) (explode s)
+        end
+
+    fun mkModuleName s =
+        if isValidModuleName s then
+            SOME (ModuleName s)
+        else
+            NONE
+
+    fun mkModuleNameEx s =
+        if isValidModuleName s then
+            ModuleName s
+        else
+            raise Fail "Not a valid identifier."
+
     (* Identifiers *)
 
     datatype ident = Identifier of string
