@@ -31,7 +31,7 @@ structure Module :> MODULE = struct
     datatype module = Module of name * docstring * (Name.ident, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
-                         | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * exprRecordDefinition
+                         | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * expr
 
          and slot_definition = SlotDefinition of name * type_specifier * docstring
 
