@@ -32,6 +32,8 @@ structure Name : NAME = struct
             alpha ^ alphaup ^ num ^ sym
         end
 
+    datatype module_name = ModuleName of string
+
     (* Identifiers *)
 
     datatype ident = Identifier of string
