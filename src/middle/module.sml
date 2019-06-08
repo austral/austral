@@ -24,7 +24,9 @@ structure Module :> MODULE = struct
 
     type func_visibility = Syntax.type_visibility
 
-    datatype module = Module of name * Syntax.docstring * (Name.ident, declaration) Map.map
+    type docstring = Syntax.docstring
+
+    datatype module = Module of name * docstring * (Name.ident, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * exprRecordDefinition
