@@ -52,6 +52,8 @@ structure Name : NAME = struct
         else
             raise Fail "Not a valid identifier."
 
+    fun moduleNameString (ModuleName s) = s
+
     (* Identifiers *)
 
     datatype ident = Identifier of string
