@@ -20,8 +20,18 @@
 structure Module :> MODULE = struct
     type name = Name.module_name
 
+    type type_visibility = Syntax.type_visibility
+
+    type func_visibility = Syntax.type_visibility
+
     datatype module = Module of name * Syntax.docstring * (Name.ident, declaration) Map.map
-         and declaration = RecordDefinition
-                         | UnionDefinition
-                         | FunctionDefinition
+         and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
+                         | UnionDefinition of docstring * type_visibility * name * case_definition list
+                         | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * exprRecordDefinition
+
+         and slot_definition = SlotDefinition of name * type_specifier * docstring
+
+         and case_definition = CaseDefinition of name * type_specifier option * docstring
+
+         and param = Param of name * type_specifier * docstring
 end
