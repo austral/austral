@@ -58,7 +58,7 @@ structure Name : NAME = struct
         if isValidIdent s then
             Identifier s
         else
-            raise Fail "Not a valid identifier. This is an internal compiler bug stemming from a different between the Ident structure's definition of an identifier and the parser's definition."
+            raise Fail "Not a valid identifier."
 
     fun identString (Identifier s) = s
 end
