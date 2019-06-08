@@ -20,5 +20,8 @@
 structure Module :> MODULE = struct
     type name = Name.module_name
 
-    datatype module = Module of name * Syntax.docstring
+    datatype module = Module of name * Syntax.docstring * (Name.ident, declaration) Map.map
+         and declaration = RecordDefinition
+                         | UnionDefinition
+                         | FunctionDefinition
 end
