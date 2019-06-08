@@ -28,7 +28,9 @@ structure Module :> MODULE = struct
 
     type type_specifier = Syntax.type_specifier
 
-    datatype module = Module of name * docstring * (Name.ident, declaration) Map.map
+    type imports = (Name.ident, Name.module_name) Map.map
+
+    datatype module = Module of name * docstring * imports * (Name.ident, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier
