@@ -26,8 +26,6 @@ structure Name : NAME = struct
 
     (* Module names *)
 
-    datatype module_name = ModuleName of string
-
     val moduleNameAlphabet =
         let val sym = "-."
         in
@@ -44,20 +42,20 @@ structure Name : NAME = struct
             alpha ^ alphaup ^ num ^ sym
         end
 
-    fun isValid s =
+    fun isValidIdent s =
         let val sigma = explode identAlphabet
         in
             List.all (fn c => Util.member c sigma) (explode s)
         end
 
     fun mkIdent s =
-        if isValid s then
+        if isValidIdent s then
             SOME (Identifier s)
         else
             NONE
 
     fun mkIdentEx s =
-        if isValid s then
+        if isValidIdent s then
             Identifier s
         else
             raise Fail "Not a valid identifier. This is an internal compiler bug stemming from a different between the Ident structure's definition of an identifier and the parser's definition."
