@@ -83,8 +83,10 @@ structure Module :> MODULE = struct
 
     *)
 
-    fun checkReferencedModuleExists (Syntax.Import (moduleName, _)) menv =
-        Option.isSome (getModule menv moduleName)
+    fun validateImport (Syntax.Import (moduleName, names)) menv =
+        case getModule menv moduleName of
+            SOME mod => mod
+          | NONE => raise Fail "No such module"
 
     (* Here we implement the remainder of module resolution. This is mostly
        mapping syntax declarations to module declarations. The validation
