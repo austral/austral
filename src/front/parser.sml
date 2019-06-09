@@ -514,15 +514,13 @@ structure Parser : PARSER = struct
 
     (* Interface *)
 
-    exception ParserException of string
-
     fun succeedOrDie result =
         case result of
             (ps.Success (r, _)) => r
           | f => let val msg = "Bad parse: " ^ (ps.explain f)
                  in
                      print msg;
-                     raise ParserException msg
+                     Error.syntax msg
                  end
     fun pf f s =
         succeedOrDie (ps.run f (ParsimonyStringInput.fromString s))
