@@ -48,7 +48,7 @@ structure Module :> MODULE = struct
         raise Fail "derp"
 
     and resolveDeclarations declarationList =
-        map resolveDeclaration declarationList
+        raise Fail "Not implemented"
 
     and resolveDeclaration (Syntax.TypeAlias _) =
         raise Fail "Not implemented"
