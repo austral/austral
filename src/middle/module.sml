@@ -67,4 +67,8 @@ structure Module :> MODULE = struct
         raise Fail "Not implemented"
       | resolveType (Syntax.Address ts) =
         Address (resolveType ts)
+      | resolveType (Syntax.Pointer ts) =
+        Pointer (resolveType ts)
+      | resolveType (Syntax.TupleType tss) =
+        TupleType (map resolveType tss)
 end
