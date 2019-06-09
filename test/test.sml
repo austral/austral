@@ -200,35 +200,35 @@ structure AustralTest = struct
                           in
                               [
                                 isParse "from a import b"
-                                        (Import (i "a",
-                                                 [ImportedName (i "b")])),
+                                        (mnmport (mn "a",
+                                                 [ImportedName (mn "b")])),
                                 isParse "from   a   import   b    "
-                                        (Import (i "a",
-                                                 [ImportedName (i "b")])),
+                                        (mnmport (mn "a",
+                                                 [ImportedName (mn "b")])),
                                 isParse "from a import b,c, d, e ,  f  "
-                                        (Import (i "a",
-                                                 [ImportedName (i "b"),
-                                                  ImportedName (i "c"),
-                                                  ImportedName (i "d"),
-                                                  ImportedName (i "e"),
-                                                  ImportedName (i "f")])),
+                                        (mnmport (mn "a",
+                                                 [ImportedName (mn "b"),
+                                                  ImportedName (mn "c"),
+                                                  ImportedName (mn "d"),
+                                                  ImportedName (mn "e"),
+                                                  ImportedName (mn "f")])),
                                 isParse "from    a   import    b,c, d, e ,  f  "
-                                        (Import (i "a",
-                                                 [ImportedName (i "b"),
-                                                  ImportedName (i "c"),
-                                                  ImportedName (i "d"),
-                                                  ImportedName (i "e"),
-                                                  ImportedName (i "f")])),
+                                        (mnmport (mn "a",
+                                                 [ImportedName (mn "b"),
+                                                  ImportedName (mn "c"),
+                                                  ImportedName (mn "d"),
+                                                  ImportedName (mn "e"),
+                                                  ImportedName (mn "f")])),
                                 isParse "from mod import a as b, c as d"
-                                        (Import (i "mod",
+                                        (mnmport (mn "mod",
                                                  [ImportedNameAs { original = i "a", rename = i "b" },
                                                   ImportedNameAs { original = i "c", rename = i "d" }])),
                                 isParse "from mod import name, a as b, c as d, name2"
-                                        (Import (i "mod",
-                                                 [ImportedName (i "name"),
+                                        (mnmport (mn "mod",
+                                                 [ImportedName (mn "name"),
                                                   ImportedNameAs { original = i "a", rename = i "b" },
                                                   ImportedNameAs { original = i "c", rename = i "d" },
-                                                  ImportedName (i "name2")]))
+                                                  ImportedName (mn "name2")]))
                               ]
                           end
                 ],
