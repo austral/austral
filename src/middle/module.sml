@@ -93,7 +93,8 @@ structure Module :> MODULE = struct
 
     fun validateImport (Syntax.Import (moduleName, names)) menv =
         case getModule menv moduleName of
-            (SOME module) => module
+            (SOME module) => (map validateDeclarationExists names;
+                              module)
           | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
 
     and validateDeclarationExists module name =
