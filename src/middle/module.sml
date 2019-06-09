@@ -18,6 +18,8 @@
 *)
 
 structure Module :> MODULE = struct
+    (* Types *)
+
     type name = Name.ident
     type module_name = Name.module_name
 
@@ -41,6 +43,24 @@ structure Module :> MODULE = struct
          and case_definition = CaseDefinition of name * ty option * docstring
 
          and param = Param of name * ty * docstring
+
+    (* Module Resolution
+
+       The following functions resolve Syntax.module objects into module
+       objects.
+
+       First, we resolve imports. Import validation is fairly straightforward:
+       we have a list of import statements, each of which refers to a single
+       module and imports a set of names from that module, and have to turn it
+       into a map of identifiers to the name of the module that identifier comes
+       from.
+
+       In the process, we need to validate a few things:
+
+       1. Check that imports refer to modules that exist in the module environment.
+       2. Check that imported names refer to declarations that exist in the referenced module.
+
+     *)
 
     fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
         Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
