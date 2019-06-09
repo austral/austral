@@ -19,10 +19,10 @@
 
 structure Error :> ERROR = struct
     fun syntax message =
-        raise Fail ("Syntax Error: " ^ message)
+        raise Fail ("Syntax error: " ^ message)
 
     fun semantic message =
-        raise Fail ("Semantic Error: " ^ message)
+        raise Fail ("Semantic error: " ^ message)
 
     fun notImplemented () =
         raise Fail "Not implemented"
