@@ -91,6 +91,28 @@ structure Module :> MODULE = struct
             (SOME module) => module
           | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
 
+    and validateDeclarationExists module name =
+        let fun getName (Syntax.ImportedName name) =
+                name
+              | getName (Syntax.ImportedNameAs ( original, rename }) =
+                original
+        in
+            let name = getName name
+            in
+                case getDeclaration module name of
+                    (SOME decl) => decl
+                  | NONE => Error.semantic ("Imported name '"
+                                            ^
+                                            (Ident.identString name)
+                                            ^
+                                            "' does not exist in module '"
+                                            ^
+                                            (moduleName module)
+                                            ^
+                                            "'")
+            end
+        end
+
     (* Here we implement the remainder of module resolution. This is mostly
        mapping syntax declarations to module declarations. The validation
        perform at this stage is basically ensuring declaration names don't
