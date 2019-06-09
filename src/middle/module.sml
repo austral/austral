@@ -113,7 +113,7 @@ structure Module :> MODULE = struct
                 in
                     let val names = map mapper names
                     in
-                        (moduleName, Set.fromList names)
+                        Set.fromList names
                     end
                 end
         in
@@ -128,7 +128,7 @@ structure Module :> MODULE = struct
                                             above) has been performed by this
                                             point, so construct and return set
                                             of ImportedName objects *)
-                                         importedNames
+                                         (moduleName, importedNames)
                                  end
               | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
         end
