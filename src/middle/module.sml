@@ -100,7 +100,7 @@ structure Module :> MODULE = struct
         Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
 
     and resolveImports importList =
-        raise Fail "derp"
+        Error.notImplemented ()
 
     and resolveDeclarations declarationList =
         raise Fail "Not implemented"
