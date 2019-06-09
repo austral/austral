@@ -26,4 +26,7 @@ structure Error :> ERROR = struct
 
     fun notImplemented () =
         raise Fail "Not implemented"
+
+    fun internal message =
+        raise Fail ("Internal compiler error: " ^ message)
 end
