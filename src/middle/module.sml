@@ -55,6 +55,9 @@ structure Module :> MODULE = struct
 
     val getModule = Map.get
 
+    fun getDeclaration (Module (_, _, _, ds)) name =
+        Map.get ds name
+
     (* Module Resolution
 
        The following functions resolve Syntax.module objects into module
