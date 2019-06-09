@@ -21,4 +21,5 @@ signature ERROR = sig
     val syntax : string -> 'a
     val semantic : string -> 'a
     val notImplemented : unit -> 'a
+    val internal : string -> 'a
 end
