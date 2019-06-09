@@ -132,6 +132,11 @@ structure Module :> MODULE = struct
       | validateTypeVis Syntax.PrivateType =
         false
 
+    and validateFuncVis Syntax.PublicFunction =
+        true
+      | validateFuncVis Syntax.PrivateFunction =
+        false
+
     (* Here we implement the remainder of module resolution. This is mostly
        mapping syntax declarations to module declarations. The validation
        perform at this stage is basically ensuring declaration names don't
