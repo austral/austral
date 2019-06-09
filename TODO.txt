@@ -28,6 +28,7 @@ LONG-TERM TODO:
 - CUDA backend
 - C+OpenMP backend
 - Define syntax for linear iteration operators
+- Track source positions
 
 DONE:
 
