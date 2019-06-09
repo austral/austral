@@ -50,7 +50,7 @@ structure Name : NAME = struct
         if isValidModuleName s then
             ModuleName s
         else
-            raise Fail "Not a valid identifier."
+            Error.syntax ("Not a valid identifier: " ^ s)
 
     fun moduleNameString (ModuleName s) = s
 
