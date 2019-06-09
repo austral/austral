@@ -1,7 +1,7 @@
 .cm
 austral
 austral-test
-src/c-runtime.sml
+src/back/c-runtime.sml
 test/valid/*.c
 test/valid/*.bin
 docs/*.html
