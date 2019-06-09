@@ -103,7 +103,7 @@ structure Module :> MODULE = struct
         Error.notImplemented ()
 
     and resolveDeclarations declarationList =
-        raise Fail "Not implemented"
+        Error.notImplemented
 
     and resolveDeclaration (Syntax.RecordDefinition (ds, tv, name, slots)) =
         let fun resolveSlot (Syntax.SlotDefinition (n, ts, ds)) =
