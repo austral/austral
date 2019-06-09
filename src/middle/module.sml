@@ -125,7 +125,7 @@ structure Module :> MODULE = struct
         end
 
     and resolveType (Syntax.NamedType name) =
-        raise Fail "Not implemented"
+        Error.notImplemented ()
       | resolveType (Syntax.Address ts) =
         Type.Address (resolveType ts)
       | resolveType (Syntax.Pointer ts) =
