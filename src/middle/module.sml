@@ -123,19 +123,17 @@ structure Module :> MODULE = struct
             end
 
     and validateDeclarationExists module name =
-            in
-                case getDeclaration module name of
-                    (SOME decl) => decl
-                  | NONE => Error.semantic ("Imported name '"
-                                            ^
-                                            (Name.identString name)
-                                            ^
-                                            "' does not exist in module '"
-                                            ^
-                                            (Name.moduleNameString (moduleName module))
-                                            ^
-                                            "'")
-            end
+        case getDeclaration module name of
+            (SOME decl) => decl
+          | NONE => Error.semantic ("Imported name '"
+                                    ^
+                                    (Name.identString name)
+                                    ^
+                                    "' does not exist in module '"
+                                    ^
+                                    (Name.moduleNameString (moduleName module))
+                                    ^
+                                    "'")
         end
 
     and validateDeclarationVisibility (Syntax.RecordDefinition (_, vis, _, _)) =
