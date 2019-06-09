@@ -53,6 +53,8 @@ structure Module :> MODULE = struct
 
     type menv = (module_name, module) Map.map
 
+    val getModule = Map.get
+
     (* Module Resolution
 
        The following functions resolve Syntax.module objects into module
