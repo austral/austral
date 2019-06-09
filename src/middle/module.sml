@@ -62,7 +62,7 @@ structure Module :> MODULE = struct
         let fun resolveSlot (Syntax.CaseDefinition (n, ts, ds)) =
                 CaseDefinition (n, resolveType ts, ds)
         in
-            UnionDefinition (ds, tv, name, map resolveCaseDefinition cases)
+            UnionDefinition (ds, tv, name, map resolveCase cases)
         end
       | resolveDeclaration (Syntax.FunctionDefinition (ds, fv, name, params, rt, expr)) =
         let fun resolveParam (Syntax.Param (n, ts, ds)) =
