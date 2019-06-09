@@ -392,7 +392,7 @@ structure Parser : PARSER = struct
 
     val importParser =
         let val from = ps.seq (ps.pstring "from") ws1
-            and modName = ps.seqL identParser ws1
+            and modName = ps.seqL moduleNameParser ws1
             and import = ps.seq (ps.pstring "import") ws1
             and importList = commaSeparatedList1 importedNameParser
         in
