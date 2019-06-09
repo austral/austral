@@ -86,6 +86,14 @@ structure Module :> MODULE = struct
     fun checkReferencedModuleExists (Syntax.Import (moduleName, _)) menv =
         Option.isSome (getModule menv moduleName)
 
+    (* Here we implement the remainder of module resolution. This is mostly
+       mapping syntax declarations to module declarations. The validation
+       perform at this stage is basically ensuring declaration names don't
+       collide (with each other, or with imports). Additionally, we resolve type
+       specifiers to type objects.
+
+    *)
+
     fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
         Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
 
