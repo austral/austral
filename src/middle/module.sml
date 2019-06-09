@@ -96,7 +96,7 @@ structure Module :> MODULE = struct
     fun importNamesToSet names =
         let fun mapper (Syntax.ImportedName name) =
                 name
-              | mapper (Syntax.ImportedNameAs { rename, _ }) =
+              | mapper (Syntax.ImportedNameAs { rename, original }) =
                 rename
         in
             let val names = map mapper names
