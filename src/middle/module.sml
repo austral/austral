@@ -110,7 +110,7 @@ structure Module :> MODULE = struct
                     Error.semantic "Colliding import"
                 else
                     let val pairs = map (fn (mn, s) =>
-                                            map (fn elem => (mn, elem)) (Set.toList s))
+                                            map (fn elem => (elem, mn)) (Set.toList s))
                                         importedNames
                     in
                         Map.fromList (List.concat pairs)
