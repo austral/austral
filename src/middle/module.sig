@@ -24,5 +24,7 @@ signature MODULE = sig
 
     type menv
 
+    val getModule : menv -> module_name -> module option
+
     val resolve : Syntax.module -> module
 end
