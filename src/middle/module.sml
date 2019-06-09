@@ -114,9 +114,9 @@ structure Module :> MODULE = struct
                                          Error.syntax "Repeated import"
                                      else
                                          (* All validation (except for point 5
-                                        above) has been performed by this point,
-                                        so construct and return set of
-                                        ImportedName objects *)
+                                            above) has been performed by this
+                                            point, so construct and return set
+                                            of ImportedName objects *)
                                          importedNames
                                  end
               | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
