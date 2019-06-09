@@ -123,7 +123,7 @@ structure Module :> MODULE = struct
       | validateDeclaration (Syntax.UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
       | validateDeclaration (Syntax.FunctionDefinition (_, vis, _, _, _, _)) =
-        validateFuncVis vis
+        validFuncVis vis
 
     and validateTypeVis Syntax.PublicType =
         true
@@ -132,9 +132,9 @@ structure Module :> MODULE = struct
       | validateTypeVis Syntax.PrivateType =
         false
 
-    and validateFuncVis Syntax.PublicFunction =
+    and validFuncVis Syntax.PublicFunction =
         true
-      | validateFuncVis Syntax.PrivateFunction =
+      | validFuncVis Syntax.PrivateFunction =
         false
 
     (* Here we implement the remainder of module resolution. This is mostly
