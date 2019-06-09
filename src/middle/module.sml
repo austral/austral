@@ -101,7 +101,16 @@ structure Module :> MODULE = struct
            names to the name of the module they're imported from. *)
         let val importedNames : (module_name * name Set.set) list = map (validateImport menv) imports
         in
-            ()
+            (* To check that no names are repeated, we merge all sets into a
+               single set, and compare sizes *)
+            let val bigSet = fromList (map (fn (_, s) => Set.toList s) importedNames)
+                and totalNames = List.foldl (op +) 0 (map (fn (_, s) => Set.size s) importedNames)
+            in
+                if Set.size bigSet <> totalNames then
+                    Error.semantic "Colliding import"
+                else
+
+            end
         end
 
     and validateImport menv (Syntax.Import (moduleName, names)) =
