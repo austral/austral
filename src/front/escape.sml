@@ -42,7 +42,7 @@ structure Escape : ESCAPE = struct
       | consumeWhitespace (#"\v" :: rest) = consumeWhitespace rest
       | consumeWhitespace (#"\f" :: rest) = consumeWhitespace rest
       | consumeWhitespace (#"\\" :: rest) = rest
-      | consumeWhitespace _ = raise Fail "Bad whitespace escape sequence"
+      | consumeWhitespace _ = Error.syntax "Bad whitespace escape sequence"
 
     fun escapedToString (EscapedString s) =
         s
