@@ -80,7 +80,7 @@ structure Name : NAME = struct
         if isValidIdent s then
             Identifier s
         else
-            raise Fail "Not a valid identifier."
+            Error.syntax ("Not a valid identifier: " ^ s)
 
     fun identString (Identifier s) = s
 end
