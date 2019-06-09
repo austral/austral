@@ -53,7 +53,11 @@ structure Module :> MODULE = struct
     and resolveDeclaration (Syntax.TypeAlias _) =
         raise Fail "Not implemented"
       | resolveDeclaration (Syntax.RecordDefinition (ds, tv, name, slots)) =
-        RecordDefinition (ds, tv, name, map resolveSlotDefinition slots)
+        let fun resolveSlot (Syntax.SlotDefinition (n, ts, ds)) =
+                SlotDefinition (n, resolveType ts, ds)
+        in
+            RecordDefinition (ds, tv, name, map resolveSlotDefinition slots)
+        end
       | resolveDeclaration (Syntax.UnionDefinition (ds, tv, name, cases)) =
         UnionDefinition (ds, tv, name, map resolveCaseDefinition cases)
       | resolveDeclaration (Syntax.FunctionDefinition (ds, fv, name, params, rt, expr)) =
