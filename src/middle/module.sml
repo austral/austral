@@ -113,7 +113,7 @@ structure Module :> MODULE = struct
                 in
                     let val names = map mapper names
                     in
-                        Set.fromList names
+                        (moduleName, Set.fromList names)
                     end
                 end
         in
