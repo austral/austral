@@ -51,6 +51,9 @@ is
   src/front/parser.sig
   src/front/parser.sml
 
+  src/middle/type.sig
+  src/middle/type.sml
+
   src/middle/module.sig
   src/middle/module.sml
 
