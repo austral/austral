@@ -125,11 +125,11 @@ structure Module :> MODULE = struct
       | validateDeclaration (Syntax.FunctionDefinition (_, vis, _, _, _, _)) =
         validFuncVis vis
 
-    and validateTypeVis Syntax.PublicType =
+    and validTypeVis Syntax.PublicType =
         true
-      | validateTypeVis Syntax.OpaqueType =
+      | validTypeVis Syntax.OpaqueType =
         true
-      | validateTypeVis Syntax.PrivateType =
+      | validTypeVis Syntax.PrivateType =
         false
 
     and validFuncVis Syntax.PublicFunction =
