@@ -97,7 +97,10 @@ structure Module :> MODULE = struct
                               (* All validation (except for point 4 above) has
                                  been performed by this point, so construct a
                                  set of ImportedName objects *)
-                              module)
+                              let val importedNames = module
+                              in
+                                  Set.fromList names
+                              end)
           | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
 
     and validateImportedName module name =
