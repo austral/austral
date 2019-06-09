@@ -110,7 +110,7 @@ structure Module :> MODULE = struct
             (SOME module) => let val importedNames = importNamesToSet names
                              in
                                  map (validateImportedName module) names;
-                                 if Set.size importedName <> (List.length names) then
+                                 if Set.size importedNames <> (List.length names) then
                                      Error.syntax "Repeated import"
                                  else
                                      (* All validation (except for point 5
