@@ -99,7 +99,7 @@ structure Module :> MODULE = struct
     and validateDeclarationExists module name =
         let fun getName (Syntax.ImportedName name) =
                 name
-              | getName (Syntax.ImportedNameAs ( original, rename }) =
+              | getName (Syntax.ImportedNameAs { original, rename }) =
                 original
         in
             let name = getName name
