@@ -57,8 +57,18 @@ structure Module :> MODULE = struct
 
        In the process, we need to validate a few things:
 
-       1. Check that imports refer to modules that exist in the module environment.
-       2. Check that imported names refer to declarations that exist in the referenced module.
+       1. Check that imports refer to modules that exist in the module
+       environment.
+
+       2. Check that imported names refer to declarations that exist in the
+       referenced module.
+
+       3. Check that those declarations are public (in the case of functions) or
+       either public or opaque (in the case of types). Otherwise, we can't
+       import them.
+
+       4. Ensure that imports don't collide with each other: if we have `from A
+       import a` and `from B import a`, this is clearly an error.
 
      *)
 
