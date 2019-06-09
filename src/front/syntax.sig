@@ -59,9 +59,9 @@ signature SYNTAX = sig
 
     (* Declarations *)
 
-    datatype module = Module of docstring * name * import list * declaration list
+    datatype module = Module of docstring * Name.moduleName * import list * declaration list
 
-         and import = Import of name * imported_name list
+         and import = Import of Name.moduleName * imported_name list
 
          and imported_name = ImportedName of name
                            | ImportedNameAs of { original: name, rename: name }
