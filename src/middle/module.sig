@@ -22,5 +22,7 @@ signature MODULE = sig
 
     type module
 
+    type menv
+
     val resolve : Syntax.module -> module
 end
