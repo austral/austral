@@ -18,7 +18,8 @@
 *)
 
 structure Module :> MODULE = struct
-    type name = Name.module_name
+    type name = Name.ident
+    type module_name = Name.module_name
 
     type type_visibility = Syntax.type_visibility
 
@@ -28,9 +29,9 @@ structure Module :> MODULE = struct
 
     type ty = Type.ty
 
-    type imports = (Name.ident, Name.module_name) Map.map
+    type imports = (Name.ident, module_name) Map.map
 
-    datatype module = Module of name * docstring * imports * (Name.ident, declaration) Map.map
+    datatype module = Module of module_name * docstring * imports * (Name.ident, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * param list * ty
