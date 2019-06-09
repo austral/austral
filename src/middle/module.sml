@@ -108,7 +108,7 @@ structure Module :> MODULE = struct
                     (SOME decl) => decl
                   | NONE => Error.semantic ("Imported name '"
                                             ^
-                                            (Ident.identString name)
+                                            (Name.identString name)
                                             ^
                                             "' does not exist in module '"
                                             ^
