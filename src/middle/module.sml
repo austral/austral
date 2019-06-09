@@ -59,7 +59,7 @@ structure Module :> MODULE = struct
             RecordDefinition (ds, tv, name, map resolveSlot slots)
         end
       | resolveDeclaration (Syntax.UnionDefinition (ds, tv, name, cases)) =
-        let fun resolveSlot (Syntax.CaseDefinition (n, ts, ds)) =
+        let fun resolveCase (Syntax.CaseDefinition (n, ts, ds)) =
                 CaseDefinition (n, resolveType ts, ds)
         in
             UnionDefinition (ds, tv, name, map resolveCase cases)
