@@ -83,6 +83,9 @@ structure Module :> MODULE = struct
 
     *)
 
+    fun checkReferencedModuleExists (Syntax.Import (moduleName, _)) menv =
+        Option.isSome (getModule menv moduleName)
+
     fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
         Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
 
