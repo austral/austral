@@ -118,6 +118,20 @@ structure Module :> MODULE = struct
             end
         end
 
+    and validateDeclaration (Syntax.RecordDeclaration (_, vis, _, _)) =
+        validTypeVis vis
+      | validateDeclaration (Syntax.UnionDeclaration (_, vis, _, _)) =
+        validTypeVis vis
+      | validateDeclaration (Syntax.FunctionDefinition (_, vis, _, _, _, _)) =
+        validateFuncVis vis
+
+    and validateTypeVis Syntax.PublicType =
+        true
+      | validateTypeVis Syntax.OpaqueType =
+        true
+      | validateTypeVis Syntax.PrivateType =
+        false
+
     (* Here we implement the remainder of module resolution. This is mostly
        mapping syntax declarations to module declarations. The validation
        perform at this stage is basically ensuring declaration names don't
