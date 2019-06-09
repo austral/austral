@@ -43,4 +43,7 @@ structure Module :> MODULE = struct
 
     fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
         Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
+
+    and resolveImports importList =
+        raise Fail "derp"
 end
