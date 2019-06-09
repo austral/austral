@@ -61,7 +61,7 @@ structure Module :> MODULE = struct
         end
       | resolveDeclaration (Syntax.UnionDefinition (ds, tv, name, cases)) =
         let fun resolveCase (Syntax.CaseDefinition (n, ts, ds)) =
-                CaseDefinition (n, resolveType ts, ds)
+                CaseDefinition (n, Option.map resolveType ts, ds)
         in
             UnionDefinition (ds, tv, name, map resolveCase cases)
         end
