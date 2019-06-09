@@ -68,7 +68,7 @@ structure Module :> MODULE = struct
         let fun resolveParam (Syntax.Param (n, ts, ds)) =
                 Param (n, resolveType ts, ds)
         in
-            FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt, expr)
+            FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt)
         end
 
     and resolveType (Syntax.NamedType name) =
