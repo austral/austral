@@ -57,5 +57,9 @@ structure Module :> MODULE = struct
       | resolveDeclaration (Syntax.UnionDefinition (ds, tv, name, cases)) =
         UnionDefinition (ds, tv, name, map resolveCaseDefinition cases)
       | resolveDeclaration (Syntax.FunctionDefinition (ds, fv, name, params, rt, expr)) =
-        FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt, expr)
+        let fun resolveParam (Syntax.Param (n, ts, ds)) =
+                Param (n, resolveType ts, ds)
+        in
+            FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt, expr)
+        end
 end
