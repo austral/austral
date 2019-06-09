@@ -69,7 +69,7 @@ signature SYNTAX = sig
          and declaration = TypeAlias of docstring * name * type_visibility * type_specifier
                          | RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
-                         | FunctionDefinition of docstring * func_visibility * name * params * type_specifier * expr
+                         | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * expr
 
          and type_visibility = PublicType
                              | OpaqueType
@@ -81,8 +81,6 @@ signature SYNTAX = sig
 
          and func_visibility = PublicFunction
                              | PrivateFunction
-
-         and params = ParamList of param list
 
          and param = Param of name * type_specifier * docstring
 end
