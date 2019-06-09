@@ -66,8 +66,7 @@ structure Syntax :> SYNTAX = struct
          and imported_name = ImportedName of name
                            | ImportedNameAs of { original: name, rename: name }
 
-         and declaration = TypeAlias of docstring * name * type_visibility * type_specifier
-                         | RecordDefinition of docstring * type_visibility * name * slot_definition list
+         and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * expr
 
