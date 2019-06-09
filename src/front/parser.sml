@@ -478,11 +478,9 @@ structure Parser : PARSER = struct
                                                           docstringParserR))))
         in
             let val paramListParser =
-                    ps.pmap (fn params =>
-                                Syntax.ParamList params)
-                            (ps.between (ps.pchar #"(")
-                                        (commaSeparatedList0 paramParser)
-                                        (ps.pchar #")"))
+                    ps.between (ps.pchar #"(")
+                               (commaSeparatedList0 paramParser)
+                               (ps.pchar #")")
 
                 and rtParser =
                     ps.seqR (ps.pchar #":")
