@@ -21,10 +21,12 @@ signature MODULE = sig
     type module_name = Name.module_name
 
     type module
+    type declaration
 
     type menv
 
     val getModule : menv -> module_name -> module option
+    val getDeclaration : module -> Name.ident -> declaration option
 
     val resolve : Syntax.module -> module
 end
