@@ -67,7 +67,7 @@ structure Parser : PARSER = struct
     val moduleNameParser =
         let val modNameCharParser = ps.anyOfString Name.moduleNameAlphabet
         in
-            ps.pmap (String.implode) (ps.many1 modNameCharParser)
+            ps.pmap (Name.mkModuleNameEx o String.implode) (ps.many1 modNameCharParser)
         end
 
     (* Parsing type specifiers *)
