@@ -140,7 +140,7 @@ structure Module :> MODULE = struct
         validTypeVis vis
       | validateDeclarationVisibility (UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclarationVisibility (FunctionDefinition (_, vis, _, _, _, _)) =
+      | validateDeclarationVisibility (FunctionDefinition (_, vis, _, _, _)) =
         validFuncVis vis
 
     and validTypeVis Syntax.PublicType =
