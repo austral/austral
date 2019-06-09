@@ -44,6 +44,11 @@ structure Module :> MODULE = struct
 
          and param = Param of name * ty * docstring
 
+    (* Module functions *)
+
+    fun getDeclaration (Module (_, _, _, ds)) name =
+        Map.get ds name
+
     (* Module Environment
 
        The module environment is the collection of modules the compiler knows
@@ -54,9 +59,6 @@ structure Module :> MODULE = struct
     type menv = (module_name, module) Map.map
 
     val getModule = Map.get
-
-    fun getDeclaration (Module (_, _, _, ds)) name =
-        Map.get ds name
 
     (* Module Resolution
 
