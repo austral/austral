@@ -6,6 +6,7 @@ TODO:
 - Import validation: imports refer to declarations that exist in the referenced module
 - Import validation: imports refer to declarations that are public or opaque
 - Import validation: imports don't collide with each other
+- Import validation: ensure local declarations don't collide with import names
 - Resolve Syntax.module objects into actual module instances
 - Parse type specifiers to type objects
 
