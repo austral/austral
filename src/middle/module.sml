@@ -50,6 +50,8 @@ structure Module :> MODULE = struct
     and resolveDeclarations declarationList =
         map resolveDeclaration declarationList
 
-    and resolveDeclaration (TypeAlias _) =
+    and resolveDeclaration (Syntax.TypeAlias _) =
         raise Fail "Not implemented"
+      | resolveDeclaration (Syntax.RecordDefinition (ds, tv, name, slots)) =
+        RecordDefinition (ds, tv, name, map resolveSlotDefinition slots)
 end
