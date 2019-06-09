@@ -102,7 +102,7 @@ structure Module :> MODULE = struct
               | getName (Syntax.ImportedNameAs { original, rename }) =
                 original
         in
-            let name = getName name
+            let val name = getName name
             in
                 case getDeclaration module name of
                     (SOME decl) => decl
