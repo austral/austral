@@ -64,6 +64,12 @@ structure Parser : PARSER = struct
 
     val identParser = ps.pmap (Name.mkIdentEx o String.implode) (ps.many1 identCharParser)
 
+    val moduleNameParser =
+        let val modNameCharParser = ps.anyOfString Name.moduleNameAlphabet
+        in
+            ps.pmap (String.implode) (ps.many1 modNameCharParser)
+        end
+
     (* Parsing type specifiers *)
 
     val namedTypeParser = ps.pmap Syntax.NamedType identParser
@@ -502,12 +508,6 @@ structure Parser : PARSER = struct
         end
 
     (* Modules *)
-
-    val moduleNameParser =
-        let val modNameCharParser = ps.anyOfString Name.moduleNameAlphabet
-        in
-            ps.pmap (String.implode) (ps.many1 modNameCharParser)
-        end
 
     val moduleDeclarationParser =
         ps.seqR (ps.pstring "module")
