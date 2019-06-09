@@ -21,7 +21,6 @@ LONG-TERM TODO:
 - doparallel special operator
 - Define function pointer type
 - Define `function` operator
-- Better error messages
 - Define an integer-cast thing to cast integers or some such
 - Validate foreign function return types
 - Bitwise operators
@@ -218,3 +217,4 @@ DONE:
 - Module objects
 - Type module
 - Move errors to their own module
+- Better error messages
