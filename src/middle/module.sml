@@ -98,30 +98,31 @@ structure Module :> MODULE = struct
           | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
 
     and validateImportedName module name =
-        let val decl = validateDeclarationExists module name
-        in
-            if validateDeclarationVisibility decl then
-                ()
-            else
-                Error.semantic ("Attempted to import a private name: '"
-                                ^
-                                (Name.identString name)
-                                ^
-                                "' in the module '"
-                                ^
-                                (Name.moduleNameString (moduleName module))
-                                ^
-                                "' is private")
-
-        end
-
-    and validateDeclarationExists module name =
         let fun getName (Syntax.ImportedName name) =
                 name
               | getName (Syntax.ImportedNameAs { original, rename }) =
                 original
         in
             let val name = getName name
+            in
+                let val decl = validateDeclarationExists module name
+                in
+                    if validateDeclarationVisibility decl then
+                        ()
+                    else
+                        Error.semantic ("Attempted to import a private name: '"
+                                        ^
+                                        (Name.identString name)
+                                        ^
+                                        "' in the module '"
+                                        ^
+                                        (Name.moduleNameString (moduleName module))
+                                        ^
+                                        "' is private")
+                end
+            end
+
+    and validateDeclarationExists module name =
             in
                 case getDeclaration module name of
                     (SOME decl) => decl
