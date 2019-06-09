@@ -28,5 +28,6 @@ signature MODULE = sig
     val getModule : menv -> module_name -> module option
     val getDeclaration : module -> Name.ident -> declaration option
 
+    val validateImports : Syntax.import list -> menv -> (Name.ident, module_name) Map.map
     val resolve : Syntax.module -> module
 end
