@@ -1,5 +1,6 @@
 TODO:
 
+- Type module
 - Import validation: imports refer to modules that exist in the menv
 - Import validation: imports refer to declarations that exist in the referenced module
 - Import validation: imports refer to declarations that are public or opaque
