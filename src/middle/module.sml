@@ -118,9 +118,9 @@ structure Module :> MODULE = struct
             end
         end
 
-    and validateDeclaration (Syntax.RecordDeclaration (_, vis, _, _)) =
+    and validateDeclaration (Syntax.RecordDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclaration (Syntax.UnionDeclaration (_, vis, _, _)) =
+      | validateDeclaration (Syntax.UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
       | validateDeclaration (Syntax.FunctionDefinition (_, vis, _, _, _, _)) =
         validateFuncVis vis
