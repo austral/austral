@@ -99,7 +99,7 @@ structure Module :> MODULE = struct
            on that specific import list. We check that no import names are
            repeated across these sets, and finally, return a map of imported
            names to the name of the module they're imported from. *)
-        let val importedNames : ((module_name, name) Set.set) list = map (validateImport menv) imports
+        let val importedNames : ((module_name * name) Set.set) list = map (validateImport menv) imports
         in
             ()
         end
