@@ -118,11 +118,11 @@ structure Module :> MODULE = struct
             end
         end
 
-    and validateDeclaration (Syntax.RecordDefinition (_, vis, _, _)) =
+    and validateDeclarationVisibility (Syntax.RecordDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclaration (Syntax.UnionDefinition (_, vis, _, _)) =
+      | validateDeclarationVisibility (Syntax.UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclaration (Syntax.FunctionDefinition (_, vis, _, _, _, _)) =
+      | validateDeclarationVisibility (Syntax.FunctionDefinition (_, vis, _, _, _, _)) =
         validFuncVis vis
 
     and validTypeVis Syntax.PublicType =
