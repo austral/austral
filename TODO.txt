@@ -1,5 +1,6 @@
 TODO:
 
+- Move errors to their own module
 - Module environment
 - Parse syntax declarations to module declarations
 - Import validation: imports refer to modules that exist in the menv
