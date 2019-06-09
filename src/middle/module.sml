@@ -93,33 +93,34 @@ structure Module :> MODULE = struct
 
     *)
 
-    fun importNamesToSet names =
-        let fun mapper (Syntax.ImportedName name) =
-                name
-              | mapper (Syntax.ImportedNameAs { rename, original }) =
-                rename
-        in
-            let val names = map mapper names
-            in
-                Set.fromList names
-            end
-        end
-
     fun validateImport (Syntax.Import (moduleName, names)) menv =
-        case getModule menv moduleName of
-            (SOME module) => let val importedNames = importNamesToSet names
-                             in
-                                 map (validateImportedName module) names;
-                                 if Set.size importedNames <> (List.length names) then
-                                     Error.syntax "Repeated import"
-                                 else
-                                     (* All validation (except for point 5
+        let fun importNamesToSet names =
+                let fun mapper (Syntax.ImportedName name) =
+                        name
+                      | mapper (Syntax.ImportedNameAs { rename, original }) =
+                        rename
+                in
+                    let val names = map mapper names
+                    in
+                        Set.fromList names
+                    end
+                end
+        in
+            case getModule menv moduleName of
+                (SOME module) => let val importedNames = importNamesToSet names
+                                 in
+                                     map (validateImportedName module) names;
+                                     if Set.size importedNames <> (List.length names) then
+                                         Error.syntax "Repeated import"
+                                     else
+                                         (* All validation (except for point 5
                                         above) has been performed by this point,
                                         so construct and return set of
                                         ImportedName objects *)
-                                     importedNames
-                             end
-          | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
+                                         importedNames
+                                 end
+              | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
+        end
 
     and validateImportedName module name =
         let fun getName (Syntax.ImportedName name) =
