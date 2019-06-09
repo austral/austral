@@ -51,9 +51,7 @@ structure Module :> MODULE = struct
     and resolveDeclarations declarationList =
         raise Fail "Not implemented"
 
-    and resolveDeclaration (Syntax.TypeAlias _) =
-        raise Fail "Not implemented"
-      | resolveDeclaration (Syntax.RecordDefinition (ds, tv, name, slots)) =
+    and resolveDeclaration (Syntax.RecordDefinition (ds, tv, name, slots)) =
         let fun resolveSlot (Syntax.SlotDefinition (n, ts, ds)) =
                 SlotDefinition (n, resolveType ts, ds)
         in
