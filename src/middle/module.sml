@@ -134,7 +134,6 @@ structure Module :> MODULE = struct
                                     (Name.moduleNameString (moduleName module))
                                     ^
                                     "'")
-        end
 
     and validateDeclarationVisibility (Syntax.RecordDefinition (_, vis, _, _)) =
         validTypeVis vis
