@@ -62,4 +62,7 @@ structure Module :> MODULE = struct
         in
             FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt, expr)
         end
+
+    and resolveType (Syntax.NamedType name) =
+        raise Fail "Not implemented"
 end
