@@ -66,7 +66,7 @@ structure Util :> UTIL = struct
       | butlast (first::rest) =
         first :: (butlast rest)
       | butlast nil =
-        raise Fail "butlast called with an empty list"
+        Error.internal "butlast called with an empty list"
 
     type prefix = string
 
