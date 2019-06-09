@@ -40,4 +40,7 @@ structure Module :> MODULE = struct
          and case_definition = CaseDefinition of name * ty option * docstring
 
          and param = Param of name * ty * docstring
+
+    fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
+        Module (name, docstring, imports, declarations)
 end
