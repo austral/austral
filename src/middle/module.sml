@@ -46,4 +46,7 @@ structure Module :> MODULE = struct
 
     and resolveImports importList =
         raise Fail "derp"
+
+    and resolveDeclarations declarationList =
+        raise Fail "derp"
 end
