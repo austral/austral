@@ -18,5 +18,6 @@
 *)
 
 signature ERROR = sig
+    val syntax : string -> 'a
     val notImplemented : unit -> 'a
 end

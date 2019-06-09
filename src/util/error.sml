@@ -18,6 +18,9 @@
 *)
 
 structure Error :> ERROR = struct
+    fun syntax message =
+        raise Fail ("Syntax Error: " ^ message)
+
     fun notImplemented () =
         raise Fail "Not implemented"
 end
