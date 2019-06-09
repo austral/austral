@@ -121,6 +121,7 @@ structure Module :> MODULE = struct
                                         "' is private")
                 end
             end
+        end
 
     and validateDeclarationExists module name =
         case getDeclaration module name of
