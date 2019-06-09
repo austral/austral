@@ -85,7 +85,7 @@ structure Module :> MODULE = struct
 
     fun validateImport (Syntax.Import (moduleName, names)) menv =
         case getModule menv moduleName of
-            (SOME mod) => mod
+            (SOME m) => m
           | NONE => raise Fail "No such module"
 
     (* Here we implement the remainder of module resolution. This is mostly
