@@ -39,7 +39,7 @@ structure Util :> UTIL = struct
     fun writeStringToFile filepath str =
         let val stream = TextIO.openOut filepath
         in
-            TextIO.output (stream, str) handle e => (TextIO.closeOut stream; raise e);
+            TextIO.output (stream, str) handle e => (TextIO.closeOut stream; Error.internal ("Failed to write to file '" ^ filepath ^ "'"));
             TextIO.closeOut stream
         end
 
