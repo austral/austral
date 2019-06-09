@@ -196,6 +196,7 @@ structure AustralTest = struct
                 suite "Declarations" [
                     suite "Imports"
                           let val isParse = isParseFn Parser.parseImport
+                              and mn = Name.mkModuleNameEx
                           in
                               [
                                 isParse "from a import b"
