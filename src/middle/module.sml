@@ -56,7 +56,7 @@ structure Module :> MODULE = struct
         let fun resolveSlot (Syntax.SlotDefinition (n, ts, ds)) =
                 SlotDefinition (n, resolveType ts, ds)
         in
-            RecordDefinition (ds, tv, name, map resolveSlotDefinition slots)
+            RecordDefinition (ds, tv, name, map resolveSlot slots)
         end
       | resolveDeclaration (Syntax.UnionDefinition (ds, tv, name, cases)) =
         UnionDefinition (ds, tv, name, map resolveCaseDefinition cases)
