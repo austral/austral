@@ -54,4 +54,8 @@ structure Module :> MODULE = struct
         raise Fail "Not implemented"
       | resolveDeclaration (Syntax.RecordDefinition (ds, tv, name, slots)) =
         RecordDefinition (ds, tv, name, map resolveSlotDefinition slots)
+      | resolveDeclaration (Syntax.UnionDefinition (ds, tv, name, cases)) =
+        UnionDefinition (ds, tv, name, map resolveCaseDefinition cases)
+      | resolveDeclaration (Syntax.FunctionDefinition (ds, fv, name, params, rt, expr)) =
+        FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt, expr)
 end
