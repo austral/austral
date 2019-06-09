@@ -113,7 +113,7 @@ structure Module :> MODULE = struct
                                  if Set.size importedName <> (List.length names) then
                                      Error.syntax "Repeated import"
                                  else
-                                     (* All validation (except for point 4
+                                     (* All validation (except for point 5
                                         above) has been performed by this point,
                                         so construct and return set of
                                         ImportedName objects *)
