@@ -65,4 +65,6 @@ structure Module :> MODULE = struct
 
     and resolveType (Syntax.NamedType name) =
         raise Fail "Not implemented"
+      | resolveType (Syntax.Address ts) =
+        Address (resolveType ts)
 end
