@@ -44,6 +44,15 @@ structure Module :> MODULE = struct
 
          and param = Param of name * ty * docstring
 
+    (* Module Environment
+
+       The module environment is the collection of modules the compiler knows
+       about. It's a map of module names to module instances.
+
+    *)
+
+    type menv = (module_name, module) Map.map
+
     (* Module Resolution
 
        The following functions resolve Syntax.module objects into module
@@ -70,7 +79,7 @@ structure Module :> MODULE = struct
        4. Ensure that imports don't collide with each other: if we have `from A
        import a` and `from B import a`, this is clearly an error.
 
-     *)
+    *)
 
     fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
         Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
