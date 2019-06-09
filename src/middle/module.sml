@@ -46,6 +46,9 @@ structure Module :> MODULE = struct
 
     (* Module functions *)
 
+    fun moduleName (Module (n, _ _, _)) =
+        n
+
     fun getDeclaration (Module (_, _, _, ds)) name =
         Map.get ds name
 
