@@ -1,6 +1,5 @@
 TODO:
 
-- Module environment
 - Parse syntax declarations to module declarations
 - Import validation: imports don't collide with each other
 - Import validation: ensure local declarations don't collide with import names
@@ -219,3 +218,4 @@ DONE:
 - Import validation: imports refer to modules that exist in the menv
 - Import validation: imports refer to declarations that exist in the referenced module
 - Import validation: imports refer to declarations that are public or opaque
+- Module environment
