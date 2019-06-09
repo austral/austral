@@ -86,7 +86,7 @@ structure Module :> MODULE = struct
     fun validateImport (Syntax.Import (moduleName, names)) menv =
         case getModule menv moduleName of
             (SOME m) => m
-          | NONE => raise Fail "No such module"
+          | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
 
     (* Here we implement the remainder of module resolution. This is mostly
        mapping syntax declarations to module declarations. The validation
