@@ -22,7 +22,7 @@ structure Util :> UTIL = struct
                        | Failure of string
 
     fun valOf (Result v) = v
-      | valOf (Failure f) = raise Fail ("Result.Failure: " ^ f)
+      | valOf (Failure f) = Error.internal ("Result.Failure: " ^ f)
 
     type path = string
 
