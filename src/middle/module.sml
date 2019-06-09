@@ -93,15 +93,19 @@ structure Module :> MODULE = struct
 
     *)
 
-    fun validateImports imports =
+    fun validateImports imports menv =
         (* We are given a list of import statements. We call validateImport on
            each to get a set of imported names, and also to perform validation
            on that specific import list. We check that no import names are
            repeated across these sets, and finally, return a map of imported
            names to the name of the module they're imported from. *)
+        let val importedNames = map (validateImport menv) imports
+        in
+            ()
+        end
 
 
-    fun validateImport (Syntax.Import (moduleName, names)) menv =
+    fun validateImport menv (Syntax.Import (moduleName, names)) =
         let fun importNamesToSet names =
                 let fun mapper (Syntax.ImportedName name) =
                         name
