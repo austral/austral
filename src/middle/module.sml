@@ -104,8 +104,7 @@ structure Module :> MODULE = struct
             ()
         end
 
-
-    fun validateImport menv (Syntax.Import (moduleName, names)) =
+    and validateImport menv (Syntax.Import (moduleName, names)) =
         let fun importNamesToSet names =
                 let fun mapper (Syntax.ImportedName name) =
                         name
