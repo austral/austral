@@ -112,7 +112,7 @@ structure Module :> MODULE = struct
                                             ^
                                             "' does not exist in module '"
                                             ^
-                                            (Ident.moduleNameString (moduleName module))
+                                            (Name.moduleNameString (moduleName module))
                                             ^
                                             "'")
             end
