@@ -93,9 +93,27 @@ structure Module :> MODULE = struct
 
     fun validateImport (Syntax.Import (moduleName, names)) menv =
         case getModule menv moduleName of
-            (SOME module) => (map validateDeclarationExists names;
+            (SOME module) => (map (validateImportedName module) names;
                               module)
           | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
+
+    and validateImportedName module name =
+        let val decl = validateDeclarationExists module name
+        in
+            if validateDeclarationVisibility decl then
+                ()
+            else
+                Error.semantic ("Attempted to import a private name: '"
+                                ^
+                                (Name.identString name)
+                                ^
+                                "' in the module '"
+                                ^
+                                (Name.moduleNameString (moduleName module))
+                                ^
+                                "' is private")
+
+        end
 
     and validateDeclarationExists module name =
         let fun getName (Syntax.ImportedName name) =
