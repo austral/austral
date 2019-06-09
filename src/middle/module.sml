@@ -86,7 +86,9 @@ structure Module :> MODULE = struct
        either public or opaque (in the case of types). Otherwise, we can't
        import them.
 
-       4. Ensure that imports don't collide with each other: if we have `from A
+       4. Check that we don't repeat any names within an import list.
+
+       5. Ensure that imports don't collide with each other: if we have `from A
        import a` and `from B import a`, this is clearly an error.
 
     *)
