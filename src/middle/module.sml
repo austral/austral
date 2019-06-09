@@ -109,9 +109,12 @@ structure Module :> MODULE = struct
                 if Set.size bigSet <> totalNames then
                     Error.semantic "Colliding import"
                 else
-                    Map.fromList (map (fn (mn, s) =>
-                                          map (fn elem => (mn, elem)) (Set.toList s))
-                                      importedNames)
+                    let val pairs = map (fn (mn, s) =>
+                                            map (fn elem => (mn, elem)) (Set.toList s))
+                                        importedNames
+                    in
+                        Map.fromList (List.concat pairs)
+                    end
             end
         end
 
