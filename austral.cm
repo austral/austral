@@ -22,6 +22,7 @@ is
   vendor/parsimony/parsimony.cm
 
   src/util/error.sig
+  src/util/error.sml
 
   src/util/util.sig
   src/util/util.sml
