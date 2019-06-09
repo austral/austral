@@ -136,11 +136,11 @@ structure Module :> MODULE = struct
                                     ^
                                     "'")
 
-    and validateDeclarationVisibility (Syntax.RecordDefinition (_, vis, _, _)) =
+    and validateDeclarationVisibility (RecordDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclarationVisibility (Syntax.UnionDefinition (_, vis, _, _)) =
+      | validateDeclarationVisibility (UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclarationVisibility (Syntax.FunctionDefinition (_, vis, _, _, _, _)) =
+      | validateDeclarationVisibility (FunctionDefinition (_, vis, _, _, _, _)) =
         validFuncVis vis
 
     and validTypeVis Syntax.PublicType =
