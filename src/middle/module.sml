@@ -103,13 +103,15 @@ structure Module :> MODULE = struct
         in
             (* To check that no names are repeated, we merge all sets into a
                single set, and compare sizes *)
-            let val bigSet = fromList (map (fn (_, s) => Set.toList s) importedNames)
+            let val bigSet = Set.fromList (map (fn (_, s) => Set.toList s) importedNames)
                 and totalNames = List.foldl (op +) 0 (map (fn (_, s) => Set.size s) importedNames)
             in
                 if Set.size bigSet <> totalNames then
                     Error.semantic "Colliding import"
                 else
-
+                    Map.fromList (map (fn (mn, s) =>
+                                          map (fn elem => (mn, elem)) (Set.toList s))
+                                      importedNames)
             end
         end
 
