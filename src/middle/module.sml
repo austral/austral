@@ -42,5 +42,5 @@ structure Module :> MODULE = struct
          and param = Param of name * ty * docstring
 
     fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
-        Module (name, docstring, imports, declarations)
+        Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
 end
