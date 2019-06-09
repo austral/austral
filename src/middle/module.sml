@@ -91,16 +91,31 @@ structure Module :> MODULE = struct
 
     *)
 
+    fun importNamesToSet names =
+        let fun mapper (Syntax.ImportedName name) =
+                name
+              | mapper (Syntax.ImportedNameAs { rename }) =
+                rename
+        in
+            let val names = map mapper names
+            in
+                Set.fromList names
+            end
+        end
+
     fun validateImport (Syntax.Import (moduleName, names)) menv =
         case getModule menv moduleName of
-            (SOME module) => let val importedNames = module
+            (SOME module) => let val importedNames = importNamesToSet names
                              in
                                  map (validateImportedName module) names;
-                                 (* All validation (except for point 4 above)
-                                    has been performed by this point, so
-                                    construct and return set of ImportedName
-                                    objects *)
-                                 Set.fromList names
+                                 if Set.size importedName <> (List.length names) then
+                                     Error.syntax "Repeated import"
+                                 else
+                                     (* All validation (except for point 4
+                                        above) has been performed by this point,
+                                        so construct and return set of
+                                        ImportedName objects *)
+                                     importedNames
                              end
           | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
 
