@@ -532,5 +532,5 @@ structure Parser : PARSER = struct
     val parseImport = pf importParser
 
     fun parseModule s =
-        raise Fail "Not implemented just yet"
+        Error.notImplemented ()
 end
