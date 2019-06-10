@@ -1,6 +1,6 @@
 TODO:
 
-- Parse syntax declarations to module declarations
+- Resolve syntax declarations to module declarations
 - Import validation: ensure local declarations don't collide with import names
 - Resolve Syntax.module objects into actual module instances
 - Parse type specifiers to type objects
