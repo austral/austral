@@ -23,4 +23,6 @@ structure TypingPass :> TYPING_PASS = struct
        appropriately based on whether the type is an imported name or a locally
        defined name (or, if it's undefined, throwing an error). *)
 
+    fun resolveName (ResolvedDecl.Module (_, _, imports, decls)) name =
+
 end
