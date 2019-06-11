@@ -65,9 +65,11 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                 if Set.size bigSet <> totalNames then
                     Error.semantic "Colliding import"
                 else
-                    let val imports = map (fn (mn, s) =>
-                                              map (fn elem =>
-                                                      Import.mkImport { name = elem, moduleName = mn }))
+                    let val imports = map (fn (moduleName, s) =>
+                                              map (fn (name, trueName) =>
+                                                      Import.mkImport { name = name,
+                                                                        trueName = trueName,
+                                                                        moduleName = moduleName }))
                                                   (Set.toList s))
                                           importedNames
                     in
@@ -79,9 +81,9 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
     and validateImport menv (Syntax.Import (moduleName, names)) =
         let fun importNamesToSet names =
                 let fun mapper (Syntax.ImportedName name) =
-                        name
+                        (name, name)
                       | mapper (Syntax.ImportedNameAs { rename, original }) =
-                        rename
+                        (rename, original)
                 in
                     let val names = map mapper names
                     in
