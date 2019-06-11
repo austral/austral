@@ -99,7 +99,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
               | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
         end
 
-    and declarationExistse module import =
+    and declarationExists module import =
         case Module.getDeclaration module (Import.importTrueName import) of
             (SOME decl) => decl
           | NONE => Error.semantic ("Imported name '"
