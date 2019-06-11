@@ -36,8 +36,8 @@ structure Resolution :> RESOLUTION = struct
     fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
         Module.Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
 
-    and resolveImports importList =
-        Error.notImplemented ()
+    and resolveImports menv importList =
+        ImportResolution.resolve importList menv
 
     and resolveDeclarations declarationList =
         Error.notImplemented ()
