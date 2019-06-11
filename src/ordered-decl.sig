@@ -28,7 +28,7 @@ signature ORDERED_DECL = sig
     type case_definition = Syntax.case_definition
     type param = Syntax.param
 
-    datatype module = Module of module_name * docstring * Import.imports * (name, declaration) Map.map
+    datatype module = Module of module_name * docstring * Syntax.import list * (name, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * expr
