@@ -61,6 +61,8 @@ is
   src/type.sig
   src/type.sml
 
+  (* Internal Representations *)
+
   src/import.sig
   src/import.sml
 
