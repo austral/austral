@@ -58,13 +58,13 @@ is
   src/type.sig
   src/type.sml
 
-  (* Internal Representations *)
-
   src/import.sig
   src/import.sml
 
   src/module.sig
   src/module.sml
+
+  (* Internal Representations *)
 
   src/dast.sig
   src/dast.sml
