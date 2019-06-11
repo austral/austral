@@ -1,5 +1,6 @@
 TODO:
 
+- Fix imports to properly support renames
 - Parse type parameters in type definitions
 - Resolve syntax declarations to module declarations
 - Import validation: ensure local declarations don't collide with import names
