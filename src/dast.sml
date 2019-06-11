@@ -26,13 +26,14 @@ structure DAst :> DAST = struct
     type func_visibility = Syntax.func_visibility
     type docstring = Syntax.docstring
     type ty = Type.ty
+    type expr = Syntax.expr
 
     type imports = (Name.ident, module_name) Map.map
 
     datatype module = Module of module_name * docstring * imports * (Name.ident, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
-                         | FunctionDefinition of docstring * func_visibility * name * param list * ty
+                         | FunctionDefinition of docstring * func_visibility * name * param list * ty * expr
 
          and slot_definition = SlotDefinition of name * ty * docstring
 
