@@ -41,7 +41,7 @@ structure Import :> IMPORT = struct
         let val set = Set.fromList (map importName imports)
         in
             if Set.size set <> List.length imports then
-                Error.semantic "Repeated import"
+                Error.semantic "Colliding import"
             else
                 imports
         end
