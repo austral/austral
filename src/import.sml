@@ -28,4 +28,6 @@ structure Import :> IMPORT = struct
     fun importName (Import i) = #name i
 
     fun importTrueName (Import i) = #trueName i
+
+    fun importModuleName (Import i) = #moduleName i
 end
