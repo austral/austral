@@ -86,7 +86,11 @@ function fib(n: i32): i32 =
 
 ## Practical Linear Types
 
-A simple type system like that of C helps us by pointing out errors concerning the shape of data: trying to fit a square peg in a round hole. More advanced type systems help us express the semantic role of data in our types. Linear types go further, and help us prevent a whole category of defects along the lines of use-after-`free` and double-`free` errors.
+A simple type system like that of C helps us by pointing out errors concerning
+the shape of data: trying to fit a square peg in a round hole. More advanced
+type systems help us express the semantic role of data in our types. Linear
+types go further, and help us prevent a whole category of defects along the
+lines of use-after-`free` and double-`free` errors.
 
 Consider the following database API, using SML notation:
 
