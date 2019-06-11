@@ -32,7 +32,7 @@ structure Import :> IMPORT = struct
     fun importModuleName (Import i) = #moduleName i
 
     fun getImport imports name =
-        List.find (fn import =
+        List.find (fn import =>
                       importName import = name)
                   imports
 end
