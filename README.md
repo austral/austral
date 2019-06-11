@@ -127,7 +127,8 @@ val query : !database -> string -> (result list, database)
 val close : !database -> unit
 ```
 
-Now these errors disappear. Use-after-`close` is impossible, because `close` returns `unit`:
+Now these errors disappear. Use-after-`close` is impossible, because `close`
+returns `unit`:
 
 ```sml
 let val db = connect "my_database"
