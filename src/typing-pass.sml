@@ -55,6 +55,8 @@ structure TypingPass :> TYPING_PASS = struct
         Type.Address (resolveType menv ty)
       | resolveType menv (Syntax.Pointer ty) =
         Type.Pointer (resolveType menv ty)
+      | resolveType menv (Syntax.TupleType tys) =
+        Type.TupleType (map (resolveType menv) tys)
 
     (* Here, we have to resolve type specifiers. We go through all declarations,
        turning type specifiers into type objects, assigning named types
