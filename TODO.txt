@@ -1,7 +1,8 @@
 TODO:
 
+- Syntax->DAst pass
+- DAst -> menv extraction
 - Parse type parameters in type definitions
-- Resolve syntax declarations to module declarations
 - Import validation: ensure local declarations don't collide with import names
 - Resolve Syntax.module objects into actual module instances
 - Parse type specifiers to type objects
