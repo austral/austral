@@ -67,4 +67,7 @@ structure TypingPass :> TYPING_PASS = struct
 
     and resolveSlot (Syntax.SlotDefinition (name, ty, docstring)) =
         TypedDecl.SlotDefinition (name, resolveType ty, docstring)
+
+    and resolveCase (Syntax.CaseDefinition (name, tyOpt, docstring)) =
+        TypedDecl.CaseDefinition (name, Option.map resolveType ty, docstring)
 end
