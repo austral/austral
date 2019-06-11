@@ -18,10 +18,7 @@
 *)
 
 structure TypingPass :> TYPING_PASS = struct
-    (* Here, we have to resolve type specifiers. We go through all declarations,
-       turning type specifiers into type objects, assigning named types
-       appropriately based on whether the type is an imported name or a locally
-       defined name (or, if it's undefined, throwing an error). *)
+    (* Resolve named types *)
 
     fun resolveNamedType menv (ResolvedDecl.Module (moduleName, _, imports, decls)) name =
         case Import.getImport imports name of
@@ -49,4 +46,22 @@ structure TypingPass :> TYPING_PASS = struct
           | (SOME (Syntax.UnionDefinition _)) => Type.NamedType (moduleName, name)
           | (SOME _) => Error.semantic "Not a type definition"
           | NONE => Error.semantic "No type with this name"
+
+    (* Here, we have to resolve type specifiers. We go through all declarations,
+       turning type specifiers into type objects, assigning named types
+       appropriately based on whether the type is an imported name or a locally
+       defined name (or, if it's undefined, throwing an error). *)
+
+    fun resolve (ResolvedDecl.Module (name, docstring, imports, decls)) =
+        TypedDecl.Module (name, docstring, imports, resolveDecls decls)
+
+    and resolveDecls decls =
+        Map.fromList (map resolveDecl (Map.toList decls))
+
+    and resolveDecl (SyntaxDecl.RecordDefinition (docstring, vis, name, slots)) =
+        TypedDecl.RecordDefinition (docstring, vis, name, map (resolveSlot) slots)
+      | resolveDecl (SyntaxDecl.UnionDefinition (docstring, vis, name, cases)) =
+        TypedDecl.UnionDefinition (docstring, vis, name, map (resolveCase) cases)
+      | resolveDecl (SyntaxDecl.FunctionDefinition (docstring, vis, name, params, rt, body)) =
+        TypedDecl.FunctionDefinition (docstring, vis, name, map (resolveParam params), resolveType rt, body)
 end
