@@ -148,11 +148,11 @@ structure Resolution :> RESOLUTION = struct
                                     ^
                                     "'")
 
-    and validateDeclarationVisibility (DAst.RecordDefinition (_, vis, _, _)) =
+    and validateDeclarationVisibility (Module.RecordDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclarationVisibility (DAst.UnionDefinition (_, vis, _, _)) =
+      | validateDeclarationVisibility (Module.UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclarationVisibility (DAst.FunctionDefinition (_, vis, _, _, _, _)) =
+      | validateDeclarationVisibility (Module.FunctionDefinition (_, vis, _, _, _, _)) =
         validFuncVis vis
 
     and validTypeVis Syntax.PublicType =
