@@ -65,11 +65,11 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                 if Set.size bigSet <> totalNames then
                     Error.semantic "Colliding import"
                 else
-                    let val pairs = map (fn (mn, s) =>
-                                            map (fn elem => (elem, mn)) (Set.toList s))
-                                        importedNames
+                    let val imports = map (fn (mn, s) =>
+                                              map (fn elem => (elem, mn)) (Set.toList s))
+                                          importedNames
                     in
-                        Map.fromList (List.concat pairs)
+                        Import.fromList (List.concat imports)
                     end
             end
         end
