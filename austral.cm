@@ -41,6 +41,8 @@ is
   src/util/ordered-map.sig
   src/util/ordered-map.sml
 
+  (* Common *)
+
   src/name.sig
   src/name.sml
 
