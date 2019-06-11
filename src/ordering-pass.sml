@@ -22,7 +22,7 @@ structure OrderingPass :> ORDERING_PASS = struct
       OrderedDecl.Module (name, docstring, imports, transformDeclarations declarations)
       
     and transformDeclarations decls =
-      Map.fromList (fn decl => (declarationName decl, decl)) decls
+      Map.fromList (map (fn decl => (declarationName decl, decl)) decls)
       
     and declarationName (Syntax.RecordDefinition (_, _, name, _)) = name
       | declarationName (Syntax.UnionDefinition (_, _, name, _)) = name
