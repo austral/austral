@@ -33,7 +33,7 @@ structure TypingPass :> TYPING_PASS = struct
         in
             (* We force the result with Option.valOf since we know, from earlier
                validation passes, that all imports point to existing modules *)
-            let val module = Option.valOf (Module.getModule menv module)
+            let val module = Option.valOf (Module.getModule menv moduleName)
             in
                 case Option.valOf (Module.getDeclaration module (Import.importTrueName import)) of
                     (Module.RecordDefinition _) => Type.NamedType (moduleName, name)
