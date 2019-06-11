@@ -20,4 +20,10 @@
 signature IMPORT = sig
     type import
     type imports
+
+    val importName : import -> Name.ident
+    val importTrueName : import -> Name.ident
+    val importModuleName : import -> Module.name
+
+    val getImport : imports -> Name.ident -> import option
 end
