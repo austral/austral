@@ -18,4 +18,5 @@
 *)
 
 signature ORDERING_PASS = sig
+    val transform : Syntax.module -> OrderedDecl.module
 end
