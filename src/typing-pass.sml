@@ -28,7 +28,7 @@ structure TypingPass :> TYPING_PASS = struct
             (SOME import) => resolveImportedNamedType import
           | NONE => resolveLocalNamedType moduleName decls name
 
-    and resolveImportedNamedType import =
+    and resolveImportedNamedType menv import =
         let val moduleName = Import.importModuleName import
         in
             (* We force the result with Option.valOf since we know, from earlier
