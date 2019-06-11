@@ -24,9 +24,9 @@ signature MODULE = sig
     type declaration
 
     val moduleName : module -> module_name
+    val getDeclaration : module -> Name.ident -> declaration option
 
     type menv
 
     val getModule : menv -> module_name -> module option
-    val getDeclaration : module -> Name.ident -> declaration option
 end
