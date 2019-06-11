@@ -149,6 +149,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
       | validateDeclarationVisibility (Module.FunctionDefinition (_, vis, _, _, _)) =
         validFuncVis vis
 
+    (* Given a type's visibility declaration, check if it can be imported *)
     and validTypeVis Syntax.PublicType =
         true
       | validTypeVis Syntax.OpaqueType =
