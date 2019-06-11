@@ -81,7 +81,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                 else
                     Error.semantic ("Attempted to import a private name: '"
                                     ^
-                                    (Name.identString name)
+                                    (Name.identString (Import.importTrueName import))
                                     ^
                                     "' in the module '"
                                     ^
