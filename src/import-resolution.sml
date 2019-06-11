@@ -101,7 +101,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
             (SOME decl) => decl
           | NONE => Error.semantic ("Imported name '"
                                     ^
-                                    (Name.identString name)
+                                    (Name.identString (Module.importTrueName import))
                                     ^
                                     "' does not exist in module '"
                                     ^
