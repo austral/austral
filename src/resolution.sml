@@ -198,7 +198,7 @@ structure Resolution :> RESOLUTION = struct
         end
       | resolveDeclaration (Syntax.FunctionDefinition (ds, fv, name, params, rt, expr)) =
         let fun resolveParam (Syntax.Param (n, ts, ds)) =
-                Param (n, resolveType ts, ds)
+                DAst.Param (n, resolveType ts, ds)
         in
             FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt)
         end
