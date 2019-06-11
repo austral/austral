@@ -70,7 +70,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                                                       Import.mkImport { name = name,
                                                                         trueName = trueName,
                                                                         moduleName = moduleName }))
-                                                  (Set.toList s))
+                                                  (Set.toList s)
                                           importedNames
                     in
                         Import.fromList (List.concat imports)
