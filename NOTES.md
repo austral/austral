@@ -11,4 +11,5 @@ Code travels down the following intermediate representations:
 
 - Syntax (module `Syntax`): this is the output straight from the parser, the basic abstract
   syntax tree.
--
+- Declaration AST (module `DAst`): declarations from `Syntax` are parsed to
+  resolve imports, find colliding declarations, resolve types etc.
