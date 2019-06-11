@@ -84,8 +84,8 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                                   trueName=name,
                                   moduleName=mn }
               | flattenImport (Syntax.ImportedNameAs { rename, original }) =
-                Import.mkImport { name=name,
-                                  trueName=name,
+                Import.mkImport { name=rename,
+                                  trueName=original,
                                   moduleName=mn }
         in
             List.concat (map (fn (Syntax.Import (moduleName, names)) =>
