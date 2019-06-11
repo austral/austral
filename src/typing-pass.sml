@@ -29,6 +29,15 @@ structure TypingPass :> TYPING_PASS = struct
           | NONE => resolveLocalNamedType moduleName decls name
 
     and resolveImportedNamedType import =
+        let val moduleName = Import.importModuleName import
+        in
+            (* We force the result with Option.valOf since we know, from earlier
+               validation passes, that all imports point to existing modules *)
+            let val module = Option.valOf (Module.getModule menv module)
+            in
+
+            end
+        end
 
     and resolveLocalNamedType moduleName decls name =
         case Map.get decls name of
