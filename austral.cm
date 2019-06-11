@@ -86,4 +86,10 @@ is
   src/parser.sig
   src/parser.sml
 
+  src/ordering-pass.sig
+  src/ordering-pass.sml
+
+  src/resolution-pass.sig
+  src/resolution-pass.sml
+
   $/basis.cm
