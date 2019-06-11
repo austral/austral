@@ -18,7 +18,7 @@
 *)
 
 structure Resolution :> RESOLUTION = struct
-    open Module
+
 
     (* Module Resolution
 
