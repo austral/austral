@@ -50,32 +50,10 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
     *)
 
     fun validateImports imports menv =
-        (* We are given a list of import statements. We call validateImport on
-           each to get a set of imported names, and also to perform validation
-           on that specific import list. We check that no import names are
-           repeated across these sets, and finally, we construct an
-           `Import.imports` object. *)
-        let val importedNames : (module_name * Name.ident Set.set) list = map (validateImport menv) imports
+        let imports = flatten imports
         in
-            (* To check that no names are repeated, we merge all sets into a
-               single set, and compare sizes *)
-            let val bigSet = Set.fromList (map (fn (_, s) => Set.toList s) importedNames)
-                and totalNames = List.foldl (op +) 0 (map (fn (_, s) => Set.size s) importedNames)
-            in
-                if Set.size bigSet <> totalNames then
-                    Error.semantic "Colliding import"
-                else
-                    let val imports = map (fn (moduleName, s) =>
-                                              map (fn (name, trueName) =>
-                                                      Import.mkImport { name = name,
-                                                                        trueName = trueName,
-                                                                        moduleName = moduleName }))
-                                                  (Set.toList s)
-                                          importedNames
-                    in
-                        Import.fromList (List.concat imports)
-                    end
-            end
+            map (referencedModuleExists menv) imports;
+            Imports.fromList imports
         end
 
     and flatten imports =
@@ -93,49 +71,19 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                                  imports)
         end
 
-    and validateImport menv (Syntax.Import (moduleName, names)) =
-        let fun importNamesToSet names =
-                let fun mapper (Syntax.ImportedName name) =
-                        (name, name)
-                      | mapper (Syntax.ImportedNameAs { rename, original }) =
-                        (rename, original)
-                in
-                    let val names = map mapper names
-                    in
-                        Set.fromList names
-                    end
-                end
-        in
-            case Module.getModule menv moduleName of
-                (SOME module) => let val importedNames = importNamesToSet names
-                                 in
-                                     map (validateImportedName module) names;
-                                     if Set.size importedNames <> (List.length names) then
-                                         Error.syntax "Repeated import"
-                                     else
-                                         (* All validation (except for point 5
-                                            above) has been performed by this
-                                            point, so construct and return set
-                                            of ImportedName objects *)
-                                         (moduleName, importedNames)
-                                 end
-              | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
+    and referencedModuleExists menv import =
+        case Module.getModule menv moduleName of
+            (SOME module) => ()
+          | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
         end
 
-    and validateImportedName module name =
-        let fun getName (Syntax.ImportedName name) =
-                name
-              | getName (Syntax.ImportedNameAs { original, rename }) =
-                original
+    and importedDeclarationExists module import =
+        let val decl = validateDeclarationExists module (Import.importTrueName import)
         in
-            let val name = getName name
-            in
-                let val decl = validateDeclarationExists module name
-                in
-                    if validateDeclarationVisibility decl then
-                        ()
-                    else
-                        Error.semantic ("Attempted to import a private name: '"
+            if validateDeclarationVisibility decl then
+                ()
+            else
+                Error.semantic ("Attempted to import a private name: '"
                                         ^
                                         (Name.identString name)
                                         ^
@@ -149,9 +97,20 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
         end
 
     (* Check that a declaration exists *)
-    and validateDeclarationExists module name =
-        case Module.getDeclaration module name of
-            (SOME decl) => decl
+    and validateDeclarationExistsAndIsImportable module import =
+        case Module.getDeclaration module (Import.importTrueName import) of
+            (SOME decl) => if declarationIsVisible decl then
+                               ()
+                           else
+                               Error.semantic ("Attempted to import a private name: '"
+                                               ^
+                                               (Name.identString name)
+                                               ^
+                                               "' in the module '"
+                                               ^
+                                               (Name.moduleNameString (Module.moduleName module))
+                                               ^
+                                               "' is private")
           | NONE => Error.semantic ("Imported name '"
                                     ^
                                     (Name.identString name)
@@ -163,24 +122,24 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                                     "'")
 
     (* Check if a declaration can be imported *)
-    and validateDeclarationVisibility (Module.RecordDefinition (_, vis, _, _)) =
-        validTypeVis vis
-      | validateDeclarationVisibility (Module.UnionDefinition (_, vis, _, _)) =
-        validTypeVis vis
-      | validateDeclarationVisibility (Module.FunctionDefinition (_, vis, _, _, _)) =
-        validFuncVis vis
+    and declarationIsVisible (Module.RecordDefinition (_, vis, _, _)) =
+        typeIsImportable vis
+      | declarationIsVisible (Module.UnionDefinition (_, vis, _, _)) =
+        typeIsImportable vis
+      | declarationIsVisible (Module.FunctionDefinition (_, vis, _, _, _)) =
+        functionIsImportable vis
 
     (* Given a type's visibility declaration, check if it can be imported *)
-    and validTypeVis Syntax.PublicType =
+    and typeIsImportable Syntax.PublicType =
         true
-      | validTypeVis Syntax.OpaqueType =
+      | typeIsImportable Syntax.OpaqueType =
         true
-      | validTypeVis Syntax.PrivateType =
+      | typeIsImportable Syntax.PrivateType =
         false
 
     (* Given a functions's visibility declaration, check if it can be imported *)
-    and validFuncVis Syntax.PublicFunction =
+    and functionIsImportable Syntax.PublicFunction =
         true
-      | validFuncVis Syntax.PrivateFunction =
+      | functionIsImportable Syntax.PrivateFunction =
         false
 end
