@@ -22,5 +22,5 @@ signature IMPORT_RESOLUTION = sig
     type name = Name.ident
     type module_name = Name.module_name
 
-    val resolve : import list -> Module.menv -> Import.imports
+    val resolve : Module.menv -> import list -> Import.imports
 end
