@@ -148,7 +148,7 @@ structure Resolution :> RESOLUTION = struct
                                     ^
                                     "'")
 
-    and validateDeclarationVisibility (RecordDefinition (_, vis, _, _)) =
+    and validateDeclarationVisibility (DAst.RecordDefinition (_, vis, _, _)) =
         validTypeVis vis
       | validateDeclarationVisibility (UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
