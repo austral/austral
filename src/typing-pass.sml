@@ -36,7 +36,7 @@ structure TypingPass :> TYPING_PASS = struct
                validation passes, that all imports point to existing modules *)
             let val module = Option.valOf (Module.getModule menv moduleName)
             in
-                case Option.valOf (Module.getDeclaration module name) of
+                case (Option.valOf (Module.getDeclaration module name)) of
                     (Module.RecordDefinition _) => Type.NamedType (moduleName, name)
                   | (Module.UnionDefinition _) => Type.NamedType (moduleName, name)
                   | _ => Error.semantic "Not a type definition"
@@ -45,7 +45,8 @@ structure TypingPass :> TYPING_PASS = struct
 
     and resolveLocalNamedType moduleName decls name =
         case Map.get decls name of
-            (Syntax.RecordDefinition _) => Type.NamedType (moduleName, name)
-          | (Syntax.UnionDefinition _) => Type.NamedType (moduleName, name)
-          | _ => Error.semantic "Not a type definition"
+            (SOME (Syntax.RecordDefinition _)) => Type.NamedType (moduleName, name)
+          | (SOME (Syntax.UnionDefinition _)) => Type.NamedType (moduleName, name)
+          | (SOME _) => Error.semantic "Not a type definition"
+          | NONE => Error.semantic "No type with this name"
 end
