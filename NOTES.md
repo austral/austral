@@ -13,6 +13,7 @@ Code travels down the following intermediate representations:
   syntax tree.
 - Ordered declarations AST.
 - Resolved declarations AST.
+- Typed declarations AST.
 
 ## Linear API
 
