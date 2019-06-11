@@ -25,6 +25,8 @@ structure Import :> IMPORT = struct
 
     type imports = import list
 
+    val mkImport = Import
+
     (* Accessors *)
 
     fun importName (Import i) = #name i
