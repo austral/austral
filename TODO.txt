@@ -1,7 +1,7 @@
 TODO:
 
 - Type-augmented declarations
-- Syntax->DAst pass
+- Syntax->OrderedDecl pass
 - DAst -> menv extraction
 - Parse type parameters in type definitions
 - Import validation: ensure local declarations don't collide with import names
