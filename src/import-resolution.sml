@@ -129,6 +129,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
             end
         end
 
+    (* Check that a declaration exists *)
     and validateDeclarationExists module name =
         case Module.getDeclaration module name of
             (SOME decl) => decl
