@@ -96,7 +96,9 @@ val query : database -> string -> result list
 val close : database -> unit
 ```
 
-Briefly, the `connect` function takes a connection URI and returns a `database` instance, the `query` function takes a database instance and a query string and returns the result list of that query, and `close` closes a database connection.
+Briefly, the `connect` function takes a connection URI and returns a `database`
+instance, the `query` function takes a database instance and a query string and
+returns the result list of that query, and `close` closes a database connection.
 
 The correct usage pattern is: we open a database connection, make zero or more
 queries, then close it. But SML's type system does not allow us to enforce this.
