@@ -18,6 +18,8 @@
 *)
 
 signature MODULE = sig
+    (* Modules *)
+
     type module_name = Name.module_name
 
     type module
@@ -25,6 +27,8 @@ signature MODULE = sig
 
     val moduleName : module -> module_name
     val getDeclaration : module -> Name.ident -> declaration option
+
+    (* Module environments *)
 
     type menv
 
