@@ -25,3 +25,10 @@ allocate: t -> pointer(t)
 load: pointer(t) -> t // dereferencing deallocates
 swap: pointer(t) -> t -> (pointer(t), t)
 ```
+
+Arrays:
+
+```
+allocate_array: t -> size -> array(t)
+replace: array(t) -> index -> t -> (array(t), t)
+```
