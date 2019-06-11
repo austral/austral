@@ -18,4 +18,6 @@
 *)
 
 signature IMPORT = sig
+    type import
+    type imports
 end
