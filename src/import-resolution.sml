@@ -78,6 +78,21 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
             end
         end
 
+    and flatten imports =
+        let fun flattenImport mn (Syntax.ImportedName name) =
+                Import.mkImport { name=name,
+                                  trueName=name,
+                                  moduleName=mn }
+              | flattenImport (Syntax.ImportedNameAs { rename, original }) =
+                Import.mkImport { name=name,
+                                  trueName=name,
+                                  moduleName=mn }
+        in
+            List.concat (map (fn (Syntax.Import (moduleName, names) =>
+                                  map (flattenImport mn) names)
+                                 imports))
+        end
+
     and validateImport menv (Syntax.Import (moduleName, names)) =
         let fun importNamesToSet names =
                 let fun mapper (Syntax.ImportedName name) =
