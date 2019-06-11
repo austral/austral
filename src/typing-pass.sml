@@ -25,8 +25,10 @@ structure TypingPass :> TYPING_PASS = struct
 
     fun resolveNamedType menv (ResolvedDecl.Module (moduleName, _, imports, decls)) name =
         case Import.getImport imports name of
-            (SOME import) => resolveImportedNamedType name
+            (SOME import) => resolveImportedNamedType import
           | NONE => resolveLocalNamedType moduleName decls name
+
+    and resolveImportedNamedType import =
 
     and resolveLocalNamedType moduleName decls name =
         case Map.get decls name of
