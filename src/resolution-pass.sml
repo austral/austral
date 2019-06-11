@@ -25,7 +25,7 @@ structure ResolutionPass :> RESOLUTION_PASS = struct
             ResolvedDecl.Module (docstring, name, imports, declarations)
         end
 
-    and checkCollison imports declarations =
+    and checkCollision imports declarations =
         map (fn (name, _) =>
                 (case Import.getImport imports name of
                      (SOME _) => Error.semantic "Import collides with local declaration"
