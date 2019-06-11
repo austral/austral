@@ -35,7 +35,10 @@ structure TypingPass :> TYPING_PASS = struct
                validation passes, that all imports point to existing modules *)
             let val module = Option.valOf (Module.getModule menv module)
             in
-
+                case Option.valOf (Module.getDeclaration module (Import.importTrueName import)) of
+                    (Module.RecordDefinition _) => Type.NamedType (moduleName, name)
+                  | (Module.UnionDefinition _) => Type.NamedType (moduleName, name)
+                  | _ => Error.semantic "Not a type definition"
             end
         end
 
