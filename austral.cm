@@ -86,7 +86,4 @@ is
   src/parser.sig
   src/parser.sml
 
-  (*  src/resolution.sig
-  src/resolution.sml*)
-
   $/basis.cm
