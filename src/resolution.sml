@@ -186,7 +186,7 @@ structure Resolution :> RESOLUTION = struct
 
     and resolveDeclaration (Syntax.RecordDefinition (ds, tv, name, slots)) =
         let fun resolveSlot (Syntax.SlotDefinition (n, ts, ds)) =
-                SlotDefinition (n, resolveType ts, ds)
+                DAst.SlotDefinition (n, resolveType ts, ds)
         in
             RecordDefinition (ds, tv, name, map resolveSlot slots)
         end
