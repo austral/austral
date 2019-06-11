@@ -53,7 +53,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
         let val imports = flatten imports
         in
             map (validateImport menv) imports;
-            Imports.fromList imports
+            Import.fromList imports
         end
 
     and flatten imports =
