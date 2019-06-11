@@ -12,6 +12,7 @@ Code travels down the following intermediate representations:
 - Syntax (module `Syntax`): this is the output straight from the parser, the basic abstract
   syntax tree.
 - Ordered declarations AST.
+- Resolved declarations AST.
 
 ## Linear API
 
