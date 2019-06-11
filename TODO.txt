@@ -2,7 +2,6 @@ TODO:
 
 - Syntax->OrderedDecl pass
 - OrderedDecl->ResolvedDecl pass
-- Type-augmented declarations
 - ResolvedDecl->TypedDecl pass
 - TypedDecl->Module pass
 - Parse type parameters in type definitions
@@ -226,3 +225,4 @@ DONE:
 - Fix imports to properly support renames
 - Ordered decl IR
 - Resolved decl IR
+- Type-augmented declarations
