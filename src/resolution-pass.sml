@@ -19,5 +19,16 @@
 
 structure ResolutionPass :> RESOLUTION_PASS = struct
     fun transform menv (OrderedDecl.Module (docstring, name, imports, declarations)) =
-        ResolvedDecl.Module (docstring, name, ImportResolution.resolve menv imports, declarations)
+        let val imports = ImportResolution.resolve menv imports
+        in
+            checkCollision imports declarations;
+            ResolvedDecl.Module (docstring, name, imports, declarations)
+        end
+
+    and checkCollison imports declarations =
+        map (fn (name, _) =>
+                (case Import.getImport imports name of
+                     (SOME _) => Error.semantic "Import collides with local declaration"
+                   | NONE => ()))
+            (Map.toList declarations)
 end
