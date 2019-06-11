@@ -26,4 +26,5 @@ structure TypingPass :> TYPING_PASS = struct
     fun resolveName menv (ResolvedDecl.Module (_, _, imports, decls)) name =
         case Import.getImport imports name of
             (SOME import) => resolveImportedName name
+          | NONE => resolveLocalName decls name
 end
