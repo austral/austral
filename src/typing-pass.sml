@@ -31,4 +31,6 @@ structure TypingPass :> TYPING_PASS = struct
     and resolveLocalName decls name =
         case Map.get decls name of
             (Syntax.RecordDefinition _) => LOCAL_NAME
+          | (Syntax.UnionDefinition _) => LOCAL_NAME
+          | _ => Error.semantic "Not a type definition"
 end
