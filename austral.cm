@@ -21,6 +21,8 @@ Group
 is
   vendor/parsimony/parsimony.cm
 
+  (* Utilities *)
+
   src/util/error.sig
   src/util/error.sml
 
