@@ -18,7 +18,12 @@
 *)
 
 structure Resolution :> RESOLUTION = struct
+    type module_name = Module.module_name
 
+    type module = DAst.module
+    type declaration = DAst.declaration
+
+    type menv = Module.menv
 
     (* Module Resolution
 
