@@ -128,7 +128,7 @@ structure Resolution :> RESOLUTION = struct
                                         ^
                                         "' in the module '"
                                         ^
-                                        (Name.moduleNameString (moduleName module))
+                                        (Name.moduleNameString (Module.moduleName module))
                                         ^
                                         "' is private")
                 end
