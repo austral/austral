@@ -1,5 +1,8 @@
 TODO:
 
+- Ordered decl IR
+- Resolved decl IR
+- Type-augmented declarations
 - Syntax->DAst pass
 - DAst -> menv extraction
 - Parse type parameters in type definitions
