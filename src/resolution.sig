@@ -25,6 +25,5 @@ signature RESOLUTION = sig
 
     type menv = Module.menv
 
-    val validateImports : Syntax.import list -> menv -> (Name.ident, module_name) Map.map
     val resolve : Syntax.module -> module
 end
