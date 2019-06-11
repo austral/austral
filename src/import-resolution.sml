@@ -92,7 +92,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
         end
 
     and referencedModuleExists menv import =
-        case Module.getModule menv moduleName of
+        case Module.getModule menv (Import.importModuleName import) of
             (SOME module) => ()
           | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
 
