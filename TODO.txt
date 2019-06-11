@@ -1,7 +1,5 @@
 TODO:
 
-- Ordered decl IR
-- Resolved decl IR
 - Type-augmented declarations
 - Syntax->DAst pass
 - DAst -> menv extraction
@@ -224,3 +222,5 @@ DONE:
 - Module environment
 - Import validation: imports don't collide with each other
 - Fix imports to properly support renames
+- Ordered decl IR
+- Resolved decl IR
