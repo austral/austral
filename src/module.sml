@@ -62,5 +62,4 @@ structure Module :> MODULE = struct
     type menv = (module_name, module) Map.map
 
     val getModule = Map.get
-
 end
