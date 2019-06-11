@@ -165,7 +165,8 @@ in
 end
 ```
 
-(You can imagine using something like Haskell's `do` notation to remove the nesting from this example.)
+(You can imagine using something like Haskell's `do` notation to remove the
+nesting from this example.)
 
 # License
 
