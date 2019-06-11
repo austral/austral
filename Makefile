@@ -9,11 +9,10 @@ CM_TEST_FILE := austral-test.cm
 
 BIN = austral
 
-C_RUNTIME_SRC := src/back/runtime.c
-C_RUNTIME_SCRIPT := src/back/runtime.awk
-C_RUNTIME_ML := src/back/c-runtime.sml
-SRC := src/util/*.sig src/util/*.sml \
-       src/front/*.sig src/front/*.sml \
+C_RUNTIME_SRC := src/runtime.c
+C_RUNTIME_SCRIPT := src/runtime.awk
+C_RUNTIME_ML := src/c-runtime.sml
+SRC := src/*.sig src/*.sml
        $(C_RUNTIME_ML)
 TEST_SRC := test/*.sml
 
@@ -35,7 +34,6 @@ test: $(SRC) $(TEST_SRC)
 clean:
 	if [ -f $(BIN) ]; then rm $(BIN); fi
 	if [ -f $(C_RUNTIME_ML) ]; then rm $(C_RUNTIME_ML); fi
-	if [ -d src/util/.cm/ ]; then rm -rf src/util/.cm/; fi
-	if [ -d src/front/.cm/ ]; then rm -rf src/front/.cm/; fi
+	if [ -d src/.cm/ ]; then rm -rf src/util/.cm/; fi
 	rm -f test/valid/*.c
 	rm -f test/valid/*.bin
