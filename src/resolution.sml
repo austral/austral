@@ -152,7 +152,7 @@ structure Resolution :> RESOLUTION = struct
         validTypeVis vis
       | validateDeclarationVisibility (DAst.UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclarationVisibility (FunctionDefinition (_, vis, _, _, _)) =
+      | validateDeclarationVisibility (DAst.FunctionDefinition (_, vis, _, _, _)) =
         validFuncVis vis
 
     and validTypeVis Syntax.PublicType =
