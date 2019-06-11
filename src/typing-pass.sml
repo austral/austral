@@ -70,7 +70,7 @@ structure TypingPass :> TYPING_PASS = struct
 
     and resolveDecls ctx decls =
         Map.fromList (map (fn (name, decl) =>
-                              (name, resolveDecl ctx))
+                              (name, resolveDecl ctx decl))
                           (Map.toList decls))
 
     and resolveDecl ctx (Syntax.RecordDefinition (docstring, vis, name, slots)) =
