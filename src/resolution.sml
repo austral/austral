@@ -152,7 +152,7 @@ structure Resolution :> RESOLUTION = struct
         validTypeVis vis
       | validateDeclarationVisibility (Module.UnionDefinition (_, vis, _, _)) =
         validTypeVis vis
-      | validateDeclarationVisibility (Module.FunctionDefinition (_, vis, _, _, _, _)) =
+      | validateDeclarationVisibility (Module.FunctionDefinition (_, vis, _, _, _)) =
         validFuncVis vis
 
     and validTypeVis Syntax.PublicType =
