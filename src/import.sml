@@ -33,6 +33,17 @@ structure Import :> IMPORT = struct
 
     fun importModuleName (Import i) = #moduleName i
 
+    (* Functions for working with import lists *)
+
+    fun fromList imports =
+        let val set = Set.fromList map importName imports
+        in
+            if Set.size set <> List.length list then
+                Error.semantic "Repeated import"
+            else
+                imports
+        end
+
     fun getImport imports name =
         List.find (fn import =>
                       importName import = name)
