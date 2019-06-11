@@ -27,4 +27,5 @@ structure Import :> IMPORT = struct
 
     fun importName (Import i) = i#name
 
+    fun importTrueName (Import i) = i # trueName
 end
