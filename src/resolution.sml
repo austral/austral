@@ -194,7 +194,7 @@ structure Resolution :> RESOLUTION = struct
         let fun resolveCase (Syntax.CaseDefinition (n, ts, ds)) =
                 DAst.CaseDefinition (n, Option.map resolveType ts, ds)
         in
-            UnionDefinition (ds, tv, name, map resolveCase cases)
+            DAst.UnionDefinition (ds, tv, name, map resolveCase cases)
         end
       | resolveDeclaration (Syntax.FunctionDefinition (ds, fv, name, params, rt, expr)) =
         let fun resolveParam (Syntax.Param (n, ts, ds)) =
