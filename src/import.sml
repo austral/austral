@@ -36,7 +36,7 @@ structure Import :> IMPORT = struct
     (* Functions for working with import lists *)
 
     fun fromList imports =
-        let val set = Set.fromList map importName imports
+        let val set = Set.fromList (map importName imports)
         in
             if Set.size set <> List.length imports then
                 Error.semantic "Repeated import"
