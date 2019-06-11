@@ -19,7 +19,7 @@
 
 structure ImportResolution :> IMPORT_RESOLUTION = struct
     type import = Syntax.import
-    type name = Name.name
+    type name = Name.ident
     type module_name = Name.module_name
 
     (* Import resolution means taking a list of imports from the syntax module
