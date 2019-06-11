@@ -61,7 +61,7 @@ structure Resolution :> RESOLUTION = struct
            on that specific import list. We check that no import names are
            repeated across these sets, and finally, return a map of imported
            names to the name of the module they're imported from. *)
-        let val importedNames : (module_name * name Set.set) list = map (validateImport menv) imports
+        let val importedNames : (module_name * Name.ident Set.set) list = map (validateImport menv) imports
         in
             (* To check that no names are repeated, we merge all sets into a
                single set, and compare sizes *)
