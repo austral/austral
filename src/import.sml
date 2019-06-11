@@ -25,6 +25,8 @@ structure Import :> IMPORT = struct
 
     type imports = import list
 
+    (* Accessors *)
+
     fun importName (Import i) = #name i
 
     fun importTrueName (Import i) = #trueName i
