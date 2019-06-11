@@ -53,8 +53,8 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
         (* We are given a list of import statements. We call validateImport on
            each to get a set of imported names, and also to perform validation
            on that specific import list. We check that no import names are
-           repeated across these sets, and finally, return a map of imported
-           names to the name of the module they're imported from. *)
+           repeated across these sets, and finally, we construct an
+           `Import.imports` object. *)
         let val importedNames : (module_name * Name.ident Set.set) list = map (validateImport menv) imports
         in
             (* To check that no names are repeated, we merge all sets into a
