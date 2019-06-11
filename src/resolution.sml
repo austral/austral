@@ -33,7 +33,7 @@ structure Resolution :> RESOLUTION = struct
 
     *)
 
-    fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
+    fun resolve menv (Syntax.Module (docstring, name, imports, declarations)) =
         Module.Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
 
     and resolveImports menv importList =

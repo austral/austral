@@ -25,5 +25,5 @@ signature RESOLUTION = sig
 
     type menv = Module.menv
 
-    val resolve : Syntax.module -> module
+    val resolve : Syntax.module -> menv -> module
 end
