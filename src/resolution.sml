@@ -93,7 +93,7 @@ structure Resolution :> RESOLUTION = struct
                     end
                 end
         in
-            case getModule menv moduleName of
+            case Module.getModule menv moduleName of
                 (SOME module) => let val importedNames = importNamesToSet names
                                  in
                                      map (validateImportedName module) names;
