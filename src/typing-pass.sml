@@ -51,39 +51,39 @@ structure TypingPass :> TYPING_PASS = struct
 
     (* Resolve all type specifiers *)
 
-    fun resolveType menv (Syntax.NamedType name) =
-        resolveNamedType menv name
-      | resolveType menv (Syntax.Address ty) =
-        Type.Address (resolveType menv ty)
-      | resolveType menv (Syntax.Pointer ty) =
-        Type.Pointer (resolveType menv ty)
-      | resolveType menv (Syntax.TupleType tys) =
-        Type.TupleType (map (resolveType menv) tys)
+    fun resolveType ctx (Syntax.NamedType name) =
+        resolveNamedType ctx name
+      | resolveType ctx (Syntax.Address ty) =
+        Type.Address (resolveType ctx ty)
+      | resolveType ctx (Syntax.Pointer ty) =
+        Type.Pointer (resolveType ctx ty)
+      | resolveType ctx (Syntax.TupleType tys) =
+        Type.TupleType (map (resolveType ctx) tys)
 
     (* Here, we have to resolve type specifiers. We go through all declarations,
        turning type specifiers into type objects, assigning named types
        appropriately based on whether the type is an imported name or a locally
        defined name (or, if it's undefined, throwing an error). *)
 
-    fun resolve menv (ResolvedDecl.Module (name, docstring, imports, decls)) =
-        TypedDecl.Module (name, docstring, imports, resolveDecls menv decls)
+    fun resolve ctx (ResolvedDecl.Module (name, docstring, imports, decls)) =
+        TypedDecl.Module (name, docstring, imports, resolveDecls ctx decls)
 
-    and resolveDecls menv decls =
-        Map.fromList (map (resolveDecl menv) (Map.toList decls))
+    and resolveDecls ctx decls =
+        Map.fromList (map (resolveDecl ctx) (Map.toList decls))
 
-    and resolveDecl menv (SyntaxDecl.RecordDefinition (docstring, vis, name, slots)) =
-        TypedDecl.RecordDefinition (docstring, vis, name, map (resolveSlot menv) slots)
-      | resolveDecl menv (SyntaxDecl.UnionDefinition (docstring, vis, name, cases)) =
-        TypedDecl.UnionDefinition (docstring, vis, name, map (resolveCase menv) cases)
-      | resolveDecl menv (SyntaxDecl.FunctionDefinition (docstring, vis, name, params, rt, body)) =
-        TypedDecl.FunctionDefinition (docstring, vis, name, map (resolveParam menv) params, resolveType rt, body)
+    and resolveDecl ctx (SyntaxDecl.RecordDefinition (docstring, vis, name, slots)) =
+        TypedDecl.RecordDefinition (docstring, vis, name, map (resolveSlot ctx) slots)
+      | resolveDecl ctx (SyntaxDecl.UnionDefinition (docstring, vis, name, cases)) =
+        TypedDecl.UnionDefinition (docstring, vis, name, map (resolveCase ctx) cases)
+      | resolveDecl ctx (SyntaxDecl.FunctionDefinition (docstring, vis, name, params, rt, body)) =
+        TypedDecl.FunctionDefinition (docstring, vis, name, map (resolveParam ctx) params, resolveType rt, body)
 
-    and resolveSlot menv (Syntax.SlotDefinition (name, ty, docstring)) =
-        TypedDecl.SlotDefinition (name, resolveType menv ty, docstring)
+    and resolveSlot ctx (Syntax.SlotDefinition (name, ty, docstring)) =
+        TypedDecl.SlotDefinition (name, resolveType ctx ty, docstring)
 
-    and resolveCase menv (Syntax.CaseDefinition (name, tyOpt, docstring)) =
-        TypedDecl.CaseDefinition (name, Option.map (resolveType menv) ty, docstring)
+    and resolveCase ctx (Syntax.CaseDefinition (name, tyOpt, docstring)) =
+        TypedDecl.CaseDefinition (name, Option.map (resolveType ctx) ty, docstring)
 
-    and resolveParam menv (Syntax.Param (name, ty, docstring)) =
-        TypedDecl.Param (name, resolveType menv ty, docstring)
+    and resolveParam ctx (Syntax.Param (name, ty, docstring)) =
+        TypedDecl.Param (name, resolveType ctx ty, docstring)
 end
