@@ -74,7 +74,7 @@ structure TypingPass :> TYPING_PASS = struct
       | resolveDecl menv (SyntaxDecl.UnionDefinition (docstring, vis, name, cases)) =
         TypedDecl.UnionDefinition (docstring, vis, name, map (resolveCase menv) cases)
       | resolveDecl menv (SyntaxDecl.FunctionDefinition (docstring, vis, name, params, rt, body)) =
-        TypedDecl.FunctionDefinition (docstring, vis, name, map (resolveParam params), resolveType rt, body)
+        TypedDecl.FunctionDefinition (docstring, vis, name, map (resolveParam menv) params, resolveType rt, body)
 
     and resolveSlot menv (Syntax.SlotDefinition (name, ty, docstring)) =
         TypedDecl.SlotDefinition (name, resolveType menv ty, docstring)
