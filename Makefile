@@ -11,7 +11,7 @@ BIN = austral
 
 C_RUNTIME_SRC := src/back/runtime.c
 C_RUNTIME_SCRIPT := src/back/runtime.awk
-C_RUNTIME_ML := src/c-runtime.sml
+C_RUNTIME_ML := src/back/c-runtime.sml
 SRC := src/util/*.sig src/util/*.sml \
        src/front/*.sig src/front/*.sml \
        $(C_RUNTIME_ML)
