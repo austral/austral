@@ -20,8 +20,8 @@
 signature RESOLUTION = sig
     type module_name = Module.module_name
 
-    type module = Module.module
-    type declaration = Module.declaration
+    type module = DAst.module
+    type declaration = DAst.declaration
 
     type menv = Module.menv
 
