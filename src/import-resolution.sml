@@ -43,6 +43,10 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
        5. Ensure that imports don't collide with each other: if we have `from A
        import a` and `from B import a`, this is clearly an error.
 
+       Note that we don't check that imports don't collide with declarations in
+       the module. This is because this pass just focuses on the imports as a
+       standalone unit.
+
     *)
 
     fun validateImports imports menv =
