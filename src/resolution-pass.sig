@@ -18,4 +18,5 @@
 *)
 
 signature RESOLUTION_PASS = sig
+    val transform : Module.menv -> OrderedDecl.module -> ResolvedDecl.module
 end
