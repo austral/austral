@@ -55,9 +55,6 @@ is
   src/syntax.sig
   src/syntax.sml
 
-  src/parser.sig
-  src/parser.sml
-
   src/type.sig
   src/type.sml
 
@@ -79,5 +76,8 @@ is
   src/resolution.sml*)
 
   (* Passes *)
+
+  src/parser.sig
+  src/parser.sml
 
   $/basis.cm
