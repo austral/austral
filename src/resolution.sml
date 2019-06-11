@@ -192,7 +192,7 @@ structure Resolution :> RESOLUTION = struct
         end
       | resolveDeclaration (Syntax.UnionDefinition (ds, tv, name, cases)) =
         let fun resolveCase (Syntax.CaseDefinition (n, ts, ds)) =
-                CaseDefinition (n, Option.map resolveType ts, ds)
+                DAst.CaseDefinition (n, Option.map resolveType ts, ds)
         in
             UnionDefinition (ds, tv, name, map resolveCase cases)
         end
