@@ -23,7 +23,7 @@ signature IMPORT = sig
 
     val importName : import -> Name.ident
     val importTrueName : import -> Name.ident
-    val importModuleName : import -> Module.name
+    val importModuleName : import -> Name.module_name
 
     val getImport : imports -> Name.ident -> import option
 end
