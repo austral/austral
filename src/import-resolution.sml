@@ -95,7 +95,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
         let val moduleName = Import.importModuleName import
         in
             case Module.getModule menv moduleName of
-                (SOME module) => ()
+                (SOME module) => module
               | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
         end
 
