@@ -18,4 +18,7 @@
 *)
 
 structure ImportResolution :> IMPORT_RESOLUTION = struct
+    type import = Syntax.import
+    type name = Name.name
+    type module_name = Name.module_name
 end
