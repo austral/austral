@@ -19,7 +19,7 @@
 
 signature IMPORT_RESOLUTION = sig
     type import = Syntax.import
-    type name = Name.name
+    type name = Name.ident
     type module_name = Name.module_name
 
     val resolve : import list -> Import.imports
