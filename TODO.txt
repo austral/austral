@@ -1,7 +1,7 @@
 TODO:
 
 - TypedDecl->Module pass
-- Parse type parameters in type definitions
+- Parser: type parameters in type definitions
 
 LONG-TERM TODO:
 
