@@ -70,4 +70,7 @@ structure TypingPass :> TYPING_PASS = struct
 
     and resolveCase (Syntax.CaseDefinition (name, tyOpt, docstring)) =
         TypedDecl.CaseDefinition (name, Option.map resolveType ty, docstring)
+
+    and resolveParam (Syntax.Param (name, ty, docstring)) =
+        TypedDecl.Param (name, resolveType ty, docstring)
 end
