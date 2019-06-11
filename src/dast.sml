@@ -22,13 +22,9 @@ structure DAst :> DAST = struct
 
     type name = Name.ident
     type module_name = Name.module_name
-
     type type_visibility = Syntax.type_visibility
-
     type func_visibility = Syntax.func_visibility
-
     type docstring = Syntax.docstring
-
     type ty = Type.ty
 
     type imports = (Name.ident, module_name) Map.map
