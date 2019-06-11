@@ -39,28 +39,28 @@ is
   src/util/ordered-map.sig
   src/util/ordered-map.sml
 
-  src/front/name.sig
-  src/front/name.sml
+  src/name.sig
+  src/name.sml
 
-  src/front/arith.sig
-  src/front/arith.sml
+  src/arith.sig
+  src/arith.sml
 
-  src/front/escape.sig
-  src/front/escape.sml
+  src/escape.sig
+  src/escape.sml
 
-  src/front/syntax.sig
-  src/front/syntax.sml
+  src/syntax.sig
+  src/syntax.sml
 
-  src/front/parser.sig
-  src/front/parser.sml
+  src/parser.sig
+  src/parser.sml
 
-  src/middle/type.sig
-  src/middle/type.sml
+  src/type.sig
+  src/type.sml
 
-  src/middle/module.sig
-  src/middle/module.sml
+  src/module.sig
+  src/module.sml
 
-  src/middle/resolution.sig
-  src/middle/resolution.sml
+  src/resolution.sig
+  src/resolution.sml
 
   $/basis.cm
