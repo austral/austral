@@ -27,6 +27,8 @@ signature IMPORT = sig
     val importTrueName : import -> Name.ident
     val importModuleName : import -> Name.module_name
 
+    (* Given a list of imports, return an `imports` object. Validates that there
+       are no colliding imports. *)
     val fromList : import list -> imports
     val getImport : imports -> Name.ident -> import option
 end
