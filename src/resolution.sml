@@ -144,7 +144,7 @@ structure Resolution :> RESOLUTION = struct
                                     ^
                                     "' does not exist in module '"
                                     ^
-                                    (Name.moduleNameString (moduleName module))
+                                    (Name.moduleNameString (Module.moduleName module))
                                     ^
                                     "'")
 
