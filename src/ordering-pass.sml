@@ -18,4 +18,9 @@
 *)
 
 structure OrderingPass :> ORDERING_PASS = struct
+    (*fun transform (Syntax.Module (docstring, name, imports, declarations)) =
+      OrderedDecl.Module (name, docstring, imports, transformDeclarations declarations)
+      
+    and transformDeclarations decls =
+      *)
 end
