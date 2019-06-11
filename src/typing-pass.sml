@@ -22,4 +22,5 @@ structure TypingPass :> TYPING_PASS = struct
        turning type specifiers into type objects, assigning named types
        appropriately based on whether the type is an imported name or a locally
        defined name (or, if it's undefined, throwing an error). *)
-  end
+
+end
