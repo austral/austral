@@ -63,6 +63,9 @@ is
   src/dast.sig
   src/dast.sml
 
+  src/import-resolution.sig
+  src/import-resolution.sml
+
   src/resolution.sig
   src/resolution.sml
 
