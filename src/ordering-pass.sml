@@ -20,10 +20,10 @@
 structure OrderingPass :> ORDERING_PASS = struct
     fun transform (Syntax.Module (docstring, name, imports, declarations)) =
       OrderedDecl.Module (name, docstring, imports, transformDeclarations declarations)
-      
+
     and transformDeclarations decls =
       Map.fromList (map (fn decl => (declarationName decl, decl)) decls)
-      
+
     and declarationName (Syntax.RecordDefinition (_, _, name, _)) = name
       | declarationName (Syntax.UnionDefinition (_, _, name, _)) = name
       | declarationName (Syntax.FunctionDefinition (_, _, name, _, _, _)) = name
