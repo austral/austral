@@ -21,6 +21,8 @@ signature IMPORT = sig
     type import
     type imports
 
+    val mkImport : { name: Name.ident, trueName: Name.ident, moduleName: Name.module_name } -> import
+
     val importName : import -> Name.ident
     val importTrueName : import -> Name.ident
     val importModuleName : import -> Name.module_name
