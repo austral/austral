@@ -176,7 +176,7 @@ structure Resolution :> RESOLUTION = struct
     *)
 
     fun resolve (Syntax.Module (docstring, name, imports, declarations)) =
-        Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
+        Module.Module (name, docstring, resolveImports imports, resolveDeclarations declarations)
 
     and resolveImports importList =
         Error.notImplemented ()
