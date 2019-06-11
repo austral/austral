@@ -18,4 +18,8 @@
 *)
 
 structure Import :> IMPORT = struct
+    type name = Name.ident
+    type module_name = Name.module_name
+
+    datatype import = Import of { name: name, trueName: name, moduleName: module_name }
 end
