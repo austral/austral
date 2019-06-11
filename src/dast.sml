@@ -18,8 +18,6 @@
 *)
 
 structure DAst :> DAST = struct
-    (* Types *)
-
     type name = Name.ident
     type module_name = Name.module_name
     type type_visibility = Syntax.type_visibility
