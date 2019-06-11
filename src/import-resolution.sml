@@ -88,9 +88,9 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                                   trueName=name,
                                   moduleName=mn }
         in
-            List.concat (map (fn (Syntax.Import (moduleName, names) =>
-                                  map (flattenImport mn) names)
-                                 imports))
+            List.concat (map (fn (Syntax.Import (moduleName, names)) =>
+                                 map (flattenImport mn) names)
+                                 imports)
         end
 
     and validateImport menv (Syntax.Import (moduleName, names)) =
