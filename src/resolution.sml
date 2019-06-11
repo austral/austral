@@ -136,7 +136,7 @@ structure Resolution :> RESOLUTION = struct
         end
 
     and validateDeclarationExists module name =
-        case getDeclaration module name of
+        case Module.getDeclaration module name of
             (SOME decl) => decl
           | NONE => Error.semantic ("Imported name '"
                                     ^
