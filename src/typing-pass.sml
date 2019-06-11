@@ -47,6 +47,13 @@ structure TypingPass :> TYPING_PASS = struct
           | (SOME _) => Error.semantic "Not a type definition"
           | NONE => Error.semantic "No type with this name"
 
+    (* Resolve all type specifiers *)
+
+    fun resolveType menv (Syntax.NamedType name) =
+        resolveNamedType menv name
+      | resolveType menv (Syntax.Address ty) =
+        Type.Address (resolveType menv ty)
+
     (* Here, we have to resolve type specifiers. We go through all declarations,
        turning type specifiers into type objects, assigning named types
        appropriately based on whether the type is an imported name or a locally
