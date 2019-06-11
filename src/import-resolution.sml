@@ -24,12 +24,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
 
     (* Import resolution means taking a list of imports from the syntax module
        and resolving them to a map of imported names to the modules that import
-       them, and doing some validation in the meantime.
-
-       Import validation is fairly straightforward: we have a list of import
-       statements, each of which refers to a single module and imports a set of
-       names from that module, and have to turn it into a map of identifiers to
-       the name of the module that identifier comes from.
+       them.
 
        In the process, we need to validate a few things:
 
