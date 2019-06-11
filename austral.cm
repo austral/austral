@@ -60,6 +60,9 @@ is
   src/module.sig
   src/module.sml
 
+  src/dast.sig
+  src/dast.sml
+
   src/resolution.sig
   src/resolution.sml
 
