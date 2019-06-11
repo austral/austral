@@ -67,7 +67,7 @@ structure TypingPass :> TYPING_PASS = struct
         TypedDecl.Module (name, docstring, imports, resolveDecls decls)
 
     and resolveDecls decls =
-        Map.fromList (map resolveDecl (Map.toList decls))
+        Map.fromList (map (resolveDecl menv) (Map.toList decls))
 
     and resolveDecl menv (SyntaxDecl.RecordDefinition (docstring, vis, name, slots)) =
         TypedDecl.RecordDefinition (docstring, vis, name, map (resolveSlot menv) slots)
