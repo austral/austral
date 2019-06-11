@@ -200,7 +200,7 @@ structure Resolution :> RESOLUTION = struct
         let fun resolveParam (Syntax.Param (n, ts, ds)) =
                 DAst.Param (n, resolveType ts, ds)
         in
-            DAst.FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt)
+            DAst.FunctionDefinition (ds, fv, name, map resolveParam params, resolveType rt, expr)
         end
 
     and resolveType (Syntax.NamedType name) =
