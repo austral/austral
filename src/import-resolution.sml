@@ -52,7 +52,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
     fun validateImports imports menv =
         let imports = flatten imports
         in
-            map (referencedModuleExists menv) imports;
+            map (validateImport menv) imports;
             Imports.fromList imports
         end
 
@@ -71,46 +71,35 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                                  imports)
         end
 
+    and validateImport menv import =
+        let val module = referencedModuleExists menv import
+        in
+            let val decl = declarationExists module import
+            in
+                if declarationIsVisible decl then
+                    ()
+                else
+                    Error.semantic ("Attempted to import a private name: '"
+                                    ^
+                                    (Name.identString name)
+                                    ^
+                                    "' in the module '"
+                                    ^
+                                    (Name.moduleNameString (Module.moduleName module))
+                                    ^
+                                    "' is private")
+            end
+        end
+
     and referencedModuleExists menv import =
         case Module.getModule menv moduleName of
             (SOME module) => ()
           | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
         end
 
-    and importedDeclarationExists module import =
-        let val decl = validateDeclarationExists module (Import.importTrueName import)
-        in
-            if validateDeclarationVisibility decl then
-                ()
-            else
-                Error.semantic ("Attempted to import a private name: '"
-                                        ^
-                                        (Name.identString name)
-                                        ^
-                                        "' in the module '"
-                                        ^
-                                        (Name.moduleNameString (Module.moduleName module))
-                                        ^
-                                        "' is private")
-                end
-            end
-        end
-
-    (* Check that a declaration exists *)
-    and validateDeclarationExistsAndIsImportable module import =
+    and declarationExistse module import =
         case Module.getDeclaration module (Import.importTrueName import) of
-            (SOME decl) => if declarationIsVisible decl then
-                               ()
-                           else
-                               Error.semantic ("Attempted to import a private name: '"
-                                               ^
-                                               (Name.identString name)
-                                               ^
-                                               "' in the module '"
-                                               ^
-                                               (Name.moduleNameString (Module.moduleName module))
-                                               ^
-                                               "' is private")
+            (SOME decl) => decl
           | NONE => Error.semantic ("Imported name '"
                                     ^
                                     (Name.identString name)
