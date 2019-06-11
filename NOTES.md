@@ -13,3 +13,13 @@ Code travels down the following intermediate representations:
   syntax tree.
 - Declaration AST (module `DAst`): declarations from `Syntax` are parsed to
   resolve imports, find colliding declarations, resolve types etc.
+
+## Linear API
+
+Rough notes.
+
+```
+allocate: t -> pointer(t)
+load: pointer(t) -> t
+swap: pointer(t) -> t -> (pointer(t), t)
+```
