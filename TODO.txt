@@ -1,6 +1,5 @@
 TODO:
 
-- Fix imports to properly support renames
 - Parse type parameters in type definitions
 - Resolve syntax declarations to module declarations
 - Import validation: ensure local declarations don't collide with import names
@@ -221,3 +220,4 @@ DONE:
 - Import validation: imports refer to declarations that are public or opaque
 - Module environment
 - Import validation: imports don't collide with each other
+- Fix imports to properly support renames
