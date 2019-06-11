@@ -30,4 +30,9 @@ structure Import :> IMPORT = struct
     fun importTrueName (Import i) = #trueName i
 
     fun importModuleName (Import i) = #moduleName i
+
+    fun getImport imports name =
+        List.find (fn import =
+                      importName import = name)
+                  imports
 end
