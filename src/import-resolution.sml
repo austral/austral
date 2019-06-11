@@ -142,6 +142,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                                     ^
                                     "'")
 
+    (* Check if a declaration can be imported *)
     and validateDeclarationVisibility (Module.RecordDefinition (_, vis, _, _)) =
         validTypeVis vis
       | validateDeclarationVisibility (Module.UnionDefinition (_, vis, _, _)) =
@@ -157,6 +158,7 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
       | validTypeVis Syntax.PrivateType =
         false
 
+    (* Given a functions's visibility declaration, check if it can be imported *)
     and validFuncVis Syntax.PublicFunction =
         true
       | validFuncVis Syntax.PrivateFunction =
