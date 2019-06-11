@@ -92,4 +92,7 @@ is
   src/resolution-pass.sig
   src/resolution-pass.sml
 
+  src/typing-pass.sig
+  src/typing-pass.sml
+
   $/basis.cm
