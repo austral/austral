@@ -1,6 +1,5 @@
 TODO:
 
-- ResolvedDecl->TypedDecl pass
 - TypedDecl->Module pass
 - Parse type parameters in type definitions
 - Import validation: ensure local declarations don't collide with import names
@@ -226,3 +225,4 @@ DONE:
 - Type-augmented declarations
 - Syntax->OrderedDecl pass
 - OrderedDecl->ResolvedDecl pass
+- ResolvedDecl->TypedDecl pass
