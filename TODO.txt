@@ -1,6 +1,5 @@
 TODO:
 
-- Syntax->OrderedDecl pass
 - OrderedDecl->ResolvedDecl pass
 - ResolvedDecl->TypedDecl pass
 - TypedDecl->Module pass
@@ -226,3 +225,4 @@ DONE:
 - Ordered decl IR
 - Resolved decl IR
 - Type-augmented declarations
+- Syntax->OrderedDecl pass
