@@ -19,7 +19,7 @@
 
 signature IMPORT = sig
     type import
-    type imports = import list
+    type imports
 
     val importName : import -> Name.ident
     val importTrueName : import -> Name.ident
