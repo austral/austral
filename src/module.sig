@@ -23,7 +23,7 @@ signature MODULE = sig
     type module
     type declaration
 
-    val moduleName : module -> name
+    val moduleName : module -> module_name
 
     type menv
 
