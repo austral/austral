@@ -18,9 +18,11 @@
 *)
 
 structure TypingPass :> TYPING_PASS = struct
+    type ctx = Module.menv * ResolvedDecl.module
+
     (* Resolve named types *)
 
-    fun resolveNamedType menv (ResolvedDecl.Module (moduleName, _, imports, decls)) name =
+    fun resolveNamedType (menv, (ResolvedDecl.Module (moduleName, _, imports, decls))) name =
         case Import.getImport imports name of
             (SOME import) => resolveImportedNamedType menv import
           | NONE => resolveLocalNamedType moduleName decls name
