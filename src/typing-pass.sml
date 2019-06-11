@@ -64,7 +64,7 @@ structure TypingPass :> TYPING_PASS = struct
        defined name (or, if it's undefined, throwing an error). *)
 
     fun resolve (ResolvedDecl.Module (name, docstring, imports, decls)) =
-        TypedDecl.Module (name, docstring, imports, resolveDecls decls)
+        TypedDecl.Module (name, docstring, imports, resolveDecls menv decls)
 
     and resolveDecls menv decls =
         Map.fromList (map (resolveDecl menv) (Map.toList decls))
