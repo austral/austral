@@ -22,4 +22,6 @@ structure Import :> IMPORT = struct
     type module_name = Name.module_name
 
     datatype import = Import of { name: name, trueName: name, moduleName: module_name }
+
+    type imports = import list
 end
