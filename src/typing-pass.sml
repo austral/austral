@@ -27,4 +27,8 @@ structure TypingPass :> TYPING_PASS = struct
         case Import.getImport imports name of
             (SOME import) => resolveImportedName name
           | NONE => resolveLocalName decls name
+
+    and resolveLocalName decls name =
+        case Map.get decls name of
+            (Syntax.RecordDefinition _) => LOCAL_NAME
 end
