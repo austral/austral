@@ -3,7 +3,6 @@ TODO:
 - TypedDecl->Module pass
 - Parse type parameters in type definitions
 - Import validation: ensure local declarations don't collide with import names
-- Transform type specifiers to type objects
 
 LONG-TERM TODO:
 
@@ -225,3 +224,4 @@ DONE:
 - Syntax->OrderedDecl pass
 - OrderedDecl->ResolvedDecl pass
 - ResolvedDecl->TypedDecl pass
+- Transform type specifiers to type objects
