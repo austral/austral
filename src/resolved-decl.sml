@@ -19,7 +19,6 @@
 
 structure ResolvedDecl :> RESOLVED_DECL = struct
     type name = Name.ident
-    type module_name = Name.module_name
     type type_visibility = Syntax.type_visibility
     type func_visibility = Syntax.func_visibility
     type docstring = Syntax.docstring
@@ -28,7 +27,7 @@ structure ResolvedDecl :> RESOLVED_DECL = struct
     type case_definition = Syntax.case_definition
     type param = Syntax.param
 
-    datatype module = Module of module_name * docstring * Import.imports * (name, declaration) Map.map
+    datatype module = Module of Name.module_name * docstring * Import.imports * (name, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * expr
