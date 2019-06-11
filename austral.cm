@@ -66,6 +66,9 @@ is
   src/syntax.sig
   src/syntax.sml
 
+  src/ordered-decl.sig
+  src/ordered-decl.sml
+
   src/dast.sig
   src/dast.sml
 
