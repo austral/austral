@@ -23,7 +23,5 @@ signature RESOLUTION = sig
     type module = DAst.module
     type declaration = DAst.declaration
 
-    type menv = Module.menv
-
-    val resolve : Syntax.module -> menv -> module
+    val resolve : Syntax.module -> Module.menv -> module
 end
