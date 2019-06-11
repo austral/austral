@@ -25,5 +25,6 @@ structure Import :> IMPORT = struct
 
     type imports = import list
 
-    fun importName (Import { name=name, trueName=_, moduleName=_ }) = name
+    fun importName (Import { name=name, trueName=_, moduleName=_ }) =
+        name
 end
