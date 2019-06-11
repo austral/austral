@@ -19,5 +19,5 @@
 
 structure ResolutionPass :> RESOLUTION_PASS = struct
     fun transform menv (OrderedDecl.Module (docstring, name, imports, declarations)) =
-        ResolvedDecl.Module (docstring, name, ImportResolution.resolve imports menv, declarations)
+        ResolvedDecl.Module (docstring, name, ImportResolution.resolve menv imports, declarations)
 end
