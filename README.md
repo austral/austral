@@ -148,7 +148,9 @@ in
 end
 ```
 
-But we can still make multiple queries with the linearly-typed API, because the `query` function returns a tuple of the result set and the new database object. In SML notation:
+But we can still make multiple queries with the linearly-typed API, because the
+`query` function returns a tuple of the result set and the new database
+object. In SML notation:
 
 ```sml
 let val db = connect "my_database"
