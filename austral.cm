@@ -52,9 +52,6 @@ is
   src/escape.sig
   src/escape.sml
 
-  src/syntax.sig
-  src/syntax.sml
-
   src/type.sig
   src/type.sml
 
@@ -65,6 +62,9 @@ is
   src/module.sml
 
   (* Internal Representations *)
+
+  src/syntax.sig
+  src/syntax.sml
 
   src/dast.sig
   src/dast.sml
