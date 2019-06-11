@@ -60,4 +60,6 @@ is
   src/middle/module.sig
   src/middle/module.sml
 
+  src/middle/resolution.sig
+
   $/basis.cm
