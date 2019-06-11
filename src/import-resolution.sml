@@ -66,7 +66,8 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
                     Error.semantic "Colliding import"
                 else
                     let val imports = map (fn (mn, s) =>
-                                              map (fn elem => (elem, mn)) (Set.toList s))
+                                              map (fn elem => Import.mkImport { name = elem, moduleName = mn))
+                                                  (Set.toList s))
                                           importedNames
                     in
                         Import.fromList (List.concat imports)
