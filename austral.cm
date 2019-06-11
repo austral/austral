@@ -57,6 +57,9 @@ is
   src/type.sig
   src/type.sml
 
+  src/import.sig
+  src/import.sml
+
   src/module.sig
   src/module.sml
 
