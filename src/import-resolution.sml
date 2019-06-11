@@ -92,9 +92,12 @@ structure ImportResolution :> IMPORT_RESOLUTION = struct
         end
 
     and referencedModuleExists menv import =
-        case Module.getModule menv (Import.importModuleName import) of
-            (SOME module) => ()
-          | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
+        let val moduleName = Import.importModuleName import
+        in
+            case Module.getModule menv moduleName of
+                (SOME module) => ()
+              | NONE => Error.semantic ("No module with this name: " ^ (Name.moduleNameString moduleName))
+        end
 
     and declarationExistse module import =
         case Module.getDeclaration module (Import.importTrueName import) of
