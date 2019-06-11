@@ -29,7 +29,7 @@ Anti-features:
 
 - No garbage collection.
 - No destructors.
-- No exceptions.
+- No exceptions (and no surprise control flow).
 - No implicit function calls.
 - No implicit type conversions.
 - No global variables.
