@@ -18,12 +18,7 @@
 *)
 
 structure Resolution :> RESOLUTION = struct
-    type module_name = Module.module_name
-
-    type module = Module.module
-    type declaration = Module.declaration
-
-    type menv = Module.menv
+    open Module
 
     (* Module Resolution
 
