@@ -29,12 +29,9 @@ structure ModuleExtraction :> MODULE_EXTRACTION = struct
     and extractDecl (TypedDecl.RecordDefinition (ds, vis, name, slots)) =
         Module.RecordDefinition (ds, vis, name, slots)
       | extractDecl (TypedDecl.UnionDefinition (ds, vis, name, cases)) =
-        Module.UnionDefinition (ds, vis, name, map extractCase cases)
+        Module.UnionDefinition (ds, vis, name, cases)
       | extractDecl (TypedDecl.FunctionDefinition (ds, vis, name, params, rt, _)) =
         Module.FunctionDefinition (ds, vis, name, map extractParam params, rt)
-
-    and extractCase (TypedDecl.CaseDefinition (name, tyOpt, ds)) =
-        Module.CaseDefinition (name, tyOpt, ds)
 
     and extractParam (TypedDecl.Param (name, ty, ds)) =
         Module.Param (name, ty, ds)
