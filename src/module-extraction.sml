@@ -28,8 +28,8 @@ structure ModuleExtraction :> MODULE_EXTRACTION = struct
 
     and extractDecl (TypedDecl.RecordDefinition data) =
         Module.RecordDefinition data
-      | extractDecl (TypedDecl.UnionDefinition (ds, vis, name, cases)) =
-        Module.UnionDefinition (ds, vis, name, cases)
+      | extractDecl (TypedDecl.UnionDefinition data) =
+        Module.UnionDefinition data
       | extractDecl (TypedDecl.FunctionDefinition (ds, vis, name, params, rt, _)) =
         Module.FunctionDefinition (ds, vis, name, params, rt)
 end
