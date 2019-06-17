@@ -31,7 +31,7 @@ structure Module :> MODULE = struct
 
     type ty = Type.ty
 
-    type imports = (name, module_name) Map.map
+    type imports = Import.imports
 
     datatype module = Module of module_name * docstring * imports * (name, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
