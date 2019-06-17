@@ -18,4 +18,6 @@
 *)
 
 structure ModuleExtraction :> MODULE_EXTRACTION = struct
+    fun extract (TypedDecl.Module (name, docstring, imports, decls)) =
+        Module.module (name, docstring, imports, extractDecls decls)
 end
