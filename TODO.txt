@@ -225,3 +225,4 @@ DONE:
 - Transform type specifiers to type objects
 - Import validation: ensure local declarations don't collide with import names
 - TypedDecl->Module pass
+- Simplify TypedDecl->Module pass
