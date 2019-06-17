@@ -96,6 +96,6 @@ is
   src/typing-pass.sml
 
   src/module-extraction.sig
-  src/module-extaction.sml
+  src/module-extraction.sml
 
   $/basis.cm
