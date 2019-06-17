@@ -22,7 +22,7 @@ structure ModuleExtraction :> MODULE_EXTRACTION = struct
         Module.module (name, docstring, imports, extractDecls decls)
 
     and extractDecls decls =
-        map (fn (name, decl) =>
-                (name, extractDecl decl))
-            (Map.toList decls)
+        Map.fromList (map (fn (name, decl) =>
+                              (name, extractDecl decl))
+                          (Map.toList decls))
 end
