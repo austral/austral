@@ -27,7 +27,7 @@ structure ModuleExtraction :> MODULE_EXTRACTION = struct
                           (Map.toList decls))
 
     and extractDecl (TypedDecl.RecordDefinition (ds, vis, name, slots)) =
-        Module.RecordDefinition (ds, vis, name, map extractSlot slots)
+        Module.RecordDefinition (ds, vis, name, slots)
       | extractDecl (TypedDecl.UnionDefinition (ds, vis, name, cases)) =
         Module.UnionDefinition (ds, vis, name, map extractCase cases)
       | extractDecl (TypedDecl.FunctionDefinition (ds, vis, name, params, rt, _)) =
