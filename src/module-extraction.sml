@@ -25,4 +25,7 @@ structure ModuleExtraction :> MODULE_EXTRACTION = struct
         Map.fromList (map (fn (name, decl) =>
                               (name, extractDecl decl))
                           (Map.toList decls))
+
+    and extractDecl (TypedDecl.RecordDefinition (ds, vis, name, slots)) =
+        Module.RecordDefinition (ds, vis, name, map extractSlot slots)
 end
