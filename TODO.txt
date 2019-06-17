@@ -1,6 +1,5 @@
 TODO:
 
-- TypedDecl->Module pass
 - Parser: type parameters in type definitions
 
 LONG-TERM TODO:
@@ -225,3 +224,4 @@ DONE:
 - ResolvedDecl->TypedDecl pass
 - Transform type specifiers to type objects
 - Import validation: ensure local declarations don't collide with import names
+- TypedDecl->Module pass
