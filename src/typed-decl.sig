@@ -26,8 +26,7 @@ signature TYPED_DECL = sig
 
     datatype module = Module of Name.module_name * docstring * Import.imports * (name, declaration) Map.map
          and declaration = RecordDefinition of docstring * type_visibility * name * Module.slot_definition list
-                         | UnionDefinition of docstring * type_visibility * name * case_definition list
+                         | UnionDefinition of docstring * type_visibility * name * Module.case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * param list * ty * Syntax.expr
-         and case_definition = CaseDefinition of name * ty option * docstring
          and param = Param of name * ty * docstring
 end
