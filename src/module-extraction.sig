@@ -18,4 +18,5 @@
 *)
 
 signature MODULE_EXTRACTION = sig
+    val extract : TypedDecl.module -> Module.module
 end
