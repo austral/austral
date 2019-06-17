@@ -25,10 +25,9 @@ structure TypedDecl :> TYPED_DECL = struct
     type ty = Type.ty
 
     datatype module = Module of Name.module_name * docstring * Import.imports * (name, declaration) Map.map
-         and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
+         and declaration = RecordDefinition of docstring * type_visibility * name * Module.slot_definition list
                          | UnionDefinition of docstring * type_visibility * name * case_definition list
                          | FunctionDefinition of docstring * func_visibility * name * param list * ty * Syntax.expr
-         and slot_definition = SlotDefinition of name * ty * docstring
          and case_definition = CaseDefinition of name * ty option * docstring
          and param = Param of name * ty * docstring
 end
