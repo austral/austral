@@ -1,6 +1,7 @@
 TODO:
 
 - Parser: type parameters in type definitions
+- let syntax
 
 LONG-TERM TODO:
 
