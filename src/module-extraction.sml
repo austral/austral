@@ -39,6 +39,6 @@ structure ModuleExtraction :> MODULE_EXTRACTION = struct
     and extractCase (TypedDecl.CaseDefinition (name, tyOpt, ds)) =
         Module.CaseDefinition (name, tyOpt, ds)
 
-    and extractParam (TypedDecl.Param (name, ty)) =
-        Module.Param (name, ty)
+    and extractParam (TypedDecl.Param (name, ty, ds)) =
+        Module.Param (name, ty, ds)
 end
