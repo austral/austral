@@ -31,7 +31,7 @@ structure ModuleExtraction :> MODULE_EXTRACTION = struct
       | extractDecl (TypedDecl.UnionDefinition (ds, vis, name, cases)) =
         Module.UnionDefinition (ds, vis, name, map extractCase cases)
       | extractDecl (TypedDecl.FunctionDefinition (ds, vis, name, params, rt, _)) =
-        Module.FunctionDefinition (ds, vis, name, params, rt)
+        Module.FunctionDefinition (ds, vis, name, map extractParam params, rt)
 
     and extractSlot (TypedDecl.SlotDefinition (name, ty, ds)) =
         Module.SlotDefinition (name, ty, ds)
