@@ -87,5 +87,5 @@ structure TypingPass :> TYPING_PASS = struct
         Module.CaseDefinition (name, Option.map (resolveType ctx) tyOpt, docstring)
 
     and resolveParam ctx (Syntax.Param (name, ty, docstring)) =
-        TypedDecl.Param (name, resolveType ctx ty, docstring)
+        Module.Param (name, resolveType ctx ty, docstring)
 end
