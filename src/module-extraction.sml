@@ -19,7 +19,7 @@
 
 structure ModuleExtraction :> MODULE_EXTRACTION = struct
     fun extract (TypedDecl.Module (name, docstring, imports, decls)) =
-        Module.module (name, docstring, imports, extractDecls decls)
+        Module.Module (name, docstring, imports, extractDecls decls)
 
     and extractDecls decls =
         Map.fromList (map (fn (name, decl) =>
