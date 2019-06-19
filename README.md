@@ -34,6 +34,7 @@ Anti-features:
 - No implicit function calls.
 - No implicit type conversions.
 - No global state.
+- No reflection.
 - No type inference, type information flows in one direction.
 
 ## Building
