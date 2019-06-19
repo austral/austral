@@ -35,6 +35,7 @@ Anti-features:
 - No implicit type conversions.
 - No global state.
 - No reflection.
+- No Java-style @Annotations.
 - No type inference, type information flows in one direction.
 
 ## Building
