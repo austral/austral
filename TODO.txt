@@ -2,6 +2,8 @@ TODO:
 
 - Parser: type parameters in type definitions
 - let syntax
+- AST type
+- Expr->AST transformation
 
 LONG-TERM TODO:
 
