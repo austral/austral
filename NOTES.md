@@ -33,3 +33,42 @@ Arrays:
 allocate_array: t -> size -> array(t)
 replace: array(t) -> index -> t -> (array(t), t)
 ```
+
+# Language Notes
+
+## Syntax
+
+EBNF quick guide:
+
+Definition is `=`, terminates with `;`. Concatenation is `,`. Alternation is
+`|`. Optional is `[...]`. Repetition (zero or more) is `{...}`.
+
+For brevity, we use `<...>` to mean comma-separated repetition, e.g. the empty
+string, `A`, `A,B`, `A,B,C`, without a trailing comma.
+
+Non-terminals are in `PascalCase`. Terminals are `lower case`. Whitespace is
+implied.
+
+```
+Module = "module", module name, {Import}, {Declaration};
+Import = "from", module name, "import", identifier, ["as" identifier];
+Declaration = RecordDecl | UnionDecl | FunctionDef;
+
+RecordDef = [TypeVis], ["linear"] "record", identifier, "{", <Slot>, "}";
+UnionDef = [TypeVis], ["linear"], "union", identifier, "{", <Case>, "}";
+TypeVis = "opaque" | "public";
+Slot = identifier, ":", TypeSpec;
+Case = identifier, [":", TypeSpec];
+
+TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")"
+
+FunctionDef = ["public"], "function", identifier, "(", <Param>, ")"
+Param = identifier, ":", TypeSpec
+```
+
+Lexical elements:
+
+```
+module name
+identifier
+```
