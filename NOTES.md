@@ -53,15 +53,12 @@ implied.
 Module = "module", module name, {Import}, {Declaration};
 Import = "from", module name, "import", identifier, ["as" identifier];
 Declaration = RecordDecl | UnionDecl | FunctionDef;
-
 RecordDef = [TypeVis], ["linear"] "record", identifier, "{", <Slot>, "}";
 UnionDef = [TypeVis], ["linear"], "union", identifier, "{", <Case>, "}";
 TypeVis = "opaque" | "public";
 Slot = identifier, ":", TypeSpec;
 Case = identifier, [":", TypeSpec];
-
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")"
-
 FunctionDef = ["public"], "function", identifier, "(", <Param>, ")"
 Param = identifier, ":", TypeSpec
 ```
