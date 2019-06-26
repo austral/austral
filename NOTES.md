@@ -69,6 +69,6 @@ Param = identifier, ":", TypeSpec
 Lexical elements:
 
 ```
-module name
-identifier
+module name = <TODO add regex>
+identifier = <TODO add regex>
 ```
