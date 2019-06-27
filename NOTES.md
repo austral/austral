@@ -61,7 +61,6 @@ Case = identifier, [":", TypeSpec];
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
 FunctionDef = ["public"], "function", identifier, "(", <Param>, ")";
 Param = identifier, ":", TypeSpec;
-
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
