@@ -64,6 +64,8 @@ TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
 FunctionDef = [docstring], ["public"], "function", identifier, "(", <Param>, ")", Block;
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
+Statement = "abort"
+          | "return", Expression;
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
