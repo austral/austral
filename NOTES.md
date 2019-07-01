@@ -67,7 +67,7 @@ Block = "{", {Statement}, "}";
 Statement = "abort"
           | "return", Expression;
 Expression = Constant;
-Constant = unit constant | integer constant | float constant | string constant;
+Constant = "nil" | integer constant | float constant | string constant;
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
@@ -77,4 +77,5 @@ lowercase = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l
 digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 symbol = "$" | "?" | "'"
 docstring = "`", any character ,"`";
+integer constant = ["+" | "-"], digit, {digit | "_"}
 ```
