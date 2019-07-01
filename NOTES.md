@@ -77,5 +77,7 @@ lowercase = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l
 digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 symbol = "$" | "?" | "'"
 docstring = "`", any character ,"`";
-integer constant = ["+" | "-"], digit, {digit | "_"};
+digits = digit, { digit | "_" |;
+integer constant = ["+" | "-"], digits;
+float constant = integer constant, ".", digits, ["e", integer constant];
 ```
