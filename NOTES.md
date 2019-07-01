@@ -67,6 +67,7 @@ Block = "{", {Statement}, "}";
 Statement = "abort"
           | "return", Expression;
 Expression = Constant | ArithExpr | ComparisonExpr;
+PExpression = Constant | Variable | "(", Expression, ")";
 Constant = "nil" | integer constant | float constant | string constant;
 ArithExpr = ;
 ComparisonExpr = Expression, ("=", "<", "<=", ">", ">=", "<>"), Expression;
