@@ -80,5 +80,5 @@ docstring = "`", { any character - "`" | "\`" } ,"`";
 digits = digit, { digit | "_" |;
 integer constant = ["+" | "-"], digits;
 float constant = integer constant, ".", digits, ["e", integer constant];
-string constnat = '"', any character, '"';
+string constant = '"', any character, '"';
 ```
