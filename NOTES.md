@@ -53,8 +53,8 @@ implied.
 Module = [docstring], "module", module name, {Import}, {Declaration};
 Import = "from", module name, "import", identifier, ["as" identifier];
 Declaration = RecordDecl | UnionDecl | FunctionDef;
-RecordDef = [docstring], [TypeVis], ["linear"] "record", identifier, "{", <Slot>, "}";
-UnionDef = [docstring], [TypeVis], ["linear"], "union", identifier, "{", <Case>, "}";
+RecordDef = [docstring], [TypeVis], "record", identifier, "{", <Slot>, "}";
+UnionDef = [docstring], [TypeVis], "union", identifier, "{", <Case>, "}";
 TypeVis = "opaque" | "public";
 Slot = identifier, ":", TypeSpec, [docstring];
 Case = identifier, [":", TypeSpec], [docstring];
