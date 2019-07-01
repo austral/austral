@@ -68,7 +68,7 @@ Statement = "abort"
           | "return", Expression;
 Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr;
 PExpression = Constant | Variable | "(", Expression, ")";
-Constant = "nil" | integer constant | float constant | string constant;
+Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
 ArithExpr = ;
 ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "<>"), PExpression;
 BooleanExpr = "not" PExpression | PExpression, {"and", PExpression} | PExpression, {"or", PExpression};
