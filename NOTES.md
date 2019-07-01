@@ -53,9 +53,10 @@ implied.
 Module = [docstring], "module", module name, {Import}, {Declaration};
 Import = "from", module name, "import", identifier, ["as" identifier];
 Declaration = RecordDecl | UnionDecl | FunctionDef;
-RecordDef = [docstring], [TypeVis], "record", identifier, "{", <Slot>, "}";
-UnionDef = [docstring], [TypeVis], "union", identifier, "{", <Case>, "}";
+RecordDef = [docstring], [TypeVis], "record", identifier, [TypeParams], "{", <Slot>, "}";
+UnionDef = [docstring], [TypeVis], "union", identifier, [TypeParams],"{", <Case>, "}";
 TypeVis = "opaque" | "public";
+TypeParams = "(", <identifier, [":", Universe"]>, "}", [":", "Universe"];
 Slot = identifier, ":", TypeSpec, [docstring];
 Case = identifier, [":", TypeSpec], [docstring];
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
