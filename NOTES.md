@@ -66,10 +66,10 @@ Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 Statement = "abort"
           | "return", Expression;
-Expression = Constant | ArithExpr | RelationExpr;
+Expression = Constant | ArithExpr | ComparisonExpr;
 Constant = "nil" | integer constant | float constant | string constant;
 ArithExpr = ;
-RelationExpr = Expression, ("=", "<", "<=", ">", ">=", "<>"), Expression;
+ComparisonExpr = Expression, ("=", "<", "<=", ">", ">=", "<>"), Expression;
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
