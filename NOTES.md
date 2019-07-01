@@ -66,11 +66,12 @@ Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 Statement = "abort"
           | "return", Expression;
-Expression = Constant | ArithExpr | ComparisonExpr;
+Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr;
 PExpression = Constant | Variable | "(", Expression, ")";
 Constant = "nil" | integer constant | float constant | string constant;
 ArithExpr = ;
-ComparisonExpr = Expression, ("=", "<", "<=", ">", ">=", "<>"), Expression;
+ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "<>"), PExpression;
+BooleanExpr = "not" PExpression | PExpression, {"and", PExpression} | PExpression, {"or", PExpression};
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
