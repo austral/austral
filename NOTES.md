@@ -57,6 +57,7 @@ RecordDef = [docstring], [TypeVis], "record", identifier, [TypeParams], "{", <Sl
 UnionDef = [docstring], [TypeVis], "union", identifier, [TypeParams],"{", <Case>, "}";
 TypeVis = "opaque" | "public";
 TypeParams = "(", <identifier, [":", Universe"]>, "}", [":", "Universe"];
+Universe = "Type1" | "Type*";
 Slot = identifier, ":", TypeSpec, [docstring];
 Case = identifier, [":", TypeSpec], [docstring];
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
