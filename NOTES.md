@@ -68,6 +68,8 @@ Statement = "abort"
           | "return", Expression;
 Expression = Constant | ArithExpr | RelationExpr;
 Constant = "nil" | integer constant | float constant | string constant;
+ArithExpr = ;
+RelationExpr = Expression, ("=", "<", "<=", ">", ">=", "<>"), Expression;
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
