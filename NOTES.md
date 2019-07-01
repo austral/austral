@@ -66,6 +66,8 @@ Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 Statement = "abort"
           | "return", Expression;
+Expression = Constant;
+Constant = unit constant | integer constant | float constant | string constant;
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
