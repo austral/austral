@@ -66,7 +66,7 @@ Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 Statement = "abort"
           | "return", Expression;
-Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variablex;
+Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variable;
 PExpression = Constant | Variable | "(", Expression, ")";
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
 ArithExpr = Term, {"+", Term} | Term, {"-", Term};
