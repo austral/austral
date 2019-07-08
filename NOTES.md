@@ -19,14 +19,6 @@ Code travels down the following intermediate representations:
 
 Rough notes.
 
-Pointers:
-
-```
-allocate: t -> pointer(t)
-load: pointer(t) -> t // dereferencing deallocates
-swap: pointer(t) -> t -> (pointer(t), t)
-```
-
 Arrays:
 
 ```
