@@ -58,12 +58,16 @@ Declaration = RecordDecl | UnionDecl | FunctionDef;
 (* Type definitions *)
 RecordDef = [docstring], [TypeVis], "record", identifier, [TypeParams], "{", <Slot>, "}";
 UnionDef = [docstring], [TypeVis], "union", identifier, [TypeParams], "{", <Case>, "}";
+
 TypeVis = "opaque" | "public";
 TypeParams = "(", <identifier, [":", Universe"]>, "}", [":", "Universe"];
 Universe = "Type1" | "Type*";
+
 Slot = identifier, ":", TypeSpec, [docstring];
 Case = identifier, [":", TypeSpec], [docstring];
+
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
+
 FunctionDef = [docstring], ["public"], "function", identifier, "(", <Param>, ")", Block;
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
