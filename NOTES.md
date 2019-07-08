@@ -65,6 +65,34 @@ Code travels down the following intermediate representations:
   
   If the return value is Optional::None, this indicates allocation failure.
 
+### Unsafe Memory
+
+module: `Austral.Memory`
+
+- `type MemoryCapability : Type1`
+
+  This is a linear capability for memory access.
+   
+- `function acquire(world: World): (MemoryCapability, World)`
+
+  Obtain permission to access memory.
+   
+- `function waive(cap: MemoryCapability): ()`
+
+  Waive permission to access memory.
+   
+- `type Address`
+
+  The type of memory addresses.
+   
+- `constant null`
+
+  The null address.
+   
+- `function loadSigned8(cap: MemoryCapability, addr: Address): (cap, Signed8)`
+
+  Dereference a signed 8 bit integer from an address.
+
 # Language Notes
 
 ## Syntax
