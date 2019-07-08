@@ -50,6 +50,30 @@ replace: array(t) -> index -> t -> (array(t), t)
 
   If the pointed-to type is unrestricted, we can write to it freely.
 
+### Arrays
+
+- `function empty<T: Type>(): Optional(Array(T))`
+
+  Allocates the empty array. Optiona::None indicates allocation failure.
+
+  In a no-runtime implementation, this always returns Optional::None.
+    
+- `function iota<T: Type*>(value: T, size: Size): Optional(Array(T))`
+
+  If the contained type is unrestricted, we can preallocate an array with that value.
+  
+  The name comes from APL (by way of Scheme or C++).
+    
+- `function replace<T: Type>(array: Array(T), index: Size, value: T): (T, Array(T))`
+    
+  If the contained type is linear, we replace a value at an index, returning the old value.
+    
+- `function append<T: Type>(array: Array(T), value: T): Optional(Array(T))`
+
+  Add an element to the end of the array, expanding the capacity if necessary.
+  
+  If the return value is Optional::None, this indicates allocation failure.
+
 # Language Notes
 
 ## Syntax
