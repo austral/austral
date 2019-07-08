@@ -68,11 +68,14 @@ Case = identifier, [":", TypeSpec], [docstring];
 
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
 
+(* Functions *)
 FunctionDef = [docstring], ["public"], "function", identifier, "(", <Param>, ")", Block;
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
+
 Statement = "abort"
           | "return", Expression;
+
 Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variablex;
 PExpression = Constant | Variable | "(", Expression, ")";
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
