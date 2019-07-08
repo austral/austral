@@ -88,9 +88,22 @@ BooleanExpr = "not" PExpression | PExpression, {"and", PExpression} | PExpressio
 Variable = "identifier;
 
 (* Terminals *)
+
+(* Identifiers of various kinds *)
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
+
+(* Documentation strings *)
+docstring = "`", { any character - "`" | "\`" } ,"`";
+
+(* Literals *)
+digits = digit, { digit | "_" };
+integer constant = ["+" | "-"], digits;
+float constant = integer constant, ".", digits, ["e", integer constant];
+string constant = '"', { any character - '"' | '\"' }, '"';
+
+(* Auxiliary *)
 letter = uppercase | lowercase;
 uppercase = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J"
           | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T"
@@ -100,9 +113,4 @@ lowercase = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
           | "u" | "v" | "w" | "x" | "y" | "z"
 digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 symbol = "$" | "?" | "'"
-docstring = "`", { any character - "`" | "\`" } ,"`";
-digits = digit, { digit | "_" };
-integer constant = ["+" | "-"], digits;
-float constant = integer constant, ".", digits, ["e", integer constant];
-string constant = '"', { any character - '"' | '\"' }, '"';
 ```
