@@ -89,9 +89,7 @@ Variable = "identifier;
 
 (* Arithmetic expressions *)
 ArithExpr = Term, {"+", Term} | Term, {"-", Term};
-Term = PExpression, "*", PExpression
-     | PExpression, "/", PExpression
-     | PExpression, "^", PExpression;
+Term = PExpression, {("*" | "/" | "^"), PExpression};
 
 (* Terminals *)
 
