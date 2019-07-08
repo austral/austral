@@ -67,7 +67,7 @@ Code travels down the following intermediate representations:
 
 ### Unsafe Memory
 
-module: `Austral.Memory`
+Built-in module: `Austral.Memory`
 
 - `type MemoryCapability : Type1`
 
