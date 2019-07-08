@@ -34,6 +34,30 @@ allocate_array: t -> size -> array(t)
 replace: array(t) -> index -> t -> (array(t), t)
 ```
 
+### Pointers
+
+- `function allocate<T: Type>(value: T): Optional(Pointer(T))`
+
+  Allocate memory to hold the value. Optional::None indicates allocation failure.
+
+  In a no-runtime implementation, this always returns Optional::None.
+    
+- `function deallocate<T: Type>(p: Pointer(T)): T`
+
+  Deallocation and dereferencing are the same.
+    
+- `function load<T: Type*>(p: Pointer(T)): (T, Pointer(T))`
+
+  If the pointed-to type is unrestricted, we can dereference it freely.
+
+- `function swap<T: Type1>(p: Pointer(T), value: T): (T, Pointer(T))`
+
+  Replace the pointers of a linear pointer, returning the old contents.
+    
+- `function store<T: Type*>(p: Pointer(T), value: T): Pointer(T)
+
+  If the pointed-to type is unrestricted, we can write to it freely.
+
 # Language Notes
 
 ## Syntax
