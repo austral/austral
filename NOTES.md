@@ -77,6 +77,7 @@ Block = "{", {Statement}, "}";
 Statement = "abort"
           | "return", Expression;
 
+(* Expressions *)
 Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variablex;
 PExpression = Constant | Variable | "(", Expression, ")";
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
@@ -85,6 +86,7 @@ Term = PExpression, "*", PExpression | PExpression, "/", PExpression | PExpressi
 ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "<>"), PExpression;
 BooleanExpr = "not" PExpression | PExpression, {"and", PExpression} | PExpression, {"or", PExpression};
 Variable = "identifier;
+
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
