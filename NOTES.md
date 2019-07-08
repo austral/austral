@@ -73,6 +73,7 @@ FunctionDef = [docstring], ["public"], "function", identifier, "(", <Param>, ")"
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
+(* Statements *)
 Statement = "abort"
           | "return", Expression;
 
