@@ -140,9 +140,9 @@ Statement = "abort"
 Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variable;
 PExpression = Constant | Variable | "(", Expression, ")";
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
-ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "<>"), PExpression;
 Variable = "identifier;
 
+ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "<>"), PExpression;
 BooleanExpr = "not" PExpression
             | PExpression, {"and", PExpression}
             | PExpression, {"or", PExpression};
