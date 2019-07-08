@@ -50,9 +50,12 @@ Non-terminals are in `PascalCase`. Terminals are `lower case`. Whitespace is
 implied.
 
 ```
+(* Declarations *)
 Module = [docstring], "module", module name, {Import}, {Declaration};
 Import = "from", module name, "import", identifier, ["as" identifier];
 Declaration = RecordDecl | UnionDecl | FunctionDef;
+
+(* Type definitions *)
 RecordDef = [docstring], [TypeVis], "record", identifier, [TypeParams], "{", <Slot>, "}";
 UnionDef = [docstring], [TypeVis], "union", identifier, [TypeParams], "{", <Case>, "}";
 TypeVis = "opaque" | "public";
