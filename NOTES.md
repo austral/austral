@@ -37,7 +37,7 @@ Code travels down the following intermediate representations:
 
   Replace the pointers of a linear pointer, returning the old contents.
     
-- `function store<T: Type*>(p: Pointer(T), value: T): Pointer(T)
+- `function store<T: Type*>(p: Pointer(T), value: T): Pointer(T)`
 
   If the pointed-to type is unrestricted, we can write to it freely.
 
