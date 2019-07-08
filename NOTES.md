@@ -87,6 +87,7 @@ ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "<>"), PExpression;
 BooleanExpr = "not" PExpression | PExpression, {"and", PExpression} | PExpression, {"or", PExpression};
 Variable = "identifier;
 
+(* Terminals *)
 module name = module identifier, { ".", module identifier };
 module identifier = letter, { letter | digit }
 identifier = letter, { letter | digit | symbol };
