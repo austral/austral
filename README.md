@@ -12,7 +12,7 @@ Features:
 - **Linear types**: linear types allow resources to be handled in a
   provably-safe manner. Memory can be managed safely and without runtime
   overhead, avoiding double `free()`, use-after-`free` errors, and double fetch errors. Other
-  resources like file or database handles can also be handled linearly.
+  resources like file or database handles can also be handled safely.
 
 - **Macros**: macros enable compile-time metaprogramming and extending the
   language from within.
