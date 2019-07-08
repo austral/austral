@@ -17,15 +17,6 @@ Code travels down the following intermediate representations:
 
 ## Linear API
 
-Rough notes.
-
-Arrays:
-
-```
-allocate_array: t -> size -> array(t)
-replace: array(t) -> index -> t -> (array(t), t)
-```
-
 ### Pointers
 
 - `function allocate<T: Type>(value: T): Optional(Pointer(T))`
