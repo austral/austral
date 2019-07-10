@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Syntax :> SYNTAX = struct
+structure Syntax = struct
     (* Type aliases *)
 
     type name = Name.ident
