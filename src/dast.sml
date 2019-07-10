@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure DAst :> DAST = struct
+structure DAst = struct
     type name = Name.ident
     type module_name = Name.module_name
     type type_visibility = Syntax.type_visibility
