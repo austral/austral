@@ -142,7 +142,8 @@ Statement = BindingDeclaration
           | "return", Expression, ";";
 
 BindingDeclaration = ["let" | "var"], identifier, [":", TypeSpec], ":=", Expression, ";";
-Assignment = identifier, ":=", Expression, ";";
+Assignment = Place, ":=", Expression, ";";
+Place = identifier;
 IfStatement = "if", Expression, Block, {"else if", Block}, ["else", Block];
 ForLoop = "for", identifier, [":", TypeSpec], "from", Expression, "to", Expression, Block;
 WhileLoop = "while", Expression, Block;
