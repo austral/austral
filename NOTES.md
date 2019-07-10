@@ -136,6 +136,7 @@ Block = "{", {Statement}, "}";
 Statement = BindingDeclaration
           | Assignment
           | IfStatement
+          | CaseStatement
           | ForLoop
           | WhileLoop
           | "abort", ";"
@@ -145,6 +146,7 @@ BindingDeclaration = ["let" | "var"], identifier, [":", TypeSpec], ":=", Express
 Assignment = Place, ":=", Expression, ";";
 Place = identifier;
 IfStatement = "if", Expression, Block, {"else if", Block}, ["else", Block];
+CaseStatement = "case", Expression, "{", { identifier, , Block }, "}";
 ForLoop = "for", identifier, [":", TypeSpec], "from", Expression, "to", Expression, Block;
 WhileLoop = "while", Expression, Block;
 
