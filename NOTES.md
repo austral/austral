@@ -158,6 +158,7 @@ Constant = "nil" | "true" | "false" | integer constant | float constant | string
 Variable = "identifier;
 Funcall = identifier, "(", <Expression>, ")";
 IfExpression = "if", Expression, "then", Expression, "else", Expression;
+CaseExpression = "case", Expression, "of", {identifier, Binding, "=>", Expression};
 
 ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "/="), PExpression;
 BooleanExpr = "not" PExpression
