@@ -134,7 +134,7 @@ Block = "{", {Statement}, "}";
 
 (* Statements *)
 Statement = IfStatement
-          | WhileStatement;
+          | WhileStatement
           | "abort", ";"
           | "return", Expression, ";";
 IfStatement = "if", Expression, Block, {"else if", Block}, ["else", Block];
