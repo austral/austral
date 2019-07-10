@@ -142,7 +142,7 @@ PExpression = Constant | Variable | "(", Expression, ")" | Funcall;
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
 Variable = "identifier;
 
-ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "<>"), PExpression;
+ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "/="), PExpression;
 BooleanExpr = "not" PExpression
             | PExpression, {"and", PExpression}
             | PExpression, {"or", PExpression};
