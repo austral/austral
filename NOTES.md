@@ -141,6 +141,7 @@ Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variable | Fu
 PExpression = Constant | Variable | "(", Expression, ")" | Funcall;
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
 Variable = "identifier;
+Funcall = identifier, "(", <Expression>, ")";
 
 ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "/="), PExpression;
 BooleanExpr = "not" PExpression
