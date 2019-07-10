@@ -149,7 +149,8 @@ BooleanExpr = "not" PExpression
             | PExpression, {"or", PExpression};
 
 (* Arithmetic expressions *)
-ArithExpr = PExpression, {("+" | "-" | "*" | "/" | "^"), PExpression};
+ArithExpr = PExpression, {("+" | "-" | "*" | "/" | "^"), PExpression}
+          | "-", Expression;
 
 (* Terminals *)
 
