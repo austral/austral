@@ -134,11 +134,11 @@ Block = "{", {Statement}, "}";
 
 (* Statements *)
 Statement = IfStatement
-          | WhileStatement
+          | WhileLoop
           | "abort", ";"
           | "return", Expression, ";";
 IfStatement = "if", Expression, Block, {"else if", Block}, ["else", Block];
-WhileStatement = "while", Expression, Block;
+WhileLoop = "while", Expression, Block;
 
 (* Expressions *)
 Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variable | Funcall;
