@@ -137,7 +137,7 @@ Statement = "abort"
           | "return", Expression;
 
 (* Expressions *)
-Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variable;
+Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variable | Funcall;
 PExpression = Constant | Variable | "(", Expression, ")";
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
 Variable = "identifier;
