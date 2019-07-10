@@ -62,7 +62,6 @@ is
 
   (* Internal Representations *)
 
-  src/syntax.sig
   src/syntax.sml
 
   src/ordered-decl.sig
