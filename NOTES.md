@@ -134,10 +134,12 @@ Block = "{", {Statement}, "}";
 
 (* Statements *)
 Statement = IfStatement
+          | ForLoop
           | WhileLoop
           | "abort", ";"
           | "return", Expression, ";";
 IfStatement = "if", Expression, Block, {"else if", Block}, ["else", Block];
+ForLoop = "for", identifier, [":", TypeSpec], "from", Expression, "to", Expression, Block;
 WhileLoop = "while", Expression, Block;
 
 (* Expressions *)
