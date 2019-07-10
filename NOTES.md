@@ -160,7 +160,8 @@ Expression = Constant
            | Variable
            | Funcall
            | IfExpression
-           | CaseExpression;
+           | CaseExpression
+           | UnionConstructor;
 PExpression = Constant | Variable | "(", Expression, ")" | Funcall;
 
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
@@ -169,6 +170,7 @@ Variable = "identifier;
 Funcall = identifier, "(", <Expression>, ")";
 IfExpression = "if", Expression, "then", Expression, "else", Expression;
 CaseExpression = "case", Expression, "of", {identifier, Binding, "=>", Expression};
+UnionConstructor = identifier, "::", identifier, "(", <Expression>, ")";
 
 ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "/="), PExpression;
 BooleanExpr = "not" PExpression
