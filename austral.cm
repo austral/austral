@@ -68,7 +68,6 @@ is
 
   src/resolved-decl.sml
 
-  src/typed-decl.sig
   src/typed-decl.sml
 
   src/dast.sig
