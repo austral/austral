@@ -19,13 +19,13 @@ Code travels down the following intermediate representations:
 
 ### Pointers
 
-- `function allocate<T: Type>(value: T): Optional(Pointer(T))`
+- `function allocate<T>(value: T): Optional(Pointer(T))`
 
   Allocate memory to hold the value. Optional::None indicates allocation failure.
 
   In a no-runtime implementation, this always returns Optional::None.
 
-- `function deallocate<T: Type>(p: Pointer(T)): T`
+- `function deallocate<T>(p: Pointer(T)): T`
 
   Deallocation and dereferencing are the same.
 
@@ -33,7 +33,7 @@ Code travels down the following intermediate representations:
 
   If the pointed-to type is unrestricted, we can dereference it freely.
 
-- `function swap<T: Type1>(p: Pointer(T), value: T): (T, Pointer(T))`
+- `function swap<T>(p: Pointer(T), value: T): (T, Pointer(T))`
 
   Replace the pointers of a linear pointer, returning the old contents.
 
