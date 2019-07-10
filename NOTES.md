@@ -24,11 +24,11 @@ Code travels down the following intermediate representations:
   Allocate memory to hold the value. Optional::None indicates allocation failure.
 
   In a no-runtime implementation, this always returns Optional::None.
-    
+
 - `function deallocate<T: Type>(p: Pointer(T)): T`
 
   Deallocation and dereferencing are the same.
-    
+
 - `function load<T: Type*>(p: Pointer(T)): (T, Pointer(T))`
 
   If the pointed-to type is unrestricted, we can dereference it freely.
@@ -36,7 +36,7 @@ Code travels down the following intermediate representations:
 - `function swap<T: Type1>(p: Pointer(T), value: T): (T, Pointer(T))`
 
   Replace the pointers of a linear pointer, returning the old contents.
-    
+
 - `function store<T: Type*>(p: Pointer(T), value: T): Pointer(T)`
 
   If the pointed-to type is unrestricted, we can write to it freely.
@@ -48,21 +48,21 @@ Code travels down the following intermediate representations:
   Allocates the empty array. Optiona::None indicates allocation failure.
 
   In a no-runtime implementation, this always returns Optional::None.
-    
+
 - `function iota<T: Type*>(value: T, size: Size): Optional(Array(T))`
 
   If the contained type is unrestricted, we can preallocate an array with that value.
-  
+
   The name comes from APL (by way of Scheme or C++).
-    
+
 - `function replace<T: Type>(array: Array(T), index: Size, value: T): (T, Array(T))`
-    
+
   If the contained type is linear, we replace a value at an index, returning the old value.
-    
+
 - `function append<T: Type>(array: Array(T), value: T): Optional(Array(T))`
 
   Add an element to the end of the array, expanding the capacity if necessary.
-  
+
   If the return value is Optional::None, this indicates allocation failure.
 
 ### Unsafe Memory
@@ -72,23 +72,23 @@ Built-in module: `Austral.Memory`
 - `type MemoryCapability : Type1`
 
   This is a linear capability for memory access.
-   
+
 - `function acquire(world: World): (MemoryCapability, World)`
 
   Obtain permission to access memory.
-   
+
 - `function waive(cap: MemoryCapability): ()`
 
   Waive permission to access memory.
-   
+
 - `type Address`
 
   The type of memory addresses.
-   
+
 - `constant null`
 
   The null address.
-   
+
 - `function loadSigned8(cap: MemoryCapability, addr: Address): (cap, Signed8)`
 
   Dereference a signed 8 bit integer from an address.
