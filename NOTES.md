@@ -153,6 +153,7 @@ WhileLoop = "while", Expression, Block;
 
 (* Expressions *)
 Expression = Constant
+           | TupleLiteral
            | ArithExpr
            | ComparisonExpr
            | BooleanExpr
@@ -163,6 +164,7 @@ Expression = Constant
 PExpression = Constant | Variable | "(", Expression, ")" | Funcall;
 
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
+TupleLiteral = "(", <Expression>, ")";
 Variable = "identifier;
 Funcall = identifier, "(", <Expression>, ")";
 IfExpression = "if", Expression, "then", Expression, "else", Expression;
