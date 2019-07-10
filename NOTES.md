@@ -152,7 +152,14 @@ ForLoop = "for", identifier, [":", TypeSpec], "from", Expression, "to", Expressi
 WhileLoop = "while", Expression, Block;
 
 (* Expressions *)
-Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variable | Funcall | IfExpression | CaseExpression;
+Expression = Constant
+           | ArithExpr
+           | ComparisonExpr
+           | BooleanExpr
+           | Variable
+           | Funcall
+           | IfExpression
+           | CaseExpression;
 PExpression = Constant | Variable | "(", Expression, ")" | Funcall;
 Constant = "nil" | "true" | "false" | integer constant | float constant | string constant;
 Variable = "identifier;
