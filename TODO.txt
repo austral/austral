@@ -1,6 +1,8 @@
 TODO:
 
 - Syntax: update expr and define statements after the EBNF syntax
+- TypedDecl: define typed statements and expressions
+- Typing pass
 - Parser: type parameters in type definitions
 - let syntax
 - AST type
