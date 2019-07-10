@@ -133,8 +133,8 @@ Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
 (* Statements *)
-Statement = "abort"
-          | "return", Expression;
+Statement = "abort", ";"
+          | "return", Expression, ";";
 
 (* Expressions *)
 Expression = Constant | ArithExpr | ComparisonExpr | BooleanExpr | Variable | Funcall;
