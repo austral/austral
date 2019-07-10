@@ -43,7 +43,7 @@ Code travels down the following intermediate representations:
 
 ### Arrays
 
-- `function empty<T: Type>(): Optional(Array(T))`
+- `function empty<T>(): Optional(Array(T))`
 
   Allocates the empty array. Optiona::None indicates allocation failure.
 
@@ -55,11 +55,11 @@ Code travels down the following intermediate representations:
 
   The name comes from APL (by way of Scheme or C++).
 
-- `function replace<T: Type>(array: Array(T), index: Size, value: T): (T, Array(T))`
+- `function replace<T>(array: Array(T), index: Size, value: T): (T, Array(T))`
 
   If the contained type is linear, we replace a value at an index, returning the old value.
 
-- `function append<T: Type>(array: Array(T), value: T): Optional(Array(T))`
+- `function append<T>(array: Array(T), value: T): Optional(Array(T))`
 
   Add an element to the end of the array, expanding the capacity if necessary.
 
