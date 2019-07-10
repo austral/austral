@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Arith :> ARITH = struct
+structure Arith = struct
     datatype oper = Add
                   | Sub
                   | Mul
