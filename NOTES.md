@@ -142,11 +142,12 @@ Statement = BindingDeclaration
           | "abort", ";"
           | "return", Expression, ";";
 
-BindingDeclaration = ["let" | "var"], identifier, [":", TypeSpec], ":=", Expression, ";";
+BindingDeclaration = ["let" | "var"], Binding, [":", TypeSpec], ":=", Expression, ";";
+Binding = identifier | "(", <Binding>, ")" | "{", identifier, "}";
 Assignment = Place, ":=", Expression, ";";
 Place = identifier;
 IfStatement = "if", Expression, Block, {"else if", Block}, ["else", Block];
-CaseStatement = "case", Expression, "{", { identifier, , Block }, "}";
+CaseStatement = "case", Expression, "{", { identifier, Binding, Block }, "}";
 ForLoop = "for", identifier, [":", TypeSpec], "from", Expression, "to", Expression, Block;
 WhileLoop = "while", Expression, Block;
 
