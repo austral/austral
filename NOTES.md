@@ -141,7 +141,7 @@ Statement = LetStatement
           | "abort", ";"
           | "return", Expression, ";";
 
-
+Assignment = identifier, ":=", Expression, ";";
 IfStatement = "if", Expression, Block, {"else if", Block}, ["else", Block];
 ForLoop = "for", identifier, [":", TypeSpec], "from", Expression, "to", Expression, Block;
 WhileLoop = "while", Expression, Block;
