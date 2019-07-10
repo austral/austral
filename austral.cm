@@ -64,7 +64,6 @@ is
 
   src/syntax.sml
 
-  src/ordered-decl.sig
   src/ordered-decl.sml
 
   src/resolved-decl.sig
