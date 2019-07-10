@@ -165,7 +165,7 @@ docstring = "`", { any character - "`" | "\`" } ,"`";
 (* Literals *)
 digits = digit, { digit | "_" };
 integer constant = digits;
-float constant = integer constant, ".", digits, ["e", integer constant];
+float constant = digits, ".", digits, ["e", ["+", "-"], integer constant];
 string constant = '"', { any character - '"' | '\"' }, '"';
 
 (* Auxiliary *)
