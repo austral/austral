@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure TypedDecl :> TYPED_DECL = struct
+structure TypedDecl = struct
     type name = Name.ident
     type type_visibility = Syntax.type_visibility
     type func_visibility = Syntax.func_visibility
