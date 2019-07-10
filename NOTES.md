@@ -133,7 +133,7 @@ Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
 (* Statements *)
-Statement = LetStatement
+Statement = BindingDeclaration
           | Assignment
           | IfStatement
           | ForLoop
@@ -141,6 +141,7 @@ Statement = LetStatement
           | "abort", ";"
           | "return", Expression, ";";
 
+BindingDeclaration = ["let" | "var"], identifier, [":", TypeSpec], ":=", Expression, ";";
 Assignment = identifier, ":=", Expression, ";";
 IfStatement = "if", Expression, Block, {"else if", Block}, ["else", Block];
 ForLoop = "for", identifier, [":", TypeSpec], "from", Expression, "to", Expression, Block;
