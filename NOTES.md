@@ -128,7 +128,8 @@ Case = identifier, [":", TypeSpec], [docstring];
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
 
 (* Functions *)
-FunctionDef = [docstring], ["public"], "function", identifier, "(", <Param>, ")", Block;
+FunctionDef = [docstring], ["public"], "function", identifier, FuncTypeParams, "(", <Param>, ")", Block;
+FuncTypeParams = "<", <identifier, [":", Universe | "*"]>, ">";
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
