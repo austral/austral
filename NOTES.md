@@ -134,7 +134,7 @@ FuncSignature = "(", <Param>, ")", ":", TypeSpec;
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
-TypeClassDef = "class", ident, "(", ident, [":", Universe], ")", ["extends", <ident>], "{", {MethodDecl}, "}";
+TypeClassDef = [docstring], "class", ident, "(", ident, [":", Universe], ")", ["extends", <ident>], "{", {MethodDecl}, "}";
 MethodDecl = "function", ident, FuncSignature, ";";
 
 ClassInstanceDef = "instance", ident, "for", InstanceArgument, "{", {MethodDef}, "}";
