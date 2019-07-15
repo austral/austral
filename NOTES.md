@@ -135,6 +135,7 @@ Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
 TypeClassDef = "class", ident, "(", ident, [":", Universe], ")", "{", {MethodDecl}, "}";
+MethodDecl = "function", ident, FuncSignature, ";";
 
 (* Statements *)
 Statement = BindingDeclaration
