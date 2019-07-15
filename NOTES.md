@@ -110,9 +110,9 @@ implied.
 
 ```
 (* Declarations *)
-Module = [docstring], "module", module name, {Import}, {Declaration};
+Module = [docstring], "module", module name, {Import}, {Definition};
 Import = "from", module name, "import", identifier, ["as" identifier];
-Declaration = RecordDef | UnionDef | FunctionDef;
+Definition = RecordDef | UnionDef | FunctionDef;
 
 (* Type definitions *)
 RecordDef = [docstring], [TypeVis], "record", identifier, [TypeParams], "{", <Slot>, "}";
