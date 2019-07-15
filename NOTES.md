@@ -130,6 +130,7 @@ TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
 (* Function definitions *)
 FunctionDef = [docstring], ["public"], "function", identifier, FuncTypeParams, "(", <Param>, ")", Block;
 FuncTypeParams = "<", <identifier, [":", Universe | "*"]>, ">";
+FuncSignature = "(", <Param>, ")", ":", TypeSpec;
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
