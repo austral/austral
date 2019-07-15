@@ -231,3 +231,4 @@ DONE:
 - Import validation: ensure local declarations don't collide with import names
 - TypedDecl->Module pass
 - Simplify TypedDecl->Module pass
+- Finalize syntax for typeclasses
