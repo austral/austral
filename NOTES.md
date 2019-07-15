@@ -137,6 +137,8 @@ Block = "{", {Statement}, "}";
 TypeClassDef = "class", ident, "(", ident, [":", Universe], ")", ["extends", <ident>], "{", {MethodDecl}, "}";
 MethodDecl = "function", ident, FuncSignature, ";";
 
+ClassInstanceDef = "instance", ident, "(", InstanceArgument, ")", "{", "}";
+
 (* Statements *)
 Statement = BindingDeclaration
           | Assignment
