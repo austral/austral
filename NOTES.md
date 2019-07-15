@@ -139,7 +139,7 @@ MethodDecl = [docstring], "function", ident, FuncSignature, ";";
 
 ClassInstanceDef = [docstring], "instance", ident, "for", InstanceArgument, "{", {MethodDef}, "}";
 InstanceArgument = ident | ident, "(", <ident>, ")";
-MethodDef = "function", identifier, FuncSignature, Block;
+MethodDef = [docstring], "function", identifier, FuncSignature, Block;
 
 (* Statements *)
 Statement = BindingDeclaration
