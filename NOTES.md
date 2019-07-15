@@ -135,7 +135,7 @@ Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
 TypeClassDef = [docstring], "class", ident, "(", ident, [":", Universe], ")", ["extends", <ident>], "{", {MethodDecl}, "}";
-MethodDecl = "function", ident, FuncSignature, ";";
+MethodDecl = [docstring], "function", ident, FuncSignature, ";";
 
 ClassInstanceDef = "instance", ident, "for", InstanceArgument, "{", {MethodDef}, "}";
 InstanceArgument = ident | ident, "(", <ident>, ")";
