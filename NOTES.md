@@ -112,7 +112,7 @@ implied.
 (* Declarations *)
 Module = [docstring], "module", module name, {Import}, {Declaration};
 Import = "from", module name, "import", identifier, ["as" identifier];
-Declaration = RecordDecl | UnionDef | FunctionDef;
+Declaration = RecordDef | UnionDef | FunctionDef;
 
 (* Type definitions *)
 RecordDef = [docstring], [TypeVis], "record", identifier, [TypeParams], "{", <Slot>, "}";
