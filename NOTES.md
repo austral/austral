@@ -112,7 +112,7 @@ implied.
 (* Declarations *)
 Module = [docstring], "module", module name, {Import}, {Definition};
 Import = "from", module name, "import", identifier, ["as" identifier];
-Definition = RecordDef | UnionDef | FunctionDef;
+Definition = RecordDef | UnionDef | FunctionDef | TypeClassDef | ClassInstanceDef;
 
 (* Type definitions *)
 RecordDef = [docstring], [TypeVis], "record", identifier, [TypeParams], "{", <Slot>, "}";
@@ -132,6 +132,8 @@ FunctionDef = [docstring], ["public"], "function", identifier, FuncTypeParams, "
 FuncTypeParams = "<", <identifier, [":", Universe | "*"]>, ">";
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
+
+TypeClassDef = "class", ident, "(", ident, [":", Universe], ")", "{", {MethodDecl}, "}";
 
 (* Statements *)
 Statement = BindingDeclaration
