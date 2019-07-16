@@ -43,7 +43,6 @@ is
 
   (* Common *)
 
-  src/name.sig
   src/name.sml
 
   src/arith.sml
