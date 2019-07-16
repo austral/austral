@@ -17,7 +17,6 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-
 signature ESCAPE = sig
     (* A string where escape characters have been processed into the characters they represent *)
     type escaped_string
