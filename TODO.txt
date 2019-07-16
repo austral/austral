@@ -1,10 +1,7 @@
 TODO:
 
-- Update Syntax type to EBNF syntax
-- TypedDecl: define typed statements and expressions
-- Typing pass
-- Parser: sync parser with EBNF syntax in NOTES.md
-- Parser: type parameters in type definitions
+- Update Syntax types to EBNF syntax
+- Update parser to EBNF syntax
 
 LONG-TERM TODO:
 
