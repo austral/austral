@@ -114,7 +114,6 @@ Module = [docstring], "module", module name, {Import}, {Definition};
 Import = "from", module name, "import", identifier, ["as" identifier];
 Definition = RecordDef | UnionDef | FunctionDef | TypeClassDef | ClassInstanceDef;
 
-(* Type definitions *)
 RecordDef = [docstring], [TypeVis], "record", identifier, [TypeParams], "{", <Slot>, "}";
 UnionDef = [docstring], [TypeVis], "union", identifier, [TypeParams], "{", <Case>, "}";
 
