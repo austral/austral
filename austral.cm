@@ -61,7 +61,6 @@ is
 
   (* Passes *)
 
-  src/import-resolution.sig
   src/import-resolution.sml
 
   src/parser.sml
