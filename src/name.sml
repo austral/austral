@@ -17,6 +17,26 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature NAME = sig
+    (* Module names *)
+    type module_name
+
+    val moduleNameAlphabet : string
+
+    val mkModuleName : string -> module_name option
+    val mkModuleNameEx : string -> module_name
+    val moduleNameString : module_name -> string
+
+    (* Identifiers: names of types, functions, variables *)
+    type ident
+
+    val identAlphabet : string
+
+    val mkIdent : string -> ident option
+    val mkIdentEx : string -> ident
+    val identString : ident -> string
+end
+
 structure Name : NAME = struct
     (* Alphabet definition utilities *)
 
