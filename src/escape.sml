@@ -17,6 +17,21 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+
+signature ESCAPE = sig
+    (* A string where escape characters have been processed into the characters they represent *)
+    type escaped_string
+
+    (* Given a string with escape characters, process the escape characters and return a escaped string *)
+    val escapeString : string -> escaped_string
+
+    (* Return a escaped string as a regular string *)
+    val escapedToString : escaped_string -> string
+
+    (* Replace unrepresentable characters in a escaped string (e.g. newlines) with escape characters *)
+    val unescapeString : escaped_string -> string
+end
+
 structure Escape : ESCAPE = struct
     datatype escaped_string = EscapedString of string
 
