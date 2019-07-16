@@ -44,15 +44,10 @@ is
   (* Common *)
 
   src/name.sml
-
   src/arith.sml
-
   src/escape.sml
-
   src/type.sml
-
   src/import.sml
-
   src/module.sig
   src/module.sml
 
