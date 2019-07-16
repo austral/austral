@@ -22,9 +22,9 @@ Features:
 - **Typeclasses**: typeclasses, borrowed from Haskell, allow for bounded ad-hoc
   polymorphism.
 
-- **Safe arithmetic**: Austral has well-defined integer modular arithmetic
-  semantics, in addition to built-in overflow-checked arithmetic operators and
-  saturation arithmetic operators.
+- **Safe arithmetic**: Austral has well-defined semantics for all arithmetic
+  operations on numeric types. There are distinct integer types for
+  trap-on-overflow arithmetic and modular arithmetic, as in Ada.
 
 - **Algebraic data types**: as in ML or Haskell.
 
