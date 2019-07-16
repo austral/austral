@@ -17,6 +17,15 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature PARSER = sig
+    val parseTypeSpecifier : string -> Syntax.type_specifier
+
+    val parseExpression : string -> Syntax.expr
+
+    val parseImport : string -> Syntax.import
+    val parseModule : string -> Syntax.module
+end
+
 structure Parser : PARSER = struct
     structure ps = Parsimony(ParsimonyStringInput)
 
