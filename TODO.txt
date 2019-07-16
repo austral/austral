@@ -1,6 +1,5 @@
 TODO:
 
-- Review generic function syntax
 - Review import syntax
 - Syntax: update expr and define statements after the EBNF syntax
 - TypedDecl: define typed statements and expressions
@@ -233,3 +232,4 @@ DONE:
 - TypedDecl->Module pass
 - Simplify TypedDecl->Module pass
 - Finalize syntax for typeclasses
+- Review generic function syntax
