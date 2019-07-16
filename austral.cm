@@ -65,7 +65,6 @@ is
 
   src/parser.sml
 
-  src/ordering-pass.sig
   src/ordering-pass.sml
 
   src/resolution-pass.sig
