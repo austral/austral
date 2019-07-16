@@ -17,6 +17,22 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature IMPORT = sig
+    type import
+    type imports
+
+    val mkImport : { name: Name.ident, trueName: Name.ident, moduleName: Name.module_name } -> import
+
+    val importName : import -> Name.ident
+    val importTrueName : import -> Name.ident
+    val importModuleName : import -> Name.module_name
+
+    (* Given a list of imports, return an `imports` object. Validates that there
+       are no colliding imports. *)
+    val fromList : import list -> imports
+    val getImport : imports -> Name.ident -> import option
+end
+
 structure Import :> IMPORT = struct
     type name = Name.ident
     type module_name = Name.module_name
