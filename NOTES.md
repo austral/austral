@@ -135,7 +135,7 @@ Block = "{", {Statement}, "}";
 TypeClassDef = [docstring], "class", ident, "(", ident, [":", Universe], ")", ["extends", <ident>], "{", {MethodDecl}, "}";
 MethodDecl = [docstring], "function", ident, FuncSignature, ";";
 
-ClassInstanceDef = [docstring], "instance", ident, "for", InstanceArgument, "{", {MethodDef}, "}";
+ClassInstanceDef = [docstring], ["public"], "instance", ident, "for", InstanceArgument, "{", {MethodDef}, "}";
 InstanceArgument = ident | ident, "(", <ident>, ")";
 MethodDef = [docstring], "function", identifier, FuncSignature, Block;
 
