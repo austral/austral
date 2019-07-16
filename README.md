@@ -15,6 +15,10 @@ Features:
   errors. Other resources like file or database handles can also be handled
   safely.
 
+- **Capabilities**: linear capabilities enable fine-grained permissioned access
+  to low-level facilities. Third-party dependencies can be constrained in what
+  types of resources they can access.
+
 - **Macros**: macros enable compile-time metaprogramming and extending the
   language from within.
 
