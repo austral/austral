@@ -73,7 +73,6 @@ is
 
   src/typing-pass.sml
 
-  src/module-extraction.sig
   src/module-extraction.sml
 
   $/basis.cm
