@@ -17,6 +17,10 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature MODULE_EXTRACTION = sig
+    val extract : TypedDecl.module -> Module.module
+end
+
 structure ModuleExtraction :> MODULE_EXTRACTION = struct
     fun extract (TypedDecl.Module (name, docstring, imports, decls)) =
         Module.Module (name, docstring, imports, extractDecls decls)
