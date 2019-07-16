@@ -67,7 +67,6 @@ is
 
   src/ordering-pass.sml
 
-  src/resolution-pass.sig
   src/resolution-pass.sml
 
   src/typing-pass.sml
