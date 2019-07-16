@@ -19,9 +19,6 @@ Features:
   to low-level facilities. Third-party dependencies can be constrained in what
   types of resources they can access.
 
-- **Macros**: macros enable compile-time metaprogramming and extending the
-  language from within.
-
 - **Typeclasses**: typeclasses, borrowed from Haskell, allow for bounded ad-hoc
   polymorphism.
 
