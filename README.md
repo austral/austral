@@ -26,7 +26,8 @@ Features:
   operations on numeric types. There are distinct integer types for
   trap-on-overflow arithmetic and modular arithmetic, as in Ada.
 
-- **Algebraic data types**: as in ML or Haskell.
+- **Algebraic Data Types**: tuples and disjunctions, as in ML or Haskell, let us
+  write simple and expressive inductive type definitions.
 
 Anti-features:
 
