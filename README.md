@@ -40,7 +40,6 @@ Anti-features:
 - No reflection.
 - No Java-style @Annotations.
 - No type inference, type information flows in one direction.
-- No overloading of primitive operators.
 - No uninitialized variables.
 
 ## Building
