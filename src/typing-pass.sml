@@ -17,6 +17,9 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature TYPING_PASS = sig
+end
+
 structure TypingPass :> TYPING_PASS = struct
     type ctx = Module.menv * ResolvedDecl.module
 
