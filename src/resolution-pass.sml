@@ -17,6 +17,10 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature RESOLUTION_PASS = sig
+    val transform : Module.menv -> OrderedDecl.module -> ResolvedDecl.module
+end
+
 structure ResolutionPass :> RESOLUTION_PASS = struct
     fun transform menv (OrderedDecl.Module (docstring, name, imports, declarations)) =
         let val imports = ImportResolution.resolve menv imports
