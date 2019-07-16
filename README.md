@@ -80,18 +80,6 @@ Finally, to run the tests, you need both MLton and SML/NJ. Run this:
 $ ./run-tests.sh
 ```
 
-## Examples
-
-### Fibonacci
-
-```
-function fib(n: i32): i32 =
-  if n < 2 then
-    n
-  else
-    fib(n - 1) + fib(n - 2)
-```
-
 # License
 
 Copyright 2018–2019 Fernando Borretti.
