@@ -127,7 +127,6 @@ Case = identifier, [":", TypeSpec], [docstring];
 
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
 
-(* Function definitions *)
 FunctionDef = [docstring], ["public"], "function", identifier, FuncTypeParams, FuncSignature, Block;
 FuncTypeParams = "<", <identifier, [":", Universe], ">";
 FuncSignature = "(", <Param>, ")", ":", TypeSpec;
