@@ -4,8 +4,7 @@
 
 **Not done yet.**
 
-Austral is a new language. It is designed to be simple to understand and to
-implement.
+Austral is a new language.
 
 Features:
 
