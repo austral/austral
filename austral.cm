@@ -49,7 +49,6 @@ is
 
   src/escape.sml
 
-  src/type.sig
   src/type.sml
 
   src/import.sml
