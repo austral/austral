@@ -127,12 +127,13 @@ Case = identifier, [":", TypeSpec], [docstring];
 TypeSpec = identifier | "(", <TypeSpec>, ")" | identifier, "(", <TypeSpec>, ")";
 
 FunctionDef = [docstring], ["public"], ["generic", FuncTypeParams], "function", identifier, FuncSignature, Block;
-FuncTypeParams = "(", <identifier, [":", Universe], ")";
+FuncTypeParams = "(", <identifier, [":", Universe | ClassName], ")";
 FuncSignature = "(", <Param>, ")", ":", TypeSpec;
 Param = identifier, ":", TypeSpec, [docstring];
 Block = "{", {Statement}, "}";
 
-TypeClassDef = [docstring], ["public"], "class", ident, "(", ident, [":", Universe], ")", ["extends", <ident>], "{", {MethodDecl}, "}";
+TypeClassDef = [docstring], ["public"], "class", ClassName, "(", ident, [":", Universe], ")", ["extends", <ident>], "{", {MethodDecl}, "}";
+ClassName = ident;
 MethodDecl = [docstring], "function", ident, FuncSignature, ";";
 
 ClassInstanceDef = [docstring], ["public"], "instance", ident, "for", InstanceArgument, "{", {MethodDef}, "}";
