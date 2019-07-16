@@ -17,6 +17,14 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature IMPORT_RESOLUTION = sig
+    type import = Syntax.import
+    type name = Name.ident
+    type module_name = Name.module_name
+
+    val resolve : Module.menv -> import list -> Import.imports
+end
+
 structure ImportResolution :> IMPORT_RESOLUTION = struct
     type import = Syntax.import
     type name = Name.ident
