@@ -17,6 +17,10 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature ORDERING_PASS = sig
+    val transform : Syntax.module -> OrderedDecl.module
+end
+
 structure OrderingPass :> ORDERING_PASS = struct
     fun transform (Syntax.Module (docstring, name, imports, declarations)) =
       OrderedDecl.Module (name, docstring, imports, transformDeclarations declarations)
