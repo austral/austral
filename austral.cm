@@ -47,7 +47,6 @@ is
 
   src/arith.sml
 
-  src/escape.sig
   src/escape.sml
 
   src/type.sig
