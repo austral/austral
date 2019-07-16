@@ -17,6 +17,16 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature TYPE = sig
+    type module_name = Name.module_name
+    type type_name = Name.ident
+
+    datatype ty = NamedType of module_name * type_name
+                | Address of ty
+                | Pointer of ty
+                | TupleType of ty list
+end
+
 structure Type :> TYPE = struct
     type module_name = Name.module_name
     type type_name = Name.ident
