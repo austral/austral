@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure CAst :> C_AST = struct
+structure CAst = struct
     datatype ty = NamedType of string
                 | Pointer of ty
                 | Struct of (ty * string) list
