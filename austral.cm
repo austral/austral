@@ -23,7 +23,6 @@ is
 
   (* Utilities *)
 
-  src/util/error.sig
   src/util/error.sml
 
   src/util/util.sig
