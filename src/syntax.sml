@@ -85,6 +85,8 @@ structure Syntax = struct
 
          and expr = UnitConstant
                   | BooleanConstant of bool
+                  | IntConstant of string
+                  | FloatConstant of string
 
          and docstring = Docstring of string option
 end
