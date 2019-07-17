@@ -17,6 +17,25 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature MAP = sig
+    type (''k, 'v) map
+
+    val empty : (''k, 'v) map
+    val get : (''k, 'v) map -> ''k -> 'v option
+    val add : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map option
+    val iadd : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map
+    val set : (''k, 'v) map -> ''k -> 'v -> (''k, 'v) map
+    val iaddList : (''k, 'v) map -> (''k * 'v) list -> (''k, 'v) map
+    val size : (''k, 'v) map -> int
+
+    val keys : (''k, 'v) map -> ''k Set.set
+
+    val fromList : (''k * 'v) list -> (''k, 'v) map
+    val toList : (''k, 'v) map -> (''k * 'v) list
+
+    val mergeMaps : (''k, 'v) map -> (''k, 'v) map -> (''k, 'v) map
+end
+
 structure Map :> MAP = struct
     datatype (''k, 'v) map = Map of (''k * 'v) list
 
