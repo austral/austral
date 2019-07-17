@@ -33,7 +33,7 @@ structure Syntax = struct
          and type_vis = OpaqueType
                       | PublicType
 
-         and type_params = TyParams type_param list * universe
+         and type_params = TyParams of type_param list * universe
 
          and type_param = TyParam of { name: identifier, universe: universe }
 end
