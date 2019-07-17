@@ -18,6 +18,8 @@
 *)
 
 structure Syntax = struct
+    type identifier = Name.ident
+
     datatype module = Module of docstring * module_name * import list * definition list
 
          and import = Import of module_name * imported_name
