@@ -17,6 +17,35 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature ORDERED_SET = sig
+    type ''a set
+
+    val empty : ''a set
+    val singleton : ''a -> ''a set
+
+    val exists : ''a set -> ''a -> bool
+
+    val add : ''a set -> ''a -> ''a set
+    val addList : ''a set -> ''a list -> ''a set
+
+    val union : ''a set -> ''a set -> ''a set
+    val unionList : ''a set list -> ''a set
+
+    val difference : ''a set -> ''a set -> ''a set
+
+    val size : ''a set -> int
+    (* positions start at 1 *)
+    val positionOf : ''a set -> ''a -> int option
+    val nth : ''a set -> int -> ''a
+
+    val filter : ''a set -> (''a -> bool) -> ''a set
+
+    val fromList : ''a list -> ''a set
+    val toList : ''a set -> ''a list
+
+    val toUnordered : ''a set -> ''a Set.set
+end
+
 structure OrderedSet :> ORDERED_SET = struct
     datatype ''a set = Set of ''a list
 
