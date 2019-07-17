@@ -17,6 +17,13 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature ERROR = sig
+    val syntax : string -> 'a
+    val semantic : string -> 'a
+    val notImplemented : unit -> 'a
+    val internal : string -> 'a
+end
+
 structure Error :> ERROR = struct
     fun syntax message =
         raise Fail ("Syntax error: " ^ message)
