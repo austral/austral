@@ -67,6 +67,7 @@ structure Syntax = struct
 
          and statement = BindingDecl of mutability * identifier * type_spec option * expr
                        | Assignment of place * expr
+                       | IfStatement of expr * block * (expr * block) list * block
 
          and docstring = Docstring of string option
 end
