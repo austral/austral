@@ -26,4 +26,7 @@ structure Syntax = struct
 
          and definition = RecordDef of docstring * type_vis * identifier * type_params * slot list
                         | UnionDef of docstring * type_vis * identifier * type_params * union_case list
+                        | FunctionDef of unit
+                        | TypeClassDef of unit
+                        | ClassInstanceDef of unit
 end
