@@ -36,4 +36,9 @@ structure Syntax = struct
          and type_params = TyParams of type_param list * universe
 
          and type_param = TyParam of { name: identifier, universe: universe }
+
+         and universe = LinearUniverse
+                      | UnrestrictedUniverse
+                      | AnyUniverse
+                      | ImplementsClass of identifier
 end
