@@ -18,4 +18,5 @@
 *)
 
 structure Syntax = struct
+    datatype module = Module of docstring, module_name, import list, definition list
 end
