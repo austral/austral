@@ -44,6 +44,8 @@ structure Syntax = struct
 
          and slot = Slot of identifier * type_spec * docstring
 
+         and union_case = Case of identifier * type_spec option * docstring
+
 
          and docstring = Docstring of string option
 end
