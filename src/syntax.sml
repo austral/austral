@@ -81,7 +81,7 @@ structure Syntax = struct
                      | TupleBinding of identifier list
                      | RecordBinding of identifier list
 
-         and place = IdentPlace identifier
+         and place = IdentPlace of identifier
 
          and expr = UnitConstant
                   | BooleanConstant of bool
