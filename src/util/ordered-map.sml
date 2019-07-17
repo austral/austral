@@ -17,6 +17,21 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature ORDERED_MAP = sig
+    type (''k, 'v) map
+
+    val empty : (''k, 'v) map
+    val get : (''k, 'v) map -> ''k -> 'v option
+    val add : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map option
+
+   (* Add a key-value pair to the map if it is not already present, otherwise,
+      return the map as-is *)
+    val iadd : (''k, 'v) map -> (''k * 'v) -> (''k, 'v) map
+
+    val keys : (''k, 'v) map -> ''k OrderedSet.set
+    val keyPosition : (''k, 'v) map -> ''k -> int option
+end
+
 structure OrderedMap :> ORDERED_MAP = struct
     datatype (''k, 'v) map = Map of (''k * 'v) list
 
