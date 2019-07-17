@@ -98,5 +98,12 @@ structure Syntax = struct
                       | Div
                       | Exp
 
+         and comp_op = Equals
+                     | LessThan
+                     | LessThanEq
+                     | GreaterThan
+                     | GreaterThanEq
+                     | NotEquals
+
          and docstring = Docstring of string option
 end
