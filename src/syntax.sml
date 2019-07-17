@@ -78,7 +78,8 @@ structure Syntax = struct
                      | TupleBinding of identifier list
                      | RecordBinding of identifier list
 
-
+         and expr = UnitConstant
+                  | BooleanConstant of bool
 
          and docstring = Docstring of string option
 end
