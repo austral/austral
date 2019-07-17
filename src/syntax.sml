@@ -59,5 +59,9 @@ structure Syntax = struct
 
          and func_type_params = FuncTypeParams of type_param list
 
+         and func_signature = FuncSig of param list * type_spec
+
+         and param = Param of identifier * type_spec
+
          and docstring = Docstring of string option
 end
