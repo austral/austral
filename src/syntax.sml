@@ -92,6 +92,7 @@ structure Syntax = struct
                   | ArithExpr of arith_op * expr * expr
                   | ComparisonExpr of comp_op * expr * expr
                   | Not of expr
+                  | And of expr list
 
          and arith_op = Add
                       | Sub
