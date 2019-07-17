@@ -26,32 +26,6 @@ structure Syntax = struct
 
     (* Expressions *)
 
-    datatype expr = UnitConstant
-                  | BoolConstant of bool
-                  | IntConstant of string
-                  | FloatConstant of string
-                  | StringConstant of Escape.escaped_string
-                  | Variable of name
-                  | Let of binding list * expr
-                  | If of expr * expr * expr
-                  | ArithOp of Arith.kind * Arith.oper * expr * expr
-                  | CompOp of comp_op * expr * expr
-                  | Not of expr
-                  | And of expr * expr
-                  | Or of expr * expr
-                  | TupleCreate of expr list
-                  | SizeOf of type_specifier
-                  | Block of expr list
-                  | Funcall of name * expr list
-         and binding = VarBinding of name * expr
-                     | TupBinding of name list * expr
-         and comp_op = EqualTo
-                     | NotEqualTo
-                     | GreaterThan
-                     | LessThan
-                     | GreaterThanEq
-| LessThanEq
-
     (* Declarations *)
 
     datatype module = Module of docstring * Name.module_name * import list * declaration list
