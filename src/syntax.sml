@@ -27,28 +27,3 @@ structure Syntax = struct
     (* Expressions *)
 
     (* Declarations *)
-
-    datatype module = Module of docstring * Name.module_name * import list * declaration list
-
-         and import = Import of Name.module_name * imported_name list
-
-         and imported_name = ImportedName of name
-                           | ImportedNameAs of { original: name, rename: name }
-
-         and declaration = RecordDefinition of docstring * type_visibility * name * slot_definition list
-                         | UnionDefinition of docstring * type_visibility * name * case_definition list
-                         | FunctionDefinition of docstring * func_visibility * name * param list * type_specifier * expr
-
-         and type_visibility = PublicType
-                             | OpaqueType
-                             | PrivateType
-
-         and slot_definition = SlotDefinition of name * type_specifier * docstring
-
-         and case_definition = CaseDefinition of name * type_specifier option * docstring
-
-         and func_visibility = PublicFunction
-                             | PrivateFunction
-
-         and param = Param of name * type_specifier * docstring
-end
