@@ -18,12 +18,4 @@
 *)
 
 structure Syntax = struct
-    (* Type aliases *)
-
-    type name = Name.ident
-
-    datatype docstring = Docstring of string option
-
-    (* Expressions *)
-
-    (* Declarations *)
+end
