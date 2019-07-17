@@ -90,6 +90,7 @@ structure Syntax = struct
                   | StringConstant of Escape.escaped_string
                   | TupleLiteral of expr list
                   | ArithExpr of arith_op * expr * expr
+                  | ComparisonExpr of comp_op * expr * expr
 
          and docstring = Docstring of string option
 end
