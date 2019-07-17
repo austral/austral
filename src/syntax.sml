@@ -34,4 +34,6 @@ structure Syntax = struct
                       | PublicType
 
          and type_params = ty_param list * universe
+
+         and ty_param = TyParam of { name: identifier, universe: universe }
 end
