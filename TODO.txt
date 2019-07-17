@@ -1,6 +1,5 @@
 TODO:
 
-- Update Syntax types to EBNF syntax
 - Update parser to EBNF syntax
 
 LONG-TERM TODO:
@@ -230,3 +229,4 @@ DONE:
 - Finalize syntax for typeclasses
 - Review generic function syntax
 - Review import syntax
+- Update Syntax types to EBNF syntax
