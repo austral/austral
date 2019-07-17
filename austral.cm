@@ -34,7 +34,6 @@ is
   src/util/ordered-set.sig
   src/util/ordered-set.sml
 
-  src/util/map.sig
   src/util/map.sml
 
   src/util/ordered-map.sig
