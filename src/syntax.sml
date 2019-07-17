@@ -46,6 +46,10 @@ structure Syntax = struct
 
          and union_case = Case of identifier * type_spec option * docstring
 
+         and type_spec = NamedType of identifier
+                       | TupleType of type_spec list
+                       | TypeCons of identifier * type_spec list
+
 
          and docstring = Docstring of string option
 end
