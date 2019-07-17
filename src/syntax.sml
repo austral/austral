@@ -71,6 +71,8 @@ structure Syntax = struct
                        | CaseStatement of expr * (identifier * binding * block) list
                        | ForLoop of identifier * type_spec option * expr * expr * block
                        | WhileLoop of expr * block
+                       | Abort
+
 
          and binding = IdentBinding of identifier
                      | TupleBinding of identifier list
