@@ -91,6 +91,7 @@ structure Syntax = struct
                   | TupleLiteral of expr list
                   | ArithExpr of arith_op * expr * expr
                   | ComparisonExpr of comp_op * expr * expr
+                  | Not of expr
 
          and arith_op = Add
                       | Sub
