@@ -19,6 +19,9 @@
 
 structure Syntax = struct
     datatype module = Module of docstring * module_name * import list * definition list
+
          and import = Import of module_name * imported_name
+
          and imported_name = ImportedName of { name: identifier, rename: identifier }
+
 end
