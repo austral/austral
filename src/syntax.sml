@@ -98,6 +98,7 @@ structure Syntax = struct
                   | Funcall of identifier * expr list
                   | IfExpression of expr * expr * expr
                   | CaseExpression of expr * (identifier * binding * expr) list
+                  | UnionConstructor of identifier * identifier * expr list
 
          and arith_op = Add
                       | Sub
