@@ -41,4 +41,7 @@ structure Syntax = struct
                       | UnrestrictedUniverse
                       | AnyUniverse
                       | ImplementsClass of identifier
+
+
+         and docstring = Docstring of string option
 end
