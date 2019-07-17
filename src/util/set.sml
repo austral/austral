@@ -17,6 +17,32 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature SET = sig
+    type ''a set
+
+    val empty : ''a set
+    val singleton : ''a -> ''a set
+
+    val add : ''a set -> ''a -> ''a set
+    val addList : ''a set -> ''a list -> ''a set
+
+    val eq : ''a set -> ''a set -> bool
+
+    val union : ''a set -> ''a set -> ''a set
+    val unionList : ''a set list -> ''a set
+
+    val intersection : ''a set -> ''a set -> ''a set
+
+    (* A-B : all the elements in A, except those also in B *)
+    val minus : ''a set -> ''a set -> ''a set
+
+    val isIn : ''a set -> ''a -> bool
+    val size : ''a set -> int
+
+    val fromList : ''a list -> ''a set
+    val toList : ''a set -> ''a list
+end
+
 structure Set :> SET = struct
     type ''a set = ''a list
 
