@@ -17,6 +17,31 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
+signature UTIL = sig
+    datatype 'a result = Result of 'a
+                       | Failure of string
+
+    val valOf : 'a result -> 'a
+
+    type path = string
+    val readFileToString : path -> string
+    val writeStringToFile : path -> string -> unit
+
+    val member : ''a -> ''a list -> bool
+    val position : ''a -> ''a list -> int option
+
+    val mapidx : (('a * int) -> 'b) -> 'a list -> 'b list
+    val butlast : 'a list -> 'a list
+
+    type prefix = string
+
+    (* If string starts with prefix, return the remainder of string. Otherwise
+       return NONE. *)
+    val afterPrefix : string -> prefix -> string option
+
+    val foldThread : (('a * 'b) -> ('c * 'b)) -> 'a list -> 'b -> ('c list * 'b)
+end
+
 structure Util :> UTIL = struct
     datatype 'a result = Result of 'a
                        | Failure of string
