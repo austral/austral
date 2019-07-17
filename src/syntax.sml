@@ -63,5 +63,7 @@ structure Syntax = struct
 
          and param = Param of identifier * type_spec
 
+         and block = Block of statement list
+
          and docstring = Docstring of string option
 end
