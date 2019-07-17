@@ -53,6 +53,9 @@ structure Syntax = struct
                        | TupleType of type_spec list
                        | TypeCons of identifier * type_spec list
 
+         and func_vis = PublicFunction
+                      | PrivateFunction
+
          and func_type_params = FuncTypeParams of type_param list
 
          and docstring = Docstring of string option
