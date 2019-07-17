@@ -32,4 +32,6 @@ structure Syntax = struct
 
          and type_vis = OpaqueType
                       | PublicType
+
+         and type_params = unit
 end
