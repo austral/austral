@@ -35,6 +35,7 @@ structure Syntax = struct
 
          and type_vis = OpaqueType
                       | PublicType
+                      | PrivateType
 
          and type_params = TyParams of type_param list * universe
 
