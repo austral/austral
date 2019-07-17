@@ -74,6 +74,9 @@ structure Syntax = struct
                        | Abort
                        | Return of expr
 
+         and mutability = MutableBinding
+                        | ImmutableBinding
+
          and binding = IdentBinding of identifier
                      | TupleBinding of identifier list
                      | RecordBinding of identifier list
