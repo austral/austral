@@ -70,6 +70,7 @@ structure Syntax = struct
                        | IfStatement of expr * block * (expr * block) list * block
                        | CaseStatement of expr * (identifier * binding * block) list
                        | ForLoop of identifier * type_spec option * expr * expr * block
+                       | WhileLoop of expr * block
 
          and binding = IdentBinding of identifier
                      | TupleBinding of identifier list
