@@ -69,10 +69,13 @@ structure Syntax = struct
                        | Assignment of place * expr
                        | IfStatement of expr * block * (expr * block) list * block
                        | CaseStatement of expr * (identifier * binding * block) list
+                       | ForLoop of identifier * type_spec option * expr * expr * block
 
          and binding = IdentBinding of identifier
                      | TupleBinding of identifier list
                      | RecordBinding of identifier list
+
+
 
          and docstring = Docstring of string option
 end
