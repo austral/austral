@@ -33,5 +33,5 @@ structure Syntax = struct
          and type_vis = OpaqueType
                       | PublicType
 
-         and type_params = unit
+         and type_params = ty_param list * universe
 end
