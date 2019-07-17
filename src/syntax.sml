@@ -24,4 +24,5 @@ structure Syntax = struct
 
          and imported_name = ImportedName of { name: identifier, rename: identifier }
 
+         and definition = RecordDef of docstring * type_vis * identifier * type_params * slot list
 end
