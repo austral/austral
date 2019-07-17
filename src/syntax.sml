@@ -94,6 +94,7 @@ structure Syntax = struct
                   | Not of expr
                   | And of expr list
                   | Or of expr list
+                  | Variable of identifier
 
          and arith_op = Add
                       | Sub
