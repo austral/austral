@@ -42,6 +42,8 @@ structure Syntax = struct
                       | AnyUniverse
                       | ImplementsClass of identifier
 
+         and slot = Slot of identifier * type_spec * docstring
+
 
          and docstring = Docstring of string option
 end
