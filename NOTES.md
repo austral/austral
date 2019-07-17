@@ -151,7 +151,7 @@ Statement = BindingDeclaration
           | "return", Expression, ";";
 
 BindingDeclaration = ["let" | "var"], Binding, [":", TypeSpec], ":=", Expression, ";";
-Binding = identifier | "(", <Binding>, ")" | "{", identifier, "}";
+Binding = identifier | "(", <identifier>, ")" | "{", identifier, "}";
 Assignment = Place, ":=", Expression, ";";
 Place = identifier;
 IfStatement = "if", Expression, Block, {"else if", Expression, Block}, ["else", Block];
