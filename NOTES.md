@@ -178,7 +178,7 @@ Variable = "identifier;
 Funcall = identifier, "(", <Expression>, ")";
 IfExpression = "if", Expression, "then", Expression, "else", Expression;
 CaseExpression = "case", Expression, "of", {identifier, Binding, "=>", Expression};
-UnionConstructor = identifier, "::", identifier, "(", <Expression>, ")";
+UnionConstructor = identifier, ".", identifier, "(", <Expression>, ")";
 
 ComparisonExpr = PExpression, ("=", "<", "<=", ">", ">=", "/="), PExpression;
 BooleanExpr = "not" PExpression
