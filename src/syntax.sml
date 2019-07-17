@@ -96,6 +96,7 @@ structure Syntax = struct
                   | Or of expr list
                   | Variable of identifier
                   | Funcall of identifier * expr list
+                  | IfExpression of expr * expr * expr
 
          and arith_op = Add
                       | Sub
