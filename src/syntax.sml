@@ -72,7 +72,7 @@ structure Syntax = struct
                        | ForLoop of identifier * type_spec option * expr * expr * block
                        | WhileLoop of expr * block
                        | Abort
-
+                       | Return of expr
 
          and binding = IdentBinding of identifier
                      | TupleBinding of identifier list
