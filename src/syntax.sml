@@ -26,11 +26,6 @@ structure Syntax = struct
 
     (* Expressions *)
 
-    datatype type_specifier = NamedType of name
-                            | Address of type_specifier
-                            | Pointer of type_specifier
-                            | TupleType of type_specifier list
-
     datatype expr = UnitConstant
                   | BoolConstant of bool
                   | IntConstant of string
