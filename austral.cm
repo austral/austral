@@ -24,19 +24,10 @@ is
   (* Utilities *)
 
   src/util/error.sml
-
-  src/util/util.sig
   src/util/util.sml
-
-  src/util/set.sig
   src/util/set.sml
-
-  src/util/ordered-set.sig
   src/util/ordered-set.sml
-
   src/util/map.sml
-
-  src/util/ordered-map.sig
   src/util/ordered-map.sml
 
   (* Common *)
