@@ -87,7 +87,7 @@ structure Syntax = struct
                   | BooleanConstant of bool
                   | IntConstant of string
                   | FloatConstant of string
-                  | StringConstant of string
+                  | StringConstant of Escape.escaped_string
 
          and docstring = Docstring of string option
 end
