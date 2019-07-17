@@ -65,7 +65,7 @@ structure Syntax = struct
 
          and block = Block of statement list
 
-         and statement = BindingDecl of mutability * identifier * type_spec option * expr
+         and statement = BindingDecl of mutability * binding * type_spec option * expr
                        | Assignment of place * expr
                        | IfStatement of expr * block * (expr * block) list * block
                        | CaseStatement of expr * (identifier * binding * block) list
