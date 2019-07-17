@@ -29,4 +29,7 @@ structure Syntax = struct
                         | FunctionDef of unit
                         | TypeClassDef of unit
                         | ClassInstanceDef of unit
+
+         and type_vis = OpaqueType
+                      | PublicType
 end
