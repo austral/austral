@@ -29,7 +29,7 @@ structure Syntax = struct
 
          and definition = RecordDef of docstring * type_vis * identifier * type_params * slot list
                         | UnionDef of docstring * type_vis * identifier * type_params * union_case list
-                        | FunctionDef of unit
+                        | FunctionDef of docstring * func_vis * func_type_params * identifier * func_signature * block
                         | TypeClassDef of unit
                         | ClassInstanceDef of unit
 
