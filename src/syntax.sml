@@ -88,6 +88,7 @@ structure Syntax = struct
                   | IntConstant of string
                   | FloatConstant of string
                   | StringConstant of Escape.escaped_string
+                  | TupleLiteral of expr list
 
          and docstring = Docstring of string option
 end
