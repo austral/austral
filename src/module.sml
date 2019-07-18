@@ -25,7 +25,7 @@ structure Module = struct
 
     type type_visibility = Syntax.type_vis
 
-    type func_visibility = Syntax.func_visibility
+    type func_visibility = Syntax.func_vis
 
     type docstring = Syntax.docstring
 
