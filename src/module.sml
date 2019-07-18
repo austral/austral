@@ -23,7 +23,7 @@ structure Module = struct
     type name = Name.ident
     type module_name = Name.module_name
 
-    type type_visibility = Syntax.type_visibility
+    type type_visibility = Syntax.type_vis
 
     type func_visibility = Syntax.func_visibility
 
