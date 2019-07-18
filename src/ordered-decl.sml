@@ -19,8 +19,6 @@
 
 structure OrderedDecl = struct
     type name = Name.ident
-    type type_visibility = Syntax.type_visibility
-    type func_visibility = Syntax.func_visibility
     type docstring = Syntax.docstring
     type type_specifier = Syntax.type_specifier
     type slot_definition = Syntax.slot_definition
