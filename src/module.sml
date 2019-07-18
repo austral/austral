@@ -17,7 +17,7 @@
     along with Austral.  If not, see <http://www.gnu.org/licenses/>.
 *)
 
-structure Module :> MODULE = struct
+structure Module = struct
     (* Types *)
 
     type name = Name.ident
