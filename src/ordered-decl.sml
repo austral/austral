@@ -19,7 +19,6 @@
 
 structure OrderedDecl = struct
     type name = Name.ident
-    type docstring = Syntax.docstring
 
     datatype module = Module of Name.module_name
                                 * Syntax.docstring * Syntax.import list * (name, Syntax.declaration) Map.map
