@@ -20,10 +20,6 @@
 structure OrderedDecl = struct
     type name = Name.ident
     type docstring = Syntax.docstring
-    type type_specifier = Syntax.type_specifier
-    type slot_definition = Syntax.slot_definition
-    type case_definition = Syntax.case_definition
-    type param = Syntax.param
 
     datatype module = Module of Name.module_name * docstring * Syntax.import list * (name, Syntax.declaration) Map.map
 end
