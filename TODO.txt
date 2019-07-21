@@ -1,6 +1,7 @@
 TODO:
 
 - Syntax for closures
+- Think about how closures and universes interact
 - Figure out how typeclass instances work with import resolution
 - Update parser to EBNF syntax
 
