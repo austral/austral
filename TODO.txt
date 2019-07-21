@@ -1,5 +1,6 @@
 TODO:
 
+- Syntax for closures
 - Figure out how typeclass instances work with import resolution
 - Update parser to EBNF syntax
 
