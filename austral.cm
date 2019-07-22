@@ -49,11 +49,11 @@ is
 
   (* Passes *)
 
-  src/import-resolution.sml
+  (*src/import-resolution.sml
   src/parser.sml
   src/ordering-pass.sml
   src/resolution-pass.sml
   src/typing-pass.sml
-  src/module-extraction.sml
+  src/module-extraction.sml*)
 
   $/basis.cm
