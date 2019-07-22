@@ -1,6 +1,7 @@
 TODO:
 
 - Syntax for closures
+- Syntax for function/closure types
 - Think about observed types
 - Update parser to EBNF syntax
 
