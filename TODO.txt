@@ -2,7 +2,6 @@ TODO:
 
 - Syntax for closures
 - Think about observed types
-- Figure out how typeclass instances work with import resolution
 - Update parser to EBNF syntax
 
 LONG-TERM TODO:
@@ -234,3 +233,4 @@ DONE:
 - Review import syntax
 - Update Syntax types to EBNF syntax
 - Think about how closures and universes interact
+- Figure out how typeclass instances work with import resolution
