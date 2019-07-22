@@ -37,7 +37,7 @@ is
   src/escape.sml
   src/type.sml
   src/import.sml
-  src/module.sml
+  (*src/module.sml*)
 
   (* Internal Representations *)
 
