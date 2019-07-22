@@ -214,3 +214,7 @@ Some thoughts on the spectrum from statement-expression separated languages and 
 At one end: clean separation of statements and expressions.
 
 At the other: pure expression-oriented languages, Standard ML and Haskell.
+
+In the middle: mixed statement/expression languages. Scala, Rust. Look like statements, are actually expressions. This is a critique of languages in this region of design space.
+
+Corner cases: `return` and `let`. What is the type of `return` statement (expression)? In Rust it's the unit type, though it should be the type of divergent functions (bottom), since ironically it never returns (that is, doesn't evaluate to anything).
