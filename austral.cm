@@ -41,11 +41,11 @@ is
 
   (* Internal Representations *)
 
-  src/syntax.sml
+  (*src/syntax.sml
   src/ordered-decl.sml
   src/resolved-decl.sml
   src/typed-decl.sml
-  src/dast.sml
+  src/dast.sml*)
 
   (* Passes *)
 
