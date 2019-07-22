@@ -231,5 +231,13 @@ The error message will show `x` has type `()`. But really, it should be the type
 Thus, in this example:
 
 ```rust
+fn test() -> i32 {
+    if true {
+        return 0
+    } else {
+        1
+    }
+}
+```
 
-```34
+Here, `if` is an expression, which means that as in Haskell, both branches must be the same type for it to be well-typed. But here, the true branch is an expression of type unit, and the false branch is an expression of type `i32`. This type checks because the compiler recognizes this type of construct as a special case.
