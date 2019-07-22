@@ -206,3 +206,11 @@ lowercase = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
 digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 symbol = "$" | "?" | "'"
 ```
+
+## Syntax Rationale
+
+Some thoughts on the spectrum from statement-expression separated languages and expression oriented languages.
+
+At one end: clean separation of statements and expressions.
+
+At the other: pure expression-oriented languages, Standard ML and Haskell.
