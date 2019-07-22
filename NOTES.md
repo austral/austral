@@ -217,4 +217,19 @@ At the other: pure expression-oriented languages, Standard ML and Haskell.
 
 In the middle: mixed statement/expression languages. Scala, Rust. Look like statements, are actually expressions. This is a critique of languages in this region of design space.
 
-Corner cases: `return` and `let`. What is the type of `return` statement (expression)? In Rust it's the unit type, though it should be the type of divergent functions (bottom), since ironically it never returns (that is, doesn't evaluate to anything).
+Corner cases: `return` and `let`. What is the type of `return` statement (expression)? In Rust it's the unit type. Proof:
+
+```rust
+fn main() -> () {
+    let x = return ();
+    x + 1;
+}
+```
+
+The error message will show `x` has type `()`. But really, it should be the type of divergent functions (bottom, denoted `!`), since ironically it never returns (that is, doesn't evaluate to anything).
+
+Thus, in this example:
+
+```rust
+
+```34
