@@ -244,6 +244,6 @@ Here, `if` is an expression, which means that as in Haskell, both branches must 
 
 Another edge case is `let`. In Standard ML, an expression-oriented language, the form of let expressions is `let x = v in e`, and `x` is defined only in `e`. The type of the whole expression is the type of `e`: this is perfectly sensible and we can relate it to evaluation rules in the lambda calculus.
 
-In Rust, however, variable declaration is syntactically ALGOL-like, yet everything is an expression, so a declaration of the form `let x = 1` should be an expression. But it isn't: it's a special case. And if it were an expression (presumably returning unit, since returning its initial value would consume owned values), it wouldn't be a terribly useful one, since it doesn't carry the context where the binding is valid.
+In Rust, however, variable declaration is syntactically ALGOL-like, yet everything is an expression, so a declaration of the form `let x = 1` should be an expression. But it isn't: it's a special case. And if it were an expression (presumably returning unit, since returning its initial value would consume owned values), it wouldn't be a terribly useful one, since it doesn't carry the context where the binding is valid (you need a compiler pass to turn it into its nested form).
 
 tldr: expressions good. expressions and statements good. frankexpressions bad.
