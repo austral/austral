@@ -1,5 +1,6 @@
 TODO:
 
+- Fix the syntax of arithmetic
 - Syntax for closures
 - Syntax for function/closure types
 - Update parser to EBNF syntax
