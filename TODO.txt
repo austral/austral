@@ -1,6 +1,7 @@
 TODO:
 
 - Extend the syntax to support pragmas
+- Think about a better name for pragmas
 - Fix the syntax of arithmetic
 - Syntax for closures
 - Syntax for function/closure types
