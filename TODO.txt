@@ -1,5 +1,6 @@
 TODO:
 
+- Extend the syntax to support pragmas
 - Fix the syntax of arithmetic
 - Syntax for closures
 - Syntax for function/closure types
