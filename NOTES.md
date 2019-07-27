@@ -271,4 +271,16 @@ public generic (T)
 function cons(value: T, list: List(T)): List(T) {
   return Cons(T, list);
 }
+
+public generic (T)
+fuction length(list: Observed(List(T))): Natural {
+  case list {
+    None {
+      return 0;
+    },
+    Cons(_, tail) {
+      return 1 + length(tail);
+    }
+  }
+}
 ```
