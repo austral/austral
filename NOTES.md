@@ -256,6 +256,11 @@ tldr: expressions good. expressions and statements good. frankexpressions bad.
 module LinkedList;
 
 record LinkedList(T) {
-  head: Optional(Pointer(T))
+  head: Optional(Node(T))
+}
+
+record Node(T) {
+  head: T,
+  tail: Optional(Pointer(Node(T)))
 }
 ```
