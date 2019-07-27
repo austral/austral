@@ -253,5 +253,9 @@ tldr: expressions good. expressions and statements good. frankexpressions bad.
 ### Linked Lists
 
 ```
+module LinkedList;
 
+record LinkedList(T) {
+  head: Optional(Pointer(T))
+}
 ```
