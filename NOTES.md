@@ -259,7 +259,7 @@ module List;
 
 opaque union List(T) {
   None,
-  Cons : (T, Optional(Pointer(List(T))))
+  Cons : (T, Pointer(List(T)))
 }
 
 public generic (T)
@@ -269,7 +269,7 @@ function empty(): List(T) {
 
 public generic (T)
 function cons(value: T, list: List(T)): List(T) {
-  return Cons(T, list);
+  return Cons(T, allocate(list));
 }
 
 public generic (T)
@@ -279,7 +279,22 @@ fuction length(list: Observed(List(T))): Natural {
       return 0;
     },
     Cons(_, tail) {
-      return 1 + length(tail);
+      return 1 + length(observedLoad(tail));
+    }
+  }
+}
+
+-- In-place map
+public generic (T, T')
+function map(f: (T) -> T', list: List(T')) {
+  case list {
+    None {
+      return None;
+    },
+    Cons(head, tail) {
+      -- The type of tail is Pointer(List(T))
+      return Cons(call(f, head),
+                  swap(tail, map(f, tail)));
     }
   }
 }
