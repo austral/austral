@@ -285,8 +285,8 @@ fuction length(list: Observed(List(T))): Natural {
 }
 
 -- In-place map
-public generic (T, T')
-function map(f: (T) -> T', list: List(T')) {
+public generic (T, E)
+function map(f: Function(T, T, E), list: List(T')) {
   case list {
     None {
       return None;
