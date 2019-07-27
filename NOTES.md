@@ -265,7 +265,12 @@ record Node(T) {
 }
 
 generic (T)
-function empty() {
+function empty(): LinkedList(T) {
   return LinkedList(head => Optional.None as Node(T))
+}
+
+generic (T)
+function cons(head: T, list: LinkedList(T)): LinkedList(T) {
+
 }
 ```
