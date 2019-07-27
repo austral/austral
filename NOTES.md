@@ -252,25 +252,23 @@ tldr: expressions good. expressions and statements good. frankexpressions bad.
 
 ### Linked Lists
 
+The trivial implementation:
+
 ```
-module LinkedList;
+module List;
 
-record LinkedList(T) {
-  head: Optional(Node(T))
+opaque union List(T) {
+  None,
+  Cons : (T, Optional(Pointer(List(T))))
 }
 
-record Node(T) {
-  head: T,
-  tail: Optional(Pointer(Node(T)))
+public generic (T)
+function empty(): List(T) {
+  return None();
 }
 
-generic (T)
-function empty(): LinkedList(T) {
-  return LinkedList(head => Optional.None as Node(T))
-}
-
-generic (T)
-function cons(head: T, list: LinkedList(T)): LinkedList(T) {
-
+public generic (T)
+function cons(value: T, list: List(T)): List(T) {
+  return Cons(T, list);
 }
 ```
