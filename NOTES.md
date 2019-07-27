@@ -299,3 +299,5 @@ function map(f: (T) -> T', list: List(T')) {
   }
 }
 ```
+
+Note the error above (tail is used twice).
