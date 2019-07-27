@@ -263,4 +263,9 @@ record Node(T) {
   head: T,
   tail: Optional(Pointer(Node(T)))
 }
+
+generic (T)
+function empty() {
+  return LinkedList(head => Optional.None as Node(T))
+}
 ```
