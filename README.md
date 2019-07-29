@@ -40,6 +40,7 @@ Anti-features:
 - No Java-style @Annotations.
 - No type inference, type information flows in one direction.
 - No uninitialized variables.
+- No pre/post increment/decrement (`x++` in C).
 
 ## Building
 
