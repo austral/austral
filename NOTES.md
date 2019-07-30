@@ -285,7 +285,7 @@ fuction length(list: Observed(List(T))): Natural {
 }
 
 -- In-place map
-public generic (T, E)
+public generic (T, E : Type*)
 function map(f: Function(T, T, E), list: List(T')) {
   case list {
     None {
@@ -294,7 +294,7 @@ function map(f: Function(T, T, E), list: List(T')) {
     Cons(head, tail) {
       -- The type of tail is Pointer(List(T))
       return Cons(call(f, head),
-                  swap(tail, map(f, tail)));
+                  swapf(tail, lambda (t: List(T)) { return map(f, tail); }));
     }
   }
 }
