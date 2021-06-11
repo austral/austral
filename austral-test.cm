@@ -1,9 +1,0 @@
-Group
-is
-  vendor/mlunit/mlunit.cm
-  vendor/parsimony/parsimony.cm
-
-  austral.cm
-  test/test.sml
-
-  $/basis.cm

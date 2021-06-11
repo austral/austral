@@ -1,10 +1,2 @@
-.cm
+_build
 austral
-austral-test
-src/c-runtime.sml
-test/valid/*.c
-test/valid/*.bin
-docs/*.html
-docs/*.png
-node_modules
-package-lock.json
