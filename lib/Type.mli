@@ -34,3 +34,6 @@ type typed_slot = TypedSlot of identifier * ty
 type typed_case = TypedCase of identifier * typed_slot list
 
 type value_parameter = ValueParameter of identifier * ty
+
+(* A string representation of a type, for debugging *)
+val type_string : ty -> string
