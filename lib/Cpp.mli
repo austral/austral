@@ -1,4 +1,3 @@
-open Identifier
 open Common
 
 type cpp_function_linkage =
@@ -6,7 +5,7 @@ type cpp_function_linkage =
   | LinkageExternal
 
 type cpp_ty =
-  | CNamedType of identifier * cpp_ty list
+  | CNamedType of string * cpp_ty list
   | CPointer of cpp_ty
   | CStructType of cpp_struct
   | CUnionType of cpp_slot list
@@ -17,7 +16,7 @@ type cpp_expr =
   | CBool of bool
   | CInt of string
   | CFloat of string
-  | CStrinrg of string
+  | CString of string
   | CVar of string
   | CFuncall of string * cpp_expr list
   | CArithmetic of arithmetic_operator * cpp_expr * cpp_expr
@@ -51,8 +50,8 @@ type cpp_decl =
   | CConstantDefinition of string * cpp_ty * cpp_expr
   | CTypeDeclaration of string * cpp_ty_param list
   | CTypeDefinition of string * cpp_ty_param list * cpp_ty
-  | CStructDefinition of string * cpp_ty_param list * cpp_struct
-  | CEnumDefinition of string * cpp_ty_param list
+  | CStructDefinition of cpp_ty_param list * cpp_struct
+  | CEnumDefinition of string * string list
   | CFunctionDeclaration of string * cpp_ty_param list * cpp_value_param list * cpp_ty * cpp_function_linkage
   | CFunctionDefinition of string * cpp_ty_param list * cpp_value_param list * cpp_ty * cpp_stmt
   | CDeclBlock of cpp_decl list
