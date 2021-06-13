@@ -1,10 +1,7 @@
 open Identifier
 open Common
 
-type qtypespec = {
-    name: qident;
-    args: qtypespec list
-  }
+type qtypespec = QTypeSpecifier of qident * qtypespec list
 
 type astmt =
   | ASkip
