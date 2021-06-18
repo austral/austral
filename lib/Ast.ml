@@ -5,11 +5,7 @@ type qtypespec = QTypeSpecifier of qident * qtypespec list
 
 type astmt =
   | ASkip
-  | ALet of {
-      name: identifier;
-      ty: qtypespec;
-      value: aexpr
-    }
+  | ALet of identifier * qtypespec * aexpr
   | AAssign of identifier * aexpr
   | AIf of aexpr * astmt * astmt
   | ACase of aexpr * abstract_when list
@@ -40,11 +36,7 @@ and aexpr =
   | IfExpression of aexpr * aexpr * aexpr
 
 and abstract_when =
-  | AbstractWhen of {
-      name: identifier;
-      bindings: (identifier * qtypespec) list;
-      body: astmt
-    }
+  | AbstractWhen of identifier * (identifier * qtypespec) list * astmt
 
 and abstract_arglist =
   | Positional of aexpr list
