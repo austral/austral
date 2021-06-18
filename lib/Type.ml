@@ -35,6 +35,8 @@ type typed_case = TypedCase of identifier * typed_slot list
 
 type value_parameter = ValueParameter of identifier * ty
 
+type type_signature = TypeSignature of identifier * type_parameter list * universe
+
 let rec type_string = function
   | Unit -> "Unit"
   | Boolean -> "Boolean"
