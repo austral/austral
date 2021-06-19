@@ -1,8 +1,10 @@
-type type_vis =
-  | TypeVisPublic
-  | TypeVisOpaque
-  | TypeVisPrivate
+open Identifier
+open Semantic
 
-type vis =
-  | VisPublic
-  | VisPrivate
+type menv
+
+val empty_menv : menv
+
+val get_decl : menv -> qident -> sem_decl option
+
+val get_callable : menv -> module_name -> qident -> callable option
