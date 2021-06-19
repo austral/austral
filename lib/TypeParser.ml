@@ -100,24 +100,28 @@ and any_arg_is_type (args: ty list) =
   in
   List.exists is_type (List.map type_universe args)
 
-let rec get_type_signature menv sigs name =
+(* Type signature retrieval *)
+
+let get_type_signature menv sigs name =
+  let get_local_type_signature (sigs: type_signature list) (name: qident): type_signature option =
+    List.find_opt (fun (TypeSignature (n, _, _)) -> n == (local_name name)) sigs
+
+  and get_foreign_type_signature (menv: menv) (name: qident): type_signature option =
+    match get_decl menv name with
+    | (Some decl) ->
+       decl_type_signature decl
+    | None ->
+     None
+  in
   match get_local_type_signature sigs name with
   | (Some ts) ->
      Some ts
   | None ->
      get_foreign_type_signature menv name
 
-and get_local_type_signature (sigs: type_signature list) (name: qident): type_signature option =
-  List.find_opt (fun (TypeSignature (n, _, _)) -> n == (local_name name)) sigs
+(* Parsing *)
 
-and get_foreign_type_signature (menv: menv) (name: qident): type_signature option =
-  match get_decl menv name with
-  | (Some decl) ->
-      decl_type_signature decl
-  | None ->
-     None
-
-let rec parse typarams (QTypeSpecifier (name, args)) =
+let rec parse menv sigs typarams (QTypeSpecifier (name, args)) =
   match is_built_in_type (ident_string (original_name name)) with
   | Some ty ->
      ty
@@ -126,8 +130,10 @@ let rec parse typarams (QTypeSpecifier (name, args)) =
      | Some ty ->
         ty
      | None ->
-        parse_user_type typarams name args
+        parse_user_defined_type menv sigs typarams name args
 
+(* Is the given name a type parameter in the list of type paramters? If so,
+   return it as a type variable. *)
 and is_param (typarams: type_parameter list) (name: qident): ty option =
   let name' = original_name name
   in
@@ -137,5 +143,54 @@ and is_param (typarams: type_parameter list) (name: qident): ty option =
   | None ->
      None
 
-and parse_user_type (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
-  err "derp"
+and parse_user_defined_type (menv: menv) (sigs: type_signature list) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
+  match get_type_signature menv sigs name with
+  | Some ts ->
+     parse_user_defined_type' menv sigs ts typarams name args
+  | None ->
+     err "No such type"
+
+and parse_user_defined_type' (menv: menv) (sigs: type_signature list) (ts: type_signature) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
+  let (TypeSignature (_, ts_params, declared_universe)) = ts in
+  (* Check: the number of type parameters in the signature matches the number of
+     type arguments *)
+  check_param_arity_matches ts_params args;
+  (* Check: the universe of each type argument matches the universe of each type
+     parameter in the type signature. *)
+  let args' = List.map (parse menv sigs typarams) args in
+  check_universes_match ts_params args';
+  (* Construct the named type *)
+  let universe = effective_universe ts_params declared_universe args' in
+  NamedType (name, args', universe)
+
+and check_param_arity_matches (params: type_parameter list) (args: qtypespec list): unit =
+  assert ((List.length params) = (List.length args))
+
+and check_universes_match (params: type_parameter list) (args: ty list): unit =
+  let _ = List.map2 check_universes_match' params args in ()
+
+and check_universes_match' (TypeParameter (_, param_u)) (arg: ty): unit =
+  let arg_u = type_universe arg in
+  if universe_compatible param_u arg_u then
+    ()
+  else
+    err "Universe mismatch"
+
+and universe_compatible param arg =
+  (* The check here is:
+
+     1. If the parameter universe is Free, the argument universe must be Free.
+     2. If the parameter universe is Linear, the argument universe must be Linear.
+     3. If the parameter universe is Type, the argument universe must be any one of Free, Linear, or
+        type.
+     4. If the parameter universe is Region, the argument universe must be Region.
+   *)
+  match param with
+  | FreeUniverse ->
+     arg = FreeUniverse
+  | LinearUniverse ->
+     arg = LinearUniverse
+  | TypeUniverse ->
+     (arg = FreeUniverse) || (arg = LinearUniverse) || (arg = TypeUniverse)
+  | RegionUniverse ->
+     arg = RegionUniverse

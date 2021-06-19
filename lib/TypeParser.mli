@@ -17,6 +17,10 @@ val get_type_signature : menv -> type_signature list -> qident -> type_signature
 
 (* Parse a qualified type specifier.
 
-   The first argument is the list of type parameters known at parse time. The
-   second argument is the type specifier to parse. *)
-val parse : type_parameter list -> qtypespec -> ty
+   The second argument is the list of local type signatures from the module the
+   type specifier is being parsed in.Arith_status
+
+   The third argument is the list of type parameters known at parse time.  *)
+val parse : menv -> type_signature list -> type_parameter list -> qtypespec -> ty
+
+val universe_compatible : universe -> universe -> bool
