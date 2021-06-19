@@ -69,3 +69,5 @@ val get_declaration : semantic_module * identifier -> sem_decl option
    argument is the name of the module doing the
    importing. *)
 val get_callable : semantic_module * module_name * identifier -> callable option
+
+val decl_type_signature : sem_decl -> type_signature option

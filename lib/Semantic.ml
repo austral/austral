@@ -165,3 +165,19 @@ let is_importable (decl, source_module, importing_module) =
   (* Not callables *)
   | _ -> false
   *)
+
+let decl_type_signature = function
+  | SConstantDefinition _ ->
+     None
+  | STypeAliasDefinition (_, n, p, u, _) ->
+     Some (TypeSignature (n, p, u))
+  | SRecordDefinition (_, _, n, p, u, _) ->
+     Some (TypeSignature (n, p, u))
+  | SUnionDefinition (_, _, n, p, u, _) ->
+     Some (TypeSignature (n, p, u))
+  | SFunctionDeclaration _ ->
+     None
+  | STypeClassDecl _ ->
+     None
+  | STypeClassInstanceDecl _ ->
+     None
