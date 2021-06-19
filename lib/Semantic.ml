@@ -35,7 +35,7 @@ and semantic_typeclass =
   STypeClass of vis * identifier * type_parameter * semantic_method_decl list
 
 and semantic_instance =
-  STypeClassInstance of vis * qident * type_parameter list * ty * semantic_method_decl list
+  STypeClassInstance of vis * identifier * type_parameter list * ty * semantic_method_decl list
 
 and semantic_method_decl =
   SMethodDecl of identifier * value_parameter list * ty
