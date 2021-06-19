@@ -35,6 +35,34 @@ let rec type_variables = function
   | TyVar v -> TypeVarSet.singleton v
   | _ -> TypeVarSet.empty
 
+let is_built_in_type = function
+  | "Unit" ->
+     Some Unit
+  | "Boolean" ->
+     Some Boolean
+  | "Natural_8" ->
+     Some (Integer (Unsigned, Width8))
+  | "Natural_16" ->
+     Some (Integer (Unsigned, Width16))
+  | "Natural_32" ->
+     Some (Integer (Unsigned, Width32))
+  | "Natural_64" ->
+     Some (Integer (Unsigned, Width64))
+  | "Integer_8" ->
+     Some (Integer (Signed, Width8))
+  | "Integer_16" ->
+     Some (Integer (Signed, Width16))
+  | "Integer_32" ->
+     Some (Integer (Signed, Width32))
+  | "Integer_64" ->
+     Some (Integer (Signed, Width64))
+  | "SingleFloat" ->
+     Some SingleFloat
+  | "DoubleFloat" ->
+     Some DoubleFloat
+  | _ ->
+     None
+
 let rec effective_universe typarams declared_universe args =
   (* Algorithm:
 

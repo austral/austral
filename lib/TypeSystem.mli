@@ -16,6 +16,8 @@ val is_comparable : ty -> bool
 (* Return the set of type variables in a type expression, *)
 val type_variables : ty -> TypeVarSet.t
 
+val is_built_in_type : string -> ty option
+
 (* Given a type's list of type parameters, its declared universe, and a list of
    supplied type arguments, evaluate the effective universe the type belongs to.
 
