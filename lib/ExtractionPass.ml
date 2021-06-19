@@ -1,5 +1,6 @@
-open Combined
 open Type
+open Combined
+(*open Semantic*)
 
 let rec extract_type_signatures (CombinedModule { decls; _ }) =
   List.filter_map extract_type_signatures' decls
@@ -20,3 +21,11 @@ and extract_type_signatures' (def: combined_definition) =
      None
   | CInstance _ ->
      None
+(*
+let rec extract_declarations (CombinedModule { decls; _ }) local_types =
+  List.filter_map (extract_declaration local_types) decls
+
+and extract_declaration (local_types: type_signature list) (def: combined_definition) =
+  match def with
+  | CConstant (vis, name, typespec, value, docstring) ->
+ *)

@@ -3,7 +3,7 @@ open Common
 open Imports
 open Ast
 open Type
-open ModuleSystem
+open Semantic
 
 type combined_module = CombinedModule of {
       name: module_name;

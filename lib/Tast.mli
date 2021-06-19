@@ -1,6 +1,5 @@
 open Identifier
 open Common
-open ModuleSystem
 open Type
 open Semantic
 

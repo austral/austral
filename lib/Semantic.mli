@@ -1,6 +1,14 @@
 open Identifier
-open ModuleSystem
 open Type
+
+type type_vis =
+  | TypeVisPublic
+  | TypeVisOpaque
+  | TypeVisPrivate
+
+type vis =
+  | VisPublic
+  | VisPrivate
 
 (* Semantic modules represent everything we need to know
    about a module to perform semantic analysis on it. That
