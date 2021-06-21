@@ -13,3 +13,9 @@ let importing_module (ImportMap (n, _, _, _)) =
 
 let get_symbol (ImportMap (_, m, _, _)) name =
   IdentifierMap.find_opt name m
+
+let imported_classes (ImportMap (_, _, cs, _)) =
+  cs
+
+let imported_instances (ImportMap (_, _, _, is)) =
+  is
