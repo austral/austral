@@ -34,13 +34,19 @@ and concrete_def =
   | ConcreteInstanceDef of concrete_instance
 
 and concrete_type_alias =
-  ConcreteTypeAlias
+  ConcreteTypeAlias of identifier * type_parameter list * universe * typespec * docstring
 
 and concrete_record =
-  ConcreteRecord
+  ConcreteRecord of identifier * type_parameter list * universe * concrete_slot list * docstring
 
 and concrete_union =
-  ConcreteUnion
+  ConcreteUnion of identifier * type_parameter list * universe * concrete_case list * docstring
+
+and concrete_slot =
+  ConcreteSlot of identifier * typespec
+
+and concrete_case =
+  ConcreteCase of identifier * concrete_slot list
 
 and concrete_typeclass =
   ConcreteTypeClass of identifier * type_parameter * concrete_method_decl list * docstring
@@ -96,3 +102,7 @@ and concrete_arglist =
 
 and concrete_param =
   ConcreteParam of identifier * typespec
+
+val get_decl : concrete_module_interface -> identifier -> concrete_decl option
+
+val get_def : concrete_module_body -> identifier -> concrete_def option

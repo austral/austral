@@ -34,13 +34,19 @@ and concrete_def =
   | ConcreteInstanceDef of concrete_instance
 
 and concrete_type_alias =
-  ConcreteTypeAlias
+  ConcreteTypeAlias of identifier * type_parameter list * universe * typespec * docstring
 
 and concrete_record =
-  ConcreteRecord
+  ConcreteRecord of identifier * type_parameter list * universe * concrete_slot list * docstring
 
 and concrete_union =
-  ConcreteUnion
+  ConcreteUnion of identifier * type_parameter list * universe * concrete_case list * docstring
+
+and concrete_slot =
+  ConcreteSlot of identifier * typespec
+
+and concrete_case =
+  ConcreteCase of identifier * concrete_slot list
 
 and concrete_typeclass =
   ConcreteTypeClass of identifier * type_parameter * concrete_method_decl list * docstring
@@ -96,3 +102,42 @@ and concrete_arglist =
 
 and concrete_param =
   ConcreteParam of identifier * typespec
+
+let decl_name = function
+  | ConcreteConstantDecl (n, _, _) -> Some n
+  | ConcreteOpaqueTypeDecl (n, _, _, _) -> Some n
+  | ConcreteTypeAliasDecl (ConcreteTypeAlias (n, _, _, _, _)) -> Some n
+  | ConcreteRecordDecl (ConcreteRecord (n, _, _, _, _)) -> Some n
+  | ConcreteUnionDecl (ConcreteUnion (n, _, _, _, _)) -> Some n
+  | ConcreteFunctionDecl (n, _, _, _, _) -> Some n
+  | ConcreteTypeClassDecl (ConcreteTypeClass (n, _, _, _)) -> Some n
+  | ConcreteInstanceDecl _ -> None
+
+let def_name = function
+  | ConcreteConstantDef (n, _, _, _) -> Some n
+  | ConcreteTypeAliasDef (ConcreteTypeAlias (n, _, _, _, _)) -> Some n
+  | ConcreteRecordDef (ConcreteRecord (n, _, _, _, _)) -> Some n
+  | ConcreteUnionDef (ConcreteUnion (n, _, _, _, _)) -> Some n
+  | ConcreteFunctionDef (n, _, _, _, _, _, _) -> Some n
+  | ConcreteTypeClassDef (ConcreteTypeClass (n, _, _, _)) -> Some n
+  | ConcreteInstanceDef _ -> None
+
+let get_decl (ConcreteModuleInterface (_, _, decls)) name =
+  let pred decl =
+    match decl_name decl with
+    | (Some name') ->
+       name = name'
+    | None ->
+       false
+  in
+  List.find_opt pred decls
+
+let get_def (ConcreteModuleBody (_, _, defs)) name =
+  let pred def =
+    match def_name def with
+    | (Some name') ->
+       name = name'
+    | None ->
+       false
+  in
+  List.find_opt pred defs
