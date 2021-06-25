@@ -71,3 +71,5 @@ val get_declaration : semantic_module * identifier -> sem_decl option
 val get_callable : semantic_module * module_name * identifier -> callable option
 
 val decl_type_signature : sem_decl -> type_signature option
+
+val is_importable : sem_decl -> bool

@@ -4,7 +4,11 @@ open Semantic
 (* Represents the imports into a module. *)
 type import_map
 
+(* Create an empty map, given the name of the module that's we're importing
+   into. *)
 val empty_map : module_name -> import_map
+
+val add_symbol : import_map -> qident -> import_map
 
 (* The name of the module we're importing into. *)
 val importing_module : import_map -> module_name

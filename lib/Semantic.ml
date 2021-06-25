@@ -149,23 +149,6 @@ let get_callable (SemanticModule { name=source_module_name; decls; imported_clas
   | None ->
      List.find_map (get_callable_typeclass source_module_name importing_module_name callable_name) imported_classes
 
-(* Check whether a given callable declaration is
-   importable, given the name of the source module and
-   the name of the importing module.
-let is_importable (decl, source_module, importing_module) =
-  match decl with
-  | SFunctionDeclaration (vis, _, _, _, _) ->
-     (vis = VisPublic) || (source_module = importing_module)
-  | SRecordDefinition (_, vis, _, _, _, _) ->
-     (vis = TypeVisPublic) || (source_module = importing_module)
-  | SUnionDefinition (_, vis, _, _, _, _) ->
-     (vis = TypeVisPublic) || (source_module = importing_module)
-  | STypeClassDecl (STypeClass (vis, _, _, _)) ->
-     (vis = VisPublic) || (source_module = importing_module)
-  (* Not callables *)
-  | _ -> false
-  *)
-
 let decl_type_signature = function
   | SConstantDefinition _ ->
      None
@@ -181,3 +164,28 @@ let decl_type_signature = function
      None
   | STypeClassInstanceDecl _ ->
      None
+
+let rec is_importable = function
+  | SConstantDefinition (vis, _ ,_) ->
+     is_public vis
+  | STypeAliasDefinition (vis, _, _, _, _) ->
+     is_public_or_opaque vis
+  | SRecordDefinition (_, vis, _, _, _, _) ->
+     is_public_or_opaque vis
+  | SUnionDefinition (_, vis, _, _, _, _) ->
+     is_public_or_opaque vis
+  | SFunctionDeclaration (vis, _, _, _, _) ->
+     is_public vis
+  | STypeClassDecl (STypeClass (vis, _, _, _)) ->
+     is_public vis
+  | STypeClassInstanceDecl (STypeClassInstance (vis, _, _, _, _)) ->
+     is_public vis
+
+and is_public = function
+  | VisPublic -> true
+  | VisPrivate -> false
+
+and is_public_or_opaque = function
+  | TypeVisPublic -> true
+  | TypeVisOpaque -> true
+  | TypeVisPrivate -> false
