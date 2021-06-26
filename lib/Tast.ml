@@ -3,6 +3,7 @@ open Identifier
 open Common
 open Type
 open Semantic
+open Error
 
 type typed_module = TypedModule of module_name * typed_decl list
 
@@ -83,3 +84,35 @@ and reorder_arglist l names =
 and find_arg_with_name l name =
   let (_, value) = List.find (fun (n, _) -> name = n) l in
   value
+
+let rec get_type = function
+  | TNilConstant ->
+     Unit
+  | TBoolConstant _ ->
+     Boolean
+  | TIntConstant _ ->
+     Integer (Signed, Width32)
+  | TFloatConstant _ ->
+     DoubleFloat
+  | TStringConstant _ ->
+     err "Not implemented yet"
+  | TVariable (_, ty) ->
+     ty
+  | TArithmetic (_, lhs, _) ->
+     get_type lhs
+  | TFuncall (_, _, ty) ->
+     ty
+  | TMethodCall (_, _, _, ty) ->
+     ty
+  | TComparison _ ->
+     Boolean
+  | TConjunction _ ->
+     Boolean
+  | TDisjunction _ ->
+     Boolean
+  | TIfExpression (_, t, _) ->
+     get_type t
+  | TRecordConstructor (ty, _) ->
+     ty
+  | TUnionConstructor (ty, _, _) ->
+     ty

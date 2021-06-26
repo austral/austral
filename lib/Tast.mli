@@ -82,3 +82,5 @@ val arglist_size : typed_arglist -> int
           is exactly the same as the set of given parameter names.
 *)
 val arglist_to_positional : typed_arglist * identifier list -> texpr list
+
+val get_type : texpr -> ty
