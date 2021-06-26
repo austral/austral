@@ -19,6 +19,9 @@ let binding_conflict name ty ty' =
   in
   err str
 
+let get_binding (TypeBindings m) name =
+  IdentifierMap.find_opt name m
+
 (* Add a binding to the map.
 
    If a binding with this name already exists, fail if the types are
@@ -40,3 +43,14 @@ let rec add_bindings bs pairs =
 let merge_bindings (TypeBindings a) (TypeBindings b) =
   let m = add_bindings empty_bindings (IdentifierMap.bindings a) in
   add_bindings m (IdentifierMap.bindings b)
+
+let rec replace_variables bindings ty =
+  match ty with
+  | TyVar (TypeVariable (n, u)) ->
+     (match get_binding bindings n with
+      | Some ty -> ty
+      | None -> TyVar (TypeVariable (n, u)))
+  | NamedType (n, a, u) ->
+     NamedType (n, List.map (replace_variables bindings) a, u)
+  | t ->
+     t

@@ -10,3 +10,10 @@ val empty_bindings : type_bindings
 val merge_bindings : type_bindings -> type_bindings -> type_bindings
 
 val add_binding : type_bindings -> identifier -> ty -> type_bindings
+
+val get_binding : type_bindings -> identifier -> ty option
+
+(* Given a set of bindings, and a type expression, replace every type variable
+   in the expression with the value from the bindings. If the variable is not
+   found in the bindings, do nothing. *)
+val replace_variables : type_bindings -> ty -> ty
