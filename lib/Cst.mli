@@ -55,10 +55,10 @@ and concrete_instance =
   ConcreteInstance of identifier * type_parameter list * typespec * concrete_method_def list * docstring
 
 and concrete_method_decl =
-  ConcreteMethodDecl of identifier * concrete_param list * typespec
+  ConcreteMethodDecl of identifier * concrete_param list * typespec * docstring
 
 and concrete_method_def =
-  ConcreteMethodDef of identifier * concrete_param list * typespec * cstmt
+  ConcreteMethodDef of identifier * concrete_param list * typespec * cstmt * docstring
 
 and typespec =
   TypeSpecifier of identifier * typespec list
@@ -103,6 +103,14 @@ and concrete_arglist =
 and concrete_param =
   ConcreteParam of identifier * typespec
 
-val get_decl : concrete_module_interface -> identifier -> concrete_decl option
+val decl_name : concrete_decl -> identifier option
 
-val get_def : concrete_module_body -> identifier -> concrete_def option
+val def_name : concrete_def -> identifier option
+
+val get_concrete_decl : concrete_module_interface -> identifier -> concrete_decl option
+
+val get_concrete_def : concrete_module_body -> identifier -> concrete_def option
+
+val has_instance_decl : concrete_module_interface -> identifier -> type_parameter list -> typespec -> bool
+
+val get_instance_def : concrete_module_body -> identifier -> type_parameter list -> typespec -> concrete_instance option

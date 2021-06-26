@@ -55,10 +55,10 @@ and concrete_instance =
   ConcreteInstance of identifier * type_parameter list * typespec * concrete_method_def list * docstring
 
 and concrete_method_decl =
-  ConcreteMethodDecl of identifier * concrete_param list * typespec
+  ConcreteMethodDecl of identifier * concrete_param list * typespec * docstring
 
 and concrete_method_def =
-  ConcreteMethodDef of identifier * concrete_param list * typespec * cstmt
+  ConcreteMethodDef of identifier * concrete_param list * typespec * cstmt * docstring
 
 and typespec =
   TypeSpecifier of identifier * typespec list
@@ -122,7 +122,7 @@ let def_name = function
   | ConcreteTypeClassDef (ConcreteTypeClass (n, _, _, _)) -> Some n
   | ConcreteInstanceDef _ -> None
 
-let get_decl (ConcreteModuleInterface (_, _, decls)) name =
+let get_concrete_decl (ConcreteModuleInterface (_, _, decls)) name =
   let pred decl =
     match decl_name decl with
     | (Some name') ->
@@ -132,7 +132,7 @@ let get_decl (ConcreteModuleInterface (_, _, decls)) name =
   in
   List.find_opt pred decls
 
-let get_def (ConcreteModuleBody (_, _, defs)) name =
+let get_concrete_def (ConcreteModuleBody (_, _, defs)) name =
   let pred def =
     match def_name def with
     | (Some name') ->
@@ -141,3 +141,21 @@ let get_def (ConcreteModuleBody (_, _, defs)) name =
        false
   in
   List.find_opt pred defs
+
+let has_instance_decl (ConcreteModuleInterface (_, _, decls)) (name: identifier) (typarams: type_parameter list) (ty: typespec): bool =
+  let pred = function
+    | ConcreteInstanceDecl (name', typarams', ty', _) ->
+       (name = name') && (typarams = typarams') && (ty = ty')
+    | _ ->
+       false
+  in
+  List.exists pred decls
+
+let get_instance_def (ConcreteModuleBody (_, _, defs)) (name: identifier) (typarams: type_parameter list) (ty: typespec): concrete_instance option =
+  let filter = function
+    | ConcreteInstanceDef ci -> Some ci
+    | _ -> None
+  and pred (ConcreteInstance (name', typarams', ty', _, _)) =
+    (name = name') && (typarams = typarams') && (ty = ty')
+  in
+  List.find_opt pred (List.filter_map filter defs)
