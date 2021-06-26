@@ -46,6 +46,7 @@ and texpr =
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr
   | TDisjunction of texpr * texpr
+  | TNegation of texpr
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list

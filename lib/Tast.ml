@@ -48,6 +48,7 @@ and texpr =
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr
   | TDisjunction of texpr * texpr
+  | TNegation of texpr
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
@@ -109,6 +110,8 @@ let rec get_type = function
   | TConjunction _ ->
      Boolean
   | TDisjunction _ ->
+     Boolean
+  | TNegation _ ->
      Boolean
   | TIfExpression (_, t, _) ->
      get_type t
