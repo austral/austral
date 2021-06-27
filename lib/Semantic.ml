@@ -143,7 +143,7 @@ let get_callable_decl source_module importing_module callable_name decl  =
 
 (* TODO: Refactor into is_callable_with_name, is_importable, as_callable *)
 
-let get_callable (SemanticModule { name=source_module_name; decls; imported_classes; _ }, importing_module_name, callable_name) =
+let get_module_callable (SemanticModule { name=source_module_name; decls; imported_classes; _ }, importing_module_name, callable_name) =
   match List.find_map (get_callable_decl source_module_name importing_module_name callable_name) decls with
   | (Some decl) -> Some decl
   | None ->

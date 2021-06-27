@@ -5,6 +5,8 @@ open Type
    types. These are created as part of the type checking process. *)
 type type_bindings
 
+val binding_count : type_bindings -> int
+
 val empty_bindings : type_bindings
 
 val merge_bindings : type_bindings -> type_bindings -> type_bindings

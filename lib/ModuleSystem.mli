@@ -9,4 +9,5 @@ val get_module : menv -> module_name -> semantic_module option
 
 val get_decl : menv -> qident -> sem_decl option
 
+(* The second argument is the name of the module where typechecking is taking place. *)
 val get_callable : menv -> module_name -> qident -> callable option

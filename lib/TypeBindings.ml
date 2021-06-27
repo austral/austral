@@ -3,8 +3,10 @@ open IdentifierMap
 open Error
 open Type
 
-
 type type_bindings = TypeBindings of ty IdentifierMap.t
+
+let binding_count (TypeBindings m) =
+  IdentifierMap.cardinal m
 
 let empty_bindings = TypeBindings IdentifierMap.empty
 

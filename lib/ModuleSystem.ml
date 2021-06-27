@@ -20,6 +20,6 @@ let get_decl menv name =
 let get_callable menv importing_module_name name =
   match get_module menv (source_module_name name) with
   | (Some sm) ->
-     get_callable (sm, importing_module_name, original_name name)
+     get_module_callable (sm, importing_module_name, original_name name)
   | None ->
      None
