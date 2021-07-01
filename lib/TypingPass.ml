@@ -4,6 +4,7 @@ open TypeSystem
 open TypeBindings
 open TypeMatch
 open TypeVarSet
+open TypeParser
 open LexEnv
 open ModuleSystem
 open Ast
@@ -135,7 +136,7 @@ and augment_callable (name: qident) (callable: callable) (asserted_ty: ty option
   | FunctionCallable (typarams, params, rt) ->
      augment_function_call name typarams params rt asserted_ty args
   | RecordConstructor (typarams, universe, slots) ->
-     augment_record_constructor typarams universe slots asserted_ty args
+     augment_record_constructor name typarams universe slots asserted_ty args
   | UnionConstructor { type_name; type_params; universe; case } ->
      augment_union_constructor type_name type_params universe case asserted_ty args
   | MethodCallable { type_class_name; type_class_type_parameter; method_name; value_parameters; return_type } ->
@@ -155,8 +156,39 @@ and augment_function_call name typarams params rt asserted_ty args =
   check_bindings typarams bindings;
   TFuncall (name, arguments, rt'')
 
-and augment_record_constructor _ _ _ _ _ =
-  err "TODO"
+and augment_record_constructor (name: qident) (typarams: type_parameter list) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
+  (* Check: he argument list must be named *)
+  let args' = (match args with
+               | TPositionalArglist _ ->
+                  err "Arguments to a record constructor must be named"
+               | TNamedArglist a ->
+                  a) in
+  (* Check: the set of slots matches the set of param names *)
+  let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
+  let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
+  let sorter a b = compare (ident_string a) (ident_string b) in
+  if (List.sort sorter slot_names) <> (List.sort sorter argument_names) then
+    err "Slot names don't match argument names"
+  else
+    (* Convert args to positional *)
+    let arguments = arglist_to_positional (args, slot_names) in
+    (* Check the list of params against the list of arguments *)
+    let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
+    let bindings = check_argument_list params arguments in
+    (* Use the bindings to get the effective return type *)
+    let rt = NamedType (name,
+                        List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams,
+                        universe)
+    in
+    let rt' = replace_variables bindings rt in
+    let rt'' = handle_return_type_polymorphism typarams rt' asserted_ty in
+    (* Check: the set of bindings equals the set of type parameters *)
+    check_bindings typarams bindings;
+    (* Check the resulting type is in the correct universe *)
+    if universe_compatible universe (type_universe rt'') then
+      TRecordConstructor (rt'', List.map2 (fun a b -> (a, b)) slot_names arguments)
+    else
+      err "Universe mismatch"
 
 and augment_union_constructor _ _ _ _ _ =
   err "TODO"
@@ -223,7 +255,7 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
     let check (TypeParameter (n, u)): unit =
       (match get_binding bindings n with
        | Some ty ->
-          if u = type_universe ty then
+          if universe_compatible u (type_universe ty) then
             ()
           else
             err "Mismatched universes"
