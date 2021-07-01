@@ -157,7 +157,7 @@ and augment_function_call name typarams params rt asserted_ty args =
   TFuncall (name, arguments, rt'')
 
 and augment_record_constructor (name: qident) (typarams: type_parameter list) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
-  (* Check: he argument list must be named *)
+  (* Check: the argument list must be named *)
   let args' = (match args with
                | TPositionalArglist _ ->
                   err "Arguments to a record constructor must be named"
@@ -190,8 +190,40 @@ and augment_record_constructor (name: qident) (typarams: type_parameter list) (u
     else
       err "Universe mismatch"
 
-and augment_union_constructor _ _ _ _ _ =
-  err "TODO"
+and augment_union_constructor (type_name: qident) (typarams: type_parameter list) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
+  (* Check: the argument list must be named *)
+  let args' = (match args with
+               | TPositionalArglist _ ->
+                  err "Arguments to a union constructor must be named"
+               | TNamedArglist a ->
+                  a) in
+  (* Check: the set of slots matches the set of param names *)
+  let (TypedCase (case_name, slots)) = case in
+  let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
+  let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
+  let sorter a b = compare (ident_string a) (ident_string b) in
+  if (List.sort sorter slot_names) <> (List.sort sorter argument_names) then
+    err "Slot names don't match argument names"
+  else
+    (* Convert args to positional *)
+    let arguments = arglist_to_positional (args, slot_names) in
+    (* Check the list of params against the list of arguments *)
+    let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
+    let bindings = check_argument_list params arguments in
+    (* Use the bindings to get the effective return type *)
+    let rt = NamedType (type_name,
+                        List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams,
+                        universe)
+    in
+    let rt' = replace_variables bindings rt in
+    let rt'' = handle_return_type_polymorphism typarams rt' asserted_ty in
+    (* Check: the set of bindings equals the set of type parameters *)
+    check_bindings typarams bindings;
+    (* Check the resulting type is in the correct universe *)
+    if universe_compatible universe (type_universe rt'') then
+      TUnionConstructor (rt'', case_name, List.map2 (fun a b -> (a, b)) slot_names arguments)
+    else
+      err "Universe mismatch"
 
 and augment_method_call _ _ _ _ _ _ =
   err "TODO"
