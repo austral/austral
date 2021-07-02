@@ -1,48 +1,24 @@
-open IdentifierMap
+open Identifier
 open Type
 open Error
 
-type scope = Scope of ty IdentifierMap.t
-
-(* The first element is the innermost scope. *)
-type lexenv = LexEnv of scope list
+type lexenv = (identifier * ty) list
 
 let empty_lexenv =
-  LexEnv []
+  []
 
-let empty_scope =
-  Scope IdentifierMap.empty
+let get_var l name =
+  Option.map (fun (_, t) -> t) (List.find_opt (fun (n, _) -> n = name) l)
 
-let push_scope (LexEnv l) =
-  LexEnv (List.cons empty_scope l)
-
-let pop_scope (LexEnv l) =
-  match l with
-  | _::rest -> LexEnv rest
-  | [] -> err "Empty lexical environment"
-
-let rec get_var' l name =
-  match l with
-  | first::rest ->
-     let (Scope m) = first in
-     (match IdentifierMap.find_opt name m with
-      | Some ty ->
-         Some ty
-      | None ->
-         get_var' rest name)
-  | [] -> None
-
-let get_var (LexEnv l) name =
-  get_var' l name
-
-let add_var lenv name ty =
-  match get_var lenv name with
-  | Some _ ->
-     err "Binding already exists in lexenv"
+let push_var l name ty =
+  match get_var l name with
+  | (Some _) ->
+     err "push_var: var with this name already exists"
   | None ->
-     let (LexEnv scopes) = lenv in
-     match scopes with
-     | (Scope s)::rest ->
-        LexEnv (List.cons (Scope (IdentifierMap.add name ty s)) rest)
-     | [] ->
-        LexEnv [Scope (IdentifierMap.singleton name ty)]
+     (name, ty) :: l
+
+let pop_var = function
+  | (_::rest) ->
+     rest
+  | [] ->
+     err "pop_var called with empty lexenv"
