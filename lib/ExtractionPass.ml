@@ -30,7 +30,7 @@ let rec extract_declarations (module_name: module_name) (menv: menv) local_types
   List.map (extract_declaration module_name menv local_types) decls
 
 and extract_declaration (module_name: module_name) (menv: menv) (local_types: type_signature list) (def: combined_definition) =
-  let parse' = parse menv local_types in
+  let parse' = parse_type menv local_types in
   let rec parse_slot (typarams: type_parameter list) (QualifiedSlot (n, ts)): typed_slot =
     TypedSlot (n, parse' typarams ts)
   and parse_case (typarams: type_parameter list) (QualifiedCase (n, ss)): typed_case =

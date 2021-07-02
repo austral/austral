@@ -121,7 +121,7 @@ let get_type_signature menv sigs name =
 
 (* Parsing *)
 
-let rec parse menv sigs typarams (QTypeSpecifier (name, args)) =
+let rec parse_type menv sigs typarams (QTypeSpecifier (name, args)) =
   match is_built_in_type (ident_string (original_name name)) with
   | Some ty ->
      ty
@@ -157,7 +157,7 @@ and parse_user_defined_type' (menv: menv) (sigs: type_signature list) (ts: type_
   check_param_arity_matches ts_params args;
   (* Check: the universe of each type argument matches the universe of each type
      parameter in the type signature. *)
-  let args' = List.map (parse menv sigs typarams) args in
+  let args' = List.map (parse_type menv sigs typarams) args in
   check_universes_match ts_params args';
   (* Construct the named type *)
   let universe = effective_universe ts_params declared_universe args' in
