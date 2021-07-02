@@ -1,4 +1,4 @@
-(ocamllex lexer)
+(ocamllex Lexer)
 
 (library
  (name austral_core)

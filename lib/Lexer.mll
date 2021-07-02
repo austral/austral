@@ -1,4 +1,5 @@
 {
+open Lexing
 open Error
 open Tokens
 }
