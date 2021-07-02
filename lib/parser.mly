@@ -1,26 +1,42 @@
+%{
+open Identifier
+open Cst
+%}
+
+/* Identifiers and constants */
+%token <string> IDENTIFIER
+%token NIL
+%token TRUE
+%token FALSE
+%token <string> INT_CONSTANT
+%token <string> FLOAT_CONSTANT
+/* Brackets */
+%token LPAREN
+%token RPAREN
+%token LBRACKET
+%token RBRACKET
+/* Arithmetic operators */
 %token PLUS
 %token MINUS
 %token MUL
 %token DIV
-%token
+/* Comparison operators */
+%token EQ
+%token NEQ
+%token LT
+%token LTE
+%token GT
+%token GTE
+/* Keywords */
 %token MODULE
 %token IS
-%token END
 %token BODY
 %token IMPORT
-%token LPAREN
-%token RPAREN
-%token SEMI
-%token COMMA
-%token AS
+%token END
 %token CONSTANT
-%token COLON
 %token TYPE
-%token LBRACKET
-%token RBRACKET
 %token FUNCTION
 %token GENERIC
-%token ASSIGN
 %token RECORD
 %token UNION
 %token CASE
@@ -29,49 +45,53 @@
 %token INTERFACE
 %token IMPLEMENTATION
 %token METHOD
-%token DOCSTRING_MARKER
 %token IF
 %token THEN
 %token ELSE
 %token LET
 %token WHILE
-%token DO
 %token FOR
+%token DO
 %token FROM
 %token TO
 %token RETURN
-%token BEGIN
-%token BORROW
-%token IN
-%token SKIP_TOKEN
-%token NIL
-%token TRUE
-%token FALSE
-%token PERIOD
-%token DQUOTE
-%token AND
-%token OR
-%token NOT
+%token SKIP
+/* Symbols */
+%token SEMI
+%token COMMA
+%token COLON
 %token RIGHT_ARROW
-%token UNDERSCORE
-%token PRAGMA
-
-%token UNIVERSE_FREE
-%token UNIVERSE_LINEAR
-%token UNIVERSE_TYPE
-%token UNIVERSE_REGION
-
-%token EQUAL
-%token NOT_EQUAL
-%token LESS_THAN
-%token LESS_THAN_OR_EQUAL
-%token GREATER_THAN
-%token GREATER_THAN_OR_EQUAL
-
+/* etc. */
 %token EOF
+
+/* Types */
+
+%type <cexpr> expression
+%type <cexpr> atomic_expression
+%type <concrete_arglist> argument_list
+%type <identifier * cexpr> named_arg
+
+%start expression
 
 %%
 
-program:
-  | module_interface
-  | module_body
+expression:
+  | v=atomic_expression { v }
+  ;
+
+atomic_expression:
+  | NIL { CNilConstant }
+  | TRUE { CBoolConstant true }
+  | FALSE { CBoolConstant false }
+  | i=INT_CONSTANT { CIntConstant i }
+  | f=FLOAT_CONSTANT { CFloatConstant f }
+  | v=IDENTIFIER { CVariable (make_ident v) }
+  | n=IDENTIFIER LPAREN args=argument_list RPAREN { CFuncall (make_ident n, args) }
+  | LPAREN e=expression RPAREN { e }
+
+argument_list:
+  | args=separated_list(COMMA, named_arg) { ConcreteNamedArgs args }
+  | args=separated_list(COMMA, expression) { ConcretePositionalArgs args }
+
+named_arg:
+  | n=IDENTIFIER RIGHT_ARROW v=expression { (make_ident n, v) }
