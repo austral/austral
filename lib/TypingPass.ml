@@ -14,8 +14,8 @@ open Error
 
 (* Since the semantic extraction pass has already happened, we can simplify the
    call to `parse_type` by passing an empty list of local type signatures. *)
-let parse_typespec (menv: menv) (typarams: type_parameter list) (ty: qtypespec): ty =
-  parse_type menv [] typarams ty
+(*let parse_typespec (menv: menv) (typarams: type_parameter list) (ty: qtypespec): ty =
+  parse_type menv [] typarams ty*)
 
 let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
   let aug = augment_expr module_name menv lexenv asserted_ty in
