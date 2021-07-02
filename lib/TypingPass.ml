@@ -12,6 +12,11 @@ open Tast
 open Semantic
 open Error
 
+(* Since the semantic extraction pass has already happened, we can simplify the
+   call to `parse_type` by passing an empty list of local type signatures. *)
+let parse_typespec (menv: menv) (typarams: type_parameter list) (ty: qtypespec): ty =
+  parse_type menv [] typarams ty
+
 let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
   let aug = augment_expr module_name menv lexenv asserted_ty in
   match expr with
@@ -282,6 +287,8 @@ and is_return_type_polymorphic (typarams: type_parameter list) (rt: ty): bool =
     List.filter (fun (TypeVariable (n, _)) -> List.exists (fun (TypeParameter (n', _)) -> n = n') typarams) vars in
   List.length vars_without_parameters > 0
 
+(* Check that there are as many bindings as there are type parameters, and that
+   every type parameter is satisfied. *)
 and check_bindings (typarams: type_parameter list) (bindings: type_bindings): unit =
   if (List.length typarams) = (binding_count bindings) then
     let check (TypeParameter (n, u)): unit =
@@ -298,3 +305,20 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
     ()
   else
     err "Not the same number of bindings and parameters"
+
+(*
+let augment_stmt (module_name: module_name) (menv: menv) (typarams: type_parameter list) (lexenv: lexenv) (stmt: astmt): tstmt =
+  match stmt with
+  | ASkip ->
+     TSkip
+  | ALet (name, ty, value) ->
+     let ty' = parse_typespec menv typarams ty in
+     let value' = augment_expr module_name menv lexenv (Some ty') value in
+     if ty' = (get_type value') then
+       let lexenv' = push_var lexenv name ty' in
+       lexenv'
+     else
+       err "let: type mismatch"
+  | _ ->
+     err "TODO"
+ *)
