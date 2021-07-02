@@ -69,29 +69,36 @@ open Cst
 %type <cexpr> expression
 %type <cexpr> atomic_expression
 %type <concrete_arglist> argument_list
-%type <identifier * cexpr> named_arg
+%type <cexpr list> positional_arglist
 
 %start expression
 
 %%
 
 expression:
-  | v=atomic_expression { v }
+  | atomic_expression { $1 }
   ;
 
 atomic_expression:
   | NIL { CNilConstant }
-  | TRUE { CBoolConstant true }
-  | FALSE { CBoolConstant false }
-  | i=INT_CONSTANT { CIntConstant i }
-  | f=FLOAT_CONSTANT { CFloatConstant f }
-  | v=IDENTIFIER { CVariable (make_ident v) }
-  | n=IDENTIFIER LPAREN args=argument_list RPAREN { CFuncall (make_ident n, args) }
-  | LPAREN e=expression RPAREN { e }
+  | IDENTIFIER LPAREN argument_list RPAREN { CFuncall (make_ident $1, $3) }
+  | LPAREN expression RPAREN { $2 }
+  ;
 
 argument_list:
-  | args=separated_list(COMMA, named_arg) { ConcreteNamedArgs args }
-  | args=separated_list(COMMA, expression) { ConcretePositionalArgs args }
+  | positional_arglist  { ConcretePositionalArgs $1 }
+  | named_arglist { ConcreteNamedArgs $1 }
+  ;
+
+positional_arglist:
+  | expression COMMA positional_arglist { $1 :: $3 }
+  | expression { $1 }
+  ;
+
+named_arglist:
+  | named_arg COMMA named_arglist { $1 :: $3 }
+  | named_arg { $1 }
+  ;
 
 named_arg:
-  | n=IDENTIFIER RIGHT_ARROW v=expression { (make_ident n, v) }
+  | IDENTIFIER RIGHT_ARROW expression { (make_ident $1, $3) }
