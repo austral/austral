@@ -11,8 +11,8 @@ let rec abs_stmt im stmt =
      ALet (name, qualify_typespec im ty, abs_expr im value)
   | CAssign (name, value) ->
      AAssign (name, abs_expr im value)
-  | CIf (condition_branches, else_branch) ->
-     abs_if im condition_branches else_branch
+  | CIf (c, t, f) ->
+     AIf (abs_expr im c, abs_stmt im t, abs_stmt im f)
   | CCase (e, cases) ->
      ACase (abs_expr im e, List.map (abs_when im) cases)
   | CWhile (c, b) ->
@@ -53,13 +53,6 @@ and abs_expr im expr =
      Negation (abs_expr im e)
   | CIfExpression (c, t, f) ->
      IfExpression (abs_expr im c, abs_expr im t, abs_expr im f)
-
-and abs_if (im: import_map) (cbranches: condition_branch list) (else_branch: cstmt): astmt =
-  match cbranches with
-  | (ConditionBranch (c, b))::rest ->
-     AIf (abs_expr im c, abs_stmt im b, abs_if im rest else_branch)
-  | [] ->
-     ASkip
 
 and abs_when im (ConcreteWhen (name, params, body)) =
     AbstractWhen (name,

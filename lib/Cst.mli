@@ -82,7 +82,7 @@ and cstmt =
   | CSkip
   | CLet of identifier * typespec * cexpr
   | CAssign of identifier * cexpr
-  | CIf of condition_branch list * cstmt
+  | CIf of cexpr * cstmt * cstmt
   | CCase of cexpr * concrete_when list
   | CWhile of cexpr * cstmt
   | CFor of identifier * cexpr * cexpr * cstmt

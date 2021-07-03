@@ -2,6 +2,13 @@
 open Identifier
 open Common
 open Cst
+open Error
+
+let parse_error _ =
+  let s = Parsing.symbol_start ()
+  and e = Parsing.symbol_end ()
+  in
+  raise (AustralParseError (s, e))
 %}
 
 /* Brackets */
@@ -59,6 +66,7 @@ open Cst
 %token COMMA
 %token COLON
 %token RIGHT_ARROW
+%token ASSIGN
 /* Identifiers and constants */
 %token NIL
 %token TRUE
@@ -71,25 +79,57 @@ open Cst
 
 /* Types */
 
+%type <Cst.cstmt> statement
 %type <Cst.cexpr> expression
-%type <Cst.cexpr> atomic_expression
-%type <Cst.cexpr> variable
-%type <Cst.cexpr> funcall
-%type <Cst.cexpr> parenthesized_expr
-%type <Cst.concrete_arglist> argument_list
-%type <Cst.cexpr list> positional_arglist
-%type <(Identifier.identifier * Cst.cexpr) list> named_arglist
-%type <(Identifier.identifier * Cst.cexpr)> named_arg
 
-%type <Cst.cexpr> compound_expression
-%type <Common.comparison_operator> comp_op
-%type <Cst.cexpr> arith_expr
-%type <Cst.cexpr> term
-%type <Cst.cexpr> factor
-
-%start expression
+%start statement expression
 
 %%
+
+/* Declarations *)
+
+/* Statements */
+
+statement:
+  | if_statement { $1 }
+  | LET identifier COLON typespec ASSIGN expression SEMI { CLet ($2, $4, $6) }
+  | identifier ASSIGN expression SEMI { CAssign ($1, $3) }
+  | expression SEMI { CDiscarding $1 }
+  | CASE expression OF whenlist END CASE SEMI { CCase ($2, $4) }
+  | WHILE expression DO block END WHILE SEMI { CWhile ($2, $4) }
+  | FOR identifier FROM expression TO expression DO block END FOR SEMI { CFor ($2, $4, $6, $8) }
+  | RETURN expression SEMI { CReturn $2 }
+  | SKIP SEMI { CSkip }
+  ;
+
+if_statement:
+  | IF expression THEN block else_clause { CIf ($2, $4, $5) }
+  ;
+
+else_clause:
+  | ELSE IF expression THEN block else_clause { CIf ($3, $5, $6) }
+  | ELSE block END IF SEMI { $2 }
+  | END IF SEMI { CSkip }
+
+whenlist:
+  | when_stmt whenlist { $1 :: $2 }
+  | when_stmt { [$1] }
+  ;
+
+when_stmt:
+  | WHEN identifier LPAREN parameter_list RPAREN DO block SEMI { ConcreteWhen ($2, $4, $7) }
+  | WHEN identifier DO block SEMI { ConcreteWhen ($2, [], $4) }
+  ;
+
+block:
+  | blocklist { CBlock $1 }
+
+blocklist:
+  | statement blocklist { $1 :: $2 }
+  | statement { [$1] }
+  ;
+
+/* Expressions */
 
 expression:
   | atomic_expression { $1 }
@@ -100,17 +140,27 @@ atomic_expression:
   | NIL { CNilConstant }
   | TRUE { CBoolConstant true }
   | FALSE { CBoolConstant false }
+  | int_constant { $1 }
+  | float_constant { $1 }
   | variable { $1 }
   | funcall { $1 }
   | parenthesized_expr { $1 }
   ;
 
+int_constant:
+  | INT_CONSTANT { CIntConstant $1 }
+  ;
+
+float_constant:
+  | FLOAT_CONSTANT { CFloatConstant $1 }
+  ;
+
 variable:
-  | IDENTIFIER { CVariable (make_ident $1) }
+  | identifier { CVariable $1 }
   ;
 
 funcall:
-  | IDENTIFIER LPAREN argument_list RPAREN { CFuncall (make_ident $1, $3) }
+  | identifier LPAREN argument_list RPAREN { CFuncall ($1, $3) }
   ;
 
 parenthesized_expr:
@@ -133,7 +183,7 @@ named_arglist:
   ;
 
 named_arg:
-  | IDENTIFIER RIGHT_ARROW expression { (make_ident $1, $3) }
+  | identifier RIGHT_ARROW expression { ($1, $3) }
 
 compound_expression:
   | atomic_expression comp_op atomic_expression { CComparison ($2, $1, $3) }
@@ -166,7 +216,33 @@ term:
   ;
 
 factor:
+  | int_constant { $1 }
+  | float_constant { $1 }
   | variable { $1 }
   | funcall { $1 }
   | parenthesized_expr { $1 }
   ;
+
+
+/* Common */
+
+identifier:
+  | IDENTIFIER { make_ident $1 }
+  ;
+
+typespec:
+  | identifier LBRACKET typearglist RBRACKET { TypeSpecifier ($1, $3) }
+  | identifier { TypeSpecifier ($1, []) }
+  ;
+
+typearglist:
+  | typespec COMMA typearglist { $1 :: $3 }
+  | typespec { [$1] }
+  ;
+
+parameter_list:
+  | parameter COMMA parameter_list { $1 :: $3 }
+  | parameter { [$1] }
+
+parameter:
+  | identifier COLON typespec { ConcreteParam ($1, $3) }

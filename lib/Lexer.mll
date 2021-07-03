@@ -74,6 +74,7 @@ rule token = parse
   | "," { COMMA }
   | ":" { COLON }
   | "=>" { RIGHT_ARROW }
+  | ":=" { ASSIGN }
   (* Identifiers and constants *)
   | "nil" { NIL }
   | "true" { TRUE }

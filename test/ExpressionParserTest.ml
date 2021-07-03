@@ -1,12 +1,10 @@
 open OUnit2
-open Austral_core.Identifier
 open Austral_core.Common
 open Austral_core.Cst
 open Austral_core.ParserInterface
+open TestUtil
 
 let p = parse_expr
-let eq = assert_equal
-let i = make_ident
 
 let peq (s: string) (v: 'a) =
   eq v (p s)
@@ -37,7 +35,7 @@ let test_parse_arithmetic _ =
   and sub a b = CArith (Subtract, a, b)
   and mul a b = CArith (Multiply, a, b)
   and div a b = CArith (Divide, a, b)
-  and v s = CVariable (make_ident s)
+  and v s = CVariable (i s)
   in
   peq "a" (v "a");
   peq "a+b" (add (v "a") (v "b"));
