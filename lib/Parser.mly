@@ -82,11 +82,7 @@ open Cst
 %type <(Identifier.identifier * Cst.cexpr)> named_arg
 
 %type <Cst.cexpr> compound_expression
-%type <Cst.cexpr> comparison
 %type <Common.comparison_operator> comp_op
-%type <Cst.cexpr> conjunction
-%type <Cst.cexpr> disjunction
-%type <Cst.cexpr> negation
 %type <Cst.cexpr> arith_expr
 %type <Cst.cexpr> term
 %type <Cst.cexpr> factor
@@ -140,15 +136,12 @@ named_arg:
   | IDENTIFIER RIGHT_ARROW expression { (make_ident $1, $3) }
 
 compound_expression:
-  | comparison { $1 }
-  | conjunction { $1 }
-  | disjunction { $1 }
-  | negation { $1 }
-  | arith_expr { $1 }
-  ;
-
-comparison:
   | atomic_expression comp_op atomic_expression { CComparison ($2, $1, $3) }
+  | atomic_expression AND atomic_expression { CConjunction ($1, $3) }
+  | atomic_expression OR atomic_expression { CDisjunction ($1, $3) }
+  | NOT atomic_expression { CNegation $2 }
+  | arith_expr { $1 }
+  | IF expression THEN expression ELSE expression { CIfExpression ($2, $4, $6) }
   ;
 
 comp_op:
@@ -158,18 +151,6 @@ comp_op:
   | LTE { LessThanOrEqual }
   | GT { GreaterThanOrEqual }
   | GTE { GreaterThanOrEqual }
-
-conjunction:
-  | atomic_expression AND atomic_expression { CConjunction ($1, $3) }
-  ;
-
-disjunction:
-  | atomic_expression OR atomic_expression { CDisjunction ($1, $3) }
-  ;
-
-negation:
-  | NOT atomic_expression { CNegation $2 }
-  ;
 
 arith_expr:
   | term PLUS arith_expr { CArith (Add, $1, $3) }
