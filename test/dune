@@ -1,0 +1,3 @@
+(tests
+ (names ExpressionParserTest)
+ (libraries austral_core ounit2))
