@@ -1,5 +1,5 @@
-(ocamllex Lexer)
 (ocamlyacc Parser)
+(ocamllex Lexer)
 
 (library
  (name austral_core)

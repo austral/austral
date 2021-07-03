@@ -1,7 +1,6 @@
 {
-open Lexing
 open Error
-open Tokens
+open Parser
 }
 
 (* Helper regexes *)
@@ -17,20 +16,13 @@ let period = '.'
 
 (* Token regexes *)
 
-let identifier = (alpha) ('_' alpha+)*
+let identifier = (alpha) ('_'|alpha)*
 let int_constant = digit (digit|'\'')+
 let float_constant = int_constant period int_constant (exponent sign int_constant)?
 
 (* Rules *)
 
-rule read_token = parse
-  (* Identifiers and constants *)
-  | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
-  | "nil" { NIL }
-  | "true" { TRUE }
-  | "false" { FALSE }
-  | int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
-  | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
+rule token = parse
   (* Brackets *)
   | "(" { LPAREN }
   | ")" { RPAREN }
@@ -82,6 +74,14 @@ rule read_token = parse
   | "," { COMMA }
   | ":" { COLON }
   | "=>" { RIGHT_ARROW }
+  (* Identifiers and constants *)
+  | "nil" { NIL }
+  | "true" { TRUE }
+  | "false" { FALSE }
+  | int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
+  | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
+  | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
+  | whitespace { token lexbuf }
   | eof { EOF }
   | _ {err ("Character not allowed in source text: " ^ Lexing.lexeme lexbuf) }
