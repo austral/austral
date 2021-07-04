@@ -256,13 +256,8 @@ identifier:
   ;
 
 typespec:
-  | identifier LBRACKET typearglist RBRACKET { TypeSpecifier ($1, $3) }
+  | identifier LBRACKET separated_list(COMMA, typespec) RBRACKET { TypeSpecifier ($1, $3) }
   | identifier { TypeSpecifier ($1, []) }
-  ;
-
-typearglist:
-  | typespec COMMA typearglist { $1 :: $3 }
-  | typespec { [$1] }
   ;
 
 universe:
