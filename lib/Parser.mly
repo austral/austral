@@ -114,6 +114,7 @@ standalone_identifier:
 declaration:
   | constant_decl { $1 }
   | type_decl { $1 }
+  | type_definition { $1 }
   ;
 
 constant_decl:
@@ -121,7 +122,16 @@ constant_decl:
   ;
 
 type_decl:
-  | doc=docstringopt TYPE name=identifier typarams=type_parameter_list COLON universe=universe SEMI { ConcreteOpaqueTypeDecl (name, typarams, universe, doc) }
+  | doc=docstringopt TYPE name=identifier
+    typarams=type_parameter_list COLON universe=universe
+    SEMI { ConcreteOpaqueTypeDecl (name, typarams, universe, doc) }
+  ;
+
+type_definition:
+  | doc=docstringopt TYPE name=identifier
+    typarams=type_parameter_list COLON universe=universe
+    IS def=typespec
+    SEMI { ConcreteTypeAliasDecl (ConcreteTypeAlias (name, typarams, universe, def, doc)) }
   ;
 
 /* Statements */
