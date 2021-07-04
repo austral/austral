@@ -115,8 +115,7 @@ declaration:
   ;
 
 constant_decl:
-  | CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($2, $4, Docstring "") }
-  | docstring CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($3, $5, $1) }
+  | docstringopt CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($3, $5, $1) }
   ;
 
 /* Statements */
@@ -290,3 +289,6 @@ parameter:
 docstring:
   | DOCSTRING_MARKER { Docstring "" }
   ;
+
+docstringopt:
+  | option(docstring) { Option.value $1 ~default:(Docstring "") }
