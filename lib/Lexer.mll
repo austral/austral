@@ -69,6 +69,11 @@ rule token = parse
   | "to" { TO }
   | "return" { RETURN }
   | "skip" { SKIP }
+  | "Free" { UNIVERSE_FREE }
+  | "Linear" { UNIVERSE_LINEAR }
+  | "Type" { UNIVERSE_TYPE }
+  | "Region" { UNIVERSE_REGION }
+  | "pragma" { PRAGMA }
   (* Symbols *)
   | ";" { SEMI }
   | "," { COMMA }

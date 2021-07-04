@@ -1,6 +1,7 @@
 open Identifier
 open Common
 open Type
+open Error
 
 type concrete_module_interface =
   ConcreteModuleInterface of module_name * concrete_import_list list * concrete_decl list
@@ -159,3 +160,12 @@ let get_instance_def (ConcreteModuleBody (_, _, defs)) (name: identifier) (typar
     (name = name') && (typarams = typarams') && (ty = ty')
   in
   List.find_opt pred (List.filter_map filter defs)
+
+let make_pragma name args =
+  let s = ident_string name in
+  if s = "Foreign_Import" then
+    match args with
+    | (ConcretePositionalArgs [CStringConstant f]) -> ForeignImportPragma f
+    | _ -> err "Invalid foreign import pragma"
+  else
+    err ("Unknown pragma: " ^ s)

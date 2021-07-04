@@ -59,6 +59,7 @@ open Type
 %token UNIVERSE_LINEAR
 %token UNIVERSE_TYPE
 %token UNIVERSE_REGION
+%token PRAGMA
 /* Symbols */
 %token SEMI
 %token COMMA
@@ -163,13 +164,18 @@ case:
   ;
 
 function_decl:
-  | doc=docstringopt FUNCTION name=identifier LPAREN params=parameter_list RPAREN
-    COLON rt=typespec SEMI
-    { ConcreteFunctionDecl (name, [], params, rt, doc) }
-  | doc=docstringopt GENERIC typarams=type_parameter_list
+  | doc=docstringopt typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
     COLON rt=typespec SEMI
     { ConcreteFunctionDecl (name, typarams, params, rt, doc) }
+  ;
+
+generic_segment:
+  | option(generic_segment_inner) { Option.value $1 ~default:[] }
+  ;
+
+generic_segment_inner:
+  | GENERIC type_parameter_list { $2 }
   ;
 
 typeclass_def:
@@ -194,11 +200,27 @@ instance_decl:
 
 body_decl:
   | constant_def { $1 }
+  | type_definition { $1 }
+  | record_definition { $1 }
+  | union_definition { $1 }
+  | function_def { $1 }
   ;
 
 constant_def:
   | doc=docstringopt CONSTANT name=identifier COLON ty=typespec
     IS v=expression SEMI { ConcreteConstantDecl (name, ty, v, doc) }
+  ;
+
+function_def:
+  | doc=docstringopt typarams=generic_segment
+    FUNCTION name=identifier LPAREN params=parameter_list RPAREN
+    COLON rt=typespec IS pragmas=pragma* body=block SEMI
+    { ConcreteFunctionDef (name, typarams, params, rt, body, docstring, pragmas) }
+  ;
+
+pragma:
+  | PRAGMA name=pragma LPAREN args=argument_list RPAREN SEMI
+    { make_pragma name args }
   ;
 
 /* Statements */
