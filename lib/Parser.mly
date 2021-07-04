@@ -2,7 +2,6 @@
 open Identifier
 open Common
 open Cst
-open Type
 %}
 
 /* Brackets */
@@ -79,15 +78,35 @@ open Type
 
 /* Types */
 
-%type <Cst.concrete_decl> declaration
-%type <Cst.cstmt> statement
-%type <Cst.cexpr> expression
-%type <Type.universe> universe
-%type <Identifier.identifier> identifier
+%type <Cst.concrete_decl> standalone_declaration
+%type <Cst.cstmt> standalone_statement
+%type <Cst.cexpr> standalone_expression
+%type <Identifier.identifier> standalone_identifier
 
-%start declaration statement expression universe identifier
+%start standalone_declaration
+%start standalone_statement
+%start standalone_expression
+%start standalone_identifier
 
 %%
+
+/* Entrypoints */
+
+standalone_declaration:
+  | declaration EOF { $1 }
+  ;
+
+standalone_statement:
+  | statement EOF { $1 }
+  ;
+
+standalone_expression:
+  | expression EOF { $1 }
+  ;
+
+standalone_identifier:
+  | identifier EOF { $1 }
+  ;
 
 /* Declarations */
 

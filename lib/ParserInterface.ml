@@ -21,7 +21,7 @@ let parse' f s =
     err ("Parse error: " ^ (position_text s lexbuf))
 
 let parse_stmt s =
-  parse' Parser.statement s
+  parse' Parser.standalone_statement s
 
 let parse_expr s =
-  parse' Parser.expression s
+  parse' Parser.standalone_expression s
