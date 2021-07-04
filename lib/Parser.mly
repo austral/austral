@@ -79,12 +79,12 @@ open Type
 
 /* Types */
 
-%type <Cst.concrete_decl> standalone_declaration
+%type <Cst.concrete_decl> standalone_interface_decl
 %type <Cst.cstmt> standalone_statement
 %type <Cst.cexpr> standalone_expression
 %type <Identifier.identifier> standalone_identifier
 
-%start standalone_declaration
+%start standalone_interface_decl
 %start standalone_statement
 %start standalone_expression
 %start standalone_identifier
@@ -93,8 +93,8 @@ open Type
 
 /* Entrypoints */
 
-standalone_declaration:
-  | declaration EOF { $1 }
+standalone_interface_decl:
+  | interface_decl EOF { $1 }
   ;
 
 standalone_statement:
@@ -111,7 +111,7 @@ standalone_identifier:
 
 /* Declarations */
 
-declaration:
+interface_decl:
   | constant_decl { $1 }
   | type_decl { $1 }
   | type_definition { $1 }
@@ -190,6 +190,15 @@ instance_decl:
     { ConcreteInstanceDecl (name, typarams, arg, doc) }
   | doc=docstringopt INSTANCE name=identifier LPAREN arg=typespec RPAREN SEMI
     { ConcreteInstanceDecl (name, [], arg, doc) }
+  ;
+
+body_decl:
+  | constant_def { $1 }
+  ;
+
+constant_def:
+  | doc=docstringopt CONSTANT name=identifier COLON ty=typespec
+    IS v=expression SEMI { ConcreteConstantDecl (name, ty, v, doc) }
   ;
 
 /* Statements */
