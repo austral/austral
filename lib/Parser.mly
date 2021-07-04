@@ -185,7 +185,7 @@ variable:
   ;
 
 funcall:
-  | identifier LPAREN argument_list RPAREN { CFuncall ($1, $3) }
+  | identifier argument_list { CFuncall ($1, $2) }
   ;
 
 parenthesized_expr:
@@ -193,18 +193,17 @@ parenthesized_expr:
   ;
 
 argument_list:
-  | positional_arglist  { ConcretePositionalArgs $1 }
-  | named_arglist { ConcreteNamedArgs $1 }
+  | LPAREN positional_arglist RPAREN { ConcretePositionalArgs $2 }
+  | LPAREN named_arglist RPAREN { ConcreteNamedArgs $2 }
+  | LPAREN RPAREN { ConcretePositionalArgs [] }
   ;
 
 positional_arglist:
-  | expression COMMA positional_arglist { $1 :: $3 }
-  | expression { [$1] }
+  | separated_list(COMMA, expression) { $1 }
   ;
 
 named_arglist:
-  | named_arg COMMA named_arglist { $1 :: $3 }
-  | named_arg { [$1] }
+  | separated_list(COMMA, named_arg) { $1 }
   ;
 
 named_arg:
@@ -268,8 +267,7 @@ universe:
   ;
 
 parameter_list:
-  | parameter COMMA parameter_list { $1 :: $3 }
-  | parameter { [$1] }
+  | separated_list(COMMA, parameter) { $1 }
   ;
 
 parameter:
