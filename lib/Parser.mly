@@ -115,6 +115,7 @@ declaration:
   | constant_decl { $1 }
   | type_decl { $1 }
   | type_definition { $1 }
+  | record_definition { $1 }
   ;
 
 constant_decl:
@@ -132,6 +133,17 @@ type_definition:
     typarams=type_parameter_list COLON universe=universe
     IS def=typespec
     SEMI { ConcreteTypeAliasDecl (ConcreteTypeAlias (name, typarams, universe, def, doc)) }
+  ;
+
+record_definition:
+  | doc=docstringopt RECORD name=identifier
+    typarams=type_parameter_list COLON universe=universe
+    IS slots=separated_list(COMMA, slot)
+    END RECORD SEMI { ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, doc)) }
+  ;
+
+slot:
+  | name=identifier COLON ty=typespec { ConcreteSlot (name, ty) }
   ;
 
 /* Statements */
