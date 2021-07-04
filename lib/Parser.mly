@@ -3,13 +3,6 @@ open Identifier
 open Common
 open Cst
 open Type
-open Error
-
-let parse_error _ =
-  let s = Parsing.symbol_start ()
-  and e = Parsing.symbol_end ()
-  in
-  raise (AustralParseError (s, e))
 %}
 
 /* Brackets */
@@ -86,10 +79,13 @@ let parse_error _ =
 
 /* Types */
 
+%type <Cst.concrete_decl> declaration
 %type <Cst.cstmt> statement
 %type <Cst.cexpr> expression
+%type <Type.universe> universe
+%type <Identifier.identifier> identifier
 
-%start statement expression
+%start declaration statement expression universe identifier
 
 %%
 
@@ -103,7 +99,6 @@ constant_decl:
   | CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($2, $4, Docstring "") }
   | docstring CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($3, $5, $1) }
   ;
-
 
 /* Statements */
 
