@@ -118,6 +118,7 @@ declaration:
   | record_definition { $1 }
   | union_definition { $1 }
   | function_decl { $1 }
+  | typeclass_def { $1 }
   | instance_decl { $1 }
   ;
 
@@ -169,6 +170,18 @@ function_decl:
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
     COLON rt=typespec SEMI
     { ConcreteFunctionDecl (name, typarams, params, rt, doc) }
+  ;
+
+typeclass_def:
+  | doc=docstringopt TYPECLASS name=identifier LPAREN typaram=type_parameter
+    IS methods=method_decl* END TYPECLASS SEMI
+    { ConcreteTypeClassDecl (ConcreteTypeClass (name, typaram, methods, doc)) }
+  ;
+
+method_decl:
+  | doc=docstringopt METHOD name=identifier
+    LPAREN params=parameter_list RPAREN COLON rt=typespec SEMI
+   { ConcreteMethodDecl (name, params, rt, doc) }
   ;
 
 instance_decl:
