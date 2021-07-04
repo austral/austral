@@ -125,7 +125,7 @@ statement:
   | LET identifier COLON typespec ASSIGN expression SEMI { CLet ($2, $4, $6) }
   | identifier ASSIGN expression SEMI { CAssign ($1, $3) }
   | expression SEMI { CDiscarding $1 }
-  | CASE expression OF whenlist END CASE SEMI { CCase ($2, $4) }
+  | CASE expression OF when_stmt* END CASE SEMI { CCase ($2, $4) }
   | WHILE expression DO block END WHILE SEMI { CWhile ($2, $4) }
   | FOR identifier FROM expression TO expression DO block END FOR SEMI { CFor ($2, $4, $6, $8) }
   | RETURN expression SEMI { CReturn $2 }
@@ -140,11 +140,6 @@ else_clause:
   | ELSE IF expression THEN block else_clause { CIf ($3, $5, $6) }
   | ELSE block END IF SEMI { $2 }
   | END IF SEMI { CSkip }
-
-whenlist:
-  | when_stmt whenlist { $1 :: $2 }
-  | when_stmt { [$1] }
-  ;
 
 when_stmt:
   | WHEN identifier LPAREN parameter_list RPAREN DO block SEMI { ConcreteWhen ($2, $4, $7) }
