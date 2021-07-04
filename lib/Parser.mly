@@ -191,11 +191,9 @@ method_decl:
   ;
 
 instance_decl:
-  | doc=docstringopt GENERIC typarams=type_parameter_list
+  | doc=docstringopt typarams=generic_segment
     INSTANCE name=identifier LPAREN arg=typespec RPAREN SEMI
     { ConcreteInstanceDecl (name, typarams, arg, doc) }
-  | doc=docstringopt INSTANCE name=identifier LPAREN arg=typespec RPAREN SEMI
-    { ConcreteInstanceDecl (name, [], arg, doc) }
   ;
 
 body_decl:
@@ -204,6 +202,8 @@ body_decl:
   | record_definition { $1 }
   | union_definition { $1 }
   | function_def { $1 }
+  | typeclass_def { $1 }
+  | instance_def { $1 }
   ;
 
 constant_def:
@@ -214,13 +214,28 @@ constant_def:
 function_def:
   | doc=docstringopt typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
-    COLON rt=typespec IS pragmas=pragma* body=block SEMI
+    COLON rt=typespec IS pragmas=pragma* body=block END FUNCTION SEMI
     { ConcreteFunctionDef (name, typarams, params, rt, body, docstring, pragmas) }
   ;
 
 pragma:
   | PRAGMA name=pragma LPAREN args=argument_list RPAREN SEMI
     { make_pragma name args }
+  ;
+
+instance_def:
+  | doc=docstringopt typarams=generic_segment
+    INSTANCE name=identifier LPAREN arg=typespec RPAREN IS
+    methods=method_def*
+    END INSTANCE SEMI
+    { ConcreteInstanceDef (name, typarams, arg, methods, doc) }
+  ;
+
+method_def:
+  | doc=docstringopt METHOD name=identifier
+    LPAREN params=parameter_list RPAREN COLON rt=typespec
+    IS body=block END METHOD SEMI
+   { ConcreteMethodDef (name, params, rt, body, doc) }
   ;
 
 /* Statements */
