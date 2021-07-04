@@ -75,6 +75,8 @@ rule token = parse
   | ":" { COLON }
   | "=>" { RIGHT_ARROW }
   | ":=" { ASSIGN }
+  (* Strings and docstrings *)
+  | "```" { DOCSTRING_MARKER }
   (* Identifiers and constants *)
   | "nil" { NIL }
   | "true" { TRUE }

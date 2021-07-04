@@ -2,6 +2,7 @@
 open Identifier
 open Common
 open Cst
+open Type
 open Error
 
 let parse_error _ =
@@ -61,12 +62,18 @@ let parse_error _ =
 %token TO
 %token RETURN
 %token SKIP
+%token UNIVERSE_FREE
+%token UNIVERSE_LINEAR
+%token UNIVERSE_TYPE
+%token UNIVERSE_REGION
 /* Symbols */
 %token SEMI
 %token COMMA
 %token COLON
 %token RIGHT_ARROW
 %token ASSIGN
+/* Strings and docstrings */
+%token DOCSTRING_MARKER
 /* Identifiers and constants */
 %token NIL
 %token TRUE
@@ -86,7 +93,17 @@ let parse_error _ =
 
 %%
 
-/* Declarations *)
+/* Declarations */
+
+declaration:
+  | constant_decl { $1 }
+  ;
+
+constant_decl:
+  | CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($2, $4, Docstring "") }
+  | docstring CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($3, $5, $1) }
+  ;
+
 
 /* Statements */
 
@@ -240,9 +257,22 @@ typearglist:
   | typespec { [$1] }
   ;
 
+universe:
+  | UNIVERSE_FREE { FreeUniverse }
+  | UNIVERSE_LINEAR { LinearUniverse }
+  | UNIVERSE_TYPE { TypeUniverse }
+  | UNIVERSE_REGION { RegionUniverse }
+  ;
+
 parameter_list:
   | parameter COMMA parameter_list { $1 :: $3 }
   | parameter { [$1] }
+  ;
 
 parameter:
   | identifier COLON typespec { ConcreteParam ($1, $3) }
+  ;
+
+docstring:
+  | DOCSTRING_MARKER { Docstring "" }
+  ;
