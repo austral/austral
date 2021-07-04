@@ -2,6 +2,7 @@
 open Identifier
 open Common
 open Cst
+open Type
 %}
 
 /* Brackets */
@@ -112,10 +113,15 @@ standalone_identifier:
 
 declaration:
   | constant_decl { $1 }
+  | type_decl { $1 }
   ;
 
 constant_decl:
   | docstringopt CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($3, $5, $1) }
+  ;
+
+type_decl:
+  | doc=docstringopt TYPE name=identifier typarams=type_parameter_list COLON universe=universe SEMI { ConcreteOpaqueTypeDecl (name, typarams, universe, doc) }
   ;
 
 /* Statements */
@@ -273,6 +279,17 @@ parameter_list:
 parameter:
   | identifier COLON typespec { ConcreteParam ($1, $3) }
   ;
+
+type_parameter_list:
+  | option(type_parameter_list_inner) { Option.value $1 ~default:[] }
+  ;
+
+type_parameter_list_inner:
+  | LBRACKET separated_list(COMMA, type_parameter) RBRACKET { $2 }
+  ;
+
+type_parameter:
+  | identifier COLON universe { TypeParameter ($1, $3) }
 
 docstring:
   | DOCSTRING_MARKER { Docstring "" }
