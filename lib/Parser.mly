@@ -138,12 +138,24 @@ type_definition:
 record_definition:
   | doc=docstringopt RECORD name=identifier
     typarams=type_parameter_list COLON universe=universe
-    IS slots=separated_list(COMMA, slot)
+    IS slots=slot*
     END RECORD SEMI { ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, doc)) }
   ;
 
 slot:
-  | name=identifier COLON ty=typespec { ConcreteSlot (name, ty) }
+  | name=identifier COLON ty=typespec SEMI { ConcreteSlot (name, ty) }
+  ;
+
+union_definition:
+  | doc=docstringopt UNION name=identifier
+    typarams=type_parameter_list COLON universe=universe
+    IS case*
+    END RECORD SEMI { ConcreteUnionDecl (ConcreteUnion (name, typarams, universe, cases, doc)) }
+  ;
+
+case:
+  | CASE name=identifier SEMI { ConcreteCase (name, []) }
+  | CASE name=identifier IS slots=slot* { ConcreteCase (name, slots) }
   ;
 
 /* Statements */
