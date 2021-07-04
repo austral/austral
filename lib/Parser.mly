@@ -116,6 +116,8 @@ declaration:
   | type_decl { $1 }
   | type_definition { $1 }
   | record_definition { $1 }
+  | union_definition { $1 }
+  | function_decl { $1 }
   ;
 
 constant_decl:
@@ -149,13 +151,23 @@ slot:
 union_definition:
   | doc=docstringopt UNION name=identifier
     typarams=type_parameter_list COLON universe=universe
-    IS case*
+    IS cases=case*
     END RECORD SEMI { ConcreteUnionDecl (ConcreteUnion (name, typarams, universe, cases, doc)) }
   ;
 
 case:
   | CASE name=identifier SEMI { ConcreteCase (name, []) }
   | CASE name=identifier IS slots=slot* { ConcreteCase (name, slots) }
+  ;
+
+function_decl:
+  | doc=docstringopt FUNCTION name=identifier LPAREN params=parameter_list RPAREN
+    COLON rt=typespec SEMI
+    { ConcreteFunctionDecl (name, [], params, rt, doc) }
+  | doc=docstringopt GENERIC typarams=type_parameter_list
+    FUNCTION name=identifier LPAREN params=parameter_list RPAREN
+    COLON rt=typespec SEMI
+    { ConcreteFunctionDecl (name, typarams, params, rt, doc) }
   ;
 
 /* Statements */
