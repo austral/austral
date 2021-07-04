@@ -41,8 +41,8 @@ open Type
 %token CASE
 %token OF
 %token WHEN
-%token INTERFACE
-%token IMPLEMENTATION
+%token TYPECLASS
+%token INSTANCE
 %token METHOD
 %token IF
 %token THEN
@@ -118,6 +118,7 @@ declaration:
   | record_definition { $1 }
   | union_definition { $1 }
   | function_decl { $1 }
+  | instance_decl { $1 }
   ;
 
 constant_decl:
@@ -168,6 +169,14 @@ function_decl:
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
     COLON rt=typespec SEMI
     { ConcreteFunctionDecl (name, typarams, params, rt, doc) }
+  ;
+
+instance_decl:
+  | doc=docstringopt GENERIC typarams=type_parameter_list
+    INSTANCE name=identifier LPAREN arg=typespec RPAREN SEMI
+    { ConcreteInstanceDecl (name, typarams, arg, doc) }
+  | doc=docstringopt INSTANCE name=identifier LPAREN arg=typespec RPAREN SEMI
+    { ConcreteInstanceDecl (name, [], arg, doc) }
   ;
 
 /* Statements */
