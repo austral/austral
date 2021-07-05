@@ -3,6 +3,7 @@ open Identifier
 open Common
 open Cst
 open Type
+open Util
 %}
 
 /* Brackets */
@@ -329,11 +330,11 @@ atomic_expression:
   ;
 
 int_constant:
-  | INT_CONSTANT { CIntConstant $1 }
+  | INT_CONSTANT { CIntConstant (remove_char $1 '\'') }
   ;
 
 float_constant:
-  | FLOAT_CONSTANT { CFloatConstant $1 }
+  | FLOAT_CONSTANT { CFloatConstant (remove_char $1 '\'') }
   ;
 
 variable:
