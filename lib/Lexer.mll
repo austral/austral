@@ -31,7 +31,7 @@ let comment = "--.\n"
 
 let identifier = (alpha) ('_'|alpha)*
 let int_constant = digit (digit|'\'')*
-let float_constant = int_constant period int_constant (exponent sign int_constant)?
+let float_constant = int_constant period int_constant? (exponent sign? int_constant)?
 
 (* Rules *)
 
@@ -101,8 +101,8 @@ rule token = parse
   | "nil" { NIL }
   | "true" { TRUE }
   | "false" { FALSE }
-  | int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
   | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
+  | int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
   | comment { token lexbuf }
