@@ -381,6 +381,7 @@ comp_op:
   | LTE { LessThanOrEqual }
   | GT { GreaterThanOrEqual }
   | GTE { GreaterThanOrEqual }
+  ;
 
 arith_expr:
   | term PLUS arith_expr { CArith (Add, $1, $3) }
@@ -449,6 +450,7 @@ type_parameter_list_inner:
 
 type_parameter:
   | identifier COLON universe { TypeParameter ($1, $3) }
+  ;
 
 docstring:
   | DOCSTRING_MARKER { Docstring "" }
@@ -456,3 +458,4 @@ docstring:
 
 docstringopt:
   | option(docstring) { Option.value $1 ~default:(Docstring "") }
+  ;
