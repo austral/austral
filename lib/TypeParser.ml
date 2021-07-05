@@ -27,9 +27,9 @@ let is_built_in_type = function
      Some (Integer (Signed, Width32))
   | "Integer_64" ->
      Some (Integer (Signed, Width64))
-  | "SingleFloat" ->
+  | "Single_Float" ->
      Some SingleFloat
-  | "DoubleFloat" ->
+  | "Double_Float" ->
      Some DoubleFloat
   | _ ->
      None
