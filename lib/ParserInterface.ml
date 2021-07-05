@@ -6,7 +6,7 @@ let colnum pos =
 
 let pos_string pos =
   let l = string_of_int pos.pos_lnum
-  and c = string_of_int (colnum pos) in
+  and c = string_of_int ((colnum pos) + 1) in
   "line " ^ l ^ ", column " ^ c
 
 let position_text s lexbuf =
