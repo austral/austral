@@ -5,6 +5,8 @@ type menv
 
 val empty_menv : menv
 
+val put_module : menv -> semantic_module -> menv
+
 val get_module : menv -> module_name -> semantic_module option
 
 val get_decl : menv -> qident -> sem_decl option

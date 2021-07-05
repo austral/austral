@@ -1,6 +1,7 @@
 open Identifier
 open IdentifierMap
 open Semantic
+open Error
 
 type menv = ModuleEnv of semantic_module ModuleNameMap.t
 
@@ -23,3 +24,10 @@ let get_callable menv importing_module_name name =
      get_module_callable (sm, importing_module_name, original_name name)
   | None ->
      None
+
+let put_module m sem =
+  let (SemanticModule { name; _ }) = sem
+  and (ModuleEnv menv) = m in
+  match get_module m name with
+  | None -> ModuleEnv (ModuleNameMap.add name sem menv)
+  | (Some _) -> err "Module with this name already exists"
