@@ -8,17 +8,38 @@ let pos_string pos =
  *)
 let position_text s lexbuf =
   let pos = lexbuf.lex_curr_p
-  and lines = String.split_on_char '\n' s in
-  let line = List.nth lines (pos.pos_lnum - 1) in
-  let second_line = String.init (String.length line) (fun i -> if i = (pos.pos_cnum - 1) then '^' else ' ') in
-  line ^ "\n" ^ second_line
+  and lines = String.split_on_char '\n' s
+  and prefix = "    " in
+  let current_line_prefix = "    " ^ (string_of_int pos.pos_lnum) ^ " |"
+  in
+  let second_line_prefix = String.make (String.length current_line_prefix) ' ' in
+  let previous_line = if pos.pos_lnum = 1 then
+                        None
+                      else
+                        Some ((string_of_int (pos.pos_lnum - 1)) ^ " |" ^ (List.nth lines (pos.pos_lnum - 1)))
+  and nextline = if pos.pos_lnum = (List.length lines) then
+                   None
+                 else
+                   Some ((string_of_int (pos.pos_lnum + 1)) ^ " |" ^ (List.nth lines (pos.pos_lnum + 1)))
+  and current_line = current_line_prefix ^ List.nth lines pos.pos_lnum in
+  let second_line = String.init (String.length current_line) (fun i -> if i = (pos.pos_bol - 1) then '^' else ' ') in
+  let previous_str =
+    (match previous_line with
+     | Some s -> prefix ^ s ^ "\n"
+     | None -> "")
+    and nextline_str =
+      (match nextline with
+       | Some s -> prefix ^ s ^ "\n"
+       | None -> "")
+  in
+  previous_str ^ current_line ^ "\n" ^ second_line_prefix ^ second_line ^ "\n" ^ nextline_str
 
 let parse' f s =
   let lexbuf = Lexing.from_string s in
   try
     f Lexer.token lexbuf
   with Parser.Error ->
-    err ("Parse error: " ^ (position_text s lexbuf))
+    err ("Parse error: \n" ^ (position_text s lexbuf))
 
 let parse_module_int s =
   parse' Parser.module_int s
