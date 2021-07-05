@@ -6,7 +6,7 @@ open Parser
 let advance_line lexbuf =
   let pos = lexbuf.lex_curr_p in
   let pos' = { pos with
-    pos_bol= 1;
+    pos_bol = lexbuf.lex_curr_pos;
     pos_lnum = pos.pos_lnum + 1
   } in
   lexbuf.lex_curr_p <- pos'
@@ -24,6 +24,8 @@ let newline = "\r\n" | "\n"
 let exponent = 'e' | 'E'
 let sign = '+' | '-'
 let period = '.'
+
+let comment = "--.\n"
 
 (* Token regexes *)
 
@@ -103,6 +105,7 @@ rule token = parse
   | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
+  | comment { token lexbuf }
   | whitespace { token lexbuf }
   | newline { advance_line lexbuf; token lexbuf }
   | eof { EOF }
