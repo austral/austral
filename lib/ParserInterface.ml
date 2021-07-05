@@ -20,6 +20,12 @@ let parse' f s =
   with Parser.Error ->
     err ("Parse error: " ^ (position_text s lexbuf))
 
+let parse_module_int s =
+  parse' Parser.module_int s
+
+let parse_module_body s =
+  parse' Parser.module_body s
+
 let parse_stmt s =
   parse' Parser.standalone_statement s
 
