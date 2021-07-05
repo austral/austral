@@ -19,13 +19,13 @@ let alpha = ['a'-'z' 'A'-'Z']
 let alphanum = (alpha|digit)
 let whitespace = [' ' '\t']+
 
-let newline = "\r\n" | "\n"
+let newline = "\r\n" | '\n'
 
 let exponent = 'e' | 'E'
 let sign = '+' | '-'
 let period = '.'
 
-let comment = "--.\n"
+let comment = "--" [^ '\r' '\n']* (newline)
 
 (* Token regexes *)
 
@@ -36,6 +36,8 @@ let float_constant = int_constant period int_constant? (exponent sign? int_const
 (* Rules *)
 
 rule token = parse
+  (* Comments *)
+  | comment { token lexbuf }
   (* Brackets *)
   | "(" { LPAREN }
   | ")" { RPAREN }
@@ -105,7 +107,6 @@ rule token = parse
   | int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
-  | comment { token lexbuf }
   | whitespace { token lexbuf }
   | newline { advance_line lexbuf; token lexbuf }
   | eof { EOF }
