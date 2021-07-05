@@ -244,7 +244,7 @@ body_decl:
 
 constant_def:
   | doc=docstringopt CONSTANT name=identifier COLON ty=typespec
-    IS v=expression SEMI { ConcreteConstantDef (name, ty, v, doc) }
+    ASSIGN v=expression SEMI { ConcreteConstantDef (name, ty, v, doc) }
   ;
 
 function_def:
