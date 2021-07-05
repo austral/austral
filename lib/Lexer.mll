@@ -8,7 +8,7 @@ open Parser
 let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 let alphanum = (alpha|digit)
-let whitespace = [' ' '\t' '\r']+
+let whitespace = [' ' '\t' '\n' '\r']+
 
 let exponent = 'e' | 'E'
 let sign = '+' | '-'
