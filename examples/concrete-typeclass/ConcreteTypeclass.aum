@@ -1,0 +1,18 @@
+import Austral.Memory (Pointer);
+
+module body Example.ConcreteTypeclass is
+    interface Numerical(T: Free) is
+        method To_Integer(x: T): Integer_32;
+    end;
+
+    implementation Numerical(Unit) is
+        method To_Integer(x: Unit): Integer_32 is
+            return 0;
+        end;
+    end;
+
+    function Nil_To_Integer(): Integer_32 is
+        let X: Integer_32 := To_Integer(nil);
+        return X;
+    end;
+end module body.

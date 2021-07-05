@@ -1,0 +1,12 @@
+module body Example.Identity is
+    generic (T: Type)
+    function Identity(value: T): T is
+        return value;
+    end;
+
+    function Main(): Integer_32 is
+        let x: Integer_32 := Identity(10);
+        let y: Double_Float := Identity(3.14);
+        return x;
+    end;
+end module body.

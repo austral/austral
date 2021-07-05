@@ -1,0 +1,15 @@
+import Austral.Memory (
+    Pointer,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
+
+module body Example.Memory is
+    function Main(): Unit is
+        let P: Pointer[Integer_32] := Allocate(10);
+        Deallocate(P);
+        return nil;
+    end;
+end module body.

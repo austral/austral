@@ -1,0 +1,6 @@
+module body Example.GenericRecord is
+    function Main(): Integer_32 is
+        let R: Pair[Integer_32] := Pair(left => 10, right => 10);
+        return R.left;
+    end;
+end module body.

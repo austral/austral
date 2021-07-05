@@ -1,0 +1,20 @@
+import Austral.Memory (Pointer, Allocate);
+
+module body Example.GenericTypeclass is
+    interface Numerical(T: Free) is
+        method To_Integer(x: T): Integer_32;
+    end;
+
+    generic (T: Free)
+    implementation Numerical(Pointer[T]) is
+        method To_Integer(x: Pointer[T]): Integer_32 is
+            return 0;
+        end;
+    end;
+
+    function Pointer_To_Integer(): Integer_32 is
+        let P: Pointer[Integer_32] := Allocate(10);
+        let X: Integer_32 := To_Integer(P);
+        return X;
+    end;
+end module body.

@@ -1,0 +1,4 @@
+module Example.Fibonacci is
+    ```The fibonacci function.```
+    function Fibonacci(n: Natural_64): Natural_64;
+end module.

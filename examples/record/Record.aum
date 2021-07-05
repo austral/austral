@@ -1,0 +1,11 @@
+module body Example.Record is
+    record R: Free is
+        X: Integer_32;
+    end;
+
+    function Main(): Integer_32 is
+        let Rec : R := R(X => 10);
+        let Y: Integer_32 := Rec.X;
+        return Y;
+    end;
+end module body.

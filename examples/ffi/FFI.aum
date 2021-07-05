@@ -1,0 +1,10 @@
+module body Example.FFI is
+    function Put_Character(character: Integer_32): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
+    function Main(): Unit is
+        Put_Character(97);
+        return nil;
+    end;
+end module body;

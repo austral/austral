@@ -1,0 +1,8 @@
+module Example.GenericRecord is
+    record Pair[T: Type]: Type is
+        left: T;
+        right: T;
+    end;
+
+    function Main(): Integer_32;
+end module.
