@@ -1,3 +1,4 @@
+open Identifier
 open Imports
 open Qualifier
 open AbstractionPass
@@ -225,7 +226,10 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
   and (ConcreteModuleBody (mn', body_imports, defs)) = cmb
   in
   if mn != mn' then
-    err "Interface and body have mismatching names"
+    err ("Interface and body have mismatching names: "
+         ^ (mod_name_string mn)
+         ^ " and "
+         ^ (mod_name_string mn'))
   else
     let im = resolve mn menv interface_imports
     and bm = resolve mn menv body_imports
