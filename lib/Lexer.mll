@@ -44,7 +44,8 @@ rule token = parse
   | "module" { MODULE }
   | "is" { IS }
   | "body" { BODY }
-  | "immport" { IMPORT }
+  | "import" { IMPORT }
+  | "as" { AS }
   | "end" { END }
   | "constant" { CONSTANT }
   | "type" { TYPE }
@@ -77,6 +78,7 @@ rule token = parse
   (* Symbols *)
   | ";" { SEMI }
   | "," { COMMA }
+  | "." { PERIOD }
   | ":" { COLON }
   | "=>" { RIGHT_ARROW }
   | ":=" { ASSIGN }

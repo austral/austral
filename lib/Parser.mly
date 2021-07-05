@@ -31,6 +31,7 @@ open Type
 %token IS
 %token BODY
 %token IMPORT
+%token AS
 %token END
 %token CONSTANT
 %token TYPE
@@ -63,6 +64,7 @@ open Type
 /* Symbols */
 %token SEMI
 %token COMMA
+%token PERIOD
 %token COLON
 %token RIGHT_ARROW
 %token ASSIGN
@@ -80,11 +82,15 @@ open Type
 
 /* Types */
 
+%type <Cst.concrete_module_interface> module_int
+%type <Cst.concrete_module_body> module_body
 %type <Cst.concrete_decl> standalone_interface_decl
 %type <Cst.cstmt> standalone_statement
 %type <Cst.cexpr> standalone_expression
 %type <Identifier.identifier> standalone_identifier
 
+%start module_int
+%start module_body
 %start standalone_interface_decl
 %start standalone_statement
 %start standalone_expression
@@ -110,16 +116,46 @@ standalone_identifier:
   | identifier EOF { $1 }
   ;
 
+/* Module interfaces and bodies */
+
+module_int:
+  | docstringopt imports=import_stmt* MODULE
+    name=module_name IS decls=interface_decl*
+    END MODULE PERIOD EOF
+    { ConcreteModuleInterface (name, imports, decls) }
+  ;
+
+module_body:
+  | docstringopt imports=import_stmt* MODULE BODY
+    name=module_name IS decls=body_decl*
+    END MODULE BODY PERIOD EOF
+    { ConcreteModuleBody (name, imports, decls) }
+  ;
+
+/* Imports */
+
+import_stmt:
+  | IMPORT name=module_name LPAREN
+    symbols=separated_list(COMMA, imported_symbol)
+    RPAREN
+    { ConcreteImportList (name, symbols) }
+  ;
+
+imported_symbol:
+  | name=identifier { ConcreteImport (name, None) }
+  | name=identifier AS nickname=identifier { ConcreteImport (name, Some nickname) }
+  ;
+
 /* Declarations */
 
 interface_decl:
   | constant_decl { $1 }
   | type_decl { $1 }
-  | type_definition { $1 }
-  | record_definition { $1 }
-  | union_definition { $1 }
+  | type_alias { ConcreteTypeAliasDecl $1 }
+  | record { ConcreteRecordDecl $1 }
+  | union { ConcreteUnionDecl $1 }
   | function_decl { $1 }
-  | typeclass_def { $1 }
+  | typeclass { ConcreteTypeClassDecl $1 }
   | instance_decl { $1 }
   ;
 
@@ -133,29 +169,29 @@ type_decl:
     SEMI { ConcreteOpaqueTypeDecl (name, typarams, universe, doc) }
   ;
 
-type_definition:
+type_alias:
   | doc=docstringopt TYPE name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS def=typespec
-    SEMI { ConcreteTypeAliasDecl (ConcreteTypeAlias (name, typarams, universe, def, doc)) }
+    SEMI { ConcreteTypeAlias (name, typarams, universe, def, doc) }
   ;
 
-record_definition:
+record:
   | doc=docstringopt RECORD name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS slots=slot*
-    END RECORD SEMI { ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, doc)) }
+    END RECORD SEMI { ConcreteRecord (name, typarams, universe, slots, doc) }
   ;
 
 slot:
   | name=identifier COLON ty=typespec SEMI { ConcreteSlot (name, ty) }
   ;
 
-union_definition:
+union:
   | doc=docstringopt UNION name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS cases=case*
-    END RECORD SEMI { ConcreteUnionDecl (ConcreteUnion (name, typarams, universe, cases, doc)) }
+    END RECORD SEMI { ConcreteUnion (name, typarams, universe, cases, doc) }
   ;
 
 case:
@@ -178,10 +214,10 @@ generic_segment_inner:
   | GENERIC type_parameter_list { $2 }
   ;
 
-typeclass_def:
+typeclass:
   | doc=docstringopt TYPECLASS name=identifier LPAREN typaram=type_parameter
     IS methods=method_decl* END TYPECLASS SEMI
-    { ConcreteTypeClassDecl (ConcreteTypeClass (name, typaram, methods, doc)) }
+    { ConcreteTypeClass (name, typaram, methods, doc) }
   ;
 
 method_decl:
@@ -198,28 +234,28 @@ instance_decl:
 
 body_decl:
   | constant_def { $1 }
-  | type_definition { $1 }
-  | record_definition { $1 }
-  | union_definition { $1 }
+  | type_alias { ConcreteTypeAliasDef $1 }
+  | record { ConcreteRecordDef $1 }
+  | union { ConcreteUnionDef $1 }
   | function_def { $1 }
-  | typeclass_def { $1 }
+  | typeclass { ConcreteTypeClassDef $1 }
   | instance_def { $1 }
   ;
 
 constant_def:
   | doc=docstringopt CONSTANT name=identifier COLON ty=typespec
-    IS v=expression SEMI { ConcreteConstantDecl (name, ty, v, doc) }
+    IS v=expression SEMI { ConcreteConstantDef (name, ty, v, doc) }
   ;
 
 function_def:
   | doc=docstringopt typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
     COLON rt=typespec IS pragmas=pragma* body=block END FUNCTION SEMI
-    { ConcreteFunctionDef (name, typarams, params, rt, body, docstring, pragmas) }
+    { ConcreteFunctionDef (name, typarams, params, rt, body, doc, pragmas) }
   ;
 
 pragma:
-  | PRAGMA name=pragma LPAREN args=argument_list RPAREN SEMI
+  | PRAGMA name=identifier LPAREN args=argument_list RPAREN SEMI
     { make_pragma name args }
   ;
 
@@ -228,7 +264,7 @@ instance_def:
     INSTANCE name=identifier LPAREN arg=typespec RPAREN IS
     methods=method_def*
     END INSTANCE SEMI
-    { ConcreteInstanceDef (name, typarams, arg, methods, doc) }
+    { ConcreteInstanceDef (ConcreteInstance (name, typarams, arg, methods, doc)) }
   ;
 
 method_def:
@@ -372,6 +408,15 @@ factor:
 
 identifier:
   | IDENTIFIER { make_ident $1 }
+  ;
+
+module_name:
+  | module_name_inner { make_mod_name (String.concat "." $1) }
+  ;
+
+module_name_inner:
+  | IDENTIFIER PERIOD module_name_inner { $1 :: $3 }
+  | IDENTIFIER { [$1] }
   ;
 
 typespec:
