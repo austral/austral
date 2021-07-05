@@ -21,6 +21,12 @@ let test_parse_int_constant _ =
   peq "123" (CIntConstant "123");
   peq "1'000" (CIntConstant "1000")
 
+let test_parse_float_constant _ =
+  peq "0.0" (CFloatConstant "0.0");
+  peq "123.3" (CFloatConstant "123.3");
+  peq "1'000.0e12" (CFloatConstant "1000.0e12");
+  peq "1'000.000'1e-3" (CFloatConstant "1000.0001e-3")
+
 let test_parse_variable _ =
   peq "a" (CVariable (i "a"));
   peq "A" (CVariable (i "A"));
@@ -54,6 +60,7 @@ let suite =
       "Nil constant" >:: test_parse_nil_constant;
       "Bool constant" >:: test_parse_bool_constant;
       "Int constant" >:: test_parse_int_constant;
+      "Float constant" >:: test_parse_float_constant;
       "Variable" >:: test_parse_variable;
       "Function call, positional arguments" >:: test_parse_funcall_positional;
       "Function call, named arguments" >:: test_parse_funcall_named;
