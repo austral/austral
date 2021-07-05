@@ -30,7 +30,7 @@ let comment = "--.\n"
 (* Token regexes *)
 
 let identifier = (alpha) ('_'|alpha)*
-let int_constant = digit (digit|'\'')+
+let int_constant = digit (digit|'\'')*
 let float_constant = int_constant period int_constant (exponent sign int_constant)?
 
 (* Rules *)
