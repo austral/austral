@@ -225,7 +225,7 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
   let (ConcreteModuleInterface (mn, interface_imports, decls)) = cmi
   and (ConcreteModuleBody (mn', body_imports, defs)) = cmb
   in
-  if mn != mn' then
+  if mn <> mn' then
     err ("Interface and body have mismatching names: "
          ^ (mod_name_string mn)
          ^ " and "
