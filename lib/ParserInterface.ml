@@ -35,7 +35,6 @@ let position_text s lexbuf =
        | Some s -> prefix ^ s ^ "\n"
        | None -> "")
   in
-  print_endline (string_of_int pos.pos_bol);
   previous_str ^ current_line ^ "\n" ^ second_line_prefix ^ second_line ^ "\n" ^ nextline_str
 
 let parse' f s =
