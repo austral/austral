@@ -16,3 +16,6 @@ let read_file_to_string path =
   with _ ->
     close_in_noerr stream;
     err ("Failed to read file: " ^ path)
+
+let remove_char (s: string) (c: char)  =
+  string_implode (List.filter (fun c' -> c != c') (string_explode s))
