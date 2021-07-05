@@ -1,6 +1,15 @@
 {
+open Lexing
 open Error
 open Parser
+
+let advance_line lexbuf =
+  let pos = lexbuf.lex_curr_p in
+  let pos' = { pos with
+    pos_bol= 1;
+    pos_lnum = pos.pos_lnum + 1
+  } in
+  lexbuf.lex_curr_p <- pos'
 }
 
 (* Helper regexes *)
@@ -8,7 +17,9 @@ open Parser
 let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 let alphanum = (alpha|digit)
-let whitespace = [' ' '\t' '\n' '\r']+
+let whitespace = [' ' '\t']+
+
+let newline = "\r\n" | "\n"
 
 let exponent = 'e' | 'E'
 let sign = '+' | '-'
@@ -93,5 +104,6 @@ rule token = parse
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
   | whitespace { token lexbuf }
+  | newline { advance_line lexbuf; token lexbuf }
   | eof { EOF }
-  | _ {err ("Character not allowed in source text: " ^ Lexing.lexeme lexbuf) }
+  | _ {err ("Character not allowed in source text: '" ^ Lexing.lexeme lexbuf ^ "'") }
