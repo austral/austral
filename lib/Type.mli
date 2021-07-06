@@ -45,3 +45,6 @@ type type_signature = TypeSignature of identifier * type_parameter list * univer
 
 (* A string representation of a type, for debugging *)
 val type_string : ty -> string
+
+(* The type of array sizes and indices *)
+val size_type : ty

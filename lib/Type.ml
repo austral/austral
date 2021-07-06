@@ -59,3 +59,5 @@ and width_string = function
 and args_string = function
   | (first::rest) -> "[" ^ (String.concat ", " (List.map type_string (first::rest))) ^ "]"
   | [] -> ""
+
+let size_type = Integer (Unsigned, Width64)

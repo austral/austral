@@ -306,6 +306,16 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
 let parse_typespec (menv: menv) (typarams: type_parameter list) (ty: qtypespec): ty =
   parse_type menv [] typarams ty
 
+let is_boolean = function
+  | Boolean -> true
+  | _ -> false
+
+let is_compatible_with_size_type = function
+  | TIntConstant _ ->
+     true
+  | e ->
+     (get_type e) = size_type
+
 let rec augment_stmt (module_name: module_name) (menv: menv) (typarams: type_parameter list) (lexenv: lexenv) (stmt: astmt): tstmt =
   match stmt with
   | ASkip ->
@@ -329,5 +339,38 @@ let rec augment_stmt (module_name: module_name) (menv: menv) (typarams: type_par
            err "assignment: type mismatch"
       | None ->
          err "No var with this name")
+  | AIf (c, t, f) ->
+     let c' = augment_expr module_name menv lexenv None c in
+     if is_boolean (get_type c') then
+       TIf (c', augment_stmt module_name menv typarams lexenv t, augment_stmt module_name menv typarams lexenv f)
+     else
+       err "The type of the condition in an if statement must be a boolean."
+  | AWhile (c, body) ->
+     let c' = augment_expr module_name menv lexenv None c in
+     if is_boolean (get_type c') then
+       TWhile (c', augment_stmt module_name menv typarams lexenv body)
+     else
+       err "The type of the condition in a while loop must be a boolean"
+  | AFor { name; initial; final; body } ->
+     let i' = augment_expr module_name menv lexenv None initial
+     and f' = augment_expr module_name menv lexenv None final in
+     if is_compatible_with_size_type i' then
+       if is_compatible_with_size_type f' then
+         let lexenv' = push_var lexenv name size_type in
+         let b' = augment_stmt module_name menv typarams lexenv' body in
+         TFor (name, i', f', b')
+       else
+         err "The type of the final value in a for loop must be an integer type."
+     else
+       err "The type of the initial value in a for loop must be an integer type."
+  | ABlock (f, r) ->
+     TBlock (augment_stmt module_name menv typarams lexenv f,
+             augment_stmt module_name menv typarams lexenv r)
+  | ADiscarding e ->
+     let e' = augment_expr module_name menv lexenv None e in
+     TDiscarding e'
+  | AReturn e ->
+     let e' = augment_expr module_name menv lexenv None e in
+     TReturn e'
   | _ ->
      err "TODO"
