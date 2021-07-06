@@ -2,13 +2,14 @@ open Imports
 open Cst
 open Ast
 open Qualifier
+open Error
 
 let rec abs_stmt im stmt =
   match stmt with
   | CSkip ->
      ASkip
-  | CLet (name, ty, value) ->
-     ALet (name, qualify_typespec im ty, abs_expr im value)
+  | CLet _ ->
+     err "Let statement not in a list context"
   | CAssign (name, value) ->
      AAssign (name, abs_expr im value)
   | CIf (c, t, f) ->
@@ -25,7 +26,7 @@ let rec abs_stmt im stmt =
          body = abs_stmt im b
        }
   | CBlock l ->
-     abs_block im l
+     let_reshape im l
   | CDiscarding e ->
      ADiscarding (abs_expr im e)
   | CReturn e ->
@@ -55,15 +56,9 @@ and abs_expr im expr =
      IfExpression (abs_expr im c, abs_expr im t, abs_expr im f)
 
 and abs_when im (ConcreteWhen (name, params, body)) =
-    AbstractWhen (name,
-                  List.map (fun (ConcreteParam (n, t)) -> (n, qualify_typespec im t)) params,
-                  abs_stmt im body)
-
-and abs_block (im: import_map) (l: cstmt list): astmt =
-  match l with
-  | (first::rest) ->
-     ABlock (abs_stmt im first, abs_block im rest)
-  | [] -> ASkip
+  AbstractWhen (name,
+                List.map (fun (ConcreteParam (n, t)) -> (n, qualify_typespec im t)) params,
+                abs_stmt im body)
 
 and abs_arglist im args =
   match args with
@@ -71,3 +66,17 @@ and abs_arglist im args =
      Positional (List.map (abs_expr im) l)
   | ConcreteNamedArgs l ->
      Named (List.map (fun (n, v) -> (n, abs_expr im v)) l)
+
+(* Given a list of statements, find the first let statement, if any, and put the
+   remainder of the list under its body. Then call let_reshape on that
+   remainder. *)
+and let_reshape (im: import_map) (l: cstmt list): astmt =
+  match l with
+  | first::rest ->
+     (match first with
+      | CLet (n, t, v) ->
+         ALet (n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
+      | s ->
+         ABlock (abs_stmt im s, let_reshape im rest))
+  | [] ->
+     ASkip
