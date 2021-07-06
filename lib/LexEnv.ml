@@ -17,6 +17,13 @@ let push_var l name ty =
   | None ->
      (name, ty) :: l
 
+let rec push_vars env l =
+  match l with
+  | (n,t)::rest ->
+     push_vars (push_var env n t) rest
+  | [] ->
+     env
+
 let pop_var = function
   | (_::rest) ->
      rest
