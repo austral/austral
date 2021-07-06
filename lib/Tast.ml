@@ -9,7 +9,7 @@ type typed_module = TypedModule of module_name * typed_decl list
 
 and typed_decl =
   | TConstant of vis * identifier * ty * texpr * docstring
-  | TTypeAlias of type_vis * identifier * type_parameter list * universe * texpr * docstring
+  | TTypeAlias of type_vis * identifier * type_parameter list * universe * ty * docstring
   | TRecord of type_vis * identifier * type_parameter list * universe * typed_slot list * docstring
   | TUnion of type_vis * identifier * type_parameter list * universe * typed_case list * docstring
   | TFunction of vis * identifier * type_parameter list * value_parameter list * ty * tstmt * docstring
@@ -18,7 +18,7 @@ and typed_decl =
   | TInstance of vis * identifier * type_parameter list * ty * typed_method_def list * docstring
 
 and typed_method_decl =
-  TypedMethodDecl of identifier * type_parameter list * ty
+  TypedMethodDecl of identifier * value_parameter list * ty
 
 and typed_method_def =
   TypedMethodDef of identifier * value_parameter list * ty * tstmt

@@ -9,6 +9,7 @@ open LexEnv
 open ModuleSystem
 open Ast
 open Tast
+open Combined
 open Semantic
 open Util
 open Error
@@ -434,3 +435,70 @@ and augment_when (module_name: module_name) (menv: menv) (typarams: type_paramet
     TypedWhen (name, List.map (fun (n, t) -> ValueParameter (n, t)) bindings'', body')
   else
     err "The set of slots in the case statement doesn't match the set of slots in the union definition."
+
+let rec augment_decl (module_name: module_name) (menv: menv) (decl: combined_definition): typed_decl =
+  match decl with
+  | CConstant (vis, name, ts, expr, doc) ->
+     let ty = parse_typespec menv [] ts in
+     let expr' = augment_expr module_name menv empty_lexenv (Some ty) expr in
+     if ty = get_type expr' then
+       TConstant (vis, name, ty, expr', doc)
+     else
+       err "The declared type does not match the actual type of the expression."
+  | CTypeAlias (vis, name, typarams, universe, ts, doc) ->
+     let ty = parse_typespec menv typarams ts in
+     TTypeAlias (vis, name, typarams, universe, ty, doc)
+  | CRecord (vis, name, typarams, universe, slots, doc) ->
+     let slots' = augment_slots menv typarams slots in
+     TRecord (vis, name, typarams, universe, slots', doc)
+  | CUnion (vis, name, typarams, universe, cases, doc) ->
+     let cases' = augment_cases menv typarams cases in
+     TUnion (vis, name, typarams, universe, cases', doc)
+  | CFunction (vis, name, typarams, params, rt, body, doc, pragmas) ->
+     let params' = augment_params menv typarams params
+     and rt' = parse_typespec menv typarams rt in
+     (match pragmas with
+      | [ForeignImportPragma s] ->
+         if typarams = [] then
+           TForeignFunction (vis, name, params', rt', s, doc)
+         else
+           err "Foreign functions can't have type parameters."
+      | [] ->
+         let body' = augment_stmt module_name menv typarams (lexenv_from_params params') body in
+         TFunction (vis, name, typarams, params', rt', body', doc)
+      | _ ->
+         err "Invalid pragmas")
+  | CTypeclass (vis, name, typaram, methods, doc) ->
+     TTypeClass (vis, name, typaram, List.map (augment_method_decl menv typaram) methods, doc)
+  | CInstance (vis, name, typarams, arg, methods, doc) ->
+     (* TODO: the universe of the type parameter matches the universe of the type argument *)
+     (* TODO: Check the methods in the instance match the methods in the class *)
+     let arg' = parse_typespec menv typarams arg in
+     TInstance (vis, name, typarams, arg', List.map (augment_method_def module_name menv typarams) methods, doc)
+
+and augment_slots menv typarams slots =
+  List.map (fun (QualifiedSlot (n, ts)) -> TypedSlot (n, parse_typespec menv typarams ts)) slots
+
+and augment_cases menv typarams cases =
+  List.map (fun (QualifiedCase (n, ss)) -> TypedCase (n, augment_slots menv typarams ss)) cases
+
+and augment_params menv typarams params =
+  List.map (fun (QualifiedParameter (n, ts)) -> ValueParameter (n, parse_typespec menv typarams ts)) params
+
+and lexenv_from_params (params: value_parameter list): lexenv =
+  match params with
+  | (ValueParameter (n, t))::rest ->
+     push_var (lexenv_from_params rest) n t
+  | [] ->
+     empty_lexenv
+
+and augment_method_decl menv typaram (CMethodDecl (name, params, rt, _)) =
+  let params' = augment_params menv [typaram] params
+  and rt' = parse_typespec menv [typaram] rt in
+  TypedMethodDecl (name, params', rt')
+
+and augment_method_def module_name menv typarams (CMethodDef (name, params, rt, _, body)) =
+  let params' = augment_params menv typarams params
+  and rt' = parse_typespec menv typarams rt in
+  let body' = augment_stmt module_name menv typarams (lexenv_from_params params') body in
+  TypedMethodDef (name, params', rt', body')
