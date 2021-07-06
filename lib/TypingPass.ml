@@ -12,11 +12,6 @@ open Tast
 open Semantic
 open Error
 
-(* Since the semantic extraction pass has already happened, we can simplify the
-   call to `parse_type` by passing an empty list of local type signatures. *)
-(*let parse_typespec (menv: menv) (typarams: type_parameter list) (ty: qtypespec): ty =
-  parse_type menv [] typarams ty*)
-
 let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
   let aug = augment_expr module_name menv lexenv asserted_ty in
   match expr with
@@ -306,19 +301,33 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
   else
     err "Not the same number of bindings and parameters"
 
-(*
-let augment_stmt (module_name: module_name) (menv: menv) (typarams: type_parameter list) (lexenv: lexenv) (stmt: astmt): tstmt =
+(* Since the semantic extraction pass has already happened, we can simplify the
+   call to `parse_type` by passing an empty list of local type signatures. *)
+let parse_typespec (menv: menv) (typarams: type_parameter list) (ty: qtypespec): ty =
+  parse_type menv [] typarams ty
+
+let rec augment_stmt (module_name: module_name) (menv: menv) (typarams: type_parameter list) (lexenv: lexenv) (stmt: astmt): tstmt =
   match stmt with
   | ASkip ->
      TSkip
-  | ALet (name, ty, value) ->
+  | ALet (name, ty, value, body) ->
      let ty' = parse_typespec menv typarams ty in
      let value' = augment_expr module_name menv lexenv (Some ty') value in
      if ty' = (get_type value') then
        let lexenv' = push_var lexenv name ty' in
-       lexenv'
+       let body' = augment_stmt module_name menv typarams lexenv' body in
+       TLet (name, ty', value', body')
      else
        err "let: type mismatch"
+  | AAssign (name, value) ->
+     let value' = augment_expr module_name menv lexenv None value in
+     (match get_var lexenv name with
+      | Some ty ->
+         if ty = (get_type value') then
+           TAssign (name, value')
+         else
+           err "assignment: type mismatch"
+      | None ->
+         err "No var with this name")
   | _ ->
      err "TODO"
- *)
