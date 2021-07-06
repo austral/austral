@@ -23,7 +23,7 @@ and typed_method_def =
 
 and tstmt =
   | TSkip
-  | TLet of identifier * ty * texpr
+  | TLet of identifier * ty * texpr * tstmt
   | TAssign of identifier * texpr
   | TIf of texpr * tstmt * tstmt
   | TCase of texpr * typed_when list
