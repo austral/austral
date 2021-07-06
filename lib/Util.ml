@@ -1,3 +1,4 @@
+open Identifier
 open Error
 
 let string_explode s =
@@ -19,3 +20,7 @@ let read_file_to_string path =
 
 let remove_char (s: string) (c: char)  =
   string_implode (List.filter (fun c' -> c <> c') (string_explode s))
+
+let ident_set_eq a b =
+  let sorter a b = compare (ident_string a) (ident_string b) in
+  (List.sort sorter a) = (List.sort sorter b)
