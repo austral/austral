@@ -29,6 +29,28 @@ open Error
            } data;
        } Optional_Int;
 
+   A case statement like:
+
+       case e of
+           when Present(value: Integer_32) do
+               f();
+           when Absent do
+               g();
+       end case;
+
+   Is represented like this:
+
+       Optional_Int tmp_0 = e;
+       switch (tmp_0) {
+           case Optional_Int_Tag.PRESENT:
+                int32_t value = tmp_0.data.Present.value;
+	        f();
+                break;
+           case Optional_Int_Tag.ABSENT:
+                g();
+                break;
+       }
+
 *)
 
 (* Name generation *)
