@@ -281,3 +281,6 @@ let gen_decl (decl: typed_decl): cpp_decl =
      CDeclBlock []
   | TInstance (_, _, typarams, _, methods, _) ->
      CDeclBlock (List.map (gen_method typarams) methods)
+
+let gen_module (TypedModule (name, decls)) =
+  CNamespace (gen_module_name name, List.map gen_decl decls)
