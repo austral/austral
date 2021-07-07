@@ -138,7 +138,7 @@ let match_decls (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: co
                       docstring,
                       pragmas)
          else
-           err "Mismatch"
+           err "Function declaration does not match definition"
       | _ ->
          err "Not a function")
   | ConcreteTypeClassDecl (ConcreteTypeClass (name, typaram, methods, docstring)) ->
