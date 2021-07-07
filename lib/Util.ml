@@ -21,6 +21,15 @@ let read_file_to_string path =
 let remove_char (s: string) (c: char)  =
   string_implode (List.filter (fun c' -> c <> c') (string_explode s))
 
+let replace_char (s: string) (c: char) (r: string): string =
+  let replace char =
+    if char = c then
+      string_explode r
+    else
+      [char]
+  in
+  string_implode (List.concat (List.map replace (string_explode s)))
+
 let ident_set_eq a b =
   let sorter a b = compare (ident_string a) (ident_string b) in
   (List.sort sorter a) = (List.sort sorter b)
