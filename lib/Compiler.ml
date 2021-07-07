@@ -27,7 +27,7 @@ let rec compile_mod c is bs =
   let typed = augment_module menv' combined in
   let cpp = gen_module typed in
   let code = render_module cpp in
-  Compiler (menv', (compiler_code c) ^ "\n" ^ code)
+  Compiler (menv', (compiler_code c) ^ code)
 
 let rec compile_multiple c modules =
   match modules with
