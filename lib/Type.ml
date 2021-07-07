@@ -61,3 +61,9 @@ and args_string = function
   | [] -> ""
 
 let size_type = Integer (Unsigned, Width64)
+
+let width_int = function
+  | Width8 -> 8
+  | Width16 -> 16
+  | Width32 -> 32
+  | Width64 -> 64
