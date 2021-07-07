@@ -128,7 +128,7 @@ let match_decls (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: co
   | ConcreteFunctionDecl (name, typarams, params, rt, docstring) ->
      (match def with
       | ConcreteFunctionDef (name', typarams', params', rt', body, _, pragmas) ->
-         if (name = name') && (typarams = typarams') && (params == params') && (rt == rt') then
+         if (name = name') && (typarams = typarams') && (params = params') && (rt = rt') then
            CFunction (VisPublic,
                       name,
                       typarams,

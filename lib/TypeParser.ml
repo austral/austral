@@ -104,7 +104,7 @@ and any_arg_is_type (args: ty list) =
 
 let get_type_signature menv sigs name =
   let get_local_type_signature (sigs: type_signature list) (name: qident): type_signature option =
-    List.find_opt (fun (TypeSignature (n, _, _)) -> n == (local_name name)) sigs
+    List.find_opt (fun (TypeSignature (n, _, _)) -> n = (local_name name)) sigs
 
   and get_foreign_type_signature (menv: menv) (name: qident): type_signature option =
     match get_decl menv name with
@@ -137,7 +137,7 @@ let rec parse_type menv sigs typarams (QTypeSpecifier (name, args)) =
 and is_param (typarams: type_parameter list) (name: qident): ty option =
   let name' = original_name name
   in
-  match List.find_opt (fun (TypeParameter (n, _)) -> n == name') typarams with
+  match List.find_opt (fun (TypeParameter (n, _)) -> n = name') typarams with
   | Some (TypeParameter (_, u)) ->
      Some (TyVar (TypeVariable (name', u)))
   | None ->

@@ -85,7 +85,7 @@ let get_callable_typeclass source_module importing_module callable_name (STypeCl
   match (List.find_opt (fun (SMethodDecl (n, _, _)) -> n = callable_name) methods) with
   | (Some (SMethodDecl (_, params, rt))) ->
      let type_class_name' = make_qident (source_module, type_class_name, type_class_name) in
-     if ((vis = VisPublic) || (source_module == importing_module)) then
+     if ((vis = VisPublic) || (source_module = importing_module)) then
        Some (MethodCallable {
                  type_class_name = type_class_name';
                  type_class_type_parameter = param;
@@ -104,19 +104,19 @@ let get_callable_decl source_module importing_module callable_name decl  =
   | SFunctionDeclaration (vis, name, typarams, params, rt) ->
      (* A function is callable if its name is the same as the callable name,
         and if it's either public or in the same module. *)
-     if (name = callable_name) && ((vis = VisPublic) || (source_module == importing_module)) then
+     if (name = callable_name) && ((vis = VisPublic) || (source_module = importing_module)) then
        Some (FunctionCallable (typarams, params, rt))
      else
        None
   | (STypeAliasDefinition (vis, name, typarams, universe, ty)) ->
-     if (name = callable_name) && ((vis = TypeVisPublic) || (source_module == importing_module)) then
+     if (name = callable_name) && ((vis = TypeVisPublic) || (source_module = importing_module)) then
        Some (TypeAliasCallable (typarams, universe, ty))
      else
        None
   | SRecordDefinition (_, vis, name, typarams, universe, slots) ->
      (* A record is callable if its name is the same as the callable name, and
         it's either public (not opaque) or in the same module. *)
-     if (name = callable_name) && ((vis = TypeVisPublic) || (source_module == importing_module)) then
+     if (name = callable_name) && ((vis = TypeVisPublic) || (source_module = importing_module)) then
        Some (RecordConstructor (typarams, universe, slots))
      else
        None
@@ -127,10 +127,10 @@ let get_callable_decl source_module importing_module callable_name decl  =
         original name. This may lead to confusing error messages. To do this properly,
         we should look at the import map of the importing module and find how the name
         of the union type is being qualified. *)
-     (match (List.find_opt (fun (TypedCase (n, _)) -> n == callable_name) cases) with
+     (match (List.find_opt (fun (TypedCase (n, _)) -> n = callable_name) cases) with
       | (Some case) ->
          let name' = make_qident (source_module, callable_name, callable_name) in
-         if ((vis = TypeVisPublic) || (source_module == importing_module)) then
+         if ((vis = TypeVisPublic) || (source_module = importing_module)) then
            Some (UnionConstructor {
                      type_name = name';
                      type_params = typarams;
