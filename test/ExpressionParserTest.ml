@@ -31,7 +31,8 @@ let test_parse_variable _ =
   peq "a" (CVariable (i "a"));
   peq "A" (CVariable (i "A"));
   peq "Test" (CVariable (i "Test"));
-  peq "Test_Test" (CVariable (i "Test_Test"))
+  peq "Test_Test" (CVariable (i "Test_Test"));
+  peq "Test_Test3" (CVariable (i "Test_Test3"))
 
 let test_parse_funcall_positional _ =
   peq "f(true)" (CFuncall (i "f", ConcretePositionalArgs [CBoolConstant true]));
