@@ -1,5 +1,4 @@
-let prelude = {code|
-#include <stdlib.h>
+let prelude = {code|#include <stdlib.h>
 
 namespace Austral__Memory {
     template<typename T>
