@@ -7,4 +7,4 @@ module body Example.FFI is
         Put_Character(97);
         return nil;
     end;
-end module body;
+end module body.

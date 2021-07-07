@@ -1,2 +1,2 @@
 module Example.FFI is
-end module;
+end module.
