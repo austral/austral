@@ -235,7 +235,7 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
     and bm = resolve mn menv body_imports
     in
     let public_decls = List.map (parse_decl im bm cmb) decls
-    and private_decls = parse_defs cmi im defs
+    and private_decls = parse_defs cmi bm defs
     in
     CombinedModule {
         name = mn;
