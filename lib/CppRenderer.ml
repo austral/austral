@@ -2,9 +2,9 @@ open Common
 open Cpp
 
 type indentation = Indentation of int
-(*
+
 let zero_indent = Indentation 0
- *)
+
 let indent (Indentation i) =
   Indentation (i+4)
 
@@ -13,7 +13,10 @@ type line = Line of indentation * string
 let render_line (Line (Indentation i, s)) =
   (String.make i ' ') ^ s
 
-let rec render_decl i d =
+let rec render_module d =
+  String.concat "\n" (List.map render_line (render_decl zero_indent d))
+
+and render_decl i d =
   match d with
   | CNamespace (name, decls) ->
      List.concat [
