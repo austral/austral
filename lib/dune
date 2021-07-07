@@ -5,7 +5,6 @@
 (library
  (name austral_core)
  (synopsis "The bootstrapping compiler for Austral.")
- (libraries angstrom)
  (flags
   ;menhir generates instances of the "unused rec flag"
   ; warning
