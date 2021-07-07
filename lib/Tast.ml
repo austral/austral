@@ -44,7 +44,7 @@ and texpr =
   | TVariable of identifier * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of qident * texpr list * ty
-  | TMethodCall of qident * semantic_instance * ty list * ty
+  | TMethodCall of qident * semantic_instance * texpr list * ty
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr
   | TDisjunction of texpr * texpr
