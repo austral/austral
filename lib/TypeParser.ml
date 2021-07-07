@@ -148,8 +148,7 @@ and parse_user_defined_type (menv: menv) (sigs: type_signature list) (typarams: 
   | Some ts ->
      parse_user_defined_type' menv sigs ts typarams name args
   | None ->
-     err ("No user defined type named "
-          ^ (ident_string (original_name name)))
+     err ("No user defined type with name: " ^ (qident_debug_name name))
 
 and parse_user_defined_type' (menv: menv) (sigs: type_signature list) (ts: type_signature) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
   let (TypeSignature (_, ts_params, declared_universe)) = ts in
