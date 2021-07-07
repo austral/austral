@@ -138,7 +138,7 @@ module_body:
 import_stmt:
   | IMPORT name=module_name LPAREN
     symbols=separated_list(COMMA, imported_symbol)
-    RPAREN
+    RPAREN SEMI
     { ConcreteImportList (name, symbols) }
   ;
 
