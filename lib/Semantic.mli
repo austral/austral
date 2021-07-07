@@ -42,6 +42,7 @@ and semantic_method_decl =
 
 and callable =
   | FunctionCallable of type_parameter list * value_parameter list * ty
+  | TypeAliasCallable of type_parameter list * universe * ty
   | RecordConstructor of type_parameter list * universe * typed_slot list
   | UnionConstructor of {
       type_name: qident;

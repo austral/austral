@@ -42,6 +42,7 @@ and semantic_method_decl =
 
 and callable =
   | FunctionCallable of type_parameter list * value_parameter list * ty
+  | TypeAliasCallable of type_parameter list * universe * ty
   | RecordConstructor of type_parameter list * universe * typed_slot list
   | UnionConstructor of {
       type_name: qident;
@@ -107,6 +108,11 @@ let get_callable_decl source_module importing_module callable_name decl  =
        Some (FunctionCallable (typarams, params, rt))
      else
        None
+  | (STypeAliasDefinition (vis, name, typarams, universe, ty)) ->
+     if (name = callable_name) && ((vis = TypeVisPublic) || (source_module == importing_module)) then
+       Some (TypeAliasCallable (typarams, universe, ty))
+     else
+       None
   | SRecordDefinition (_, vis, name, typarams, universe, slots) ->
      (* A record is callable if its name is the same as the callable name, and
         it's either public (not opaque) or in the same module. *)
@@ -138,7 +144,6 @@ let get_callable_decl source_module importing_module callable_name decl  =
      get_callable_typeclass source_module importing_module callable_name type_class
   (* Not callables *)
   | (SConstantDefinition _) -> None
-  | (STypeAliasDefinition _) -> None
   | (STypeClassInstanceDecl _) -> None
 
 (* TODO: Refactor into is_callable_with_name, is_importable, as_callable *)

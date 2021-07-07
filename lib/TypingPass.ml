@@ -137,6 +137,8 @@ and augment_callable (name: qident) (callable: callable) (asserted_ty: ty option
   match callable with
   | FunctionCallable (typarams, params, rt) ->
      augment_function_call name typarams params rt asserted_ty args
+  | TypeAliasCallable (typarams, universe, ty) ->
+     augment_typealias_callable name typarams universe asserted_ty ty args
   | RecordConstructor (typarams, universe, slots) ->
      augment_record_constructor name typarams universe slots asserted_ty args
   | UnionConstructor { type_name; type_params; universe; case } ->
@@ -157,6 +159,9 @@ and augment_function_call name typarams params rt asserted_ty args =
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings typarams bindings;
   TFuncall (name, arguments, rt'')
+
+and augment_typealias_callable _ _ _ _ _ _ =
+  err "TODO"
 
 and augment_record_constructor (name: qident) (typarams: type_parameter list) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
   (* Check: the argument list must be named *)
