@@ -507,3 +507,6 @@ and augment_method_def module_name menv typarams (CMethodDef (name, params, rt, 
   and rt' = parse_typespec menv typarams rt in
   let body' = augment_stmt module_name menv typarams (lexenv_from_params params') body in
   TypedMethodDef (name, params', rt', body')
+
+let augment_module menv (CombinedModule { name; decls; _ }) =
+  TypedModule (name, List.map (augment_decl name menv) decls)
