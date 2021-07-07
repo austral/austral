@@ -116,6 +116,10 @@ let union_type_name = function
 let union_tag_enum_name (n: qident): string =
   (gen_qident n) ^ "_Tag"
 
+(* Like union_tag_enum_name but for union definitions. *)
+let local_union_tag_enum_name (n: identifier): string =
+  (gen_ident n) ^ "_Tag"
+
 (* Given a union type and the name of a case, return the
    value of the tag enum for that case. *)
 let union_tag_value (ty: ty) (case_name: identifier): cpp_expr =
@@ -210,3 +214,66 @@ and when_to_case ty var (TypedWhen (n, bindings, body)) =
   let bindings' = List.map (fun (ValueParameter (n, t)) -> CLet (gen_ident n, gen_type t, get_binding n)) bindings in
   let body'' = CBlock (List.append bindings' [gen_stmt body]) in
   CSwitchCase (tag_value, body'')
+
+(* Declarations *)
+
+let gen_params params =
+  List.map (fun (ValueParameter (n, t)) -> CValueParam (gen_ident n, gen_type t)) params
+
+let gen_typarams params =
+  List.map (fun (TypeParameter (n, _)) -> CTypeParam (gen_ident n)) params
+
+let gen_slots slots =
+  List.map (fun (TypedSlot (n, t)) -> CSlot (gen_ident n, gen_type t)) slots
+
+let gen_cases cases =
+  List.map (fun (TypedCase (n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
+
+let gen_method typarams (TypedMethodDef (n, params, rt, body)) =
+  CFunctionDefinition (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt body)
+
+let gen_decl (decl: typed_decl): cpp_decl =
+  match decl with
+  | TConstant (_, n, ty, e, _) ->
+     CConstantDefinition (gen_ident n, gen_type ty, gen_exp e)
+  | TTypeAlias (_, n, typarams, _, ty, _) ->
+     CTypeDefinition (gen_ident n, gen_typarams typarams, gen_type ty)
+  | TRecord (_, n, typarams, _, slots, _) ->
+     CStructDefinition (
+         gen_typarams typarams,
+         CStruct (
+             Some (gen_ident n),
+             gen_slots slots
+           )
+       )
+  | TUnion (_, n, typarams, _, cases, _) ->
+     let enum_def = CEnumDefinition (
+                        local_union_tag_enum_name n,
+                        List.map (fun (TypedCase (n, _)) -> gen_ident n) cases
+                      )
+     and union_def = CStructDefinition (
+                         gen_typarams typarams,
+                         CStruct (
+                             Some (gen_ident n),
+                             [
+                               CSlot ("tag", CNamedType (local_union_tag_enum_name n, []));
+                               CSlot ("data", CUnionType (gen_cases cases))
+                             ]
+                           )
+                       )
+     in
+     CDeclBlock [enum_def; union_def]
+  | TFunction (_, name, typarams, params, rt, body, _) ->
+     CFunctionDefinition (gen_ident name, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt body)
+  | TForeignFunction (_, n, params, rt, underlying, _) ->
+     let ff_decl = CFunctionDeclaration (underlying, [], gen_params params, gen_type rt, LinkageExternal) in
+     let args = List.map (fun (ValueParameter (n, _)) -> CVar (gen_ident n)) params in
+     let funcall = CFuncall (underlying, args) in
+     let body = CReturn funcall in
+     let def = CFunctionDefinition (gen_ident n, [], gen_params params, gen_type rt, body) in
+     CDeclBlock [ff_decl; def]
+  | TTypeClass _ ->
+     (* Type class declarations are not compiled *)
+     CDeclBlock []
+  | TInstance (_, _, typarams, _, methods, _) ->
+     CDeclBlock (List.map (gen_method typarams) methods)
