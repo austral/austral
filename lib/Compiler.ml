@@ -11,7 +11,7 @@ type compiler = Compiler of menv * string
 
 let cmenv (Compiler (m, _)) = m
 
-let ccode (Compiler (_, c)) = c
+let compiler_code (Compiler (_, c)) = c
 
 let empty_compiler =
   let menv = put_module empty_menv memory_module in
@@ -27,7 +27,7 @@ let rec compile_mod c is bs =
   let typed = augment_module menv' combined in
   let cpp = gen_module typed in
   let code = render_module cpp in
-  Compiler (menv', (ccode c) ^ "\n" ^ code)
+  Compiler (menv', (compiler_code c) ^ "\n" ^ code)
 
 let rec compile_multiple c modules =
   match modules with

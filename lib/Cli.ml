@@ -9,8 +9,8 @@ let main' (args: string list): unit =
   let paths = List.map split_common_path args in
   let contents = List.map (fun (i, b) -> (read_file_to_string i, read_file_to_string b)) paths in
   let c = compile_multiple empty_compiler contents in
-  let _ = c in
-  ()
+  let code = compiler_code c in
+  print_endline code
 
 let main (args: string list): unit =
   try
