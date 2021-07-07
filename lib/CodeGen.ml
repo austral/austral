@@ -3,6 +3,7 @@ open Type
 open BuiltIn
 open Tast
 open Cpp
+open Util
 open Error
 
 (* Codegen implementation notes:
@@ -65,7 +66,7 @@ let gen_ident (i: identifier): string =
   (ident_string i)
 
 let gen_module_name (n: module_name): string =
-  Str.global_replace (Str.regexp "\\.") "__" (mod_name_string n)
+  replace_char (mod_name_string n) '.' "__"
 
 let gen_qident (i: qident): string =
   (gen_module_name (source_module_name i)) ^ "::" ^ (gen_ident (original_name i))
