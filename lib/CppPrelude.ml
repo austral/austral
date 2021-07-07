@@ -23,5 +23,5 @@ namespace Austral__Memory {
         free(pointer);
         return false;
     }
-};
+}
 |code}
