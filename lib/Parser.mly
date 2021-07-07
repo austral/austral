@@ -251,7 +251,7 @@ constant_def:
 function_def:
   | doc=docstringopt typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
-    COLON rt=typespec IS pragmas=pragma* body=block END FUNCTION SEMI
+    COLON rt=typespec IS pragmas=pragma* body=block END SEMI
     { ConcreteFunctionDef (name, typarams, params, rt, body, doc, pragmas) }
   ;
 
