@@ -4,9 +4,10 @@ open Semantic
 
 let memory_module_name = make_mod_name "Austral.Memory"
 
+let pointer_type_name = make_ident "Pointer"
+
 let memory_module =
   let i = make_ident in
-  let pointer_type_name = i "Pointer" in
   let pointer_type_qname = make_qident (memory_module_name, pointer_type_name, pointer_type_name) in
   let typarams = [TypeParameter(i "T", FreeUniverse)]
   and type_t = TyVar (TypeVariable (i "T", FreeUniverse)) in
