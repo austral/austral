@@ -22,3 +22,9 @@ let imported_classes (ImportMap (_, _, cs, _)) =
 
 let imported_instances (ImportMap (_, _, _, is)) =
   is
+
+let dump_import_map (ImportMap (n, m, _, _)) =
+  "ImportMap:\n"
+  ^ "    name=" ^ (mod_name_string n) ^ "\n"
+  ^ "    imports:\n"
+  ^ (String.concat "\n" (List.map (fun (k, v) -> (ident_string k) ^ " -> " ^ (qident_debug_name v) ^ "\n") (IdentifierMap.bindings m)))

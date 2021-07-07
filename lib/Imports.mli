@@ -21,3 +21,5 @@ val imported_classes : import_map -> semantic_typeclass list
 
 (* The list of imported typeclass instances *)
 val imported_instances : import_map -> semantic_instance list
+
+val dump_import_map : import_map -> string
