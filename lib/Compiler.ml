@@ -1,5 +1,6 @@
 open ModuleSystem
 open BuiltIn
+open CppPrelude
 open ParserInterface
 open CombiningPass
 open ExtractionPass
@@ -15,7 +16,7 @@ let compiler_code (Compiler (_, c)) = c
 
 let empty_compiler =
   let menv = put_module empty_menv memory_module in
-  Compiler (menv, "")
+  Compiler (menv, prelude)
 
 let rec compile_mod c is bs =
   let ci = parse_module_int is
