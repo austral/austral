@@ -93,7 +93,7 @@ and render_linkage = function
 and render_stmt (i: indentation) (stmt: cpp_stmt): line list =
   match stmt with
   | CLet (name, ty, value) ->
-     let s = (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ "" in
+     let s = (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";" in
      [Line (i, s)]
   | CAssign (name, value) ->
      let s = name ^ " = " ^ (e value) ^ ";" in
