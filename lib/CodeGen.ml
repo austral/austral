@@ -1,5 +1,6 @@
 open Identifier
 open Type
+open BuiltIn
 open Tast
 open Cpp
 open Error
@@ -71,12 +72,6 @@ let gen_qident (i: qident): string =
 
 (* Types *)
 
-let is_special_type (_: qident): bool =
-  false
-
-let gen_special_type (_: qident) (_: ty list): cpp_ty =
-  err "TODO"
-
 let rec gen_type (ty: ty): cpp_ty =
   let t s = CNamedType (s, []) in
   match ty with
@@ -95,13 +90,22 @@ let rec gen_type (ty: ty): cpp_ty =
   | DoubleFloat ->
      t "double"
   | NamedType (n, a, _) ->
-     if is_special_type n then
-       gen_special_type n a
-     else
-       CNamedType (gen_qident n, List.map gen_type a)
+     gen_named_type n a
   | TyVar (TypeVariable (n, _)) ->
      CNamedType (gen_ident n, [])
 
+and gen_named_type (name: qident) (args: ty list): cpp_ty =
+  let mod_name = source_module_name name
+  and original = original_name name
+  in
+  if (mod_name = memory_module_name) && (original = pointer_type_name) then
+    match args with
+    | [t] ->
+       CPointer (gen_type t)
+    | _ ->
+       err "Invalid Pointer type usage"
+  else
+    CNamedType (gen_qident name, List.map gen_type args)
 
 (* Expressions *)
 
