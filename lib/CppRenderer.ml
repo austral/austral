@@ -99,7 +99,7 @@ and render_stmt (i: indentation) (stmt: cpp_stmt): line list =
      let s = name ^ " = " ^ (e value) ^ ";" in
      [Line (i, s)]
   | CDiscarding value ->
-     [Line (i, e value)]
+     [Line (i, (e value) ^ ";")]
   | CIf (c, t, f) ->
      List.concat [
          [Line (i, "if (" ^ (e c) ^ ") {")];
