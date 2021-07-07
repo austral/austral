@@ -20,3 +20,10 @@ let make_qident (m, o, n) =
 let source_module_name { source; _ } = source
 let original_name { original; _ } = original
 let local_name { local; _ } = local
+
+let qident_debug_name { source; original; local } =
+  let s = mod_name_string source
+  and o = ident_string original
+  and l = ident_string local
+  in
+  l ^ " from " ^ s ^ (if o = l then "" else (", originally " ^ o))

@@ -19,3 +19,5 @@ val source_module_name : qident -> module_name
 val original_name : qident -> identifier
 
 val local_name : qident -> identifier
+
+val qident_debug_name : qident -> string
