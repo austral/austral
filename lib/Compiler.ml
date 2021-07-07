@@ -1,4 +1,5 @@
 open ModuleSystem
+open BuiltIn
 open ParserInterface
 open CombiningPass
 open ExtractionPass
@@ -7,7 +8,9 @@ type compiler = Compiler of menv
 
 let cmenv (Compiler m) = m
 
-let empty_compiler = Compiler empty_menv
+let empty_compiler =
+  let menv = put_module empty_menv memory_module in
+  Compiler menv
 
 let rec compile_mod c is bs =
   let ci = parse_module_int is
