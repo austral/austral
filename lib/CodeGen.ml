@@ -31,6 +31,10 @@ open Error
 
 *)
 
+(* Name generation *)
+
+let new_variable _ =
+  ""
 
 (* Identifiers *)
 
@@ -90,11 +94,10 @@ let union_type_name = function
 let union_tag_enum_name (n: qident): string =
   (gen_qident n) ^ "_Tag"
 
-
 (* Given a union type and the name of a case, return the
    value of the tag enum for that case. *)
-let union_tag_value (ty: ty) (case_name: identifier): string =
-  union_tag_enum_name (union_type_name ty) ^ "::" ^ (gen_ident case_name)
+let union_tag_value (ty: ty) (case_name: identifier): cpp_expr =
+  CVar (union_tag_enum_name (union_type_name ty) ^ "::" ^ (gen_ident case_name))
 
 let rec gen_exp (e: texpr): cpp_expr =
   let g = gen_exp in
@@ -132,6 +135,56 @@ let rec gen_exp (e: texpr): cpp_expr =
   | TUnionConstructor (ty, case_name, values) ->
      let args = CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values) in
      CStructInitializer [
-         ("tag", CVar (union_tag_value ty case_name));
+         ("tag", union_tag_value ty case_name);
          ("data", CStructInitializer [(gen_ident case_name, args)])
        ]
+
+(* Statements *)
+
+let rec gen_stmt (stmt: tstmt): cpp_stmt =
+  match stmt with
+  | TSkip ->
+     CBlock []
+  | TLet (n, t, v, b) ->
+     let l = CLet (gen_ident n, gen_type t, gen_exp v) in
+     CBlock [l; gen_stmt b]
+  | TAssign (n, v) ->
+     CAssign (gen_ident n, gen_exp v)
+  | TIf (c, tb, fb) ->
+     CIf (gen_exp c, gen_stmt tb, gen_stmt fb)
+  | TCase (e, whens) ->
+     gen_case (get_type e) e whens
+  | TWhile (c, b) ->
+     CWhile (gen_exp c, gen_stmt b)
+  | TFor (v, i, f, b) ->
+     CFor (gen_ident v, gen_exp i, gen_exp f, gen_stmt b)
+  | TBlock (a, b) ->
+     CBlock [gen_stmt a; gen_stmt b]
+  | TDiscarding e ->
+     CDiscarding (gen_exp e)
+  | TReturn e ->
+     CReturn (gen_exp e)
+
+and gen_case (ty: ty) (e: texpr) (whens: typed_when list): cpp_stmt =
+  (* Code gen for a case statement: generate a variable, and assign the value
+     being pattern-matched to that variable. Generate a switch statement over
+     the tag enum. Each when statement that has bindings needs to generate some
+     variable assignments for those bindings from the generated variable. *)
+  let var = new_variable () in
+  let cases = List.map (when_to_case ty var) whens in
+  let switch = CSwitch (CVar var, cases) in
+  CBlock [
+      CLet (var, gen_type ty, gen_exp e);
+      switch
+    ]
+
+and when_to_case ty var (TypedWhen (n, bindings, body)) =
+  let case_name = gen_ident n
+  and tag_value = union_tag_value ty n
+  in
+  let get_binding binding_name =
+    CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+  in
+  let bindings' = List.map (fun (ValueParameter (n, t)) -> CLet (gen_ident n, gen_type t, get_binding n)) bindings in
+  let body'' = CBlock (List.append bindings' [gen_stmt body]) in
+  CSwitchCase (tag_value, body'')
