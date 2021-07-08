@@ -6,4 +6,9 @@ module body Example.Fibonacci is
             return Fibonacci(n - 1) + Fibonacci(n - 2);
         end if;
     end;
+
+    function Main(): Unit is
+        Fibonacci(30);
+        return nil;
+    end;
 end module body.
