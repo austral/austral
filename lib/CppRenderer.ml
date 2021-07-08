@@ -41,13 +41,13 @@ and render_decl i d =
   | CStructDefinition (typarams, record) ->
      List.concat [
          render_typarams i typarams;
-         [Line (i, render_struct record)]
+         [Line (i, (render_struct record) ^ ";")]
        ]
   | CEnumDefinition (name, cases) ->
      List.concat [
          [Line (i, "enum " ^ name ^ " {")];
          [Line (indent i, comma_sep (List.map (fun case -> case) cases))];
-         [Line (i, "}")];
+         [Line (i, "};")];
        ]
   | CFunctionDeclaration (name, typarams, params, rt, linkage) ->
      let s = (render_linkage linkage)
@@ -167,7 +167,7 @@ and render_type = function
   | CUnionType slots ->
      "union "
      ^ "{ "
-     ^ (semi_sep (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots))
+     ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots))
      ^ "}"
 
 and render_type_args = function
@@ -180,7 +180,7 @@ and render_struct (CStruct (name, slots)) =
   ^ name'
   ^ " {"
   ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots))
-  ^ "};"
+  ^ "}"
 
 and render_expr = function
   | (CBool b) -> render_bool b
