@@ -1,5 +1,5 @@
 module body Example.Identity is
-    generic (T: Type)
+    generic [T: Type]
     function Identity(value: T): T is
         return value;
     end;
