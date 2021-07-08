@@ -231,6 +231,7 @@ and paren s =
 
 and comma_sep ss =
   String.concat ", " ss
-
+(*
 and semi_sep ss =
   String.concat "; " ss
+ *)

@@ -43,7 +43,7 @@ open Error
    Is represented like this:
 
        Optional_Int tmp_0 = e;
-       switch (tmp_0) {
+       switch (tmp_0.tag) {
            case Optional_Int_Tag.PRESENT:
                 int32_t value = tmp_0.data.Present.value;
 	        f();
@@ -207,7 +207,7 @@ and gen_case (ty: ty) (e: texpr) (whens: typed_when list): cpp_stmt =
      variable assignments for those bindings from the generated variable. *)
   let var = new_variable () in
   let cases = List.map (when_to_case ty var) whens in
-  let switch = CSwitch (CVar var, cases) in
+  let switch = CSwitch (CStructAccessor (CVar var, "tag"), cases) in
   CBlock [
       CLet (var, gen_type ty, gen_exp e);
       switch
