@@ -181,7 +181,7 @@ record:
   | doc=docstringopt RECORD name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS slots=slot*
-    END RECORD SEMI { ConcreteRecord (name, typarams, universe, slots, doc) }
+    END SEMI { ConcreteRecord (name, typarams, universe, slots, doc) }
   ;
 
 slot:
