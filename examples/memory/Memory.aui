@@ -1,2 +1,3 @@
 module Example.Memory is
+    function Main(): Unit;
 end module.

@@ -3,9 +3,9 @@ module body Example.Record is
         X: Integer_32;
     end;
 
-    function Main(): Integer_32 is
+    function Main(): Unit is
         let Rec : R := R(X => 10);
         let Y: Integer_32 := Rec.X;
-        return Y;
+        return nil;
     end;
 end module body.

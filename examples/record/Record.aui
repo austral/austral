@@ -1,5 +1,5 @@
 module Example.Record is
     type R: Free;
 
-    function Main(): Integer_32;
+    function Main(): Unit;
 end module.
