@@ -217,8 +217,8 @@ generic_segment_inner:
   ;
 
 typeclass:
-  | doc=docstringopt TYPECLASS name=identifier LPAREN typaram=type_parameter
-    IS methods=method_decl* END TYPECLASS SEMI
+  | doc=docstringopt TYPECLASS name=identifier LPAREN typaram=type_parameter RPAREN
+    IS methods=method_decl* END SEMI
     { ConcreteTypeClass (name, typaram, methods, doc) }
   ;
 
