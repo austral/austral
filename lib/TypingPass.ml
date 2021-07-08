@@ -199,8 +199,11 @@ and augment_record_constructor (name: qident) (typarams: type_parameter list) (u
 and augment_union_constructor (type_name: qident) (typarams: type_parameter list) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
   (* Check: the argument list must be named *)
   let args' = (match args with
-               | TPositionalArglist _ ->
-                  err "Arguments to a union constructor must be named"
+               | TPositionalArglist l ->
+                  if l = [] then
+                    []
+                  else
+                    err "Arguments to a union constructor must be named"
                | TNamedArglist a ->
                   a) in
   (* Check: the set of slots matches the set of param names *)
