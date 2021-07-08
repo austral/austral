@@ -221,7 +221,7 @@ and when_to_case ty var (TypedWhen (n, bindings, body)) =
     CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
   in
   let bindings' = List.map (fun (ValueParameter (n, t)) -> CLet (gen_ident n, gen_type t, get_binding n)) bindings in
-  let body'' = CBlock (List.append bindings' [gen_stmt body]) in
+  let body'' = CExplicitBlock (List.append bindings' [gen_stmt body]) in
   CSwitchCase (tag_value, body'')
 
 (* Declarations *)
