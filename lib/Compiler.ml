@@ -1,3 +1,4 @@
+open Identifier
 open ModuleSystem
 open BuiltIn
 open CppPrelude
@@ -7,6 +8,7 @@ open ExtractionPass
 open TypingPass
 open CodeGen
 open CppRenderer
+open Error
 
 type compiler = Compiler of menv * string
 
@@ -34,3 +36,36 @@ let rec compile_multiple c modules =
   match modules with
   | (is, bs)::rest -> compile_multiple (compile_mod c is bs) rest
   | [] -> c
+
+let check_entrypoint_validity menv qi =
+  match get_decl menv qi with
+  | Some decl ->
+     (match decl with
+      | SFunctionDeclaration (vis, _, typarams, params, rt) ->
+         if vis = VisPublic then
+           if typarams = [] then
+             if params = [] then
+               if rt = Unit then
+                 ()
+               else
+                 err "Entrypoint function must return the unit type."
+             else
+               err "Entrypoint function must take no arguments"
+           else
+             err "Entrypoint function cannot be generic."
+         else
+           err "Entrypoint function is not public."
+      | _ ->
+         err "Entrypoint is not a function.")
+  | None ->
+     err "Entrypoint does not exist."
+
+let entrypoint_code mn i =
+  let f = (mod_name_string mn) ^ "__" ^ (ident_string i) in
+  "int main() {\n    " ^ f ^ "();\n    return 0;\n}\n"
+
+let compile_entrypoint c mn i =
+  let qi = make_qident (mn, i, i) in
+  check_entrypoint_validity (cmenv c) qi;
+  let (Compiler (m, c)) = c in
+  Compiler (m, c ^ "\n" ^ (entrypoint_code mn i))
