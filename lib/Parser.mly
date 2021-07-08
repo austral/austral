@@ -256,7 +256,7 @@ function_def:
   ;
 
 pragma:
-  | PRAGMA name=identifier LPAREN args=argument_list RPAREN SEMI
+  | PRAGMA name=identifier args=argument_list SEMI
     { make_pragma name args }
   ;
 
