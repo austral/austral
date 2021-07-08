@@ -57,8 +57,12 @@ open Error
 
 (* Name generation *)
 
+let counter = ref 0
+
 let new_variable _ =
-  ""
+  let v = "tmp" ^ (string_of_int !counter) in
+  counter := !counter + 1;
+  v
 
 (* Identifiers *)
 
