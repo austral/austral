@@ -299,8 +299,8 @@ else_clause:
   | END IF SEMI { CSkip }
 
 when_stmt:
-  | WHEN identifier LPAREN parameter_list RPAREN DO block SEMI { ConcreteWhen ($2, $4, $7) }
-  | WHEN identifier DO block SEMI { ConcreteWhen ($2, [], $4) }
+  | WHEN identifier LPAREN parameter_list RPAREN DO block { ConcreteWhen ($2, $4, $7) }
+  | WHEN identifier DO block { ConcreteWhen ($2, [], $4) }
   ;
 
 block:
