@@ -33,6 +33,11 @@ and render_decl i d =
          render_typarams i typarams;
          [Line (i, "typedef " ^ name ^ ";")]
        ]
+  | CStructForwardDeclaration (name, typarams) ->
+     List.concat [
+         render_typarams i typarams;
+         [Line (i, "struct " ^ name ^ ";")]
+       ]
   | CTypeDefinition (name, typarams, def) ->
      List.concat [
          render_typarams i typarams;
