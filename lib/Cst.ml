@@ -165,7 +165,12 @@ let make_pragma name args =
   let s = ident_string name in
   if s = "Foreign_Import" then
     match args with
-    | (ConcretePositionalArgs [CStringConstant f]) -> ForeignImportPragma f
-    | _ -> err "Invalid foreign import pragma"
+    | ConcreteNamedArgs [(a, CStringConstant f)] ->
+       if a = make_ident "External_Name" then
+         ForeignImportPragma f
+       else
+         err "Invalid foreign import pragma"
+    | _ ->
+       err "Invalid foreign import pragma"
   else
     err ("Unknown pragma: " ^ s)
