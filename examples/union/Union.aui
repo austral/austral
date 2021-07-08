@@ -11,4 +11,6 @@ module Example.Union is
         case Float is
             value: Double_Float;
     end;
+
+    function Main(): Unit;
 end module.
