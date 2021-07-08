@@ -120,7 +120,7 @@ let get_callable_decl source_module importing_module callable_name decl  =
        Some (RecordConstructor (typarams, universe, slots))
      else
        None
-  | SUnionDefinition (_, vis, _, typarams, universe, cases) ->
+  | SUnionDefinition (_, vis, type_name, typarams, universe, cases) ->
      (* A union is callable if the callable name is the name of a case, and
         the union is public or is in the same module. *)
      (* TODO: Here we're assuming the local (import nickname) name is the same as the
@@ -129,7 +129,7 @@ let get_callable_decl source_module importing_module callable_name decl  =
         of the union type is being qualified. *)
      (match (List.find_opt (fun (TypedCase (n, _)) -> n = callable_name) cases) with
       | (Some case) ->
-         let name' = make_qident (source_module, callable_name, callable_name) in
+         let name' = make_qident (source_module, type_name, type_name) in
          if ((vis = TypeVisPublic) || (source_module = importing_module)) then
            Some (UnionConstructor {
                      type_name = name';
