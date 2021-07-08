@@ -48,7 +48,6 @@ type cpp_decl =
   | CNamespace of string * cpp_decl list
   | CUsingDeclaration of { namespace: string; symbol: string }
   | CConstantDefinition of string * cpp_ty * cpp_expr
-  | CTypeDeclaration of string * cpp_ty_param list
   | CStructForwardDeclaration of string * cpp_ty_param list
   | CTypeDefinition of string * cpp_ty_param list * cpp_ty
   | CStructDefinition of cpp_ty_param list * cpp_struct

@@ -28,11 +28,6 @@ and render_decl i d =
      [Line (i, "using " ^ namespace ^ "::" ^ symbol)]
   | CConstantDefinition (name, ty, value) ->
      [Line (i, (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";")]
-  | CTypeDeclaration (name, typarams) ->
-     List.concat [
-         render_typarams i typarams;
-         [Line (i, "typedef " ^ name ^ ";")]
-       ]
   | CStructForwardDeclaration (name, typarams) ->
      List.concat [
          render_typarams i typarams;
