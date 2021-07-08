@@ -146,7 +146,7 @@ let rec gen_exp (e: texpr): cpp_expr =
   | TFloatConstant f ->
      CFloat f
   | TStringConstant _ ->
-     err "TODO"
+     err "TODO: string constant codegen"
   | TVariable (n, _) ->
      CVar (gen_ident n)
   | TFuncall (name, args, _) ->

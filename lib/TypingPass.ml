@@ -161,7 +161,7 @@ and augment_function_call name typarams params rt asserted_ty args =
   TFuncall (name, arguments, rt'')
 
 and augment_typealias_callable _ _ _ _ _ _ =
-  err "TODO"
+  err "TODO: typealias callable"
 
 and augment_record_constructor (name: qident) (typarams: type_parameter list) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
   (* Check: the argument list must be named *)
@@ -237,7 +237,7 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
       err "Universe mismatch"
 
 and augment_method_call _ _ _ _ _ _ =
-  err "TODO"
+  err "TODO: method call"
 
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
