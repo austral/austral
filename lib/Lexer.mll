@@ -73,8 +73,8 @@ rule token = parse
   | "case" { CASE }
   | "of" { OF }
   | "when" { WHEN }
-  | "typeclass" { TYPECLASS }
-  | "instance" { INSTANCE }
+  | "interface" { TYPECLASS }
+  | "implementation" { INSTANCE }
   | "method" { METHOD }
   | "if" { IF }
   | "then" { THEN }
