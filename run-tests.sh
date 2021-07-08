@@ -14,4 +14,4 @@ compile examples/identity/Identity Identity
 compile examples/named-argument/NamedArgument NamedArgument
 compile examples/memory/Memory Memory
 #compile examples/record/Record Record
-#compile examples/union/Union Union
+compile examples/union/Union Union
