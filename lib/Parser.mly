@@ -77,6 +77,7 @@ open Util
 %token FALSE
 %token <string> INT_CONSTANT
 %token <string> FLOAT_CONSTANT
+%token <string> STRING_CONSTANT
 %token <string> IDENTIFIER
 /* etc. */
 %token EOF
@@ -324,6 +325,7 @@ atomic_expression:
   | FALSE { CBoolConstant false }
   | int_constant { $1 }
   | float_constant { $1 }
+  | string_constant { $1 }
   | variable { $1 }
   | funcall { $1 }
   | parenthesized_expr { $1 }
@@ -335,6 +337,10 @@ int_constant:
 
 float_constant:
   | FLOAT_CONSTANT { CFloatConstant (remove_char $1 '\'') }
+  ;
+
+string_constant:
+  | STRING_CONSTANT { CStringConstant $1 }
   ;
 
 variable:

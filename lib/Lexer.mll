@@ -10,6 +10,8 @@ let advance_line lexbuf =
     pos_lnum = pos.pos_lnum + 1
   } in
   lexbuf.lex_curr_p <- pos'
+
+let string_acc: Buffer.t = Buffer.create 64
 }
 
 (* Helper regexes *)
@@ -105,9 +107,16 @@ rule token = parse
   | "false" { FALSE }
   | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
   | int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
+  | '"' { read_string lexbuf }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
   | whitespace { token lexbuf }
   | newline { advance_line lexbuf; token lexbuf }
   | eof { EOF }
   | _ {err ("Character not allowed in source text: '" ^ Lexing.lexeme lexbuf ^ "'") }
+
+and read_string = parse
+  | '"' { let c = Buffer.contents string_acc in Buffer.clear string_acc; STRING_CONSTANT c }
+  | [^ '"'] { Buffer.add_string string_acc (Lexing.lexeme lexbuf); read_string lexbuf }
+  | eof { err "End of file in string literal" }
+  | _ {err ("Character not allowed in string literal: '" ^ Lexing.lexeme lexbuf ^ "'") }
