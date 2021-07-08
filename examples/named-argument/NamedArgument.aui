@@ -1,3 +1,4 @@
 module Example.NamedArgument is
     function F(x: Boolean, y: Boolean): Unit;
+    function Main(): Unit;
 end module.
