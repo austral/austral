@@ -31,10 +31,15 @@ let main' (args: string list): unit =
   let args' = List.map parse_arg args in
   let paths = List.filter_map (fun a -> match a with (ModuleArg (i,b)) -> Some (i,b) | _ -> None) args' in
   let contents = List.map (fun (i, b) -> (read_file_to_string i, read_file_to_string b)) paths in
-  let _ = List.find (fun a -> match a with (EntrypointArg _) -> true | _ -> false) args' in
-  let c = compile_multiple empty_compiler contents in
-  let code = compiler_code c in
-  print_endline code
+  let entrypoint = List.filter_map (fun a -> match a with (EntrypointArg (m,i)) -> Some (m, i) | _ -> None) args' in
+  match entrypoint with
+  | [(m,i)] ->
+     let c = compile_multiple empty_compiler contents in
+     let c' = compile_entrypoint c m i in
+     let code = compiler_code c' in
+     print_endline code
+  | _ ->
+     err "No entrypoint"
 
 let main (args: string list): unit =
   try

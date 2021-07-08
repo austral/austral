@@ -61,7 +61,7 @@ let check_entrypoint_validity menv qi =
      err "Entrypoint does not exist."
 
 let entrypoint_code mn i =
-  let f = (mod_name_string mn) ^ "__" ^ (ident_string i) in
+  let f = (gen_module_name mn) ^ "::" ^ (gen_ident i) in
   "int main() {\n    " ^ f ^ "();\n    return 0;\n}\n"
 
 let compile_entrypoint c mn i =
