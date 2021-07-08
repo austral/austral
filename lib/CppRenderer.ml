@@ -180,7 +180,7 @@ and render_struct (CStruct (name, slots)) =
   ^ name'
   ^ " {"
   ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots))
-  ^ "}"
+  ^ "};"
 
 and render_expr = function
   | (CBool b) -> render_bool b
