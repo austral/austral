@@ -117,6 +117,7 @@ rule token = parse
 
 and read_string = parse
   | '"' { let c = Buffer.contents string_acc in Buffer.clear string_acc; STRING_CONSTANT c }
+  | '\\' '"' { Buffer.add_char string_acc '"'; read_string lexbuf }
   | [^ '"'] { Buffer.add_string string_acc (Lexing.lexeme lexbuf); read_string lexbuf }
   | eof { err "End of file in string literal" }
   | _ {err ("Character not allowed in string literal: '" ^ Lexing.lexeme lexbuf ^ "'") }
