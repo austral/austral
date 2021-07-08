@@ -265,7 +265,7 @@ instance_def:
   | doc=docstringopt typarams=generic_segment
     INSTANCE name=identifier LPAREN arg=typespec RPAREN IS
     methods=method_def*
-    END INSTANCE SEMI
+    END SEMI
     { ConcreteInstanceDef (ConcreteInstance (name, typarams, arg, methods, doc)) }
   ;
 
