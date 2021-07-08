@@ -166,8 +166,11 @@ and augment_typealias_callable _ _ _ _ _ _ =
 and augment_record_constructor (name: qident) (typarams: type_parameter list) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
   (* Check: the argument list must be named *)
   let args' = (match args with
-               | TPositionalArglist _ ->
-                  err "Arguments to a record constructor must be named"
+               | TPositionalArglist l ->
+                  if l = [] then
+                    []
+                  else
+                    err "Arguments to a record constructor must be named"
                | TNamedArglist a ->
                   a) in
   (* Check: the set of slots matches the set of param names *)
