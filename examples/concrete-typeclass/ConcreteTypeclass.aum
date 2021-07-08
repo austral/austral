@@ -15,4 +15,8 @@ module body Example.ConcreteTypeclass is
         let X: Integer_32 := To_Integer(nil);
         return X;
     end;
+
+    function Main(): Unit is
+        return nil;
+    end;
 end module body.
