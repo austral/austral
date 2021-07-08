@@ -46,7 +46,7 @@ and render_decl i d =
   | CEnumDefinition (name, cases) ->
      List.concat [
          [Line (i, "enum " ^ name ^ " {")];
-         List.concat (List.map (fun case -> [Line (indent i, case)]) cases);
+         [Line (indent i, comma_sep (List.map (fun case -> case) cases))];
          [Line (i, "}")];
        ]
   | CFunctionDeclaration (name, typarams, params, rt, linkage) ->
