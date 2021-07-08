@@ -11,9 +11,13 @@ function compile() {
 
 compile examples/constant Constant
 compile examples/identity Identity
+#compile examples/ffi FFI
+#compile examples/fib Fibonacci
 compile examples/named-argument NamedArgument
 compile examples/memory Memory
 #compile examples/record Record
 compile examples/union Union
+#compile examples/concrete-typeclass ConcreteTypeclass
 #compile examples/generic-record GenericRecord
 #compile examples/generic-union GenericUnion
+#compile examples/generic-typeclassGenericUnion
