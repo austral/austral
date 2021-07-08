@@ -302,9 +302,29 @@ and gen_type_decl decl =
   | _ ->
      None
 
+(* Extract functions into forward function declarations *)
+
+let rec gen_fun_decls decls =
+  List.filter_map gen_fun_decl decls
+
+and gen_fun_decl decl =
+  match decl with
+  | TFunction (_, n, tp, p, rt, _, _) ->
+     Some (CFunctionDeclaration (gen_ident n, gen_typarams tp, gen_params p, gen_type rt, LinkageInternal))
+  | TForeignFunction (_, n, p, rt, _, _) ->
+     Some (CFunctionDeclaration (gen_ident n, [], gen_params p, gen_type rt, LinkageInternal))
+  | TInstance (_, _, tp, _, ms, _) ->
+     Some (CDeclBlock (List.map (gen_method_decl tp) ms))
+  | _ ->
+     None
+
+and gen_method_decl typarams (TypedMethodDef (n, params, rt, _)) =
+  CFunctionDeclaration (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, LinkageInternal)
+
 (* Codegen a module *)
 
 let gen_module (TypedModule (name, decls)) =
   let type_decls = gen_type_decls decls
+  and fun_decls = gen_fun_decls decls
   and decls' = List.map gen_decl decls in
-  CNamespace (gen_module_name name, List.append type_decls decls')
+  CNamespace (gen_module_name name, List.concat [type_decls; fun_decls; decls'])
