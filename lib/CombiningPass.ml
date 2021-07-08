@@ -88,43 +88,6 @@ let match_decls (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: co
            err "Mismatch"
       | _ ->
          err "Not a type")
-  | ConcreteTypeAliasDecl (ConcreteTypeAlias (name, typarams, universe, ty, docstring)) ->
-     (match def with
-      | ConcreteTypeAliasDef (ConcreteTypeAlias (name', typarams', universe', ty', _)) ->
-         if (name = name') && (typarams = typarams') && (universe = universe') && (ty = ty') then
-           CTypeAlias (TypeVisPublic, name, typarams, universe, qualify_typespec ii ty, docstring)
-         else
-           err "Mismatch"
-      | _ ->
-         err "Not a type alias")
-  | ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
-     (match def with
-      | (ConcreteRecordDef (ConcreteRecord (name', typarams', universe', slots', _))) ->
-         if (name = name') && (typarams = typarams') && (universe = universe') && (slots = slots') then
-           CRecord (TypeVisPublic,
-                    name,
-                    typarams,
-                    universe,
-                    parse_slots ii slots,
-                    docstring)
-         else
-           err "Mismatch"
-      | _ ->
-         err "Not a record")
-  | ConcreteUnionDecl (ConcreteUnion (name, typarams, universe, cases, docstring)) ->
-     (match def with
-      | (ConcreteUnionDef (ConcreteUnion (name', typarams', universe', cases', _))) ->
-         if (name = name') && (typarams = typarams') && (universe = universe') && (cases = cases') then
-           CUnion (TypeVisPublic,
-                   name,
-                   typarams,
-                   universe,
-                   parse_cases ii cases,
-                   docstring)
-         else
-           err "Mismatch"
-      | _ ->
-         err "Not a union")
   | ConcreteFunctionDecl (name, typarams, params, rt, docstring) ->
      (match def with
       | ConcreteFunctionDef (name', typarams', params', rt', body, _, pragmas) ->
@@ -141,19 +104,6 @@ let match_decls (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: co
            err "Function declaration does not match definition"
       | _ ->
          err "Not a function")
-  | ConcreteTypeClassDecl (ConcreteTypeClass (name, typaram, methods, docstring)) ->
-     (match def with
-      | ConcreteTypeClassDef (ConcreteTypeClass (name', typaram', methods', _)) ->
-         if (name = name') && (typaram = typaram') && (methods = methods') then
-           CTypeclass (VisPublic,
-                       name,
-                       typaram,
-                       parse_method_decls ii methods,
-                       docstring)
-         else
-           err "Mismatch"
-      | _ ->
-         err "Not a type class")
   | ConcreteInstanceDecl (name, typarams, argument, docstring) ->
      (match def with
       | ConcreteInstanceDef (ConcreteInstance (name', typarams', argument', methods, _)) ->
@@ -168,6 +118,8 @@ let match_decls (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: co
            err "Mismatch"
       | _ ->
          err "Not an instance")
+  | _ ->
+     err "Invalid decl in this context"
 
 let private_def im def =
   match def with
@@ -247,11 +199,37 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
 and parse_decl (im: import_map) (bm: import_map) (cmb: concrete_module_body) (decl: concrete_decl): combined_definition =
   match decl_name decl with
   | (Some name) ->
-     (match get_concrete_def cmb name with
-      | (Some def) ->
-         match_decls im bm decl def
-      | None ->
-         err "Interface declaration has no corresponding body declaration")
+     (match decl with
+      (* Some declarations don't need to have a matching body *)
+      | ConcreteTypeAliasDecl (ConcreteTypeAlias (name, typarams, universe, ty, docstring)) ->
+         CTypeAlias (TypeVisPublic, name, typarams, universe, qualify_typespec im ty, docstring)
+      | ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
+         CRecord (TypeVisPublic,
+                  name,
+                  typarams,
+                  universe,
+                  parse_slots im slots,
+                  docstring)
+      | ConcreteUnionDecl (ConcreteUnion (name, typarams, universe, cases, docstring)) ->
+         CUnion (TypeVisPublic,
+                 name,
+                 typarams,
+                 universe,
+                 parse_cases im cases,
+                 docstring)
+      | ConcreteTypeClassDecl (ConcreteTypeClass (name, typaram, methods, docstring)) ->
+         CTypeclass (VisPublic,
+                     name,
+                     typaram,
+                     parse_method_decls im methods,
+                     docstring)
+      | _ ->
+         (* Other declarations need to match a body *)
+         (match get_concrete_def cmb name with
+          | (Some def) ->
+             match_decls im bm decl def
+          | None ->
+             err "Interface declaration has no corresponding body declaration"))
   | None ->
      (match decl with
       | ConcreteInstanceDecl (name, typarams, argument, _) ->
