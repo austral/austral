@@ -287,5 +287,24 @@ let gen_decl (decl: typed_decl): cpp_decl =
   | TInstance (_, _, typarams, _, methods, _) ->
      CDeclBlock (List.map (gen_method typarams) methods)
 
+(* Extract types into forward type declarations *)
+
+let rec gen_type_decls decls =
+  List.filter_map gen_type_decl decls
+
+and gen_type_decl decl =
+  let d n p = Some (CStructForwardDeclaration (gen_ident n, gen_typarams p)) in
+  match decl with
+  | TRecord (_, n, p, _ ,_, _) ->
+     d n p
+  | TUnion (_, n, p, _, _ ,_) ->
+     d n p
+  | _ ->
+     None
+
+(* Codegen a module *)
+
 let gen_module (TypedModule (name, decls)) =
-  CNamespace (gen_module_name name, List.map gen_decl decls)
+  let type_decls = gen_type_decls decls
+  and decls' = List.map gen_decl decls in
+  CNamespace (gen_module_name name, List.append type_decls decls')
