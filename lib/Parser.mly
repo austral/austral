@@ -192,7 +192,7 @@ union:
   | doc=docstringopt UNION name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS cases=case*
-    END RECORD SEMI { ConcreteUnion (name, typarams, universe, cases, doc) }
+    END SEMI { ConcreteUnion (name, typarams, universe, cases, doc) }
   ;
 
 case:
