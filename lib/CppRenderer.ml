@@ -178,8 +178,8 @@ and render_struct (CStruct (name, slots)) =
   let name' = Option.value name ~default:"" in
   "struct "
   ^ name'
-  ^ "{ "
-  ^ (semi_sep (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots))
+  ^ " {"
+  ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots))
   ^ "}"
 
 and render_expr = function
