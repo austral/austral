@@ -3,6 +3,10 @@ open TypeBindings
 
 exception Type_match_error of string
 
+let type_mismatch msg a b =
+  let msg' = msg ^ ": expected:\n\n" ^ (show_ty a) ^ "\n\nbut got:\n\n" ^ (show_ty b) in
+  raise (Type_match_error msg')
+
 let rec match_type a b =
   match (a, b) with
   | (Unit, Unit) -> empty_bindings
@@ -11,26 +15,26 @@ let rec match_type a b =
      if (s = s') && (w = w') then
        empty_bindings
      else
-       raise (Type_match_error ("Integer types don't match: expected " ^ (type_string a) ^ " but got " ^ (type_string b)))
+       type_mismatch "Integer types don't match" a b
   | (SingleFloat, SingleFloat) -> empty_bindings
   | (DoubleFloat, DoubleFloat) -> empty_bindings
-  | (NamedType (n, a, _), NamedType (n', a', _)) ->
+  | (NamedType (n, args, _), NamedType (n', args', _)) ->
      (* We ignore the universe, since the type system
         is nominal. *)
      if n = n' then
-       match_type_list a a'
+       match_type_list args args'
      else
-       raise (Type_match_error "Type mismatch")
+       type_mismatch "Type mismatch" a b
   | (Array (t, r), Array (t', r')) ->
      let bindings = match_type t t' in
      if r = r' then
        bindings
      else
-       raise (Type_match_error "Type mismatch: array region mismatch")
+       type_mismatch "Array type mismatch" a b
   | (TyVar (TypeVariable (i, u)), t) ->
      match_type_var i u t
   | _ ->
-     raise (Type_match_error "Type mismatch")
+     type_mismatch "Type mismatch" a b
 
 and match_type_var name universe ty =
   (* Check if the argument type is a variable. *)
