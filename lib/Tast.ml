@@ -2,8 +2,8 @@ open StringSet
 open Identifier
 open Common
 open Type
+open Region
 open Semantic
-open Error
 
 type typed_module = TypedModule of module_name * typed_decl list
 
@@ -97,7 +97,7 @@ let rec get_type = function
   | TFloatConstant _ ->
      DoubleFloat
   | TStringConstant _ ->
-     err "Not implemented yet"
+     Array (Integer (Unsigned, Width8), static_region)
   | TVariable (_, ty) ->
      ty
   | TArithmetic (_, lhs, _) ->

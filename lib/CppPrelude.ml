@@ -6,6 +6,14 @@ namespace Austral__Core {
         size_t size;
         T* data;
     };
+
+    template<typename T>
+    Array<T> Make_Array(size_t size, T* data) {
+        return {
+            .size = size,
+            .data = data
+        };
+    }
 }
 
 namespace Austral__Memory {

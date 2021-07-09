@@ -147,8 +147,8 @@ let rec gen_exp (e: texpr): cpp_expr =
      CInt i
   | TFloatConstant f ->
      CFloat f
-  | TStringConstant _ ->
-     err "TODO: string constant codegen"
+  | TStringConstant s ->
+     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CString s])
   | TVariable (n, _) ->
      CVar (gen_ident n)
   | TFuncall (name, args, _) ->
