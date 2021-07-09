@@ -1,5 +1,13 @@
 let prelude = {code|#include <stdlib.h>
 
+namespace Austral__Core {
+    template<typename T>
+    struct Array {
+        size_t size;
+        T* data;
+    };
+}
+
 namespace Austral__Memory {
     template<typename T>
     T* Allocate(T value) {
