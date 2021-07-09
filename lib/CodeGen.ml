@@ -329,4 +329,10 @@ let gen_module (TypedModule (name, decls)) =
   let type_decls = gen_type_decls decls
   and fun_decls = gen_fun_decls decls
   and decls' = List.map gen_decl decls in
-  CNamespace (gen_module_name name, List.concat [type_decls; fun_decls; decls'])
+  let partitioner d =
+    match d with
+    | CTypeDefinition _ -> true
+    | _ -> false
+  in
+  let (type_alias_decls, other_decls) = List.partition partitioner decls' in
+  CNamespace (gen_module_name name, List.concat [type_decls; type_alias_decls; fun_decls; other_decls])
