@@ -11,7 +11,7 @@ let rec match_type a b =
      if (s = s') && (w = w') then
        empty_bindings
      else
-       raise (Type_match_error "Integer types don't match")
+       raise (Type_match_error ("Integer types don't match: expected " ^ (type_string a) ^ " but got " ^ (type_string b)))
   | (SingleFloat, SingleFloat) -> empty_bindings
   | (DoubleFloat, DoubleFloat) -> empty_bindings
   | (NamedType (n, a, _), NamedType (n', a', _)) ->
