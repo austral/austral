@@ -51,4 +51,6 @@ val type_string : ty -> string
 (* The type of array sizes and indices *)
 val size_type : ty
 
+val string_type : ty
+
 val width_int : integer_width -> int

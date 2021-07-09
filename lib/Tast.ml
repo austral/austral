@@ -2,7 +2,6 @@ open StringSet
 open Identifier
 open Common
 open Type
-open Region
 open Semantic
 
 type typed_module = TypedModule of module_name * typed_decl list
@@ -97,7 +96,7 @@ let rec get_type = function
   | TFloatConstant _ ->
      DoubleFloat
   | TStringConstant _ ->
-     Array (Integer (Unsigned, Width8), static_region)
+     string_type
   | TVariable (_, ty) ->
      ty
   | TArithmetic (_, lhs, _) ->

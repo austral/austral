@@ -67,3 +67,5 @@ and args_string = function
   | [] -> ""
 
 let size_type = Integer (Unsigned, Width64)
+
+let string_type = Array (Integer (Unsigned, Width8), static_region)
