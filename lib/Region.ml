@@ -1,7 +1,7 @@
 open Identifier
 
 type region = Region of identifier * int
-[@@deriving eq]
+[@@deriving eq, show]
 
 let region_name (Region (n, _)) = n
 

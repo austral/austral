@@ -34,6 +34,7 @@ type ty =
   | NamedType of qident * ty list * universe
   | Array of ty * region
   | TyVar of type_var
+[@@deriving show]
 
 type typed_slot = TypedSlot of identifier * ty
 

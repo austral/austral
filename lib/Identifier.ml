@@ -1,11 +1,11 @@
 type identifier = string
-[@@deriving eq]
+[@@deriving eq, show]
 
 let make_ident i = i
 let ident_string i = i
 
 type module_name = string
-[@@deriving eq]
+[@@deriving eq, show]
 
 let make_mod_name n = n
 let mod_name_string n = n
@@ -15,6 +15,7 @@ type qident = {
     original: identifier;
     local: identifier
   }
+[@@deriving show]
 
 let make_qident (m, o, n) =
   { source = m; original = o; local = n }

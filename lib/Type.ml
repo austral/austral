@@ -6,24 +6,24 @@ type universe =
   | LinearUniverse
   | TypeUniverse
   | RegionUniverse
-[@@deriving eq]
+[@@deriving eq, show]
 
 type integer_width =
   | Width8
   | Width16
   | Width32
   | Width64
-[@@deriving eq]
+[@@deriving eq, show]
 
 type signedness =
   | Unsigned
   | Signed
-[@@deriving eq]
+[@@deriving eq, show]
 
 type type_parameter = TypeParameter of identifier * universe
 
 type type_var = TypeVariable of identifier * universe
-[@@deriving eq]
+[@@deriving eq, show]
 
 type ty =
   | Unit
@@ -34,6 +34,7 @@ type ty =
   | NamedType of qident * ty list * universe
   | Array of ty * region
   | TyVar of type_var
+[@@deriving show]
 
 type typed_slot = TypedSlot of identifier * ty
 
