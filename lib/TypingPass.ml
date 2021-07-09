@@ -488,10 +488,10 @@ let rec augment_stmt (module_name: module_name) (menv: menv) (typarams: type_par
        let body' = augment_stmt module_name menv typarams lexenv' body in
        TLet (name, ty', value', body')
      else
-       err ("let: type mismatch, expected "
-            ^ (type_string ty')
-            ^ " but got "
-            ^ (type_string (get_type value')))
+       err ("let: type mismatch, expected:\n\n"
+            ^ (show_ty ty')
+            ^ "\n\nbut got\n\n"
+            ^ (show_ty (get_type value')))
   | AAssign (name, value) ->
      let value' = augment_expr module_name menv lexenv None value in
      (match get_var lexenv name with
