@@ -74,4 +74,4 @@ let show_bindings (TypeBindings m) =
   let show_binding (n, t) =
     (show_identifier n) ^ " => " ^ (show_ty t)
   in
-  "TypeBindings {" ^ (String.concat ", " (List.map show_binding (IdentifierMap.bindings m))) ^ ")"
+  "TypeBindings {" ^ (String.concat ", " (List.map show_binding (IdentifierMap.bindings m))) ^ "}"
