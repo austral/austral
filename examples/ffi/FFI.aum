@@ -3,8 +3,13 @@ module body Example.FFI is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
+    function Put_String(str: Fixed_String): Integer_32 is
+        pragma Foreign_Import(External_Name => "puts");
+    end;
+
     function Main(): Unit is
         Put_Character(97);
+        Put_String("Hello, world!\n");
         return nil;
     end;
 end module body.
