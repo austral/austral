@@ -141,28 +141,27 @@ and augment_path (menv: menv) (module_name: module_name) (head_ty: ty) (elems: p
      err "Path is empty"
 
 and augment_path_elem (menv: menv) (module_name: module_name) (head_ty: ty) (elem: path_elem): typed_path_elem =
-  match elem with
-  | SlotAccessor slot_name ->
-     (* Check: e' is a public record type *)
-     let (source_module, vis, slots) = get_record_definition_for_type menv head_ty in
-     if (vis = TypeVisPublic) || (module_name = source_module) then
-       (* Check: the given slot name must exist in this record type. *)
-       let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-       TSlotAccessor (slot_name, slot_ty)
-     else
-       err "Trying to read a slot from a non-public record"
-
-and get_record_definition_for_type menv ty =
-  match ty with
-  | (NamedType (n, _, _)) ->
-     get_record_definition menv n
+  match head_ty with
+  | (NamedType (name, args, _)) ->
+     (match elem with
+      | SlotAccessor slot_name ->
+         (* Check: e' is a public record type *)
+         let (source_module, vis, typarams, slots) = get_record_definition menv name in
+         if (vis = TypeVisPublic) || (module_name = source_module) then
+           (* Check: the given slot name must exist in this record type. *)
+           let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
+           let bindings = match_typarams typarams args in
+           let slot_ty' = replace_variables bindings slot_ty in
+           TSlotAccessor (slot_name, slot_ty')
+         else
+           err "Trying to read a slot from a non-public record")
   | _ ->
      err "Not a record type"
 
 and get_record_definition menv name =
   match get_decl menv name with
-  | (Some (SRecordDefinition (mod_name, vis, _, _, _, slots))) ->
-     (mod_name, vis, slots)
+  | (Some (SRecordDefinition (mod_name, vis, _, typarams, _, slots))) ->
+     (mod_name, vis, typarams, slots)
   | _ ->
      err "No record with this name"
 
