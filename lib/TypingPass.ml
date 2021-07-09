@@ -129,11 +129,11 @@ and augment_arglist (module_name: module_name) (menv: menv) (lexenv: lexenv) (as
 and augment_call (module_name: module_name) (menv: menv) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
   match get_callable menv module_name name with
   | Some callable ->
-     augment_callable name callable asserted_ty args
+     augment_callable module_name menv name callable asserted_ty args
   | None ->
      err "No callable with this name"
 
-and augment_callable (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
+and augment_callable (module_name: module_name) (menv: menv) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
   match callable with
   | FunctionCallable (typarams, params, rt) ->
      augment_function_call name typarams params rt asserted_ty args
@@ -143,8 +143,8 @@ and augment_callable (name: qident) (callable: callable) (asserted_ty: ty option
      augment_record_constructor name typarams universe slots asserted_ty args
   | UnionConstructor { type_name; type_params; universe; case } ->
      augment_union_constructor type_name type_params universe case asserted_ty args
-  | MethodCallable { type_class_name; type_class_type_parameter; method_name; value_parameters; return_type } ->
-     augment_method_call type_class_name type_class_type_parameter method_name value_parameters return_type asserted_ty args
+  | MethodCallable { type_class_name; type_class_type_parameter; value_parameters; return_type; _ } ->
+     augment_method_call menv module_name type_class_name type_class_type_parameter name value_parameters return_type asserted_ty args
 
 and augment_function_call name typarams params rt asserted_ty args =
   (* For simplicity, and to reduce duplication of code, we convert the argument
@@ -236,8 +236,96 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
     else
       err "Universe mismatch"
 
-and augment_method_call _ _ _ _ _ _ =
-  err "TODO: method call"
+and augment_method_call menv source_module_name type_class_name typaram callable_name params rt asserted_ty args =
+  (* At this point, we know the method's name and the typeclass it belongs
+     to. We pull the parameter list from the typeclass, and compare that against
+     the argument list. *)
+  (* For simplicity, and to reduce duplication of code, we convert the argument
+     list to a positional list. *)
+  let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
+  let arguments = arglist_to_positional (args, param_names) in
+  (* Check the list of params against the list of arguments *)
+  let bindings = check_argument_list params arguments in
+  (* Use the bindings to get the effective return type *)
+  let rt' = replace_variables bindings rt in
+  let rt'' = handle_return_type_polymorphism [typaram] rt' asserted_ty in
+  (* Check: the set of bindings equals the set of type parameters *)
+  check_bindings [typaram] bindings;
+  let (TypeParameter (type_parameter_name, _)) = typaram in
+  match get_binding bindings type_parameter_name with
+  | (Some dispatch_ty) ->
+     let instance = get_instance menv source_module_name dispatch_ty type_class_name in
+     TMethodCall (callable_name, instance, arguments, rt'')
+  | None ->
+     err "Internal: couldn't extract dispatch type."
+
+and get_instance (menv: menv) (source_module_name: module_name) (dispatch_ty: ty) (type_class_name: qident): semantic_instance =
+  (* This comment describes the process of finding an instance of the typeclass
+     given the argument list.
+
+     Suppose we have a typeclass:
+
+         interface Printable(T: Free) is
+             method Print(t: T): Unit;
+         end;
+
+     And an instance:
+
+         implementation Printable(Integer_32) is
+             method Print(t: Integer_32) is
+                 ...
+             end;
+         end;
+
+     Then, if we have a call like `Print(30)`, we know which typeclass it's
+     coming from. As part of the type matching process, we match the parameter
+     list from the typeclass against the argument list in the method call, and
+     get a set of bindings that maps `T` to `Integer_32`.
+
+     We ask the binding map for the value of the binding with the name of the
+     typeclass parameter. In this case, the typeclass parameter is `T`, so we
+     get `Integer_32`. This is called the dispatch type. We then iterate over
+     all visible instances of this typeclass, and find one where the instance
+     argument matches the dispatch type.
+
+     Note: the types have to _match_, not be equal, that is, the matching
+     process produces bindings. This is important when finding generic
+     instances.
+
+         generic (U: Free)
+         implementation Printable(List[U]) is
+             method Print(t: List[U]) is
+                 ...
+             end;
+         end;
+
+     Here, a call like `print(listOfInts)` will yield a binding map that maps
+     `T` to `List[Integer_32]`. When we search the list of visible instances,
+     we'll find `List[U]`, and matching these types will produce another binding
+     map that maps `U` to `Integer_32`.
+
+     We use this second binding map to replace the variables in the dispatch
+     type: in our case, `List[U]` becomes `List[Integer_32]`. *)
+  let m = (match get_module menv source_module_name with
+           | (Some m) -> m
+           | None -> err "Internal: current module does not exist in the menv.") in
+  let finder (STypeClassInstance (_, name, _, arg, _)) =
+    if name = (original_name type_class_name) then
+      try
+        let _ = match_type arg dispatch_ty in
+        (* TODO: the rest of the process described above. *)
+        true
+      with
+        Type_match_error _ ->
+      (* Does not match, just skip to the next instance, *)
+        false
+    else
+      false
+  in
+  match List.find_opt finder (visible_instances m) with
+  | (Some i) -> i
+  | None -> err "No instance for this method call"
+
 
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
