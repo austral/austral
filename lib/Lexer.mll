@@ -12,6 +12,8 @@ let advance_line lexbuf =
   lexbuf.lex_curr_p <- pos'
 
 let string_acc: Buffer.t = Buffer.create 64
+
+let docstring_acc: Buffer.t = Buffer.create 64
 }
 
 (* Helper regexes *)
@@ -100,14 +102,14 @@ rule token = parse
   | "=>" { RIGHT_ARROW }
   | ":=" { ASSIGN }
   (* Strings and docstrings *)
-  | "```" { DOCSTRING_MARKER }
+  | "```" { read_docstring lexbuf }
+  | '"' { read_string lexbuf }
   (* Identifiers and constants *)
   | "nil" { NIL }
   | "true" { TRUE }
   | "false" { FALSE }
   | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
   | int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
-  | '"' { read_string lexbuf }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
   | whitespace { token lexbuf }
@@ -121,3 +123,9 @@ and read_string = parse
   | [^ '"'] { Buffer.add_string string_acc (Lexing.lexeme lexbuf); read_string lexbuf }
   | eof { err "End of file in string literal" }
   | _ {err ("Character not allowed in string literal: '" ^ Lexing.lexeme lexbuf ^ "'") }
+
+and read_docstring = parse
+  | "```" { let c = Buffer.contents docstring_acc in Buffer.clear docstring_acc; DOCSTRING_TOKEN c }
+  | '\\' "```" { Buffer.add_string docstring_acc "```"; read_docstring lexbuf }
+  | eof { err "End of file in docstring" }
+  | _ { Buffer.add_string docstring_acc (Lexing.lexeme lexbuf); read_docstring lexbuf }

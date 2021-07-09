@@ -70,14 +70,14 @@ open Util
 %token RIGHT_ARROW
 %token ASSIGN
 /* Strings and docstrings */
-%token DOCSTRING_MARKER
+%token <string> STRING_CONSTANT
+%token <string> DOCSTRING_TOKEN
 /* Identifiers and constants */
 %token NIL
 %token TRUE
 %token FALSE
 %token <string> INT_CONSTANT
 %token <string> FLOAT_CONSTANT
-%token <string> STRING_CONSTANT
 %token <string> IDENTIFIER
 /* etc. */
 %token EOF
@@ -460,7 +460,7 @@ type_parameter:
   ;
 
 docstring:
-  | DOCSTRING_MARKER { Docstring "" }
+  | DOCSTRING_TOKEN { Docstring $1 }
   ;
 
 docstringopt:
