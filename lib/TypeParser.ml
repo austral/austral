@@ -1,5 +1,6 @@
 open Identifier
 open Type
+open Region
 open TypeSystem
 open Ast
 open ModuleSystem
@@ -31,6 +32,8 @@ let is_built_in_type = function
      Some SingleFloat
   | "Double_Float" ->
      Some DoubleFloat
+  | "Fixed_String" ->
+     Some (Array (Integer (Unsigned, Width8), static_region))
   | _ ->
      None
 
