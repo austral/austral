@@ -54,6 +54,8 @@ and abs_expr im expr =
      Negation (abs_expr im e)
   | CIfExpression (c, t, f) ->
      IfExpression (abs_expr im c, abs_expr im t, abs_expr im f)
+  | CPath (e, es) ->
+     Path (abs_expr im e, List.map abs_path_elem es)
 
 and abs_when im (ConcreteWhen (name, params, body)) =
   AbstractWhen (name,
@@ -66,6 +68,11 @@ and abs_arglist im args =
      Positional (List.map (abs_expr im) l)
   | ConcreteNamedArgs l ->
      Named (List.map (fun (n, v) -> (n, abs_expr im v)) l)
+
+and abs_path_elem elem =
+  match elem with
+  | CSlotAccessor i ->
+     SlotAccessor i
 
 (* Given a list of statements, find the first let statement, if any, and put the
    remainder of the list under its body. Then call let_reshape on that

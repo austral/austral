@@ -180,6 +180,23 @@ let rec gen_exp (e: texpr): cpp_expr =
          ("tag", union_tag_value ty case_name);
          ("data", CStructInitializer [(gen_ident case_name, args)])
        ]
+  | TPath (e, elems) ->
+     gen_path (gen_exp e) (List.rev elems)
+
+and gen_path (expr: cpp_expr) (elems: typed_path_elem list): cpp_expr =
+  match elems with
+  | [elem] ->
+     gen_path_elem expr elem
+  | elem::rest ->
+     let expr' = gen_path_elem expr elem in
+     gen_path expr' rest
+  | [] ->
+     err "Empty path"
+
+and gen_path_elem (expr: cpp_expr) (elem: typed_path_elem): cpp_expr =
+  match elem with
+  | TSlotAccessor (n, _) ->
+     CStructAccessor (expr, gen_ident n)
 
 (* Statements *)
 

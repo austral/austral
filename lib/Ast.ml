@@ -34,6 +34,7 @@ and aexpr =
   | Disjunction of aexpr * aexpr
   | Negation of aexpr
   | IfExpression of aexpr * aexpr * aexpr
+  | Path of aexpr * path_elem list
 
 and abstract_when =
   | AbstractWhen of identifier * (identifier * qtypespec) list * astmt
@@ -41,3 +42,6 @@ and abstract_when =
 and abstract_arglist =
   | Positional of aexpr list
   | Named of (identifier * aexpr) list
+
+and path_elem =
+  SlotAccessor of identifier

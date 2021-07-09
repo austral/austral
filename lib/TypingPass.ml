@@ -102,6 +102,9 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
          err "Both branches of an if expression must be the same type."
      else
        err "The type of the condition in an if expression must be a boolean."
+  | Path (e, elems) ->
+     let e' = aug e in
+     TPath (e', augment_path menv module_name (get_type e') elems)
 
 and is_bool e =
   match get_type e with
@@ -125,6 +128,48 @@ and augment_arglist (module_name: module_name) (menv: menv) (lexenv: lexenv) (as
      TPositionalArglist (List.map aug args')
   | Named pairs ->
      TNamedArglist (List.map (fun (n, v) -> (n, aug v)) pairs)
+
+and augment_path (menv: menv) (module_name: module_name) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
+  match elems with
+  | [elem] ->
+     [augment_path_elem menv module_name head_ty elem]
+  | elem::rest ->
+     let elem' = augment_path_elem menv module_name head_ty elem in
+     let rest' = augment_path menv module_name (path_elem_type elem') rest in
+     elem' :: rest'
+  | [] ->
+     err "Path is empty"
+
+and augment_path_elem (menv: menv) (module_name: module_name) (head_ty: ty) (elem: path_elem): typed_path_elem =
+  match elem with
+  | SlotAccessor slot_name ->
+     (* Check: e' is a public record type *)
+     let (source_module, vis, slots) = get_record_definition_for_type menv head_ty in
+     if (vis = TypeVisPublic) || (module_name = source_module) then
+       (* Check: the given slot name must exist in this record type. *)
+       let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
+       TSlotAccessor (slot_name, slot_ty)
+     else
+       err "Trying to read a slot from a non-public record"
+
+and get_record_definition_for_type menv ty =
+  match ty with
+  | (NamedType (n, _, _)) ->
+     get_record_definition menv n
+  | _ ->
+     err "Not a record type"
+
+and get_record_definition menv name =
+  match get_decl menv name with
+  | (Some (SRecordDefinition (mod_name, vis, _, _, _, slots))) ->
+     (mod_name, vis, slots)
+  | _ ->
+     err "No record with this name"
+
+and get_slot_with_name slots slot_name =
+  match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
+  | Some s -> s
+  | None -> err "No slot with this name"
 
 and augment_call (module_name: module_name) (menv: menv) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
   match get_callable menv module_name name with

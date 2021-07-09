@@ -51,9 +51,13 @@ and texpr =
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
+  | TPath of texpr * typed_path_elem list
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt
+
+and typed_path_elem =
+  TSlotAccessor of identifier * ty
 
 type typed_arglist =
   | TPositionalArglist of texpr list
@@ -86,3 +90,5 @@ val arglist_size : typed_arglist -> int
 val arglist_to_positional : typed_arglist * identifier list -> texpr list
 
 val get_type : texpr -> ty
+
+val path_elem_type : typed_path_elem -> ty

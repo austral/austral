@@ -77,6 +77,7 @@ and cexpr =
   | CDisjunction of cexpr * cexpr
   | CNegation of cexpr
   | CIfExpression of cexpr * cexpr * cexpr
+  | CPath of cexpr * concrete_path_elem list
 
 and cstmt =
   | CSkip
@@ -102,6 +103,9 @@ and concrete_arglist =
 
 and concrete_param =
   ConcreteParam of identifier * typespec
+
+and concrete_path_elem =
+  CSlotAccessor of identifier
 
 val decl_name : concrete_decl -> identifier option
 

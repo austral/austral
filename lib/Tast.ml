@@ -52,9 +52,13 @@ and texpr =
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
+  | TPath of texpr * typed_path_elem list
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt
+
+and typed_path_elem =
+  TSlotAccessor of identifier * ty
 
 type typed_arglist =
   | TPositionalArglist of texpr list
@@ -121,3 +125,11 @@ let rec get_type = function
      ty
   | TUnionConstructor (ty, _, _) ->
      ty
+  | TPath (_, elems) ->
+     assert ((List.length elems) > 0);
+     let last = List.nth elems ((List.length elems) - 1) in
+     path_elem_type last
+
+and path_elem_type = function
+  | TSlotAccessor (_, t) ->
+     t
