@@ -11,6 +11,10 @@ val is_built_in_type : string -> ty option
    Preconditions: the lists have the same length. *)
 val effective_universe : type_parameter list -> universe -> ty list -> universe
 
+val any_arg_is_linear : ty list -> bool
+
+val any_arg_is_type : ty list -> bool
+
 (* Find the type signature of the type with the given name, if any
    exists. Searches the local type signature list first. *)
 val get_type_signature : menv -> type_signature list -> qident -> type_signature option
