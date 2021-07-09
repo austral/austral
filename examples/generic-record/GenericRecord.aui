@@ -4,5 +4,5 @@ module Example.GenericRecord is
         right: T;
     end;
 
-    function Main(): Integer_32;
+    function Main(): Unit;
 end module.
