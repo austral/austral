@@ -189,6 +189,10 @@ and render_expr = function
   | (CString s) -> "\"" ^ s ^ "\""
   | (CVar s) -> s
   | (CFuncall (n, a)) -> n ^ (paren (comma_sep (List.map e a)))
+  | (CCast (e, t)) ->
+     let e' = render_expr e
+     and t' = render_type t in
+     "((" ^ t' ^ ")(" ^ e' ^ "))"
   | (CArithmetic (op, l, r)) ->
      paren ((e l) ^ " " ^ render_arith op ^ " " ^ (e r) ^ ")")
   | (CComparison (op, l, r)) ->

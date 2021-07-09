@@ -153,6 +153,8 @@ let rec gen_exp (e: texpr): cpp_expr =
      CFuncall (gen_qident name, List.map g args)
   | TMethodCall (name, _, args, _) ->
      CFuncall (gen_qident name, List.map g args)
+  | TCast (e, t) ->
+     CCast (gen_exp e, gen_type t)
   | TArithmetic (op, lhs, rhs) ->
      CArithmetic (op, g lhs, g rhs)
   | TComparison (op, lhs, rhs) ->
