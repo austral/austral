@@ -1,4 +1,5 @@
 open Identifier
+open Region
 
 type universe =
   | FreeUniverse
@@ -27,6 +28,7 @@ type ty =
   | SingleFloat
   | DoubleFloat
   | NamedType of qident * ty list * universe
+  | Array of ty * region
   | TyVar of type_var
 
 type typed_slot = TypedSlot of identifier * ty

@@ -96,6 +96,8 @@ let rec gen_type (ty: ty): cpp_ty =
      t "double"
   | NamedType (n, a, _) ->
      gen_named_type n a
+  | Array (t, _) ->
+     CNamedType ("Austral__Core::Array", [gen_type t])
   | TyVar (TypeVariable (n, _)) ->
      CNamedType (gen_ident n, [])
 

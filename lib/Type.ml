@@ -1,4 +1,5 @@
 open Identifier
+open Region
 
 type universe =
   | FreeUniverse
@@ -27,6 +28,7 @@ type ty =
   | SingleFloat
   | DoubleFloat
   | NamedType of qident * ty list * universe
+  | Array of ty * region
   | TyVar of type_var
 
 type typed_slot = TypedSlot of identifier * ty
@@ -44,6 +46,8 @@ let rec type_string = function
   | SingleFloat -> "SingleFloat"
   | DoubleFloat -> "DoubleFloat"
   | NamedType (n, args, _) -> (ident_string (local_name n)) ^ args_string args
+  | Array (t, r) ->
+     "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "]"
   | TyVar (TypeVariable (n, _)) -> ident_string n
 
 and signedness_string = function

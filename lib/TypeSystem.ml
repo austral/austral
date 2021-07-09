@@ -8,6 +8,7 @@ let type_universe = function
   | SingleFloat -> FreeUniverse
   | DoubleFloat -> FreeUniverse
   | NamedType (_, _, u) -> u
+  | Array (_, _) -> FreeUniverse
   | TyVar (TypeVariable (_, u)) -> u
 
 let type_arguments = function
