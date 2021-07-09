@@ -1,6 +1,7 @@
 open Type
 open TypeBindings
-open Error
+
+exception Type_match_error of string
 
 let rec match_type a b =
   match (a, b) with
@@ -10,7 +11,7 @@ let rec match_type a b =
      if (s = s') && (w = w') then
        empty_bindings
      else
-       err "Integer types don't match"
+       raise (Type_match_error "Integer types don't match")
   | (SingleFloat, SingleFloat) -> empty_bindings
   | (DoubleFloat, DoubleFloat) -> empty_bindings
   | (NamedType (n, a, _), NamedType (n', a', _)) ->
@@ -19,10 +20,11 @@ let rec match_type a b =
      if n = n' then
        match_type_list a a'
      else
-       err "Type mismatch"
+       raise (Type_match_error "Type mismatch")
   | (TyVar (TypeVariable (i, u)), t) ->
      match_type_var i u t
-  | _ -> err "Type mismatch"
+  | _ ->
+     raise (Type_match_error "Type mismatch")
 
 and match_type_var name universe ty =
   (* Check if the argument type is a variable. *)
