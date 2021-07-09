@@ -21,6 +21,12 @@ let rec match_type a b =
        match_type_list a a'
      else
        raise (Type_match_error "Type mismatch")
+  | (Array (t, r), Array (t', r')) ->
+     let bindings = match_type t t' in
+     if r = r' then
+       bindings
+     else
+       raise (Type_match_error "Type mismatch: array region mismatch")
   | (TyVar (TypeVariable (i, u)), t) ->
      match_type_var i u t
   | _ ->
