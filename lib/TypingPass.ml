@@ -160,7 +160,7 @@ and augment_function_call name typarams params rt asserted_ty args =
   check_bindings typarams bindings;
   TFuncall (name, arguments, rt'')
 
-and augment_typealias_callable _ typarams _ asserted_ty definition_ty args =
+and augment_typealias_callable name typarams universe asserted_ty definition_ty args =
   (* Check: the argument list is a positional list with a single argument *)
   let arg = (match args with
              | TPositionalArglist [a] ->
@@ -172,7 +172,8 @@ and augment_typealias_callable _ typarams _ asserted_ty definition_ty args =
   let params = [ValueParameter (make_ident "synthetic", definition_ty)] in
   let bindings = check_argument_list params [arg] in
   (* Use the bindings to get the effective return type *)
-  let rt' = replace_variables bindings definition_ty in
+  let rt = NamedType (name, List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams, universe) in
+  let rt' = replace_variables bindings rt in
   let rt'' = handle_return_type_polymorphism typarams rt' asserted_ty in
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings typarams bindings;
