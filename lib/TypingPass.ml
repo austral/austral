@@ -15,7 +15,7 @@ open Util
 open Error
 
 let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
-  let aug = augment_expr module_name menv lexenv asserted_ty in
+  let aug = augment_expr module_name menv lexenv None in
   match expr with
   | NilConstant ->
      TNilConstant
@@ -34,7 +34,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
       | None ->
          err ("I can't find the variable named " ^ (ident_string name)))
   | FunctionCall (name, args) ->
-     augment_call module_name menv asserted_ty name (augment_arglist module_name menv lexenv asserted_ty args)
+     augment_call module_name menv asserted_ty name (augment_arglist module_name menv lexenv None args)
   | ArithmeticExpression (op, lhs, rhs) ->
      let lhs' = aug lhs
      and rhs' = aug rhs in
