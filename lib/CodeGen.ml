@@ -383,6 +383,7 @@ let gen_module (TypedModule (name, decls)) =
   let partitioner d =
     match d with
     | CTypeDefinition _ -> true
+    | CEnumDefinition _ -> true
     | _ -> false
   in
   let (type_alias_decls, other_decls) = List.partition partitioner decls' in
