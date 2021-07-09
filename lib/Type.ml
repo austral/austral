@@ -54,20 +54,16 @@ and signedness_string = function
   | Unsigned -> "Natural"
   | Signed -> "Integer"
 
-and width_string = function
-  | Width8 -> "8"
-  | Width16 -> "16"
-  | Width32 -> "32"
-  | Width64 -> "64"
+and width_int = function
+  | Width8 -> 8
+  | Width16 -> 16
+  | Width32 -> 32
+  | Width64 -> 64
+
+and width_string w = string_of_int (width_int w)
 
 and args_string = function
   | (first::rest) -> "[" ^ (String.concat ", " (List.map type_string (first::rest))) ^ "]"
   | [] -> ""
 
 let size_type = Integer (Unsigned, Width64)
-
-let width_int = function
-  | Width8 -> 8
-  | Width16 -> 16
-  | Width32 -> 32
-  | Width64 -> 64
