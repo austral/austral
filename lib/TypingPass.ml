@@ -217,7 +217,12 @@ and augment_typealias_callable name typarams universe asserted_ty definition_ty 
   let params = [ValueParameter (make_ident "synthetic", definition_ty)] in
   let bindings = check_argument_list params [arg] in
   (* Use the bindings to get the effective return type *)
-  let rt = NamedType (name, List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams, universe) in
+  let rt = NamedType (
+               name,
+               List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams,
+               universe
+             )
+  in
   let rt' = replace_variables bindings rt in
   let rt'' = handle_return_type_polymorphism typarams rt' asserted_ty in
   (* Check: the set of bindings equals the set of type parameters *)
