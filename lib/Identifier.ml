@@ -1,9 +1,11 @@
 type identifier = string
+[@@deriving eq]
 
 let make_ident i = i
 let ident_string i = i
 
 type module_name = string
+[@@deriving eq]
 
 let make_mod_name n = n
 let mod_name_string n = n
@@ -27,3 +29,6 @@ let qident_debug_name { source; original; local } =
   and l = ident_string local
   in
   l ^ " from " ^ s ^ (if o = l then "" else (", originally " ^ o))
+
+let equal_qident { source; original; _ } { source=source'; original=original'; _ } =
+  (equal_module_name source source') && (equal_identifier original original')

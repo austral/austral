@@ -1,6 +1,7 @@
 open Identifier
 
 type region
+[@@deriving eq]
 
 val region_name : region -> identifier
 

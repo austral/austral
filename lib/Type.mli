@@ -6,20 +6,24 @@ type universe =
   | LinearUniverse
   | TypeUniverse
   | RegionUniverse
+[@@deriving eq]
 
 type integer_width =
   | Width8
   | Width16
   | Width32
   | Width64
+[@@deriving eq]
 
 type signedness =
   | Unsigned
   | Signed
+[@@deriving eq]
 
 type type_parameter = TypeParameter of identifier * universe
 
 type type_var = TypeVariable of identifier * universe
+[@@deriving eq]
 
 type ty =
   | Unit
@@ -54,3 +58,5 @@ val size_type : ty
 val string_type : ty
 
 val width_int : integer_width -> int
+
+val equal_ty : ty -> ty -> bool
