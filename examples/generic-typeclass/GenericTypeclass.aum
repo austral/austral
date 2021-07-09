@@ -5,7 +5,7 @@ module body Example.GenericTypeclass is
         method To_Integer(x: T): Integer_32;
     end;
 
-    generic (T: Free)
+    generic [T: Free]
     implementation Numerical(Pointer[T]) is
         method To_Integer(x: Pointer[T]): Integer_32 is
             return 0;
