@@ -17,7 +17,7 @@ compile examples/named-argument NamedArgument
 compile examples/memory Memory
 #compile examples/record Record
 compile examples/union Union
-#compile examples/concrete-typeclass ConcreteTypeclass
+compile examples/concrete-typeclass ConcreteTypeclass
 #compile examples/generic-record GenericRecord
 #compile examples/generic-union GenericUnion
-#compile examples/generic-typeclass GenericTypeclass
+compile examples/generic-typeclass GenericTypeclass
