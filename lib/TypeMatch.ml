@@ -58,3 +58,7 @@ and match_type_var name universe ty =
 and match_type_list tys tys' =
   let bs = List.map2 match_type tys tys' in
   List.fold_left merge_bindings empty_bindings bs
+
+let match_typarams typarams args =
+  let typarams' = List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams in
+  match_type_list typarams' args
