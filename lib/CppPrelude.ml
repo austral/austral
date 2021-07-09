@@ -1,4 +1,5 @@
-let prelude = {code|#include <stdlib.h>
+let prelude = {code|#include <cstdlib>
+#include <cstdint>
 
 namespace Austral__Core {
     template<typename T>
