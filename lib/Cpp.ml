@@ -55,7 +55,6 @@ type cpp_decl =
   | CEnumDefinition of string * string list
   | CFunctionDeclaration of string * cpp_ty_param list * cpp_value_param list * cpp_ty * cpp_function_linkage
   | CFunctionDefinition of string * cpp_ty_param list * cpp_value_param list * cpp_ty * cpp_stmt
-  | CDeclBlock of cpp_decl list
 
 and cpp_ty_param = CTypeParam of string
 and cpp_value_param = CValueParam of string * cpp_ty

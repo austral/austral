@@ -76,8 +76,6 @@ and render_decl i d =
          render_stmt (indent i) body;
          [Line (i, "}")];
        ]
-  | CDeclBlock ss ->
-     List.concat (List.map (render_decl i) ss)
 
 and render_typarams i params =
   let t (CTypeParam n) = "typename " ^ n in
