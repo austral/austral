@@ -280,7 +280,14 @@ let gen_decl (decl: typed_decl): cpp_decl =
      CFunctionDefinition (gen_ident name, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt body)
   | TForeignFunction (_, n, params, rt, underlying, _) ->
      let ff_decl = CFunctionDeclaration (underlying, [], gen_params params, gen_type rt, LinkageExternal) in
-     let args = List.map (fun (ValueParameter (n, _)) -> CVar (gen_ident n)) params in
+     let make_param n t =
+       if t = string_type then
+         (* Extract the pointer from the Array struct *)
+         CStructAccessor (CVar (gen_ident n), "data")
+       else
+         CVar (gen_ident n)
+     in
+     let args = List.map (fun (ValueParameter (n, t)) -> make_param n t) params in
      let funcall = CFuncall (underlying, args) in
      let body = CReturn funcall in
      let def = CFunctionDefinition (gen_ident n, [], gen_params params, gen_type rt, body) in
