@@ -1,7 +1,8 @@
 open Identifier
 open IdentifierMap
-open Error
 open Type
+open TypeParser
+open Error
 
 type type_bindings = TypeBindings of ty IdentifierMap.t
 
@@ -53,6 +54,24 @@ let rec replace_variables bindings ty =
       | Some ty -> ty
       | None -> TyVar (TypeVariable (n, u)))
   | NamedType (n, a, u) ->
-     NamedType (n, List.map (replace_variables bindings) a, u)
+     let a' = List.map (replace_variables bindings) a in
+     if u = TypeUniverse then
+       let u' = if any_arg_is_linear a' then
+                  LinearUniverse
+                else
+                  if any_arg_is_type a' then
+                    TypeUniverse
+                  else
+                    FreeUniverse
+       in
+       NamedType (n, a', u')
+     else
+       NamedType (n, a', u)
   | t ->
      t
+
+let show_bindings (TypeBindings m) =
+  let show_binding (n, t) =
+    (show_identifier n) ^ " => " ^ (show_ty t)
+  in
+  "TypeBindings {" ^ (String.concat ", " (List.map show_binding (IdentifierMap.bindings m))) ^ ")"

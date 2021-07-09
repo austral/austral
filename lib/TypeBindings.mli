@@ -19,3 +19,5 @@ val get_binding : type_bindings -> identifier -> ty option
    in the expression with the value from the bindings. If the variable is not
    found in the bindings, do nothing. *)
 val replace_variables : type_bindings -> ty -> ty
+
+val show_bindings : type_bindings -> string
