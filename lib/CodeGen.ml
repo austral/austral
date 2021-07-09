@@ -148,7 +148,7 @@ let rec gen_exp (e: texpr): cpp_expr =
   | TFloatConstant f ->
      CFloat f
   | TStringConstant s ->
-     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CString s])
+     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CCast (CString s, CPointer (CNamedType ("uint8_t", [])))])
   | TVariable (n, _) ->
      CVar (gen_ident n)
   | TFuncall (name, args, _) ->
