@@ -12,7 +12,7 @@ function compile() {
 compile examples/constant Constant
 compile examples/identity Identity
 compile examples/ffi FFI
-#compile examples/fib Fibonacci
+compile examples/fib Fibonacci
 compile examples/named-argument NamedArgument
 compile examples/memory Memory
 compile examples/type-alias TypeAlias

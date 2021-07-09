@@ -1,5 +1,5 @@
 module Example.Fibonacci is
     ```The fibonacci function.```
-    function Fibonacci(n: Natural_64): Natural_64;
+    function Fibonacci(n: Integer_32): Integer_32;
     function Main(): Unit;
 end module.
