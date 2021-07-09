@@ -16,7 +16,7 @@ compile examples/fib Fibonacci
 compile examples/named-argument NamedArgument
 compile examples/memory Memory
 compile examples/type-alias TypeAlias
-#compile examples/record Record
+compile examples/record Record
 compile examples/union Union
 compile examples/concrete-typeclass ConcreteTypeclass
 #compile examples/generic-record GenericRecord
