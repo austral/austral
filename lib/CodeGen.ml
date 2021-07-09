@@ -2,6 +2,7 @@ open Identifier
 open Type
 open BuiltIn
 open Tast
+open Region
 open Cpp
 open Util
 open Error
@@ -136,6 +137,8 @@ let local_union_tag_enum_name (n: identifier): string =
 let union_tag_value (ty: ty) (case_name: identifier): cpp_expr =
   CVar (union_tag_enum_name (union_type_name ty) ^ "::" ^ (gen_ident case_name))
 
+let c_string_type = CPointer (CNamedType ("uint8_t", []))
+
 let rec gen_exp (e: texpr): cpp_expr =
   let g = gen_exp in
   match e with
@@ -148,7 +151,7 @@ let rec gen_exp (e: texpr): cpp_expr =
   | TFloatConstant f ->
      CFloat f
   | TStringConstant s ->
-     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CCast (CString s, CPointer (CNamedType ("uint8_t", [])))])
+     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CCast (CString s, c_string_type)])
   | TVariable (n, _) ->
      CVar (gen_ident n)
   | TFuncall (name, args, _) ->
@@ -279,7 +282,27 @@ let gen_decl (decl: typed_decl): cpp_decl =
   | TFunction (_, name, typarams, params, rt, body, _) ->
      CFunctionDefinition (gen_ident name, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt body)
   | TForeignFunction (_, n, params, rt, underlying, _) ->
-     let ff_decl = CFunctionDeclaration (underlying, [], gen_params params, gen_type rt, LinkageExternal) in
+     let type_to_c_type t =
+       (match t with
+        | Unit ->
+           err "Not allowed"
+        | Boolean ->
+           gen_type t
+        | Integer _ ->
+           gen_type t
+        | SingleFloat ->
+           gen_type t
+        | DoubleFloat ->
+           gen_type t
+        | Array (Integer (Unsigned, Width8), r) ->
+           if r = static_region then
+             c_string_type
+           else
+             err "Not allowed"
+        | _ ->
+           err "Not allowed")
+     in
+     let ff_decl = CFunctionDeclaration (underlying, [], List.map (fun (ValueParameter (n, t)) -> CValueParam (gen_ident n, type_to_c_type t)) params, gen_type rt, LinkageExternal) in
      let make_param n t =
        if t = string_type then
          (* Extract the pointer from the Array struct *)
