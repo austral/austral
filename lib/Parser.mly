@@ -373,6 +373,7 @@ named_arg:
   | identifier RIGHT_ARROW expression { ($1, $3) }
 
 compound_expression:
+  | path { $1 }
   | atomic_expression comp_op atomic_expression { CComparison ($2, $1, $3) }
   | atomic_expression AND atomic_expression { CConjunction ($1, $3) }
   | atomic_expression OR atomic_expression { CDisjunction ($1, $3) }
@@ -380,6 +381,15 @@ compound_expression:
   | arith_expr { $1 }
   | IF expression THEN expression ELSE expression { CIfExpression ($2, $4, $6) }
   ;
+
+path:
+  | initial=atomic_expression elems=path_rest+ { CPath (initial, elems) }
+
+path_rest:
+  | slot_accessor { $1 }
+
+slot_accessor:
+  | PERIOD identifier { CSlotAccessor $2 }
 
 comp_op:
   | EQ { Equal }
