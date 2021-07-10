@@ -376,15 +376,31 @@ and gen_method_decl typarams (TypedMethodDef (n, params, rt, _)) =
 
 (* Codegen a module *)
 
+let decl_order = function
+  | CNamespace _ ->
+     0
+  | CUsingDeclaration _ ->
+     1
+  | CEnumDefinition _ ->
+     2
+  | CStructForwardDeclaration _ ->
+     3
+  | CStructDefinition _ ->
+     4
+  | CTypeDefinition _ ->
+     5
+  | CConstantDefinition _ ->
+     6
+  | CFunctionDeclaration _ ->
+     7
+  | CFunctionDefinition _ ->
+     8
+
 let gen_module (TypedModule (name, decls)) =
   let type_decls = gen_type_decls decls
   and fun_decls = List.concat (gen_fun_decls decls)
   and decls' = List.concat (List.map gen_decl decls) in
-  let partitioner d =
-    match d with
-    | CTypeDefinition _ -> true
-    | CEnumDefinition _ -> true
-    | _ -> false
-  in
-  let (type_alias_decls, other_decls) = List.partition partitioner decls' in
-  CNamespace (gen_module_name name, List.concat [type_decls; type_alias_decls; fun_decls; other_decls])
+  let decls'' = List.concat [type_decls; fun_decls; decls'] in
+  let sorter a b = compare (decl_order a) (decl_order b) in
+  let sorted_decls = List.sort sorter decls'' in
+  CNamespace (gen_module_name name, sorted_decls)
