@@ -1,5 +1,7 @@
+open Identifier
 open Type
 open TypeVarSet
+open Region
 
 let type_universe = function
     Unit -> FreeUniverse
