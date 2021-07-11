@@ -308,7 +308,7 @@ let gen_decl (decl: typed_decl): cpp_decl list =
   | TFunction (_, name, typarams, params, rt, body, _) ->
      [CFunctionDefinition (gen_ident name, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt body)]
   | TForeignFunction (_, n, params, rt, underlying, _) ->
-     let type_to_c_type t =
+     let param_type_to_c_type t =
        (match t with
         | Unit ->
            err "Not allowed"
@@ -325,10 +325,27 @@ let gen_decl (decl: typed_decl): cpp_decl list =
              c_string_type
            else
              err "Not allowed"
+        | NamedType (n, _, _) ->
+           let mn = source_module_name n
+           and orig = original_name n
+           in
+           if (mn = memory_module_name) && (orig = pointer_type_name) then
+             gen_type t
+           else
+             err "Pointers are the only named type allowed as parameters of C functions."
         | _ ->
            err "Not allowed")
      in
-     let ff_decl = CFunctionDeclaration (underlying, [], List.map (fun (ValueParameter (n, t)) -> CValueParam (gen_ident n, type_to_c_type t)) params, gen_type rt, LinkageExternal) in
+     let return_type_to_c_type t =
+       match t with
+       | Array _ ->
+          err "Foreign functions cannot return arrays."
+       | _ ->
+          param_type_to_c_type t
+     in
+     let ff_params = List.map (fun (ValueParameter (n, t)) -> CValueParam (gen_ident n, param_type_to_c_type t)) params
+     and ff_rt = return_type_to_c_type rt in
+     let ff_decl = CFunctionDeclaration (underlying, [], ff_params, ff_rt, LinkageExternal) in
      let make_param n t =
        if t = string_type then
          (* Extract the pointer from the Array struct *)
