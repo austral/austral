@@ -16,6 +16,12 @@ type astmt =
       final: aexpr;
       body: astmt
     }
+  | ABorrow of {
+      original: identifier;
+      rename: identifier;
+      region: identifier;
+      body: astmt
+    }
   | ABlock of astmt * astmt
   | ADiscarding of aexpr
   | AReturn of aexpr

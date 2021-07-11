@@ -87,6 +87,12 @@ and cstmt =
   | CCase of cexpr * concrete_when list
   | CWhile of cexpr * cstmt
   | CFor of identifier * cexpr * cexpr * cstmt
+  | CBorrow of {
+      original: identifier;
+      rename: identifier;
+      region: identifier;
+      body: cstmt
+    }
   | CBlock of cstmt list
   | CDiscarding of cexpr
   | CReturn of cexpr

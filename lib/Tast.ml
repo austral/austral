@@ -30,6 +30,14 @@ and tstmt =
   | TCase of texpr * typed_when list
   | TWhile of texpr * tstmt
   | TFor of identifier * texpr * texpr * tstmt
+  | TBorrow of {
+      original: identifier;
+      rename: identifier;
+      region: identifier;
+      orig_type: ty;
+      ref_type: ty;
+      body: tstmt
+    }
   | TBlock of tstmt * tstmt
   | TDiscarding of texpr
   | TReturn of texpr

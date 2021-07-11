@@ -25,6 +25,8 @@ let rec abs_stmt im stmt =
          final = abs_expr im f;
          body = abs_stmt im b
        }
+  | CBorrow { original; rename; region; body } ->
+     ABorrow { original; rename; region; body=abs_stmt im body }
   | CBlock l ->
      let_reshape im l
   | CDiscarding e ->

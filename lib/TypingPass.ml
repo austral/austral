@@ -494,6 +494,9 @@ type stmt_ctx = module_name * menv * region_map * type_parameter list * lexenv
 let update_lexenv (mn, menv, rm, typarams, _) lexenv =
   (mn, menv, rm, typarams, lexenv)
 
+let update_rm (mn, menv, _, typarams, lexenv) rm =
+  (mn, menv, rm, typarams, lexenv)
+
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   let (module_name, menv, rm, typarams, lexenv) = ctx in
   match stmt with
@@ -564,6 +567,29 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          err "The type of the final value in a for loop must be an integer type."
      else
        err "The type of the initial value in a for loop must be an integer type."
+  | ABorrow { original; rename; region; body } ->
+     (match get_var lexenv original with
+      | (Some orig_ty) ->
+         let u = type_universe orig_ty in
+         if ((u = LinearUniverse) || (u = TypeUniverse)) then
+           let region_obj = fresh_region region in
+           let refty = ReadRef (orig_ty, region_obj) in
+           let lexenv' = push_var lexenv region refty in
+           let rm' = add_region rm region region_obj in
+           let ctx' = update_lexenv ctx lexenv' in
+           let ctx''= update_rm ctx' rm' in
+           TBorrow {
+               original=original;
+               rename=rename;
+               region=region;
+               orig_type=orig_ty;
+               ref_type=refty;
+               body=augment_stmt ctx'' body
+             }
+         else
+           err "Cannot borrow a non-linear type."
+      | None ->
+         err "No variable with this name.")
   | ABlock (f, r) ->
      TBlock (augment_stmt ctx f,
              augment_stmt ctx r)

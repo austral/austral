@@ -221,6 +221,9 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
      CWhile (gen_exp c, gen_stmt b)
   | TFor (v, i, f, b) ->
      CFor (gen_ident v, gen_exp i, gen_exp f, gen_stmt b)
+  | TBorrow { original; rename; orig_type; body; _ } ->
+      let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
+      CBlock [l; gen_stmt body]
   | TBlock (a, b) ->
      CBlock [gen_stmt a; gen_stmt b]
   | TDiscarding e ->
