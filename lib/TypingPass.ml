@@ -105,7 +105,13 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
        err "The type of the condition in an if expression must be a boolean."
   | Path (e, elems) ->
      let e' = aug e in
-     TPath (e', augment_path menv module_name (get_type e') elems)
+     let elems' = augment_path menv module_name (get_type e') elems in
+     let path' = TPath (e', elems') in
+     let universe = type_universe (get_type path') in
+     if universe = FreeUniverse then
+       path'
+     else
+       err "Paths must end in the free universe"
 
 and is_bool e =
   match get_type e with
