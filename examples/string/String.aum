@@ -1,6 +1,6 @@
 module body Example.String is
     function Main(): Unit is
-        let X: Fixed_String := "Hello, world!\n";
+        let X: Fixed_Array[Natural_8] := "Hello, world!\n";
         return nil;
     end;
 end module body.
