@@ -1,5 +1,6 @@
 open Identifier
 open Type
+open Region
 open Ast
 open ModuleSystem
 
@@ -25,6 +26,6 @@ val get_type_signature : menv -> type_signature list -> qident -> type_signature
    type specifier is being parsed in.Arith_status
 
    The third argument is the list of type parameters known at parse time.  *)
-val parse_type : menv -> type_signature list -> type_parameter list -> qtypespec -> ty
+val parse_type : menv -> type_signature list -> region_map -> type_parameter list -> qtypespec -> ty
 
 val universe_compatible : universe -> universe -> bool

@@ -1,6 +1,7 @@
 open Identifier
 open Type
 open TypeSystem
+open Region
 open Ast
 open ModuleSystem
 open Semantic
@@ -124,16 +125,20 @@ let get_type_signature menv sigs name =
 
 (* Parsing *)
 
-let rec parse_type menv sigs typarams (QTypeSpecifier (name, args)) =
+let rec parse_type (menv: menv) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
   match parse_built_in_type (ident_string (original_name name)) args with
   | Some ty ->
      ty
   | None ->
-     match is_param typarams name with
-     | Some ty ->
-        ty
-     | None ->
-        parse_user_defined_type menv sigs typarams name args
+     (match is_region rm name with
+      | Some ty ->
+         ty
+      | None ->
+         (match is_param typarams name with
+          | Some ty ->
+             ty
+          | None ->
+             parse_user_defined_type menv sigs rm typarams name args))
 
 (* Is the given name a type parameter in the list of type paramters? If so,
    return it as a type variable. *)
@@ -146,21 +151,28 @@ and is_param (typarams: type_parameter list) (name: qident): ty option =
   | None ->
      None
 
-and parse_user_defined_type (menv: menv) (sigs: type_signature list) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
+(* Is the given name a region parameter? If so, return it as a RegionTy instance
+   by finding the region in the region map. *)
+and is_region (rm: region_map) (name: qident): ty option =
+  match get_region rm (original_name name) with
+  | (Some r) -> Some (RegionTy r)
+  | None -> None
+
+and parse_user_defined_type (menv: menv) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
   match get_type_signature menv sigs name with
   | Some ts ->
-     parse_user_defined_type' menv sigs ts typarams name args
+     parse_user_defined_type' menv sigs ts rm typarams name args
   | None ->
      err ("No user defined type with name: " ^ (qident_debug_name name))
 
-and parse_user_defined_type' (menv: menv) (sigs: type_signature list) (ts: type_signature) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
+and parse_user_defined_type' (menv: menv) (sigs: type_signature list) (ts: type_signature) (rm: region_map) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
   let (TypeSignature (_, ts_params, declared_universe)) = ts in
   (* Check: the number of type parameters in the signature matches the number of
      type arguments *)
   check_param_arity_matches ts_params args;
   (* Check: the universe of each type argument matches the universe of each type
      parameter in the type signature. *)
-  let args' = List.map (parse_type menv sigs typarams) args in
+  let args' = List.map (parse_type menv sigs rm typarams) args in
   check_universes_match ts_params args';
   (* Construct the named type *)
   let universe = effective_universe ts_params declared_universe args' in
