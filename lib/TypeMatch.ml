@@ -31,6 +31,11 @@ let rec match_type a b =
        bindings
      else
        type_mismatch "Array type mismatch" a b
+  | (RegionTy r, RegionTy r') ->
+     if r = r' then
+       empty_bindings
+     else
+       type_mismatch "Region type mismatch" a b
   | (TyVar (TypeVariable (i, u)), t) ->
      match_type_var i u t
   | _ ->
