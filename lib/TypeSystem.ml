@@ -12,6 +12,7 @@ let type_universe = function
   | NamedType (_, _, u) -> u
   | Array (_, _) -> FreeUniverse
   | RegionTy _ -> RegionUniverse
+  | ReadRef _ -> FreeUniverse
   | TyVar (TypeVariable (_, u)) -> u
 
 let type_arguments = function

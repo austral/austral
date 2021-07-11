@@ -34,6 +34,7 @@ type ty =
   | NamedType of qident * ty list * universe
   | Array of ty * region
   | RegionTy of region
+  | ReadRef of ty * region
   | TyVar of type_var
 [@@deriving show]
 

@@ -101,6 +101,8 @@ let rec gen_type (ty: ty): cpp_ty =
      CNamedType ("Austral__Core::Array", [gen_type t])
   | RegionTy _ ->
      err "TODO: Codegen for region types"
+  | ReadRef (t, _) ->
+     CPointer (gen_type t)
   | TyVar (TypeVariable (n, _)) ->
      CNamedType (gen_ident n, [])
 

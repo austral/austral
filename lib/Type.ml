@@ -34,6 +34,7 @@ type ty =
   | NamedType of qident * ty list * universe
   | Array of ty * region
   | RegionTy of region
+  | ReadRef of ty * region
   | TyVar of type_var
 [@@deriving show]
 
@@ -56,6 +57,8 @@ let rec type_string = function
      "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "]"
   | RegionTy r ->
      ident_string (region_name r)
+  | ReadRef (t, r) ->
+     "Reference[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "]"
   | TyVar (TypeVariable (n, _)) -> ident_string n
 
 and signedness_string = function
