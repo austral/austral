@@ -33,6 +33,7 @@ type ty =
   | DoubleFloat
   | NamedType of qident * ty list * universe
   | Array of ty * region
+  | RegionTy of region
   | TyVar of type_var
 [@@deriving show]
 

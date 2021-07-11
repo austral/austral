@@ -9,6 +9,7 @@ let type_universe = function
   | DoubleFloat -> FreeUniverse
   | NamedType (_, _, u) -> u
   | Array (_, _) -> FreeUniverse
+  | RegionTy _ -> RegionUniverse
   | TyVar (TypeVariable (_, u)) -> u
 
 let type_arguments = function

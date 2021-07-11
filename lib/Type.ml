@@ -33,6 +33,7 @@ type ty =
   | DoubleFloat
   | NamedType of qident * ty list * universe
   | Array of ty * region
+  | RegionTy of region
   | TyVar of type_var
 [@@deriving show]
 
@@ -53,6 +54,8 @@ let rec type_string = function
   | NamedType (n, args, _) -> (ident_string (local_name n)) ^ args_string args
   | Array (t, r) ->
      "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "]"
+  | RegionTy r ->
+     ident_string (region_name r)
   | TyVar (TypeVariable (n, _)) -> ident_string n
 
 and signedness_string = function
