@@ -6,7 +6,8 @@ open ModuleSystem
 open Semantic
 open Error
 
-let is_built_in_type = function
+let parse_built_in_type name _ =
+  match name with
   | "Unit" ->
      Some Unit
   | "Boolean" ->
@@ -124,7 +125,7 @@ let get_type_signature menv sigs name =
 (* Parsing *)
 
 let rec parse_type menv sigs typarams (QTypeSpecifier (name, args)) =
-  match is_built_in_type (ident_string (original_name name)) with
+  match parse_built_in_type (ident_string (original_name name)) args with
   | Some ty ->
      ty
   | None ->
