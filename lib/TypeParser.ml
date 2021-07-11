@@ -7,7 +7,7 @@ open ModuleSystem
 open Semantic
 open Error
 
-let parse_built_in_type name _ =
+let parse_built_in_type name args =
   match name with
   | "Unit" ->
      Some Unit
@@ -37,6 +37,12 @@ let parse_built_in_type name _ =
      Some string_type
   | "Static" ->
      Some (RegionTy static_region)
+  | "Fixed_Array" ->
+     (match args with
+      | [ty] ->
+         Some (Array (ty, static_region))
+      | _ ->
+         err "Invalid Fixed_Array type specifier.")
   | _ ->
      None
 
@@ -128,7 +134,8 @@ let get_type_signature menv sigs name =
 (* Parsing *)
 
 let rec parse_type (menv: menv) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
-  match parse_built_in_type (ident_string (original_name name)) args with
+  let args' = List.map (parse_type menv sigs rm typarams) args in
+  match parse_built_in_type (ident_string (original_name name)) args' with
   | Some ty ->
      ty
   | None ->
@@ -140,7 +147,7 @@ let rec parse_type (menv: menv) (sigs: type_signature list) (rm: region_map) (ty
           | Some ty ->
              ty
           | None ->
-             parse_user_defined_type menv sigs rm typarams name args))
+             parse_user_defined_type menv sigs name args'))
 
 (* Is the given name a type parameter in the list of type paramters? If so,
    return it as a type variable. *)
@@ -160,27 +167,26 @@ and is_region (rm: region_map) (name: qident): ty option =
   | (Some r) -> Some (RegionTy r)
   | None -> None
 
-and parse_user_defined_type (menv: menv) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
+and parse_user_defined_type (menv: menv) (sigs: type_signature list) (name: qident) (args: ty list): ty =
   match get_type_signature menv sigs name with
   | Some ts ->
-     parse_user_defined_type' menv sigs ts rm typarams name args
+     parse_user_defined_type' ts name args
   | None ->
      err ("No user defined type with name: " ^ (qident_debug_name name))
 
-and parse_user_defined_type' (menv: menv) (sigs: type_signature list) (ts: type_signature) (rm: region_map) (typarams: type_parameter list) (name: qident) (args: qtypespec list): ty =
+and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list): ty =
   let (TypeSignature (_, ts_params, declared_universe)) = ts in
   (* Check: the number of type parameters in the signature matches the number of
      type arguments *)
   check_param_arity_matches ts_params args;
   (* Check: the universe of each type argument matches the universe of each type
      parameter in the type signature. *)
-  let args' = List.map (parse_type menv sigs rm typarams) args in
-  check_universes_match ts_params args';
+  check_universes_match ts_params args;
   (* Construct the named type *)
-  let universe = effective_universe ts_params declared_universe args' in
-  NamedType (name, args', universe)
+  let universe = effective_universe ts_params declared_universe args in
+  NamedType (name, args, universe)
 
-and check_param_arity_matches (params: type_parameter list) (args: qtypespec list): unit =
+and check_param_arity_matches (params: type_parameter list) (args: ty list): unit =
   assert ((List.length params) = (List.length args))
 
 and check_universes_match (params: type_parameter list) (args: ty list): unit =
