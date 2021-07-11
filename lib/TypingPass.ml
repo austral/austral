@@ -5,6 +5,7 @@ open TypeBindings
 open TypeMatch
 open TypeVarSet
 open TypeParser
+open Region
 open LexEnv
 open ModuleSystem
 open Ast
@@ -469,8 +470,8 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
 
 (* Since the semantic extraction pass has already happened, we can simplify the
    call to `parse_type` by passing an empty list of local type signatures. *)
-let parse_typespec (menv: menv) (typarams: type_parameter list) (ty: qtypespec): ty =
-  parse_type menv [] typarams ty
+let parse_typespec (menv: menv) (rm: region_map) (typarams: type_parameter list) (ty: qtypespec): ty =
+  parse_type menv [] rm typarams ty
 
 let is_boolean = function
   | Boolean -> true
@@ -482,16 +483,22 @@ let is_compatible_with_size_type = function
   | e ->
      (get_type e) = size_type
 
-let rec augment_stmt (module_name: module_name) (menv: menv) (typarams: type_parameter list) (lexenv: lexenv) (stmt: astmt): tstmt =
+type stmt_ctx = module_name * menv * region_map * type_parameter list * lexenv
+
+let update_lexenv (mn, menv, rm, typarams, _) lexenv =
+  (mn, menv, rm, typarams, lexenv)
+
+let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
+  let (module_name, menv, rm, typarams, lexenv) = ctx in
   match stmt with
   | ASkip ->
      TSkip
   | ALet (name, ty, value, body) ->
-     let ty' = parse_typespec menv typarams ty in
+     let ty' = parse_typespec menv rm typarams ty in
      let value' = augment_expr module_name menv lexenv (Some ty') value in
      if equal_ty ty' (get_type value') then
        let lexenv' = push_var lexenv name ty' in
-       let body' = augment_stmt module_name menv typarams lexenv' body in
+       let body' = augment_stmt (update_lexenv ctx lexenv') body in
        TLet (name, ty', value', body')
      else
        err ("let: type mismatch, expected:\n\n"
@@ -511,7 +518,7 @@ let rec augment_stmt (module_name: module_name) (menv: menv) (typarams: type_par
   | AIf (c, t, f) ->
      let c' = augment_expr module_name menv lexenv None c in
      if is_boolean (get_type c') then
-       TIf (c', augment_stmt module_name menv typarams lexenv t, augment_stmt module_name menv typarams lexenv f)
+       TIf (c', augment_stmt ctx t, augment_stmt ctx f)
      else
        err "The type of the condition in an if statement must be a boolean."
   | ACase (expr, whens) ->
@@ -529,14 +536,14 @@ let rec augment_stmt (module_name: module_name) (menv: menv) (typarams: type_par
      if ident_set_eq case_names when_names then
        (* Group the cases and whens *)
        let whens' = group_cases_whens cases whens in
-       let whens'' = List.map (fun (c, w) -> augment_when module_name menv typarams lexenv w c) whens' in
+       let whens'' = List.map (fun (c, w) -> augment_when ctx w c) whens' in
        TCase (expr', whens'')
      else
        err "Non-exhaustive case statement."
   | AWhile (c, body) ->
      let c' = augment_expr module_name menv lexenv None c in
      if is_boolean (get_type c') then
-       TWhile (c', augment_stmt module_name menv typarams lexenv body)
+       TWhile (c', augment_stmt ctx body)
      else
        err "The type of the condition in a while loop must be a boolean"
   | AFor { name; initial; final; body } ->
@@ -545,15 +552,15 @@ let rec augment_stmt (module_name: module_name) (menv: menv) (typarams: type_par
      if is_compatible_with_size_type i' then
        if is_compatible_with_size_type f' then
          let lexenv' = push_var lexenv name size_type in
-         let b' = augment_stmt module_name menv typarams lexenv' body in
+         let b' = augment_stmt (update_lexenv ctx lexenv') body in
          TFor (name, i', f', b')
        else
          err "The type of the final value in a for loop must be an integer type."
      else
        err "The type of the initial value in a for loop must be an integer type."
   | ABlock (f, r) ->
-     TBlock (augment_stmt module_name menv typarams lexenv f,
-             augment_stmt module_name menv typarams lexenv r)
+     TBlock (augment_stmt ctx f,
+             augment_stmt ctx r)
   | ADiscarding e ->
      let e' = augment_expr module_name menv lexenv None e in
      TDiscarding e'
@@ -583,7 +590,8 @@ and group_cases_whens (cases: typed_case list) (whens: abstract_when list): (typ
 and group_bindings_slots (bindings: (identifier * qtypespec) list) (slots: typed_slot list): (identifier * qtypespec * ty) list =
   List.map (fun (n, t) -> (n, t, let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> n = n') slots in ty')) bindings
 
-and augment_when (module_name: module_name) (menv: menv) (typarams: type_parameter list) (lexenv: lexenv) (w: abstract_when) (c: typed_case): typed_when =
+and augment_when (ctx: stmt_ctx) (w: abstract_when) (c: typed_case): typed_when =
+  let (_, menv, rm, typarams, lexenv) = ctx in
   let (AbstractWhen (name, bindings, body)) = w
   and (TypedCase (_, slots)) = c in
   (* Check the set of binding names is the same as the set of slots *)
@@ -593,14 +601,14 @@ and augment_when (module_name: module_name) (menv: menv) (typarams: type_paramet
     (* Check the type of each binding matches the type of the slot *)
     let bindings' = group_bindings_slots bindings slots in
     let bindings'' = List.map (fun (n, ty, actual_ty) ->
-                         let ty' = parse_typespec menv typarams ty in
+                         let ty' = parse_typespec menv rm typarams ty in
                          if ty' <> actual_ty then
                            err "Slot type mismatch"
                          else
                            (n, ty'))
                        bindings' in
     let lexenv' = push_vars lexenv bindings'' in
-    let body' = augment_stmt module_name menv typarams lexenv' body in
+    let body' = augment_stmt (update_lexenv ctx lexenv') body in
     TypedWhen (name, List.map (fun (n, t) -> ValueParameter (n, t)) bindings'', body')
   else
     err "The set of slots in the case statement doesn't match the set of slots in the union definition."
@@ -608,24 +616,28 @@ and augment_when (module_name: module_name) (menv: menv) (typarams: type_paramet
 let rec augment_decl (module_name: module_name) (menv: menv) (decl: combined_definition): typed_decl =
   match decl with
   | CConstant (vis, name, ts, expr, doc) ->
-     let ty = parse_typespec menv [] ts in
+     let ty = parse_typespec menv empty_region_map [] ts in
      let expr' = augment_expr module_name menv empty_lexenv (Some ty) expr in
      if ty = get_type expr' then
        TConstant (vis, name, ty, expr', doc)
      else
        err "The declared type does not match the actual type of the expression."
   | CTypeAlias (vis, name, typarams, universe, ts, doc) ->
-     let ty = parse_typespec menv typarams ts in
+     let rm = region_map_from_typarams typarams in
+     let ty = parse_typespec menv rm typarams ts in
      TTypeAlias (vis, name, typarams, universe, ty, doc)
   | CRecord (vis, name, typarams, universe, slots, doc) ->
-     let slots' = augment_slots menv typarams slots in
+     let rm = region_map_from_typarams typarams in
+     let slots' = augment_slots menv rm typarams slots in
      TRecord (vis, name, typarams, universe, slots', doc)
   | CUnion (vis, name, typarams, universe, cases, doc) ->
-     let cases' = augment_cases menv typarams cases in
+     let rm = region_map_from_typarams typarams in
+     let cases' = augment_cases menv rm typarams cases in
      TUnion (vis, name, typarams, universe, cases', doc)
   | CFunction (vis, name, typarams, params, rt, body, doc, pragmas) ->
-     let params' = augment_params menv typarams params
-     and rt' = parse_typespec menv typarams rt in
+     let rm = region_map_from_typarams typarams in
+     let params' = augment_params menv rm typarams params
+     and rt' = parse_typespec menv rm typarams rt in
      (match pragmas with
       | [ForeignImportPragma s] ->
          if typarams = [] then
@@ -633,26 +645,29 @@ let rec augment_decl (module_name: module_name) (menv: menv) (decl: combined_def
          else
            err "Foreign functions can't have type parameters."
       | [] ->
-         let body' = augment_stmt module_name menv typarams (lexenv_from_params params') body in
+         let ctx = module_name, menv, rm, typarams, (lexenv_from_params params') in
+         let body' = augment_stmt ctx body in
          TFunction (vis, name, typarams, params', rt', body', doc)
       | _ ->
          err "Invalid pragmas")
   | CTypeclass (vis, name, typaram, methods, doc) ->
-     TTypeClass (vis, name, typaram, List.map (augment_method_decl menv typaram) methods, doc)
+     let rm = region_map_from_typarams [typaram] in
+     TTypeClass (vis, name, typaram, List.map (augment_method_decl menv rm typaram) methods, doc)
   | CInstance (vis, name, typarams, arg, methods, doc) ->
      (* TODO: the universe of the type parameter matches the universe of the type argument *)
      (* TODO: Check the methods in the instance match the methods in the class *)
-     let arg' = parse_typespec menv typarams arg in
-     TInstance (vis, name, typarams, arg', List.map (augment_method_def module_name menv typarams) methods, doc)
+     let rm = region_map_from_typarams typarams in
+     let arg' = parse_typespec menv rm typarams arg in
+     TInstance (vis, name, typarams, arg', List.map (augment_method_def module_name menv rm typarams) methods, doc)
 
-and augment_slots menv typarams slots =
-  List.map (fun (QualifiedSlot (n, ts)) -> TypedSlot (n, parse_typespec menv typarams ts)) slots
+and augment_slots menv rm typarams slots =
+  List.map (fun (QualifiedSlot (n, ts)) -> TypedSlot (n, parse_typespec menv rm typarams ts)) slots
 
-and augment_cases menv typarams cases =
-  List.map (fun (QualifiedCase (n, ss)) -> TypedCase (n, augment_slots menv typarams ss)) cases
+and augment_cases menv rm typarams cases =
+  List.map (fun (QualifiedCase (n, ss)) -> TypedCase (n, augment_slots menv rm typarams ss)) cases
 
-and augment_params menv typarams params =
-  List.map (fun (QualifiedParameter (n, ts)) -> ValueParameter (n, parse_typespec menv typarams ts)) params
+and augment_params menv rm typarams params =
+  List.map (fun (QualifiedParameter (n, ts)) -> ValueParameter (n, parse_typespec menv rm typarams ts)) params
 
 and lexenv_from_params (params: value_parameter list): lexenv =
   match params with
@@ -661,15 +676,16 @@ and lexenv_from_params (params: value_parameter list): lexenv =
   | [] ->
      empty_lexenv
 
-and augment_method_decl menv typaram (CMethodDecl (name, params, rt, _)) =
-  let params' = augment_params menv [typaram] params
-  and rt' = parse_typespec menv [typaram] rt in
+and augment_method_decl menv rm typaram (CMethodDecl (name, params, rt, _)) =
+  let params' = augment_params menv rm [typaram] params
+  and rt' = parse_typespec menv rm [typaram] rt in
   TypedMethodDecl (name, params', rt')
 
-and augment_method_def module_name menv typarams (CMethodDef (name, params, rt, _, body)) =
-  let params' = augment_params menv typarams params
-  and rt' = parse_typespec menv typarams rt in
-  let body' = augment_stmt module_name menv typarams (lexenv_from_params params') body in
+and augment_method_def module_name menv rm typarams (CMethodDef (name, params, rt, _, body)) =
+  let params' = augment_params menv rm typarams params
+  and rt' = parse_typespec menv rm typarams rt in
+  let ctx = module_name, menv, rm, typarams, (lexenv_from_params params') in
+  let body' = augment_stmt ctx body in
   TypedMethodDef (name, params', rt', body')
 
 let augment_module menv (CombinedModule { name; decls; _ }) =

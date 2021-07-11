@@ -8,7 +8,9 @@ open Tast
 
 val augment_expr : module_name -> menv -> lexenv -> ty option -> aexpr -> texpr
 
-val augment_stmt: module_name -> menv -> type_parameter list -> lexenv -> astmt -> tstmt
+type stmt_ctx
+
+val augment_stmt: stmt_ctx -> astmt -> tstmt
 
 val augment_decl : module_name -> menv -> combined_definition -> typed_decl
 
