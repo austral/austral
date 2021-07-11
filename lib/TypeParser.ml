@@ -41,6 +41,16 @@ let parse_built_in_type name args =
          Some (Array (ty, static_region))
       | _ ->
          err "Invalid Fixed_Array type specifier.")
+  | "Reference" ->
+     (match args with
+      | [ty; RegionTy r] ->
+         let u = type_universe ty in
+         if ((u = LinearUniverse) || (u = TypeUniverse)) then
+           Some (ReadRef (ty, r))
+         else
+           err "References can only point to linear types."
+      | _ ->
+         err "Invalid Reference type specifier.")
   | _ ->
      None
 
