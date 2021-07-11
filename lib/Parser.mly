@@ -55,6 +55,8 @@ open Util
 %token DO
 %token FROM
 %token TO
+%token BORROW
+%token IN
 %token RETURN
 %token SKIP
 %token UNIVERSE_FREE
@@ -286,6 +288,7 @@ statement:
   | CASE expression OF when_stmt* END CASE SEMI { CCase ($2, $4) }
   | WHILE expression DO block END WHILE SEMI { CWhile ($2, $4) }
   | FOR identifier FROM expression TO expression DO block END FOR SEMI { CFor ($2, $4, $6, $8) }
+  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b } }
   | RETURN expression SEMI { CReturn $2 }
   | SKIP SEMI { CSkip }
   ;

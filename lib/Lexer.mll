@@ -87,6 +87,8 @@ rule token = parse
   | "do" { DO }
   | "from" { FROM }
   | "to" { TO }
+  | "borrow" { BORROW }
+  | "in" { IN }
   | "return" { RETURN }
   | "skip" { SKIP }
   | "Free" { UNIVERSE_FREE }
