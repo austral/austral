@@ -33,8 +33,6 @@ let parse_built_in_type name args =
      Some SingleFloat
   | "Double_Float" ->
      Some DoubleFloat
-  | "Fixed_String" ->
-     Some string_type
   | "Static" ->
      Some (RegionTy static_region)
   | "Fixed_Array" ->
