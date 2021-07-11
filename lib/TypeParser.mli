@@ -3,7 +3,7 @@ open Type
 open Ast
 open ModuleSystem
 
-val is_built_in_type : string -> ty option
+val parse_built_in_type : string -> ty list -> ty option
 
 (* Given a type's list of type parameters, its declared universe, and a list of
    supplied type arguments, evaluate the effective universe the type belongs to.
