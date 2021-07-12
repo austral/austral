@@ -178,6 +178,10 @@ and same_state (states: state list): bool =
 and xor (a: bool) (b: bool): bool =
   (a || b) || (not (a && b))
 
+let universe_linear_ish = function
+  | LinearUniverse -> true
+  | TypeUniverse -> true
+  | _ -> false
 
 (* Check that all linear variables defined in this statement are used
    consistently. *)
@@ -187,7 +191,7 @@ let rec check_linearity (stmt: tstmt): unit =
      ()
   | TLet (n, t, _, b) ->
      let u = type_universe t in
-     if ((u = LinearUniverse) || (u = TypeUniverse)) then
+     if universe_linear_ish u then
        check_consistency n b
      else
        ()
@@ -212,3 +216,28 @@ let rec check_linearity (stmt: tstmt): unit =
      ()
   | TReturn _ ->
      ()
+
+let rec check_decl_linearity (decl: typed_decl): unit =
+  match decl with
+  | TFunction (_, _, _, params, _, b, _) ->
+     (* Check linearity of parameters *)
+     let _ = List.map (check_param b) params in
+     (* Check linearity within the code *)
+     check_linearity b
+  | TInstance (_, _, _, _, methods, _) ->
+     let _ = List.map check_method_linearity methods in
+     ()
+  | _ ->
+     ()
+
+and check_method_linearity (TypedMethodDef (_, params, _, b)) =
+  (* Check linearity of parameters *)
+  let _ = List.map (check_param b) params in
+  (* Check linearity within the code *)
+  check_linearity b
+
+and check_param (b: tstmt) (ValueParameter (n, t)) =
+  if universe_linear_ish (type_universe t) then
+    check_consistency n b
+  else
+    ()
