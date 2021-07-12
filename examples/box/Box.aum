@@ -26,6 +26,13 @@ module body Example.Box is
         return value;
     end;
 
+    generic [T: Type]
+    function Swap(box: Box[T], value: T): T is
+        let old: T := Load(box.pointer);
+        Store(box.pointer, value);
+        return old;
+    end;
+
     function Main(): Unit is
         return nil;
     end;
