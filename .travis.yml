@@ -1,8 +1,0 @@
-language: generic
-sudo: false
-
-install:
-  - sudo apt-get install -y make smlnj mlton clang
-
-script:
-  - ./run-tests.sh
