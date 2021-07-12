@@ -472,7 +472,10 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
     let _ = List.map check typarams in
     ()
   else
-    err "Not the same number of bindings and parameters"
+    err ("Not the same number of bindings and parameters. Bindings: "
+         ^ (show_bindings bindings)
+         ^ ". Parameters: "
+         ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))
 
 (* Since the semantic extraction pass has already happened, we can simplify the
    call to `parse_type` by passing an empty list of local type signatures. *)
