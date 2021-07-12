@@ -1,0 +1,17 @@
+import Austral.Memory (
+    Pointer,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
+
+module body Example.Box is
+    record Box[T: Type]: Linear is
+        pointer: Pointer[T];
+    end;
+
+    function Main(): Unit is
+        return nil;
+    end;
+end module body.

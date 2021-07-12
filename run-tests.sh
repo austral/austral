@@ -23,3 +23,4 @@ compile examples/generic-record GenericRecord
 compile examples/generic-union GenericUnion
 compile examples/generic-typeclass GenericTypeclass
 compile examples/string String
+compile examples/box Box
