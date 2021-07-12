@@ -4,6 +4,7 @@ open TypeSystem
 open Region
 open Ast
 open ModuleSystem
+open BuiltIn
 open Semantic
 open Error
 
@@ -54,7 +55,7 @@ let parse_built_in_type name args =
   | _ ->
      None
 
-let rec effective_universe typarams declared_universe args =
+let rec effective_universe name typarams declared_universe args =
   (* Algorithm:
 
      1. If the declared universe is Free then none of the type parameters can be Linear or Type.
@@ -80,7 +81,10 @@ let rec effective_universe typarams declared_universe args =
      if all_arguments_are_free args then
        FreeUniverse
      else
-       err "Free type called with non-free argument"
+       if is_pointer_type name then
+         FreeUniverse
+       else
+         err "Free type called with non-free argument"
   | LinearUniverse ->
      LinearUniverse
   | RegionUniverse ->
@@ -191,7 +195,7 @@ and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list)
      parameter in the type signature. *)
   check_universes_match ts_params args;
   (* Construct the named type *)
-  let universe = effective_universe ts_params declared_universe args in
+  let universe = effective_universe name ts_params declared_universe args in
   NamedType (name, args, universe)
 
 and check_param_arity_matches (params: type_parameter list) (args: ty list): unit =

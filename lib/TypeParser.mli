@@ -10,7 +10,7 @@ val parse_built_in_type : string -> ty list -> ty option
    supplied type arguments, evaluate the effective universe the type belongs to.
 
    Preconditions: the lists have the same length. *)
-val effective_universe : type_parameter list -> universe -> ty list -> universe
+val effective_universe : qident -> type_parameter list -> universe -> ty list -> universe
 
 val any_arg_is_linear : ty list -> bool
 

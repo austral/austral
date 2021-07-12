@@ -107,10 +107,7 @@ let rec gen_type (ty: ty): cpp_ty =
      CNamedType (gen_ident n, [])
 
 and gen_named_type (name: qident) (args: ty list): cpp_ty =
-  let mod_name = source_module_name name
-  and original = original_name name
-  in
-  if (mod_name = memory_module_name) && (original = pointer_type_name) then
+  if is_pointer_type name then
     match args with
     | [t] ->
        CPointer (gen_type t)
@@ -326,10 +323,7 @@ let gen_decl (decl: typed_decl): cpp_decl list =
            else
              err "Not allowed"
         | NamedType (n, _, _) ->
-           let mn = source_module_name n
-           and orig = original_name n
-           in
-           if (mn = memory_module_name) && (orig = pointer_type_name) then
+           if is_pointer_type n then
              gen_type t
            else
              err "Pointers are the only named type allowed as parameters of C functions."
