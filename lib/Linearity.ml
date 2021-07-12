@@ -1,4 +1,6 @@
 open Identifier
+open Type
+open TypeSystem
 open Tast
 open Error
 
@@ -175,3 +177,38 @@ and same_state (states: state list): bool =
 
 and xor (a: bool) (b: bool): bool =
   (a || b) || (not (a && b))
+
+
+(* Check that all linear variables defined in this statement are used
+   consistently. *)
+let rec check_linearity (stmt: tstmt): unit =
+  match stmt with
+  | TSkip ->
+     ()
+  | TLet (n, t, _, b) ->
+     let u = type_universe t in
+     if ((u = LinearUniverse) || (u = TypeUniverse)) then
+       check_consistency n b
+     else
+       ()
+  | TAssign _ ->
+     ()
+  | TIf (_, tb, fb) ->
+     check_linearity tb;
+     check_linearity fb
+  | TCase (_, whens) ->
+     let _ = List.map (fun (TypedWhen (_, _, b)) -> check_linearity b) whens in
+     ()
+  | TWhile (_, b) ->
+     check_linearity b
+  | TFor (_, _, _, b) ->
+     check_linearity b
+  | TBorrow { body; _ } ->
+     check_linearity body
+  | TBlock (a, b) ->
+     check_linearity a;
+     check_linearity b
+  | TDiscarding _ ->
+     ()
+  | TReturn _ ->
+     ()

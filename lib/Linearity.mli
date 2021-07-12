@@ -1,6 +1,5 @@
-open Identifier
 open Tast
 
-(* Check that a linear variable is used consistently in the body in which it is
-   defined. *)
-val check_consistency : identifier -> tstmt -> unit
+(* Check that all linear variables defined in this statement are used
+   consistently. *)
+val check_linearity : tstmt -> unit
