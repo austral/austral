@@ -14,6 +14,16 @@ module body Example.Box is
     generic [T: Type]
     function Make(value: T): Box[T] is
         let ptr: Pointer[T] := Allocate(value);
+        let box: Box[T] := Box(pointer => ptr);
+        return box;
+    end;
+
+    generic [T: Type]
+    function Unbox(box: Box[T]): T is
+        let ptr: Pointer[T] := box.pointer;
+        let value: T := Load(ptr);
+        Deallocate(ptr);
+        return value;
     end;
 
     function Main(): Unit is

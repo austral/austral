@@ -4,5 +4,8 @@ module Example.Box is
     generic [T: Type]
     function Make(value: T): Box[T];
 
+    generic [T: Type]
+    function Unbox(box: Box[T]): T;
+
     function Main(): Unit;
 end module.
