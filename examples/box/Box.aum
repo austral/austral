@@ -11,6 +11,11 @@ module body Example.Box is
         pointer: Pointer[T];
     end;
 
+    generic [T: Type]
+    function Make(value: T): Box[T] is
+        let ptr: Pointer[T] := Allocate(value);
+    end;
+
     function Main(): Unit is
         return nil;
     end;
