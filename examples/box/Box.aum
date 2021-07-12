@@ -33,7 +33,15 @@ module body Example.Box is
         return old;
     end;
 
+    function Put_Character(character: Integer_32): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
     function Main(): Unit is
+        let box: Box[Integer_32] := Make(123);
+        Swap(box, 97);
+        let value: Integer_32 := Unbox(box);
+        Put_Character(value);
         return nil;
     end;
 end module body.
