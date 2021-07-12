@@ -17,26 +17,26 @@ namespace Austral__Core {
     }
 }
 
-namespace Austral__Memory {
+namespace A_Austral__Memory {
     template<typename T>
-    T* Allocate(T value) {
+    T* A_Allocate(T value) {
         T* ptr = (T*) malloc(sizeof(T));
         return ptr;
     }
 
     template<typename T>
-    T Load(T* pointer) {
+    T A_Load(T* pointer) {
         return *pointer;
     }
 
     template<typename T>
-    bool Store(T* pointer, T value) {
+    bool A_Store(T* pointer, T value) {
         *pointer = value;
         return false;
     }
 
     template<typename T>
-    bool Deallocate(T* pointer) {
+    bool A_Deallocate(T* pointer) {
         free(pointer);
         return false;
     }

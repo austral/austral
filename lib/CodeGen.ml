@@ -67,11 +67,13 @@ let new_variable _ =
 
 (* Identifiers *)
 
+let austral_prefix: string = "A_"
+
 let gen_ident (i: identifier): string =
-  (ident_string i)
+  austral_prefix ^ (ident_string i)
 
 let gen_module_name (n: module_name): string =
-  replace_char (mod_name_string n) '.' "__"
+  austral_prefix ^ replace_char (mod_name_string n) '.' "__"
 
 let gen_qident (i: qident): string =
   (gen_module_name (source_module_name i)) ^ "::" ^ (gen_ident (original_name i))
