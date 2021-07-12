@@ -48,8 +48,12 @@ and match_type_var name universe ty =
      (* When the argument type is a type variable, check if the variables have
         the same name. *)
      if (name = i') && (universe = u') then
-       (* If the variables have the same name, return the empty map *)
-       empty_bindings
+       (* Originally I thought that in this case we should return the empty
+          binding. But I realize that when you have a call like `f(g(x))` where
+          `g` has a type parameter `T` in its return type, and `f` has a type
+          parameter also called `T` in its return type, the compiler thinks the
+          parameter is not satisfied. Perhaps this requires further thought. *)
+       add_binding empty_bindings name ty
      else
        (* Otherwise, add a new binding.
 
