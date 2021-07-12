@@ -12,6 +12,7 @@ open Ast
 open Tast
 open Combined
 open Semantic
+open Linearity
 open Util
 open Error
 
@@ -724,4 +725,6 @@ and augment_method_def module_name menv rm typarams (CMethodDef (name, params, r
   TypedMethodDef (name, params', rt', body')
 
 let augment_module menv (CombinedModule { name; decls; _ }) =
-  TypedModule (name, List.map (augment_decl name menv) decls)
+  let decls' = List.map (augment_decl name menv) decls in
+  let _ = List.map check_decl_linearity decls' in
+  TypedModule (name, decls')
