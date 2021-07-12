@@ -9,11 +9,11 @@ let pointer_type_name = make_ident "Pointer"
 let memory_module =
   let i = make_ident in
   let pointer_type_qname = make_qident (memory_module_name, pointer_type_name, pointer_type_name) in
-  let typarams = [TypeParameter(i "T", FreeUniverse)]
-  and type_t = TyVar (TypeVariable (i "T", FreeUniverse)) in
+  let typarams = [TypeParameter(i "T", TypeUniverse)]
+  and type_t = TyVar (TypeVariable (i "T", TypeUniverse)) in
   let pointer_t = NamedType (pointer_type_qname, [type_t], FreeUniverse) in
   let pointer_type_def =
-    (* type Pointer[T: Free]: Free is Unit *)
+    (* type Pointer[T: Type]: Free is Unit *)
     STypeAliasDefinition (
         TypeVisOpaque,
         pointer_type_name,
@@ -23,7 +23,7 @@ let memory_module =
       )
   in
   let allocate_def =
-    (* generic T: Free
+    (* generic T: Type
        function Allocate(value: T): Pointer[T] *)
     SFunctionDeclaration (
         VisPublic,
@@ -33,7 +33,7 @@ let memory_module =
         NamedType (pointer_type_qname, [type_t], FreeUniverse)
       )
   and load_def =
-    (* generic T: Free
+    (* generic T: Type
        function Load(pointer: Pointer[T]): T *)
     SFunctionDeclaration (
         VisPublic,
@@ -43,7 +43,7 @@ let memory_module =
         type_t
       )
   and store_def =
-    (* generic T: Free
+    (* generic T: Type
        function Store(pointer: Pointer[T], value: T): Unit *)
     SFunctionDeclaration (
         VisPublic,
@@ -70,3 +70,6 @@ let memory_module =
       imported_classes = [];
       imported_instances = []
     }
+
+let is_pointer_type (name: qident): bool =
+  ((source_module_name name) = memory_module_name) && ((original_name name) = pointer_type_name)
