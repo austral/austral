@@ -52,6 +52,8 @@ type value_parameter = ValueParameter of identifier * ty
    signatures.  *)
 type type_signature = TypeSignature of identifier * type_parameter list * universe
 
+val universe_string : universe -> string
+
 (* A string representation of a type, for debugging *)
 val type_string : ty -> string
 

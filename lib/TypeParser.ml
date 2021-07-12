@@ -205,7 +205,10 @@ and check_universes_match' (TypeParameter (_, param_u)) (arg: ty): unit =
   if universe_compatible param_u arg_u then
     ()
   else
-    err "Universe mismatch"
+    err ("Type parser: Universe mismatch: parameter universe is "
+         ^ (universe_string param_u)
+         ^ ", argument universe is "
+         ^ (universe_string arg_u))
 
 and universe_compatible param arg =
   (* The check here is:

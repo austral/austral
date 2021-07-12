@@ -46,6 +46,12 @@ type value_parameter = ValueParameter of identifier * ty
 
 type type_signature = TypeSignature of identifier * type_parameter list * universe
 
+let universe_string = function
+  | FreeUniverse -> "Free"
+  | LinearUniverse -> "Linear"
+  | TypeUniverse -> "Type"
+  | RegionUniverse -> "Region"
+
 let rec type_string = function
   | Unit -> "Unit"
   | Boolean -> "Boolean"
