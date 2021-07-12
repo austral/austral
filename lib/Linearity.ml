@@ -85,7 +85,7 @@ let new_state (name: identifier) (expr: texpr) (state: state): state =
      if a = 0 then
        Consumed
      else
-       err "Linear variable consumed again."
+       err ("Linear variable consumed again: " ^ (ident_string name))
 
 let rec check_consistency (name: identifier) (stmt: tstmt): unit =
   let state = check_consistency' name stmt Unconsumed in
