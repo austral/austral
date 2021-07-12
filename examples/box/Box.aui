@@ -8,7 +8,7 @@ module Example.Box is
     function Unbox(box: Box[T]): T;
 
     generic [T: Type]
-    function Swap(box: Box[T], value: T): T;
+    function Swap(box: Box[T], new: T): T;
 
     function Main(): Unit;
 end module.

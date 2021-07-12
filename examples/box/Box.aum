@@ -27,9 +27,9 @@ module body Example.Box is
     end;
 
     generic [T: Type]
-    function Swap(box: Box[T], value: T): T is
+    function Swap(box: Box[T], new: T): T is
         let old: T := Load(box.pointer);
-        Store(box.pointer, value);
+        Store(box.pointer, new);
         return old;
     end;
 
