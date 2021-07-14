@@ -73,7 +73,10 @@ let memory_module =
     }
 
 let is_pointer_type (name: qident): bool =
-  ((source_module_name name) = memory_module_name) && ((original_name name) = pointer_type_name)
+  let s = source_module_name name
+  and o = original_name name
+  in
+  (equal_module_name s memory_module_name) && (equal_identifier o pointer_type_name)
 
 let pervasive_module_name = make_mod_name "Austral.Pervasive"
 
