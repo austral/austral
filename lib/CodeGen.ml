@@ -238,7 +238,7 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
   | TIf (c, tb, fb) ->
      CIf (gen_exp c, gen_stmt tb, gen_stmt fb)
   | TCase (e, whens) ->
-     gen_case (get_type e) e whens
+     gen_case e whens
   | TWhile (c, b) ->
      CWhile (gen_exp c, gen_stmt b)
   | TFor (v, i, f, b) ->
@@ -253,12 +253,13 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
   | TReturn e ->
      CReturn (gen_exp e)
 
-and gen_case (ty: ty) (e: texpr) (whens: typed_when list): cpp_stmt =
+and gen_case (e: texpr) (whens: typed_when list): cpp_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
      being pattern-matched to that variable. Generate a switch statement over
      the tag enum. Each when statement that has bindings needs to generate some
      variable assignments for those bindings from the generated variable. *)
-  let var = new_variable () in
+  let ty = get_type e
+  and var = new_variable () in
   let cases = List.map (when_to_case ty var) whens in
   let switch = CSwitch (CStructAccessor (CVar var, "tag"), cases) in
   CBlock [
