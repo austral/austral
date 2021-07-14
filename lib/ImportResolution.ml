@@ -39,7 +39,7 @@ let resolve_import (menv: menv) (imports: import_map) (idecl: import_decl): impo
       | None ->
          err "No declaration with this name")
   | None ->
-     err "No module with this name"
+     err ("No module with this name: " ^ (mod_name_string module_name))
 
 let rec resolve' (menv: menv) (imports: import_map) (list: import_decl list): import_map =
   match list with
