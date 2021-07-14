@@ -78,6 +78,22 @@ let gen_module_name (n: module_name): string =
 let gen_qident (i: qident): string =
   (gen_module_name (source_module_name i)) ^ "::" ^ (gen_ident (original_name i))
 
+(* Utilities for compiling special types and expressions *)
+
+(* If ty is of the form Optional[Pointer[T]], return Some T, otherwise None. *)
+let is_optional_pointer_type (name: qident) (args: ty list): ty option =
+  if ((source_module_name name) = pervasive_module_name) && ((original_name name) = option_type_name) then
+    (match args with
+     | [NamedType (n', [arg'], _)] ->
+        if is_pointer_type n' then
+          Some arg'
+        else
+             None
+     | _ ->
+        None)
+  else
+    None
+
 (* Types *)
 
 let rec gen_type (ty: ty): cpp_ty =
@@ -109,6 +125,7 @@ let rec gen_type (ty: ty): cpp_ty =
      CNamedType (gen_ident n, [])
 
 and gen_named_type (name: qident) (args: ty list): cpp_ty =
+  (* Pointer types are compiled specially *)
   if is_pointer_type name then
     match args with
     | [t] ->
@@ -116,7 +133,13 @@ and gen_named_type (name: qident) (args: ty list): cpp_ty =
     | _ ->
        err "Invalid Pointer type usage"
   else
-    CNamedType (gen_qident name, List.map gen_type args)
+    (* Option[Pointer[T]] types are compiled specially *)
+    match is_optional_pointer_type name args with
+    | Some target_ty ->
+       CPointer (gen_type target_ty)
+    | None ->
+       (* It's a regular user defined type. *)
+       CNamedType (gen_qident name, List.map gen_type args)
 
 (* Expressions *)
 
