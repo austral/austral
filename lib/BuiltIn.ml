@@ -93,10 +93,12 @@ let pervasive_source_text = (
   |code}
 )
 
+let option_type_name = make_ident "Option"
+
 let pervasive_imports =
   ConcreteImportList (
       pervasive_module_name,
       [
-        ConcreteImport (make_ident "Option", None)
+        ConcreteImport (option_type_name, None)
       ]
     )

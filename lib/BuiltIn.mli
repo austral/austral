@@ -14,4 +14,6 @@ val pervasive_module_name : module_name
 
 val pervasive_source_text: string * string
 
+val option_type_name : identifier
+
 val pervasive_imports: concrete_import_list
