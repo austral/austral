@@ -1,5 +1,5 @@
 module body Example.Fibonacci is
-    function Fibonacci(n: Integer_32): Integer_32 is
+    function Fibonacci(n: Natural_64): Natural_64 is
         if n < 2 then
             return n;
         else

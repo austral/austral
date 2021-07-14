@@ -435,7 +435,7 @@ and check_argument_list' (bindings: type_bindings) (params: value_parameter list
 
 and match_parameter (param: value_parameter) (arg: texpr): type_bindings =
   let (ValueParameter (_, ty)) = param in
-  match_type ty (get_type arg)
+  match_type_with_value ty arg
 
 and handle_return_type_polymorphism (typarams: type_parameter list) (rt: ty) (asserted_ty: ty option): (type_bindings * ty) =
   if is_return_type_polymorphic typarams rt then

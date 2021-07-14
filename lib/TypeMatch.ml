@@ -1,5 +1,6 @@
 open Type
 open TypeBindings
+open Tast
 
 exception Type_match_error of string
 
@@ -75,3 +76,17 @@ and match_type_list tys tys' =
 let match_typarams typarams args =
   let typarams' = List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams in
   match_type_list typarams' args
+
+let match_type_with_value (ty: ty) (expr: texpr): type_bindings =
+  (* Like type_match, but gentler with integer constants. *)
+  match ty with
+  | Integer _ ->
+     (match expr with
+      | TIntConstant _ ->
+         (* TODO: check sign against signedness *)
+         (* TODO: check value against width *)
+         empty_bindings
+      | _ ->
+         match_type ty (get_type expr))
+  | _ ->
+     match_type ty (get_type expr)
