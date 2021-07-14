@@ -54,7 +54,20 @@ let rec count_appearances (name: identifier) (expr: texpr) =
         | TSlotAccessor _ ->
            0)
      in
-     (ca e) + (sum (List.map ca_path elems))
+     let elems' = sum (List.map ca_path elems) in
+     (* All paths end in a free value. If the head of the path is the variable
+        we're counting, we don't count this as an appearance. This is for
+        programmer ergonomics. It's also so that if we have a record `r` with
+        two linear values `a` and `b`, an expression like `r.a` won't consume
+        `r` and leave `r.b` dangling. *)
+     (match e with
+      | TVariable (n, _) ->
+         if equal_identifier name n then
+           elems'
+         else
+           (ca e) + elems'
+      | _ ->
+         (ca e) + elems')
 
 (* Represents the state of a linear variable *)
 type state =
