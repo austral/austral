@@ -208,11 +208,26 @@ let rec gen_exp (e: texpr): cpp_expr =
   | TRecordConstructor (_, values) ->
      CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values)
   | TUnionConstructor (ty, case_name, values) ->
-     let args = CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values) in
-     CStructInitializer [
-         ("tag", union_tag_value ty case_name);
-         ("data", CStructInitializer [(gen_ident case_name, args)])
-       ]
+     (match is_optional_pointer_type ty with
+      | Some _ ->
+         (* Constructors for values of type Option[Pointer[T]] must be compiled specially *)
+         if (equal_identifier case_name (make_ident "Some")) then
+           match values with
+           | [(_, v)] ->
+              gen_exp v
+           | _ ->
+              err "Bad constructor"
+         else
+           if (equal_identifier case_name (make_ident "None")) then
+             CVar "NULL"
+           else
+             err "Invalid case"
+      | None ->
+         let args = CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values) in
+         CStructInitializer [
+             ("tag", union_tag_value ty case_name);
+             ("data", CStructInitializer [(gen_ident case_name, args)])
+           ])
   | TPath (e, elems) ->
      gen_path (gen_exp e) (List.rev elems)
 
