@@ -166,7 +166,12 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
   | TDiscarding e ->
      new_state name e state
   | TReturn e ->
-     new_state name e state
+     let state' = new_state name e state in
+     if state' = Unconsumed then
+       err ("Can't return from a function while there are unconsumed linear values. Name: "
+            ^ (ident_string name))
+     else
+       state'
 
 (* Check whether all states in the list are the same state *)
 and same_state (states: state list): bool =
