@@ -186,3 +186,9 @@ let make_pragma name args =
        err "Invalid foreign import pragma"
   else
     err ("Unknown pragma: " ^ s)
+
+let append_import_to_interface (ConcreteModuleInterface (mn, imports, decls)) import =
+  ConcreteModuleInterface (mn, import :: imports, decls)
+
+let append_import_to_body (ConcreteModuleBody (mn, imports, decls)) import =
+  ConcreteModuleBody (mn, import :: imports, decls)
