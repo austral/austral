@@ -8,6 +8,7 @@ open ExtractionPass
 open TypingPass
 open CodeGen
 open CppRenderer
+open Cst
 open Error
 
 type compiler = Compiler of menv * string
@@ -20,7 +21,9 @@ let rec compile_mod c is bs =
   let ci = parse_module_int is
   and cb = parse_module_body bs
   and menv = cmenv c in
-  let combined = combine menv ci cb in
+  let ci' = append_import_to_interface ci pervasive_imports
+  and cb' = append_import_to_body cb pervasive_imports in
+  let combined = combine menv ci' cb' in
   let semantic = extract menv combined in
   let menv' = put_module (cmenv c) semantic in
   let typed = augment_module menv' combined in
