@@ -49,25 +49,31 @@ let rec count_appearances (name: identifier) (expr: texpr) =
   | TUnionConstructor (_, _, args) ->
      sum (List.map (fun (_, e) -> ca e) args)
   | TPath (e, elems) ->
+     (* All paths end in a free value. If the head of the path is the variable
+        we're counting, we don't count this as an appearance. This is for
+        programmer ergonomics. It's also so that if we have a record `r` with
+        two linear values `a` and `b`, an expression like `r.a` won't consume
+        `r` and leave `r.b` dangling.
+
+        And this applies inductively to all other struct accessors: if we have
+        `x.y.z.w` it doesn't matter if `x` is a linear variable and `y` and `z`
+        are values of a linear type, as long as `w` is free. *)
+     let e' =
+       (* Count the number of appearances of this variable in the expression,
+          unless the expression is just a bare variable. So `f(x).y` will count
+          but not `x.y`. *)
+       (match e with
+        | TVariable _ ->
+           0
+        | _ ->
+           ca e)
+     in
      let ca_path elem =
        (match elem with
         | TSlotAccessor _ ->
            0)
      in
-     let elems' = sum (List.map ca_path elems) in
-     (* All paths end in a free value. If the head of the path is the variable
-        we're counting, we don't count this as an appearance. This is for
-        programmer ergonomics. It's also so that if we have a record `r` with
-        two linear values `a` and `b`, an expression like `r.a` won't consume
-        `r` and leave `r.b` dangling. *)
-     (match e with
-      | TVariable (n, _) ->
-         if equal_identifier name n then
-           elems'
-         else
-           (ca e) + elems'
-      | _ ->
-         (ca e) + elems')
+     e' + (sum (List.map ca_path elems))
 
 (* Represents the state of a linear variable *)
 type state =
