@@ -126,7 +126,3 @@ val has_instance_decl : concrete_module_interface -> identifier -> type_paramete
 val get_instance_def : concrete_module_body -> identifier -> type_parameter list -> typespec -> concrete_instance option
 
 val make_pragma : identifier -> concrete_arglist -> pragma
-
-val append_import_to_interface : concrete_module_interface -> concrete_import_list -> concrete_module_interface
-
-val append_import_to_body : concrete_module_body -> concrete_import_list -> concrete_module_body

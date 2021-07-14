@@ -11,6 +11,20 @@ open CppRenderer
 open Cst
 open Error
 
+let append_import_to_interface ci import =
+  let (ConcreteModuleInterface (mn, imports, decls)) = ci in
+  if equal_module_name mn pervasive_module_name then
+    ci
+  else
+    ConcreteModuleInterface (mn, import :: imports, decls)
+
+let append_import_to_body cb import =
+  let (ConcreteModuleBody (mn, imports, decls)) = cb in
+  if equal_module_name mn pervasive_module_name then
+    cb
+  else
+    ConcreteModuleBody (mn, import :: imports, decls)
+
 type compiler = Compiler of menv * string
 
 let cmenv (Compiler (m, _)) = m
@@ -72,6 +86,6 @@ let compile_entrypoint c mn i =
 let empty_compiler =
   let menv = put_module empty_menv memory_module in
   let c = Compiler (menv, prelude) in
-  let (is, bs) = pervasives_source_text in
+  let (is, bs) = pervasive_source_text in
   let c' = compile_mod c is bs in
   c'

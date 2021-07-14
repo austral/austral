@@ -75,9 +75,11 @@ let memory_module =
 let is_pointer_type (name: qident): bool =
   ((source_module_name name) = memory_module_name) && ((original_name name) = pointer_type_name)
 
-let pervasives_source_text = (
+let pervasive_module_name = make_mod_name "Austral.Pervasive"
+
+let pervasive_source_text = (
   {code|
-    module Austral.Pervasives is
+    module Austral.Pervasive is
         union Option[T: Type]: Type is
             case None;
             case Some is
@@ -86,14 +88,14 @@ let pervasives_source_text = (
     end module.
   |code},
   {code|
-    module body Austral.Pervasives is
+    module body Austral.Pervasive is
     end module body.
   |code}
 )
 
 let pervasive_imports =
   ConcreteImportList (
-      make_mod_name "Austral.Pervasives",
+      pervasive_module_name,
       [
         ConcreteImport (make_ident "Option", None)
       ]
