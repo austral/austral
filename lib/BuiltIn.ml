@@ -1,5 +1,6 @@
 open Identifier
 open Type
+open Cst
 open Semantic
 
 let memory_module_name = make_mod_name "Austral.Memory"
@@ -73,3 +74,27 @@ let memory_module =
 
 let is_pointer_type (name: qident): bool =
   ((source_module_name name) = memory_module_name) && ((original_name name) = pointer_type_name)
+
+let pervasives_source_text = (
+  {code|
+    module Austral.Pervasives is
+        union Option[T: Type]: Type is
+            case None;
+            case Some is
+                value: T;
+        end;
+    end module.
+  |code},
+  {code|
+    module body Austral.Pervasives is
+    end module body.
+  |code}
+)
+
+let pervasive_imports =
+  ConcreteImportList (
+      make_mod_name "Austral.Pervasives",
+      [
+        ConcreteImport (make_ident "Option", None)
+      ]
+    )

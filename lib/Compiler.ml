@@ -16,10 +16,6 @@ let cmenv (Compiler (m, _)) = m
 
 let compiler_code (Compiler (_, c)) = c
 
-let empty_compiler =
-  let menv = put_module empty_menv memory_module in
-  Compiler (menv, prelude)
-
 let rec compile_mod c is bs =
   let ci = parse_module_int is
   and cb = parse_module_body bs
@@ -69,3 +65,10 @@ let compile_entrypoint c mn i =
   check_entrypoint_validity (cmenv c) qi;
   let (Compiler (m, c)) = c in
   Compiler (m, c ^ "\n" ^ (entrypoint_code mn i))
+
+let empty_compiler =
+  let menv = put_module empty_menv memory_module in
+  let c = Compiler (menv, prelude) in
+  let (is, bs) = pervasives_source_text in
+  let c' = compile_mod c is bs in
+  c'
