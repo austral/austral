@@ -80,19 +80,26 @@ let gen_qident (i: qident): string =
 
 (* Utilities for compiling special types and expressions *)
 
-(* If ty is of the form Optional[Pointer[T]], return Some T, otherwise None. *)
-let is_optional_pointer_type (name: qident) (args: ty list): ty option =
+let is_optional_pointer_named_type (name: qident) (args: ty list): ty option =
   if ((source_module_name name) = pervasive_module_name) && ((original_name name) = option_type_name) then
     (match args with
      | [NamedType (n', [arg'], _)] ->
         if is_pointer_type n' then
           Some arg'
         else
-             None
+          None
      | _ ->
         None)
   else
     None
+
+(* If ty is of the form Optional[Pointer[T]], return Some T, otherwise None. *)
+let is_optional_pointer_type (ty: ty): ty option =
+  match ty with
+  | NamedType (name, args, _) ->
+     is_optional_pointer_named_type name args
+  | _ ->
+     None
 
 (* Types *)
 
@@ -134,7 +141,7 @@ and gen_named_type (name: qident) (args: ty list): cpp_ty =
        err "Invalid Pointer type usage"
   else
     (* Option[Pointer[T]] types are compiled specially *)
-    match is_optional_pointer_type name args with
+    match is_optional_pointer_named_type name args with
     | Some target_ty ->
        CPointer (gen_type target_ty)
     | None ->
@@ -254,6 +261,69 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
      CReturn (gen_exp e)
 
 and gen_case (e: texpr) (whens: typed_when list): cpp_stmt =
+  (* If the expression is of type Option[Pointer[T]], we compile this specially. *)
+  let ty = get_type e in
+  match is_optional_pointer_type ty with
+  | Some target_ty ->
+     gen_option_pointer_case e target_ty whens
+  | None ->
+     gen_ordinary_case e whens
+
+and gen_option_pointer_case (e: texpr) (target_ty: ty) (whens: typed_when list): cpp_stmt =
+  (* Codegen: a case statement of the form:
+
+         case optptr of
+             when Some(value: Pointer[T]) do
+                 f(value);
+             when None do
+                 g();
+         end case;
+
+     Compiles to:
+
+         T* tmp = optptr;
+         if (tmp == NULL) {
+             T* value = tmp;
+             f(value);
+         } else {
+             g();
+         }
+   *)
+  let is_some (TypedWhen (name, _, body)): tstmt option =
+    if (equal_identifier name (make_ident "Some")) then
+      Some body
+    else
+      None
+  and is_none (TypedWhen (name, _, body)): tstmt option =
+    if (equal_identifier name (make_ident "None")) then
+      Some body
+    else
+      None
+  in
+  let ty = get_type e
+  and var = new_variable () in
+  match List.find_map is_some whens with
+  | Some some_body ->
+     (match List.find_map is_none whens with
+      | Some none_body ->
+         let cond = CComparison (Equal, CVar var, CVar "NULL")
+         and tb = CBlock [
+                      CLet ("value", gen_type target_ty, CVar var);
+                      gen_stmt some_body
+                    ]
+         in
+         let ifstmt = CIf (cond, tb, gen_stmt none_body) in
+         CBlock [
+             CLet (var, gen_type ty, gen_exp e);
+             ifstmt
+           ]
+      | _ ->
+         err "No None case")
+  | None ->
+     err "No Some case"
+
+
+and gen_ordinary_case (e: texpr) (whens: typed_when list): cpp_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
      being pattern-matched to that variable. Generate a switch statement over
      the tag enum. Each when statement that has bindings needs to generate some

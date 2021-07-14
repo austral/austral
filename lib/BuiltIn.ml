@@ -102,6 +102,8 @@ let pervasive_imports =
   ConcreteImportList (
       pervasive_module_name,
       [
-        ConcreteImport (option_type_name, None)
+        ConcreteImport (option_type_name, None);
+        ConcreteImport (make_ident "Some", None);
+        ConcreteImport (make_ident "None", None)
       ]
     )
