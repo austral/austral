@@ -18,31 +18,31 @@ module body Example.Box is
         return box;
     end;
 
-    generic [T: Type]
-    function Unbox(box: Box[T]): T is
-        let ptr: Pointer[T] := box.pointer;
-        let value: T := Load(ptr);
-        Deallocate(ptr);
-        return value;
-    end;
+    --generic [T: Type]
+    --function Unbox(box: Box[T]): T is
+    --    let ptr: Pointer[T] := box.pointer;
+    --    let value: T := Load(ptr);
+    --    Deallocate(ptr);
+    --    return value;
+    --end;
 
-    generic [T: Type]
-    function Swap(box: Box[T], new: T): T is
-        let ptr: Pointer[T] := box.pointer;
-        let old: T := Load(ptr);
-        Store(ptr, new);
-        return old;
-    end;
+    --generic [T: Type]
+    --function Swap(box: Box[T], new: T): T is
+    --    let ptr: Pointer[T] := box.pointer;
+    --    let old: T := Load(ptr);
+    --    Store(ptr, new);
+    --    return old;
+    --end;
 
     function Put_Character(character: Integer_32): Integer_32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function Main(): Unit is
-        let b: Box[Integer_32] := Make(123);
+        --let b: Box[Integer_32] := Make(123);
         --Swap(b, 97);
-        let value: Integer_32 := Unbox(b);
-        Put_Character(value);
+        --let value: Integer_32 := Unbox(b);
+        --Put_Character(value);
         return nil;
     end;
 end module body.
