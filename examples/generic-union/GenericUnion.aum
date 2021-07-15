@@ -1,13 +1,13 @@
 module body Example.GenericUnion is
-    union Optional[T: Type]: Type is
-        case None;
-        case Some is
+    union Optional2[T: Type]: Type is
+        case None2;
+        case Some2 is
             value: T;
     end;
 
     function Main(): Unit is
-        let S: Optional[Integer_32] := Some(value => 10);
-        let N: Optional[Integer_32] := None();
+        let S: Optional2[Integer_32] := Some2(value => 10);
+        let N: Optional2[Integer_32] := None2();
         return nil;
     end;
 end module body.
