@@ -639,7 +639,7 @@ and augment_when (ctx: stmt_ctx) (w: abstract_when) (c: typed_case): typed_when 
     let bindings'' = List.map (fun (n, ty, actual_ty) ->
                          let ty' = parse_typespec menv rm typarams ty in
                          if ty' <> actual_ty then
-                           err "Slot type mismatch"
+                           err ("Slot type mismatch: expected \n\n" ^ (show_ty ty') ^ "\n\nbut got:\n\n" ^ (show_ty actual_ty))
                          else
                            (n, ty'))
                        bindings' in
