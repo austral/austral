@@ -74,3 +74,5 @@ val get_module_callable : semantic_module * module_name * identifier -> callable
 val decl_type_signature : sem_decl -> type_signature option
 
 val is_importable : sem_decl -> bool
+
+val has_union_constructor_with_name : semantic_module -> identifier -> bool

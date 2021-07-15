@@ -37,7 +37,10 @@ let resolve_import (menv: menv) (imports: import_map) (idecl: import_decl): impo
          else
            err "Declaration is not importable"
       | None ->
-         err "No declaration with this name")
+         if has_union_constructor_with_name smodule name then
+           add_symbol imports (make_qident (module_name, name, nickname))
+         else
+           err "No declaration with this name")
   | None ->
      err ("No module with this name: " ^ (mod_name_string module_name))
 

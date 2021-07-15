@@ -194,3 +194,18 @@ and is_public_or_opaque = function
   | TypeVisPublic -> true
   | TypeVisOpaque -> true
   | TypeVisPrivate -> false
+
+let has_union_constructor_with_name (SemanticModule { decls; _ }) name =
+  let pred = function
+    | SUnionDefinition (_, _, _, _, _, cases) ->
+       let pred' (TypedCase (n, _)) =
+         if equal_identifier name n then
+           true
+         else
+           false
+       in
+       List.exists pred' cases
+    | _ ->
+       false
+  in
+  List.exists pred decls
