@@ -493,16 +493,16 @@ let is_compatible_with_size_type = function
   | e ->
      (get_type e) = size_type
 
-type stmt_ctx = module_name * menv * region_map * type_parameter list * lexenv
+type stmt_ctx = module_name * menv * region_map * type_parameter list * lexenv * ty
 
-let update_lexenv (mn, menv, rm, typarams, _) lexenv =
-  (mn, menv, rm, typarams, lexenv)
+let update_lexenv (mn, menv, rm, typarams, _, rt) lexenv =
+  (mn, menv, rm, typarams, lexenv, rt)
 
-let update_rm (mn, menv, _, typarams, lexenv) rm =
-  (mn, menv, rm, typarams, lexenv)
+let update_rm (mn, menv, _, typarams, lexenv, rt) rm =
+  (mn, menv, rm, typarams, lexenv, rt)
 
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
-  let (module_name, menv, rm, typarams, lexenv) = ctx in
+  let (module_name, menv, rm, typarams, lexenv, rt) = ctx in
   match stmt with
   | ASkip ->
      TSkip
@@ -604,7 +604,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      TDiscarding e'
   | AReturn e ->
      let e' = augment_expr module_name menv lexenv None e in
-     (* TODO: check type of e' matches return context *)
+     let _ = match_type rt (get_type e') in
      TReturn e'
 
 and get_union_type_definition (importing_module: module_name) (menv: menv) (ty: ty) =
@@ -630,7 +630,7 @@ and group_bindings_slots (bindings: (identifier * qtypespec) list) (slots: typed
   List.map (fun (n, t) -> (n, t, let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> n = n') slots in ty')) bindings
 
 and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case): typed_when =
-  let (_, menv, rm, typarams, lexenv) = ctx in
+  let (_, menv, rm, typarams, lexenv, _) = ctx in
   let (AbstractWhen (name, bindings, body)) = w
   and (TypedCase (_, slots)) = c in
   (* Check the set of binding names is the same as the set of slots *)
@@ -684,7 +684,7 @@ let rec augment_decl (module_name: module_name) (menv: menv) (decl: combined_def
          else
            err "Foreign functions can't have type parameters."
       | [] ->
-         let ctx = module_name, menv, rm, typarams, (lexenv_from_params params') in
+         let ctx = (module_name, menv, rm, typarams, (lexenv_from_params params'), rt') in
          let body' = augment_stmt ctx body in
          TFunction (vis, name, typarams, params', rt', body', doc)
       | _ ->
@@ -723,7 +723,7 @@ and augment_method_decl menv rm typaram (CMethodDecl (name, params, rt, _)) =
 and augment_method_def module_name menv rm typarams (CMethodDef (name, params, rt, _, body)) =
   let params' = augment_params menv rm typarams params
   and rt' = parse_typespec menv rm typarams rt in
-  let ctx = module_name, menv, rm, typarams, (lexenv_from_params params') in
+  let ctx = (module_name, menv, rm, typarams, (lexenv_from_params params'), rt') in
   let body' = augment_stmt ctx body in
   TypedMethodDef (name, params', rt', body')
 
