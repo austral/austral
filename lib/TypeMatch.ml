@@ -1,3 +1,4 @@
+open Identifier
 open Type
 open TypeBindings
 open Tast
@@ -38,9 +39,25 @@ let rec match_type a b =
      else
        type_mismatch "Region type mismatch" a b
   | (TyVar (TypeVariable (i, u)), t) ->
-     match_type_var i u t
+     (match t with
+      | TyVar (TypeVariable (i', u')) ->
+         if (equal_identifier i i') && (u = u') then
+           (* Don't bind T => T *)
+           empty_bindings
+         else
+           match_type_var i u t
+      | _ ->
+         match_type_var i u t)
   | (t, TyVar (TypeVariable (i, u))) ->
-     match_type_var i u t
+     (match t with
+      | TyVar (TypeVariable (i', u')) ->
+         if (equal_identifier i i') && (u = u') then
+           (* Don't bind T => T *)
+           empty_bindings
+         else
+           match_type_var i u t
+      | _ ->
+         match_type_var i u t)
   | _ ->
      type_mismatch "Type mismatch" a b
 
