@@ -9,6 +9,9 @@ type type_bindings = TypeBindings of ty IdentifierMap.t
 let binding_count (TypeBindings m) =
   IdentifierMap.cardinal m
 
+let bindings_list (TypeBindings m) =
+  IdentifierMap.bindings m
+
 let empty_bindings = TypeBindings IdentifierMap.empty
 
 let binding_conflict name ty ty' =

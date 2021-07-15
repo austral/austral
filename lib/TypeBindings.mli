@@ -7,6 +7,8 @@ type type_bindings
 
 val binding_count : type_bindings -> int
 
+val bindings_list : type_bindings -> (identifier * ty) list
+
 val empty_bindings : type_bindings
 
 val merge_bindings : type_bindings -> type_bindings -> type_bindings
