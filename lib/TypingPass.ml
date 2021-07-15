@@ -509,6 +509,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | ALet (name, ty, value, body) ->
      let ty' = parse_typespec menv rm typarams ty in
      let value' = augment_expr module_name menv lexenv (Some ty') value in
+     (*print_endline ("Let type: " ^ (type_string ty'));
+     print_endline ("\nValue type: " ^ (type_string (get_type value')) ^ "\n\n");*)
      if equal_ty ty' (get_type value') then
        let lexenv' = push_var lexenv name ty' in
        let body' = augment_stmt (update_lexenv ctx lexenv') body in

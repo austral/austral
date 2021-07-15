@@ -1,8 +1,8 @@
 module Example.Box is
     type Box[T: Type]: Linear;
 
-    generic [T: Type]
-    function Make(val: T): Box[T];
+    --generic [T: Type]
+    --function Make(val: T): Box[T];
 
     --generic [T: Type]
     --function Unbox(box: Box[T]): T;
