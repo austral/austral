@@ -11,7 +11,7 @@ module body Example.Memory is
         let opt: Option[Pointer[Integer_32]] := Allocate(10);
         case opt of
             when Some(value: Pointer[Integer_32]) do
-              Deallocate(P);
+              Deallocate(value);
             when None do
               -- Do nothing.
               skip;
