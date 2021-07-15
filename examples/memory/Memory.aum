@@ -8,8 +8,14 @@ import Austral.Memory (
 
 module body Example.Memory is
     function Main(): Unit is
-        let P: Pointer[Integer_32] := Allocate(10);
-        Deallocate(P);
+        let opt: Option[Pointer[Integer_32]] := Allocate(10);
+        case opt of
+            when Some(value: Pointer[Integer_32]) do
+              Deallocate(P);
+            when None do
+              -- Do nothing.
+              skip;
+        end case;
         return nil;
     end;
 end module body.
