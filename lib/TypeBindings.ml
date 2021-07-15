@@ -34,11 +34,12 @@ let get_binding (TypeBindings m) name =
    distinct. *)
 let add_binding (TypeBindings m) name ty =
   match IdentifierMap.find_opt name m with
-      | (Some ty') -> if ty = ty' then
-                        TypeBindings m
-                      else
-                        binding_conflict name ty ty'
-      | None -> TypeBindings (IdentifierMap.add name ty m)
+  | Some ty' -> if equal_ty ty ty' then
+                  (*let _ = print_endline ("Adding binding: " ^ (ident_string name) ^ " => " ^ (type_string ty)) in*)
+                  TypeBindings m
+                else
+                  binding_conflict name ty ty'
+  | None -> TypeBindings (IdentifierMap.add name ty m)
 
 (* Add multiple bindings to a bindings map. *)
 let rec add_bindings bs pairs =
