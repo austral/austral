@@ -433,11 +433,15 @@ let gen_decl (decl: typed_decl): cpp_decl list =
              c_string_type
            else
              err "Not allowed"
-        | NamedType (n, _, _) ->
+        | NamedType (n, args, _) ->
            if is_pointer_type n then
              gen_type t
            else
-             err "Pointers are the only named type allowed as parameters of C functions."
+             (match is_optional_pointer_named_type n args with
+              | Some _ ->
+                 gen_type t
+              | None ->
+                 err "Pointers and optional pointers are the only named type allowed as parameters of C functions.")
         | _ ->
            err "Not allowed")
      in
