@@ -24,6 +24,9 @@ let test_successful_matches _ =
   meq t Unit [("T", Unit)];
   let param = fnt "Option" [t]
   and arg = fnt "Option" [Unit] in
+  meq param arg [("T", Unit)];
+  let param = fnt "Option" [Unit]
+  and arg = fnt "Option" [t] in
   meq param arg [("T", Unit)]
 
 let suite =

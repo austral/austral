@@ -39,6 +39,8 @@ let rec match_type a b =
        type_mismatch "Region type mismatch" a b
   | (TyVar (TypeVariable (i, u)), t) ->
      match_type_var i u t
+  | (t, TyVar (TypeVariable (i, u))) ->
+     match_type_var i u t
   | _ ->
      type_mismatch "Type mismatch" a b
 
