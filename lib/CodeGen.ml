@@ -279,12 +279,12 @@ and gen_case (e: texpr) (whens: typed_when list): cpp_stmt =
   (* If the expression is of type Option[Pointer[T]], we compile this specially. *)
   let ty = get_type e in
   match is_optional_pointer_type ty with
-  | Some target_ty ->
-     gen_option_pointer_case e target_ty whens
+  | Some _ ->
+     gen_option_pointer_case e whens
   | None ->
      gen_ordinary_case e whens
 
-and gen_option_pointer_case (e: texpr) (target_ty: ty) (whens: typed_when list): cpp_stmt =
+and gen_option_pointer_case (e: texpr) (whens: typed_when list): cpp_stmt =
   (* Codegen: a case statement of the form:
 
          case optptr of
@@ -297,7 +297,7 @@ and gen_option_pointer_case (e: texpr) (target_ty: ty) (whens: typed_when list):
      Compiles to:
 
          T* tmp = optptr;
-         if (tmp == NULL) {
+         if (tmp != NULL) {
              T* value = tmp;
              f(value);
          } else {
@@ -321,9 +321,9 @@ and gen_option_pointer_case (e: texpr) (target_ty: ty) (whens: typed_when list):
   | Some some_body ->
      (match List.find_map is_none whens with
       | Some none_body ->
-         let cond = CComparison (Equal, CVar var, CVar "NULL")
+         let cond = CComparison (NotEqual, CVar var, CVar "NULL")
          and tb = CBlock [
-                      CLet ("value", gen_type target_ty, CVar var);
+                      CLet (austral_prefix ^ "value", gen_type ty, CVar var);
                       gen_stmt some_body
                     ]
          in
