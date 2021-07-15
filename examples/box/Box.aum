@@ -11,28 +11,14 @@ module body Example.Box is
         pointer: Pointer[T];
     end;
 
-    --generic [T: Type]
-    --function Make(val: T): Box[T] is
-    --    let ptr: Option[Pointer[T]] := Allocate(val);
-    --    case ptr of
-    --        when Some(value: Pointer[T]) do
-    --            let box: Box[T] := Box(pointer => value);
-    --            return box;
-    --        when None do
-    --            -- Abort here.
-    --            skip;
-    --    end case;
-    --end;
-
     generic [T: Type]
-    function Make2(val: T): Option[Box[T]] is
+    function Make(val: T): Option[Box[T]] is
         let ptr: Option[Pointer[T]] := Allocate(val);
         case ptr of
             when Some(value: Pointer[T]) do
                 let box: Box[T] := Box(pointer => value);
-                --let boxopt: Option[Box[T]] := Some(value => box);
-                --return boxopt;
-                skip;
+                let boxopt: Option[Box[T]] := Some(value => box);
+                return boxopt;
             when None do
                 let boxopt: Option[Box[T]] := None();
                 return boxopt;
