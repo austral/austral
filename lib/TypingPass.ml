@@ -543,13 +543,15 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
         4. Iterate over the cases, and ensure the bindings are correct.
       *)
      let expr' = augment_expr module_name menv lexenv None expr in
-     let cases = get_union_type_definition module_name menv (get_type expr') in
+     let ty = get_type expr' in
+     let (union_ty, cases) = get_union_type_definition module_name menv (get_type expr') in
+     let typebindings = match_type union_ty ty in
      let case_names = List.map (fun (TypedCase (n, _)) -> n) cases in
      let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
      if ident_set_eq case_names when_names then
        (* Group the cases and whens *)
        let whens' = group_cases_whens cases whens in
-       let whens'' = List.map (fun (c, w) -> augment_when ctx w c) whens' in
+       let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
        TCase (expr', whens'')
      else
        err "Non-exhaustive case statement."
@@ -612,9 +614,10 @@ and get_union_type_definition (importing_module: module_name) (menv: menv) (ty: 
               | _ ->
                  err "Not a named type") in
   match get_decl menv name with
-  | (Some (SUnionDefinition (module_name, vis, _, _, _, cases))) ->
+  | (Some (SUnionDefinition (module_name, vis, name, typarams, universe, cases))) ->
      if (vis = TypeVisPublic) || (importing_module = module_name) then
-       cases
+       (NamedType (make_qident (module_name, name, name), List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams, universe),
+        cases)
      else
        err "Union must be public or from the same module to be used in a case statement."
   | _ ->
@@ -626,7 +629,7 @@ and group_cases_whens (cases: typed_case list) (whens: abstract_when list): (typ
 and group_bindings_slots (bindings: (identifier * qtypespec) list) (slots: typed_slot list): (identifier * qtypespec * ty) list =
   List.map (fun (n, t) -> (n, t, let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> n = n') slots in ty')) bindings
 
-and augment_when (ctx: stmt_ctx) (w: abstract_when) (c: typed_case): typed_when =
+and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case): typed_when =
   let (_, menv, rm, typarams, lexenv) = ctx in
   let (AbstractWhen (name, bindings, body)) = w
   and (TypedCase (_, slots)) = c in
@@ -636,16 +639,16 @@ and augment_when (ctx: stmt_ctx) (w: abstract_when) (c: typed_case): typed_when 
   if ident_set_eq binding_names slot_names then
     (* Check the type of each binding matches the type of the slot *)
     let bindings' = group_bindings_slots bindings slots in
-    let bindings'' = List.map (fun (n, ty, actual_ty) ->
-                         let ty' = parse_typespec menv rm typarams ty in
-                         if ty' <> actual_ty then
-                           err ("Slot type mismatch: expected \n\n" ^ (show_ty ty') ^ "\n\nbut got:\n\n" ^ (show_ty actual_ty))
-                         else
-                           (n, ty'))
-                       bindings' in
-    let lexenv' = push_vars lexenv bindings'' in
+    let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
+    let newvars = List.map (fun (n, ty, actual) ->
+                      if equal_ty ty actual then
+                        (n, ty)
+                      else
+                        err ("Slot type mismatch: expected \n\n" ^ (show_ty ty) ^ "\n\nbut got:\n\n" ^ (show_ty actual)))
+                    bindings'' in
+    let lexenv' = push_vars lexenv newvars in
     let body' = augment_stmt (update_lexenv ctx lexenv') body in
-    TypedWhen (name, List.map (fun (n, t) -> ValueParameter (n, t)) bindings'', body')
+    TypedWhen (name, List.map (fun (n, t, _) -> ValueParameter (n, t)) bindings'', body')
   else
     err "The set of slots in the case statement doesn't match the set of slots in the union definition."
 
