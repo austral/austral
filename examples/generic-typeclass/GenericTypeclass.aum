@@ -13,9 +13,14 @@ module body Example.GenericTypeclass is
     end;
 
     function Pointer_To_Integer(): Integer_32 is
-        let P: Pointer[Integer_32] := Allocate(10);
-        let X: Integer_32 := To_Integer(P);
-        return X;
+        let opt: Option[Pointer[Integer_32]] := Allocate(10);
+        case opt of
+          when Some(value: Pointer[Integer_32]) do
+            let X: Integer_32 := To_Integer(value);
+            return X;
+          when None do
+            return 0;
+        end case;
     end;
 
     function Main(): Unit is
