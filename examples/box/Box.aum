@@ -12,10 +12,16 @@ module body Example.Box is
     end;
 
     generic [T: Type]
-    function Make(value: T): Box[T] is
-        let ptr: Pointer[T] := Allocate(value);
-        let box: Box[T] := Box(pointer => ptr);
-        return box;
+    function Make(val: T): Box[T] is
+        let ptr: Option[Pointer[T]] := Allocate(val);
+        case ptr of
+            when Some(value: Pointer[T]) do
+                let box: Box[T] := Box(pointer => value);
+                return box;
+            when None do
+                -- Abort here.
+                skip;
+        end case;
     end;
 
     --generic [T: Type]
