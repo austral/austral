@@ -3,6 +3,42 @@ open Type
 open Cst
 open Semantic
 
+(* Austral.Pervasive *)
+
+let pervasive_module_name = make_mod_name "Austral.Pervasive"
+
+let pervasive_source_text = (
+  {code|
+    module Austral.Pervasive is
+        union Option[T: Type]: Type is
+            case None;
+            case Some is
+                value: T;
+        end;
+    end module.
+  |code},
+  {code|
+    module body Austral.Pervasive is
+    end module body.
+  |code}
+)
+
+let option_type_name = make_ident "Option"
+
+let option_type_qname = make_qident (pervasive_module_name, option_type_name, option_type_name)
+
+let pervasive_imports =
+  ConcreteImportList (
+      pervasive_module_name,
+      [
+        ConcreteImport (option_type_name, None);
+        ConcreteImport (make_ident "Some", None);
+        ConcreteImport (make_ident "None", None)
+      ]
+    )
+
+(* Austral.Memory *)
+
 let memory_module_name = make_mod_name "Austral.Memory"
 
 let pointer_type_name = make_ident "Pointer"
@@ -25,13 +61,13 @@ let memory_module =
   in
   let allocate_def =
     (* generic T: Type
-       function Allocate(value: T): Pointer[T] *)
+       function Allocate(value: T): Optional[Pointer[T]] *)
     SFunctionDeclaration (
         VisPublic,
         i "Allocate",
         typarams,
         [ValueParameter (i "value", type_t)],
-        NamedType (pointer_type_qname, [type_t], FreeUniverse)
+        NamedType (option_type_qname, [pointer_t], FreeUniverse)
       )
   and load_def =
     (* generic T: Type
@@ -77,33 +113,3 @@ let is_pointer_type (name: qident): bool =
   and o = original_name name
   in
   (equal_module_name s memory_module_name) && (equal_identifier o pointer_type_name)
-
-let pervasive_module_name = make_mod_name "Austral.Pervasive"
-
-let pervasive_source_text = (
-  {code|
-    module Austral.Pervasive is
-        union Option[T: Type]: Type is
-            case None;
-            case Some is
-                value: T;
-        end;
-    end module.
-  |code},
-  {code|
-    module body Austral.Pervasive is
-    end module body.
-  |code}
-)
-
-let option_type_name = make_ident "Option"
-
-let pervasive_imports =
-  ConcreteImportList (
-      pervasive_module_name,
-      [
-        ConcreteImport (option_type_name, None);
-        ConcreteImport (make_ident "Some", None);
-        ConcreteImport (make_ident "None", None)
-      ]
-    )
