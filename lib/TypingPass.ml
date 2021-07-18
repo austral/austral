@@ -544,10 +544,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let bindings' = group_bindings_slots bindings slots in
              let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
              let newvars = List.map (fun (n, ty, actual) ->
-                               if equal_ty ty actual then
-                                 (n, ty)
-                               else
-                                 err ("Destructure slot type mismatch: in slot " ^ (ident_string n) ^ ", expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
+                               let _ = match_type ty actual in
+                               (n, ty))
                              bindings'' in
              let lexenv' = push_vars lexenv newvars in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
