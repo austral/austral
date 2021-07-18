@@ -6,6 +6,7 @@ type qtypespec = QTypeSpecifier of qident * qtypespec list
 type astmt =
   | ASkip
   | ALet of identifier * qtypespec * aexpr * astmt
+  | ADestructure of (identifier * qtypespec) list * aexpr * astmt
   | AAssign of identifier * aexpr
   | AIf of aexpr * astmt * astmt
   | ACase of aexpr * abstract_when list

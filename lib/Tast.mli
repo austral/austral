@@ -24,6 +24,7 @@ and typed_method_def =
 and tstmt =
   | TSkip
   | TLet of identifier * ty * texpr * tstmt
+  | TDestructure of (identifier * ty) list * texpr * tstmt
   | TAssign of identifier * texpr
   | TIf of texpr * tstmt * tstmt
   | TCase of texpr * typed_when list

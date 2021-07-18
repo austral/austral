@@ -128,6 +128,9 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
   | TLet (_, _, e, b) ->
      let state' = new_state name e state in
      check_consistency' name b state'
+  | TDestructure (_, e, b) ->
+    let state' = new_state name e state in
+    check_consistency' name b state'
   | TAssign (_, e) ->
      new_state name e state
   | TIf (c, tb, fb) ->
@@ -219,6 +222,15 @@ let rec check_linearity (stmt: tstmt): unit =
        check_consistency n b
      else
        ()
+  | TDestructure (bs, _, b) ->
+     let check' (n, t) =
+         let u = type_universe t in
+         if universe_linear_ish u then
+           check_consistency n b
+         else
+           ()
+     in
+     let _ = List.map check' bs in ()
   | TAssign _ ->
      ()
   | TIf (_, tb, fb) ->

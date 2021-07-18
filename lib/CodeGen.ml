@@ -255,6 +255,13 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
   | TLet (n, t, v, b) ->
      let l = CLet (gen_ident n, gen_type t, gen_exp v) in
      CBlock [l; gen_stmt b]
+  | TDestructure (bs, e, b) ->
+     let tmp = new_variable () in
+     let vardecl = CLet (tmp, gen_type (get_type e), gen_exp e)
+     and bs' = List.map (fun (n, t) -> CLet (gen_ident n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
+     and b' = gen_stmt b
+     in
+     CBlock (List.concat [[vardecl]; bs'; [b']])
   | TAssign (n, v) ->
      CAssign (gen_ident n, gen_exp v)
   | TIf (c, tb, fb) ->

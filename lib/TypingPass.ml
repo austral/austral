@@ -522,6 +522,46 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
             ^ (show_ty ty')
             ^ "\n\nbut got\n\n"
             ^ (show_ty (get_type value')))
+  | ADestructure (bindings, value, body) ->
+     let value' = augment_expr module_name menv lexenv None value in
+     (* Check: the value must be a public record type *)
+     let rec_ty = get_type value' in
+     (match rec_ty with
+      | (NamedType (name, _, u)) ->
+         let (source_module, vis, typarams, slots) = get_record_definition menv name in
+         let orig_type = NamedType (
+                             make_qident (source_module, original_name name, original_name name),
+                             List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams,
+                             u
+                           )
+         in
+         let typebindings = match_type orig_type rec_ty in
+         if (vis = TypeVisPublic) || (module_name = source_module) then
+           (* Find the set of slot names and the set of binding names, and compare them *)
+           let binding_names = List.map (fun (n, _) -> n) bindings
+           and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
+           if ident_set_eq binding_names slot_names then
+             let bindings' = group_bindings_slots bindings slots in
+             let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
+             let newvars = List.map (fun (n, ty, actual) ->
+                               if equal_ty ty actual then
+                                 (n, ty)
+                               else
+                                 err ("Slot type mismatch: expected \n\n" ^ (show_ty ty) ^ "\n\nbut got:\n\n" ^ (show_ty actual)))
+                             bindings'' in
+             let lexenv' = push_vars lexenv newvars in
+             let body' = augment_stmt (update_lexenv ctx lexenv') body in
+             TDestructure (
+                 List.map (fun (n, _, t) -> (n, t)) bindings'',
+                 value',
+                 body'
+               )
+           else
+             err "Destructuring a record: not the same set of bindings and slots"
+         else
+           err "Not a public record"
+      | _ ->
+         err "Not a record type")
   | AAssign (name, value) ->
      let value' = augment_expr module_name menv lexenv None value in
      (match get_var lexenv name with

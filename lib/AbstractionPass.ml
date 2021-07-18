@@ -10,6 +10,8 @@ let rec abs_stmt im stmt =
      ASkip
   | CLet _ ->
      err "Let statement not in a list context"
+  | CDestructure _ ->
+     err "Destructure statement not in a list context"
   | CAssign (name, value) ->
      AAssign (name, abs_expr im value)
   | CIf (c, t, f) ->
@@ -85,6 +87,12 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
      (match first with
       | CLet (n, t, v) ->
          ALet (n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
+      | CDestructure (bs, e) ->
+         let bs' = List.map (fun (n, ts) -> (n, qualify_typespec im ts)) bs
+         and e' = abs_expr im e
+         and b = let_reshape im rest
+         in
+         ADestructure (bs', e', b)
       | s ->
          ABlock (abs_stmt im s, let_reshape im rest))
   | [] ->
