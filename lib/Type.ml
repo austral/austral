@@ -53,19 +53,26 @@ let universe_string = function
   | RegionUniverse -> "Region"
 
 let rec type_string = function
-  | Unit -> "Unit"
-  | Boolean -> "Boolean"
-  | Integer (s, w) -> (signedness_string s) ^ "_" ^ (width_string w)
-  | SingleFloat -> "SingleFloat"
-  | DoubleFloat -> "DoubleFloat"
-  | NamedType (n, args, _) -> (ident_string (local_name n)) ^ args_string args
+  | Unit ->
+     "Unit"
+  | Boolean ->
+     "Boolean"
+  | Integer (s, w) ->
+     (signedness_string s) ^ "_" ^ (width_string w)
+  | SingleFloat ->
+     "SingleFloat"
+  | DoubleFloat ->
+     "DoubleFloat"
+  | NamedType (n, args, u) ->
+     (ident_string (local_name n)) ^ args_string args ^ " : " ^ (universe_string u)
   | Array (t, r) ->
-     "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "]"
+     "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "] : Free"
   | RegionTy r ->
      ident_string (region_name r)
   | ReadRef (t, r) ->
-     "Reference[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "]"
-  | TyVar (TypeVariable (n, _)) -> ident_string n
+     "Reference[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "] : Free"
+  | TyVar (TypeVariable (n, u)) ->
+     (ident_string n) ^ " : " ^ (universe_string u)
 
 and signedness_string = function
   | Unsigned -> "Natural"
