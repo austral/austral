@@ -547,7 +547,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                                if equal_ty ty actual then
                                  (n, ty)
                                else
-                                 err ("Slot type mismatch: expected \n\n" ^ (show_ty ty) ^ "\n\nbut got:\n\n" ^ (show_ty actual)))
+                                 err ("Destructure slot type mismatch: in slot " ^ (ident_string n) ^ ", expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
                              bindings'' in
              let lexenv' = push_vars lexenv newvars in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
@@ -688,7 +688,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
                       if equal_ty ty actual then
                         (n, ty)
                       else
-                        err ("Slot type mismatch: expected \n\n" ^ (show_ty ty) ^ "\n\nbut got:\n\n" ^ (show_ty actual)))
+                        err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
                     bindings'' in
     let lexenv' = push_vars lexenv newvars in
     let body' = augment_stmt (update_lexenv ctx lexenv') body in

@@ -6,7 +6,7 @@ open Tast
 exception Type_match_error of string
 
 let type_mismatch msg a b =
-  let msg' = msg ^ ": expected:\n\n" ^ (show_ty a) ^ "\n\nbut got:\n\n" ^ (show_ty b) in
+  let msg' = msg ^ ": expected:\n\n" ^ (type_string a) ^ "\n\nbut got:\n\n" ^ (type_string b) in
   raise (Type_match_error msg')
 
 let rec match_type a b =
