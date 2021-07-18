@@ -282,7 +282,7 @@ method_def:
 
 statement:
   | if_statement { $1 }
-  | LET identifier COLON typespec ASSIGN expression SEMI { CLet ($2, $4, $6) }
+  | let_stmt { $1 }
   | identifier ASSIGN expression SEMI { CAssign ($1, $3) }
   | expression SEMI { CDiscarding $1 }
   | CASE expression OF when_stmt* END CASE SEMI { CCase ($2, $4) }
@@ -301,6 +301,20 @@ else_clause:
   | ELSE IF expression THEN block else_clause { CIf ($3, $5, $6) }
   | ELSE block END IF SEMI { $2 }
   | END IF SEMI { CSkip }
+  ;
+
+let_stmt:
+  | let_destructure { $1 }
+  | let_simple { $1 }
+  ;
+
+let_simple:
+  | LET identifier COLON typespec ASSIGN expression SEMI { CLet ($2, $4, $6) }
+  ;
+
+let_destructure:
+  | LET LBRACKET p=parameter_list RBRACKET ASSIGN e=expression SEMI { CDestructure (List.map (fun (ConcreteParam (n, t)) -> (n, t)) p, e) }
+  ;
 
 when_stmt:
   | WHEN identifier LPAREN parameter_list RPAREN DO block { ConcreteWhen ($2, $4, $7) }
