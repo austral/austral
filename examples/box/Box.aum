@@ -25,31 +25,27 @@ module body Example.Box is
         end case;
     end;
 
-    --generic [T: Type]
-    --function Unbox(box: Box[T]): T is
-    --    let ptr: Pointer[T] := box.pointer;
-    --    let value: T := Load(ptr);
-    --    Deallocate(ptr);
-    --    return value;
-    --end;
-
-    --generic [T: Type]
-    --function Swap(box: Box[T], new: T): T is
-    --    let ptr: Pointer[T] := box.pointer;
-    --    let old: T := Load(ptr);
-    --    Store(ptr, new);
-    --    return old;
-    --end;
+    generic [T: Type]
+    function Unbox(box: Box[T]): T is
+        let { pointer: Pointer[T] } := box;
+        let value: T := Load(pointer);
+        Deallocate(pointer);
+        return value;
+    end;
 
     function Put_Character(character: Integer_32): Integer_32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function Main(): Unit is
-        --let b: Box[Integer_32] := Make(123);
-        --Swap(b, 97);
-        --let value: Integer_32 := Unbox(b);
-        --Put_Character(value);
+        let b: Option[Box[Integer_32]] := Make(97);
+        case b of
+            when Some(value: Box[Integer_32]) do
+                let contents: Integer_32 := Unbox(value);
+                Put_Character(contents);
+            when None do
+                skip;
+        end case;
         return nil;
     end;
 end module body.
