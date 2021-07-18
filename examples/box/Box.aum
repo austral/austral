@@ -33,6 +33,15 @@ module body Example.Box is
         return value;
     end;
 
+    generic [T: Free]
+    function Swap_Free(box: Box[T], new: T): Box[T] is
+        let { pointer: Pointer[T] } := box;
+        let old: T := Load(pointer);
+        Store(pointer, new);
+        let newbox: Box[T] := Box(pointer => pointer);
+        return newbox;
+    end;
+
     function Put_Character(character: Integer_32): Integer_32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
@@ -41,7 +50,8 @@ module body Example.Box is
         let b: Option[Box[Integer_32]] := Make(97);
         case b of
             when Some(value: Box[Integer_32]) do
-                let contents: Integer_32 := Unbox(value);
+                let newbox: Box[Integer_32] := Swap_Free(value, 101);
+                let contents: Integer_32 := Unbox(newbox);
                 Put_Character(contents);
             when None do
                 skip;
