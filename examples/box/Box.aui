@@ -4,8 +4,8 @@ module Example.Box is
     generic [T: Type]
     function Make(val: T): Option[Box[T]];
 
-    --generic [T: Type]
-    --function Unbox(box: Box[T]): T;
+    generic [T: Type]
+    function Unbox(box: Box[T]): T;
 
     --generic [T: Type]
     --function Swap(box: Box[T], new: T): T;
