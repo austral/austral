@@ -21,6 +21,7 @@ namespace A_Austral__Memory {
     template<typename T>
     T* A_Allocate(T value) {
         T* ptr = (T*) malloc(sizeof(T));
+        *ptr = value;
         return ptr;
     }
 
