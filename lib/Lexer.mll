@@ -47,6 +47,8 @@ rule token = parse
   | ")" { RPAREN }
   | "[" { LBRACKET }
   | "]" { RBRACKET }
+  | "{" { LCURLY }
+  | "}" { RCURLY }
   (* Arithmetic operators *)
   | "+" { PLUS }
   | "-" { MINUS }

@@ -11,6 +11,8 @@ open Util
 %token RPAREN
 %token LBRACKET
 %token RBRACKET
+%token LCURLY
+%token RCURLY
 /* Arithmetic operators */
 %token PLUS
 %token MINUS
@@ -313,7 +315,7 @@ let_simple:
   ;
 
 let_destructure:
-  | LET LBRACKET p=parameter_list RBRACKET ASSIGN e=expression SEMI { CDestructure (List.map (fun (ConcreteParam (n, t)) -> (n, t)) p, e) }
+  | LET LCURLY p=parameter_list RCURLY ASSIGN e=expression SEMI { CDestructure (List.map (fun (ConcreteParam (n, t)) -> (n, t)) p, e) }
   ;
 
 when_stmt:
