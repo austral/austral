@@ -35,6 +35,7 @@ type ty =
   | Array of ty * region
   | RegionTy of region
   | ReadRef of ty * ty
+  | WriteRef of ty * ty
   | TyVar of type_var
 [@@deriving show]
 

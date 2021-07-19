@@ -128,6 +128,8 @@ let rec gen_type (ty: ty): cpp_ty =
      err "TODO: Codegen for region types"
   | ReadRef (t, _) ->
      gen_type t
+  | WriteRef (t, _) ->
+     gen_type t
   | TyVar (TypeVariable (n, _)) ->
      CNamedType (gen_ident n, [])
 

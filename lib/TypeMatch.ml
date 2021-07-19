@@ -42,6 +42,10 @@ let rec match_type a b =
      let bindings = match_type t t' in
      let bindings' = match_type r r' in
      merge_bindings bindings bindings'
+  | (WriteRef (t, r), WriteRef (t', r')) ->
+     let bindings = match_type t t' in
+     let bindings' = match_type r r' in
+     merge_bindings bindings bindings'
   | (TyVar (TypeVariable (i, u)), t) ->
      (match t with
       | TyVar (TypeVariable (i', u')) ->
