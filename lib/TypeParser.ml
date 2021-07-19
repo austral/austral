@@ -47,7 +47,11 @@ let parse_built_in_type name args =
       | [ty; ty'] ->
          let u = type_universe ty in
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
-           Some (ReadRef (ty, ty'))
+           let u' = type_universe ty' in
+           if (u' = RegionUniverse) then
+             Some (ReadRef (ty, ty'))
+           else
+             err "Reference error: Not a region"
          else
            err "References can only point to linear types."
       | _ ->
@@ -57,7 +61,11 @@ let parse_built_in_type name args =
       | [ty; ty'] ->
          let u = type_universe ty in
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
-           Some (WriteRef (ty, ty'))
+           let u' = type_universe ty' in
+           if (u' = RegionUniverse) then
+             Some (WriteRef (ty, ty'))
+           else
+             err "WriteReference error: Not a region"
          else
            err "Writable references can only point to linear types."
       | _ ->
