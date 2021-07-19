@@ -34,7 +34,7 @@ type ty =
   | NamedType of qident * ty list * universe
   | Array of ty * region
   | RegionTy of region
-  | ReadRef of ty * region
+  | ReadRef of ty * ty
   | TyVar of type_var
 [@@deriving show]
 
@@ -68,9 +68,9 @@ let rec type_string = function
   | Array (t, r) ->
      "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "] : Free"
   | RegionTy r ->
-     ident_string (region_name r)
+     ident_string (region_name r) ^ "(" ^ (string_of_int (region_id r)) ^ ")"
   | ReadRef (t, r) ->
-     "Reference[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "] : Free"
+     "Reference[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Free"
   | TyVar (TypeVariable (n, u)) ->
      (ident_string n) ^ " : " ^ (universe_string u)
 

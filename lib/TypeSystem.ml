@@ -1,4 +1,3 @@
-open Identifier
 open Type
 open TypeVarSet
 open Region
@@ -39,20 +38,5 @@ let rec type_variables = function
   | TyVar v -> TypeVarSet.singleton v
   | _ -> TypeVarSet.empty
 
-let region_map_from_typarams typarams =
-  let filter (TypeParameter (n, u)) =
-    if u = RegionUniverse then
-      Some n
-    else
-      None
-  in
-  let rec map_from_list (rm: region_map) (names: identifier list): region_map =
-    match names with
-    | first::rest ->
-       let rm' = add_region rm first (fresh_region first) in
-       map_from_list rm' rest
-    | [] ->
-        rm
-  in
-  let names = List.filter_map filter typarams in
-  map_from_list empty_region_map names
+let region_map_from_typarams _ =
+  empty_region_map

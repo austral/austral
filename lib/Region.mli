@@ -5,6 +5,8 @@ type region
 
 val region_name : region -> identifier
 
+val region_id: region -> int
+
 val static_region_name : identifier
 
 val static_region : region

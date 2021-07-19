@@ -669,7 +669,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let u = type_universe orig_ty in
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
            let region_obj = fresh_region region in
-           let refty = ReadRef (orig_ty, region_obj) in
+           let refty = ReadRef (orig_ty, RegionTy region_obj) in
            let lexenv' = push_var lexenv rename refty in
            let rm' = add_region rm region region_obj in
            let ctx' = update_lexenv ctx lexenv' in

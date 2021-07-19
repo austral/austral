@@ -44,10 +44,10 @@ let parse_built_in_type name args =
          err "Invalid Fixed_Array type specifier.")
   | "Reference" ->
      (match args with
-      | [ty; RegionTy r] ->
+      | [ty; ty'] ->
          let u = type_universe ty in
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
-           Some (ReadRef (ty, r))
+           Some (ReadRef (ty, ty'))
          else
            err "References can only point to linear types."
       | _ ->

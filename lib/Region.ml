@@ -7,6 +7,8 @@ type region = Region of identifier * int
 
 let region_name (Region (n, _)) = n
 
+let region_id (Region (_, i)) = i
+
 let static_region_name = make_ident "Static"
 
 let static_region = Region (static_region_name, 0)
