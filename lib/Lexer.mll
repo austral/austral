@@ -90,6 +90,7 @@ rule token = parse
   | "from" { FROM }
   | "to" { TO }
   | "borrow" { BORROW }
+  | "borrow!" { MUTABLE_BORROW }
   | "in" { IN }
   | "return" { RETURN }
   | "skip" { SKIP }

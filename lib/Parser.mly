@@ -58,6 +58,7 @@ open Util
 %token FROM
 %token TO
 %token BORROW
+%token MUTABLE_BORROW
 %token IN
 %token RETURN
 %token SKIP
@@ -291,7 +292,7 @@ statement:
   | CASE expression OF when_stmt* END CASE SEMI { CCase ($2, $4) }
   | WHILE expression DO block END WHILE SEMI { CWhile ($2, $4) }
   | FOR identifier FROM expression TO expression DO block END FOR SEMI { CFor ($2, $4, $6, $8) }
-  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b } }
+  | borrow_stmt { $1 }
   | RETURN expression SEMI { CReturn $2 }
   | SKIP SEMI { CSkip }
   ;
@@ -322,6 +323,19 @@ let_destructure:
 when_stmt:
   | WHEN identifier LPAREN parameter_list RPAREN DO block { ConcreteWhen ($2, $4, $7) }
   | WHEN identifier DO block { ConcreteWhen ($2, [], $4) }
+  ;
+
+borrow_stmt:
+  | read_borrow_stmt { $1 }
+  | mutable_borrow_stmt { $1 }
+  ;
+
+read_borrow_stmt:
+  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b } }
+  ;
+
+mutable_borrow_stmt:
+  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b } }
   ;
 
 block:
