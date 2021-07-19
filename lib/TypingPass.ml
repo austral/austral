@@ -153,14 +153,20 @@ and augment_path_elem (menv: menv) (module_name: module_name) (head_ty: ty) (ele
   match elem with
   | SlotAccessor slot_name ->
      (match head_ty with
-      | (NamedType (name, args, _)) ->
+      | NamedType (name, args, _) ->
          augment_slot_accessor_elem menv module_name slot_name name args
       | _ ->
          err "Not a record type")
   | PointerSlotAccessor slot_name ->
      (match head_ty with
-      | (NamedType (name, args, _)) ->
+      | NamedType (name, args, _) ->
          augment_pointer_slot_accessor_elem menv module_name slot_name name args
+      | ReadRef (ty, _) ->
+         (match ty with
+          | NamedType (name, args, _) ->
+             augment_reference_slot_accessor_elem menv module_name slot_name name args
+          | _ ->
+             err "Not a record type")
       | _ ->
          err "Not a record type")
 
@@ -195,6 +201,18 @@ and augment_pointer_slot_accessor_elem (menv: menv) (module_name: module_name) (
        err "Pointer type has more than one argument"
   else
     err "Not a pointer"
+
+and augment_reference_slot_accessor_elem (menv: menv) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
+  (* Check: e' is a public record type *)
+  let (source_module, vis, typarams, slots) = get_record_definition menv type_name in
+  if (vis = TypeVisPublic) || (module_name = source_module) then
+    (* Check: the given slot name must exist in this record type. *)
+    let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
+    let bindings = match_typarams typarams type_args in
+    let slot_ty' = replace_variables bindings slot_ty in
+    TPointerSlotAccessor (slot_name, slot_ty')
+  else
+    err "Trying to read a slot from a reference to a non-public record"
 
 and get_record_definition menv name =
   match get_decl menv name with
