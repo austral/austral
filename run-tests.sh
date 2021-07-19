@@ -24,3 +24,4 @@ compile examples/generic-union GenericUnion
 compile examples/generic-typeclass GenericTypeclass
 compile examples/string String
 compile examples/box Box
+compile examples/pointer-to-record PTR
