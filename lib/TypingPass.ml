@@ -150,15 +150,19 @@ and augment_path (menv: menv) (module_name: module_name) (head_ty: ty) (elems: p
      err "Path is empty"
 
 and augment_path_elem (menv: menv) (module_name: module_name) (head_ty: ty) (elem: path_elem): typed_path_elem =
-  match head_ty with
-  | (NamedType (name, args, _)) ->
-     (match elem with
-      | SlotAccessor slot_name ->
+  match elem with
+  | SlotAccessor slot_name ->
+     (match head_ty with
+      | (NamedType (name, args, _)) ->
          augment_slot_accessor_elem menv module_name slot_name name args
-      | PointerSlotAccessor slot_name ->
-         augment_pointer_slot_accessor_elem menv module_name slot_name name args)
-  | _ ->
-     err "Not a record type"
+      | _ ->
+         err "Not a record type")
+  | PointerSlotAccessor slot_name ->
+     (match head_ty with
+      | (NamedType (name, args, _)) ->
+         augment_pointer_slot_accessor_elem menv module_name slot_name name args
+      | _ ->
+         err "Not a record type")
 
 and augment_slot_accessor_elem (menv: menv) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
   (* Check: e' is a public record type *)
