@@ -17,3 +17,6 @@ type docstring = Docstring of string
 type pragma =
   | ForeignImportPragma of string
 
+type borrowing_mode =
+  | ReadBorrow
+  | WriteBorrow
