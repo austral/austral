@@ -67,7 +67,8 @@ and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt
 
 and typed_path_elem =
-  TSlotAccessor of identifier * ty
+  | TSlotAccessor of identifier * ty
+  | TPointerSlotAccessor of identifier * ty
 
 type typed_arglist =
   | TPositionalArglist of texpr list
@@ -141,4 +142,6 @@ let rec get_type = function
 
 and path_elem_type = function
   | TSlotAccessor (_, t) ->
+     t
+  | TPointerSlotAccessor (_, t) ->
      t

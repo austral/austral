@@ -113,7 +113,8 @@ and concrete_param =
   ConcreteParam of identifier * typespec
 
 and concrete_path_elem =
-  CSlotAccessor of identifier
+  | CSlotAccessor of identifier
+  | CPointerSlotAccessor of identifier
 
 let decl_name = function
   | ConcreteConstantDecl (n, _, _) -> Some n

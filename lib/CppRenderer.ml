@@ -207,6 +207,8 @@ and render_expr = function
      "{ " ^ (comma_sep (List.map (fun (n, v) -> "." ^ n ^ " = " ^ (e v)) args)) ^ " }"
   | (CStructAccessor (v, n)) ->
      (paren (e v)) ^ "." ^ n
+  | (CPointerStructAccessor (v, n)) ->
+     (paren (e v)) ^ "->" ^ n
 
 and e expr = render_expr expr
 

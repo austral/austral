@@ -245,6 +245,8 @@ and gen_path_elem (expr: cpp_expr) (elem: typed_path_elem): cpp_expr =
   match elem with
   | TSlotAccessor (n, _) ->
      CStructAccessor (expr, gen_ident n)
+  | TPointerSlotAccessor (n, _) ->
+     CPointerStructAccessor (expr, gen_ident n)
 
 (* Statements *)
 

@@ -28,6 +28,7 @@ type cpp_expr =
   | CIfExpression of cpp_expr * cpp_expr * cpp_expr
   | CStructInitializer of (string * cpp_expr) list
   | CStructAccessor of cpp_expr * string
+  | CPointerStructAccessor of cpp_expr * string
 
 type cpp_stmt =
   | CLet of string * cpp_ty * cpp_expr

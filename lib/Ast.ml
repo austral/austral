@@ -51,4 +51,5 @@ and abstract_arglist =
   | Named of (identifier * aexpr) list
 
 and path_elem =
-  SlotAccessor of identifier
+  | SlotAccessor of identifier
+  | PointerSlotAccessor of identifier

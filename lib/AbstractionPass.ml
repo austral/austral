@@ -77,6 +77,8 @@ and abs_path_elem elem =
   match elem with
   | CSlotAccessor i ->
      SlotAccessor i
+  | CPointerSlotAccessor i ->
+     PointerSlotAccessor i
 
 (* Given a list of statements, find the first let statement, if any, and put the
    remainder of the list under its body. Then call let_reshape on that
