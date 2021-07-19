@@ -54,10 +54,10 @@ module body Example.Box is
     end;
 
     function Main(): Unit is
-        let b: Option[Box[Integer_32]] := Make(97);
+        let b: Option[Box[Integer_32]] := Make(101);
         case b of
             when Some(value: Box[Integer_32]) do
-                let newbox: Box[Integer_32] := Swap_Free(value, 101);
+                let newbox: Box[Integer_32] := Swap_Free(value, 97);
                 let contents: Integer_32 := Unbox(newbox);
                 Put_Character(contents);
             when None do
