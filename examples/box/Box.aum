@@ -42,6 +42,13 @@ module body Example.Box is
         return newbox;
     end;
 
+    generic [T: Free, R: Region]
+    function Read_Free(boxref: Reference[Box[T], R]): T is
+        let ptr: Pointer[T] := boxref->pointer;
+        let value: T := Load(ptr);
+        return value;
+    end;
+
     function Put_Character(character: Integer_32): Integer_32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
@@ -53,6 +60,18 @@ module body Example.Box is
                 let newbox: Box[Integer_32] := Swap_Free(value, 101);
                 let contents: Integer_32 := Unbox(newbox);
                 Put_Character(contents);
+            when None do
+                skip;
+        end case;
+        let b2: Option[Box[Integer_32]] := Make(97);
+        case b2 of
+            when Some(value: Box[Integer_32]) do
+                borrow value as value2 in rho do
+                    let contents: Integer_32 := Read_Free(value2);
+                    Put_Character(contents);
+                end;
+                Unbox(value);
+                return nil;
             when None do
                 skip;
         end case;
