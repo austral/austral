@@ -93,7 +93,8 @@ and cstmt =
       original: identifier;
       rename: identifier;
       region: identifier;
-      body: cstmt
+      body: cstmt;
+      mode: borrowing_mode
     }
   | CBlock of cstmt list
   | CDiscarding of cexpr

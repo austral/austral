@@ -37,7 +37,8 @@ and tstmt =
       region: identifier;
       orig_type: ty;
       ref_type: ty;
-      body: tstmt
+      body: tstmt;
+      mode: borrowing_mode
     }
   | TBlock of tstmt * tstmt
   | TDiscarding of texpr

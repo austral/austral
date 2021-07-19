@@ -21,7 +21,8 @@ type astmt =
       original: identifier;
       rename: identifier;
       region: identifier;
-      body: astmt
+      body: astmt;
+      mode: borrowing_mode
     }
   | ABlock of astmt * astmt
   | ADiscarding of aexpr
