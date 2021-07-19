@@ -52,6 +52,16 @@ let parse_built_in_type name args =
            err "References can only point to linear types."
       | _ ->
          err "Invalid Reference type specifier.")
+  | "WriteReference" ->
+     (match args with
+      | [ty; ty'] ->
+         let u = type_universe ty in
+         if ((u = LinearUniverse) || (u = TypeUniverse)) then
+           Some (WriteRef (ty, ty'))
+         else
+           err "Writable references can only point to linear types."
+      | _ ->
+         err "Invalid WriteReference type specifier.")
   | _ ->
      None
 
