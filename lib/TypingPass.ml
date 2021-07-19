@@ -167,6 +167,12 @@ and augment_path_elem (menv: menv) (module_name: module_name) (head_ty: ty) (ele
              augment_reference_slot_accessor_elem menv module_name slot_name name args
           | _ ->
              err "Not a record type")
+      | WriteRef (ty, _) ->
+         (match ty with
+          | NamedType (name, args, _) ->
+             augment_reference_slot_accessor_elem menv module_name slot_name name args
+          | _ ->
+             err "Not a record type")
       | _ ->
          err "Not a record type")
 
