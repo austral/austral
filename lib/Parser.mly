@@ -71,6 +71,7 @@ open Util
 %token COMMA
 %token PERIOD
 %token COLON
+%token HYPHEN_RIGHT
 %token RIGHT_ARROW
 %token ASSIGN
 /* Strings and docstrings */
@@ -403,12 +404,20 @@ compound_expression:
 
 path:
   | initial=atomic_expression elems=path_rest+ { CPath (initial, elems) }
+  ;
 
 path_rest:
   | slot_accessor { $1 }
+  | pointer_slot_accessor { $1 }
+  ;
 
 slot_accessor:
   | PERIOD identifier { CSlotAccessor $2 }
+  ;
+
+pointer_slot_accessor:
+  | HYPHEN_RIGHT identifier { CSlotAccessor $2 }
+  ;
 
 comp_op:
   | EQ { Equal }

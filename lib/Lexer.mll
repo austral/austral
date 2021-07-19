@@ -103,6 +103,7 @@ rule token = parse
   | "," { COMMA }
   | "." { PERIOD }
   | ":" { COLON }
+  | "->" { HYPHEN_RIGHT }
   | "=>" { RIGHT_ARROW }
   | ":=" { ASSIGN }
   (* Strings and docstrings *)
