@@ -663,13 +663,19 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          err "The type of the final value in a for loop must be an integer type."
      else
        err "The type of the initial value in a for loop must be an integer type."
-  | ABorrow { original; rename; region; body } ->
+  | ABorrow { original; rename; region; body; mode } ->
      (match get_var lexenv original with
       | (Some orig_ty) ->
          let u = type_universe orig_ty in
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
            let region_obj = fresh_region region in
-           let refty = ReadRef (orig_ty, RegionTy region_obj) in
+           let refty =
+             (match mode with
+              | ReadBorrow ->
+                 ReadRef (orig_ty, RegionTy region_obj)
+              | WriteBorrow ->
+                 WriteRef (orig_ty, RegionTy region_obj))
+           in
            let lexenv' = push_var lexenv rename refty in
            let rm' = add_region rm region region_obj in
            let ctx' = update_lexenv ctx lexenv' in
@@ -680,7 +686,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                region=region;
                orig_type=orig_ty;
                ref_type=refty;
-               body=augment_stmt ctx'' body
+               body=augment_stmt ctx'' body;
+               mode=mode
              }
          else
            err "Cannot borrow a non-linear type."
