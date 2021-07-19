@@ -416,7 +416,7 @@ slot_accessor:
   ;
 
 pointer_slot_accessor:
-  | HYPHEN_RIGHT identifier { CSlotAccessor $2 }
+  | HYPHEN_RIGHT identifier { CPointerSlotAccessor $2 }
   ;
 
 comp_op:
