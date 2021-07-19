@@ -331,11 +331,11 @@ borrow_stmt:
   ;
 
 read_borrow_stmt:
-  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b } }
+  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b; mode=ReadBorrow } }
   ;
 
 mutable_borrow_stmt:
-  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b } }
+  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b; mode=WriteBorrow } }
   ;
 
 block:
