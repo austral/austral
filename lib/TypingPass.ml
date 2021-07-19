@@ -691,7 +691,11 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              augment_stmt ctx r)
   | ADiscarding e ->
      let e' = augment_expr module_name menv lexenv None e in
-     TDiscarding e'
+     let u = type_universe (get_type e') in
+     if ((u = LinearUniverse) || (u = TypeUniverse)) then
+       err "Discarding a linear value"
+     else
+       TDiscarding e'
   | AReturn e ->
      let e' = augment_expr module_name menv lexenv None e in
      let _ = match_type rt (get_type e') in
