@@ -177,7 +177,7 @@ and augment_pointer_slot_accessor_elem (menv: menv) (module_name: module_name) (
   if is_pointer_type type_name then
     match type_args with
     | [NamedType (type_name', type_args', _)] ->
-      (* Check arg is a public record *)
+       (* Check arg is a public record *)
        let (source_module, vis, typarams, slots) = get_record_definition menv type_name' in
        if (vis = TypeVisPublic) || (module_name = source_module) then
          (* Check: the given slot name must exist in this record type. *)
@@ -197,7 +197,7 @@ and get_record_definition menv name =
   | (Some (SRecordDefinition (mod_name, vis, _, typarams, _, slots))) ->
      (mod_name, vis, typarams, slots)
   | _ ->
-     err "No record with this name"
+     err ("No record with this name: " ^ (ident_string (original_name name)))
 
 and get_slot_with_name slots slot_name =
   match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
