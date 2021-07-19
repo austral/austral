@@ -378,7 +378,13 @@ let gen_params params =
   List.map (fun (ValueParameter (n, t)) -> CValueParam (gen_ident n, gen_type t)) params
 
 let gen_typarams params =
-  List.map (fun (TypeParameter (n, _)) -> CTypeParam (gen_ident n)) params
+  let f (TypeParameter (n, u)) =
+    if u = RegionUniverse then
+      None
+    else
+      Some (CTypeParam (gen_ident n))
+  in
+  List.filter_map f params
 
 let gen_slots slots =
   List.map (fun (TypedSlot (n, t)) -> CSlot (gen_ident n, gen_type t)) slots
