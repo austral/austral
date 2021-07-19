@@ -210,7 +210,7 @@ and augment_reference_slot_accessor_elem (menv: menv) (module_name: module_name)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
     let bindings = match_typarams typarams type_args in
     let slot_ty' = replace_variables bindings slot_ty in
-    TPointerSlotAccessor (slot_name, slot_ty')
+    TSlotAccessor (slot_name, slot_ty')
   else
     err "Trying to read a slot from a reference to a non-public record"
 
@@ -670,7 +670,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
            let region_obj = fresh_region region in
            let refty = ReadRef (orig_ty, region_obj) in
-           let lexenv' = push_var lexenv region refty in
+           let lexenv' = push_var lexenv rename refty in
            let rm' = add_region rm region region_obj in
            let ctx' = update_lexenv ctx lexenv' in
            let ctx''= update_rm ctx' rm' in
