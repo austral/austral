@@ -4,6 +4,9 @@ open TypeSystem
 open Tast
 open Error
 
+let lerr msg =
+  raise (Linearity_error msg)
+
 (* Count the number of times that a variable with the given name appears in an
    expression. *)
 let rec count_appearances (name: identifier) (expr: texpr) =
@@ -101,19 +104,19 @@ let new_state (name: identifier) (expr: texpr) (state: state): state =
        if a = 1 then
          Consumed
        else
-         err "Linear variable used more than once in the same expression."
+         lerr "Linear variable used more than once in the same expression."
   | Consumed ->
      if a = 0 then
        Consumed
      else
-       err ("Linear variable consumed again: " ^ (ident_string name))
+       lerr ("Linear variable consumed again: " ^ (ident_string name))
 
 let rec check_consistency (name: identifier) (stmt: tstmt): unit =
   let state = check_consistency' name stmt Unconsumed in
   if state = Consumed then
     ()
   else
-    err "Linear variable not consumed."
+    lerr "Linear variable not consumed."
 
 (* Check that a linear variable with the given name is used consistently in the
    body in which it is defined.
@@ -144,7 +147,7 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
      if true_branch_state = false_branch_state then
        true_branch_state
      else
-       err "Linear variable is consumed in one branch but not others."
+       lerr "Linear variable is consumed in one branch but not others."
   | TCase (e, whens) ->
      let state' = new_state name e state in
      let when_states = List.map (fun (TypedWhen (_, _, b)) -> check_consistency' name b state') whens in
@@ -152,16 +155,16 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
      if same_state when_states then
        List.nth when_states 0
      else
-       err "Linear variable is consumed in one branch but not others."
+       lerr "Linear variable is consumed in one branch but not others."
   | TWhile (e, b) ->
      (* Linear variables cannot appear in either the condition or body of a loop *)
      let ea = count_appearances name e
      and bs = check_consistency' name b state in
      if ea > 0 then
-       err "Linear variables cannot appear in the condition of a while loop."
+       lerr "Linear variables cannot appear in the condition of a while loop."
      else
        if (state = Unconsumed) && (bs = Consumed) then
-         err "Linear variables cannot appear in the body of a while loop."
+         lerr "Linear variables cannot appear in the body of a while loop."
        else
          state
   | TFor (_, i, f, b) ->
@@ -169,7 +172,7 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
      let state'' = new_state name f state' in
      let bs = check_consistency' name b state'' in
      if (state = Unconsumed) && (bs = Consumed) then
-       err "Linear variables cannot appear in the body of a for loop."
+       lerr "Linear variables cannot appear in the body of a for loop."
      else
        state''
   | TBorrow { original; body; _ } ->
@@ -179,7 +182,7 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
      if equal_identifier name original then
        let bs = check_consistency' name body state in
        if (state = Unconsumed) && (bs = Consumed) then
-         err "Linear variables cannot appear in the scope within which they are borrowed."
+         lerr "Linear variables cannot appear in the scope within which they are borrowed."
        else
          bs
      else
@@ -192,8 +195,8 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
   | TReturn e ->
      let state' = new_state name e state in
      if state' = Unconsumed then
-       err ("Can't return from a function while there are unconsumed linear values. Name: "
-            ^ (ident_string name))
+       lerr ("Can't return from a function while there are unconsumed linear values. Name: "
+             ^ (ident_string name))
      else
        state'
 
