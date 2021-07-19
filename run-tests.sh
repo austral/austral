@@ -25,3 +25,4 @@ compile examples/generic-typeclass GenericTypeclass
 compile examples/string String
 compile examples/box Box
 compile examples/pointer-to-record PTR
+compile examples/ref-to-record RTR
