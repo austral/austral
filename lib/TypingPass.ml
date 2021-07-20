@@ -796,6 +796,7 @@ let rec augment_decl (module_name: module_name) (menv: menv) (decl: combined_def
      (match pragmas with
       | [ForeignImportPragma s] ->
          if typarams = [] then
+           (* TODO: Check that the current module is unsafe *)
            TForeignFunction (vis, name, params', rt', s, doc)
          else
            err "Foreign functions can't have type parameters."
