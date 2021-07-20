@@ -137,7 +137,7 @@ module_body:
   | docstringopt imports=import_stmt* MODULE BODY
     name=module_name IS decls=body_decl*
     END MODULE BODY PERIOD EOF
-    { ConcreteModuleBody (name, imports, decls) }
+    { make_module_body name imports [] decls }
   ;
 
 /* Imports */

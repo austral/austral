@@ -19,11 +19,11 @@ let append_import_to_interface ci import =
     ConcreteModuleInterface (mn, import :: imports, decls)
 
 let append_import_to_body cb import =
-  let (ConcreteModuleBody (mn, imports, decls)) = cb in
+  let (ConcreteModuleBody (mn, kind, imports, decls)) = cb in
   if equal_module_name mn pervasive_module_name then
     cb
   else
-    ConcreteModuleBody (mn, import :: imports, decls)
+    ConcreteModuleBody (mn, kind, import :: imports, decls)
 
 type compiler = Compiler of menv * string
 

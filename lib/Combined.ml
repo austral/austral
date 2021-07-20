@@ -7,6 +7,7 @@ open Semantic
 
 type combined_module = CombinedModule of {
       name: module_name;
+      kind: module_kind;
       interface_imports: import_map;
       body_imports: import_map;
       decls: combined_definition list;

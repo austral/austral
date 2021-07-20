@@ -175,7 +175,7 @@ let private_def im def =
 
 let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
   let (ConcreteModuleInterface (mn, interface_imports, decls)) = cmi
-  and (ConcreteModuleBody (mn', body_imports, defs)) = cmb
+  and (ConcreteModuleBody (mn', kind, body_imports, defs)) = cmb
   in
   if mn <> mn' then
     err ("Interface and body have mismatching names: "
@@ -191,6 +191,7 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
     in
     CombinedModule {
         name = mn;
+        kind = kind;
         interface_imports = im;
         body_imports = bm;
         decls = List.concat [public_decls; private_decls];

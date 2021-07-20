@@ -6,7 +6,7 @@ type concrete_module_interface =
   ConcreteModuleInterface of module_name * concrete_import_list list * concrete_decl list
 
 and concrete_module_body =
-  ConcreteModuleBody of module_name * concrete_import_list list * concrete_def list
+  ConcreteModuleBody of module_name * module_kind * concrete_import_list list * concrete_def list
 
 and concrete_import_list =
   ConcreteImportList of module_name * concrete_import list
@@ -116,6 +116,8 @@ and concrete_path_elem =
   | CSlotAccessor of identifier
   | CPointerSlotAccessor of identifier
   | CArrayIndex of cexpr
+
+val make_module_body : module_name -> concrete_import_list list -> pragma list -> concrete_def list -> concrete_module_body
 
 val decl_name : concrete_decl -> identifier option
 

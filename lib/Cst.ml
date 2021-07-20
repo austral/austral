@@ -7,7 +7,7 @@ type concrete_module_interface =
   ConcreteModuleInterface of module_name * concrete_import_list list * concrete_decl list
 
 and concrete_module_body =
-  ConcreteModuleBody of module_name * concrete_import_list list * concrete_def list
+  ConcreteModuleBody of module_name * module_kind * concrete_import_list list * concrete_def list
 
 and concrete_import_list =
   ConcreteImportList of module_name * concrete_import list
@@ -118,6 +118,22 @@ and concrete_path_elem =
   | CPointerSlotAccessor of identifier
   | CArrayIndex of cexpr
 
+let make_module_body (name: module_name) (imports: concrete_import_list list) (pragmas: pragma list) (defs: concrete_def list) =
+  let is_unsafe_module p =
+    match p with
+    | UnsafeModulePragma -> true
+    | _ -> false
+  in
+  let kind_from_pragmas pragmas =
+    if (List.exists is_unsafe_module pragmas) then
+      UnsafeModule
+    else
+      SafeModule
+  in
+  let kind = kind_from_pragmas pragmas
+  in
+  ConcreteModuleBody (name, kind, imports, defs)
+
 let decl_name = function
   | ConcreteConstantDecl (n, _, _) -> Some n
   | ConcreteOpaqueTypeDecl (n, _, _, _) -> Some n
@@ -147,7 +163,7 @@ let get_concrete_decl (ConcreteModuleInterface (_, _, decls)) name =
   in
   List.find_opt pred decls
 
-let get_concrete_def (ConcreteModuleBody (_, _, defs)) name =
+let get_concrete_def (ConcreteModuleBody (_, _, _, defs)) name =
   let pred def =
     match def_name def with
     | (Some name') ->
@@ -166,7 +182,7 @@ let has_instance_decl (ConcreteModuleInterface (_, _, decls)) (name: identifier)
   in
   List.exists pred decls
 
-let get_instance_def (ConcreteModuleBody (_, _, defs)) (name: identifier) (typarams: type_parameter list) (ty: typespec): concrete_instance option =
+let get_instance_def (ConcreteModuleBody (_, _, _, defs)) (name: identifier) (typarams: type_parameter list) (ty: typespec): concrete_instance option =
   let filter = function
     | ConcreteInstanceDef ci -> Some ci
     | _ -> None
