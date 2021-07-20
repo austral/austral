@@ -1,4 +1,6 @@
 module body Example.String is
+    pragma Unsafe_Module;
+
     function Put_Character(character: Natural_8): Integer_32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
