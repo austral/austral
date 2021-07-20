@@ -1,7 +1,14 @@
 let prelude = {code|#include <cstdlib>
 #include <cstdint>
+#include <cstdio>
 
 namespace Austral__Core {
+    void Abort(const char* message, size_t size) {
+        fwrite(message, 1, size, stderr);
+        fputc('\n', stderr);
+        _Exit(EXIT_FAILURE);
+    }
+
     template<typename T>
     struct Array {
         size_t size;
@@ -14,6 +21,15 @@ namespace Austral__Core {
             .size = size,
             .data = data
         };
+    }
+
+    template<typename T>
+    T Array_Nth(Array<T> array, size_t index) {
+        if (index < array.size) {
+            return array.data[index];
+        } else {
+            Abort("Array index out of bounds.", 26);
+        }
     }
 }
 
