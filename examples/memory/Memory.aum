@@ -7,6 +7,8 @@ import Austral.Memory (
 );
 
 module body Example.Memory is
+    pragma Unsafe_Module;
+
     function Main(): Unit is
         let opt: Option[Pointer[Integer_32]] := Allocate(10);
         case opt of

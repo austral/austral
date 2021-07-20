@@ -1,6 +1,8 @@
 import Austral.Memory (Pointer, Allocate);
 
 module body Example.GenericTypeclass is
+    pragma Unsafe_Module;
+
     interface Numerical(T: Free) is
         method To_Integer(x: T): Integer_32;
     end;

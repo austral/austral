@@ -7,6 +7,8 @@ import Austral.Memory (
 );
 
 module body Example.Box is
+    pragma Unsafe_Module;
+
     record Box[T: Type]: Linear is
         pointer: Pointer[T];
     end;
