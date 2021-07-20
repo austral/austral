@@ -423,6 +423,7 @@ path:
 path_rest:
   | slot_accessor { $1 }
   | pointer_slot_accessor { $1 }
+  | array_index { $1 }
   ;
 
 slot_accessor:
@@ -431,6 +432,10 @@ slot_accessor:
 
 pointer_slot_accessor:
   | HYPHEN_RIGHT identifier { CPointerSlotAccessor $2 }
+  ;
+
+array_index:
+  | LBRACKET expression RBRACKET { CArrayIndex $2 }
   ;
 
 comp_op:
