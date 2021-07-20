@@ -1,6 +1,16 @@
 module body Example.String is
+    function Put_Character(character: Natural_8): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
+    function Put_String(str: Fixed_Array[Natural_8]): Integer_32 is
+        pragma Foreign_Import(External_Name => "puts");
+    end;
+
     function Main(): Unit is
         let X: Fixed_Array[Natural_8] := "Hello, world!\n";
+        Put_Character(X[0]);
+        Put_String(X);
         return nil;
     end;
 end module body.
