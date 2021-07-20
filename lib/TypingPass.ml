@@ -1,4 +1,5 @@
 open Identifier
+open Common
 open Type
 open TypeSystem
 open TypeBindings
@@ -768,7 +769,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
   else
     err "The set of slots in the case statement doesn't match the set of slots in the union definition."
 
-let rec augment_decl (module_name: module_name) (menv: menv) (decl: combined_definition): typed_decl =
+let rec augment_decl (module_name: module_name) (kind: module_kind) (menv: menv) (decl: combined_definition): typed_decl =
   match decl with
   | CConstant (vis, name, ts, expr, doc) ->
      let ty = parse_typespec menv empty_region_map [] ts in
@@ -796,8 +797,10 @@ let rec augment_decl (module_name: module_name) (menv: menv) (decl: combined_def
      (match pragmas with
       | [ForeignImportPragma s] ->
          if typarams = [] then
-           (* TODO: Check that the current module is unsafe *)
-           TForeignFunction (vis, name, params', rt', s, doc)
+           if kind = UnsafeModule then
+             TForeignFunction (vis, name, params', rt', s, doc)
+           else
+             err "Can't declare a foreign function in a safe module."
          else
            err "Foreign functions can't have type parameters."
       | [] ->
@@ -844,7 +847,7 @@ and augment_method_def module_name menv rm typarams (CMethodDef (name, params, r
   let body' = augment_stmt ctx body in
   TypedMethodDef (name, params', rt', body')
 
-let augment_module menv (CombinedModule { name; decls; _ }) =
-  let decls' = List.map (augment_decl name menv) decls in
+let augment_module menv (CombinedModule { name; decls; kind; _ }) =
+  let decls' = List.map (augment_decl name kind menv) decls in
   let _ = List.map check_decl_linearity decls' in
   TypedModule (name, decls')
