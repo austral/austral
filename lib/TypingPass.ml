@@ -107,7 +107,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
        err "The type of the condition in an if expression must be a boolean."
   | Path (e, elems) ->
      let e' = aug e in
-     let elems' = augment_path menv module_name (get_type e') elems in
+     let elems' = augment_path menv module_name lexenv (get_type e') elems in
      let path' = TPath (e', elems') in
      let universe = type_universe (get_type path') in
      if universe = FreeUniverse then
@@ -138,18 +138,18 @@ and augment_arglist (module_name: module_name) (menv: menv) (lexenv: lexenv) (as
   | Named pairs ->
      TNamedArglist (List.map (fun (n, v) -> (n, aug v)) pairs)
 
-and augment_path (menv: menv) (module_name: module_name) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
+and augment_path (menv: menv) (module_name: module_name) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
   | [elem] ->
-     [augment_path_elem menv module_name head_ty elem]
+     [augment_path_elem menv module_name lexenv head_ty elem]
   | elem::rest ->
-     let elem' = augment_path_elem menv module_name head_ty elem in
-     let rest' = augment_path menv module_name (path_elem_type elem') rest in
+     let elem' = augment_path_elem menv module_name lexenv head_ty elem in
+     let rest' = augment_path menv module_name lexenv (path_elem_type elem') rest in
      elem' :: rest'
   | [] ->
      err "Path is empty"
 
-and augment_path_elem (menv: menv) (module_name: module_name) (head_ty: ty) (elem: path_elem): typed_path_elem =
+and augment_path_elem (menv: menv) (module_name: module_name) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
   match elem with
   | SlotAccessor slot_name ->
      (match head_ty with
@@ -175,6 +175,15 @@ and augment_path_elem (menv: menv) (module_name: module_name) (head_ty: ty) (ele
              err "Not a record type")
       | _ ->
          err "Not a record type")
+  | ArrayIndex ie ->
+     (match head_ty with
+      | Array (elem_ty, _) ->
+         let ie' = augment_expr module_name menv lexenv None ie in
+         TArrayIndex (ie', elem_ty)
+      | NamedType _ ->
+         err "Array index operator not supported for named types yet."
+      | _ ->
+         err "Array index operator doesn't work for this type.")
 
 and augment_slot_accessor_elem (menv: menv) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
   (* Check: e' is a public record type *)

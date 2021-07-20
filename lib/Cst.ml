@@ -116,6 +116,7 @@ and concrete_param =
 and concrete_path_elem =
   | CSlotAccessor of identifier
   | CPointerSlotAccessor of identifier
+  | CArrayIndex of cexpr
 
 let decl_name = function
   | ConcreteConstantDecl (n, _, _) -> Some n

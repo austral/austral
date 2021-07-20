@@ -54,3 +54,4 @@ and abstract_arglist =
 and path_elem =
   | SlotAccessor of identifier
   | PointerSlotAccessor of identifier
+  | ArrayIndex of aexpr

@@ -209,6 +209,8 @@ and render_expr = function
      (paren (e v)) ^ "." ^ n
   | (CPointerStructAccessor (v, n)) ->
      (paren (e v)) ^ "->" ^ n
+  | CArrayIndex (ae, ie) ->
+     (paren (e ae)) ^ "[" ^ (e ie) ^ "]"
 
 and e expr = render_expr expr
 

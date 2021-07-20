@@ -70,6 +70,7 @@ and typed_when =
 and typed_path_elem =
   | TSlotAccessor of identifier * ty
   | TPointerSlotAccessor of identifier * ty
+  | TArrayIndex of texpr * ty
 
 type typed_arglist =
   | TPositionalArglist of texpr list
@@ -145,4 +146,6 @@ and path_elem_type = function
   | TSlotAccessor (_, t) ->
      t
   | TPointerSlotAccessor (_, t) ->
+     t
+  | TArrayIndex (_, t) ->
      t

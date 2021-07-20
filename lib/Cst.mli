@@ -115,6 +115,7 @@ and concrete_param =
 and concrete_path_elem =
   | CSlotAccessor of identifier
   | CPointerSlotAccessor of identifier
+  | CArrayIndex of cexpr
 
 val decl_name : concrete_decl -> identifier option
 
