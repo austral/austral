@@ -183,8 +183,8 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
          ^ " and "
          ^ (mod_name_string mn'))
   else
-    let im = resolve mn menv interface_imports
-    and bm = resolve mn menv body_imports
+    let im = resolve mn kind menv interface_imports
+    and bm = resolve mn kind menv body_imports
     in
     let public_decls = List.map (parse_decl im bm cmb) decls
     and private_decls = parse_defs cmi bm defs

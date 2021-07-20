@@ -135,9 +135,9 @@ module_int:
 
 module_body:
   | docstringopt imports=import_stmt* MODULE BODY
-    name=module_name IS decls=body_decl*
+    name=module_name IS pragmas=pragma* decls=body_decl*
     END MODULE BODY PERIOD EOF
-    { make_module_body name imports [] decls }
+    { make_module_body name imports pragmas decls }
   ;
 
 /* Imports */
@@ -263,6 +263,8 @@ function_def:
   ;
 
 pragma:
+  | PRAGMA name=identifier SEMI
+    { make_pragma name (ConcretePositionalArgs []) }
   | PRAGMA name=identifier args=argument_list SEMI
     { make_pragma name args }
   ;

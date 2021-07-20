@@ -1,4 +1,5 @@
 open Identifier
+open Common
 open ModuleSystem
 open Imports
 open Cst
@@ -30,4 +31,4 @@ open Cst
    The first argument is the name of the module we're importing into.
 
 *)
-val resolve : module_name -> menv -> concrete_import_list list -> import_map
+val resolve : module_name -> module_kind -> menv -> concrete_import_list list -> import_map

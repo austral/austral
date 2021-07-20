@@ -205,4 +205,11 @@ let make_pragma name args =
     | _ ->
        err "Invalid foreign import pragma"
   else
-    err ("Unknown pragma: " ^ s)
+    if s = "Unsafe_Module" then
+      match args with
+      | ConcretePositionalArgs [] ->
+         UnsafeModulePragma
+      | _ ->
+         err "Unsafe_Module pragma takes no arguments."
+    else
+      err ("Unknown pragma: " ^ s)
