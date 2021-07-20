@@ -25,11 +25,10 @@ namespace Austral__Core {
 
     template<typename T>
     T Array_Nth(Array<T> array, size_t index) {
-        if (index < array.size) {
-            return array.data[index];
-        } else {
+        if (index >= array.size) {
             Abort("Array index out of bounds.", 26);
         }
+        return array.data[index];
     }
 }
 
