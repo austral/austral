@@ -35,6 +35,9 @@ namespace Austral__Core {
 namespace A_Austral__Memory {
     template<typename T>
     T* A_Allocate(T value) {
+        // Note: we use malloc rather than calloc here
+        // because we're going to write to the pointer
+        // immediately.
         T* ptr = (T*) malloc(sizeof(T));
         if (ptr != NULL) {
             *ptr = value;
