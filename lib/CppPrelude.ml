@@ -32,6 +32,39 @@ namespace Austral__Core {
     }
 }
 
+namespace A_Austral__Pervasive {
+    enum A_Option_Tag {
+        A_None, A_Some
+    };
+
+    template<typename A_T>
+    struct A_Option {
+        A_Option_Tag tag;
+        union {
+            struct {} A_None;
+            struct {
+                A_T A_value;
+            } A_Some;
+        } data;
+    };
+
+    template <typename T>
+    A_Option<T> Some(T value) {
+        return {
+            .tag = A_Option_Tag::A_Some,
+            .data = { .A_Some = { .A_value = value } }
+        };
+    }
+
+    template <typename T>
+    A_Option<T> None() {
+        return {
+            .tag = A_Option_Tag::A_None,
+            .data = { .A_None = {} }
+        };
+    }
+}
+
 namespace A_Austral__Memory {
     template<typename T>
     T* A_Allocate(T value) {
@@ -63,30 +96,46 @@ namespace A_Austral__Memory {
     }
 
     template<typename T>
-    T* A_Allocate_Array(size_t number) {
+    A_Austral__Pervasive::A_Option<T> A_Allocate_Array(size_t number) {
         unsigned long long elem_size = sizeof(T);
         unsigned long long num = number;
         unsigned long long array_size = 0;
         bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
         if (has_overflowed) {
-            return NULL;
+            A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
+            return result;
         } else {
             T* ptr = calloc(num, array_size);
-            return ptr;
+            if (ptr == NULL) {
+                A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
+                return result;
+            } else {
+                Austral__Core::Array<T> arr = Austral__Core::Make_Array(number, ptr);
+                A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::Some(arr);
+                return result;
+            }
         }
     }
 
     template<typename T>
-    T* A_Resize_Array(T* data, size_t new_number) {
+    A_Austral__Pervasive::A_Option<T> A_Resize_Array(T* data, size_t new_number) {
         unsigned long long elem_size = sizeof(T);
         unsigned long long num = new_number;
         unsigned long long array_size = 0;
         bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
         if (has_overflowed) {
-            return NULL;
+            A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
+            return result;
         } else {
             T* new_ptr = realloc(data, array_size);
-            return new_ptr;
+            if (new_ptr == NULL) {
+                A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
+                return result;
+            } else {
+                Austral__Core::Array<T> arr = Austral__Core::Make_Array(new_number, new_ptr);
+                A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::Some(arr);
+                return result;
+            }
         }
     }
 }

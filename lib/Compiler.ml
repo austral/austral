@@ -85,7 +85,6 @@ let compile_entrypoint c mn i =
 
 let empty_compiler =
   let menv = put_module empty_menv memory_module in
+  let menv = put_module menv pervasive_module in
   let c = Compiler (menv, prelude) in
-  let (is, bs) = pervasive_source_text in
-  let c' = compile_mod c is bs in
-  c'
+  c

@@ -7,25 +7,39 @@ open Semantic
 
 let pervasive_module_name = make_mod_name "Austral.Pervasive"
 
-let pervasive_source_text = (
-  {code|
-    module Austral.Pervasive is
+let option_type_name = make_ident "Option"
+
+let option_type_qname = make_qident (pervasive_module_name, option_type_name, option_type_name)
+
+let pervasive_module =
+  let i = make_ident in
+  let option_type_def =
+    (*
         union Option[T: Type]: Type is
             case None;
             case Some is
                 value: T;
         end;
-    end module.
-  |code},
-  {code|
-    module body Austral.Pervasive is
-    end module body.
-  |code}
-)
-
-let option_type_name = make_ident "Option"
-
-let option_type_qname = make_qident (pervasive_module_name, option_type_name, option_type_name)
+     *)
+    SUnionDefinition (
+        pervasive_module_name,
+        TypeVisPublic,
+        option_type_name,
+        [TypeParameter (i "T", TypeUniverse)],
+        TypeUniverse,
+        [
+          TypedCase (i "None", []);
+          TypedCase (i "Some", [TypedSlot (i "value", TyVar (TypeVariable (i "T", TypeUniverse)))])
+        ]
+    )
+  in
+  let decls = [option_type_def] in
+  SemanticModule {
+      name = pervasive_module_name;
+      decls = decls;
+      imported_classes = [];
+      imported_instances = []
+    }
 
 let pervasive_imports =
   ConcreteImportList (
