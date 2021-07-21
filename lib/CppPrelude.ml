@@ -66,17 +66,27 @@ namespace A_Austral__Memory {
     T* A_Allocate_Array(size_t element_size, size_t number) {
         unsigned long long elem_size = element_size;
         unsigned long long num = number;
-        unsigned long long result = 0;
-        bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &result);
+        unsigned long long array_size = 0;
+        bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
         if (has_overflowed) {
             return NULL;
         } else {
-            T* ptr = calloc(num, elem_size);
-            if (ptr != NULL) {
-                return ptr;
-            } else {
-                return NULL;
-            }
+            T* ptr = calloc(num, array_size);
+            return ptr;
+        }
+    }
+
+    template<typename T>
+    T* A_Resize_Array(size_t element_size, size_t new_number, T* data) {
+        unsigned long long elem_size = element_size;
+        unsigned long long num = new_number;
+        unsigned long long array_size = 0;
+        bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
+        if (has_overflowed) {
+            return NULL;
+        } else {
+            T* new_ptr = realloc(data, array_size);
+            return new_ptr;
         }
     }
 }
