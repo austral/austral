@@ -61,5 +61,23 @@ namespace A_Austral__Memory {
         free(pointer);
         return false;
     }
+
+    template<typename T>
+    T* A_Allocate_Array(size_t element_size, size_t number) {
+        unsigned long long elem_size = element_size;
+        unsigned long long num = number;
+        unsigned long long result = 0;
+        bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &result);
+        if (has_overflowed) {
+            return NULL;
+        } else {
+            T* ptr = calloc(num, elem_size);
+            if (ptr != NULL) {
+                return ptr;
+            } else {
+                return NULL;
+            }
+        }
+    }
 }
 |code}
