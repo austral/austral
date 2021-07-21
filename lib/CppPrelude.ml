@@ -63,8 +63,8 @@ namespace A_Austral__Memory {
     }
 
     template<typename T>
-    T* A_Allocate_Array(size_t element_size, size_t number) {
-        unsigned long long elem_size = element_size;
+    T* A_Allocate_Array(size_t number) {
+        unsigned long long elem_size = sizeof(T);
         unsigned long long num = number;
         unsigned long long array_size = 0;
         bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
@@ -77,8 +77,8 @@ namespace A_Austral__Memory {
     }
 
     template<typename T>
-    T* A_Resize_Array(size_t element_size, size_t new_number, T* data) {
-        unsigned long long elem_size = element_size;
+    T* A_Resize_Array(T* data, size_t new_number) {
+        unsigned long long elem_size = sizeof(T);
         unsigned long long num = new_number;
         unsigned long long array_size = 0;
         bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
