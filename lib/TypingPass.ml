@@ -177,12 +177,19 @@ and augment_path_elem (menv: menv) (module_name: module_name) (lexenv: lexenv) (
       | _ ->
          err "Not a record type")
   | ArrayIndex ie ->
+     let ie' = augment_expr module_name menv lexenv None ie in
      (match head_ty with
       | Array (elem_ty, _) ->
-         let ie' = augment_expr module_name menv lexenv None ie in
          TArrayIndex (ie', elem_ty)
-      | NamedType _ ->
-         err "Array index operator not supported for named types yet."
+      | NamedType (name, args, _) ->
+         if is_heap_array_type name then
+           match args with
+           | [elem_ty] ->
+              TArrayIndex (ie', elem_ty)
+           | _ ->
+              err "Invalid usage of Heap_Array"
+         else
+           err "Can't index this type"
       | _ ->
          err "Array index operator doesn't work for this type.")
 
