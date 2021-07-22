@@ -11,6 +11,9 @@ module body Example.Array is
         let arropt: Option[Heap_Array[Boolean]] := Allocate_Array(3);
         case arropt of
             when Some(value: Heap_Array[Boolean]) do
+                let first: Boolean := value[0];
+                let second: Boolean := value[1];
+                let third: Boolean := value[2];
                 Deallocate_Array(value);
             when None do
                 skip;
