@@ -96,7 +96,7 @@ namespace A_Austral__Memory {
     }
 
     template<typename T>
-    A_Austral__Pervasive::A_Option<T> A_Allocate_Array(size_t number) {
+    A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> A_Allocate_Array(size_t number) {
         unsigned long long elem_size = sizeof(T);
         unsigned long long num = number;
         unsigned long long array_size = 0;
@@ -118,7 +118,7 @@ namespace A_Austral__Memory {
     }
 
     template<typename T>
-    A_Austral__Pervasive::A_Option<T> A_Resize_Array(T* data, size_t new_number) {
+    A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> A_Resize_Array(Austral__Core::Array<T> array, size_t new_number) {
         unsigned long long elem_size = sizeof(T);
         unsigned long long num = new_number;
         unsigned long long array_size = 0;
@@ -127,7 +127,7 @@ namespace A_Austral__Memory {
             A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
             return result;
         } else {
-            T* new_ptr = realloc(data, array_size);
+            T* new_ptr = realloc(array.data, array_size);
             if (new_ptr == NULL) {
                 A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
                 return result;
@@ -137,6 +137,12 @@ namespace A_Austral__Memory {
                 return result;
             }
         }
+    }
+
+    template<typename T>
+    bool A_Deallocate_Array(Austral__Core::Array<T> array) {
+        free(array.data);
+        return false;
     }
 }
 |code}

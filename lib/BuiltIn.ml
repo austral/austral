@@ -57,17 +57,33 @@ let memory_module_name = make_mod_name "Austral.Memory"
 
 let pointer_type_name = make_ident "Pointer"
 
+let heap_array_type_name = make_ident "Heap_Array"
+
 let memory_module =
   let i = make_ident in
-  let pointer_type_qname = make_qident (memory_module_name, pointer_type_name, pointer_type_name) in
+  let pointer_type_qname = make_qident (memory_module_name, pointer_type_name, pointer_type_name)
+  and heap_array_type_qname = make_qident (memory_module_name, heap_array_type_name, heap_array_type_name)
+  in
   let typarams = [TypeParameter(i "T", TypeUniverse)]
-  and type_t = TyVar (TypeVariable (i "T", TypeUniverse)) in
-  let pointer_t = NamedType (pointer_type_qname, [type_t], FreeUniverse) in
+  and type_t = TyVar (TypeVariable (i "T", TypeUniverse))
+  in
+  let pointer_t = NamedType (pointer_type_qname, [type_t], FreeUniverse)
+  and heap_array_t = NamedType (heap_array_type_qname, [type_t], FreeUniverse)
+  in
   let pointer_type_def =
     (* type Pointer[T: Type]: Free is Unit *)
     STypeAliasDefinition (
         TypeVisOpaque,
         pointer_type_name,
+        typarams,
+        FreeUniverse,
+        Unit
+      )
+  and heap_array_type_def =
+    (* type Heap_Array[T: Type]: Free is Unit *)
+    STypeAliasDefinition (
+        TypeVisOpaque,
+        heap_array_type_name,
         typarams,
         FreeUniverse,
         Unit
@@ -114,7 +130,49 @@ let memory_module =
         Unit
       )
   in
-  let decls = [pointer_type_def; allocate_def; load_def; store_def; deallocate_def] in
+  let allocate_array_def =
+    (* generic T: Type
+       function Allocate_Array(size: Natural_64): Optional[Heap_Array[T]] *)
+    SFunctionDeclaration (
+        VisPublic,
+        i "Allocate_Array",
+        typarams,
+        [ValueParameter (i "size", Integer (Unsigned, Width64))],
+        NamedType (option_type_qname, [heap_array_t], FreeUniverse)
+      )
+  and resize_array_def =
+    (* generic T: Type
+       functpion Resize_Array(array: Heap_Array[T], size: Natural_64): Optional[Heap_Array[T]] *)
+    SFunctionDeclaration (
+        VisPublic,
+        i "Resize_Array",
+        typarams,
+        [ValueParameter (i "array", heap_array_t); ValueParameter (i "size", Integer (Unsigned, Width64))],
+        NamedType (option_type_qname, [heap_array_t], FreeUniverse)
+      )
+  and deallocate_array_def =
+    (* generic T: Type
+       function Deallocate_Array(array: Heap_Array[T]): Unit *)
+    SFunctionDeclaration (
+        VisPublic,
+        i "Deallocate_Array",
+        typarams,
+        [ValueParameter (i "array", heap_array_t)],
+        Unit
+      )
+  in
+  let decls = [
+      pointer_type_def;
+      heap_array_type_def;
+      allocate_def;
+      load_def;
+      store_def;
+      deallocate_def;
+      allocate_array_def;
+      resize_array_def;
+      deallocate_array_def
+    ]
+  in
   SemanticModule {
       name = memory_module_name;
       decls = decls;
@@ -127,3 +185,9 @@ let is_pointer_type (name: qident): bool =
   and o = original_name name
   in
   (equal_module_name s memory_module_name) && (equal_identifier o pointer_type_name)
+
+let is_heap_array_type (name: qident): bool =
+  let s = source_module_name name
+  and o = original_name name
+  in
+  (equal_module_name s memory_module_name) && (equal_identifier o heap_array_type_name)
