@@ -274,7 +274,8 @@ and augment_function_call name typarams params rt asserted_ty args =
   let (bindings', rt'') = handle_return_type_polymorphism typarams rt' asserted_ty in
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings typarams (merge_bindings bindings bindings');
-  TFuncall (name, arguments, rt'')
+  let arguments' = cast_arguments bindings params arguments in
+  TFuncall (name, arguments', rt'')
 
 and augment_typealias_callable name typarams universe asserted_ty definition_ty args =
   (* Check: the argument list is a positional list with a single argument *)
@@ -500,6 +501,18 @@ and check_argument_list' (bindings: type_bindings) (params: value_parameter list
 and match_parameter (param: value_parameter) (arg: texpr): type_bindings =
   let (ValueParameter (_, ty)) = param in
   match_type_with_value ty arg
+
+and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arguments: texpr list): texpr list =
+  let f (ValueParameter (_, expected)) value =
+    let expected' = replace_variables bindings expected in
+    match expected' with
+    | Integer _ ->
+       (* Cast integer types *)
+       TCast (value, expected')
+    | _ ->
+       value
+  in
+  List.map2 f params arguments
 
 and handle_return_type_polymorphism (typarams: type_parameter list) (rt: ty) (asserted_ty: ty option): (type_bindings * ty) =
   if is_return_type_polymorphic typarams rt then
