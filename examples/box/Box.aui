@@ -7,8 +7,14 @@ module Example.Box is
     generic [T: Type]
     function Unbox(box: Box[T]): T;
 
-    --generic [T: Type]
-    --function Swap(box: Box[T], new: T): T;
+    generic [T: Free]
+    function Swap_Free(box: Box[T], new: T): Box[T];
+
+    generic [T: Free, R: Region]
+    function Read_Free(boxref: Reference[Box[T], R]): T;
+
+    generic [T: Free, R: Region]
+    function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit;
 
     function Main(): Unit;
 end module.
