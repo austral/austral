@@ -1,0 +1,3 @@
+module Example.Array is
+    function Main(): Unit;
+end module.

@@ -1,0 +1,21 @@
+import Austral.Memory (
+    Heap_Array,
+    Allocate_Array,
+    Deallocate_Array
+);
+
+module body Example.Array is
+    pragma Unsafe_Module;
+
+    function Main(): Unit is
+        let size: Natural_64 := 3;
+        let arropt: Option[Heap_Array[Boolean]] := Allocate_Array(size);
+        case arropt of
+            when Some(value: Heap_Array[Boolean]) do
+                Deallocate_Array(value);
+            when None do
+                skip;
+        end case;
+        return nil;
+    end;
+end module body.
