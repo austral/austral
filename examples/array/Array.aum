@@ -8,8 +8,7 @@ module body Example.Array is
     pragma Unsafe_Module;
 
     function Main(): Unit is
-        let size: Natural_64 := 3;
-        let arropt: Option[Heap_Array[Boolean]] := Allocate_Array(size);
+        let arropt: Option[Heap_Array[Boolean]] := Allocate_Array(3);
         case arropt of
             when Some(value: Heap_Array[Boolean]) do
                 Deallocate_Array(value);
