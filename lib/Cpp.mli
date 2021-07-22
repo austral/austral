@@ -32,7 +32,7 @@ type cpp_expr =
 
 type cpp_stmt =
   | CLet of string * cpp_ty * cpp_expr
-  | CAssign of string * cpp_expr
+  | CAssign of cpp_expr * cpp_expr
   | CDiscarding of cpp_expr
   | CIf of cpp_expr * cpp_stmt * cpp_stmt
   | CSwitch of cpp_expr * cpp_switch_case list

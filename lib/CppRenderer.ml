@@ -93,8 +93,8 @@ and render_stmt (i: indentation) (stmt: cpp_stmt): line list =
   | CLet (name, ty, value) ->
      let s = (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";" in
      [Line (i, s)]
-  | CAssign (name, value) ->
-     let s = name ^ " = " ^ (e value) ^ ";" in
+  | CAssign (lvalue, value) ->
+     let s = (e lvalue) ^ " = " ^ (e value) ^ ";" in
      [Line (i, s)]
   | CDiscarding value ->
      [Line (i, (e value) ^ ";")]

@@ -84,7 +84,7 @@ and cstmt =
   | CSkip
   | CLet of identifier * typespec * cexpr
   | CDestructure of (identifier * typespec) list * cexpr
-  | CAssign of identifier * cexpr
+  | CAssign of concrete_lvalue * cexpr
   | CIf of cexpr * cstmt * cstmt
   | CCase of cexpr * concrete_when list
   | CWhile of cexpr * cstmt

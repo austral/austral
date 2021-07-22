@@ -26,7 +26,7 @@ and tstmt =
   | TSkip
   | TLet of identifier * ty * texpr * tstmt
   | TDestructure of (identifier * ty) list * texpr * tstmt
-  | TAssign of identifier * texpr
+  | TAssign of typed_lvalue * texpr
   | TIf of texpr * tstmt * tstmt
   | TCase of texpr * typed_when list
   | TWhile of texpr * tstmt
@@ -73,7 +73,7 @@ and typed_path_elem =
   | TArrayIndex of texpr * ty
 
 and typed_lvalue =
-  Typed_LValue of identifier * typed_path_elem list
+  TypedLValue of identifier * typed_path_elem list
 
 type typed_arglist =
   | TPositionalArglist of texpr list

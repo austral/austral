@@ -12,8 +12,8 @@ let rec abs_stmt im stmt =
      err "Let statement not in a list context"
   | CDestructure _ ->
      err "Destructure statement not in a list context"
-  | CAssign (name, value) ->
-     AAssign (name, abs_expr im value)
+  | CAssign (lvalue, value) ->
+     AAssign (abs_lvalue im lvalue, abs_expr im value)
   | CIf (c, t, f) ->
      AIf (abs_expr im c, abs_stmt im t, abs_stmt im f)
   | CCase (e, cases) ->
@@ -101,3 +101,6 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
          ABlock (abs_stmt im s, let_reshape im rest))
   | [] ->
      ASkip
+
+and abs_lvalue im (ConcreteLValue (head, elems)) =
+  LValue (head, List.map (abs_path_elem im) elems)

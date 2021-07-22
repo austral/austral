@@ -289,7 +289,7 @@ method_def:
 statement:
   | if_statement { $1 }
   | let_stmt { $1 }
-  | identifier ASSIGN expression SEMI { CAssign ($1, $3) }
+  | lvalue ASSIGN expression SEMI { CAssign ($1, $3) }
   | expression SEMI { CDiscarding $1 }
   | CASE expression OF when_stmt* END CASE SEMI { CCase ($2, $4) }
   | WHILE expression DO block END WHILE SEMI { CWhile ($2, $4) }
@@ -321,6 +321,9 @@ let_simple:
 let_destructure:
   | LET LCURLY p=parameter_list RCURLY ASSIGN e=expression SEMI { CDestructure (List.map (fun (ConcreteParam (n, t)) -> (n, t)) p, e) }
   ;
+
+lvalue:
+  | n=identifier elems=path_rest+ { ConcreteLValue (n, elems) }
 
 when_stmt:
   | WHEN identifier LPAREN parameter_list RPAREN DO block { ConcreteWhen ($2, $4, $7) }

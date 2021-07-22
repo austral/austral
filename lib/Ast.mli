@@ -7,7 +7,7 @@ type astmt =
   | ASkip
   | ALet of identifier * qtypespec * aexpr * astmt
   | ADestructure of (identifier * qtypespec) list * aexpr * astmt
-  | AAssign of identifier * aexpr
+  | AAssign of lvalue * aexpr
   | AIf of aexpr * astmt * astmt
   | ACase of aexpr * abstract_when list
   | AWhile of aexpr * astmt

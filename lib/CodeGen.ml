@@ -275,8 +275,8 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
      and b' = gen_stmt b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
-  | TAssign (n, v) ->
-     CAssign (gen_ident n, gen_exp v)
+  | TAssign (lvalue, v) ->
+     CAssign (gen_lvalue lvalue, gen_exp v)
   | TIf (c, tb, fb) ->
      CIf (gen_exp c, gen_stmt tb, gen_stmt fb)
   | TCase (e, whens) ->
@@ -294,6 +294,9 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
      CDiscarding (gen_exp e)
   | TReturn e ->
      CReturn (gen_exp e)
+
+and gen_lvalue (TypedLValue (name, elems)) =
+  gen_path (CVar (gen_ident name)) elems
 
 and gen_case (e: texpr) (whens: typed_when list): cpp_stmt =
   (* If the expression is of type Option[Pointer[T]], we compile this specially. *)

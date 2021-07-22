@@ -658,16 +658,19 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            err "Not a public record"
       | _ ->
          err "Not a record type")
-  | AAssign (name, value) ->
-     let value' = augment_expr module_name menv lexenv None value in
-     (match get_var lexenv name with
-      | Some ty ->
-         if ty = (get_type value') then
-           TAssign (name, value')
+  | AAssign (LValue (var, elems), value) ->
+     (match get_var lexenv var with
+      | Some var_ty ->
+         let elems = augment_lvalue_path menv module_name lexenv var_ty elems in
+         let value = augment_expr module_name menv lexenv None value in
+         let path = TPath (value, elems) in
+         let universe = type_universe (get_type path) in
+         if universe = FreeUniverse then
+           TAssign (TypedLValue (var, elems), value)
          else
-           err "assignment: type mismatch"
+           err "Paths must end in the free universe"
       | None ->
-         err "No var with this name")
+         err "No var with this name.")
   | AIf (c, t, f) ->
      let c' = augment_expr module_name menv lexenv None c in
      if is_boolean (get_type c') then
@@ -757,6 +760,66 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      let e' = augment_expr module_name menv lexenv None e in
      let _ = match_type rt (get_type e') in
      TReturn e'
+
+and augment_lvalue_path (menv: menv) (module_name: module_name) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
+  match elems with
+  | [elem] ->
+     [augment_lvalue_path_elem menv module_name lexenv head_ty elem]
+  | elem::rest ->
+     let elem' = augment_lvalue_path_elem menv module_name lexenv head_ty elem in
+     let rest' = augment_lvalue_path menv module_name lexenv (path_elem_type elem') rest in
+     elem' :: rest'
+  | [] ->
+     err "Path is empty"
+
+and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
+  match elem with
+  | SlotAccessor slot_name ->
+     (match head_ty with
+      | NamedType (name, args, _) ->
+         augment_slot_accessor_elem menv module_name slot_name name args
+      | _ ->
+         err "Not a record type")
+  | PointerSlotAccessor slot_name ->
+     (match head_ty with
+      | NamedType (name, args, _) ->
+         augment_pointer_slot_accessor_elem menv module_name slot_name name args
+      | WriteRef (ty, _) ->
+         (match ty with
+          | NamedType (name, args, _) ->
+             augment_reference_slot_accessor_elem menv module_name slot_name name args
+          | _ ->
+             err "Not a record type")
+      | _ ->
+         err "Not a record type")
+  | ArrayIndex ie ->
+     let ie' = augment_expr module_name menv lexenv None ie in
+     (match head_ty with
+      | NamedType (name, args, _) ->
+         if is_heap_array_type name then
+           match args with
+           | [elem_ty] ->
+              TArrayIndex (ie', elem_ty)
+           | _ ->
+              err "Invalid usage of Heap_Array"
+         else
+           err "Can't index this type"
+      | WriteRef (ref_ty, _) ->
+         (match ref_ty with
+          | NamedType (name, args, _) ->
+             if is_heap_array_type name then
+               (match args with
+                | [elem_ty] ->
+                   TArrayIndex (ie', elem_ty)
+                | _ ->
+                   err "Invalid usage of Heap_Array")
+             else
+               err "Can't index this type"
+          | _ ->
+             err "Can't index this type")
+      | _ ->
+         err "Array index operator doesn't work for this type.")
+
 
 and get_union_type_definition (importing_module: module_name) (menv: menv) (ty: ty) =
   let name = (match ty with
