@@ -55,3 +55,6 @@ and path_elem =
   | SlotAccessor of identifier
   | PointerSlotAccessor of identifier
   | ArrayIndex of aexpr
+
+and lvalue =
+  LValue of identifier * path_elem list

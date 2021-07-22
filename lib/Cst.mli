@@ -117,6 +117,9 @@ and concrete_path_elem =
   | CPointerSlotAccessor of identifier
   | CArrayIndex of cexpr
 
+and concrete_lvalue =
+  ConcreteLValue of identifier * concrete_path_elem list
+
 val make_module_body : module_name -> concrete_import_list list -> pragma list -> concrete_def list -> concrete_module_body
 
 val decl_name : concrete_decl -> identifier option

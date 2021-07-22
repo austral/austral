@@ -72,6 +72,9 @@ and typed_path_elem =
   | TPointerSlotAccessor of identifier * ty
   | TArrayIndex of texpr * ty
 
+and typed_lvalue =
+  Typed_LValue of identifier * typed_path_elem list
+
 type typed_arglist =
   | TPositionalArglist of texpr list
   | TNamedArglist of (identifier * texpr) list

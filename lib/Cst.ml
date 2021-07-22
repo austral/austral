@@ -118,6 +118,9 @@ and concrete_path_elem =
   | CPointerSlotAccessor of identifier
   | CArrayIndex of cexpr
 
+and concrete_lvalue =
+  ConcreteLValue of identifier * concrete_path_elem list
+
 let make_module_body (name: module_name) (imports: concrete_import_list list) (pragmas: pragma list) (defs: concrete_def list) =
   let is_unsafe_module p =
     match p with
