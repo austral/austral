@@ -7,6 +7,19 @@ import Austral.Memory (
 module body Example.Array is
     pragma Unsafe_Module;
 
+    function Put_Character(character: Natural_8): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
+    function Show_Bool(b: Boolean): Unit is
+        if b then
+            Put_Character(84);
+        else
+            Put_Character(70);
+        end if;
+        return nil;
+    end;
+
     function Main(): Unit is
         let arropt: Option[Heap_Array[Boolean]] := Allocate_Array(3);
         case arropt of
@@ -14,6 +27,9 @@ module body Example.Array is
                 let first: Boolean := value[0];
                 let second: Boolean := value[1];
                 let third: Boolean := value[2];
+                Show_Bool(first);
+                Show_Bool(second);
+                Show_Bool(third);
                 Deallocate_Array(value);
             when None do
                 skip;
