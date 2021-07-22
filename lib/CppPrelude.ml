@@ -96,44 +96,44 @@ namespace A_Austral__Memory {
     }
 
     template<typename T>
-    A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> A_Allocate_Array(size_t number) {
+    A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> A_Allocate_Array(uint64_t number) {
         unsigned long long elem_size = sizeof(T);
         unsigned long long num = number;
         unsigned long long array_size = 0;
         bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
         if (has_overflowed) {
-            A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
+            A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> result = A_Austral__Pervasive::None<Austral__Core::Array<T>>();
             return result;
         } else {
-            T* ptr = calloc(num, array_size);
+            T* ptr = (T*) calloc(num, array_size);
             if (ptr == NULL) {
-                A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
+                A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> result = A_Austral__Pervasive::None<Austral__Core::Array<T>>();
                 return result;
             } else {
                 Austral__Core::Array<T> arr = Austral__Core::Make_Array(number, ptr);
-                A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::Some(arr);
+                A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> result = A_Austral__Pervasive::Some(arr);
                 return result;
             }
         }
     }
 
     template<typename T>
-    A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> A_Resize_Array(Austral__Core::Array<T> array, size_t new_number) {
+    A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> A_Resize_Array(Austral__Core::Array<T> array, uint64_t new_number) {
         unsigned long long elem_size = sizeof(T);
         unsigned long long num = new_number;
         unsigned long long array_size = 0;
         bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
         if (has_overflowed) {
-            A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
+            A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> result = A_Austral__Pervasive::None<Austral__Core::Array<T>>();
             return result;
         } else {
             T* new_ptr = realloc(array.data, array_size);
             if (new_ptr == NULL) {
-                A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::None<T>();
+                A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> result = A_Austral__Pervasive::None<Austral__Core::Array<T>>();
                 return result;
             } else {
                 Austral__Core::Array<T> arr = Austral__Core::Make_Array(new_number, new_ptr);
-                A_Austral__Pervasive::A_Option<T> result = A_Austral__Pervasive::Some(arr);
+                A_Austral__Pervasive::A_Option<Austral__Core::Array<T>> result = A_Austral__Pervasive::Some(arr);
                 return result;
             }
         }
