@@ -215,6 +215,8 @@ and render_expr = function
      (paren (e v)) ^ "." ^ n
   | (CPointerStructAccessor (v, n)) ->
      (paren (e v)) ^ "->" ^ n
+  | CIndex (arr, idx) ->
+     (e arr) ^ "[" ^ (e idx) ^ "]"
 
 and e expr = render_expr expr
 

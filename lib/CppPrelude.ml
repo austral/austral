@@ -13,6 +13,16 @@ namespace Austral__Core {
     struct Array {
         size_t size;
         T* data;
+
+        T &operator[](int index) {
+            if (index < 0) {
+               Abort("Negative index.", 15);
+            }
+            if (((size_t)(index)) >= size) {
+               Abort("Array index out of bounds.", 26);
+            }
+            return data[index];
+        }
     };
 
     template<typename T>
@@ -21,14 +31,6 @@ namespace Austral__Core {
             .size = size,
             .data = data
         };
-    }
-
-    template<typename T>
-    T Array_Nth(Array<T> array, size_t index) {
-        if (index >= array.size) {
-            Abort("Array index out of bounds.", 26);
-        }
-        return array.data[index];
     }
 }
 

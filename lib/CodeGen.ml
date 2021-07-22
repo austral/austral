@@ -257,7 +257,7 @@ and gen_path_elem (expr: cpp_expr) (elem: typed_path_elem): cpp_expr =
   | TPointerSlotAccessor (n, _) ->
      CPointerStructAccessor (expr, gen_ident n)
   | TArrayIndex (e, _) ->
-     CFuncall ("Austral__Core::Array_Nth", [expr; gen_exp e], [])
+     CIndex (expr, gen_exp e)
 
 (* Statements *)
 
