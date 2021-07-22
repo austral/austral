@@ -11,7 +11,7 @@ module body Example.FFI is
 
     function Main(): Unit is
         Put_Character(97);
-        Put_String("Hello, world!\n");
+        Put_String("Hello, world!");
         return nil;
     end;
 end module body.

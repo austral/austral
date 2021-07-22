@@ -10,7 +10,7 @@ module body Example.String is
     end;
 
     function Main(): Unit is
-        let X: Fixed_Array[Natural_8] := "Hello, world!\n";
+        let X: Fixed_Array[Natural_8] := "Hello, world!";
         Put_Character(X[0]);
         Put_String(X);
         return nil;
