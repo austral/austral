@@ -18,7 +18,7 @@ type cpp_expr =
   | CFloat of string
   | CString of string
   | CVar of string
-  | CFuncall of string * cpp_expr list
+  | CFuncall of string * cpp_expr list * cpp_ty list
   | CCast of cpp_expr * cpp_ty
   | CArithmetic of arithmetic_operator * cpp_expr * cpp_expr
   | CComparison of comparison_operator * cpp_expr * cpp_expr

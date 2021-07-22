@@ -186,7 +186,13 @@ and render_expr = function
   | (CFloat f) -> f
   | (CString s) -> "\"" ^ s ^ "\""
   | (CVar s) -> s
-  | (CFuncall (n, a)) -> n ^ (paren (comma_sep (List.map e a)))
+  | (CFuncall (n, a, tyargs)) ->
+     let t' = if tyargs = [] then
+                ""
+              else
+                "<" ^ (String.concat ", " (List.map render_type tyargs)) ^ ">"
+     in
+     n ^ t' ^ (paren (comma_sep (List.map e a)))
   | (CCast (e, t)) ->
      let e' = render_expr e
      and t' = render_type t in

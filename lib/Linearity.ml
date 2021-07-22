@@ -31,7 +31,7 @@ let rec count_appearances (name: identifier) (expr: texpr) =
        0
   | TArithmetic (_, lhs, rhs) ->
      (ca lhs) + (ca rhs)
-  | TFuncall (_, args, _) ->
+  | TFuncall (_, args, _, _) ->
      sum (List.map ca args)
   | TMethodCall (_, _, args, _) ->
      sum (List.map ca args)

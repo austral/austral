@@ -193,13 +193,13 @@ let rec gen_exp (e: texpr): cpp_expr =
   | TFloatConstant f ->
      CFloat f
   | TStringConstant s ->
-     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CCast (CString s, c_string_type)])
+     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CCast (CString s, c_string_type)], [])
   | TVariable (n, _) ->
      CVar (gen_ident n)
-  | TFuncall (name, args, _) ->
-     CFuncall (gen_qident name, List.map g args)
+  | TFuncall (name, args, _, substs) ->
+     CFuncall (gen_qident name, List.map g args, List.map (fun (_, t) -> gen_type t) substs)
   | TMethodCall (name, _, args, _) ->
-     CFuncall (gen_qident name, List.map g args)
+     CFuncall (gen_qident name, List.map g args, [])
   | TCast (e, t) ->
      CCast (gen_exp e, gen_type t)
   | TArithmetic (op, lhs, rhs) ->
@@ -257,7 +257,7 @@ and gen_path_elem (expr: cpp_expr) (elem: typed_path_elem): cpp_expr =
   | TPointerSlotAccessor (n, _) ->
      CPointerStructAccessor (expr, gen_ident n)
   | TArrayIndex (e, _) ->
-     CFuncall ("Austral__Core::Array_Nth", [expr; gen_exp e])
+     CFuncall ("Austral__Core::Array_Nth", [expr; gen_exp e], [])
 
 (* Statements *)
 
@@ -489,7 +489,7 @@ let gen_decl (decl: typed_decl): cpp_decl list =
          CVar (gen_ident n)
      in
      let args = List.map (fun (ValueParameter (n, t)) -> make_param n t) params in
-     let funcall = CFuncall (underlying, args) in
+     let funcall = CFuncall (underlying, args, []) in
      let body = CReturn funcall in
      let def = CFunctionDefinition (gen_ident n, [], gen_params params, gen_type rt, body) in
      [ff_decl; def]

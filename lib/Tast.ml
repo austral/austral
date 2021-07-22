@@ -52,7 +52,7 @@ and texpr =
   | TStringConstant of string
   | TVariable of identifier * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
-  | TFuncall of qident * texpr list * ty
+  | TFuncall of qident * texpr list * ty * (identifier * ty) list
   | TMethodCall of qident * semantic_instance * texpr list * ty
   | TCast of texpr * ty
   | TComparison of comparison_operator * texpr * texpr
@@ -117,7 +117,7 @@ let rec get_type = function
      ty
   | TArithmetic (_, lhs, _) ->
      get_type lhs
-  | TFuncall (_, _, ty) ->
+  | TFuncall (_, _, ty, _) ->
      ty
   | TMethodCall (_, _, _, ty) ->
      ty
