@@ -4,10 +4,10 @@ set -euxo pipefail
 function compile() {
     ./austral --module=$1/$2 --entrypoint=Example.$2:Main > code.cpp
     g++ code.cpp -o testbin
-    rm code.cpp
     ./testbin > actual.txt
     echo -n -e "$3" > expected.txt
     diff actual.txt expected.txt
+    rm code.cpp
     rm testbin
     rm actual.txt
     rm expected.txt
