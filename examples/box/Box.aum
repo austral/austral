@@ -109,9 +109,10 @@ module body Example.Box is
             when Some(value: Box[Integer_32]) do
                 borrow value as boxref in rho do
                     let valueref: Reference[Integer_32, rho] := Get_Value_Ref(boxref);
+                    let contents: Integer_32 := Deref(valueref);
+                    Put_Character(contents);
+                    Unbox(value);
                 end;
-                let contents: Integer_32 := Unbox(value);
-                Put_Character(contents);
             when None do
                 skip;
         end case;
