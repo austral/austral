@@ -32,8 +32,18 @@ let pervasive_module =
           TypedCase (i "Some", [TypedSlot (i "value", TyVar (TypeVariable (i "T", TypeUniverse)))])
         ]
     )
+  and deref_def =
+    (* generic T: Free, R: Region
+       function Dereference(ref: Reference[T, R]): T *)
+    SFunctionDeclaration (
+        VisPublic,
+        i "Deref",
+        [TypeParameter (i "T", FreeUniverse); TypeParameter (i "R", RegionUniverse)],
+        [ValueParameter (i "ref", ReadRef (TyVar (TypeVariable (i "T", FreeUniverse)), TyVar (TypeVariable (i "R", RegionUniverse))))],
+        TyVar (TypeVariable (i "T", FreeUniverse))
+      )
   in
-  let decls = [option_type_def] in
+  let decls = [option_type_def; deref_def] in
   SemanticModule {
       name = pervasive_module_name;
       decls = decls;
@@ -47,7 +57,8 @@ let pervasive_imports =
       [
         ConcreteImport (option_type_name, None);
         ConcreteImport (make_ident "Some", None);
-        ConcreteImport (make_ident "None", None)
+        ConcreteImport (make_ident "None", None);
+        ConcreteImport (make_ident "Deref", None)
       ]
     )
 

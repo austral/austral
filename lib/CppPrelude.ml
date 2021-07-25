@@ -65,6 +65,11 @@ namespace A_Austral__Pervasive {
             .data = { .A_None = {} }
         };
     }
+
+    template <typename T>
+    T A_Deref(T* ref) {
+        return *ref;
+    }
 }
 
 namespace A_Austral__Memory {
