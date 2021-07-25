@@ -45,15 +45,11 @@ let parse_built_in_type name args =
   | "Reference" ->
      (match args with
       | [ty; ty'] ->
-         let u = type_universe ty in
-         if ((u = LinearUniverse) || (u = TypeUniverse)) then
-           let u' = type_universe ty' in
-           if (u' = RegionUniverse) then
+         let u = type_universe ty' in
+           if (u = RegionUniverse) then
              Some (ReadRef (ty, ty'))
            else
              err "Reference error: Not a region"
-         else
-           err "References can only point to linear types."
       | _ ->
          err "Invalid Reference type specifier.")
   | "WriteReference" ->
