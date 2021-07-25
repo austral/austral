@@ -60,6 +60,8 @@ and abs_expr im expr =
      IfExpression (abs_expr im c, abs_expr im t, abs_expr im f)
   | CPath (e, es) ->
      Path (abs_expr im e, List.map (abs_path_elem im) es)
+  | CPathRef (e, es) ->
+     PathRef (abs_expr im e, List.map (abs_path_elem im) es)
 
 and abs_when im (ConcreteWhen (name, params, body)) =
   AbstractWhen (name,

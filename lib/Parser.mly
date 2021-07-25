@@ -75,6 +75,7 @@ open Util
 %token HYPHEN_RIGHT
 %token RIGHT_ARROW
 %token ASSIGN
+%token ADDRESS_OF
 /* Strings and docstrings */
 %token <string> STRING_CONSTANT
 %token <string> DOCSTRING_TOKEN
@@ -413,6 +414,7 @@ named_arg:
 
 compound_expression:
   | path { $1 }
+  | path_ref { $1 }
   | atomic_expression comp_op atomic_expression { CComparison ($2, $1, $3) }
   | atomic_expression AND atomic_expression { CConjunction ($1, $3) }
   | atomic_expression OR atomic_expression { CDisjunction ($1, $3) }
@@ -423,6 +425,10 @@ compound_expression:
 
 path:
   | initial=atomic_expression elems=path_rest+ { CPath (initial, elems) }
+  ;
+
+path_ref:
+  | ADDRESS_OF initial=atomic_expression elems=path_rest+ { CPathRef (initial, elems) }
   ;
 
 path_rest:

@@ -62,6 +62,7 @@ and texpr =
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
   | TPath of texpr * typed_path_elem list
+  | TPathRef of texpr * typed_path_elem list * ty * bool
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt

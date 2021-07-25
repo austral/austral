@@ -217,6 +217,8 @@ and render_expr = function
      (paren (e v)) ^ "->" ^ n
   | CIndex (arr, idx) ->
      (e arr) ^ "[" ^ (e idx) ^ "]"
+  | CAddressOf exp ->
+     "&" ^ (e exp)
 
 and e expr = render_expr expr
 

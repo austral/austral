@@ -115,6 +115,49 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
        path'
      else
        err "Paths must end in the free universe"
+  | PathRef (e, elems) ->
+     let e' = aug e in
+     (* The initial expression of a path a read reference or write reference *)
+     let (is_read, region) = (match (get_type e') with
+                              | ReadRef (_, r) ->
+                                 (true, r)
+                              | WriteRef (_, r) ->
+                                 (false, r)
+                              | _ ->
+                                 err "The initial expression of a path a read reference or write reference")
+     in
+     let elems' = augment_path menv module_name lexenv (get_type e') elems in
+     let path' = TPath (e', elems') in
+     (* If `p` is a path that begins in a value that is reference or writable reference in a region `R`, and ends in a value of type `T`, then:
+
+        1. If `T` is `Pointer[T]`, then the type of the path is `Reference[T, R]` or `WriteReference[T, R]`.
+        2. Otherwise, the type of the path is `Reference[T, R]` or `WriteReference[T, R]`.
+      *)
+     let path_ty = get_type path' in
+     let (path_ty', is_pointer) =
+       (match path_ty with
+        | (NamedType (name, args, _)) ->
+           if is_pointer_type name then
+             (match args with
+              | [t] ->
+                 if is_read then
+                   (ReadRef (t, region), true)
+                 else
+                   (WriteRef (t, region), true)
+              | _ ->
+                 err "Bad args")
+           else
+             if is_read then
+               (ReadRef (path_ty, region), false)
+             else
+               (WriteRef (path_ty, region), false)
+        | _ ->
+           if is_read then
+             (ReadRef (path_ty, region), false)
+           else
+             (WriteRef (path_ty, region), false))
+     in
+     TPathRef (e', elems', path_ty', is_pointer)
 
 and is_bool e =
   match get_type e with
@@ -463,7 +506,7 @@ and get_instance (menv: menv) (source_module_name: module_name) (dispatch_ty: ty
         true
       with
         Type_match_error _ ->
-      (* Does not match, just skip to the next instance, *)
+        (* Does not match, just skip to the next instance, *)
         false
     else
       false

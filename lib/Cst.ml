@@ -79,6 +79,7 @@ and cexpr =
   | CNegation of cexpr
   | CIfExpression of cexpr * cexpr * cexpr
   | CPath of cexpr * concrete_path_elem list
+  | CPathRef of cexpr * concrete_path_elem list
 
 and cstmt =
   | CSkip

@@ -81,6 +81,24 @@ let rec count_appearances (name: identifier) (expr: texpr) =
            count_appearances name ie)
      in
      e' + (sum (List.map ca_path elems))
+  | TPathRef (e, elems, _, _) ->
+     let e' =
+       (match e with
+        | TVariable _ ->
+           0
+        | _ ->
+           ca e)
+     in
+     let ca_path elem =
+       (match elem with
+        | TSlotAccessor _ ->
+           0
+        | TPointerSlotAccessor _ ->
+           0
+        | TArrayIndex (ie, _) ->
+           count_appearances name ie)
+     in
+     e' + (sum (List.map ca_path elems))
 
 (* Represents the state of a linear variable *)
 type state =

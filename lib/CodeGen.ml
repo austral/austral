@@ -239,6 +239,12 @@ let rec gen_exp (e: texpr): cpp_expr =
            ])
   | TPath (e, elems) ->
      gen_path (gen_exp e) (List.rev elems)
+  | TPathRef (e, elems, _, is_pointer) ->
+     let p = gen_path (gen_exp e) (List.rev elems) in
+     if is_pointer then
+       p
+     else
+       CAddressOf p
 
 and gen_path (expr: cpp_expr) (elems: typed_path_elem list): cpp_expr =
   match elems with

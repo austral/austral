@@ -63,6 +63,7 @@ and texpr =
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
   | TPath of texpr * typed_path_elem list
+  | TPathRef of texpr * typed_path_elem list * ty * bool
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt
@@ -144,6 +145,8 @@ let rec get_type = function
      assert ((List.length elems) > 0);
      let last = List.nth elems ((List.length elems) - 1) in
      path_elem_type last
+  | TPathRef (_, _, ty, _) ->
+     ty
 
 and path_elem_type = function
   | TSlotAccessor (_, t) ->
