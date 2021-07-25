@@ -276,7 +276,7 @@ and augment_reference_slot_accessor_elem (menv: menv) (module_name: module_name)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
     let bindings = match_typarams typarams type_args in
     let slot_ty' = replace_variables bindings slot_ty in
-    TSlotAccessor (slot_name, slot_ty')
+    TPointerSlotAccessor (slot_name, slot_ty')
   else
     err "Trying to read a slot from a reference to a non-public record"
 

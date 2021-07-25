@@ -127,9 +127,9 @@ let rec gen_type (ty: ty): cpp_ty =
   | RegionTy _ ->
      err "TODO: Codegen for region types"
   | ReadRef (t, _) ->
-     gen_type t
+     CPointer (gen_type t)
   | WriteRef (t, _) ->
-     gen_type t
+     CPointer (gen_type t)
   | TyVar (TypeVariable (n, _)) ->
      CNamedType (gen_ident n, [])
 
@@ -292,8 +292,19 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
   | TFor (v, i, f, b) ->
      CFor (gen_ident v, gen_exp i, gen_exp f, gen_stmt b)
   | TBorrow { original; rename; orig_type; body; _ } ->
-      let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
-      CBlock [l; gen_stmt body]
+     let is_pointer =
+       (match orig_type with
+        | NamedType (name, _, _) ->
+           is_pointer_type name
+        | _ ->
+           false)
+     in
+     if is_pointer then
+       let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
+       CBlock [l; gen_stmt body]
+     else
+       let l = CLet (gen_ident rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
+       CBlock [l; gen_stmt body]
   | TBlock (a, b) ->
      CBlock [gen_stmt a; gen_stmt b]
   | TDiscarding e ->
