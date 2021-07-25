@@ -71,6 +71,12 @@ let rec replace_variables bindings ty =
        NamedType (n, a', u')
      else
        NamedType (n, a', u)
+  | ReadRef (ty, region) ->
+     ReadRef (replace_variables bindings ty, replace_variables bindings region)
+  | WriteRef (ty, region) ->
+     WriteRef (replace_variables bindings ty, replace_variables bindings region)
+  | Array (ty, r) ->
+     Array (replace_variables bindings ty, r)
   | t ->
      t
 
