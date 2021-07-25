@@ -650,12 +650,17 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | ASkip ->
      TSkip
   | ALet (name, ty, value, body) ->
-     let ty' = parse_typespec menv rm typarams ty in
-     let value' = augment_expr module_name menv lexenv (Some ty') value in
-     let bindings = match_type_with_value ty' value' in
+     let expected_ty = parse_typespec menv rm typarams ty in
+     let value' = augment_expr module_name menv lexenv (Some expected_ty) value in
+     let bindings = match_type_with_value expected_ty value' in
      let ty'' = replace_variables bindings (get_type value') in
      let lexenv' = push_var lexenv name ty'' in
      let body' = augment_stmt (update_lexenv ctx lexenv') body in
+     (* print_endline ("\n\n\tName: " ^ (ident_string name))
+     print_endline ("\tExpected: " ^ (show_ty expected_ty));
+     print_endline ("\tActual: " ^ (show_ty (get_type value')));
+     print_endline ("\tBindings: " ^ (show_bindings bindings));
+     print_endline ("\tResolved: " ^ (show_ty ty'')); *)
      TLet (name, ty'', value', body')
   | ADestructure (bindings, value, body) ->
      let value' = augment_expr module_name menv lexenv None value in
