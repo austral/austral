@@ -7,6 +7,12 @@ open Error
 let lerr msg =
   raise (Linearity_error msg)
 
+let type_is_write_ref = function
+  | WriteRef _ ->
+     true
+  | _ ->
+     false
+
 (* Count the number of times that a variable with the given name appears in an
    expression. *)
 let rec count_appearances (name: identifier) (expr: texpr) =
@@ -131,12 +137,15 @@ let new_state (name: identifier) (expr: texpr) (state: state): state =
      else
        lerr ("Linear variable consumed again: " ^ (ident_string name))
 
-let rec check_consistency (name: identifier) (stmt: tstmt): unit =
-  let state = check_consistency' name stmt Unconsumed in
+let rec check_consistency (name: identifier) (is_write_ref: bool) (stmt: tstmt): unit =
+  let state = check_consistency' name is_write_ref stmt Unconsumed in
   if state = Consumed then
     ()
   else
-    lerr "Linear variable not consumed."
+    if is_write_ref then
+      ()
+    else
+      lerr "Linear variable not consumed."
 
 (* Check that a linear variable with the given name is used consistently in the
    body in which it is defined.
@@ -146,22 +155,22 @@ let rec check_consistency (name: identifier) (stmt: tstmt): unit =
 
    Returns the state the variable is in after the body: either consumed or
    unconsumed. If the variable is used incorrectly, raises an error. *)
-and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
+and check_consistency' (name: identifier) (is_write_ref: bool) (stmt: tstmt) (state: state): state =
   match stmt with
   | TSkip ->
      state
   | TLet (_, _, e, b) ->
      let state' = new_state name e state in
-     check_consistency' name b state'
+     check_consistency' name is_write_ref b state'
   | TDestructure (_, e, b) ->
     let state' = new_state name e state in
-    check_consistency' name b state'
+    check_consistency' name is_write_ref b state'
   | TAssign (_, e) ->
      new_state name e state
   | TIf (c, tb, fb) ->
      let state' = new_state name c state in
-     let true_branch_state = check_consistency' name tb state'
-     and false_branch_state = check_consistency' name fb state' in
+     let true_branch_state = check_consistency' name is_write_ref tb state'
+     and false_branch_state = check_consistency' name is_write_ref fb state' in
      (* In an if statement, the state of the variable must be the same in both
         branches. *)
      if true_branch_state = false_branch_state then
@@ -170,7 +179,7 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
        lerr "Linear variable is consumed in one branch but not others."
   | TCase (e, whens) ->
      let state' = new_state name e state in
-     let when_states = List.map (fun (TypedWhen (_, _, b)) -> check_consistency' name b state') whens in
+     let when_states = List.map (fun (TypedWhen (_, _, b)) -> check_consistency' name is_write_ref b state') whens in
      (* In a case statement, the state must be the same in all branches *)
      if same_state when_states then
        List.nth when_states 0
@@ -179,7 +188,7 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
   | TWhile (e, b) ->
      (* Linear variables cannot appear in either the condition or body of a loop *)
      let ea = count_appearances name e
-     and bs = check_consistency' name b state in
+     and bs = check_consistency' name is_write_ref b state in
      if ea > 0 then
        lerr "Linear variables cannot appear in the condition of a while loop."
      else
@@ -190,7 +199,7 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
   | TFor (_, i, f, b) ->
      let state' = new_state name i state in
      let state'' = new_state name f state' in
-     let bs = check_consistency' name b state'' in
+     let bs = check_consistency' name is_write_ref b state'' in
      if (state = Unconsumed) && (bs = Consumed) then
        lerr "Linear variables cannot appear in the body of a for loop."
      else
@@ -200,23 +209,26 @@ and check_consistency' (name: identifier) (stmt: tstmt) (state: state): state =
         this borrow refers to this variable, then the variable cannot appear in
         the body of the borrow. *)
      if equal_identifier name original then
-       let bs = check_consistency' name body state in
+       let bs = check_consistency' name is_write_ref  body state in
        if (state = Unconsumed) && (bs = Consumed) then
          lerr "Linear variables cannot appear in the scope within which they are borrowed."
        else
          bs
      else
-       check_consistency' name body state
+       check_consistency' name is_write_ref body state
   | TBlock (a, b) ->
-      let state' = check_consistency' name a state in
-      check_consistency' name b state'
+      let state' = check_consistency' name is_write_ref a state in
+      check_consistency' name is_write_ref b state'
   | TDiscarding e ->
      new_state name e state
   | TReturn e ->
      let state' = new_state name e state in
      if state' = Unconsumed then
-       lerr ("Can't return from a function while there are unconsumed linear values. Name: "
-             ^ (ident_string name))
+       if is_write_ref then
+         Unconsumed
+       else
+         lerr ("Can't return from a function while there are unconsumed linear values. Name: "
+               ^ (ident_string name))
      else
        state'
 
@@ -244,14 +256,14 @@ let rec check_linearity (stmt: tstmt): unit =
   | TLet (n, t, _, b) ->
      let u = type_universe t in
      if universe_linear_ish u then
-       check_consistency n b
+       check_consistency n (type_is_write_ref t) b
      else
        ()
   | TDestructure (bs, _, b) ->
      let check' (n, t) =
          let u = type_universe t in
          if universe_linear_ish u then
-           check_consistency n b
+           check_consistency n (type_is_write_ref t) b
          else
            ()
      in
@@ -299,6 +311,6 @@ and check_method_linearity (TypedMethodDef (_, params, _, b)) =
 
 and check_param (b: tstmt) (ValueParameter (n, t)) =
   if universe_linear_ish (type_universe t) then
-    check_consistency n b
+    check_consistency n (type_is_write_ref t) b
   else
     ()
