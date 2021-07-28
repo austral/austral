@@ -124,6 +124,17 @@ module body Example.Box is
             when None do
                 skip;
         end case;
+        -- Box a value, swap it through a mutable reference, and unbox it.
+        let b5: Option[Box[Integer_32]] := Make(101);
+        case b5 of
+            when Some(value: Box[Integer_32]) do
+                borrow! value as boxmutref in rho do
+                    Swap_Mut(boxmutref, 97);
+                    Put_Character(Unbox(value));
+                end;
+            when None do
+                skip;
+        end case;
         return nil;
     end;
 end module body.
