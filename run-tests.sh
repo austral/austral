@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
+make
+
 function compile() {
     ./austral --module=$1/$2 --entrypoint=Example.$2:Main > code.cpp
     g++ code.cpp -o testbin
