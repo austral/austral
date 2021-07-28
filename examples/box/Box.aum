@@ -64,6 +64,14 @@ module body Example.Box is
         return ref;
     end;
 
+    generic [T: Free, R: Region]
+    function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
+        let ptr: Pointer[T] := boxref->pointer;
+        let old_value: T := Load(ptr);
+        Store(ptr, value);
+        return old_value;
+    end;
+
     function Put_Character(character: Integer_32): Integer_32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;

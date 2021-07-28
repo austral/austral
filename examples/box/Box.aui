@@ -16,5 +16,8 @@ module Example.Box is
     generic [T: Free, R: Region]
     function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit;
 
+    generic [T: Free, R: Region]
+    function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T;
+
     function Main(): Unit;
 end module.
