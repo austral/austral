@@ -49,7 +49,7 @@ for OCaml, and a C++ compiler for building the resulting output.
 
 Instructions:
 
-1. Install [`opam`][opam].
+1. Install [opam][opam].
 2. `opam install dune`
 3. `make`
 
