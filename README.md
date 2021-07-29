@@ -1,7 +1,5 @@
 # Austral
 
-[![Build Status](https://travis-ci.com/austral/austral.svg?branch=master)](https://travis-ci.com/austral/austral)
-
 **Not done yet.**
 
 Austral is a new language.
