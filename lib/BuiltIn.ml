@@ -2,6 +2,7 @@ open Identifier
 open Type
 open Cst
 open Semantic
+open Region
 
 (* Austral.Pervasive *)
 
@@ -42,8 +43,18 @@ let pervasive_module =
         [ValueParameter (i "ref", ReadRef (TyVar (TypeVariable (i "T", FreeUniverse)), TyVar (TypeVariable (i "R", RegionUniverse))))],
         TyVar (TypeVariable (i "T", FreeUniverse))
       )
+  and fixed_array_size_def =
+    (* generic T: Type
+       function Fixed_Array_Size(arr: Fixed_Array[T]): Natural_64 *)
+    SFunctionDeclaration (
+        VisPublic,
+        i "Fixed_Array_Size",
+        [TypeParameter (i "T", TypeUniverse)],
+        [ValueParameter (i "arr", Array (TyVar (TypeVariable (i "T", TypeUniverse)), static_region))],
+        Integer (Unsigned, Width64)
+      )
   in
-  let decls = [option_type_def; deref_def] in
+  let decls = [option_type_def; deref_def; fixed_array_size_def] in
   SemanticModule {
       name = pervasive_module_name;
       decls = decls;
@@ -58,7 +69,8 @@ let pervasive_imports =
         ConcreteImport (option_type_name, None);
         ConcreteImport (make_ident "Some", None);
         ConcreteImport (make_ident "None", None);
-        ConcreteImport (make_ident "Deref", None)
+        ConcreteImport (make_ident "Deref", None);
+        ConcreteImport (make_ident "Fixed_Array_Size", None)
       ]
     )
 
