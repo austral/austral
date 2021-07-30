@@ -297,7 +297,7 @@ and augment_call (module_name: module_name) (menv: menv) (asserted_ty: ty option
   | Some callable ->
      augment_callable module_name menv name callable asserted_ty args
   | None ->
-     err "No callable with this name"
+     err ("No callable with this name: " ^ (qident_debug_name name))
 
 and augment_callable (module_name: module_name) (menv: menv) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
   match callable with

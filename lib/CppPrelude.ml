@@ -32,11 +32,6 @@ namespace Austral__Core {
             .data = data
         };
     }
-
-    template<typename T>
-    size_t Fixed_Array_Size(Array<T> arr) {
-        return arr.size;
-    }
 }
 
 namespace A_Austral__Pervasive {
@@ -74,6 +69,11 @@ namespace A_Austral__Pervasive {
     template <typename T>
     T A_Deref(T* ref) {
         return *ref;
+    }
+
+    template<typename T>
+    size_t A_Fixed_Array_Size(Austral__Core::Array<T> arr) {
+        return arr.size;
     }
 }
 
