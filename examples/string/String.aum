@@ -12,8 +12,10 @@ module body Example.String is
     function Main(): Unit is
         let X: Fixed_Array[Natural_8] := "Hello, world!";
         let len: Natural_64 := Fixed_Array_Size(X);
-        Put_Character(X[0]);
-        Put_String(X);
+        if len = 13 then
+            Put_Character(X[0]);
+            Put_String(X);
+        end if;
         return nil;
     end;
 end module body.
