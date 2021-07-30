@@ -183,6 +183,16 @@ let memory_module =
         [ValueParameter (i "array", heap_array_t)],
         Unit
       )
+  and heap_array_size_def =
+    (* generic T: Type
+       function Heap_Array_Size(array: Heap_Array[T]): Natural_64 *)
+    SFunctionDeclaration (
+        VisPublic,
+        i "Heap_Array_Size",
+        typarams,
+        [ValueParameter (i "array", heap_array_t)],
+        Integer (Unsigned, Width64)
+      )
   in
   let decls = [
       pointer_type_def;
@@ -193,7 +203,8 @@ let memory_module =
       deallocate_def;
       allocate_array_def;
       resize_array_def;
-      deallocate_array_def
+      deallocate_array_def;
+      heap_array_size_def
     ]
   in
   SemanticModule {

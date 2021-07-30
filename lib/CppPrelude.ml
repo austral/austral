@@ -156,5 +156,10 @@ namespace A_Austral__Memory {
         free(array.data);
         return false;
     }
+
+    template<typename T>
+    size_t A_Heap_Array_Size(Austral__Core::Array<T> arr) {
+        return arr.size;
+    }
 }
 |code}
