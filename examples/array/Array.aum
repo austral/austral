@@ -1,7 +1,8 @@
 import Austral.Memory (
     Heap_Array,
     Allocate_Array,
-    Deallocate_Array
+    Deallocate_Array,
+    Heap_Array_Size
 );
 
 module body Example.Array is
@@ -23,7 +24,8 @@ module body Example.Array is
     function Main(): Unit is
         let arropt: Option[Heap_Array[Boolean]] := Allocate_Array(3);
         case arropt of
-            when Some(value: Heap_Array[Boolean]) do
+        when Some(value: Heap_Array[Boolean]) do
+                let len: Natural_64 := Heap_Array_Size(value);
                 value[0] := true;
                 value[2] := true;
                 let first: Boolean := value[0];
