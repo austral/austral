@@ -51,7 +51,8 @@ let rec match_type a b =
       | TyVar (TypeVariable (i', u')) ->
          if (equal_identifier i i') && (u = u') then
            (* Don't bind T => T *)
-           empty_bindings
+           (*empty_bindings*)
+           match_type_var i u t
          else
            match_type_var i u t
       | _ ->
@@ -61,7 +62,8 @@ let rec match_type a b =
       | TyVar (TypeVariable (i', u')) ->
          if (equal_identifier i i') && (u = u') then
            (* Don't bind T => T *)
-           empty_bindings
+           (*empty_bindings*)
+           match_type_var i u t
          else
            match_type_var i u t
       | _ ->
