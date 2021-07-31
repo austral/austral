@@ -95,10 +95,19 @@ let rec effective_universe name typarams declared_universe args =
      if all_arguments_are_free args then
        FreeUniverse
      else
+       (* This is an error, because if a generic type is said to be in the Free
+          universe, its arguments cannot be Linear or Type. However, there is an
+          exception to this rule: the Pointer and Heap_Array types from
+          Austral.Memory are non-linear. These are escape hatches of the
+          linearity checker and are necessary to implement low-level data
+          structures. *)
        if is_pointer_type name then
          FreeUniverse
        else
-         err "Free type called with non-free argument"
+         if is_heap_array_type name then
+           FreeUniverse
+         else
+           err ("Free type called with non-free argument: " ^ (qident_debug_name name))
   | LinearUniverse ->
      LinearUniverse
   | RegionUniverse ->
@@ -115,12 +124,12 @@ let rec effective_universe name typarams declared_universe args =
 
 and all_arguments_are_free (args: ty list): bool =
   let is_compatible_with_free = function
-  | FreeUniverse ->
-     true
-  | RegionUniverse ->
-     true
-  | _ ->
-     false
+    | FreeUniverse ->
+       true
+    | RegionUniverse ->
+       true
+    | _ ->
+       false
   in
   List.for_all is_compatible_with_free (List.map type_universe args)
 
