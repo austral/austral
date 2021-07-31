@@ -913,10 +913,8 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (menv: menv)
   | CConstant (vis, name, ts, expr, doc) ->
      let ty = parse_typespec menv empty_region_map [] ts in
      let expr' = augment_expr module_name menv empty_lexenv (Some ty) expr in
-     if ty = get_type expr' then
-       TConstant (vis, name, ty, expr', doc)
-     else
-       err "The declared type does not match the actual type of the expression."
+     let _ = match_type_with_value ty expr' in
+     TConstant (vis, name, ty, expr', doc)
   | CTypeAlias (vis, name, typarams, universe, ts, doc) ->
      let rm = region_map_from_typarams typarams in
      let ty = parse_typespec menv rm typarams ts in
