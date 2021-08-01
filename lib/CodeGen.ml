@@ -130,7 +130,7 @@ let rec gen_type (ty: ty): cpp_ty =
      CPointer (gen_type t)
   | WriteRef (t, _) ->
      CPointer (gen_type t)
-  | TyVar (TypeVariable (n, _)) ->
+  | TyVar (TypeVariable (n, _, _)) ->
      CNamedType (gen_ident n, [])
 
 and gen_named_type (name: qident) (args: ty list): cpp_ty =
@@ -409,7 +409,7 @@ let gen_params params =
   List.map (fun (ValueParameter (n, t)) -> CValueParam (gen_ident n, gen_type t)) params
 
 let gen_typarams params =
-  let f (TypeParameter (n, u)) =
+  let f (TypeParameter (n, u, _)) =
     if u = RegionUniverse then
       None
     else

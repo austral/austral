@@ -46,44 +46,22 @@ let rec match_type a b =
      let bindings = match_type t t' in
      let bindings' = match_type r r' in
      merge_bindings bindings bindings'
-  | (TyVar (TypeVariable (i, u)), t) ->
-     (match t with
-      | TyVar (TypeVariable (i', u')) ->
-         if (equal_identifier i i') && (u = u') then
-           (* Don't bind T => T *)
-           (*empty_bindings*)
-           match_type_var i u t
-         else
-           match_type_var i u t
-      | _ ->
-         match_type_var i u t)
-  | (t, TyVar (TypeVariable (i, u))) ->
-     (match t with
-      | TyVar (TypeVariable (i', u')) ->
-         if (equal_identifier i i') && (u = u') then
-           (* Don't bind T => T *)
-           (*empty_bindings*)
-           match_type_var i u t
-         else
-           match_type_var i u t
-      | _ ->
-         match_type_var i u t)
+  | (TyVar (TypeVariable (i, u, from)), t) ->
+     match_type_var i u from t
+  | (t, TyVar (TypeVariable (i, u, from))) ->
+     match_type_var i u from t
   | _ ->
      type_mismatch "Type mismatch" a b
 
-and match_type_var name universe ty =
+and match_type_var name universe from ty =
   (* Check if the argument type is a variable. *)
   match ty with
-  | (TyVar (TypeVariable (i', u'))) ->
+  | (TyVar (TypeVariable (i', u', from'))) ->
      (* When the argument type is a type variable, check if the variables have
-        the same name. *)
-     if (name = i') && (universe = u') then
-       (* Originally I thought that in this case we should return the empty
-          binding. But I realize that when you have a call like `f(g(x))` where
-          `g` has a type parameter `T` in its return type, and `f` has a type
-          parameter also called `T` in its return type, the compiler thinks the
-          parameter is not satisfied. Perhaps this requires further thought. *)
-       add_binding empty_bindings name ty
+        the same name and provenance. *)
+     if (equal_identifier name i') && (universe = u') && (equal_qident from from') then
+       (* If so, do nothing: we don't want circular bindings *)
+       empty_bindings
      else
        (* Otherwise, add a new binding.
 
@@ -92,18 +70,18 @@ and match_type_var name universe ty =
           that accepts an argument `x` of generic type `U`. If we encounter a
           function call `f(x)`, then the parameter type is `T` and the argument
           type is `U`, so we create a binding `T -> U`.  *)
-       add_binding empty_bindings name ty
+       add_binding empty_bindings name from ty
   | _ ->
      (* The argument type is not a type variable. Add a straightforward
         binding. *)
-     add_binding empty_bindings name ty
+     add_binding empty_bindings name from ty
 
 and match_type_list tys tys' =
   let bs = List.map2 match_type tys tys' in
   List.fold_left merge_bindings empty_bindings bs
 
 let match_typarams typarams args =
-  let typarams' = List.map (fun (TypeParameter (n, u)) -> TyVar (TypeVariable (n, u))) typarams in
+  let typarams' = List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams in
   match_type_list typarams' args
 
 let match_type_with_value (ty: ty) (expr: texpr): type_bindings =

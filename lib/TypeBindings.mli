@@ -7,15 +7,15 @@ type type_bindings
 
 val binding_count : type_bindings -> int
 
-val bindings_list : type_bindings -> (identifier * ty) list
+val bindings_list : type_bindings -> (identifier * qident * ty) list
 
 val empty_bindings : type_bindings
 
 val merge_bindings : type_bindings -> type_bindings -> type_bindings
 
-val add_binding : type_bindings -> identifier -> ty -> type_bindings
+val add_binding : type_bindings -> identifier -> qident -> ty -> type_bindings
 
-val get_binding : type_bindings -> identifier -> ty option
+val get_binding : type_bindings -> identifier -> qident -> ty option
 
 (* Given a set of bindings, and a type expression, replace every type variable
    in the expression with the value from the bindings. If the variable is not

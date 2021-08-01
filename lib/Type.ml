@@ -20,9 +20,9 @@ type signedness =
   | Signed
 [@@deriving eq, show]
 
-type type_parameter = TypeParameter of identifier * universe
+type type_parameter = TypeParameter of identifier * universe * qident
 
-type type_var = TypeVariable of identifier * universe
+type type_var = TypeVariable of identifier * universe * qident
 [@@deriving eq, show]
 
 type ty =
@@ -74,8 +74,8 @@ let rec type_string = function
      "Reference[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Free"
   | WriteRef (t, r) ->
      "WriteReference[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Linear"
-  | TyVar (TypeVariable (n, u)) ->
-     (ident_string n) ^ " : " ^ (universe_string u)
+  | TyVar (TypeVariable (n, u, from)) ->
+     (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ " : " ^ (universe_string u)
 
 and signedness_string = function
   | Unsigned -> "Natural"

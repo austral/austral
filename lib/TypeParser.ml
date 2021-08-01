@@ -189,9 +189,9 @@ let rec parse_type (menv: menv) (sigs: type_signature list) (rm: region_map) (ty
 and is_param (typarams: type_parameter list) (name: qident): ty option =
   let name' = original_name name
   in
-  match List.find_opt (fun (TypeParameter (n, _)) -> n = name') typarams with
-  | Some (TypeParameter (_, u)) ->
-     Some (TyVar (TypeVariable (name', u)))
+  match List.find_opt (fun (TypeParameter (n, _, _)) -> equal_identifier n name') typarams with
+  | Some (TypeParameter (_, u, from)) ->
+     Some (TyVar (TypeVariable (name', u, from)))
   | None ->
      None
 
@@ -227,7 +227,7 @@ and check_param_arity_matches (params: type_parameter list) (args: ty list): uni
 and check_universes_match (params: type_parameter list) (args: ty list): unit =
   let _ = List.map2 check_universes_match' params args in ()
 
-and check_universes_match' (TypeParameter (_, param_u)) (arg: ty): unit =
+and check_universes_match' (TypeParameter (_, param_u, _)) (arg: ty): unit =
   let arg_u = type_universe arg in
   if universe_compatible param_u arg_u then
     ()

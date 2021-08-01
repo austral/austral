@@ -8,12 +8,12 @@ open TestUtil
 let meq (ty: ty) (ty': ty) (bindlist: (string * ty) list) =
   let bindings = match_type ty ty' in
   let list = bindings_list bindings in
-  let list' = List.sort (fun (n, _) (n', _) -> compare (ident_string n) (ident_string n')) list in
-  let list'' = List.map (fun (n, t) -> (ident_string n, t)) list' in
+  let list' = List.sort (fun (n, _, _) (n', _, _) -> compare (ident_string n) (ident_string n')) list in
+  let list'': (string * ty) list = List.map (fun (n, _, t) -> (ident_string n, t)) list' in
   eq list'' bindlist
 
 let v n u =
-  TyVar (TypeVariable (make_ident n, u))
+  TyVar (TypeVariable (make_ident n, u, make_qident (make_mod_name "", make_ident "", make_ident "")))
 
 let i = make_ident
 

@@ -16,31 +16,31 @@ and concrete_import =
 
 and concrete_decl =
   | ConcreteConstantDecl of identifier * typespec * docstring
-  | ConcreteOpaqueTypeDecl of identifier * type_parameter list * universe * docstring
+  | ConcreteOpaqueTypeDecl of identifier * concrete_type_param list * universe * docstring
   | ConcreteTypeAliasDecl of concrete_type_alias
   | ConcreteRecordDecl of concrete_record
   | ConcreteUnionDecl of concrete_union
-  | ConcreteFunctionDecl of identifier * type_parameter list * concrete_param list * typespec * docstring
+  | ConcreteFunctionDecl of identifier * concrete_type_param list * concrete_param list * typespec * docstring
   | ConcreteTypeClassDecl of concrete_typeclass
-  | ConcreteInstanceDecl of identifier * type_parameter list * typespec * docstring
+  | ConcreteInstanceDecl of identifier * concrete_type_param list * typespec * docstring
 
 and concrete_def =
   | ConcreteConstantDef of identifier * typespec * cexpr * docstring
   | ConcreteTypeAliasDef of concrete_type_alias
   | ConcreteRecordDef of concrete_record
   | ConcreteUnionDef of concrete_union
-  | ConcreteFunctionDef of identifier * type_parameter list * concrete_param list * typespec * cstmt * docstring * pragma list
+  | ConcreteFunctionDef of identifier * concrete_type_param list * concrete_param list * typespec * cstmt * docstring * pragma list
   | ConcreteTypeClassDef of concrete_typeclass
   | ConcreteInstanceDef of concrete_instance
 
 and concrete_type_alias =
-  ConcreteTypeAlias of identifier * type_parameter list * universe * typespec * docstring
+  ConcreteTypeAlias of identifier * concrete_type_param list * universe * typespec * docstring
 
 and concrete_record =
-  ConcreteRecord of identifier * type_parameter list * universe * concrete_slot list * docstring
+  ConcreteRecord of identifier * concrete_type_param list * universe * concrete_slot list * docstring
 
 and concrete_union =
-  ConcreteUnion of identifier * type_parameter list * universe * concrete_case list * docstring
+  ConcreteUnion of identifier * concrete_type_param list * universe * concrete_case list * docstring
 
 and concrete_slot =
   ConcreteSlot of identifier * typespec
@@ -49,10 +49,10 @@ and concrete_case =
   ConcreteCase of identifier * concrete_slot list
 
 and concrete_typeclass =
-  ConcreteTypeClass of identifier * type_parameter * concrete_method_decl list * docstring
+  ConcreteTypeClass of identifier * concrete_type_param * concrete_method_decl list * docstring
 
 and concrete_instance =
-  ConcreteInstance of identifier * type_parameter list * typespec * concrete_method_def list * docstring
+  ConcreteInstance of identifier * concrete_type_param list * typespec * concrete_method_def list * docstring
 
 and concrete_method_decl =
   ConcreteMethodDecl of identifier * concrete_param list * typespec * docstring
@@ -113,6 +113,9 @@ and concrete_arglist =
 and concrete_param =
   ConcreteParam of identifier * typespec
 
+and concrete_type_param =
+  ConcreteTypeParam of identifier * universe
+
 and concrete_path_elem =
   | CSlotAccessor of identifier
   | CPointerSlotAccessor of identifier
@@ -131,8 +134,8 @@ val get_concrete_decl : concrete_module_interface -> identifier -> concrete_decl
 
 val get_concrete_def : concrete_module_body -> identifier -> concrete_def option
 
-val has_instance_decl : concrete_module_interface -> identifier -> type_parameter list -> typespec -> bool
+val has_instance_decl : concrete_module_interface -> identifier -> concrete_type_param list -> typespec -> bool
 
-val get_instance_def : concrete_module_body -> identifier -> type_parameter list -> typespec -> concrete_instance option
+val get_instance_def : concrete_module_body -> identifier -> concrete_type_param list -> typespec -> concrete_instance option
 
 val make_pragma : identifier -> concrete_arglist -> pragma

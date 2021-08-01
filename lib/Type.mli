@@ -20,9 +20,9 @@ type signedness =
   | Signed
 [@@deriving eq]
 
-type type_parameter = TypeParameter of identifier * universe
+type type_parameter = TypeParameter of identifier * universe * qident
 
-type type_var = TypeVariable of identifier * universe
+type type_var = TypeVariable of identifier * universe * qident
 [@@deriving eq]
 
 type ty =

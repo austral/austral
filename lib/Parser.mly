@@ -524,7 +524,7 @@ type_parameter_list_inner:
   ;
 
 type_parameter:
-  | identifier COLON universe { TypeParameter ($1, $3) }
+  | identifier COLON universe { ConcreteTypeParam ($1, $3) }
   ;
 
 docstring:
