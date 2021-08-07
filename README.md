@@ -45,6 +45,8 @@ Anti-features:
 - No uninitialized variables.
 - No pre/post increment/decrement (`x++` in C).
 - No first-class async.
+- No function overloading (except through typeclasses, where it is bounded).
+- No arithmetic precedence.
 
 ## Building
 
