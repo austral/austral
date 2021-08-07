@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-make
+opam exec -- dune build
 
 function compile() {
     ./austral --module=$1/$2 --entrypoint=Example.$2:Main > code.cpp
