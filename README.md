@@ -44,6 +44,7 @@ Anti-features:
 - No type inference, type information flows in one direction.
 - No uninitialized variables.
 - No pre/post increment/decrement (`x++` in C).
+- No first-class async.
 
 ## Building
 
