@@ -14,10 +14,10 @@ Features:
   errors. Other resources like file or database handles can also be handled
   safely.
 
-- **Capabilities**: linear capabilities enable fine-grained permissioned access
-  to low-level facilities. Third-party dependencies can be constrained in what
-  types of resources they can access. This makes the language less vulnerable to
-  [supply chain attacks][sca].
+- **Capabilities**: linear [capabilities][cap] enable fine-grained permissioned
+  access to low-level facilities. Third-party dependencies can be constrained in
+  what types of resources they can access. This makes the language less
+  vulnerable to [supply chain attacks][sca].
 
 - **Typeclasses**: typeclasses, borrowed from Haskell, allow for bounded ad-hoc
   polymorphism.
@@ -92,5 +92,6 @@ Copyright 2018–2021 [Fernando Borretti][fernando].
 Licensed under the GPLv3 license. See the COPYING file for details.
 
 [opam]: https://opam.ocaml.org/doc/Install.html
+[cap]: https://en.wikipedia.org/wiki/Capability-based_security
 [sca]: https://en.wikipedia.org/wiki/Supply_chain_attack
 [fernando]: https://borretti.me/
