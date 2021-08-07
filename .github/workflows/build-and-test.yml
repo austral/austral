@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: opam install . --deps-only --with-doc --with-test
 
+      - name: Install dune
+        run: opam install dune
+
       - name: Build
         run: opam exec -- dune build
 
