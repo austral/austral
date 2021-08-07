@@ -63,6 +63,21 @@ To run the tests:
 $ ./run-tests.sh
 ```
 
+## Status
+
+1. The bootstrapping compiler, written in OCaml, is implemented. It has a couple
+   of limitations, these are to speed up development so I can iterate on a
+   working compiler as early as possible:
+
+    1. The compiler outputs templated C++ so I don't have to bother implementing
+       a monomorphization step.
+
+    2. The compiler does not support separate compilation. In practice this is
+       not a problem: there's not enough Austral code for this to matter.
+
+2. A standard library with a few basic data structures and capability-based
+   filesystem access is being designed.
+
 # License
 
 Copyright 2018–2021 Fernando Borretti.
