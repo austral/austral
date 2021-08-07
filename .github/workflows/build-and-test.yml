@@ -12,7 +12,6 @@ jobs:
         os:
           - macos-latest
           - ubuntu-latest
-          - windows-latest
         ocaml-version:
           - 4.12.0
 
@@ -28,10 +27,7 @@ jobs:
           ocaml-version: ${{ matrix.ocaml-version }}
 
       - name: Install dependencies
-        run: opam install . --deps-only --with-doc --with-test
-
-      - name: Install dune
-        run: opam install dune
+        run: opam install dune ppx_deriving ounit2 menhir
 
       - name: Build
         run: opam exec -- dune build
