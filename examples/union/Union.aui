@@ -1,0 +1,16 @@
+module Example.Union is
+    union Color: Free is
+        case Red;
+        case Green;
+        case Blue;
+    end;
+
+    union Number: Free is
+        case Integer is
+            value: Integer_32;
+        case Float is
+            value: Double_Float;
+    end;
+
+    function Main(): Unit;
+end module.

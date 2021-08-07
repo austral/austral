@@ -1,0 +1,15 @@
+module body Example.Fibonacci is
+    function Fibonacci(n: Natural_64): Natural_64 is
+        -- A simple recursive implementation.
+        if n < 2 then
+            return n;
+        else
+            return Fibonacci(n - 1) + Fibonacci(n - 2);
+        end if;
+    end;
+
+    function Main(): Unit is
+        Fibonacci(30);
+        return nil;
+    end;
+end module body.

@@ -1,0 +1,5 @@
+module Example.Record is
+    type R: Free;
+
+    function Main(): Unit;
+end module.

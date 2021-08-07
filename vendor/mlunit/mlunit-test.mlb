@@ -1,3 +1,0 @@
-$(SML_LIB)/basis/basis.mlb
-mlunit.mlb
-test/mlunit.sml

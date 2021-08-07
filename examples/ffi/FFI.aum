@@ -1,0 +1,17 @@
+module body Example.FFI is
+    pragma Unsafe_Module;
+
+    function Put_Character(character: Integer_32): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
+    function Put_String(str: Fixed_Array[Natural_8]): Integer_32 is
+        pragma Foreign_Import(External_Name => "puts");
+    end;
+
+    function Main(): Unit is
+        Put_Character(97);
+        Put_String("Hello, world!");
+        return nil;
+    end;
+end module body.

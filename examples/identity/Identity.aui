@@ -1,0 +1,6 @@
+module Example.Identity is
+    generic [T: Type]
+    function Identity(value: T): T;
+
+    function Main(): Unit;
+end module.

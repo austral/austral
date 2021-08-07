@@ -1,38 +1,15 @@
-SML := sml
-SMLFLAGS := -Cprint.depth=30
+BIN := austral
+SRC := lib/*.ml lib/*.mli lib/*.mll lib/*.mly lib/dune bin/dune bin/austral.ml
 
-MLTON := mlton
-
-CM_FILE := austral.cm
-MLB_FILE := austral.mlb
-CM_TEST_FILE := austral-test.cm
-
-BIN = austral
-
-C_RUNTIME_SRC := src/runtime.c
-C_RUNTIME_SCRIPT := src/runtime.awk
-C_RUNTIME_ML := src/c-runtime.sml
-SRC := src/*.sml $(C_RUNTIME_ML)
-TEST_SRC := test/*.sml
-
-all: compile
-
-$(C_RUNTIME_ML): $(C_RUNTIME_SRC) $(C_RUNTIME_SCRIPT)
-	awk -f $(C_RUNTIME_SCRIPT) $(C_RUNTIME_SRC) > $(C_RUNTIME_ML)
-
-compile: $(SRC)
-	$(SML) $(SMLFLAGS) -m $(CM_FILE)
+all: $(BIN)
 
 $(BIN): $(SRC)
-	$(MLTON) -output $(BIN) $(MLB_EXE_FILE)
+	dune build
+	cp _build/default/bin/austral.exe $(BIN)
 
 .PHONY: test
-test: $(SRC) $(TEST_SRC)
-	$(SML) $(SMLFLAGS) -m $(CM_TEST_FILE)
+test: $(BIN)
+	dune runtest
 
 clean:
-	if [ -f $(BIN) ]; then rm $(BIN); fi
-	if [ -f $(C_RUNTIME_ML) ]; then rm $(C_RUNTIME_ML); fi
-	if [ -d src/.cm/ ]; then rm -rf src/util/.cm/; fi
-	rm -f test/valid/*.c
-	rm -f test/valid/*.bin
+	rm $(BIN); rm -rf _build

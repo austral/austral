@@ -1,0 +1,3 @@
+module Example.TypeAlias is
+    function Main(): Unit;
+end module.

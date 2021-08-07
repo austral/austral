@@ -1,0 +1,3 @@
+module Example.GenericUnion is
+    function Main(): Unit;
+end module.

@@ -1,0 +1,8 @@
+module body Example.TypeAlias is
+    type Num: Free is Integer_32;
+
+    function Main(): Unit is
+        let N: Num := Num(10);
+        return nil;
+    end;
+end module body.

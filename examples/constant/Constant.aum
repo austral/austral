@@ -1,0 +1,11 @@
+module body Example.Constant is
+    constant Rydberg_Constant : Double_Float := 10'973'731.568'160;
+
+    -- This constant is private, since it appears in the module body file but
+    -- not the interface file.
+    constant Pi : Double_Float := 3.14;
+
+    function Main(): Unit is
+        return nil;
+    end;
+end module body.

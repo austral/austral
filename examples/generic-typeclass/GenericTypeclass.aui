@@ -1,0 +1,3 @@
+module Example.GenericTypeclass is
+    function Main(): Unit;
+end module.

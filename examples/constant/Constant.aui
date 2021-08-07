@@ -1,0 +1,6 @@
+module Example.Constant is
+    -- This constant is public, since it appears in the interface file.
+    constant Rydberg_Constant : Double_Float;
+
+    function Main(): Unit;
+end module.

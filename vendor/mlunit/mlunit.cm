@@ -1,8 +1,0 @@
-Library
-  signature ML_UNIT
-  structure MLUnit
-is
-  src/mlunit.sig
-  src/mlunit.sml
-
-  $/basis.cm

@@ -1,0 +1,30 @@
+import Austral.Memory (
+    Pointer,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
+
+module body Example.RTR is
+    pragma Unsafe_Module;
+
+    record R: Linear is
+        X: Integer_32;
+    end;
+
+    function Put_Character(character: Integer_32): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
+    function Main(): Unit is
+        let r: R := R(X => 97);
+        borrow r as r2 in rho do
+            let char: Integer_32 := r2->X;
+            Put_Character(char);
+        end;
+        let { X: Integer_32 } := r;
+        Put_Character(X);
+        return nil;
+    end;
+end module body.

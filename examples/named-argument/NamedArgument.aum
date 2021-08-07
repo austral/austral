@@ -1,0 +1,10 @@
+module body Example.NamedArgument is
+    function F(x: Boolean, y: Boolean): Unit is
+        return nil;
+    end;
+
+    function Main(): Unit is
+        F(y => false, x => true);
+        return nil;
+    end;
+end module body.

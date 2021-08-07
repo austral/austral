@@ -1,0 +1,31 @@
+import Austral.Memory (Pointer, Allocate);
+
+module body Example.GenericTypeclass is
+    pragma Unsafe_Module;
+
+    interface Numerical(T: Free) is
+        method To_Integer(x: T): Integer_32;
+    end;
+
+    generic [T: Free]
+    implementation Numerical(Pointer[T]) is
+        method To_Integer(x: Pointer[T]): Integer_32 is
+            return 0;
+        end;
+    end;
+
+    function Pointer_To_Integer(): Integer_32 is
+        let opt: Option[Pointer[Integer_32]] := Allocate(10);
+        case opt of
+          when Some(value: Pointer[Integer_32]) do
+            let X: Integer_32 := To_Integer(value);
+            return X;
+          when None do
+            return 0;
+        end case;
+    end;
+
+    function Main(): Unit is
+        return nil;
+    end;
+end module body.

@@ -1,0 +1,3 @@
+(tests
+ (names ExpressionParserTest StatementParserTest TypeMatchTest)
+ (libraries austral_core ounit2))

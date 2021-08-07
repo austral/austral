@@ -1,0 +1,3 @@
+module Example.PTR is
+    function Main(): Unit;
+end module.

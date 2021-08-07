@@ -1,0 +1,23 @@
+import Austral.Memory (
+    Pointer,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
+
+module body Example.Memory is
+    pragma Unsafe_Module;
+
+    function Main(): Unit is
+        let opt: Option[Pointer[Integer_32]] := Allocate(10);
+        case opt of
+            when Some(value: Pointer[Integer_32]) do
+              Deallocate(value);
+            when None do
+              -- Do nothing.
+              skip;
+        end case;
+        return nil;
+    end;
+end module body.

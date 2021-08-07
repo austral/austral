@@ -1,0 +1,3 @@
+module Example.FFI is
+    function Main(): Unit;
+end module.

@@ -1,0 +1,140 @@
+import Austral.Memory (
+    Pointer,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
+
+module body Example.Box is
+    pragma Unsafe_Module;
+
+    record Box[T: Type]: Linear is
+        pointer: Pointer[T];
+    end;
+
+    generic [T: Type]
+    function Make(val: T): Option[Box[T]] is
+        let ptr: Option[Pointer[T]] := Allocate(val);
+        case ptr of
+            when Some(value: Pointer[T]) do
+                let box: Box[T] := Box(pointer => value);
+                let boxopt: Option[Box[T]] := Some(value => box);
+                return boxopt;
+            when None do
+                let boxopt: Option[Box[T]] := None();
+                return boxopt;
+        end case;
+    end;
+
+    generic [T: Type]
+    function Unbox(box: Box[T]): T is
+        let { pointer: Pointer[T] } := box;
+        let value: T := Load(pointer);
+        Deallocate(pointer);
+        return value;
+    end;
+
+    generic [T: Free]
+    function Swap_Free(box: Box[T], new: T): Box[T] is
+        let { pointer: Pointer[T] } := box;
+        let old: T := Load(pointer);
+        Store(pointer, new);
+        let newbox: Box[T] := Box(pointer => pointer);
+        return newbox;
+    end;
+
+    generic [T: Free, R: Region]
+    function Read_Free(boxref: Reference[Box[T], R]): T is
+        let ptr: Pointer[T] := boxref->pointer;
+        let value: T := Load(ptr);
+        return value;
+    end;
+
+    generic [T: Free, R: Region]
+    function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit is
+        let ptr: Pointer[T] := boxref->pointer;
+        Store(ptr, value);
+        return nil;
+    end;
+
+    generic [T: Type, R: Region]
+    function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R] is
+        let ref: Reference[T, R] := &boxref->pointer;
+        return ref;
+    end;
+
+    generic [T: Free, R: Region]
+    function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
+        let ptr: Pointer[T] := boxref->pointer;
+        let old_value: T := Load(ptr);
+        Store(ptr, value);
+        return old_value;
+    end;
+
+    function Put_Character(character: Integer_32): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
+    function Main(): Unit is
+        -- Box a value, swap it, and unwrap it.
+        let b: Option[Box[Integer_32]] := Make(101);
+        case b of
+            when Some(value: Box[Integer_32]) do
+                let newbox: Box[Integer_32] := Swap_Free(value, 97);
+                let contents: Integer_32 := Unbox(newbox);
+                Put_Character(contents);
+            when None do
+                skip;
+        end case;
+        -- Box a value, read_free it and unbox it.
+        let b2: Option[Box[Integer_32]] := Make(97);
+        case b2 of
+            when Some(value: Box[Integer_32]) do
+                borrow value as value2 in rho do
+                    let contents: Integer_32 := Read_Free(value2);
+                    Put_Character(contents);
+                end;
+                Unbox(value);
+            when None do
+                skip;
+        end case;
+        -- Box a value, store a new one through a mutable reference, and unbox it.
+        let b3: Option[Box[Integer_32]] := Make(101);
+        case b3 of
+            when Some(value: Box[Integer_32]) do
+                borrow! value as value2 in rho do
+                    Store_Free(value2, 97);
+                end;
+                let contents: Integer_32 := Unbox(value);
+                Put_Character(contents);
+            when None do
+                skip;
+        end case;
+        -- Box a value, load it through a reference, and unbox it.
+        let b4: Option[Box[Integer_32]] := Make(97);
+        case b4 of
+            when Some(value: Box[Integer_32]) do
+                borrow value as boxref in rho do
+                    let valueref: Reference[Integer_32, rho] := Get_Value_Ref(boxref);
+                    let contents: Integer_32 := Deref(valueref);
+                    Put_Character(contents);
+                    Unbox(value);
+                end;
+            when None do
+                skip;
+        end case;
+        -- Box a value, swap it through a mutable reference, and unbox it.
+        let b5: Option[Box[Integer_32]] := Make(101);
+        case b5 of
+            when Some(value: Box[Integer_32]) do
+                borrow! value as boxmutref in rho do
+                    Swap_Mut(boxmutref, 97);
+                    Put_Character(Unbox(value));
+                end;
+            when None do
+                skip;
+        end case;
+        return nil;
+    end;
+end module body.
