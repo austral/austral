@@ -87,9 +87,10 @@ $ ./run-tests.sh
 
 # License
 
-Copyright 2018–2021 Fernando Borretti.
+Copyright 2018–2021 [Fernando Borretti][fernando].
 
 Licensed under the GPLv3 license. See the COPYING file for details.
 
 [opam]: https://opam.ocaml.org/doc/Install.html
 [sca]: https://en.wikipedia.org/wiki/Supply_chain_attack
+[fernando]: https://borretti.me/
