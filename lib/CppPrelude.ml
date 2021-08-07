@@ -1,6 +1,6 @@
-let prelude = {code|#include <cstdlib>
-#include <cstdint>
-#include <cstdio>
+let prelude = {code|#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
 
 namespace Austral__Core {
     void Abort(const char* message, size_t size) {
