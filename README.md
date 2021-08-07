@@ -53,11 +53,16 @@ Anti-features:
 Building the `austral` compiler requires `make` and the `dune `build system
 for OCaml, and a C++ compiler for building the resulting output.
 
-Instructions:
+First, install [opam][opam].
 
-1. Install [opam][opam].
-2. `opam install dune`
-3. `make`
+Then:
+
+```bash
+$ git clone git@github.com:austral/austral.git
+$ cd austral
+$ opam install dune ppx_deriving ounit2 menhir
+$ make
+```
 
 To run the tests:
 
