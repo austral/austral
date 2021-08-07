@@ -16,7 +16,8 @@ Features:
 
 - **Capabilities**: linear capabilities enable fine-grained permissioned access
   to low-level facilities. Third-party dependencies can be constrained in what
-  types of resources they can access.
+  types of resources they can access. This makes the language less vulnerable to
+  [supply chain attacks][sca].
 
 - **Typeclasses**: typeclasses, borrowed from Haskell, allow for bounded ad-hoc
   polymorphism.
@@ -68,3 +69,4 @@ Copyright 2018–2021 Fernando Borretti.
 Licensed under the GPLv3 license. See the COPYING file for details.
 
 [opam]: https://opam.ocaml.org/doc/Install.html
+[sca]: https://en.wikipedia.org/wiki/Supply_chain_attack
