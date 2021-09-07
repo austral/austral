@@ -48,6 +48,20 @@ Anti-features:
 - No function overloading (except through typeclasses, where it is bounded).
 - No arithmetic precedence.
 
+## Examples
+
+### Fibonacci
+
+```
+ function Fibonacci(n: Natural_64): Natural_64 is
+     if n < 2 then
+         return n;
+     else
+         return Fibonacci(n - 1) + Fibonacci(n - 2);
+     end if;
+ end;
+```
+
 ## Building
 
 Building the `austral` compiler requires `make` and the `dune `build system
