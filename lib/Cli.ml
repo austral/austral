@@ -77,6 +77,8 @@ let main' (args: string list): unit =
 
 let main (args: string list): unit =
   try
-    main' args
+    main' args;
+    exit 0
   with Programmer_error msg ->
-    Printf.eprintf "Error: %s" msg
+    Printf.eprintf "Error: %s" msg;
+    exit (-1)
