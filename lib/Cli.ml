@@ -47,22 +47,25 @@ let compile_main (args: string list): unit =
   let contents = List.map (fun (i, b) -> (read_file_to_string i, read_file_to_string b)) paths in
   let entrypoint = List.filter_map (fun a -> match a with (EntrypointArg (m,i)) -> Some (m, i) | _ -> None) args' in
   let output = List.filter_map (fun a -> match a with (OutputArg path) -> Some path | _ -> None) args' in
-  match entrypoint with
-  | [(m,i)] ->
-     let c = compile_multiple empty_compiler contents in
-     let c' = compile_entrypoint c m i in
-     let code = compiler_code c' in
-     (match output with
-      | [output_path] ->
-         write_string_to_file output_path code
-      | [] ->
-         err "Misisng --output flag."
-      | _ ->
-         err "Multiple --output flags.")
+  let compiler = compile_multiple empty_compiler contents in
+  let compiler = (match entrypoint with
+                  | [(m,i)] ->
+                     compile_entrypoint compiler m i
+                  | [] ->
+                    (* If there is not --entrypoint flag, it's a library. *)
+                     compiler
+                  | _ ->
+                     err "Multiple --entrypoint flags.")
+  in
+  let code = compiler_code compiler in
+  match output with
+  | [output_path] ->
+     write_string_to_file output_path code
   | [] ->
-     err "No --entrypoint flag."
+     err "Misisng --output flag."
   | _ ->
-     err "Multiple --entrypoint flags."
+     err "Multiple --output flags."
+
 
 let main' (args: string list): unit =
   match args with
