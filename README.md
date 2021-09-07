@@ -64,8 +64,8 @@ Anti-features:
 
 ## Building
 
-Building the `austral` compiler requires `make` and the `dune `build system
-for OCaml, and a C++ compiler for building the resulting output.
+Building the `austral` compiler requires `make` and the `dune` build system for
+OCaml, and a C++ compiler for building the resulting output.
 
 First, install [opam][opam].
 
@@ -83,6 +83,58 @@ To run the tests:
 ```bash
 $ ./run-tests.sh
 ```
+
+## Usage
+
+Suppose you have a program with modules `A`, `B`, and `C`, in the following
+files:
+
+```
+src/A.aui
+src/A.aum
+
+src/B.aui
+src/B.aum
+
+src/C.aui
+src/C.aum
+```
+
+To compile this, run:
+
+```
+$ austral compile \
+    --module=src/A.aui:src/A.aum \
+    --module=src/B.aui:src/B.aum \
+    --module=src/C.aui:src/C.aum \
+    --entrypoint=C:Main \
+    --output=program.cpp
+```
+
+This is the most general invocation. Where module interface and module body
+files share the same path and name and differ only by their extension, you can
+use:
+
+```
+$ austral compile \
+    --module=src/A \
+    --module=src/B \
+    --module=src/C \
+    --entrypoint=C:Main \
+    --output=program.cpp
+```
+
+The order in which `--module` options appear is the order in which they are
+compiled, so it matters.
+
+The `--entrypoint` option must be the name of a module, followed by a colon,
+followed by the name of a public function with the following signature:
+
+```
+function Main(): Unit;
+```
+
+Finally, the `--output` option is just the path to dump the compiled C++ to.
 
 ## Status
 

@@ -6,6 +6,8 @@ val string_implode : char list -> string
 
 val read_file_to_string : string -> string
 
+val write_string_to_file : string -> string -> unit
+
 val remove_char : string -> char -> string
 
 val replace_char : string -> char -> string -> string

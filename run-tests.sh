@@ -4,7 +4,7 @@ set -euxo pipefail
 opam exec -- dune build
 
 function compile() {
-    ./_build/default/bin/austral.exe --module=$1/$2 --entrypoint=Example.$2:Main > code.cpp
+    ./_build/default/bin/austral.exe compile --module=$1/$2 --entrypoint=Example.$2:Main --output=code.cpp
     g++ code.cpp -o testbin
     ./testbin > actual.txt
     echo -n -e "$3" > expected.txt

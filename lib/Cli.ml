@@ -6,9 +6,17 @@ open Error
 type arg =
   | ModuleArg of string * string
   | EntrypointArg of module_name * identifier
+  | OutputArg of string
 
 let parse_module_arg (s: string): arg =
-  ModuleArg (s ^ ".aui", s ^ ".aum")
+  let ss = String.split_on_char ':' s in
+  match ss with
+  | [first] ->
+     ModuleArg (first ^ ".aui", first ^ ".aum")
+  | [first; second] ->
+     ModuleArg (first, second)
+  | _ ->
+     err "Invalid value for the --module option."
 
 let parse_entrypoint_arg (s: string): arg =
   let ss = String.split_on_char ':' s in
@@ -18,6 +26,9 @@ let parse_entrypoint_arg (s: string): arg =
   | _ ->
      err "Invalid entrypoint format."
 
+let parse_output_arg (path: string): arg =
+  OutputArg path
+
 let parse_arg (s: string): arg =
   let ss = String.split_on_char '=' s in
   match ss with
@@ -25,24 +36,47 @@ let parse_arg (s: string): arg =
      parse_module_arg s'
   | ["--entrypoint"; s'] ->
      parse_entrypoint_arg s'
+  | ["--output"; s'] ->
+     parse_output_arg s'
   | _ ->
      err "Invalid command line argument."
-let main' (args: string list): unit =
+
+let compile_main (args: string list): unit =
   let args' = List.map parse_arg args in
   let paths = List.filter_map (fun a -> match a with (ModuleArg (i,b)) -> Some (i,b) | _ -> None) args' in
   let contents = List.map (fun (i, b) -> (read_file_to_string i, read_file_to_string b)) paths in
   let entrypoint = List.filter_map (fun a -> match a with (EntrypointArg (m,i)) -> Some (m, i) | _ -> None) args' in
+  let output = List.filter_map (fun a -> match a with (OutputArg path) -> Some path | _ -> None) args' in
   match entrypoint with
   | [(m,i)] ->
      let c = compile_multiple empty_compiler contents in
      let c' = compile_entrypoint c m i in
      let code = compiler_code c' in
-     print_endline code
+     (match output with
+      | [output_path] ->
+         write_string_to_file output_path code
+      | [] ->
+         err "Misisng --output flag."
+      | _ ->
+         err "Multiple --output flags.")
+  | [] ->
+     err "No --entrypoint flag."
   | _ ->
-     err "No entrypoint"
+     err "Multiple --entrypoint flags."
+
+let main' (args: string list): unit =
+  match args with
+  | first::args ->
+     (match first with
+      | "compile" ->
+         compile_main args
+      | _ ->
+         err ("Unknown command: " ^ first))
+  | _ ->
+     err "Invalid invocation."
 
 let main (args: string list): unit =
   try
     main' args
   with Programmer_error msg ->
-    print_endline msg
+    Printf.eprintf "Error: %s" msg
