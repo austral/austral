@@ -48,7 +48,7 @@ jobs:
       - name: Upload compiler binary
         uses: actions/upload-artifact@v2
         with:
-          name: austral-bin
+          name: austral-${{ runner.os }}-bin
           path: austral
           # This is for making releases without building manually on each
           # operating system. So we don't need the full 90 day retention
