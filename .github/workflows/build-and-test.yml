@@ -12,6 +12,7 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
+          - windows-latest
         ocaml-version:
           - 4.12.0
 
