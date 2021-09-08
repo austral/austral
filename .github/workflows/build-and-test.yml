@@ -37,10 +37,20 @@ jobs:
           key: deps-${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('dune-project', '**/dune') }}
 
       - name: Build
-        run: opam exec -- dune build
+        run: opam exec -- dune build && cp _build/default/bin/austral.exe austral
 
       - name: Run OCaml tests
         run: opam exec -- dune runtest
 
       - name: Run test script
         run: ./run-tests.sh
+
+      - name: Upload compiler binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: austral-bin
+          path: austral
+          # This is for making releases without building manually on each
+          # operating system. So we don't need the full 90 day retention
+          # period.
+          retention-days: 1
