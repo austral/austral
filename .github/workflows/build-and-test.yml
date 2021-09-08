@@ -22,19 +22,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Restore cached dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: ~/.opam
+          key: deps-${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('dune-project', '**/dune') }}
+
       - name: Set up OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
       - name: Install dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: opam install dune ppx_deriving ounit2 menhir
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.opam
-          key: deps-${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('dune-project', '**/dune') }}
 
       - name: Build
         run: opam exec -- dune build && cp _build/default/bin/austral.exe austral
