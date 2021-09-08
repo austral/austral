@@ -5,7 +5,7 @@ opam exec -- dune build
 
 function compile() {
     ./_build/default/bin/austral.exe compile --module=$1/$2 --entrypoint=Example.$2:Main --output=code.cpp
-    g++ code.cpp -o testbin
+    g++ -std=c++11 code.cpp -o testbin
     ./testbin > actual.txt
     echo -n -e "$3" > expected.txt
     diff actual.txt expected.txt
