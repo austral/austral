@@ -24,6 +24,8 @@ jobs:
 
       - name: Restore cached dependencies
         id: cache-deps
+        # Don't cache on Windows
+        if: (runner.os != 'Windows')
         uses: actions/cache@v2
         with:
           path: ~/.opam
@@ -35,7 +37,8 @@ jobs:
           ocaml-version: ${{ matrix.ocaml-version }}
 
       - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
+        # Only run if the cache didn't hit or we're not on windows
+        if: (steps.cache-deps.outputs.cache-hit != 'true') && (runner.os != 'Windows')
         run: opam install dune ppx_deriving ounit2 menhir
 
       - name: Build
