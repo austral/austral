@@ -30,6 +30,12 @@ jobs:
       - name: Install dependencies
         run: opam install dune ppx_deriving ounit2 menhir
 
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.opam
+          key: deps-${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('dune-project', '**/dune') }}
+
       - name: Build
         run: opam exec -- dune build
 
