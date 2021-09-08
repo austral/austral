@@ -24,8 +24,6 @@ jobs:
 
       - name: Restore cached dependencies
         id: cache-deps
-        # Don't cache on Windows
-        if: (runner.os != 'Windows')
         uses: actions/cache@v2
         with:
           path: ~/.opam
