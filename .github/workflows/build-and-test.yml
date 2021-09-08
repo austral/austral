@@ -11,6 +11,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - macos-latest
         ocaml-version:
           - 4.12.0
 
