@@ -1,12 +1,16 @@
-let prelude = {code|#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
+let prelude = {code|#include <stdint.h>
+#include <stddef.h>
 
 namespace Austral__Core {
+    void* stderr;
+    extern "C" size_t fwrite(const void * ptr, size_t size, size_t count, void* stream);
+    extern "C" int fputc(int character, void* stream);
+    extern "C" void _Exit(int exit_code);
+
     void Abort(const char* message, size_t size) {
         fwrite(message, 1, size, stderr);
         fputc('\n', stderr);
-        _Exit(EXIT_FAILURE);
+        _Exit(-1);
     }
 
     template<typename T>
@@ -78,6 +82,10 @@ namespace A_Austral__Pervasive {
 }
 
 namespace A_Austral__Memory {
+    extern "C" void* malloc(size_t size);
+    extern "C" void* calloc(size_t num, size_t size);
+    extern "C" void free(void* ptr);
+
     template<typename T>
     T* A_Allocate(T value) {
         // Note: we use malloc rather than calloc here
