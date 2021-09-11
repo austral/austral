@@ -8,15 +8,15 @@ let string_implode (l: char list): string =
   String.init (List.length l) (List.nth l)
 
 let read_file_to_string (path: string): string =
+  let rec read_stream stream =
+    try
+      let line = input_line stream in
+      line :: (read_stream stream)
+    with End_of_file ->
+      []
+  in
   let stream = open_in path in
-  try
-    let len = in_channel_length stream in
-    let str = really_input_string stream len in
-    close_in stream;
-    str
-  with _ ->
-    close_in_noerr stream;
-    err ("Failed to read file: " ^ path)
+  String.concat "\n" (read_stream stream)
 
 let write_string_to_file (path: string) (contents: string): unit =
   let stream = open_out path in
