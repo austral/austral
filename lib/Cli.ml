@@ -9,7 +9,7 @@ type arg =
   | OutputArg of string
 
 let parse_module_arg (s: string): arg =
-  let ss = String.split_on_char ':' s in
+  let ss = String.split_on_char ',' s in
   match ss with
   | [first] ->
      ModuleArg (first ^ ".aui", first ^ ".aum")

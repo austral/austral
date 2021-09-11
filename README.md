@@ -104,9 +104,9 @@ To compile this, run:
 
 ```
 $ austral compile \
-    --module=src/A.aui:src/A.aum \
-    --module=src/B.aui:src/B.aum \
-    --module=src/C.aui:src/C.aum \
+    --module=src/A.aui,src/A.aum \
+    --module=src/B.aui,src/B.aum \
+    --module=src/C.aui,src/C.aum \
     --entrypoint=C:Main \
     --output=program.cpp
 ```
