@@ -85,7 +85,7 @@ module body Example.Box is
                 let contents: Integer_32 := Unbox(newbox);
                 Put_Character(contents);
             when None do
-                skip;
+                Abort("Unexpected.");
         end case;
         -- Box a value, read_free it and unbox it.
         let b2: Option[Box[Integer_32]] := Make(97);
@@ -97,7 +97,7 @@ module body Example.Box is
                 end;
                 Unbox(value);
             when None do
-                skip;
+                Abort("Unexpected.");
         end case;
         -- Box a value, store a new one through a mutable reference, and unbox it.
         let b3: Option[Box[Integer_32]] := Make(101);
@@ -109,7 +109,7 @@ module body Example.Box is
                 let contents: Integer_32 := Unbox(value);
                 Put_Character(contents);
             when None do
-                skip;
+                Abort("Unexpected.");
         end case;
         -- Box a value, load it through a reference, and unbox it.
         let b4: Option[Box[Integer_32]] := Make(97);
@@ -122,7 +122,7 @@ module body Example.Box is
                     Unbox(value);
                 end;
             when None do
-                skip;
+                Abort("Unexpected.");
         end case;
         -- Box a value, swap it through a mutable reference, and unbox it.
         let b5: Option[Box[Integer_32]] := Make(101);
@@ -133,7 +133,7 @@ module body Example.Box is
                     Put_Character(Unbox(value));
                 end;
             when None do
-                skip;
+                Abort("Unexpected.");
         end case;
         return nil;
     end;

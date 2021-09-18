@@ -7,11 +7,13 @@ namespace Austral__Core {
     extern "C" int fputc(int character, void* stream);
     extern "C" void _Exit(int exit_code);
 
-    void Abort(const char* message, size_t size) {
-        fwrite(message, 1, size, stderr);
-        fputc('\n', stderr);
-        _Exit(-1);
-    }
+    template<typename T>
+    struct Array;
+
+    template<typename T>
+    Array<T> Make_Array(size_t size, T* data);
+
+    bool Abort(Array<uint8_t> message);
 
     template<typename T>
     struct Array {
@@ -20,10 +22,10 @@ namespace Austral__Core {
 
         T &operator[](int index) {
             if (index < 0) {
-               Abort("Negative index.", 15);
+               Abort(Make_Array<uint8_t>(15, (uint8_t*)"Negative index."));
             }
             if (((size_t)(index)) >= size) {
-               Abort("Array index out of bounds.", 26);
+               Abort(Make_Array<uint8_t>(26, (uint8_t*)"Array index out of bounds."));
             }
             return data[index];
         }
@@ -35,6 +37,13 @@ namespace Austral__Core {
             .size = size,
             .data = data
         };
+    }
+
+    bool Abort(Array<uint8_t> message) {
+        fwrite(message.data, 1, message.size, stderr);
+        fputc('\n', stderr);
+        _Exit(-1);
+        return false;
     }
 }
 
@@ -78,6 +87,10 @@ namespace A_Austral__Pervasive {
     template<typename T>
     size_t A_Fixed_Array_Size(Austral__Core::Array<T> arr) {
         return arr.size;
+    }
+
+    bool A_Abort(Austral__Core::Array<uint8_t> message) {
+        return Austral__Core::Abort(message);
     }
 }
 

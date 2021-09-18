@@ -57,8 +57,18 @@ let pervasive_module =
         [ValueParameter (i "arr", Array (TyVar (TypeVariable (i "T", TypeUniverse, qname)), static_region))],
         Integer (Unsigned, Width64)
       )
+  and abort_def =
+    let name = i "Abort" in
+    (* function Abort(arr: Fixed_Array[Natural_8]): Unit *)
+    SFunctionDeclaration (
+        VisPublic,
+        name,
+        [],
+        [ValueParameter (i "arr", Array (Integer (Unsigned, Width8), static_region))],
+        Unit
+      )
   in
-  let decls = [option_type_def; deref_def; fixed_array_size_def] in
+  let decls = [option_type_def; deref_def; fixed_array_size_def; abort_def] in
   SemanticModule {
       name = pervasive_module_name;
       decls = decls;
@@ -74,7 +84,8 @@ let pervasive_imports =
         ConcreteImport (make_ident "Some", None);
         ConcreteImport (make_ident "None", None);
         ConcreteImport (make_ident "Deref", None);
-        ConcreteImport (make_ident "Fixed_Array_Size", None)
+        ConcreteImport (make_ident "Fixed_Array_Size", None);
+        ConcreteImport (make_ident "Abort", None)
       ]
     )
 
