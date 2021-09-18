@@ -14,6 +14,10 @@ module body Example.Haversine is
         pragma Foreign_Import(External_Name => "asin");
     end;
 
+    function Sqrt(value: Double_Float): Double_Float is
+        pragma Foreign_Import(External_Name => "sqrt");
+    end;
+
     -- Actual code.
 
     record Position: Free is
@@ -27,7 +31,7 @@ module body Example.Haversine is
         let a : Double_Float := Sin(0.5 * ((p2.lat) - (p1.lat)));
         let b : Double_Float := Sin(0.5 * ((p2.lon) - (p1.lon)));
         let c : Double_Float := a*a + Cos(p1.lat)*Cos(p2.lat)*b*b;
-        return 2.0 * Earth_Radius * Arcsin(sqrt(c));
+        return 2.0 * Earth_Radius * Arcsin(Sqrt(c));
     end;
 
     function Main(): Unit is
