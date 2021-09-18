@@ -27,7 +27,7 @@ module body Example.Haversine is
 
     constant Earth_Radius : Double_Float := 6371.0;
 
-    function greatCircleDistance(p1: Position, p2: Position): Double_Float is
+    function Great_Circle_Distance(p1: Position, p2: Position): Double_Float is
         let a : Double_Float := Sin(0.5 * ((p2.lat) - (p1.lat)));
         let b : Double_Float := Sin(0.5 * ((p2.lon) - (p1.lon)));
         let c : Double_Float := a*a + Cos(p1.lat)*Cos(p2.lat)*b*b;
