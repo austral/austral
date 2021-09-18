@@ -1,5 +1,7 @@
 open Identifier
 open Semantic
+open LexEnv
+open Type
 
 type menv
 
@@ -13,3 +15,5 @@ val get_decl : menv -> qident -> sem_decl option
 
 (* The second argument is the name of the module where typechecking is taking place. *)
 val get_callable : menv -> module_name -> qident -> callable option
+
+val menv_get_var : menv -> lexenv -> qident -> ty option

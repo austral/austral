@@ -34,7 +34,7 @@ and aexpr =
   | IntConstant of string
   | FloatConstant of string
   | StringConstant of string
-  | Variable of identifier
+  | Variable of qident
   | FunctionCall of qident * abstract_arglist
   | ArithmeticExpression of arithmetic_operator * aexpr * aexpr
   | Comparison of comparison_operator * aexpr * aexpr

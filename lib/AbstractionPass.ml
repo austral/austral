@@ -43,7 +43,7 @@ and abs_expr im expr =
   | CIntConstant i -> IntConstant i
   | CFloatConstant f -> FloatConstant f
   | CStringConstant s -> StringConstant s
-  | CVariable i -> Variable i
+  | CVariable i -> Variable (qualify_identifier im i)
   | CFuncall (name, args) ->
      FunctionCall (qualify_identifier im name, abs_arglist im args)
   | CArith (op, lhs, rhs) ->

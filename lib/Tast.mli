@@ -49,7 +49,7 @@ and texpr =
   | TIntConstant of string
   | TFloatConstant of string
   | TStringConstant of string
-  | TVariable of identifier * ty
+  | TVariable of qident * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of qident * texpr list * ty * (identifier * ty) list
   | TMethodCall of qident * semantic_instance * texpr list * ty

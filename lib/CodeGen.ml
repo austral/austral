@@ -181,8 +181,8 @@ let union_tag_value (ty: ty) (case_name: identifier): cpp_expr =
 
 let c_string_type = CPointer (CNamedType ("uint8_t", []))
 
-let rec gen_exp (e: texpr): cpp_expr =
-  let g = gen_exp in
+let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
+  let g = gen_exp mn in
   match e with
   | TNilConstant ->
      CBool false
@@ -195,13 +195,16 @@ let rec gen_exp (e: texpr): cpp_expr =
   | TStringConstant s ->
      CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CCast (CString s, c_string_type)], [])
   | TVariable (n, _) ->
-     CVar (gen_ident n)
+     if (equal_module_name (source_module_name n) mn) then
+       CVar (gen_ident (original_name n))
+     else
+       CVar (gen_qident n)
   | TFuncall (name, args, _, substs) ->
      CFuncall (gen_qident name, List.map g args, List.map (fun (_, t) -> gen_type t) substs)
   | TMethodCall (name, _, args, _) ->
      CFuncall (gen_qident name, List.map g args, [])
   | TCast (e, t) ->
-     CCast (gen_exp e, gen_type t)
+     CCast (g e, gen_type t)
   | TArithmetic (op, lhs, rhs) ->
      CArithmetic (op, g lhs, g rhs)
   | TComparison (op, lhs, rhs) ->
@@ -223,7 +226,7 @@ let rec gen_exp (e: texpr): cpp_expr =
          if (equal_identifier case_name (make_ident "Some")) then
            match values with
            | [(_, v)] ->
-              gen_exp v
+              g v
            | _ ->
               err "Bad constructor"
          else
@@ -238,59 +241,62 @@ let rec gen_exp (e: texpr): cpp_expr =
              ("data", CStructInitializer [(gen_ident case_name, args)])
            ])
   | TPath (e, elems) ->
-     gen_path (gen_exp e) (List.rev elems)
+     gen_path mn (g e) (List.rev elems)
   | TPathRef (e, elems, _, is_pointer) ->
-     let p = gen_path (gen_exp e) (List.rev elems) in
+     let p = gen_path mn (g e) (List.rev elems) in
      if is_pointer then
        p
      else
        CAddressOf p
 
-and gen_path (expr: cpp_expr) (elems: typed_path_elem list): cpp_expr =
+and gen_path (mn: module_name) (expr: cpp_expr) (elems: typed_path_elem list): cpp_expr =
   match elems with
   | [elem] ->
-     gen_path_elem expr elem
+     gen_path_elem mn expr elem
   | elem::rest ->
-     let expr' = gen_path_elem expr elem in
-     gen_path expr' rest
+     let expr' = gen_path_elem mn expr elem in
+     gen_path mn expr' rest
   | [] ->
      err "Empty path"
 
-and gen_path_elem (expr: cpp_expr) (elem: typed_path_elem): cpp_expr =
+and gen_path_elem (mn: module_name) (expr: cpp_expr) (elem: typed_path_elem): cpp_expr =
   match elem with
   | TSlotAccessor (n, _) ->
      CStructAccessor (expr, gen_ident n)
   | TPointerSlotAccessor (n, _) ->
      CPointerStructAccessor (expr, gen_ident n)
   | TArrayIndex (e, _) ->
-     CIndex (expr, gen_exp e)
+     CIndex (expr, gen_exp mn e)
 
 (* Statements *)
 
-let rec gen_stmt (stmt: tstmt): cpp_stmt =
+let rec gen_stmt (mn: module_name) (stmt: tstmt): cpp_stmt =
+  let ge = gen_exp mn
+  and gs = gen_stmt mn
+  in
   match stmt with
   | TSkip ->
      CBlock []
   | TLet (n, t, v, b) ->
-     let l = CLet (gen_ident n, gen_type t, gen_exp v) in
-     CBlock [l; gen_stmt b]
+     let l = CLet (gen_ident n, gen_type t, ge v) in
+     CBlock [l; gs b]
   | TDestructure (bs, e, b) ->
      let tmp = new_variable () in
-     let vardecl = CLet (tmp, gen_type (get_type e), gen_exp e)
+     let vardecl = CLet (tmp, gen_type (get_type e), ge e)
      and bs' = List.map (fun (n, t) -> CLet (gen_ident n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
-     and b' = gen_stmt b
+     and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
   | TAssign (lvalue, v) ->
-     CAssign (gen_lvalue lvalue, gen_exp v)
+     CAssign (gen_lvalue mn lvalue, ge v)
   | TIf (c, tb, fb) ->
-     CIf (gen_exp c, gen_stmt tb, gen_stmt fb)
+     CIf (ge c, gs tb, gs fb)
   | TCase (e, whens) ->
-     gen_case e whens
+     gen_case mn e whens
   | TWhile (c, b) ->
-     CWhile (gen_exp c, gen_stmt b)
+     CWhile (ge c, gs b)
   | TFor (v, i, f, b) ->
-     CFor (gen_ident v, gen_exp i, gen_exp f, gen_stmt b)
+     CFor (gen_ident v, ge i, ge f, gs b)
   | TBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
        (match orig_type with
@@ -301,30 +307,30 @@ let rec gen_stmt (stmt: tstmt): cpp_stmt =
      in
      if is_pointer then
        let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
-       CBlock [l; gen_stmt body]
+       CBlock [l; gs body]
      else
        let l = CLet (gen_ident rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
-       CBlock [l; gen_stmt body]
+       CBlock [l; gs body]
   | TBlock (a, b) ->
-     CBlock [gen_stmt a; gen_stmt b]
+     CBlock [gs a; gs b]
   | TDiscarding e ->
-     CDiscarding (gen_exp e)
+     CDiscarding (ge e)
   | TReturn e ->
-     CReturn (gen_exp e)
+     CReturn (ge e)
 
-and gen_lvalue (TypedLValue (name, elems)) =
-  gen_path (CVar (gen_ident name)) elems
+and gen_lvalue mn (TypedLValue (name, elems)) =
+  gen_path mn (CVar (gen_ident name)) elems
 
-and gen_case (e: texpr) (whens: typed_when list): cpp_stmt =
+and gen_case (mn: module_name) (e: texpr) (whens: typed_when list): cpp_stmt =
   (* If the expression is of type Option[Pointer[T]], we compile this specially. *)
   let ty = get_type e in
   match is_optional_pointer_type ty with
   | Some _ ->
-     gen_option_pointer_case e whens
+     gen_option_pointer_case mn e whens
   | None ->
-     gen_ordinary_case e whens
+     gen_ordinary_case mn e whens
 
-and gen_option_pointer_case (e: texpr) (whens: typed_when list): cpp_stmt =
+and gen_option_pointer_case (mn: module_name) (e: texpr) (whens: typed_when list): cpp_stmt =
   (* Codegen: a case statement of the form:
 
          case optptr of
@@ -364,12 +370,12 @@ and gen_option_pointer_case (e: texpr) (whens: typed_when list): cpp_stmt =
          let cond = CComparison (NotEqual, CVar var, CVar "NULL")
          and tb = CBlock [
                       CLet (austral_prefix ^ "value", gen_type ty, CVar var);
-                      gen_stmt some_body
+                      gen_stmt mn some_body
                     ]
          in
-         let ifstmt = CIf (cond, tb, gen_stmt none_body) in
+         let ifstmt = CIf (cond, tb, gen_stmt mn none_body) in
          CBlock [
-             CLet (var, gen_type ty, gen_exp e);
+             CLet (var, gen_type ty, gen_exp mn e);
              ifstmt
            ]
       | _ ->
@@ -378,21 +384,21 @@ and gen_option_pointer_case (e: texpr) (whens: typed_when list): cpp_stmt =
      err "No Some case"
 
 
-and gen_ordinary_case (e: texpr) (whens: typed_when list): cpp_stmt =
+and gen_ordinary_case (mn: module_name) (e: texpr) (whens: typed_when list): cpp_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
      being pattern-matched to that variable. Generate a switch statement over
      the tag enum. Each when statement that has bindings needs to generate some
      variable assignments for those bindings from the generated variable. *)
   let ty = get_type e
   and var = new_variable () in
-  let cases = List.map (when_to_case ty var) whens in
+  let cases = List.map (when_to_case mn ty var) whens in
   let switch = CSwitch (CStructAccessor (CVar var, "tag"), cases) in
   CBlock [
-      CLet (var, gen_type ty, gen_exp e);
+      CLet (var, gen_type ty, gen_exp mn e);
       switch
     ]
 
-and when_to_case ty var (TypedWhen (n, bindings, body)) =
+and when_to_case mn ty var (TypedWhen (n, bindings, body)) =
   let case_name = gen_ident n
   and tag_value = union_tag_value ty n
   in
@@ -400,7 +406,7 @@ and when_to_case ty var (TypedWhen (n, bindings, body)) =
     CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
   in
   let bindings' = List.map (fun (ValueParameter (n, t)) -> CLet (gen_ident n, gen_type t, get_binding n)) bindings in
-  let body'' = CExplicitBlock (List.append bindings' [gen_stmt body]) in
+  let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 
 (* Declarations *)
@@ -423,13 +429,13 @@ let gen_slots slots =
 let gen_cases cases =
   List.map (fun (TypedCase (n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
 
-let gen_method typarams (TypedMethodDef (n, params, rt, body)) =
-  CFunctionDefinition (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt body)
+let gen_method mn typarams (TypedMethodDef (n, params, rt, body)) =
+  CFunctionDefinition (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt mn body)
 
-let gen_decl (decl: typed_decl): cpp_decl list =
+let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
   match decl with
   | TConstant (_, n, ty, e, _) ->
-     [CConstantDefinition (gen_ident n, gen_type ty, gen_exp e)]
+     [CConstantDefinition (gen_ident n, gen_type ty, gen_exp mn e)]
   | TTypeAlias (_, n, typarams, _, ty, _) ->
      [CTypeDefinition (gen_ident n, gen_typarams typarams, gen_type ty)]
   | TRecord (_, n, typarams, _, slots, _) ->
@@ -460,7 +466,7 @@ let gen_decl (decl: typed_decl): cpp_decl list =
      in
      [enum_def; union_def]
   | TFunction (_, name, typarams, params, rt, body, _) ->
-     [CFunctionDefinition (gen_ident name, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt body)]
+     [CFunctionDefinition (gen_ident name, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt mn body)]
   | TForeignFunction (_, n, params, rt, underlying, _) ->
      let param_type_to_c_type t =
        (match t with
@@ -517,7 +523,7 @@ let gen_decl (decl: typed_decl): cpp_decl list =
      (* Type class declarations are not compiled *)
      []
   | TInstance (_, _, typarams, _, methods, _) ->
-     List.map (gen_method typarams) methods
+     List.map (gen_method mn typarams) methods
 
 (* Extract types into forward type declarations *)
 
@@ -578,7 +584,7 @@ let decl_order = function
 let gen_module (TypedModule (name, decls)) =
   let type_decls = gen_type_decls decls
   and fun_decls = List.concat (gen_fun_decls decls)
-  and decls' = List.concat (List.map gen_decl decls) in
+  and decls' = List.concat (List.map (gen_decl name) decls) in
   let decls'' = List.concat [type_decls; fun_decls; decls'] in
   let sorter a b = compare (decl_order a) (decl_order b) in
   let sorted_decls = List.sort sorter decls'' in
