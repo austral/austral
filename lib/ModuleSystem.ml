@@ -1,6 +1,8 @@
 open Identifier
 open IdentifierMap
 open Semantic
+open LexEnv
+open Type
 open Error
 
 type menv = ModuleEnv of semantic_module ModuleNameMap.t
@@ -31,3 +33,18 @@ let put_module m sem =
   match get_module m name with
   | None -> ModuleEnv (ModuleNameMap.add name sem menv)
   | (Some _) -> err "Module with this name already exists"
+
+let menv_get_var (menv: menv) (lexenv: lexenv) (name: qident): ty option =
+  match get_var lexenv (original_name name) with
+  | Some ty ->
+     Some ty
+  | None ->
+     (match get_decl menv name with
+      | Some decl ->
+         (match decl with
+          | SConstantDefinition (_, _, ty) ->
+             Some ty
+          | _ ->
+             None)
+      | None ->
+         None)

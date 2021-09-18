@@ -32,11 +32,11 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
   | StringConstant s ->
      TStringConstant s
   | Variable name ->
-     (match get_var lexenv name with
+     (match menv_get_var menv lexenv name with
       | Some ty ->
          TVariable (name, ty)
       | None ->
-         err ("I can't find the variable named " ^ (ident_string name)))
+         err ("I can't find the variable named " ^ (ident_string (original_name name))))
   | FunctionCall (name, args) ->
      augment_call module_name menv asserted_ty name (augment_arglist module_name menv lexenv None args)
   | ArithmeticExpression (op, lhs, rhs) ->

@@ -31,7 +31,8 @@ let rec count_appearances (name: identifier) (expr: texpr) =
   | TStringConstant _ ->
      0
   | TVariable (n, _) ->
-     if equal_identifier name n then
+     (* TODO: is using original_name here correct? *)
+     if equal_identifier name (original_name n) then
        1
      else
        0
