@@ -12,6 +12,8 @@ let option_type_name = make_ident "Option"
 
 let option_type_qname = make_qident (pervasive_module_name, option_type_name, option_type_name)
 
+let root_cap_type_name = make_ident "Root_Capability"
+
 let pervasive_module =
   let i = make_ident in
   let option_type_def =
@@ -67,8 +69,18 @@ let pervasive_module =
         [ValueParameter (i "arr", Array (Integer (Unsigned, Width8), static_region))],
         Unit
       )
+  and root_cap_type_def =
+    let name = i "Root_Capability" in
+    (* type Root_Capability : Linear; *)
+    STypeAliasDefinition (
+        TypeVisOpaque,
+        name,
+        [],
+        LinearUniverse,
+        Unit
+    )
   in
-  let decls = [option_type_def; deref_def; fixed_array_size_def; abort_def] in
+  let decls = [option_type_def; deref_def; fixed_array_size_def; abort_def; root_cap_type_def] in
   SemanticModule {
       name = pervasive_module_name;
       decls = decls;
@@ -85,7 +97,8 @@ let pervasive_imports =
         ConcreteImport (make_ident "None", None);
         ConcreteImport (make_ident "Deref", None);
         ConcreteImport (make_ident "Fixed_Array_Size", None);
-        ConcreteImport (make_ident "Abort", None)
+        ConcreteImport (make_ident "Abort", None);
+        ConcreteImport (make_ident "Root_Capability", None)
       ]
     )
 
