@@ -114,7 +114,7 @@ module body Example.Buffer is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(): Unit is
+    function Main(root: Root_Capability): Root_Capability is
         -- Create a buffer of e's.
         let buf: Buffer[Integer_32] := Initialize(3, 101);
         borrow buf as bufref in rho do
@@ -126,6 +126,6 @@ module body Example.Buffer is
             Put_Character(first);
         end;
         Destroy_Buffer(buf);
-        return nil;
+        return root;
     end;
  end module body.
