@@ -3,8 +3,8 @@ module body Example.NamedArgument is
         return nil;
     end;
 
-    function Main(): Unit is
+    function Main(root: Root_Capability): Root_Capability is
         F(y => false, x => true);
-        return nil;
+        return root;
     end;
 end module body.
