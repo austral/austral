@@ -9,7 +9,7 @@ import Austral.Memory (
 module body Example.Memory is
     pragma Unsafe_Module;
 
-    function Main(): Unit is
+    function Main(root: Root_Capability): Root_Capability is
         let opt: Option[Pointer[Integer_32]] := Allocate(10);
         case opt of
             when Some(value: Pointer[Integer_32]) do
@@ -18,6 +18,6 @@ module body Example.Memory is
               -- Do nothing.
               skip;
         end case;
-        return nil;
+        return root;
     end;
 end module body.
