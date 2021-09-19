@@ -12,5 +12,5 @@ module Example.Union is
             value: Double_Float;
     end;
 
-    function Main(): Unit;
+    function Main(root: Root_Capability): Root_Capability;
 end module.
