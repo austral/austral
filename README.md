@@ -131,7 +131,7 @@ The `--entrypoint` option must be the name of a module, followed by a colon,
 followed by the name of a public function with the following signature:
 
 ```
-function Main(): Unit;
+function Main(root: Root_Capability): Root_Capability;
 ```
 
 Finally, the `--output` option is just the path to dump the compiled C++ to.
