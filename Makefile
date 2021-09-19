@@ -11,5 +11,11 @@ $(BIN): $(SRC)
 test: $(BIN)
 	dune runtest
 
+install: $(BIN)
+	install -m 755 austral /usr/local/bin/austral
+
+uninstall:
+	sudo rm /usr/local/bin/austral
+
 clean:
 	rm $(BIN); rm -rf _build
