@@ -48,6 +48,8 @@ namespace Austral__Core {
 }
 
 namespace A_Austral__Pervasive {
+    typedef bool A_Root_Capability;
+
     enum A_Option_Tag {
         A_None, A_Some
     };
