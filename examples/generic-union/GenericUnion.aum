@@ -5,9 +5,9 @@ module body Example.GenericUnion is
             value: T;
     end;
 
-    function Main(): Unit is
+    function Main(root: Root_Capability): Root_Capability is
         let S: Optional2[Integer_32] := Some2(value => 10);
         let N: Optional2[Integer_32] := None2();
-        return nil;
+        return root;
     end;
 end module body.

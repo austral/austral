@@ -21,7 +21,7 @@ module body Example.Array is
         return nil;
     end;
 
-    function Main(): Unit is
+    function Main(root: Root_Capability): Root_Capability is
         let arropt: Option[Heap_Array[Boolean]] := Allocate_Array(3);
         case arropt of
         when Some(value: Heap_Array[Boolean]) do
@@ -40,6 +40,6 @@ module body Example.Array is
             when None do
                 skip;
         end case;
-        return nil;
+        return root;
     end;
 end module body.

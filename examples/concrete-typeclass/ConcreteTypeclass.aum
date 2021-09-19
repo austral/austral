@@ -18,7 +18,7 @@ module body Example.ConcreteTypeclass is
         return X;
     end;
 
-    function Main(): Unit is
-        return nil;
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
     end;
 end module body.

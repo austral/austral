@@ -25,7 +25,7 @@ module body Example.GenericTypeclass is
         end case;
     end;
 
-    function Main(): Unit is
-        return nil;
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
     end;
 end module body.

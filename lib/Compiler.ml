@@ -9,6 +9,7 @@ open TypingPass
 open CodeGen
 open CppRenderer
 open Cst
+open Type
 open Error
 
 let append_import_to_interface ci import =
@@ -50,20 +51,24 @@ let rec compile_multiple c modules =
   | (is, bs)::rest -> compile_multiple (compile_mod c is bs) rest
   | [] -> c
 
-let check_entrypoint_validity menv qi =
+let rec check_entrypoint_validity menv qi =
   match get_decl menv qi with
   | Some decl ->
      (match decl with
       | SFunctionDeclaration (vis, _, typarams, params, rt) ->
          if vis = VisPublic then
            if typarams = [] then
-             if params = [] then
-               if rt = Unit then
-                 ()
-               else
-                 err "Entrypoint function must return the unit type."
-             else
-               err "Entrypoint function must take no arguments"
+             match params with
+             | [ValueParameter (_, pt)] ->
+                if is_root_cap_type pt then
+                  if is_root_cap_type rt then
+                    ()
+                  else
+                    err "Entrypoint function must return a value of type Root_Capability."
+                else
+                  err "Entrypoint function must take a single argument of type Root_Capability."
+             | _ ->
+                err "Entrypoint function must take a single argument of type Root_Capability."
            else
              err "Entrypoint function cannot be generic."
          else
@@ -73,9 +78,17 @@ let check_entrypoint_validity menv qi =
   | None ->
      err "Entrypoint does not exist."
 
+and is_root_cap_type = function
+  | NamedType (name, [], LinearUniverse) ->
+     let m = equal_module_name (source_module_name name) pervasive_module_name
+     and n = equal_identifier (original_name name) root_cap_type_name in
+     m && n
+  | _ ->
+     false
+
 let entrypoint_code mn i =
   let f = (gen_module_name mn) ^ "::" ^ (gen_ident i) in
-  "int main() {\n    " ^ f ^ "();\n    return 0;\n}\n"
+  "int main() {\n    " ^ f ^ "(false);\n    return 0;\n}\n"
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in

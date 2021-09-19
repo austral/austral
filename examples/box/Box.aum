@@ -76,7 +76,7 @@ module body Example.Box is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(): Unit is
+    function Main(root: Root_Capability): Root_Capability is
         -- Box a value, swap it, and unwrap it.
         let b: Option[Box[Integer_32]] := Make(101);
         case b of
@@ -135,6 +135,6 @@ module body Example.Box is
             when None do
                 Abort("Unexpected.");
         end case;
-        return nil;
+        return root;
     end;
 end module body.
