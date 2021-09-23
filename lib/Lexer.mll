@@ -37,7 +37,7 @@ let comment = "--" [^ '\r' '\n']* (newline)
 (* Token regexes *)
 
 let identifier = (alpha) ('_'|alphanum)*
-let dec_int_constant = digit (digit|'\'')*
+let dec_constant = digit (digit|'\'')*
 let hex_constant = "#x" hex_digit (hex_digit|'\'')*
 let bin_constant = "#b" bin_digit (bin_digit|'\'')*
 let oct_constant = "#o" oct_digit (oct_digit|'\'')*
@@ -122,8 +122,10 @@ rule token = parse
   | "true" { TRUE }
   | "false" { FALSE }
   | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
-  | dec_int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
-  | hex_constant { INT_CONSTANT (process_hex (Lexing.lexeme lexbuf)) }
+  | dec_constant { DEC_CONSTANT (Lexing.lexeme lexbuf) }
+  | hex_constant { HEX_CONSTANT (Lexing.lexeme lexbuf) }
+  | bin_constant { BIN_CONSTANT (Lexing.lexeme lexbuf) }
+  | oct_constant { OCT_CONSTANT (Lexing.lexeme lexbuf) }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
   | whitespace { token lexbuf }
