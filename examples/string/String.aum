@@ -16,6 +16,35 @@ module body Example.String is
             Put_Character(X[0]);
             Put_String(X);
         end if;
+        Put_String(
+            """A"""
+        );
+        Put_String(
+            """A
+            """
+        );
+        Put_String(
+            """
+                A"""
+        );
+        Put_String(
+            """
+                A
+            """
+        );
+        Put_String(
+            """
+                A
+                    B
+            """
+        );
+        Put_String(
+            """
+                A
+                    B
+                C
+            """
+        );
         return root;
     end;
 end module body.
