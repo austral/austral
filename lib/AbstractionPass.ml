@@ -1,6 +1,7 @@
 open Imports
 open Cst
 open Ast
+open Escape
 open Qualifier
 open Error
 
@@ -42,7 +43,7 @@ and abs_expr im expr =
   | CBoolConstant b -> BoolConstant b
   | CIntConstant i -> IntConstant i
   | CFloatConstant f -> FloatConstant f
-  | CStringConstant s -> StringConstant s
+  | CStringConstant s -> StringConstant (escape_string s)
   | CVariable i -> Variable (qualify_identifier im i)
   | CFuncall (name, args) ->
      FunctionCall (qualify_identifier im name, abs_arglist im args)

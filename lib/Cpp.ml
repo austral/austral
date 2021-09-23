@@ -1,4 +1,5 @@
 open Common
+open Escape
 
 type cpp_function_linkage =
   | LinkageInternal
@@ -16,7 +17,7 @@ type cpp_expr =
   | CBool of bool
   | CInt of string
   | CFloat of string
-  | CString of string
+  | CString of escaped_string
   | CVar of string
   | CFuncall of string * cpp_expr list * cpp_ty list
   | CCast of cpp_expr * cpp_ty

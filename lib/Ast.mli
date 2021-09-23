@@ -1,5 +1,6 @@
 open Identifier
 open Common
+open Escape
 
 type qtypespec = QTypeSpecifier of qident * qtypespec list
 
@@ -33,7 +34,7 @@ and aexpr =
   | BoolConstant of bool
   | IntConstant of string
   | FloatConstant of string
-  | StringConstant of string
+  | StringConstant of escaped_string
   | Variable of qident
   | FunctionCall of qident * abstract_arglist
   | ArithmeticExpression of arithmetic_operator * aexpr * aexpr

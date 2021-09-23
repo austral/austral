@@ -1,4 +1,5 @@
 open Common
+open Escape
 open Cpp
 
 type indentation = Indentation of int
@@ -184,7 +185,7 @@ and render_expr = function
   | (CBool b) -> render_bool b
   | (CInt i) -> i
   | (CFloat f) -> f
-  | (CString s) -> "\"" ^ s ^ "\""
+  | (CString s) -> "\"" ^ (unescape_string s) ^ "\""
   | (CVar s) -> s
   | (CFuncall (n, a, tyargs)) ->
      let t' = if tyargs = [] then

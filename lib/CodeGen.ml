@@ -5,6 +5,7 @@ open Tast
 open Region
 open Cpp
 open Util
+open Escape
 open Error
 
 (* Codegen implementation notes:
@@ -193,7 +194,7 @@ let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
   | TFloatConstant f ->
      CFloat f
   | TStringConstant s ->
-     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length s)); CCast (CString s, c_string_type)], [])
+     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length (escaped_to_string s))); CCast (CString s, c_string_type)], [])
   | TVariable (n, _) ->
      if (equal_module_name (source_module_name n) mn) then
        CVar (gen_ident (original_name n))

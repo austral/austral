@@ -1,5 +1,6 @@
 open Identifier
 open Common
+open Escape
 open Type
 open Semantic
 
@@ -48,7 +49,7 @@ and texpr =
   | TBoolConstant of bool
   | TIntConstant of string
   | TFloatConstant of string
-  | TStringConstant of string
+  | TStringConstant of escaped_string
   | TVariable of qident * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of qident * texpr list * ty * (identifier * ty) list
