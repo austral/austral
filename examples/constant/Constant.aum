@@ -9,6 +9,8 @@ module body Example.Constant is
 
     constant Octal_24: Integer_32 := #o30;
 
+    constant Char_Const: Natural_8 := 'a';
+
     -- This constant is private, since it appears in the module body file but not the interface file.
     constant Pi : Double_Float := 3.14;
 
@@ -21,6 +23,9 @@ module body Example.Constant is
         end if;
         if (Decimal_24 /= Octal_24) then
             Abort("Octal literals are broken.");
+        end if;
+        if (Char_Const /= 97) then
+            Abort("Character literals are broken.");
         end if;
         return root;
     end;
