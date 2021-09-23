@@ -1,5 +1,7 @@
 module Example.Fibonacci is
-    ```The fibonacci function.```
+    """
+    The fibonacci function.
+    """
     function Fibonacci(n: Natural_64): Natural_64;
     function Main(root: Root_Capability): Root_Capability;
 end module.
