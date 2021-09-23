@@ -34,8 +34,8 @@ let comment = "--" [^ '\r' '\n']* (newline)
 (* Token regexes *)
 
 let identifier = (alpha) ('_'|alphanum)*
-let int_constant = digit (digit|'\'')*
-let float_constant = int_constant period int_constant? (exponent sign? int_constant)?
+let dec_int_constant = digit (digit|'\'')*
+let float_constant = dec_int_constant period dec_int_constant? (exponent sign? dec_int_constant)?
 
 (* Rules *)
 
@@ -116,7 +116,7 @@ rule token = parse
   | "true" { TRUE }
   | "false" { FALSE }
   | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
-  | int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
+  | dec_int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
   | whitespace { token lexbuf }
