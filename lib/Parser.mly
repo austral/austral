@@ -389,6 +389,7 @@ float_constant:
 
 string_constant:
   | STRING_CONSTANT { CStringConstant $1 }
+  | TRIPLE_STRING_CONSTANT { CStringConstant (process_triple_string $1) }
   ;
 
 variable:
