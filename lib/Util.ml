@@ -69,6 +69,51 @@ let parse_ascii_char (s: string): int =
       | _ ->
          err "Character literal too long.")
 
+let rec count_leading_whitespace (s: string): int =
+  let chars = string_explode s in
+  match chars with
+  | ' '::rest ->
+     1 + (count_leading_whitespace (string_implode rest))
+  | _ ->
+     0
+
+let min_list (l: int list): int =
+  match l with
+  | first::rest ->
+     List.fold_left min first rest
+  | [] ->
+     err "empty list passed to min_list"
+
+let trim_common_whitespace (s: string): string =
+  let lines = String.split_on_char '\n' s in
+  let lines = List.map (fun s -> (count_leading_whitespace s, s)) lines in
+  let min_whitespace: int = min_list (List.map (fun (w, _) -> w) lines) in
+  let lines: string list = List.map (fun (_, s) -> remove_leading s min_whitespace) lines in
+  String.concat "\n" lines
+
+let process_triple_string (s: string): string =
+  let lines = String.split_on_char '\n' s in
+  match lines with
+  | first::rest ->
+     let first = if (String.equal (String.trim first) "") then
+                   ""
+                 else
+                   first
+     in
+     (match (List.rev rest) with
+      | last::body ->
+         let last = if (String.equal (String.trim last) "") then
+                      ""
+                    else
+                      first
+         in
+         let s = first ^ (String.concat "\n" body) ^ last in
+         trim_common_whitespace s
+      | [] ->
+         err "reverse is empty")
+  | [] ->
+     err "split_on_char returned empty"
+
 let ident_set_eq a b =
   let sorter a b = compare (ident_string a) (ident_string b) in
   (List.sort sorter a) = (List.sort sorter b)
