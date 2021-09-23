@@ -40,6 +40,9 @@ let replace_char (s: string) (c: char) (r: string): string =
   in
   string_implode (List.concat (List.map replace (string_explode s)))
 
+let remove_leading (s: string) (n: int) =
+  String.sub s n ((String.length s) - n)
+
 let ident_set_eq a b =
   let sorter a b = compare (ident_string a) (ident_string b) in
   (List.sort sorter a) = (List.sort sorter b)

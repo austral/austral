@@ -12,5 +12,7 @@ val remove_char : string -> char -> string
 
 val replace_char : string -> char -> string -> string
 
+val remove_leading : string -> int -> string
+
 (* Check whether two lists of identifiers are the same set. *)
 val ident_set_eq : identifier list -> identifier list -> bool
