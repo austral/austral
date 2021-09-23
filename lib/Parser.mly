@@ -376,9 +376,9 @@ atomic_expression:
 
 int_constant:
   | DEC_CONSTANT { CIntConstant (remove_char $1 '\'') }
-  | HEX_CONSTANT { CIntConstant (string_of_int (parse_hex (remove_leading 2 (remove_char $1 '\'')))) }
-  | BIN_CONSTANT { CIntConstant (string_of_int (parse_bin (remove_leading 2 (remove_char $1 '\'')))) }
-  | OCT_CONSTANT { CIntConstant (string_of_int (parse_oct (remove_leading 2 (remove_char $1 '\'')))) }
+  | HEX_CONSTANT { CIntConstant (string_of_int (parse_hex (remove_leading (remove_char $1 '\'') 2))) }
+  | BIN_CONSTANT { CIntConstant (string_of_int (parse_bin (remove_leading (remove_char $1 '\'') 2))) }
+  | OCT_CONSTANT { CIntConstant (string_of_int (parse_oct (remove_leading (remove_char $1 '\'') 2))) }
   ;
 
 float_constant:
