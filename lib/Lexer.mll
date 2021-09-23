@@ -41,7 +41,7 @@ let dec_constant = digit (digit|'\'')*
 let hex_constant = "#x" hex_digit (hex_digit|'\'')*
 let bin_constant = "#b" bin_digit (bin_digit|'\'')*
 let oct_constant = "#o" oct_digit (oct_digit|'\'')*
-let float_constant = dec_int_constant period dec_int_constant? (exponent sign? dec_int_constant)?
+let float_constant = dec_constant period dec_constant? (exponent sign? dec_constant)?
 
 (* Rules *)
 

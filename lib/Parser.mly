@@ -83,6 +83,7 @@ open Util
 %token NIL
 %token TRUE
 %token FALSE
+%token <string> DEC_CONSTANT
 %token <string> HEX_CONSTANT
 %token <string> BIN_CONSTANT
 %token <string> OCT_CONSTANT
