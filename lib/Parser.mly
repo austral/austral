@@ -78,7 +78,7 @@ open Util
 %token ADDRESS_OF
 /* Strings and docstrings */
 %token <string> STRING_CONSTANT
-%token <string> DOCSTRING_TOKEN
+%token <string> TRIPLE_STRING_CONSTANT
 /* Identifiers and constants */
 %token NIL
 %token TRUE
@@ -536,7 +536,7 @@ type_parameter:
   ;
 
 docstring:
-  | DOCSTRING_TOKEN { Docstring $1 }
+  | TRIPLE_STRING_CONSTANT { Docstring (process_triple_string $1) }
   ;
 
 docstringopt:

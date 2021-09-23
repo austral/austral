@@ -13,7 +13,7 @@ let advance_line lexbuf =
 
 let string_acc: Buffer.t = Buffer.create 64
 
-let docstring_acc: Buffer.t = Buffer.create 64
+let triple_string_acc: Buffer.t = Buffer.create 64
 }
 
 (* Helper regexes *)
@@ -118,7 +118,7 @@ rule token = parse
   | ":=" { ASSIGN }
   | "&" { ADDRESS_OF }
   (* Strings and docstrings *)
-  | "```" { read_docstring lexbuf }
+  | "\"\"\"" { read_triple_string lexbuf }
   | '"' { read_string lexbuf }
   (* Identifiers and constants *)
   | "nil" { NIL }
@@ -144,8 +144,8 @@ and read_string = parse
   | eof { err "End of file in string literal" }
   | _ {err ("Character not allowed in string literal: '" ^ Lexing.lexeme lexbuf ^ "'") }
 
-and read_docstring = parse
-  | "```" { let c = Buffer.contents docstring_acc in Buffer.clear docstring_acc; DOCSTRING_TOKEN c }
-  | '\\' "```" { Buffer.add_string docstring_acc "```"; read_docstring lexbuf }
-  | eof { err "End of file in docstring" }
-  | _ { Buffer.add_string docstring_acc (Lexing.lexeme lexbuf); read_docstring lexbuf }
+and read_triple_string = parse
+  | "\"\"\"" { let c = Buffer.contents triple_string_acc in Buffer.clear triple_string_acc; TRIPLE_STRING_CONSTANT c }
+  | '\\' "\"\"\"" { Buffer.add_string triple_string_acc "\"\"\""; read_triple_string lexbuf }
+  | eof { err "End of file in triple-quoted string." }
+  | _ { Buffer.add_string triple_string_acc (Lexing.lexeme lexbuf); read_triple_string lexbuf }
