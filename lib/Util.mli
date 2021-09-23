@@ -20,5 +20,7 @@ val parse_bin : string -> int
 
 val parse_oct : string -> int
 
+val parse_ascii_char : string -> int
+
 (* Check whether two lists of identifiers are the same set. *)
 val ident_set_eq : identifier list -> identifier list -> bool

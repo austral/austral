@@ -52,6 +52,23 @@ let parse_bin (s: string): int =
 let parse_oct (s: string): int =
   int_of_string ("0o" ^ s)
 
+let parse_ascii_char (s: string): int =
+  match s with
+  | "\\n" ->
+     97
+  | "\\r" ->
+     13
+  | "\\t" ->
+     9
+  | "\\\\" ->
+     92
+  | _ ->
+     (match (string_explode s) with
+      | [c] ->
+         Char.code c
+      | _ ->
+         err "Character literal too long.")
+
 let ident_set_eq a b =
   let sorter a b = compare (ident_string a) (ident_string b) in
   (List.sort sorter a) = (List.sort sorter b)
