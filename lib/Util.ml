@@ -40,8 +40,17 @@ let replace_char (s: string) (c: char) (r: string): string =
   in
   string_implode (List.concat (List.map replace (string_explode s)))
 
-let remove_leading (s: string) (n: int) =
+let remove_leading (s: string) (n: int): string =
   String.sub s n ((String.length s) - n)
+
+let parse_hex (s: string): int =
+  int_of_string ("0x" ^ s)
+
+let parse_bin (s: string): int =
+  int_of_string ("0b" ^ s)
+
+let parse_oct (s: string): int =
+  int_of_string ("0o" ^ s)
 
 let ident_set_eq a b =
   let sorter a b = compare (ident_string a) (ident_string b) in
