@@ -22,6 +22,9 @@ let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 let alphanum = (alpha|digit)
 let whitespace = [' ' '\t']+
+let hex_digit = ['0'-'9']['a'-'f']['A'-'F']
+let bin_digit = ['0'-'1']
+let oct_digit = ['0'-'7']
 
 let newline = "\r\n" | '\n'
 
@@ -35,6 +38,9 @@ let comment = "--" [^ '\r' '\n']* (newline)
 
 let identifier = (alpha) ('_'|alphanum)*
 let dec_int_constant = digit (digit|'\'')*
+let hex_constant = "#x" hex_digit (hex_digit|'\'')*
+let bin_constant = "#b" bin_digit (bin_digit|'\'')*
+let oct_constant = "#o" oct_digit (oct_digit|'\'')*
 let float_constant = dec_int_constant period dec_int_constant? (exponent sign? dec_int_constant)?
 
 (* Rules *)
@@ -117,6 +123,7 @@ rule token = parse
   | "false" { FALSE }
   | float_constant { FLOAT_CONSTANT (Lexing.lexeme lexbuf) }
   | dec_int_constant { INT_CONSTANT (Lexing.lexeme lexbuf) }
+  | hex_constant { INT_CONSTANT (process_hex (Lexing.lexeme lexbuf)) }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
   | whitespace { token lexbuf }
