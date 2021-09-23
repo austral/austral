@@ -105,12 +105,12 @@ let process_triple_string (s: string): string =
          let last = if (String.equal (String.trim last) "") then
                       ""
                     else
-                      first
+                      last
          in
-         let s = first ^ (String.concat "\n" body) ^ last in
+         let s = first ^ (String.concat "\n" (List.rev body)) ^ last in
          trim_common_whitespace s
       | [] ->
-         err "reverse is empty")
+         first)
   | [] ->
      err "split_on_char returned empty"
 
