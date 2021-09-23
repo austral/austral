@@ -87,6 +87,7 @@ open Util
 %token <string> HEX_CONSTANT
 %token <string> BIN_CONSTANT
 %token <string> OCT_CONSTANT
+%token <string> CHAR_CONSTANT
 %token <string> FLOAT_CONSTANT
 %token <string> IDENTIFIER
 /* etc. */
@@ -379,6 +380,7 @@ int_constant:
   | HEX_CONSTANT { CIntConstant (string_of_int (parse_hex (remove_leading (remove_char $1 '\'') 2))) }
   | BIN_CONSTANT { CIntConstant (string_of_int (parse_bin (remove_leading (remove_char $1 '\'') 2))) }
   | OCT_CONSTANT { CIntConstant (string_of_int (parse_oct (remove_leading (remove_char $1 '\'') 2))) }
+  | CHAR_CONSTANT { CIntConstant (string_of_int (parse_ascii_char (remove_char $1 '\''))) }
   ;
 
 float_constant:

@@ -129,6 +129,7 @@ rule token = parse
   | hex_constant { HEX_CONSTANT (Lexing.lexeme lexbuf) }
   | bin_constant { BIN_CONSTANT (Lexing.lexeme lexbuf) }
   | oct_constant { OCT_CONSTANT (Lexing.lexeme lexbuf) }
+  | char_constant { CHAR_CONSTANT (Lexing.lexeme lexbuf) }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   (* etc. *)
   | whitespace { token lexbuf }
