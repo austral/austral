@@ -26,6 +26,8 @@ let hex_digit = ['0'-'9' 'a'-'f' 'A'-'F']
 let bin_digit = ['0'-'1']
 let oct_digit = ['0'-'7']
 
+let ascii_char = ['a'-'z' 'A'-'Z' '0'-'9' ' ' '!' '"' '#' '$' '%' '&' ''' ')' '(' '*' '+' ',' '-' '.' '/' ':' ';' '<' '=' '>' '?' '@' '`' '~' ']' '[' '^' '_' '{' '|' '}']
+
 let newline = "\r\n" | '\n'
 
 let exponent = 'e' | 'E'
@@ -42,6 +44,7 @@ let hex_constant = '#' 'x' hex_digit (hex_digit|'\'')*
 let bin_constant = '#' 'b' bin_digit (bin_digit|'\'')*
 let oct_constant = '#' 'o' oct_digit (oct_digit|'\'')*
 let float_constant = dec_constant period dec_constant? (exponent sign? dec_constant)?
+let char_constant = '\'' (ascii_char | '\\' ['n' 'r' 't' '\\']) '\''
 
 (* Rules *)
 
