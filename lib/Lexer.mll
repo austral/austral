@@ -22,7 +22,7 @@ let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 let alphanum = (alpha|digit)
 let whitespace = [' ' '\t']+
-let hex_digit = ['0'-'9']['a'-'f']['A'-'F']
+let hex_digit = ['0'-'9' 'a'-'f' 'A'-'F']
 let bin_digit = ['0'-'1']
 let oct_digit = ['0'-'7']
 
@@ -38,9 +38,9 @@ let comment = "--" [^ '\r' '\n']* (newline)
 
 let identifier = (alpha) ('_'|alphanum)*
 let dec_constant = digit (digit|'\'')*
-let hex_constant = "#x" hex_digit (hex_digit|'\'')*
-let bin_constant = "#b" bin_digit (bin_digit|'\'')*
-let oct_constant = "#o" oct_digit (oct_digit|'\'')*
+let hex_constant = '#' 'x' hex_digit (hex_digit|'\'')*
+let bin_constant = '#' 'b' bin_digit (bin_digit|'\'')*
+let oct_constant = '#' 'o' oct_digit (oct_digit|'\'')*
 let float_constant = dec_constant period dec_constant? (exponent sign? dec_constant)?
 
 (* Rules *)
