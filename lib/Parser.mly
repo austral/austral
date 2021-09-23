@@ -83,7 +83,9 @@ open Util
 %token NIL
 %token TRUE
 %token FALSE
-%token <string> INT_CONSTANT
+%token <string> HEX_CONSTANT
+%token <string> BIN_CONSTANT
+%token <string> OCT_CONSTANT
 %token <string> FLOAT_CONSTANT
 %token <string> IDENTIFIER
 /* etc. */
@@ -372,7 +374,10 @@ atomic_expression:
   ;
 
 int_constant:
-  | INT_CONSTANT { CIntConstant (remove_char $1 '\'') }
+  | DEC_CONSTANT { CIntConstant (remove_char $1 '\'') }
+  | HEX_CONSTANT { CIntConstant (string_of_int (parse_hex (remove_leading 2 (remove_char $1 '\'')))) }
+  | BIN_CONSTANT { CIntConstant (string_of_int (parse_bin (remove_leading 2 (remove_char $1 '\'')))) }
+  | OCT_CONSTANT { CIntConstant (string_of_int (parse_oct (remove_leading 2 (remove_char $1 '\'')))) }
   ;
 
 float_constant:
