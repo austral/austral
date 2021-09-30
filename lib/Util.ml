@@ -16,7 +16,7 @@ let read_stream_to_string stream: string =
     with End_of_file ->
       []
   in
-  String.concat "\n" (read_stream stream)
+  String.trim (String.concat "\n" (read_stream stream))
 
 let read_file_to_string (path: string): string =
   let stream = open_in path in
@@ -123,3 +123,23 @@ let process_triple_string (s: string): string =
 let ident_set_eq a b =
   let sorter a b = compare (ident_string a) (ident_string b) in
   (List.sort sorter a) = (List.sort sorter b)
+
+let get_exit_code = function
+  | WEXITED i -> i
+  | WSIGNALED i -> i
+  | WSTOPPED i -> i
+
+type command_output =
+  CommandOutput of { command: string; code: int; stdout: string; stderr: string }
+
+let run_command (command: string): command_output =
+  let (stdout_chan, stdin_chan, stderr_chan) = open_process_full command [||] in
+  let stdout = read_stream_to_string stdout_chan
+  and stderr = read_stream_to_string stderr_chan in
+  let proc_stat = close_process_full (stdout_chan, stdin_chan, stderr_chan) in
+  CommandOutput {
+      command = command;
+      code = get_exit_code proc_stat;
+      stdout = stdout;
+      stderr = stderr
+    }
