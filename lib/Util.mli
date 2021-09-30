@@ -26,3 +26,9 @@ val process_triple_string : string -> string
 
 (* Check whether two lists of identifiers are the same set. *)
 val ident_set_eq : identifier list -> identifier list -> bool
+
+type command_output =
+  CommandOutput of { command: string; code: int; stdout: string; stderr: string }
+
+(* Run a shell command, and return its output. *)
+val run_command : string -> command_output
