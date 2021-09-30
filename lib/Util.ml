@@ -16,7 +16,7 @@ let read_stream_to_string stream: string =
     with End_of_file ->
       []
   in
-  String.concat "\n" (read_stream stream)
+  String.trim (String.concat "\n" (read_stream stream))
 
 let read_file_to_string (path: string): string =
   let stream = open_in path in
