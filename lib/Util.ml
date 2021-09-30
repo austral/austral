@@ -1,4 +1,5 @@
 open Identifier
+open Unix
 open Error
 
 let string_explode (s: string): char list =
@@ -7,7 +8,7 @@ let string_explode (s: string): char list =
 let string_implode (l: char list): string =
   String.init (List.length l) (List.nth l)
 
-let read_file_to_string (path: string): string =
+let read_stream_to_string stream: string =
   let rec read_stream stream =
     try
       let line = input_line stream in
@@ -15,8 +16,13 @@ let read_file_to_string (path: string): string =
     with End_of_file ->
       []
   in
-  let stream = open_in path in
   String.concat "\n" (read_stream stream)
+
+let read_file_to_string (path: string): string =
+  let stream = open_in path in
+  let contents = read_stream_to_string stream in
+  close_in stream;
+  contents
 
 let write_string_to_file (path: string) (contents: string): unit =
   let stream = open_out path in
