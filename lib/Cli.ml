@@ -3,6 +3,15 @@ open Compiler
 open Util
 open Error
 
+(* Map of filenames to file contents. *)
+module SourceMap =
+  Map.Make(
+      struct
+        type t = string
+        let compare a b = compare a b
+      end
+    )
+
 type arg =
   | ModuleArg of string * string
   | EntrypointArg of module_name * identifier
@@ -50,29 +59,57 @@ let make_module_source int_filename body_filename =
     }
 
 let compile_main (args: string list): unit =
+  (* Parse arg list *)
   let args' = List.map parse_arg args in
   let paths = List.filter_map (fun a -> match a with (ModuleArg (i,b)) -> Some (i,b) | _ -> None) args' in
   let contents = List.map (fun (i, b) -> make_module_source i b) paths in
-  let entrypoint = List.filter_map (fun a -> match a with (EntrypointArg (m,i)) -> Some (m, i) | _ -> None) args' in
-  let output = List.filter_map (fun a -> match a with (OutputArg path) -> Some path | _ -> None) args' in
-  let compiler = compile_multiple empty_compiler contents in
-  let compiler = (match entrypoint with
-                  | [(m,i)] ->
-                     compile_entrypoint compiler m i
-                  | [] ->
-                    (* If there is not --entrypoint flag, it's a library. *)
-                     compiler
-                  | _ ->
-                     err "Multiple --entrypoint flags.")
+  (* Build source map for error handling *)
+  let source_maps =
+    List.map (fun (ModuleSource { int_filename; int_code; body_filename; body_code }) ->
+        let smap = SourceMap.empty in
+        let smap = SourceMap.add int_filename int_code smap in
+        let smap = SourceMap.add body_filename body_code smap in
+        smap)
+      contents
   in
-  let code = compiler_code compiler in
-  match output with
-  | [output_path] ->
-     write_string_to_file output_path code
-  | [] ->
-     err "Misisng --output flag."
-  | _ ->
-     err "Multiple --output flags."
+  let source_map =
+    List.fold_left
+      (fun sm sm' -> SourceMap.union (fun _ v _ -> Some v) sm sm')
+      (SourceMap.empty)
+      source_maps
+  in
+  try
+    let entrypoint = List.filter_map (fun a -> match a with (EntrypointArg (m,i)) -> Some (m, i) | _ -> None) args' in
+    let output = List.filter_map (fun a -> match a with (OutputArg path) -> Some path | _ -> None) args' in
+    let compiler = compile_multiple empty_compiler contents in
+    let compiler = (match entrypoint with
+                    | [(m,i)] ->
+                       compile_entrypoint compiler m i
+                    | [] ->
+                       (* If there is not --entrypoint flag, it's a library. *)
+                       compiler
+                    | _ ->
+                       err "Multiple --entrypoint flags.")
+    in
+    let code = compiler_code compiler in
+    match output with
+    | [output_path] ->
+       write_string_to_file output_path code
+    | [] ->
+       err "Misisng --output flag."
+    | _ ->
+       err "Multiple --output flags."
+  with Austral_error error ->
+    let filename = error_filename error in
+    let code: string option =
+      match filename with
+      | Some filename ->
+         (SourceMap.find_opt filename source_map)
+      | None ->
+         None
+    in
+    Printf.eprintf "%s" (render_error error code);
+    exit (-1)
 
 
 let main' (args: string list): unit =
@@ -87,9 +124,5 @@ let main' (args: string list): unit =
      err "Invalid invocation."
 
 let main (args: string list): unit =
-  try
-    main' args;
-    exit 0
-  with Austral_error error ->
-    Printf.eprintf "%s" (render_error error);
-    exit (-1)
+  main' args;
+  exit 0
