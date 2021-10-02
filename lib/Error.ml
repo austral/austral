@@ -1,5 +1,17 @@
 open Span
 
+let indent_text (text: string) (indent: int): string =
+  let lines = String.split_on_char '\n' text in
+  let lines =
+    List.map
+      (fun line ->
+        let pad = String.make indent ' '
+        in
+        pad ^ line)
+      lines
+  in
+  String.concat "\n" lines
+
 (* Represents an error. *)
 type error = Error of {
       (* The code span that triggered the error. *)
@@ -12,6 +24,15 @@ type error = Error of {
 and error_data =
   | GenericError of string
   | ParseError
+
+
+let error_filename (error: error): string option =
+  let (Error { span; _ }) = error in
+  match span with
+  | Some (Span { filename; _ }) ->
+     Some filename
+  | None ->
+     None
 
 (* Return the error description. *)
 let error_text (error_data: error_data): string =
@@ -30,7 +51,7 @@ let error_title (error_data: error_data): string =
      "Parse Error"
 
 (* Render an error into a string for display in the terminal. *)
-let render_error (error: error) (code: string): string =
+let render_error (error: error) (code: string option): string =
   let (Error { span; data }) = error in
   let span_text =
     match span with
@@ -44,8 +65,12 @@ let render_error (error: error) (code: string): string =
   and code_text =
     match span with
     | Some span ->
-       "  Code:\n"
-       ^ (span_text code span)
+       (match code with
+        | Some code ->
+           "  Code:\n"
+           ^ (indent_text (span_text code span) 4)
+        | None ->
+           "  Code: [not available]\n")
     | None ->
        ""
   in
@@ -53,7 +78,7 @@ let render_error (error: error) (code: string): string =
   ^ "  Title: " ^ (error_title data) ^ "\n"
   ^ span_text
   ^ "  Description:\n"
-  ^ (error_text data)
+  ^ (indent_text (error_text data) 4) ^ "\n"
   ^ code_text
   ^ "\n"
 
