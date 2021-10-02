@@ -2,6 +2,7 @@ open Identifier
 open Common
 open Type
 open Error
+open Span
 
 type concrete_module_interface =
   ConcreteModuleInterface of module_name * concrete_import_list list * concrete_decl list
@@ -65,41 +66,42 @@ and typespec =
   TypeSpecifier of identifier * typespec list
 
 and cexpr =
-  | CNilConstant
-  | CBoolConstant of bool
-  | CIntConstant of string
-  | CFloatConstant of string
-  | CStringConstant of string
-  | CVariable of identifier
-  | CArith of arithmetic_operator * cexpr * cexpr
-  | CFuncall of identifier * concrete_arglist
-  | CComparison of comparison_operator * cexpr * cexpr
-  | CConjunction of cexpr * cexpr
-  | CDisjunction of cexpr * cexpr
-  | CNegation of cexpr
-  | CIfExpression of cexpr * cexpr * cexpr
-  | CPath of cexpr * concrete_path_elem list
-  | CPathRef of cexpr * concrete_path_elem list
+  | CNilConstant of span
+  | CBoolConstant of span * bool
+  | CIntConstant of span * string
+  | CFloatConstant of span * string
+  | CStringConstant of span * string
+  | CVariable of span * identifier
+  | CArith of span * arithmetic_operator * cexpr * cexpr
+  | CFuncall of span * identifier * concrete_arglist
+  | CComparison of span * comparison_operator * cexpr * cexpr
+  | CConjunction of span * cexpr * cexpr
+  | CDisjunction of span * cexpr * cexpr
+  | CNegation of span * cexpr
+  | CIfExpression of span * cexpr * cexpr * cexpr
+  | CPath of span * cexpr * concrete_path_elem list
+  | CPathRef of span * cexpr * concrete_path_elem list
 
 and cstmt =
-  | CSkip
-  | CLet of identifier * typespec * cexpr
-  | CDestructure of (identifier * typespec) list * cexpr
-  | CAssign of concrete_lvalue * cexpr
-  | CIf of cexpr * cstmt * cstmt
-  | CCase of cexpr * concrete_when list
-  | CWhile of cexpr * cstmt
-  | CFor of identifier * cexpr * cexpr * cstmt
+  | CSkip of span
+  | CLet of span * identifier * typespec * cexpr
+  | CDestructure of span * (identifier * typespec) list * cexpr
+  | CAssign of span * concrete_lvalue * cexpr
+  | CIf of span * cexpr * cstmt * cstmt
+  | CCase of span * cexpr * concrete_when list
+  | CWhile of span * cexpr * cstmt
+  | CFor of span * identifier * cexpr * cexpr * cstmt
   | CBorrow of {
+      span: span;
       original: identifier;
       rename: identifier;
       region: identifier;
       body: cstmt;
       mode: borrowing_mode
     }
-  | CBlock of cstmt list
-  | CDiscarding of cexpr
-  | CReturn of cexpr
+  | CBlock of span * cstmt list
+  | CDiscarding of span * cexpr
+  | CReturn of span * cexpr
 
 and condition_branch =
   ConditionBranch of cexpr * cstmt
@@ -202,7 +204,7 @@ let make_pragma name args =
   let s = ident_string name in
   if s = "Foreign_Import" then
     match args with
-    | ConcreteNamedArgs [(a, CStringConstant f)] ->
+    | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
        (* FIXME: For some reason if we move `make_ident "External_Name"` to `a`
           in the pattern above, a weird syntax error happens. *)
        if a = make_ident "External_Name" then

@@ -4,6 +4,7 @@ open Common
 open Cst
 open Type
 open Util
+open Span
 %}
 
 /* Brackets */
@@ -264,7 +265,7 @@ function_def:
   | doc=docstringopt typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
     COLON rt=typespec IS pragmas=pragma* body=block? END SEMI
-    { ConcreteFunctionDef (name, typarams, params, rt, Option.value body ~default:(CBlock []), doc, pragmas) }
+    { ConcreteFunctionDef (name, typarams, params, rt, Option.value body ~default:(CBlock (from_loc $loc, [])), doc, pragmas) }
   ;
 
 pragma:
@@ -294,24 +295,24 @@ method_def:
 statement:
   | if_statement { $1 }
   | let_stmt { $1 }
-  | lvalue ASSIGN expression SEMI { CAssign ($1, $3) }
-  | expression SEMI { CDiscarding $1 }
-  | CASE expression OF when_stmt* END CASE SEMI { CCase ($2, $4) }
-  | WHILE expression DO block END WHILE SEMI { CWhile ($2, $4) }
-  | FOR identifier FROM expression TO expression DO block END FOR SEMI { CFor ($2, $4, $6, $8) }
+  | lvalue ASSIGN expression SEMI { CAssign (from_loc $loc, $1, $3) }
+  | expression SEMI { CDiscarding (from_loc $loc, $1) }
+  | CASE expression OF when_stmt* END CASE SEMI { CCase (from_loc $loc, $2, $4) }
+  | WHILE expression DO block END WHILE SEMI { CWhile (from_loc $loc, $2, $4) }
+  | FOR identifier FROM expression TO expression DO block END FOR SEMI { CFor (from_loc $loc, $2, $4, $6, $8) }
   | borrow_stmt { $1 }
-  | RETURN expression SEMI { CReturn $2 }
-  | SKIP SEMI { CSkip }
+  | RETURN expression SEMI { CReturn (from_loc $loc, $2) }
+  | SKIP SEMI { CSkip (from_loc $loc) }
   ;
 
 if_statement:
-  | IF expression THEN block else_clause { CIf ($2, $4, $5) }
+  | IF expression THEN block else_clause { CIf (from_loc $loc, $2, $4, $5) }
   ;
 
 else_clause:
-  | ELSE IF expression THEN block else_clause { CIf ($3, $5, $6) }
+  | ELSE IF expression THEN block else_clause { CIf (from_loc $loc, $3, $5, $6) }
   | ELSE block END IF SEMI { $2 }
-  | END IF SEMI { CSkip }
+  | END IF SEMI { CSkip (from_loc $loc) }
   ;
 
 let_stmt:
@@ -320,11 +321,11 @@ let_stmt:
   ;
 
 let_simple:
-  | LET identifier COLON typespec ASSIGN expression SEMI { CLet ($2, $4, $6) }
+  | LET identifier COLON typespec ASSIGN expression SEMI { CLet (from_loc $loc, $2, $4, $6) }
   ;
 
 let_destructure:
-  | LET LCURLY p=parameter_list RCURLY ASSIGN e=expression SEMI { CDestructure (List.map (fun (ConcreteParam (n, t)) -> (n, t)) p, e) }
+  | LET LCURLY p=parameter_list RCURLY ASSIGN e=expression SEMI { CDestructure (from_loc $loc, List.map (fun (ConcreteParam (n, t)) -> (n, t)) p, e) }
   ;
 
 lvalue:
@@ -341,15 +342,15 @@ borrow_stmt:
   ;
 
 read_borrow_stmt:
-  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b; mode=ReadBorrow } }
+  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=ReadBorrow } }
   ;
 
 mutable_borrow_stmt:
-  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { original=o; rename=n; region=r; body=b; mode=WriteBorrow } }
+  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=WriteBorrow } }
   ;
 
 block:
-  | blocklist { CBlock $1 }
+  | blocklist { CBlock (from_loc $loc, $1) }
 
 blocklist:
   | statement blocklist { $1 :: $2 }
@@ -364,9 +365,9 @@ expression:
   ;
 
 atomic_expression:
-  | NIL { CNilConstant }
-  | TRUE { CBoolConstant true }
-  | FALSE { CBoolConstant false }
+  | NIL { CNilConstant (from_loc $loc) }
+  | TRUE { CBoolConstant (from_loc $loc, true) }
+  | FALSE { CBoolConstant (from_loc $loc, false) }
   | int_constant { $1 }
   | float_constant { $1 }
   | string_constant { $1 }
@@ -376,28 +377,28 @@ atomic_expression:
   ;
 
 int_constant:
-  | DEC_CONSTANT { CIntConstant (remove_char $1 '\'') }
-  | HEX_CONSTANT { CIntConstant (string_of_int (parse_hex (remove_leading (remove_char $1 '\'') 2))) }
-  | BIN_CONSTANT { CIntConstant (string_of_int (parse_bin (remove_leading (remove_char $1 '\'') 2))) }
-  | OCT_CONSTANT { CIntConstant (string_of_int (parse_oct (remove_leading (remove_char $1 '\'') 2))) }
-  | CHAR_CONSTANT { CIntConstant (string_of_int (parse_ascii_char (remove_char $1 '\''))) }
+  | DEC_CONSTANT { CIntConstant (from_loc $loc, remove_char $1 '\'') }
+  | HEX_CONSTANT { CIntConstant (from_loc $loc, string_of_int (parse_hex (remove_leading (remove_char $1 '\'') 2))) }
+  | BIN_CONSTANT { CIntConstant (from_loc $loc, string_of_int (parse_bin (remove_leading (remove_char $1 '\'') 2))) }
+  | OCT_CONSTANT { CIntConstant (from_loc $loc, string_of_int (parse_oct (remove_leading (remove_char $1 '\'') 2))) }
+  | CHAR_CONSTANT { CIntConstant (from_loc $loc, string_of_int (parse_ascii_char (remove_char $1 '\''))) }
   ;
 
 float_constant:
-  | FLOAT_CONSTANT { CFloatConstant (remove_char $1 '\'') }
+  | FLOAT_CONSTANT { CFloatConstant (from_loc $loc, remove_char $1 '\'') }
   ;
 
 string_constant:
-  | STRING_CONSTANT { CStringConstant $1 }
-  | TRIPLE_STRING_CONSTANT { CStringConstant (process_triple_string $1) }
+  | STRING_CONSTANT { CStringConstant (from_loc $loc, $1) }
+  | TRIPLE_STRING_CONSTANT { CStringConstant (from_loc $loc, process_triple_string $1) }
   ;
 
 variable:
-  | identifier { CVariable $1 }
+  | identifier { CVariable (from_loc $loc, $1) }
   ;
 
 funcall:
-  | identifier argument_list { CFuncall ($1, $2) }
+  | identifier argument_list { CFuncall (from_loc $loc, $1, $2) }
   ;
 
 parenthesized_expr:
@@ -424,20 +425,20 @@ named_arg:
 compound_expression:
   | path { $1 }
   | path_ref { $1 }
-  | atomic_expression comp_op atomic_expression { CComparison ($2, $1, $3) }
-  | atomic_expression AND atomic_expression { CConjunction ($1, $3) }
-  | atomic_expression OR atomic_expression { CDisjunction ($1, $3) }
-  | NOT atomic_expression { CNegation $2 }
+  | atomic_expression comp_op atomic_expression { CComparison (from_loc $loc, $2, $1, $3) }
+  | atomic_expression AND atomic_expression { CConjunction (from_loc $loc, $1, $3) }
+  | atomic_expression OR atomic_expression { CDisjunction (from_loc $loc, $1, $3) }
+  | NOT atomic_expression { CNegation (from_loc $loc, $2) }
   | arith_expr { $1 }
-  | IF expression THEN expression ELSE expression { CIfExpression ($2, $4, $6) }
+  | IF expression THEN expression ELSE expression { CIfExpression (from_loc $loc, $2, $4, $6) }
   ;
 
 path:
-  | initial=atomic_expression elems=path_rest+ { CPath (initial, elems) }
+  | initial=atomic_expression elems=path_rest+ { CPath (from_loc $loc, initial, elems) }
   ;
 
 path_ref:
-  | ADDRESS_OF initial=atomic_expression elems=path_rest+ { CPathRef (initial, elems) }
+  | ADDRESS_OF initial=atomic_expression elems=path_rest+ { CPathRef (from_loc $loc, initial, elems) }
   ;
 
 path_rest:
@@ -468,16 +469,16 @@ comp_op:
   ;
 
 arith_expr:
-  | term PLUS arith_expr { CArith (Add, $1, $3) }
-  | term MINUS arith_expr { CArith (Subtract, $1, $3) }
+  | term PLUS arith_expr { CArith (from_loc $loc, Add, $1, $3) }
+  | term MINUS arith_expr { CArith (from_loc $loc, Subtract, $1, $3) }
   | term { $1 }
   ;
 
 term:
-  | factor MUL term { CArith (Multiply, $1, $3) }
-  | factor DIV term { CArith (Divide, $1, $3) }
+  | factor MUL term { CArith (from_loc $loc, Multiply, $1, $3) }
+  | factor DIV term { CArith (from_loc $loc, Divide, $1, $3) }
   | factor  { $1 }
-  | MINUS factor  { CArith (Subtract, CIntConstant "0", $2) }
+  | MINUS factor  { CArith (from_loc $loc, Subtract, CIntConstant (from_loc $loc, "0"), $2) }
   ;
 
 factor:
