@@ -38,8 +38,9 @@ let position_text s lexbuf =
   in
   previous_str ^ current_line ^ "\n" ^ second_line_prefix ^ second_line ^ "\n" ^ nextline_str
 
-let parse' f s _ =
+let parse' f s (filename: string) =
   let lexbuf = Lexing.from_string s in
+  Lexing.set_filename lexbuf filename;
   try
     f Lexer.token lexbuf
   with Parser.Error ->
