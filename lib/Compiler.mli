@@ -6,9 +6,16 @@ val empty_compiler : compiler
 
 val compiler_code : compiler -> string
 
-val compile_mod : compiler -> string -> string -> compiler
+type module_source = ModuleSource of {
+      int_filename: string;
+      int_code: string;
+      body_filename: string;
+      body_code: string
+    }
 
-val compile_multiple : compiler -> (string * string) list -> compiler
+val compile_mod : compiler -> module_source -> compiler
+
+val compile_multiple : compiler -> module_source list -> compiler
 
 val compile_entrypoint : compiler -> module_name -> identifier -> compiler
 
