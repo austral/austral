@@ -90,6 +90,6 @@ let main (args: string list): unit =
   try
     main' args;
     exit 0
-  with Programmer_error msg ->
-    Printf.eprintf "Error: %s" msg;
+  with Austral_error error ->
+    Printf.eprintf "%s" (render_error error);
     exit (-1)

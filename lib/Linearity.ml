@@ -5,7 +5,7 @@ open Tast
 open Error
 
 let lerr msg =
-  raise (Linearity_error msg)
+  err msg
 
 let type_is_write_ref = function
   | WriteRef _ ->
