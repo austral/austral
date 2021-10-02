@@ -1,4 +1,5 @@
 open Lexing
+open Cst
 open Error
 
 let colnum pos =
@@ -37,8 +38,9 @@ let position_text s lexbuf =
   in
   previous_str ^ current_line ^ "\n" ^ second_line_prefix ^ second_line ^ "\n" ^ nextline_str
 
-let parse' f s =
+let parse' f s (filename: string) =
   let lexbuf = Lexing.from_string s in
+  Lexing.set_filename lexbuf filename;
   try
     f Lexer.token lexbuf
   with Parser.Error ->
@@ -46,14 +48,14 @@ let parse' f s =
      | Programmer_error msg ->
         err ("Parse error (" ^ (pos_string lexbuf.lex_curr_p) ^ "): \n" ^ msg ^ "\n" ^ (position_text s lexbuf))
 
-let parse_module_int s =
-  parse' Parser.module_int s
+let parse_module_int (s:string) (filename: string): concrete_module_interface  =
+  parse' Parser.module_int s filename
 
-let parse_module_body s =
-  parse' Parser.module_body s
+let parse_module_body (s: string) (filename: string): concrete_module_body =
+  parse' Parser.module_body s filename
 
 let parse_stmt s =
-  parse' Parser.standalone_statement s
+  parse' Parser.standalone_statement s ""
 
 let parse_expr s =
-  parse' Parser.standalone_expression s
+  parse' Parser.standalone_expression s ""

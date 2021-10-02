@@ -41,10 +41,18 @@ let parse_arg (s: string): arg =
   | _ ->
      err "Invalid command line argument."
 
+let make_module_source int_filename body_filename =
+  ModuleSource {
+      int_filename = int_filename;
+      int_code = read_file_to_string int_filename;
+      body_filename = body_filename;
+      body_code = read_file_to_string body_filename
+    }
+
 let compile_main (args: string list): unit =
   let args' = List.map parse_arg args in
   let paths = List.filter_map (fun a -> match a with (ModuleArg (i,b)) -> Some (i,b) | _ -> None) args' in
-  let contents = List.map (fun (i, b) -> (read_file_to_string i, read_file_to_string b)) paths in
+  let contents = List.map (fun (i, b) -> make_module_source i b) paths in
   let entrypoint = List.filter_map (fun a -> match a with (EntrypointArg (m,i)) -> Some (m, i) | _ -> None) args' in
   let output = List.filter_map (fun a -> match a with (OutputArg path) -> Some path | _ -> None) args' in
   let compiler = compile_multiple empty_compiler contents in

@@ -34,9 +34,16 @@ let cmenv (Compiler (m, _)) = m
 
 let compiler_code (Compiler (_, c)) = c
 
-let rec compile_mod c is bs =
-  let ci = parse_module_int is
-  and cb = parse_module_body bs
+type module_source = ModuleSource of {
+      int_filename: string;
+      int_code: string;
+      body_filename: string;
+      body_code: string
+    }
+
+let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; body_code }) =
+  let ci = parse_module_int int_code int_filename
+  and cb = parse_module_body body_code body_filename
   and menv = cmenv c in
   let ci' = append_import_to_interface ci pervasive_imports
   and cb' = append_import_to_body cb pervasive_imports in
@@ -50,7 +57,7 @@ let rec compile_mod c is bs =
 
 let rec compile_multiple c modules =
   match modules with
-  | (is, bs)::rest -> compile_multiple (compile_mod c is bs) rest
+  | m::rest -> compile_multiple (compile_mod c m) rest
   | [] -> c
 
 let rec check_entrypoint_validity menv qi =
@@ -104,8 +111,11 @@ let empty_compiler =
   let c = Compiler (menv, prelude) in
   c
 
+let fake_mod_source (is: string) (bs: string): module_source =
+  ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
+
 let compile_and_run (modules: (string * string) list) (entrypoint: string): (int * string) =
-  let compiler = compile_multiple empty_compiler modules in
+  let compiler = compile_multiple empty_compiler (List.map (fun (i, b) -> fake_mod_source i b) modules) in
   let (entrypoint_mod, entrypoint_name) =
     let ss = String.split_on_char ':' entrypoint in
     match ss with
