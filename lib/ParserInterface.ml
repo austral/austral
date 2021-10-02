@@ -1,4 +1,5 @@
 open Lexing
+open Cst
 open Error
 
 let colnum pos =
@@ -46,10 +47,10 @@ let parse' f s =
      | Programmer_error msg ->
         err ("Parse error (" ^ (pos_string lexbuf.lex_curr_p) ^ "): \n" ^ msg ^ "\n" ^ (position_text s lexbuf))
 
-let parse_module_int s =
+let parse_module_int (s:string): concrete_module_interface  =
   parse' Parser.module_int s
 
-let parse_module_body s =
+let parse_module_body (s: string): concrete_module_body =
   parse' Parser.module_body s
 
 let parse_stmt s =
