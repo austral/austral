@@ -11,6 +11,8 @@ open CppRenderer
 open Cst
 open Type
 open Error
+open Util
+open Filename
 
 let append_import_to_interface ci import =
   let (ConcreteModuleInterface (mn, imports, decls)) = ci in
@@ -101,3 +103,22 @@ let empty_compiler =
   let menv = put_module menv pervasive_module in
   let c = Compiler (menv, prelude) in
   c
+
+let compile_and_run (modules: (string * string) list) (entrypoint: string): (int * string) =
+  let compiler = compile_multiple empty_compiler modules in
+  let (entrypoint_mod, entrypoint_name) =
+    let ss = String.split_on_char ':' entrypoint in
+    match ss with
+    | [mn; i] ->
+       (make_mod_name mn, make_ident i)
+    | _ ->
+       err "Bad entrypoint format."
+  in
+  let compiler = compile_entrypoint compiler entrypoint_mod entrypoint_name in
+  let code = compiler_code compiler in
+  let code_path = temp_file "code" ".cpp"
+  and bin_path = temp_file "program" ".exe" in
+  write_string_to_file code_path code;
+  let _ = compile_cpp_code code_path bin_path in
+  let (CommandOutput { code; stdout; _ }) = run_command bin_path in
+  (code, stdout)

@@ -6,6 +6,7 @@ val string_implode : char list -> string
 
 val read_file_to_string : string -> string
 
+(* The first argument is the path, the second the contents. *)
 val write_string_to_file : string -> string -> unit
 
 val remove_char : string -> char -> string
@@ -32,3 +33,6 @@ type command_output =
 
 (* Run a shell command, and return its output. *)
 val run_command : string -> command_output
+
+(* Call the C++ compiler on the given file. *)
+val compile_cpp_code : string -> string -> command_output

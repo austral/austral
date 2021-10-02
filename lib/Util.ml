@@ -133,7 +133,7 @@ type command_output =
   CommandOutput of { command: string; code: int; stdout: string; stderr: string }
 
 let run_command (command: string): command_output =
-  let (stdout_chan, stdin_chan, stderr_chan) = open_process_full command [||] in
+  let (stdout_chan, stdin_chan, stderr_chan) = open_process_full command [|"PATH=" ^ (getenv "PATH")|] in
   let stdout = read_stream_to_string stdout_chan
   and stderr = read_stream_to_string stderr_chan in
   let proc_stat = close_process_full (stdout_chan, stdin_chan, stderr_chan) in
@@ -143,3 +143,12 @@ let run_command (command: string): command_output =
       stdout = stdout;
       stderr = stderr
     }
+
+let compile_cpp_code (source_path: string) (output_path: string): command_output =
+  let cmd = "g++ -std=c++11 " ^ source_path ^ " -o " ^ output_path in
+  let o = run_command cmd in
+  let (CommandOutput { command; code; stdout; stderr }) = o in
+  if code <> 0 then
+    err ("Error when running C++ compiler.\n  Command: " ^ command ^ "\n  Exit code: " ^ (string_of_int code) ^ "\n  Standard output:\n" ^ stdout ^ "\n  Standard error:\n" ^ stderr ^ "\n")
+  else
+    o
