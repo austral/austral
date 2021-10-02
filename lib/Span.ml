@@ -78,8 +78,8 @@ let span_text (code: string) (Span { startp; endp; _}): string =
         (line_num, line))
       collected_lines
   in
-  (* What's the largest line number? *)
-  let largest_line_num: int = List.fold_left max 0 (List.map (fun (ln, _) -> ln) numbered_lines) in
+  (* What's the size in characters of the largest line number? *)
+  let largest_line_num: int = List.fold_left max 0 (List.map (fun (ln, _) -> (String.length (string_of_int ln))) numbered_lines) in
   (* Render the lines. *)
   let rendered_lines: string list =
     List.map (fun (line_num, line) ->
