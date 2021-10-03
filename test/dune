@@ -1,3 +1,3 @@
 (tests
- (names ExpressionParserTest TypeMatchTest UtilTest ExampleProgramTest)
+ (names ExpressionParserTest TypeMatchTest UtilTest ExampleProgramTest LinearityTest)
  (libraries austral_core ounit2))
