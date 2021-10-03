@@ -136,6 +136,15 @@ function Main(root: Root_Capability): Root_Capability;
 
 Finally, the `--output` option is just the path to dump the compiled C++ to.
 
+There's also a command to typecheck a program without outputting anything. Only `--module` flags are accepted:
+
+```bash
+$ austral typecheck \
+    --module=src/A \
+    --module=src/B \
+    --module=src/C
+```
+
 ## Status
 
 1. The bootstrapping compiler, written in OCaml, is implemented. It has a couple

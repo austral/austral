@@ -58,7 +58,7 @@ let make_module_source int_filename body_filename =
       body_code = read_file_to_string body_filename
     }
 
-let compile_main (args: string list): unit =
+let parse_source_files (args: string list): (module_source list * string SourceMap.t) =
   (* Parse arg list *)
   let args' = List.map parse_arg args in
   let paths = List.filter_map (fun a -> match a with (ModuleArg (i,b)) -> Some (i,b) | _ -> None) args' in
@@ -78,7 +78,12 @@ let compile_main (args: string list): unit =
       (SourceMap.empty)
       source_maps
   in
+  (contents, source_map)
+
+let compile_main (args: string list): unit =
+  let (contents, source_map) = parse_source_files args in
   try
+    let args' = List.map parse_arg args in
     let entrypoint = List.filter_map (fun a -> match a with (EntrypointArg (m,i)) -> Some (m, i) | _ -> None) args' in
     let output = List.filter_map (fun a -> match a with (OutputArg path) -> Some path | _ -> None) args' in
     let compiler = compile_multiple empty_compiler contents in
@@ -111,6 +116,22 @@ let compile_main (args: string list): unit =
     Printf.eprintf "%s" (render_error error code);
     exit (-1)
 
+let typecheck_main (args: string list): unit =
+  let (contents, source_map) = parse_source_files args in
+  try
+    let _ = compile_multiple empty_compiler contents in
+    ()
+  with Austral_error error ->
+    let filename = error_filename error in
+    let code: string option =
+      match filename with
+      | Some filename ->
+         (SourceMap.find_opt filename source_map)
+      | None ->
+         None
+    in
+    Printf.eprintf "%s" (render_error error code);
+    exit (-1)
 
 let main' (args: string list): unit =
   match args with
@@ -118,8 +139,10 @@ let main' (args: string list): unit =
      (match first with
       | "compile" ->
          compile_main args
+      | "typecheck" ->
+         typecheck_main args
       | _ ->
-         err ("Unknown command: " ^ first))
+         err ("Unknown command: " ^ first ^ "\n"))
   | _ ->
      err "Invalid invocation."
 
