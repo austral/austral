@@ -300,6 +300,14 @@ end module.
 |code}
   and b = {code|
 
+import Austral.Memory (
+    Pointer,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
+
 module body Example is
     pragma Unsafe_Module;
 
