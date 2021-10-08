@@ -58,6 +58,8 @@ end module body.
   in
   try
     let _ = compile_and_run [(i, b)] "Example:Main" in
+    (* TODO: Need a way to ensure this is actually a linearity error and not an
+       unrelated e.g. syntax error. *)
     assert_failure "This should have failed."
   with
     Austral_error _ ->
