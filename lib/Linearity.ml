@@ -256,17 +256,21 @@ let rec check_linearity (stmt: tstmt): unit =
      ()
   | TLet (n, t, _, b) ->
      let u = type_universe t in
+     (* Check this var in the body *)
      if universe_linear_ish u then
        check_consistency n (type_is_write_ref t) b
      else
-       ()
+       ();
+     (* Check the body for other linear vars *)
+     check_linearity b
   | TDestructure (bs, _, b) ->
      let check' (n, t) =
          let u = type_universe t in
          if universe_linear_ish u then
            check_consistency n (type_is_write_ref t) b
          else
-           ()
+           ();
+         check_linearity b
      in
      let _ = List.map check' bs in ()
   | TAssign _ ->
@@ -275,7 +279,18 @@ let rec check_linearity (stmt: tstmt): unit =
      check_linearity tb;
      check_linearity fb
   | TCase (_, whens) ->
-     let _ = List.map (fun (TypedWhen (_, _, b)) -> check_linearity b) whens in
+     let _ = List.map (fun (TypedWhen (_, params, b)) ->
+                 (* Check the individual bound values *)
+                 let _ = List.map (fun (ValueParameter (name, ty)) ->
+                             let u = type_universe ty in
+                             if universe_linear_ish u then
+                               check_consistency name (type_is_write_ref ty) b
+                             else
+                               ())
+                           params
+                 in
+                 (* Check the body *)
+                 check_linearity b) whens in
      ()
   | TWhile (_, b) ->
      check_linearity b
