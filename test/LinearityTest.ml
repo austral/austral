@@ -132,12 +132,46 @@ end module body.
     Austral_error _ ->
     assert_bool "Passed" true
 
+(* Consume a linear record twice through unwrapping. This fails. *)
+let test_unwrap_twice _ =
+  let i = {code|
+
+module Example is
+    function Main(root: Root_Capability): Root_Capability;
+end module.
+
+|code}
+  and b = {code|
+
+module body Example is
+    record R : Linear is
+        x: Integer_32;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        let r: R := R(x => 32);
+        let { x: Integer_32 } := r;
+        let { x: Integer_32 } := r;
+        return root;
+    end;
+end module body.
+
+|code}
+  in
+  try
+    let _ = compile_and_run [(i, b)] "Example:Main" in
+    assert_failure "This should have failed."
+  with
+    Austral_error _ ->
+    assert_bool "Passed" true
+
 let suite =
   "Linearity checker tests" >::: [
       "Destructure record" >:: test_destructure_record;
       "Forget record" >:: test_forget_record;
       "Consume record in if statement" >:: test_consume_if;
-      "Consume record in one branch of an if statement" >:: test_consume_if_asymmetrically
+      "Consume record in one branch of an if statement" >:: test_consume_if_asymmetrically;
+      "Consume by unwrapping twice" >:: test_unwrap_twice
     ]
 
 let _ = run_test_tt_main suite
