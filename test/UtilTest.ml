@@ -9,9 +9,20 @@ let test_run_command _ =
   eq "derp" stdout;
   eq "" stderr
 
+let test_search_replace _ =
+  let out = search_replace {
+                text = "The quick brown fox.";
+                search = "quick";
+                replacement = "slow"
+              }
+  in
+  print_endline out;
+  assert_equal out "The slow brown fox."
+
 let suite =
   "Utilities" >::: [
-      "run_command" >:: test_run_command
+      "run_command" >:: test_run_command;
+      "search_replace" >:: test_search_replace
     ]
 
 let _ = run_test_tt_main suite

@@ -1,6 +1,7 @@
 open Common
 open Escape
 open Cpp
+open Util
 
 type indentation = Indentation of int
 
@@ -220,6 +221,29 @@ and render_expr = function
      (e arr) ^ "[" ^ (e idx) ^ "]"
   | CAddressOf exp ->
      "&" ^ (e exp)
+  | CEmbed (ty, expr, args) ->
+     let strs = List.map render_expr args in
+     (* the `expr` has a format like "derp $1 $2", so iterate over the list of
+        arg swith an index, and replace the corresponding dollar sign marker if
+        any *)
+     let replace_index (text: string) (idx: int) (replacement: string): string =
+       let marker = "$" ^ (string_of_int idx) in
+       search_replace {
+           text = text;
+           search = marker;
+           replacement = replacement
+         }
+     in
+     let rec replace_all (text: string) (strs: string list) (idx: int): string =
+       match strs with
+       | first::rest ->
+          let text' = replace_index text idx first in
+          replace_all text' rest (idx + 1)
+       | [] ->
+          text
+     in
+     let expr' = replace_all expr strs 1 in
+     "((" ^ (render_type ty) ^ ")(" ^ expr' ^ "))"
 
 and e expr = render_expr expr
 

@@ -46,6 +46,13 @@ let replace_char (s: string) (c: char) (r: string): string =
   in
   string_implode (List.concat (List.map replace (string_explode s)))
 
+type replacement = { text: string; search: string; replacement: string }
+
+let search_replace (r: replacement): string =
+  let { text: string; search: string; replacement: string } = r in
+  let re = Str.regexp_string search in
+  Str.global_replace re replacement text
+
 let remove_leading (s: string) (n: int): string =
   String.sub s n ((String.length s) - n)
 

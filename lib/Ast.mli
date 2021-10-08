@@ -45,6 +45,7 @@ and aexpr =
   | IfExpression of aexpr * aexpr * aexpr
   | Path of aexpr * path_elem list
   | PathRef of aexpr * path_elem list
+  | Embed of qtypespec * string * aexpr list
 
 and abstract_when =
   | AbstractWhen of identifier * (identifier * qtypespec) list * astmt

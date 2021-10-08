@@ -32,6 +32,7 @@ type cpp_expr =
   | CPointerStructAccessor of cpp_expr * string
   | CIndex of cpp_expr * cpp_expr
   | CAddressOf of cpp_expr
+  | CEmbed of cpp_ty * string * cpp_expr list
 
 type cpp_stmt =
   | CLet of string * cpp_ty * cpp_expr

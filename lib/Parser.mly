@@ -91,6 +91,8 @@ open Span
 %token <string> CHAR_CONSTANT
 %token <string> FLOAT_CONSTANT
 %token <string> IDENTIFIER
+/* Specials */
+%token EMBED
 /* etc. */
 %token EOF
 
@@ -374,6 +376,7 @@ atomic_expression:
   | variable { $1 }
   | funcall { $1 }
   | parenthesized_expr { $1 }
+  | intrinsic { $1 }
   ;
 
 int_constant:
@@ -421,6 +424,11 @@ named_arglist:
 
 named_arg:
   | identifier RIGHT_ARROW expression { ($1, $3) }
+
+intrinsic:
+  | EMBED LPAREN ty=typespec COMMA exp=STRING_CONSTANT COMMA args=separated_list(COMMA, expression) RPAREN
+    { CEmbed (from_loc $loc, ty, exp, args) }
+  ;
 
 compound_expression:
   | path { $1 }

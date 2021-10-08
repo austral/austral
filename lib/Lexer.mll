@@ -131,6 +131,8 @@ rule token = parse
   | oct_constant { OCT_CONSTANT (Lexing.lexeme lexbuf) }
   | char_constant { CHAR_CONSTANT (Lexing.lexeme lexbuf) }
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
+  (* Specials *)
+  | "@embed" { EMBED }
   (* etc. *)
   | whitespace { token lexbuf }
   | newline { advance_line lexbuf; token lexbuf }

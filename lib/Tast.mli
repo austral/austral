@@ -64,6 +64,7 @@ and texpr =
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
   | TPath of texpr * typed_path_elem list
   | TPathRef of texpr * typed_path_elem list * ty * bool
+  | TEmbed of ty * string * texpr list
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt

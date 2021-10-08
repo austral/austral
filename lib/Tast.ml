@@ -65,6 +65,7 @@ and texpr =
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
   | TPath of texpr * typed_path_elem list
   | TPathRef of texpr * typed_path_elem list * ty * bool
+  | TEmbed of ty * string * texpr list
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt
@@ -147,6 +148,8 @@ let rec get_type = function
      let last = List.nth elems ((List.length elems) - 1) in
      path_elem_type last
   | TPathRef (_, _, ty, _) ->
+     ty
+  | TEmbed (ty, _, _) ->
      ty
 
 and path_elem_type = function

@@ -106,6 +106,8 @@ let rec count_appearances (name: identifier) (expr: texpr) =
            count_appearances name ie)
      in
      e' + (sum (List.map ca_path elems))
+  | TEmbed (_, _, args) ->
+     sum (List.map ca args)
 
 (* Represents the state of a linear variable *)
 type state =

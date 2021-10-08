@@ -18,8 +18,13 @@ open BuiltIn
 open Util
 open Error
 
-let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
-  let aug = augment_expr module_name menv lexenv None in
+(* Since the semantic extraction pass has already happened, we can simplify the
+   call to `parse_type` by passing an empty list of local type signatures. *)
+let parse_typespec (menv: menv) (rm: region_map) (typarams: type_parameter list) (ty: qtypespec): ty =
+  parse_type menv [] rm typarams ty
+
+let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
+  let aug = augment_expr module_name menv rm typarams lexenv None in
   match expr with
   | NilConstant ->
      TNilConstant
@@ -38,7 +43,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
       | None ->
          err ("I can't find the variable named " ^ (ident_string (original_name name))))
   | FunctionCall (name, args) ->
-     augment_call module_name menv asserted_ty name (augment_arglist module_name menv lexenv None args)
+     augment_call module_name menv asserted_ty name (augment_arglist module_name menv rm typarams lexenv None args)
   | ArithmeticExpression (op, lhs, rhs) ->
      let lhs' = aug lhs
      and rhs' = aug rhs in
@@ -108,7 +113,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
        err "The type of the condition in an if expression must be a boolean."
   | Path (e, elems) ->
      let e' = aug e in
-     let elems' = augment_path menv module_name lexenv (get_type e') elems in
+     let elems' = augment_path menv module_name rm typarams lexenv (get_type e') elems in
      let path' = TPath (e', elems') in
      let universe = type_universe (get_type path') in
      if universe = FreeUniverse then
@@ -126,7 +131,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
                               | _ ->
                                  err "The initial expression of a path a read reference or write reference")
      in
-     let elems' = augment_path menv module_name lexenv (get_type e') elems in
+     let elems' = augment_path menv module_name rm typarams lexenv (get_type e') elems in
      let path' = TPath (e', elems') in
      (* If `p` is a path that begins in a value that is reference or writable reference in a region `R`, and ends in a value of type `T`, then:
 
@@ -158,6 +163,12 @@ let rec augment_expr (module_name: module_name) (menv: menv) (lexenv: lexenv) (a
              (WriteRef (path_ty, region), false))
      in
      TPathRef (e', elems', path_ty', is_pointer)
+  | Embed (ty, expr, args) ->
+     TEmbed (
+         parse_typespec menv rm typarams ty,
+         expr,
+         List.map aug args
+       )
 
 and is_bool e =
   match get_type e with
@@ -174,26 +185,26 @@ and is_float_constant e =
   | FloatConstant _ -> true
   | _ -> false
 
-and augment_arglist (module_name: module_name) (menv: menv) (lexenv: lexenv) (asserted_ty: ty option) (args: abstract_arglist): typed_arglist =
-  let aug = augment_expr module_name menv lexenv asserted_ty in
+and augment_arglist (module_name: module_name) (menv: menv) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (asserted_ty: ty option) (args: abstract_arglist): typed_arglist =
+  let aug = augment_expr module_name menv rm typarams lexenv asserted_ty in
   match args with
   | Positional args' ->
      TPositionalArglist (List.map aug args')
   | Named pairs ->
      TNamedArglist (List.map (fun (n, v) -> (n, aug v)) pairs)
 
-and augment_path (menv: menv) (module_name: module_name) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
+and augment_path (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
   | [elem] ->
-     [augment_path_elem menv module_name lexenv head_ty elem]
+     [augment_path_elem menv module_name rm typarams lexenv head_ty elem]
   | elem::rest ->
-     let elem' = augment_path_elem menv module_name lexenv head_ty elem in
-     let rest' = augment_path menv module_name lexenv (path_elem_type elem') rest in
+     let elem' = augment_path_elem menv module_name rm typarams lexenv head_ty elem in
+     let rest' = augment_path menv module_name rm typarams lexenv (path_elem_type elem') rest in
      elem' :: rest'
   | [] ->
      err "Path is empty"
 
-and augment_path_elem (menv: menv) (module_name: module_name) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
+and augment_path_elem (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
   match elem with
   | SlotAccessor slot_name ->
      (match head_ty with
@@ -220,7 +231,7 @@ and augment_path_elem (menv: menv) (module_name: module_name) (lexenv: lexenv) (
       | _ ->
          err "Not a record type")
   | ArrayIndex ie ->
-     let ie' = augment_expr module_name menv lexenv None ie in
+     let ie' = augment_expr module_name menv rm typarams lexenv None ie in
      (match head_ty with
       | Array (elem_ty, _) ->
          TArrayIndex (ie', elem_ty)
@@ -621,11 +632,6 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
          ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))*)
     ()
 
-(* Since the semantic extraction pass has already happened, we can simplify the
-   call to `parse_type` by passing an empty list of local type signatures. *)
-let parse_typespec (menv: menv) (rm: region_map) (typarams: type_parameter list) (ty: qtypespec): ty =
-  parse_type menv [] rm typarams ty
-
 let is_boolean = function
   | Boolean -> true
   | _ -> false
@@ -651,7 +657,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      TSkip
   | ALet (name, ty, value, body) ->
      let expected_ty = parse_typespec menv rm typarams ty in
-     let value' = augment_expr module_name menv lexenv (Some expected_ty) value in
+     let value' = augment_expr module_name menv rm typarams lexenv (Some expected_ty) value in
      let bindings = match_type_with_value expected_ty value' in
      let ty'' = replace_variables bindings (get_type value') in
      let lexenv' = push_var lexenv name ty'' in
@@ -663,7 +669,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      print_endline ("\tResolved: " ^ (show_ty ty'')); *)
      TLet (name, ty'', value', body')
   | ADestructure (bindings, value, body) ->
-     let value' = augment_expr module_name menv lexenv None value in
+     let value' = augment_expr module_name menv rm typarams lexenv None value in
      (* Check: the value must be a public record type *)
      let rec_ty = get_type value' in
      (match rec_ty with
@@ -703,8 +709,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | AAssign (LValue (var, elems), value) ->
      (match get_var lexenv var with
       | Some var_ty ->
-         let elems = augment_lvalue_path menv module_name lexenv var_ty elems in
-         let value = augment_expr module_name menv lexenv None value in
+         let elems = augment_lvalue_path menv module_name rm typarams lexenv var_ty elems in
+         let value = augment_expr module_name menv rm typarams lexenv None value in
          let path = TPath (value, elems) in
          let universe = type_universe (get_type path) in
          if universe = FreeUniverse then
@@ -714,7 +720,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       | None ->
          err "No var with this name.")
   | AIf (c, t, f) ->
-     let c' = augment_expr module_name menv lexenv None c in
+     let c' = augment_expr module_name menv rm typarams lexenv None c in
      if is_boolean (get_type c') then
        TIf (c', augment_stmt ctx t, augment_stmt ctx f)
      else
@@ -727,7 +733,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
         3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
         4. Iterate over the cases, and ensure the bindings are correct.
       *)
-     let expr' = augment_expr module_name menv lexenv None expr in
+     let expr' = augment_expr module_name menv rm typarams lexenv None expr in
      let ty = get_type expr' in
      let (union_ty, cases) = get_union_type_definition module_name menv (get_type expr') in
      let typebindings = match_type union_ty ty in
@@ -741,14 +747,14 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      else
        err "Non-exhaustive case statement."
   | AWhile (c, body) ->
-     let c' = augment_expr module_name menv lexenv None c in
+     let c' = augment_expr module_name menv rm typarams lexenv None c in
      if is_boolean (get_type c') then
        TWhile (c', augment_stmt ctx body)
      else
        err "The type of the condition in a while loop must be a boolean"
   | AFor { name; initial; final; body } ->
-     let i' = augment_expr module_name menv lexenv None initial
-     and f' = augment_expr module_name menv lexenv None final in
+     let i' = augment_expr module_name menv rm typarams lexenv None initial
+     and f' = augment_expr module_name menv rm typarams lexenv None final in
      if is_compatible_with_size_type i' then
        if is_compatible_with_size_type f' then
          let lexenv' = push_var lexenv name size_type in
@@ -792,29 +798,29 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      TBlock (augment_stmt ctx f,
              augment_stmt ctx r)
   | ADiscarding e ->
-     let e' = augment_expr module_name menv lexenv None e in
+     let e' = augment_expr module_name menv rm typarams lexenv None e in
      let u = type_universe (get_type e') in
      if ((u = LinearUniverse) || (u = TypeUniverse)) then
        err "Discarding a linear value"
      else
        TDiscarding e'
   | AReturn e ->
-     let e' = augment_expr module_name menv lexenv None e in
+     let e' = augment_expr module_name menv rm typarams lexenv None e in
      let _ = match_type rt (get_type e') in
      TReturn e'
 
-and augment_lvalue_path (menv: menv) (module_name: module_name) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
+and augment_lvalue_path (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
   | [elem] ->
-     [augment_lvalue_path_elem menv module_name lexenv head_ty elem]
+     [augment_lvalue_path_elem menv module_name rm typarams lexenv head_ty elem]
   | elem::rest ->
-     let elem' = augment_lvalue_path_elem menv module_name lexenv head_ty elem in
-     let rest' = augment_lvalue_path menv module_name lexenv (path_elem_type elem') rest in
+     let elem' = augment_lvalue_path_elem menv module_name rm typarams lexenv head_ty elem in
+     let rest' = augment_lvalue_path menv module_name rm typarams lexenv (path_elem_type elem') rest in
      elem' :: rest'
   | [] ->
      err "Path is empty"
 
-and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
+and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
   match elem with
   | SlotAccessor slot_name ->
      (match head_ty with
@@ -835,7 +841,7 @@ and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (lexenv: le
       | _ ->
          err "Not a record type")
   | ArrayIndex ie ->
-     let ie' = augment_expr module_name menv lexenv None ie in
+     let ie' = augment_expr module_name menv rm typarams lexenv None ie in
      (match head_ty with
       | NamedType (name, args, _) ->
          if is_heap_array_type name then
@@ -912,7 +918,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (menv: menv)
   match decl with
   | CConstant (vis, name, ts, expr, doc) ->
      let ty = parse_typespec menv empty_region_map [] ts in
-     let expr' = augment_expr module_name menv empty_lexenv (Some ty) expr in
+     let expr' = augment_expr module_name menv empty_region_map [] empty_lexenv (Some ty) expr in
      let _ = match_type_with_value ty expr' in
      TConstant (vis, name, ty, expr', doc)
   | CTypeAlias (vis, name, typarams, universe, ts, doc) ->
