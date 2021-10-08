@@ -63,6 +63,8 @@ and abs_expr im expr =
      Path (abs_expr im e, List.map (abs_path_elem im) es)
   | CPathRef (_, e, es) ->
      PathRef (abs_expr im e, List.map (abs_path_elem im) es)
+  | CEmbed (_, ty, expr, args) ->
+     Embed (qualify_typespec im ty, expr, List.map (abs_expr im) args)
 
 and abs_when im (ConcreteWhen (name, params, body)) =
   AbstractWhen (name,
