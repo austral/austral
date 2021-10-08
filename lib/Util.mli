@@ -13,6 +13,10 @@ val remove_char : string -> char -> string
 
 val replace_char : string -> char -> string -> string
 
+type replacement = { text: string; search: string; replacement: string }
+
+val search_replace : replacement -> string
+
 val remove_leading : string -> int -> string
 
 val parse_hex : string -> int
