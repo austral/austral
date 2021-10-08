@@ -78,17 +78,17 @@ module body Example.Box is
 
     function Main(root: Root_Capability): Root_Capability is
         -- Box a value, swap it, and unwrap it.
-        let b: Option[Box[Integer_32]] := Make(101);
+        let b: Option[Box[Integer_32]] := Make('e');
         case b of
             when Some(value: Box[Integer_32]) do
-                let newbox: Box[Integer_32] := Swap_Free(value, 97);
+                let newbox: Box[Integer_32] := Swap_Free(value, 'a');
                 let contents: Integer_32 := Unbox(newbox);
                 Put_Character(contents);
             when None do
                 Abort("Unexpected.");
         end case;
         -- Box a value, read_free it and unbox it.
-        let b2: Option[Box[Integer_32]] := Make(97);
+        let b2: Option[Box[Integer_32]] := Make('a');
         case b2 of
             when Some(value: Box[Integer_32]) do
                 borrow value as value2 in rho do
@@ -100,11 +100,11 @@ module body Example.Box is
                 Abort("Unexpected.");
         end case;
         -- Box a value, store a new one through a mutable reference, and unbox it.
-        let b3: Option[Box[Integer_32]] := Make(101);
+        let b3: Option[Box[Integer_32]] := Make('e');
         case b3 of
             when Some(value: Box[Integer_32]) do
                 borrow! value as value2 in rho do
-                    Store_Free(value2, 97);
+                    Store_Free(value2, 'a');
                 end;
                 let contents: Integer_32 := Unbox(value);
                 Put_Character(contents);
@@ -112,7 +112,7 @@ module body Example.Box is
                 Abort("Unexpected.");
         end case;
         -- Box a value, load it through a reference, and unbox it.
-        let b4: Option[Box[Integer_32]] := Make(97);
+        let b4: Option[Box[Integer_32]] := Make('a');
         case b4 of
             when Some(value: Box[Integer_32]) do
                 borrow value as boxref in rho do
@@ -125,11 +125,11 @@ module body Example.Box is
                 Abort("Unexpected.");
         end case;
         -- Box a value, swap it through a mutable reference, and unbox it.
-        let b5: Option[Box[Integer_32]] := Make(101);
+        let b5: Option[Box[Integer_32]] := Make('e');
         case b5 of
             when Some(value: Box[Integer_32]) do
                 borrow! value as boxmutref in rho do
-                    Swap_Mut(boxmutref, 97);
+                    Swap_Mut(boxmutref, 'a');
                     Put_Character(Unbox(value));
                 end;
             when None do
