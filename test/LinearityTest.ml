@@ -289,6 +289,67 @@ end module body.
     Austral_error _ ->
     assert_bool "Passed" true
 
+(* Test that you can't unbox a box twice. *)
+let test_unbox_twice _ =
+  let i = {code|
+
+module Example is
+    function Main(root: Root_Capability): Root_Capability;
+end module.
+
+|code}
+  and b = {code|
+
+module body Example is
+    pragma Unsafe_Module;
+
+    record Box[T: Type]: Linear is
+        pointer: Pointer[T];
+    end;
+
+    generic [T: Type]
+    function Make(val: T): Option[Box[T]] is
+        let ptr: Option[Pointer[T]] := Allocate(val);
+        case ptr of
+            when Some(value: Pointer[T]) do
+                let box: Box[T] := Box(pointer => value);
+                let boxopt: Option[Box[T]] := Some(value => box);
+                return boxopt;
+            when None do
+                let boxopt: Option[Box[T]] := None();
+                return boxopt;
+        end case;
+    end;
+
+    generic [T: Type]
+    function Unbox(box: Box[T]): T is
+        let { pointer: Pointer[T] } := box;
+        let value: T := Load(pointer);
+        Deallocate(pointer);
+        return value;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        let b: Option[Box[Integer_32]] := Make('e');
+        case b of
+            when Some(value: Box[Integer_32]) do
+                Unbox(value);
+                Unbox(value);
+            when None do
+                skip;
+        end case;
+        return root;
+    end;
+end module body.
+
+|code}
+  in
+  try
+    let _ = compile_and_run [(i, b)] "Example:Main" in
+    assert_failure "This should have failed."
+  with
+    Austral_error _ ->
+    assert_bool "Passed" true
 
 let suite =
   "Linearity checker tests" >::: [
@@ -299,7 +360,8 @@ let suite =
       "Consume by unwrapping twice" >:: test_unwrap_twice;
       "Consume by calling a function twice" >:: test_funcall_twice;
       "Forget a case binding" >:: test_forget_case_binding;
-      "Consume a case binding twice" >:: test_consume_case_binding_twice
+      "Consume a case binding twice" >:: test_consume_case_binding_twice;
+      "Unbox a box twice" >:: test_unbox_twice
     ]
 
 let _ = run_test_tt_main suite
