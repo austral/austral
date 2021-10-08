@@ -221,14 +221,12 @@ module body Example is
 
     function Main(root: Root_Capability): Root_Capability is
         let r: R := R(x => 32);
-        let ropt: Optional[R] := Some(r);
+        let ropt: Option[R] := Some(value => r);
         case ropt of
             when Some(value: R) do
                 skip;
-            end;
             when None do
                 skip;
-            end;
         end case;
         return root;
     end;
@@ -259,22 +257,20 @@ module body Example is
         x: Integer_32;
     end;
 
-    function Consume(r: R): Unit is
-        let r: R := R(x => 32);
+    function Consume(rec: R): Unit is
+        let { x: Integer_32 } := rec;
         return nil;
     end;
 
     function Main(root: Root_Capability): Root_Capability is
         let r: R := R(x => 32);
-        let ropt: Optional[R] := Some(r);
+        let ropt: Option[R] := Some(value => r);
         case ropt of
             when Some(value: R) do
                 Consume(value);
                 Consume(value);
-            end;
             when None do
                 skip;
-            end;
         end case;
         return root;
     end;
