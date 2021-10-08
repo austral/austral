@@ -58,6 +58,8 @@ end module body.
   in
   try
     let _ = compile_and_run [(i, b)] "Example:Main" in
+    (* TODO: Need a way to ensure this is actually a linearity error and not an
+       unrelated e.g. syntax error. *)
     assert_failure "This should have failed."
   with
     Austral_error _ ->
@@ -221,14 +223,12 @@ module body Example is
 
     function Main(root: Root_Capability): Root_Capability is
         let r: R := R(x => 32);
-        let ropt: Optional[R] := Some(r);
+        let ropt: Option[R] := Some(value => r);
         case ropt of
             when Some(value: R) do
                 skip;
-            end;
             when None do
                 skip;
-            end;
         end case;
         return root;
     end;
@@ -259,22 +259,20 @@ module body Example is
         x: Integer_32;
     end;
 
-    function Consume(r: R): Unit is
-        let r: R := R(x => 32);
+    function Consume(rec: R): Unit is
+        let { x: Integer_32 } := rec;
         return nil;
     end;
 
     function Main(root: Root_Capability): Root_Capability is
         let r: R := R(x => 32);
-        let ropt: Optional[R] := Some(r);
+        let ropt: Option[R] := Some(value => r);
         case ropt of
             when Some(value: R) do
                 Consume(value);
                 Consume(value);
-            end;
             when None do
                 skip;
-            end;
         end case;
         return root;
     end;
@@ -299,6 +297,14 @@ end module.
 
 |code}
   and b = {code|
+
+import Austral.Memory (
+    Pointer,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
 
 module body Example is
     pragma Unsafe_Module;
