@@ -130,8 +130,8 @@ module body Example.Box is
             when Some(value: Box[Integer_32]) do
                 borrow! value as boxmutref in rho do
                     Swap_Mut(boxmutref, 'a');
-                    Put_Character(Unbox(value));
                 end;
+                Put_Character(Unbox(value));
             when None do
                 Abort("Unexpected.");
         end case;
