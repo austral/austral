@@ -249,6 +249,8 @@ let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
        p
      else
        CAddressOf p
+  | TEmbed (ty, expr, args) ->
+     CEmbed (gen_type ty, expr, List.map g args)
 
 and gen_path (mn: module_name) (expr: cpp_expr) (elems: typed_path_elem list): cpp_expr =
   match elems with
