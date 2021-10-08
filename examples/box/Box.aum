@@ -119,8 +119,8 @@ module body Example.Box is
                     let valueref: Reference[Integer_32, rho] := Get_Value_Ref(boxref);
                     let contents: Integer_32 := Deref(valueref);
                     Put_Character(contents);
-                    Unbox(value);
                 end;
+                Unbox(value);
             when None do
                 Abort("Unexpected.");
         end case;
