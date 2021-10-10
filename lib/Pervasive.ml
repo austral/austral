@@ -79,9 +79,16 @@ module body Austral.Pervasive is
 
     type Root_Capability : Linear is Unit;
 
+    constant Minimum_Natural_8: Integer_8 := 0;
     constant Maximum_Natural_8: Natural_8 := @embed(Natural_8, "UINT8_MAX");
+
+    constant Minimum_Natural_16: Integer_8 := 0;
     constant Maximum_Natural_16: Natural_16 := @embed(Natural_16, "UINT16_MAX");
+
+    constant Minimum_Natural_32: Integer_8 := 0;
     constant Maximum_Natural_32: Natural_32 := @embed(Natural_32, "UINT32_MAX");
+
+    constant Minimum_Natural_64: Integer_8 := 0;
     constant Maximum_Natural_64: Natural_64 := @embed(Natural_64, "UINT64_MAX");
 
     constant Minimum_Integer_8: Integer_8 := @embed(Integer_8, "INT8_MIN");
@@ -95,6 +102,306 @@ module body Austral.Pervasive is
 
     constant Minimum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MIN");
     constant Maximum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MAX");
+
+    implementation Trapping_Arithmetic(Natural_8) is
+        method Trapping_Add(lhs: Natural_8, rhs: Natural_8): Natural_8 is
+            let result: Natural_8 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Natural_8)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Natural_8, rhs: Natural_8): Natural_8 is
+            let result: Natural_8 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Natural_8)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Natural_8, rhs: Natural_8): Natural_8 is
+            let result: Natural_8 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Natural_8)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Natural_8, rhs: Natural_8): Natural_8 is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Natural_8)");
+            end if;
+            return lhs / rhs;
+        end;
+    end;
+
+    implementation Trapping_Arithmetic(Integer_8) is
+        method Trapping_Add(lhs: Integer_8, rhs: Integer_8): Integer_8 is
+            let result: Integer_8 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Integer_8)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Integer_8, rhs: Integer_8): Integer_8 is
+            let result: Integer_8 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Integer_8)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Integer_8, rhs: Integer_8): Integer_8 is
+            let result: Integer_8 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Integer_8)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Integer_8, rhs: Integer_8): Integer_8 is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Integer_8)");
+            end if;
+            if (lhs = Minimum_Integer_8) and (rhs = -1) then
+                Abort("Overflow in Trapping_Divide (Integer_8)");
+            end if;
+            return 0;
+        end;
+    end;
+
+    implementation Trapping_Arithmetic(Natural_16) is
+        method Trapping_Add(lhs: Natural_16, rhs: Natural_16): Natural_16 is
+            let result: Natural_16 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Natural_16)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Natural_16, rhs: Natural_16): Natural_16 is
+            let result: Natural_16 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Natural_16)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Natural_16, rhs: Natural_16): Natural_16 is
+            let result: Natural_16 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Natural_16)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Natural_16, rhs: Natural_16): Natural_16 is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Natural_16)");
+            end if;
+            return lhs / rhs;
+        end;
+    end;
+
+    implementation Trapping_Arithmetic(Integer_16) is
+        method Trapping_Add(lhs: Integer_16, rhs: Integer_16): Integer_16 is
+            let result: Integer_16 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Integer_16)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Integer_16, rhs: Integer_16): Integer_16 is
+            let result: Integer_16 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Integer_16)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Integer_16, rhs: Integer_16): Integer_16 is
+            let result: Integer_16 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Integer_16)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Integer_16, rhs: Integer_16): Integer_16 is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Integer_16)");
+            end if;
+            if (lhs = Minimum_Integer_16) and (rhs = -1) then
+                Abort("Overflow in Trapping_Divide (Integer_16)");
+            end if;
+            return 0;
+        end;
+    end;
+
+    implementation Trapping_Arithmetic(Natural_32) is
+        method Trapping_Add(lhs: Natural_32, rhs: Natural_32): Natural_32 is
+            let result: Natural_32 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Natural_32)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Natural_32, rhs: Natural_32): Natural_32 is
+            let result: Natural_32 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Natural_32)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Natural_32, rhs: Natural_32): Natural_32 is
+            let result: Natural_32 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Natural_32)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Natural_32, rhs: Natural_32): Natural_32 is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Natural_32)");
+            end if;
+            return lhs / rhs;
+        end;
+    end;
+
+    implementation Trapping_Arithmetic(Integer_32) is
+        method Trapping_Add(lhs: Integer_32, rhs: Integer_32): Integer_32 is
+            let result: Integer_32 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Integer_32)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Integer_32, rhs: Integer_32): Integer_32 is
+            let result: Integer_32 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Integer_32)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Integer_32, rhs: Integer_32): Integer_32 is
+            let result: Integer_32 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Integer_32)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Integer_32, rhs: Integer_32): Integer_32 is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Integer_32)");
+            end if;
+            if (lhs = Minimum_Integer_32) and (rhs = -1) then
+                Abort("Overflow in Trapping_Divide (Integer_32)");
+            end if;
+            return 0;
+        end;
+    end;
+
+    implementation Trapping_Arithmetic(Natural_64) is
+        method Trapping_Add(lhs: Natural_64, rhs: Natural_64): Natural_64 is
+            let result: Natural_64 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Natural_64)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Natural_64, rhs: Natural_64): Natural_64 is
+            let result: Natural_64 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Natural_64)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Natural_64, rhs: Natural_64): Natural_64 is
+            let result: Natural_64 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Natural_64)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Natural_64, rhs: Natural_64): Natural_64 is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Natural_64)");
+            end if;
+            return lhs / rhs;
+        end;
+    end;
+
+    implementation Trapping_Arithmetic(Integer_64) is
+        method Trapping_Add(lhs: Integer_64, rhs: Integer_64): Integer_64 is
+            let result: Integer_64 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Integer_64)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Integer_64, rhs: Integer_64): Integer_64 is
+            let result: Integer_64 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Integer_64)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Integer_64, rhs: Integer_64): Integer_64 is
+            let result: Integer_64 := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Integer_64)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Integer_64, rhs: Integer_64): Integer_64 is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Integer_64)");
+            end if;
+            if (lhs = Minimum_Integer_64) and (rhs = -1) then
+                Abort("Overflow in Trapping_Divide (Integer_64)");
+            end if;
+            return 0;
+        end;
+    end;
 end module body.
 
 |code}
