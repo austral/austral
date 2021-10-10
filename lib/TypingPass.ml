@@ -65,21 +65,8 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
   | Comparison (op, lhs, rhs) ->
      let lhs' = aug lhs
      and rhs' = aug rhs in
-     if (get_type lhs') = (get_type rhs') then
-       (* If the types are the same type, check it is a comparable type. *)
-       if (is_comparable (get_type lhs')) then
-         TComparison (op, lhs', rhs')
-       else
-         err "Both operands to a comparison expression must be comparable types."
-     else
-       (* If the types are different, check if at least one operator is a constant.*)
-       let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
-       and are_float_constants = (is_float_constant lhs) || (is_float_constant rhs) in
-       if (are_int_constants || are_float_constants) then
-         (* If either operand is a constant, let it pass *)
-         TComparison (op, lhs', rhs')
-       else
-         err "Both operands to a comparison expression must be of the same type"
+     let _ = match_type_with_value (get_type lhs') rhs' in
+     TComparison (op, lhs', rhs')
   | Conjunction (lhs, rhs) ->
      let lhs' = aug lhs
      and rhs' = aug rhs in
