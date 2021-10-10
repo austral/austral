@@ -402,6 +402,174 @@ module body Austral.Pervasive is
             return 0;
         end;
     end;
+
+    implementation Overflowing_Arithmetic(Natural_8) is
+        method Overflowing_Add(lhs: Natural_8, rhs: Natural_8): Natural_8 is
+            return @embed(Natural_8, "$1 + $2", lhs, rhs);
+        end;
+
+        method Overflowing_Subtract(lhs: Natural_8, rhs: Natural_8): Natural_8 is
+            return @embed(Natural_8, "$1 - $2", lhs, rhs);
+        end;
+
+        method Overflowing_Multiply(lhs: Natural_8, rhs: Natural_8): Natural_8 is
+            return @embed(Natural_8, "$1 * $2", lhs, rhs);
+        end;
+
+        method Overflowing_Divide(lhs: Natural_8, rhs: Natural_8): Natural_8 is
+            if rhs = 0 then
+                Abort("Division by zero in Overflowing_Divide (Natural_8)");
+            end if;
+            return @embed(Natural_8, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    implementation Overflowing_Arithmetic(Integer_8) is
+        method Overflowing_Add(lhs: Integer_8, rhs: Integer_8): Integer_8 is
+            return @embed(Integer_8, "$1 + $2", lhs, rhs);
+        end;
+
+        method Overflowing_Subtract(lhs: Integer_8, rhs: Integer_8): Integer_8 is
+            return @embed(Integer_8, "$1 - $2", lhs, rhs);
+        end;
+
+        method Overflowing_Multiply(lhs: Integer_8, rhs: Integer_8): Integer_8 is
+            return @embed(Integer_8, "$1 * $2", lhs, rhs);
+        end;
+
+        method Overflowing_Divide(lhs: Integer_8, rhs: Integer_8): Integer_8 is
+            if rhs = 0 then
+                Abort("Division by zero in Overflowing_Divide (Integer_8)");
+            end if;
+            return @embed(Integer_8, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    implementation Overflowing_Arithmetic(Natural_16) is
+        method Overflowing_Add(lhs: Natural_16, rhs: Natural_16): Natural_16 is
+            return @embed(Natural_16, "$1 + $2", lhs, rhs);
+        end;
+
+        method Overflowing_Subtract(lhs: Natural_16, rhs: Natural_16): Natural_16 is
+            return @embed(Natural_16, "$1 - $2", lhs, rhs);
+        end;
+
+        method Overflowing_Multiply(lhs: Natural_16, rhs: Natural_16): Natural_16 is
+            return @embed(Natural_16, "$1 * $2", lhs, rhs);
+        end;
+
+        method Overflowing_Divide(lhs: Natural_16, rhs: Natural_16): Natural_16 is
+            if rhs = 0 then
+                Abort("Division by zero in Overflowing_Divide (Natural_16)");
+            end if;
+            return @embed(Natural_16, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    implementation Overflowing_Arithmetic(Integer_16) is
+        method Overflowing_Add(lhs: Integer_16, rhs: Integer_16): Integer_16 is
+            return @embed(Integer_16, "$1 + $2", lhs, rhs);
+        end;
+
+        method Overflowing_Subtract(lhs: Integer_16, rhs: Integer_16): Integer_16 is
+            return @embed(Integer_16, "$1 - $2", lhs, rhs);
+        end;
+
+        method Overflowing_Multiply(lhs: Integer_16, rhs: Integer_16): Integer_16 is
+            return @embed(Integer_16, "$1 * $2", lhs, rhs);
+        end;
+
+        method Overflowing_Divide(lhs: Integer_16, rhs: Integer_16): Integer_16 is
+            if rhs = 0 then
+                Abort("Division by zero in Overflowing_Divide (Integer_16)");
+            end if;
+            return @embed(Integer_16, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    implementation Overflowing_Arithmetic(Natural_32) is
+        method Overflowing_Add(lhs: Natural_32, rhs: Natural_32): Natural_32 is
+            return @embed(Natural_32, "$1 + $2", lhs, rhs);
+        end;
+
+        method Overflowing_Subtract(lhs: Natural_32, rhs: Natural_32): Natural_32 is
+            return @embed(Natural_32, "$1 - $2", lhs, rhs);
+        end;
+
+        method Overflowing_Multiply(lhs: Natural_32, rhs: Natural_32): Natural_32 is
+            return @embed(Natural_32, "$1 * $2", lhs, rhs);
+        end;
+
+        method Overflowing_Divide(lhs: Natural_32, rhs: Natural_32): Natural_32 is
+            if rhs = 0 then
+                Abort("Division by zero in Overflowing_Divide (Natural_32)");
+            end if;
+            return @embed(Natural_32, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    implementation Overflowing_Arithmetic(Integer_32) is
+        method Overflowing_Add(lhs: Integer_32, rhs: Integer_32): Integer_32 is
+            return @embed(Integer_32, "$1 + $2", lhs, rhs);
+        end;
+
+        method Overflowing_Subtract(lhs: Integer_32, rhs: Integer_32): Integer_32 is
+            return @embed(Integer_32, "$1 - $2", lhs, rhs);
+        end;
+
+        method Overflowing_Multiply(lhs: Integer_32, rhs: Integer_32): Integer_32 is
+            return @embed(Integer_32, "$1 * $2", lhs, rhs);
+        end;
+
+        method Overflowing_Divide(lhs: Integer_32, rhs: Integer_32): Integer_32 is
+            if rhs = 0 then
+                Abort("Division by zero in Overflowing_Divide (Integer_32)");
+            end if;
+            return @embed(Integer_32, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    implementation Overflowing_Arithmetic(Natural_64) is
+        method Overflowing_Add(lhs: Natural_64, rhs: Natural_64): Natural_64 is
+            return @embed(Natural_64, "$1 + $2", lhs, rhs);
+        end;
+
+        method Overflowing_Subtract(lhs: Natural_64, rhs: Natural_64): Natural_64 is
+            return @embed(Natural_64, "$1 - $2", lhs, rhs);
+        end;
+
+        method Overflowing_Multiply(lhs: Natural_64, rhs: Natural_64): Natural_64 is
+            return @embed(Natural_64, "$1 * $2", lhs, rhs);
+        end;
+
+        method Overflowing_Divide(lhs: Natural_64, rhs: Natural_64): Natural_64 is
+            if rhs = 0 then
+                Abort("Division by zero in Overflowing_Divide (Natural_64)");
+            end if;
+            return @embed(Natural_64, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    implementation Overflowing_Arithmetic(Integer_64) is
+        method Overflowing_Add(lhs: Integer_64, rhs: Integer_64): Integer_64 is
+            return @embed(Integer_64, "$1 + $2", lhs, rhs);
+        end;
+
+        method Overflowing_Subtract(lhs: Integer_64, rhs: Integer_64): Integer_64 is
+            return @embed(Integer_64, "$1 - $2", lhs, rhs);
+        end;
+
+        method Overflowing_Multiply(lhs: Integer_64, rhs: Integer_64): Integer_64 is
+            return @embed(Integer_64, "$1 * $2", lhs, rhs);
+        end;
+
+        method Overflowing_Divide(lhs: Integer_64, rhs: Integer_64): Integer_64 is
+            if rhs = 0 then
+                Abort("Division by zero in Overflowing_Divide (Integer_64)");
+            end if;
+            return @embed(Integer_64, "$1 / $2", lhs, rhs);
+        end;
+    end;
 end module body.
 
 |code}
