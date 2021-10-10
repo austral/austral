@@ -516,7 +516,7 @@ and get_instance (menv: menv) (source_module_name: module_name) (dispatch_ty: ty
         (* TODO: the rest of the process described above. *)
         true
       with
-        Type_match_error _ ->
+        Austral_error _ ->
         (* Does not match, just skip to the next instance, *)
         false
     else

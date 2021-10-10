@@ -24,6 +24,10 @@ type error = Error of {
 and error_data =
   | GenericError of string
   | ParseError
+  | TypeMismatch of {
+      expected: string;
+      got: string;
+    }
 
 
 let error_filename (error: error): string option =
@@ -41,6 +45,9 @@ let error_text (error_data: error_data): string =
      msg
   | ParseError ->
      "Error during parse."
+  | TypeMismatch { expected; got; } ->
+     ("Expected a value of type " ^ expected ^ " but got a value of type " ^ got)
+
 
 (* Return the error title. *)
 let error_title (error_data: error_data): string =
@@ -49,6 +56,8 @@ let error_title (error_data: error_data): string =
      "Generic Error"
   | ParseError ->
      "Parse Error"
+  | TypeMismatch _ ->
+     "Type Mismatch"
 
 (* Render an error into a string for display in the terminal. *)
 let render_error (error: error) (code: string option): string =
@@ -101,6 +110,18 @@ let raise_parse_error (span: span) =
   let e = Error {
               span = Some span;
               data = ParseError
+            }
+  in
+  raise (Austral_error e)
+
+(* Throw a type mismatch error. *)
+let raise_type_mismatch_error (expected: string) (got: string)  =
+  let e = Error {
+              span = None;
+              data = TypeMismatch {
+                         expected = expected;
+                         got = got;
+                       }
             }
   in
   raise (Austral_error e)
