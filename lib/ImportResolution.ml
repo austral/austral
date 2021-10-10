@@ -45,7 +45,7 @@ let resolve_import (menv: menv) (kind: module_kind) (imports: import_map) (idecl
          if has_union_constructor_with_name smodule name then
            add_symbol imports (make_qident (module_name, name, nickname))
          else
-           err "No declaration with this name")
+           err ("No declaration with this name: " ^ (ident_string name)))
   | None ->
      err ("No module with this name: " ^ (mod_name_string module_name))
 
