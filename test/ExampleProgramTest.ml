@@ -1,6 +1,18 @@
 open OUnit2
 open Austral_core.Compiler
+open Austral_core.Error
 open TestUtil
+
+let print_and_reraise_error (f: unit -> 'a): 'a =
+  try
+    f ()
+  with
+    Austral_error error ->
+     Printf.eprintf "%s" (render_error error None);
+     raise (Austral_error error)
+
+let car sources entrypoint =
+  print_and_reraise_error (fun _ -> compile_and_run sources entrypoint)
 
 (* A test of the simplest possible program: an entrypoint function that returns
    the root capability and does nothing else. *)
@@ -22,7 +34,7 @@ end module body.
 
 |code}
   in
-  let (code, stdout) = compile_and_run [(i, b)] "Example:Main" in
+  let (code, stdout) = car [(i, b)] "Example:Main" in
   eq 0 code;
   eq "" stdout
 
@@ -53,7 +65,7 @@ end module body.
 
 |code}
   in
-  let (code, stdout) = compile_and_run [(i, b)] "Example:Main" in
+  let (code, stdout) = car [(i, b)] "Example:Main" in
   eq 0 code;
   eq "a" stdout
 
