@@ -70,6 +70,10 @@ rule token = parse
   | "<=" { LTE }
   | ">" { GT }
   | ">=" { GTE }
+  (* Logical operators *)
+  | "and" { AND }
+  | "or" { OR }
+  | "not" { NOT }
   (* Keywords *)
   | "module" { MODULE }
   | "is" { IS }
