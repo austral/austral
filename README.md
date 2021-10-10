@@ -23,9 +23,8 @@ Features:
   polymorphism.
 
 - **Safe Arithmetic**: Austral has well-defined semantics for all arithmetic
-  operations on numeric types. There are distinct integer types for
-  trap-on-overflow arithmetic, modular arithmetic, and saturating arithmetic, as
-  in Ada.
+  operations on numeric types. There are distinct operations for
+  trap-on-overflow arithmetic and modular arithmetic, as in Ada.
 
 - **Algebraic Data Types**: algebraic data types, as in ML or Haskell, with
   exhaustiveness checking.
