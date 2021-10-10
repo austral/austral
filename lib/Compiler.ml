@@ -1,6 +1,7 @@
 open Identifier
 open ModuleSystem
 open BuiltIn
+open Pervasive
 open CppPrelude
 open ParserInterface
 open CombiningPass
@@ -105,14 +106,21 @@ let compile_entrypoint c mn i =
   let (Compiler (m, c)) = c in
   Compiler (m, c ^ "\n" ^ (entrypoint_code mn i))
 
-let empty_compiler =
-  let menv = put_module empty_menv memory_module in
-  let menv = put_module menv pervasive_module in
-  let c = Compiler (menv, prelude) in
-  c
-
 let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
+
+let empty_compiler =
+  let menv = put_module empty_menv memory_module in
+  let c = Compiler (menv, prelude) in
+  let c =
+    try
+      compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
+    with Austral_error error ->
+      Printf.eprintf "%s" (render_error error None);
+      exit (-1)
+    in
+  let (Compiler (menv, code)) = c in
+  Compiler (menv, code ^ austral_memory_code)
 
 let compile_and_run (modules: (string * string) list) (entrypoint: string): (int * string) =
   let compiler = compile_multiple empty_compiler (List.map (fun (i, b) -> fake_mod_source i b) modules) in
