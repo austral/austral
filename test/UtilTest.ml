@@ -16,7 +16,6 @@ let test_search_replace _ =
                 replacement = "slow"
               }
   in
-  print_endline out;
   assert_equal out "The slow brown fox."
 
 let suite =
