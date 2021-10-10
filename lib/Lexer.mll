@@ -39,11 +39,11 @@ let comment = "--" [^ '\r' '\n']* (newline)
 (* Token regexes *)
 
 let identifier = (alpha) ('_'|alphanum)*
-let dec_constant = digit (digit|'\'')*
+let dec_constant = sign? digit (digit|'\'')*
 let hex_constant = '#' 'x' hex_digit (hex_digit|'\'')*
 let bin_constant = '#' 'b' bin_digit (bin_digit|'\'')*
 let oct_constant = '#' 'o' oct_digit (oct_digit|'\'')*
-let float_constant = dec_constant period dec_constant? (exponent sign? dec_constant)?
+let float_constant = sign? dec_constant period dec_constant? (exponent sign? dec_constant)?
 let char_constant = '\'' (ascii_char | '\\' ['n' 'r' 't' '\\']) '\''
 
 (* Rules *)
