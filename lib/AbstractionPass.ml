@@ -13,29 +13,30 @@ let rec abs_stmt im stmt =
      err "Let statement not in a list context"
   | CDestructure _ ->
      err "Destructure statement not in a list context"
-  | CAssign (_, lvalue, value) ->
-     AAssign (abs_lvalue im lvalue, abs_expr im value)
-  | CIf (_, c, t, f) ->
-     AIf (abs_expr im c, abs_stmt im t, abs_stmt im f)
-  | CCase (_, e, cases) ->
-     ACase (abs_expr im e, List.map (abs_when im) cases)
-  | CWhile (_, c, b) ->
-     AWhile (abs_expr im c, abs_stmt im b)
-  | CFor (_, n, i, f, b) ->
+  | CAssign (span, lvalue, value) ->
+     AAssign (span, abs_lvalue im lvalue, abs_expr im value)
+  | CIf (span, c, t, f) ->
+     AIf (span, abs_expr im c, abs_stmt im t, abs_stmt im f)
+  | CCase (span, e, cases) ->
+     ACase (span, abs_expr im e, List.map (abs_when im) cases)
+  | CWhile (span, c, b) ->
+     AWhile (span, abs_expr im c, abs_stmt im b)
+  | CFor (span, n, i, f, b) ->
      AFor {
+         span = span;
          name = n;
          initial = abs_expr im i;
          final = abs_expr im f;
          body = abs_stmt im b
        }
-  | CBorrow { original; rename; region; body; mode; _ } ->
-     ABorrow { original; rename; region; body=abs_stmt im body; mode }
+  | CBorrow { span; original; rename; region; body; mode; _ } ->
+     ABorrow { span; original; rename; region; body=abs_stmt im body; mode }
   | CBlock (_, l) ->
      let_reshape im l
-  | CDiscarding (_, e) ->
-     ADiscarding (abs_expr im e)
-  | CReturn (_, e) ->
-     AReturn (abs_expr im e)
+  | CDiscarding (span, e) ->
+     ADiscarding (span, abs_expr im e)
+  | CReturn (span, e) ->
+     AReturn (span, abs_expr im e)
 
 and abs_expr im expr =
   match expr with
@@ -94,14 +95,14 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
   match l with
   | first::rest ->
      (match first with
-      | CLet (_, n, t, v) ->
-         ALet (n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
-      | CDestructure (_, bs, e) ->
+      | CLet (span, n, t, v) ->
+         ALet (span, n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
+      | CDestructure (span, bs, e) ->
          let bs' = List.map (fun (n, ts) -> (n, qualify_typespec im ts)) bs
          and e' = abs_expr im e
          and b = let_reshape im rest
          in
-         ADestructure (bs', e', b)
+         ADestructure (span, bs', e', b)
       | s ->
          ABlock (abs_stmt im s, let_reshape im rest))
   | [] ->

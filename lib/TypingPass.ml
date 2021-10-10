@@ -655,7 +655,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   match stmt with
   | ASkip ->
      TSkip
-  | ALet (name, ty, value, body) ->
+  | ALet (_, name, ty, value, body) ->
      let expected_ty = parse_typespec menv rm typarams ty in
      let value' = augment_expr module_name menv rm typarams lexenv (Some expected_ty) value in
      let bindings = match_type_with_value expected_ty value' in
@@ -668,7 +668,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      print_endline ("\tBindings: " ^ (show_bindings bindings));
      print_endline ("\tResolved: " ^ (show_ty ty'')); *)
      TLet (name, ty'', value', body')
-  | ADestructure (bindings, value, body) ->
+  | ADestructure (_, bindings, value, body) ->
      let value' = augment_expr module_name menv rm typarams lexenv None value in
      (* Check: the value must be a public record type *)
      let rec_ty = get_type value' in
@@ -706,7 +706,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            err "Not a public record"
       | _ ->
          err "Not a record type")
-  | AAssign (LValue (var, elems), value) ->
+  | AAssign (_, LValue (var, elems), value) ->
      (match get_var lexenv var with
       | Some var_ty ->
          let elems = augment_lvalue_path menv module_name rm typarams lexenv var_ty elems in
@@ -719,13 +719,13 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            err "Paths must end in the free universe"
       | None ->
          err "No var with this name.")
-  | AIf (c, t, f) ->
+  | AIf (_, c, t, f) ->
      let c' = augment_expr module_name menv rm typarams lexenv None c in
      if is_boolean (get_type c') then
        TIf (c', augment_stmt ctx t, augment_stmt ctx f)
      else
        err "The type of the condition in an if statement must be a boolean."
-  | ACase (expr, whens) ->
+  | ACase (_, expr, whens) ->
      (* Type checking a case statement:
 
         1. Ensure the value is of a union type.
@@ -746,13 +746,13 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
        TCase (expr', whens'')
      else
        err "Non-exhaustive case statement."
-  | AWhile (c, body) ->
+  | AWhile (_, c, body) ->
      let c' = augment_expr module_name menv rm typarams lexenv None c in
      if is_boolean (get_type c') then
        TWhile (c', augment_stmt ctx body)
      else
        err "The type of the condition in a while loop must be a boolean"
-  | AFor { name; initial; final; body } ->
+  | AFor {name; initial; final; body; _ } ->
      let i' = augment_expr module_name menv rm typarams lexenv None initial
      and f' = augment_expr module_name menv rm typarams lexenv None final in
      if is_compatible_with_size_type i' then
@@ -764,7 +764,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          err "The type of the final value in a for loop must be an integer type."
      else
        err "The type of the initial value in a for loop must be an integer type."
-  | ABorrow { original; rename; region; body; mode } ->
+  | ABorrow { original; rename; region; body; mode; _ } ->
      (match get_var lexenv original with
       | (Some orig_ty) ->
          let u = type_universe orig_ty in
@@ -797,14 +797,14 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | ABlock (f, r) ->
      TBlock (augment_stmt ctx f,
              augment_stmt ctx r)
-  | ADiscarding e ->
+  | ADiscarding (_, e) ->
      let e' = augment_expr module_name menv rm typarams lexenv None e in
      let u = type_universe (get_type e') in
      if ((u = LinearUniverse) || (u = TypeUniverse)) then
        err "Discarding a linear value"
      else
        TDiscarding e'
-  | AReturn e ->
+  | AReturn (_, e) ->
      let e' = augment_expr module_name menv rm typarams lexenv None e in
      let _ = match_type_with_value rt e' in
      TReturn e'

@@ -1,24 +1,27 @@
 open Identifier
 open Common
+open Span
 open Escape
 
 type qtypespec = QTypeSpecifier of qident * qtypespec list
 
 type astmt =
   | ASkip
-  | ALet of identifier * qtypespec * aexpr * astmt
-  | ADestructure of (identifier * qtypespec) list * aexpr * astmt
-  | AAssign of lvalue * aexpr
-  | AIf of aexpr * astmt * astmt
-  | ACase of aexpr * abstract_when list
-  | AWhile of aexpr * astmt
+  | ALet of span * identifier * qtypespec * aexpr * astmt
+  | ADestructure of span * (identifier * qtypespec) list * aexpr * astmt
+  | AAssign of span * lvalue * aexpr
+  | AIf of span * aexpr * astmt * astmt
+  | ACase of span * aexpr * abstract_when list
+  | AWhile of span * aexpr * astmt
   | AFor of {
+      span: span;
       name: identifier;
       initial: aexpr;
       final: aexpr;
       body: astmt
     }
   | ABorrow of {
+      span: span;
       original: identifier;
       rename: identifier;
       region: identifier;
@@ -26,8 +29,8 @@ type astmt =
       mode: borrowing_mode
     }
   | ABlock of astmt * astmt
-  | ADiscarding of aexpr
-  | AReturn of aexpr
+  | ADiscarding of span * aexpr
+  | AReturn of span * aexpr
 
 and aexpr =
   | NilConstant
