@@ -49,13 +49,6 @@ module Austral.Pervasive is
         method Modular_Multiply(lhs: T, rhs: T): T;
         method Modular_Divide(lhs: T, rhs: T): T;
     end;
-
-    interface Saturating_Arithmetic(T: Type) is
-        method Saturating_Add(lhs: T, rhs: T): T;
-        method Saturating_Subtract(lhs: T, rhs: T): T;
-        method Saturating_Multiply(lhs: T, rhs: T): T;
-        method Saturating_Divide(lhs: T, rhs: T): T;
-    end;
 end module.
 
 |code}
