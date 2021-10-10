@@ -648,10 +648,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let expected_ty = parse_typespec menv rm typarams ty in
          let value' = augment_expr module_name menv rm typarams lexenv (Some expected_ty) value in
          let bindings = match_type_with_value expected_ty value' in
-         let ty'' = replace_variables bindings (get_type value') in
-         let lexenv' = push_var lexenv name ty'' in
+         let ty = replace_variables bindings expected_ty in
+         let lexenv' = push_var lexenv name ty in
          let body' = augment_stmt (update_lexenv ctx lexenv') body in
-         TLet (name, ty'', value', body'))
+         TLet (name, ty, value', body'))
   | ADestructure (span, bindings, value, body) ->
      adorn_error_with_span span
        (fun _ ->
