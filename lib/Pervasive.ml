@@ -35,6 +35,27 @@ module Austral.Pervasive is
 
     constant Minimum_Integer_64: Integer_64;
     constant Maximum_Integer_64: Integer_64;
+
+    interface Trapping_Arithmetic(T: Type) is
+        method Trapping_Add(lhs: T, rhs: T): T;
+        method Trapping_Subtract(lhs: T, rhs: T): T;
+        method Trapping_Multiply(lhs: T, rhs: T): T;
+        method Trapping_Divide(lhs: T, rhs: T): T;
+    end;
+
+    interface Overflowing_Arithmetic(T: Type) is
+        method Overflowing_Add(lhs: T, rhs: T): T;
+        method Overflowing_Subtract(lhs: T, rhs: T): T;
+        method Overflowing_Multiply(lhs: T, rhs: T): T;
+        method Overflowing_Divide(lhs: T, rhs: T): T;
+    end;
+
+    interface Saturating_Arithmetic(T: Type) is
+        method Saturating_Add(lhs: T, rhs: T): T;
+        method Saturating_Subtract(lhs: T, rhs: T): T;
+        method Saturating_Multiply(lhs: T, rhs: T): T;
+        method Saturating_Divide(lhs: T, rhs: T): T;
+    end;
 end module.
 
 |code}
@@ -73,7 +94,7 @@ module body Austral.Pervasive is
     constant Maximum_Integer_32: Integer_32 := @embed(Integer_32, "INT32_MAX");
 
     constant Minimum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MIN");
-    constant Maximum_Integer_64: Integer_64 :=@embed(Integer_64, "INT64_MAX");
+    constant Maximum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MAX");
 end module body.
 
 |code}
