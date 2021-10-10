@@ -2,9 +2,9 @@ let prelude = {code|#include <stdint.h>
 #include <stddef.h>
 
 namespace Austral__Core {
-    void* stderr;
-    extern "C" size_t fwrite(const void * ptr, size_t size, size_t count, void* stream);
-    extern "C" int fputc(int character, void* stream);
+    extern "C" void* stderr;
+    extern "C" int fprintf(void* stream, const char* format, ...);
+    extern "C" int fflush(void* stream);
     extern "C" void _Exit(int exit_code);
 
     template<typename T>
@@ -40,8 +40,8 @@ namespace Austral__Core {
     }
 
     bool Abort(Array<uint8_t> message) {
-        fwrite(message.data, 1, message.size, stderr);
-        fputc('\n', stderr);
+        fprintf(stderr, "%s\n", message.data);
+        fflush(stderr);
         _Exit(-1);
         return false;
     }
