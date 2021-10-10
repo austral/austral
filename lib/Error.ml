@@ -29,7 +29,6 @@ and error_data =
       got: string;
     }
 
-
 let error_filename (error: error): string option =
   let (Error { span; _ }) = error in
   match span with
