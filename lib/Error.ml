@@ -124,3 +124,17 @@ let raise_type_mismatch_error (expected: string) (got: string)  =
             }
   in
   raise (Austral_error e)
+
+let adorn_error_with_span (spn: span) (f: unit -> 'a): 'a =
+  try
+    f ()
+  with Austral_error error ->
+    let (Error { span; data }) = error in
+    match span with
+    | Some _ ->
+       (* The error already has a span, do nothing. *)
+       raise (Austral_error error)
+    | None ->
+       (* Add the span *)
+       let new_err = Error { span = Some spn; data = data} in
+       raise (Austral_error new_err)

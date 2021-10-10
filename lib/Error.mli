@@ -14,3 +14,5 @@ exception Austral_error of error
 val err : string -> 'a
 val raise_parse_error : span -> 'a
 val raise_type_mismatch_error : string -> string -> 'a
+
+val adorn_error_with_span : span -> (unit -> 'a) -> 'a
