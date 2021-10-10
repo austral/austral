@@ -103,6 +103,10 @@ module body Austral.Pervasive is
     constant Minimum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MIN");
     constant Maximum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MAX");
 
+    ---
+    --- Trapping Arithmetic
+    ---
+
     implementation Trapping_Arithmetic(Natural_8) is
         method Trapping_Add(lhs: Natural_8, rhs: Natural_8): Natural_8 is
             let result: Natural_8 := 0;
@@ -402,6 +406,10 @@ module body Austral.Pervasive is
             return 0;
         end;
     end;
+
+    ---
+    --- Modular Arithmetic
+    ---
 
     implementation Modular_Arithmetic(Natural_8) is
         method Modular_Add(lhs: Natural_8, rhs: Natural_8): Natural_8 is
