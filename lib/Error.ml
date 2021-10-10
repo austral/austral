@@ -69,7 +69,8 @@ let render_error (error: error) (code: string option): string =
        ^ "    From: " ^ (position_to_string startp) ^ "\n"
        ^ "    To: " ^ (position_to_string endp) ^ "\n"
     | None ->
-       ""
+       "  Location:\n"
+       ^ "    [no span available]\n"
   and code_text =
     match span with
     | Some span ->
@@ -80,7 +81,8 @@ let render_error (error: error) (code: string option): string =
         | None ->
            "  Code: [not available]\n")
     | None ->
-       ""
+       "  Code:\n"
+       ^ "    [no span available]\n"
   in
   "Error:\n"
   ^ "  Title: " ^ (error_title data) ^ "\n"
