@@ -516,7 +516,7 @@ and get_instance (menv: menv) (source_module_name: module_name) (dispatch_ty: ty
         (* TODO: the rest of the process described above. *)
         true
       with
-        Type_match_error _ ->
+        Austral_error _ ->
         (* Does not match, just skip to the next instance, *)
         false
     else
@@ -806,7 +806,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
        TDiscarding e'
   | AReturn e ->
      let e' = augment_expr module_name menv rm typarams lexenv None e in
-     let _ = match_type rt (get_type e') in
+     let _ = match_type_with_value rt e' in
      TReturn e'
 
 and augment_lvalue_path (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =

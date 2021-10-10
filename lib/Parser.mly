@@ -428,6 +428,8 @@ named_arg:
 intrinsic:
   | EMBED LPAREN ty=typespec COMMA exp=STRING_CONSTANT COMMA args=separated_list(COMMA, expression) RPAREN
     { CEmbed (from_loc $loc, ty, exp, args) }
+  | EMBED LPAREN ty=typespec COMMA exp=STRING_CONSTANT RPAREN
+    { CEmbed (from_loc $loc, ty, exp, []) }
   ;
 
 compound_expression:

@@ -2,12 +2,10 @@ open Identifier
 open Type
 open TypeBindings
 open Tast
+open Error
 
-exception Type_match_error of string
-
-let type_mismatch msg a b =
-  let msg' = msg ^ ": expected:\n\n" ^ (type_string a) ^ "\n\nbut got:\n\n" ^ (type_string b) in
-  raise (Type_match_error msg')
+let type_mismatch _ a b =
+  raise_type_mismatch_error (type_string a) (type_string b)
 
 let rec match_type a b =
   match (a, b) with
