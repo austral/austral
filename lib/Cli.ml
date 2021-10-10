@@ -147,5 +147,9 @@ let main' (args: string list): unit =
      err "Invalid invocation."
 
 let main (args: string list): unit =
-  main' args;
-  exit 0
+  try
+    main' args;
+    exit 0
+  with Austral_error error ->
+    Printf.eprintf "%s" (render_error error None);
+    exit (-1)

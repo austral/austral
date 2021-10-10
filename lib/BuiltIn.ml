@@ -2,7 +2,6 @@ open Identifier
 open Type
 open Cst
 open Semantic
-open Region
 
 (* Austral.Pervasive *)
 
@@ -13,80 +12,6 @@ let option_type_name = make_ident "Option"
 let option_type_qname = make_qident (pervasive_module_name, option_type_name, option_type_name)
 
 let root_cap_type_name = make_ident "Root_Capability"
-
-let pervasive_module =
-  let i = make_ident in
-  let option_type_def =
-    (*
-        union Option[T: Type]: Type is
-            case None;
-            case Some is
-                value: T;
-        end;
-     *)
-    SUnionDefinition (
-        pervasive_module_name,
-        TypeVisPublic,
-        option_type_name,
-        [TypeParameter (i "T", TypeUniverse, option_type_qname)],
-        TypeUniverse,
-        [
-          TypedCase (i "None", []);
-          TypedCase (i "Some", [TypedSlot (i "value", TyVar (TypeVariable (i "T", TypeUniverse, option_type_qname)))])
-        ]
-    )
-  and deref_def =
-    let name = i "Deref" in
-    let qname = make_qident (pervasive_module_name, name, name) in
-    (* generic T: Free, R: Region
-       function Dereference(ref: Reference[T, R]): T *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        [TypeParameter (i "T", FreeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)],
-        [ValueParameter (i "ref", ReadRef (TyVar (TypeVariable (i "T", FreeUniverse, qname)), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
-        TyVar (TypeVariable (i "T", FreeUniverse, qname))
-      )
-  and fixed_array_size_def =
-    let name = i "Fixed_Array_Size" in
-    let qname = make_qident (pervasive_module_name, name, name) in
-    (* generic T: Type
-       function Fixed_Array_Size(arr: Fixed_Array[T]): Natural_64 *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        [TypeParameter (i "T", TypeUniverse, qname)],
-        [ValueParameter (i "arr", Array (TyVar (TypeVariable (i "T", TypeUniverse, qname)), static_region))],
-        Integer (Unsigned, Width64)
-      )
-  and abort_def =
-    let name = i "Abort" in
-    (* function Abort(arr: Fixed_Array[Natural_8]): Unit *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        [],
-        [ValueParameter (i "arr", Array (Integer (Unsigned, Width8), static_region))],
-        Unit
-      )
-  and root_cap_type_def =
-    let name = i "Root_Capability" in
-    (* type Root_Capability : Linear; *)
-    STypeAliasDefinition (
-        TypeVisOpaque,
-        name,
-        [],
-        LinearUniverse,
-        Unit
-    )
-  in
-  let decls = [option_type_def; deref_def; fixed_array_size_def; abort_def; root_cap_type_def] in
-  SemanticModule {
-      name = pervasive_module_name;
-      decls = decls;
-      imported_classes = [];
-      imported_instances = []
-    }
 
 let pervasive_imports =
   ConcreteImportList (

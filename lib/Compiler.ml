@@ -1,6 +1,7 @@
 open Identifier
 open ModuleSystem
 open BuiltIn
+open Pervasive
 open CppPrelude
 open ParserInterface
 open CombiningPass
@@ -105,14 +106,29 @@ let compile_entrypoint c mn i =
   let (Compiler (m, c)) = c in
   Compiler (m, c ^ "\n" ^ (entrypoint_code mn i))
 
-let empty_compiler =
-  let menv = put_module empty_menv memory_module in
-  let menv = put_module menv pervasive_module in
-  let c = Compiler (menv, prelude) in
-  c
-
 let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
+
+let empty_compiler =
+  (* Add the main prelude. Then compile the Austral.Pervasive module. *Then* add
+     the source code of the FFI module. This is because the FFI module uses the
+     Option type, which is defined in the Austral.Pervasive module and has to be
+     compiled first. *)
+  let menv = put_module empty_menv memory_module in
+  let c = Compiler (menv, prelude) in
+  let c =
+    (* Handle errors during the compilation of the Austral,Pervasive
+       module. Otherwise, a typo in the source code of this module will cause a
+       fatal error due to an exception stack overflow (unsure why this
+       happens). *)
+    try
+      compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
+    with Austral_error error ->
+      Printf.eprintf "%s" (render_error error None);
+      exit (-1)
+  in
+  let (Compiler (menv, code)) = c in
+  Compiler (menv, code ^ austral_memory_code)
 
 let compile_and_run (modules: (string * string) list) (entrypoint: string): (int * string) =
   let compiler = compile_multiple empty_compiler (List.map (fun (i, b) -> fake_mod_source i b) modules) in

@@ -6,8 +6,6 @@ open Semantic
 
 val pervasive_module_name : module_name
 
-val pervasive_module: semantic_module
-
 val option_type_name : identifier
 
 val root_cap_type_name : identifier
