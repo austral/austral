@@ -69,10 +69,41 @@ end module body.
   eq 0 code;
   eq "a" stdout
 
+    (* Test that integer literals work in constructor calls. *)
+let test_integer_literal_record_constructor _ =
+  let i = {code|
+
+module Example is
+    function Main(root: Root_Capability): Root_Capability;
+end module.
+
+|code}
+  and b = {code|
+
+module body Example is
+    record R: Free is
+        x: Natural_8;
+        y: Integer_8;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        let r: R := R(x => 10, y => 10);
+        return root;
+    end;
+end module body.
+
+|code}
+  in
+  let (code, stdout) = car [(i, b)] "Example:Main" in
+  eq 0 code;
+  eq "" stdout
+
+
 let suite =
   "Example programs" >::: [
       "Empty program" >:: test_empty_program;
-      "@embed intrinsic" >:: test_embed_intrinsic
+      "@embed intrinsic" >:: test_embed_intrinsic;
+      "Integer literals in record constructors" >:: test_integer_literal_record_constructor
     ]
 
 let _ = run_test_tt_main suite
