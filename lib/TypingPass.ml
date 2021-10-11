@@ -916,12 +916,69 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
   else
     err "The set of slots in the case statement doesn't match the set of slots in the union definition."
 
+let rec validate_constant_expression (expr: texpr): unit =
+  if is_constant expr then
+    ()
+  else
+    err ("The value of this constant is not a valid constant expression.")
+
+and is_constant = function
+  | TNilConstant ->
+     true
+  | TBoolConstant _ ->
+     true
+  | TIntConstant _ ->
+     true
+  | TFloatConstant _ ->
+     true
+  | TStringConstant _ ->
+     true
+  | TVariable _ ->
+     true
+  | TArithmetic (_, lhs, rhs) ->
+     (is_constant lhs) && (is_constant rhs)
+  | TFuncall _ ->
+     false
+  | TMethodCall _ ->
+     false
+  | TCast _ ->
+     true
+  | TComparison (_, lhs, rhs) ->
+     (is_constant lhs) && (is_constant rhs)
+  | TConjunction (lhs, rhs) ->
+     (is_constant lhs) && (is_constant rhs)
+  | TDisjunction (lhs, rhs) ->
+     (is_constant lhs) && (is_constant rhs)
+  | TNegation e ->
+     is_constant e
+  | TIfExpression (c, t, f) ->
+     (is_constant c) && (is_constant t) && (is_constant f)
+  | TRecordConstructor (_, values) ->
+     List.for_all (fun (_, v) -> is_constant v) values
+  | TUnionConstructor (_, _, values) ->
+     List.for_all (fun (_, v) -> is_constant v) values
+  | TPath (e, elems) ->
+     (is_constant e) && (List.for_all is_path_elem_constant elems)
+  | TPathRef (e, elems, _, _) ->
+     (is_constant e) && (List.for_all is_path_elem_constant elems)
+  | TEmbed _ ->
+     true
+
+and is_path_elem_constant = function
+  | TSlotAccessor _ ->
+     true
+  | TPointerSlotAccessor _ ->
+     true
+  | TArrayIndex (e, _) ->
+     is_constant e
+
 let rec augment_decl (module_name: module_name) (kind: module_kind) (menv: menv) (decl: combined_definition): typed_decl =
   match decl with
   | CConstant (vis, name, ts, expr, doc) ->
      let ty = parse_typespec menv empty_region_map [] ts in
      let expr' = augment_expr module_name menv empty_region_map [] empty_lexenv (Some ty) expr in
      let _ = match_type_with_value ty expr' in
+     let _ = validate_constant_expression expr' in
      TConstant (vis, name, ty, expr', doc)
   | CTypeAlias (vis, name, typarams, universe, ts, doc) ->
      let rm = region_map_from_typarams typarams in
