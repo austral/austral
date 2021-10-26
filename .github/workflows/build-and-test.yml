@@ -34,7 +34,7 @@ jobs:
 
       - name: Run OCaml tests
         run: opam exec -- dune runtest
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux'
 
       - name: Run test script
         run: ./run-tests.sh
