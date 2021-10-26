@@ -38,6 +38,7 @@ jobs:
 
       - name: Run test script
         run: ./run-tests.sh
+        if: runner.os == 'Linux'
 
       - name: Upload compiler binary
         uses: actions/upload-artifact@v2
