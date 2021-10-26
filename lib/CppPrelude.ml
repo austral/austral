@@ -2,9 +2,7 @@ let prelude = {code|#include <stdint.h>
 #include <stddef.h>
 
 namespace Austral__Core {
-    extern "C" void* stderr;
-    extern "C" int fprintf(void* stream, const char* format, ...);
-    extern "C" int fflush(void* stream);
+    #include <stdio.h>
     extern "C" void _Exit(int exit_code);
 
     template<typename T>
