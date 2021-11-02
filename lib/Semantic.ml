@@ -224,3 +224,12 @@ let has_method_with_name (SemanticModule { decls; _ }) name =
        false
   in
   List.exists pred decls
+
+let defined_instances (SemanticModule { decls; _ }) =
+  let pred = function
+    | STypeClassInstanceDecl ins ->
+       Some ins
+    | _ ->
+       None
+  in
+  List.filter_map pred decls

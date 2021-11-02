@@ -11,6 +11,9 @@ let empty_map n =
 let add_symbol (ImportMap (n, m, cs, is)) q =
   ImportMap (n, IdentifierMap.add (local_name q) q m, cs, is)
 
+let add_instance (ImportMap (n, m, cs, is)) ins =
+  ImportMap (n, m, cs, ins :: is)
+
 let importing_module (ImportMap (n, _, _, _)) =
   n
 

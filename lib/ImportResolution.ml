@@ -59,5 +59,29 @@ let rec resolve' (menv: menv) (kind: module_kind) (imports: import_map) (list: i
   | [] ->
      imports
 
+let rec add_instances im is =
+  match is with
+  | first::rest ->
+     add_instance (add_instances im rest) first
+  | [] ->
+     im
+
+let module_names (cil: concrete_import_list list): module_name list =
+  List.map (fun (ConcreteImportList (mn, _)) -> mn) cil
+
+let module_defined_instances (menv: menv) (mn: module_name): semantic_instance list =
+  match (get_module menv mn) with
+  | Some m ->
+     defined_instances m
+  | None ->
+     []
+
+let import_instances (menv: menv) (list: concrete_import_list list): semantic_instance list =
+  let mns = module_names list in
+  let instances = List.map (module_defined_instances menv) mns in
+  List.flatten instances
+
 let resolve (importing_module: module_name) (kind: module_kind) (menv: menv) (list: concrete_import_list list): import_map =
-  resolve' menv kind (empty_map importing_module) (flatten_imports list)
+  let im = resolve' menv kind (empty_map importing_module) (flatten_imports list) in
+  let ins = import_instances menv list in
+  add_instances im ins

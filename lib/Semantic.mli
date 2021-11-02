@@ -58,6 +58,9 @@ and callable =
       return_type: ty
     }
 
+(* Return all instances defined in the module. *)
+val defined_instances : semantic_module -> semantic_instance list
+
 (* Return all typeclass instances in a module. These are
    not only the instances that are defined in the module
    itself, but the instances imported by the module. *)

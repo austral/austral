@@ -10,6 +10,8 @@ val empty_map : module_name -> import_map
 
 val add_symbol : import_map -> qident -> import_map
 
+val add_instance : import_map -> semantic_instance -> import_map
+
 (* The name of the module we're importing into. *)
 val importing_module : import_map -> module_name
 
