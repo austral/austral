@@ -23,7 +23,17 @@ let pervasive_imports =
         ConcreteImport (make_ident "Deref", None);
         ConcreteImport (make_ident "Fixed_Array_Size", None);
         ConcreteImport (make_ident "Abort", None);
-        ConcreteImport (make_ident "Root_Capability", None)
+        ConcreteImport (make_ident "Root_Capability", None);
+        ConcreteImport (make_ident "Trapping_Arithmetic", None);
+        ConcreteImport (make_ident "Trapping_Add", None);
+        ConcreteImport (make_ident "Trapping_Subtract", None);
+        ConcreteImport (make_ident "Trapping_Multiply", None);
+        ConcreteImport (make_ident "Trapping_Divide", None);
+        ConcreteImport (make_ident "Modular_Arithmetic", None);
+        ConcreteImport (make_ident "Modular_Add", None);
+        ConcreteImport (make_ident "Modular_Subtract", None);
+        ConcreteImport (make_ident "Modular_Multiply", None);
+        ConcreteImport (make_ident "Modular_Divide", None)
       ]
     )
 
