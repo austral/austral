@@ -209,3 +209,18 @@ let has_union_constructor_with_name (SemanticModule { decls; _ }) name =
        false
   in
   List.exists pred decls
+
+let has_method_with_name (SemanticModule { decls; _ }) name =
+  let pred = function
+    | STypeClassDecl (STypeClass (_, _, _, methods)) ->
+       let pred' (SMethodDecl (n, _, _)) =
+         if equal_identifier name n then
+           true
+         else
+           false
+       in
+       List.exists pred' methods
+    | _ ->
+       false
+  in
+  List.exists pred decls
