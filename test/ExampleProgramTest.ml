@@ -69,7 +69,7 @@ end module body.
   eq 0 code;
   eq "a" stdout
 
-    (* Test that integer literals work in constructor calls. *)
+(* Test that integer literals work in constructor calls. *)
 let test_integer_literal_record_constructor _ =
   let i = {code|
 
@@ -98,12 +98,36 @@ end module body.
   eq 0 code;
   eq "" stdout
 
+(* Test that the trapping arithmetic typeclass produces expected results. *)
+let test_trapping_arithmetic _ =
+  let i = {code|
+
+module Example is
+    function Main(root: Root_Capability): Root_Capability;
+end module.
+
+|code}
+  and b = {code|
+module body Example is
+    function Main(root: Root_Capability): Root_Capability is
+        let res: Integer_32 := Trapping_Add(10, 10);
+        return root;
+    end;
+end module body.
+
+|code}
+  in
+  let (code, stdout) = car [(i, b)] "Example:Main" in
+  eq 0 code;
+  eq "" stdout
+
 
 let suite =
   "Example programs" >::: [
       "Empty program" >:: test_empty_program;
       "@embed intrinsic" >:: test_embed_intrinsic;
-      "Integer literals in record constructors" >:: test_integer_literal_record_constructor
+      "Integer literals in record constructors" >:: test_integer_literal_record_constructor;
+      "Trapping arithmetic" >:: test_trapping_arithmetic
     ]
 
 let _ = run_test_tt_main suite
