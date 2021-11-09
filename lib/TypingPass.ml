@@ -436,13 +436,16 @@ and augment_method_call menv source_module_name type_class_name typaram callable
   (* Use the bindings to get the effective return type *)
   let rt' = replace_variables bindings rt in
   let (bindings', rt'') = handle_return_type_polymorphism [typaram] rt' asserted_ty in
+  let bindings'' = merge_bindings bindings bindings' in
   (* Check: the set of bindings equals the set of type parameters *)
-  check_bindings [typaram] (merge_bindings bindings bindings');
+  check_bindings [typaram] bindings'';
   let (TypeParameter (type_parameter_name, _, from)) = typaram in
-  match get_binding bindings type_parameter_name from with
+  match get_binding bindings'' type_parameter_name from with
   | (Some dispatch_ty) ->
      let instance = get_instance menv source_module_name dispatch_ty type_class_name in
-     TMethodCall (callable_name, instance, arguments, rt'')
+     let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables bindings'' t)) params in
+     let arguments' = cast_arguments bindings'' params' arguments in
+     TMethodCall (callable_name, instance, arguments', rt'')
   | None ->
      err "Internal: couldn't extract dispatch type."
 

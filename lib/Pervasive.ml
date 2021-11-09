@@ -400,6 +400,28 @@ module body Austral.Pervasive is
         end;
     end;
 
+    implementation Trapping_Arithmetic(Double_Float) is
+        method Trapping_Add(lhs: Double_Float, rhs: Double_Float): Double_Float is
+            return @embed(Double_Float, "$1 + $2", lhs, rhs);
+        end;
+
+        method Trapping_Subtract(lhs: Double_Float, rhs: Double_Float): Double_Float is
+            return @embed(Double_Float, "$1 - $2", lhs, rhs);
+        end;
+
+        method Trapping_Multiply(lhs: Double_Float, rhs: Double_Float): Double_Float is
+            return @embed(Double_Float, "$1 * $2", lhs, rhs);
+        end;
+
+        method Trapping_Divide(lhs: Double_Float, rhs: Double_Float): Double_Float is
+            if rhs = 0.0 then
+                Abort("Division by zero in Trapping_Divide (Double_Float)");
+            end if;
+            return @embed(Double_Float, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+
     ---
     --- Modular Arithmetic
     ---
