@@ -62,8 +62,11 @@ and texpr =
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
-  | TPath of texpr * typed_path_elem list
-  | TPathRef of texpr * typed_path_elem list * ty * bool
+  | TPath of {
+      head: texpr;
+      elems: typed_path_elem list;
+      ty: ty
+    }
   | TEmbed of ty * string * texpr list
 
 and typed_when =
