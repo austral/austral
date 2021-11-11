@@ -10,6 +10,7 @@ type cpp_ty =
   | CPointer of cpp_ty
   | CStructType of cpp_struct
   | CUnionType of cpp_slot list
+[@@deriving show]
 and cpp_slot = CSlot of string * cpp_ty
 and cpp_struct = CStruct of string option * cpp_slot list
 
