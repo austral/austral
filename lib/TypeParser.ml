@@ -55,15 +55,11 @@ let parse_built_in_type name args =
   | "WriteReference" ->
      (match args with
       | [ty; ty'] ->
-         let u = type_universe ty in
-         if ((u = LinearUniverse) || (u = TypeUniverse)) then
-           let u' = type_universe ty' in
-           if (u' = RegionUniverse) then
-             Some (WriteRef (ty, ty'))
-           else
-             err "WriteReference error: Not a region"
+         let u' = type_universe ty' in
+         if (u' = RegionUniverse) then
+           Some (WriteRef (ty, ty'))
          else
-           err "Writable references can only point to linear types."
+           err "WriteReference error: Not a region"
       | _ ->
          err "Invalid WriteReference type specifier.")
   | _ ->

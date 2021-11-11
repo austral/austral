@@ -120,7 +120,6 @@ rule token = parse
   | "->" { HYPHEN_RIGHT }
   | "=>" { RIGHT_ARROW }
   | ":=" { ASSIGN }
-  | "&" { ADDRESS_OF }
   (* Strings and docstrings *)
   | "\"\"\"" { read_triple_string lexbuf }
   | '"' { read_string lexbuf }

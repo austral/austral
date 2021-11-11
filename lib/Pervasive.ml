@@ -12,6 +12,9 @@ module Austral.Pervasive is
     generic [T: Free, R: Region]
     function Deref(ref: Reference[T, R]): T;
 
+    generic [T: Free, R: Region]
+    function Deref_Write(ref: WriteReference[T, R]): T;
+
     generic [T: Type]
     function Fixed_Array_Size(arr: Fixed_Array[T]): Natural_64;
 
@@ -58,6 +61,11 @@ let pervasive_body_source = {code|
 module body Austral.Pervasive is
     generic [T: Free, R: Region]
     function Deref(ref: Reference[T, R]): T is
+        return @embed(T, "*$1", ref);
+    end;
+
+    generic [T: Free, R: Region]
+    function Deref_Write(ref: WriteReference[T, R]): T is
         return @embed(T, "*$1", ref);
     end;
 

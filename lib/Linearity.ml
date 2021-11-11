@@ -58,7 +58,7 @@ let rec count_appearances (name: identifier) (expr: texpr) =
      sum (List.map (fun (_, e) -> ca e) args)
   | TUnionConstructor (_, _, args) ->
      sum (List.map (fun (_, e) -> ca e) args)
-  | TPath (e, elems) ->
+  | TPath { head; elems; _ } ->
      (* All paths end in a free value. If the head of the path is the variable
         we're counting, we don't count this as an appearance. This is for
         programmer ergonomics. It's also so that if we have a record `r` with
@@ -72,29 +72,11 @@ let rec count_appearances (name: identifier) (expr: texpr) =
        (* Count the number of appearances of this variable in the expression,
           unless the expression is just a bare variable. So `f(x).y` will count
           but not `x.y`. *)
-       (match e with
+       (match head with
         | TVariable _ ->
            0
         | _ ->
-           ca e)
-     in
-     let ca_path elem =
-       (match elem with
-        | TSlotAccessor _ ->
-           0
-        | TPointerSlotAccessor _ ->
-           0
-        | TArrayIndex (ie, _) ->
-           count_appearances name ie)
-     in
-     e' + (sum (List.map ca_path elems))
-  | TPathRef (e, elems, _, _) ->
-     let e' =
-       (match e with
-        | TVariable _ ->
-           0
-        | _ ->
-           ca e)
+           ca head)
      in
      let ca_path elem =
        (match elem with

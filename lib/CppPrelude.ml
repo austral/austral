@@ -85,6 +85,16 @@ namespace A_Austral__Memory {
         return false;
     }
 
+    template<typename T>
+    T* A_Load_Read_Reference(T** ref) {
+        return *ref;
+    }
+
+    template<typename T>
+    T* A_Load_Write_Reference(T** ref) {
+        return *ref;
+    }
+
     using namespace A_Austral__Pervasive;
 
     template <typename T>

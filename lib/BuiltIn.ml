@@ -21,6 +21,7 @@ let pervasive_imports =
         ConcreteImport (make_ident "Some", None);
         ConcreteImport (make_ident "None", None);
         ConcreteImport (make_ident "Deref", None);
+        ConcreteImport (make_ident "Deref_Write", None);
         ConcreteImport (make_ident "Fixed_Array_Size", None);
         ConcreteImport (make_ident "Abort", None);
         ConcreteImport (make_ident "Root_Capability", None);
@@ -123,8 +124,31 @@ let memory_module =
         [ValueParameter (i "pointer", pointer_t qname)],
         Unit
       )
-  in
-  let allocate_array_def =
+  and load_read_ref_def =
+    let name = i "Load_Read_Reference" in
+    let qname = make_qident (memory_module_name, name, name) in
+    (* generic [T: Free, R: Region]
+       function Load_Read_Reference(ref: Reference[Pointer[T], R]): Reference[T, R] *)
+    SFunctionDeclaration (
+        VisPublic,
+        name,
+        [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)],
+        [ValueParameter (i "ref", ReadRef (NamedType (pointer_type_qname, [type_t qname], FreeUniverse), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
+        ReadRef (NamedType (pointer_type_qname, [type_t qname], FreeUniverse), TyVar (TypeVariable (i "R", RegionUniverse, qname)))
+      )
+  and load_write_ref_def =
+    let name = i "Load_Write_Reference" in
+    let qname = make_qident (memory_module_name, name, name) in
+    (* generic [T: Free, R: Region]
+       function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R] *)
+    SFunctionDeclaration (
+        VisPublic,
+        name,
+        [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)],
+        [ValueParameter (i "ref", WriteRef (NamedType (pointer_type_qname, [type_t qname], FreeUniverse), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
+        WriteRef (NamedType (pointer_type_qname, [type_t qname], FreeUniverse), TyVar (TypeVariable (i "R", RegionUniverse, qname)))
+      )
+  and allocate_array_def =
     let name = i "Allocate_Array" in
     let qname = make_qident (memory_module_name, name, name) in
     (* generic T: Type
@@ -180,6 +204,8 @@ let memory_module =
       load_def;
       store_def;
       deallocate_def;
+      load_read_ref_def;
+      load_write_ref_def;
       allocate_array_def;
       resize_array_def;
       deallocate_array_def;
