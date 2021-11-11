@@ -99,63 +99,55 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
      else
        err "The type of the condition in an if expression must be a boolean."
   | Path (e, elems) ->
-     let e' = aug e in
-     let elems' = augment_path menv module_name rm typarams lexenv (get_type e') elems in
-     let path' = TPath (e', elems') in
-     let universe = type_universe (get_type path') in
-     if universe = FreeUniverse then
-       path'
-     else
-       err "Paths must end in the free universe"
-  | PathRef (e, elems) ->
-     let e' = aug e in
-     (* The initial expression of a path a read reference or write reference *)
-     let (is_read, region) = (match (get_type e') with
-                              | ReadRef (_, r) ->
-                                 (true, r)
-                              | WriteRef (_, r) ->
-                                 (false, r)
-                              | _ ->
-                                 err "The initial expression of a path a read reference or write reference")
-     in
-     let elems' = augment_path menv module_name rm typarams lexenv (get_type e') elems in
-     let path' = TPath (e', elems') in
-     (* If `p` is a path that begins in a value that is reference or writable reference in a region `R`, and ends in a value of type `T`, then:
+     (* Path rules:
 
-        1. If `T` is `Pointer[T]`, then the type of the path is `Reference[T, R]` or `WriteReference[T, R]`.
-        2. Otherwise, the type of the path is `Reference[T, R]` or `WriteReference[T, R]`.
-      *)
-     let path_ty = get_type path' in
-     let (path_ty', is_pointer) =
-       (match path_ty with
-        | (NamedType (name, args, _)) ->
-           if is_pointer_type name then
-             (match args with
-              | [t] ->
-                 if is_read then
-                   (ReadRef (t, region), true)
-                 else
-                   (WriteRef (t, region), true)
-              | _ ->
-                 err "Bad args")
-           else
-             if is_read then
-               (ReadRef (path_ty, region), false)
-             else
-               (WriteRef (path_ty, region), false)
+        1. Path that begins in a reference ends in a reference.
+        2. All paths end in a type in the free universe.
+     *)
+     let e' = aug e in
+     (* Is the initial expression of a path a read reference or write reference or no reference? *)
+     let (is_read, region): (bool * ty option) =
+       (match (get_type e') with
+        | ReadRef (_, r) ->
+           (true, Some r)
+        | WriteRef (_, r) ->
+           (false, Some r)
         | _ ->
-           if is_read then
-             (ReadRef (path_ty, region), false)
-           else
-             (WriteRef (path_ty, region), false))
+           (false, None))
      in
-     TPathRef (e', elems', path_ty', is_pointer)
+     let elems' = augment_path menv module_name rm typarams lexenv (get_type e') elems in
+     let path_ty: ty = get_path_ty_from_elems elems' in
+     let path_ty: ty =
+       (* If the path starts in a reference it should end in one. *)
+       (match region with
+        | Some reg ->
+           if is_read then
+             ReadRef (path_ty, reg)
+           else
+             WriteRef (path_ty, reg)
+        | None ->
+           path_ty)
+     in
+     let universe = type_universe path_ty in
+     if universe = FreeUniverse then
+       TPath {
+           head = e';
+           elems = elems';
+           ty = path_ty
+         }
+     else
+       err ("Paths must end in the free universe: " ^ (show_ty path_ty))
   | Embed (ty, expr, args) ->
      TEmbed (
          parse_typespec menv rm typarams ty,
          expr,
          List.map aug args
        )
+
+and get_path_ty_from_elems (elems: typed_path_elem list): ty =
+  assert ((List.length elems) > 0);
+  let last = List.nth elems ((List.length elems) - 1) in
+  path_elem_type last
 
 and is_bool e =
   match get_type e with
@@ -610,7 +602,7 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
           else
             err "Mismatched universes"
        | None ->
-          err "No binding for this parameter")
+          err ("No binding for this parameter: " ^ (ident_string n)))
     in
     let _ = List.map check typarams in
     ()
@@ -702,7 +694,12 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
           | Some var_ty ->
              let elems = augment_lvalue_path menv module_name rm typarams lexenv var_ty elems in
              let value = augment_expr module_name menv rm typarams lexenv None value in
-             let path = TPath (value, elems) in
+             let path = TPath {
+                            head = value;
+                            elems = elems;
+                            ty = get_path_ty_from_elems elems
+                          }
+             in
              let universe = type_universe (get_type path) in
              if universe = FreeUniverse then
                TAssign (TypedLValue (var, elems), value)
@@ -960,10 +957,8 @@ and is_constant = function
      List.for_all (fun (_, v) -> is_constant v) values
   | TUnionConstructor (_, _, values) ->
      List.for_all (fun (_, v) -> is_constant v) values
-  | TPath (e, elems) ->
-     (is_constant e) && (List.for_all is_path_elem_constant elems)
-  | TPathRef (e, elems, _, _) ->
-     (is_constant e) && (List.for_all is_path_elem_constant elems)
+  | TPath { head; elems; _ } ->
+     (is_constant head) && (List.for_all is_path_elem_constant elems)
   | TEmbed _ ->
      true
 
