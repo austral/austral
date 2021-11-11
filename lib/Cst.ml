@@ -80,7 +80,6 @@ and cexpr =
   | CNegation of span * cexpr
   | CIfExpression of span * cexpr * cexpr * cexpr
   | CPath of span * cexpr * concrete_path_elem list
-  | CPathRef of span * cexpr * concrete_path_elem list
   | CEmbed of span * typespec * string * cexpr list
 
 and cstmt =
