@@ -91,19 +91,19 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function Buffer_Size(buffer: Reference[Buffer[T], R]): Natural_64 is
-        return buffer->size;
+        return Deref(buffer->size);
     end;
 
     -- Retrieval
 
     generic [T: Free, R: Region]
     function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T is
-        let arr: Heap_Array[T] := buffer->array;
+        let arr: Heap_Array[T] := Deref(buffer->array);
         return arr[index];
     end;
 
     generic [T: Type, R: Region]
     function Nth_Ref(buffer: Reference[Buffer[T], R], index: Natural_64): Reference[T, R] is
-        return &buffer->array[index];
+        return buffer->array[index];
     end;
 end module body.
