@@ -91,3 +91,15 @@ let span_text (code: string) (Span { startp; endp; _}): string =
   in
   (* Turn the lines into text. *)
   String.concat "\n" rendered_lines
+
+let empty_span: span = Span {
+                           filename = "";
+                           startp = Position {
+                                        line = 0;
+                                        column = 0;
+                                      };
+                           endp = Position {
+                                      line = 0;
+                                      column = 0;
+                                    };
+                         }

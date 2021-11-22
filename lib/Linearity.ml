@@ -142,17 +142,17 @@ let rec check_consistency (name: identifier) (is_write_ref: bool) (stmt: tstmt):
    unconsumed. If the variable is used incorrectly, raises an error. *)
 and check_consistency' (name: identifier) (is_write_ref: bool) (stmt: tstmt) (state: state): state =
   match stmt with
-  | TSkip ->
+  | TSkip _ ->
      state
-  | TLet (_, _, e, b) ->
+  | TLet (_, _, _, e, b) ->
      let state' = new_state name e state in
      check_consistency' name is_write_ref b state'
-  | TDestructure (_, e, b) ->
+  | TDestructure (_, _, e, b) ->
     let state' = new_state name e state in
     check_consistency' name is_write_ref b state'
-  | TAssign (_, e) ->
+  | TAssign (_, _, e) ->
      new_state name e state
-  | TIf (c, tb, fb) ->
+  | TIf (_, c, tb, fb) ->
      let state' = new_state name c state in
      let true_branch_state = check_consistency' name is_write_ref tb state'
      and false_branch_state = check_consistency' name is_write_ref fb state' in
@@ -162,7 +162,7 @@ and check_consistency' (name: identifier) (is_write_ref: bool) (stmt: tstmt) (st
        true_branch_state
      else
        lerr "Linear variable is consumed in one branch but not others."
-  | TCase (e, whens) ->
+  | TCase (_, e, whens) ->
      let state' = new_state name e state in
      let when_states = List.map (fun (TypedWhen (_, _, b)) -> check_consistency' name is_write_ref b state') whens in
      (* In a case statement, the state must be the same in all branches *)
@@ -170,7 +170,7 @@ and check_consistency' (name: identifier) (is_write_ref: bool) (stmt: tstmt) (st
        List.nth when_states 0
      else
        lerr "Linear variable is consumed in one branch but not others."
-  | TWhile (e, b) ->
+  | TWhile (_, e, b) ->
      (* Linear variables cannot appear in either the condition or body of a loop *)
      let ea = count_appearances name e
      and bs = check_consistency' name is_write_ref b state in
@@ -181,7 +181,7 @@ and check_consistency' (name: identifier) (is_write_ref: bool) (stmt: tstmt) (st
          lerr "Linear variables cannot appear in the body of a while loop."
        else
          state
-  | TFor (_, i, f, b) ->
+  | TFor (_, _, i, f, b) ->
      let state' = new_state name i state in
      let state'' = new_state name f state' in
      let bs = check_consistency' name is_write_ref b state'' in
@@ -201,12 +201,12 @@ and check_consistency' (name: identifier) (is_write_ref: bool) (stmt: tstmt) (st
          bs
      else
        check_consistency' name is_write_ref body state
-  | TBlock (a, b) ->
+  | TBlock (_, a, b) ->
       let state' = check_consistency' name is_write_ref a state in
       check_consistency' name is_write_ref b state'
-  | TDiscarding e ->
+  | TDiscarding (_, e) ->
      new_state name e state
-  | TReturn e ->
+  | TReturn (_, e) ->
      let state' = new_state name e state in
      if state' = Unconsumed then
        if is_write_ref then
@@ -236,9 +236,9 @@ let universe_linear_ish = function
    consistently. *)
 let rec check_linearity (stmt: tstmt): unit =
   match stmt with
-  | TSkip ->
+  | TSkip _ ->
      ()
-  | TLet (n, t, _, b) ->
+  | TLet (_, n, t, _, b) ->
      let u = type_universe t in
      (* Check this var in the body *)
      if universe_linear_ish u then
@@ -247,7 +247,7 @@ let rec check_linearity (stmt: tstmt): unit =
        ();
      (* Check the body for other linear vars *)
      check_linearity b
-  | TDestructure (bs, _, b) ->
+  | TDestructure (_, bs, _, b) ->
      let check' (n, t) =
          let u = type_universe t in
          if universe_linear_ish u then
@@ -259,10 +259,10 @@ let rec check_linearity (stmt: tstmt): unit =
      let _ = List.map check' bs in ()
   | TAssign _ ->
      ()
-  | TIf (_, tb, fb) ->
+  | TIf (_, _, tb, fb) ->
      check_linearity tb;
      check_linearity fb
-  | TCase (_, whens) ->
+  | TCase (_, _, whens) ->
      let _ = List.map (fun (TypedWhen (_, params, b)) ->
                  (* Check the individual bound values *)
                  let _ = List.map (fun (ValueParameter (name, ty)) ->
@@ -276,13 +276,13 @@ let rec check_linearity (stmt: tstmt): unit =
                  (* Check the body *)
                  check_linearity b) whens in
      ()
-  | TWhile (_, b) ->
+  | TWhile (_, _, b) ->
      check_linearity b
-  | TFor (_, _, _, b) ->
+  | TFor (_, _, _, _, b) ->
      check_linearity b
   | TBorrow { body; _ } ->
      check_linearity body
-  | TBlock (a, b) ->
+  | TBlock (_, a, b) ->
      check_linearity a;
      check_linearity b
   | TDiscarding _ ->

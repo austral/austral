@@ -5,12 +5,13 @@ open Cst
 open Ast
 open Escape
 open Qualifier
+open Span
 open Error
 
 let rec abs_stmt im stmt =
   match stmt with
-  | CSkip _ ->
-     ASkip
+  | CSkip span ->
+     ASkip span
   | CLet _ ->
      err "Let statement not in a list context"
   | CDestructure _ ->
@@ -116,9 +117,9 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
          in
          ADestructure (span, bs', e', b)
       | s ->
-         ABlock (abs_stmt im s, let_reshape im rest))
+         ABlock (empty_span, abs_stmt im s, let_reshape im rest))
   | [] ->
-     ASkip
+     ASkip empty_span
 
 and abs_lvalue im (ConcreteLValue (head, elems)) =
   LValue (head, List.map (abs_path_elem im) elems)

@@ -284,27 +284,27 @@ let rec gen_stmt (mn: module_name) (stmt: tstmt): cpp_stmt =
   and gs = gen_stmt mn
   in
   match stmt with
-  | TSkip ->
+  | TSkip _ ->
      CBlock []
-  | TLet (n, t, v, b) ->
+  | TLet (_, n, t, v, b) ->
      let l = CLet (gen_ident n, gen_type t, ge v) in
      CBlock [l; gs b]
-  | TDestructure (bs, e, b) ->
+  | TDestructure (_, bs, e, b) ->
      let tmp = new_variable () in
      let vardecl = CLet (tmp, gen_type (get_type e), ge e)
      and bs' = List.map (fun (n, t) -> CLet (gen_ident n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
      and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
-  | TAssign (lvalue, v) ->
+  | TAssign (_, lvalue, v) ->
      CAssign (gen_lvalue mn lvalue, ge v)
-  | TIf (c, tb, fb) ->
+  | TIf (_, c, tb, fb) ->
      CIf (ge c, gs tb, gs fb)
-  | TCase (e, whens) ->
+  | TCase (_, e, whens) ->
      gen_case mn e whens
-  | TWhile (c, b) ->
+  | TWhile (_, c, b) ->
      CWhile (ge c, gs b)
-  | TFor (v, i, f, b) ->
+  | TFor (_, v, i, f, b) ->
      CFor (gen_ident v, ge i, ge f, gs b)
   | TBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
@@ -320,11 +320,11 @@ let rec gen_stmt (mn: module_name) (stmt: tstmt): cpp_stmt =
      else
        let l = CLet (gen_ident rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
        CBlock [l; gs body]
-  | TBlock (a, b) ->
+  | TBlock (_, a, b) ->
      CBlock [gs a; gs b]
-  | TDiscarding e ->
+  | TDiscarding (_, e) ->
      CDiscarding (ge e)
-  | TReturn e ->
+  | TReturn (_, e) ->
      CReturn (ge e)
 
 and gen_lvalue mn (TypedLValue (name, elems)) =

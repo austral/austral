@@ -3,6 +3,7 @@ open Identifier
 open Common
 open Escape
 open Type
+open Span
 open Semantic
 
 type typed_module = TypedModule of module_name * typed_decl list
@@ -24,15 +25,16 @@ and typed_method_def =
   TypedMethodDef of identifier * value_parameter list * ty * tstmt
 
 and tstmt =
-  | TSkip
-  | TLet of identifier * ty * texpr * tstmt
-  | TDestructure of (identifier * ty) list * texpr * tstmt
-  | TAssign of typed_lvalue * texpr
-  | TIf of texpr * tstmt * tstmt
-  | TCase of texpr * typed_when list
-  | TWhile of texpr * tstmt
-  | TFor of identifier * texpr * texpr * tstmt
+  | TSkip of span
+  | TLet of span * identifier * ty * texpr * tstmt
+  | TDestructure of span * (identifier * ty) list * texpr * tstmt
+  | TAssign of span * typed_lvalue * texpr
+  | TIf of span * texpr * tstmt * tstmt
+  | TCase of span * texpr * typed_when list
+  | TWhile of span * texpr * tstmt
+  | TFor of span * identifier * texpr * texpr * tstmt
   | TBorrow of {
+      span: span;
       original: identifier;
       rename: identifier;
       region: identifier;
@@ -41,9 +43,9 @@ and tstmt =
       body: tstmt;
       mode: borrowing_mode
     }
-  | TBlock of tstmt * tstmt
-  | TDiscarding of texpr
-  | TReturn of texpr
+  | TBlock of span * tstmt * tstmt
+  | TDiscarding of span * texpr
+  | TReturn of span * texpr
 
 and texpr =
   | TNilConstant

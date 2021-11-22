@@ -6,7 +6,7 @@ open Escape
 type qtypespec = QTypeSpecifier of qident * qtypespec list
 
 type astmt =
-  | ASkip
+  | ASkip of span
   | ALet of span * identifier * qtypespec * aexpr * astmt
   | ADestructure of span * (identifier * qtypespec) list * aexpr * astmt
   | AAssign of span * lvalue * aexpr
@@ -28,7 +28,7 @@ type astmt =
       body: astmt;
       mode: borrowing_mode
     }
-  | ABlock of astmt * astmt
+  | ABlock of span * astmt * astmt
   | ADiscarding of span * aexpr
   | AReturn of span * aexpr
 

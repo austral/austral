@@ -635,8 +635,8 @@ let update_rm (mn, menv, _, typarams, lexenv, rt) rm =
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   let (module_name, menv, rm, typarams, lexenv, rt) = ctx in
   match stmt with
-  | ASkip ->
-     TSkip
+  | ASkip span ->
+     TSkip span
   | ALet (span, name, ty, value, body) ->
      adorn_error_with_span span
        (fun _ ->
@@ -646,7 +646,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let ty = replace_variables bindings expected_ty in
          let lexenv' = push_var lexenv name ty in
          let body' = augment_stmt (update_lexenv ctx lexenv') body in
-         TLet (name, ty, value', body'))
+         TLet (span, name, ty, value', body'))
   | ADestructure (span, bindings, value, body) ->
      adorn_error_with_span span
        (fun _ ->
@@ -677,6 +677,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let lexenv' = push_vars lexenv newvars in
                  let body' = augment_stmt (update_lexenv ctx lexenv') body in
                  TDestructure (
+                     span,
                      List.map (fun (n, _, t) -> (n, t)) bindings'',
                      value',
                      body'
@@ -702,7 +703,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              in
              let universe = type_universe (get_type path) in
              if universe = FreeUniverse then
-               TAssign (TypedLValue (var, elems), value)
+               TAssign (span, TypedLValue (var, elems), value)
              else
                err "Paths must end in the free universe"
           | None ->
@@ -712,7 +713,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
        (fun _ ->
          let c' = augment_expr module_name menv rm typarams lexenv None c in
          if is_boolean (get_type c') then
-           TIf (c', augment_stmt ctx t, augment_stmt ctx f)
+           TIf (span, c', augment_stmt ctx t, augment_stmt ctx f)
          else
            err "The type of the condition in an if statement must be a boolean.")
   | ACase (span, expr, whens) ->
@@ -735,7 +736,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            (* Group the cases and whens *)
            let whens' = group_cases_whens cases whens in
            let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
-           TCase (expr', whens'')
+           TCase (span, expr', whens'')
          else
            err "Non-exhaustive case statement.")
   | AWhile (span, c, body) ->
@@ -743,7 +744,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
        (fun _ ->
          let c' = augment_expr module_name menv rm typarams lexenv None c in
          if is_boolean (get_type c') then
-           TWhile (c', augment_stmt ctx body)
+           TWhile (span, c', augment_stmt ctx body)
          else
            err "The type of the condition in a while loop must be a boolean")
   | AFor { span; name; initial; final; body; } ->
@@ -755,7 +756,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            if is_compatible_with_size_type f' then
              let lexenv' = push_var lexenv name size_type in
              let b' = augment_stmt (update_lexenv ctx lexenv') body in
-             TFor (name, i', f', b')
+             TFor (span, name, i', f', b')
            else
              err "The type of the final value in a for loop must be an integer type."
          else
@@ -780,6 +781,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                let ctx' = update_lexenv ctx lexenv' in
                let ctx''= update_rm ctx' rm' in
                TBorrow {
+                   span=span;
                    original=original;
                    rename=rename;
                    region=region;
@@ -792,8 +794,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                err "Cannot borrow a non-linear type."
           | None ->
              err "No variable with this name."))
-  | ABlock (f, r) ->
-     TBlock (augment_stmt ctx f,
+  | ABlock (span, f, r) ->
+     TBlock (span,
+             augment_stmt ctx f,
              augment_stmt ctx r)
   | ADiscarding (span, e) ->
      adorn_error_with_span span
@@ -803,13 +806,13 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
            err "Discarding a linear value"
          else
-           TDiscarding e')
+           TDiscarding (span, e'))
   | AReturn (span, e) ->
      adorn_error_with_span span
        (fun _ ->
          let e' = augment_expr module_name menv rm typarams lexenv None e in
          let _ = match_type_with_value rt e' in
-         TReturn e')
+         TReturn (span, e'))
 
 and augment_lvalue_path (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
