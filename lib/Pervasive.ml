@@ -872,7 +872,7 @@ module body Austral.Pervasive is
 
     implementation Convertible_To_Integer_8(Integer_8) is
         method As_Integer_8(value: Integer_8): Integer_8 is
-            return @embed(Integer_8, "((uint8_t)($1))", value);
+            return value;
         end;
     end;
 
@@ -930,7 +930,7 @@ module body Austral.Pervasive is
 
     implementation Convertible_To_Integer_16(Integer_16) is
         method As_Integer_16(value: Integer_16): Integer_16 is
-            return @embed(Integer_16, "((int16_t)($1))", value);
+            return value;
         end;
     end;
 
@@ -988,7 +988,7 @@ module body Austral.Pervasive is
 
     implementation Convertible_To_Integer_32(Integer_32) is
         method As_Integer_32(value: Integer_32): Integer_32 is
-            return @embed(Integer_32, "((int32_t)($1))", value);
+            return value;
         end;
     end;
 
@@ -1046,7 +1046,7 @@ module body Austral.Pervasive is
 
     implementation Convertible_To_Integer_64(Integer_64) is
         method As_Integer_64(value: Integer_64): Integer_64 is
-            return @embed(Integer_64, "((int64_t)($1))", value);
+            return value;
         end;
     end;
 end module body.
