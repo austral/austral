@@ -34,6 +34,7 @@ jobs:
 
       - name: Install
         run: sudo make install
+        if: runner.os == 'Linux'
 
       - name: Run OCaml tests
         run: opam exec -- dune runtest
