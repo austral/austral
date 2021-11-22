@@ -92,8 +92,8 @@ module body Standard.Test.Box is
                         value => (contents = 'a'),
                         message => "Content is the letter 'a'"
                     );
-                    Unbox(value);
                 end;
+                Unbox(value);
             when None do
                 Abort("Unexpected.");
         end case;
