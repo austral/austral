@@ -52,6 +52,38 @@ module Austral.Pervasive is
         method Modular_Multiply(lhs: T, rhs: T): T;
         method Modular_Divide(lhs: T, rhs: T): T;
     end;
+
+    interface Convertible_To_Natural_8(T: Type) is
+        method As_Natural_8(value: T): Natural_8;
+    end;
+
+    interface Convertible_To_Natural_16(T: Type) is
+        method As_Natural_16(value: T): Natural_16;
+    end;
+
+    interface Convertible_To_Natural_32(T: Type) is
+        method As_Natural_32(value: T): Natural_32;
+    end;
+
+    interface Convertible_To_Natural_64(T: Type) is
+        method As_Natural_64(value: T): Natural_64;
+    end;
+
+    interface Convertible_To_Integer_8(T: Type) is
+        method As_Integer_8(value: T): Integer_8;
+    end;
+
+    interface Convertible_To_Integer_16(T: Type) is
+        method As_Integer_16(value: T): Integer_16;
+    end;
+
+    interface Convertible_To_Integer_32(T: Type) is
+        method As_Integer_32(value: T): Integer_32;
+    end;
+
+    interface Convertible_To_Integer_64(T: Type) is
+        method As_Integer_64(value: T): Integer_64;
+    end;
 end module.
 
 |code}
@@ -599,6 +631,422 @@ module body Austral.Pervasive is
                 Abort("Division by zero in Modular_Divide (Integer_64)");
             end if;
             return @embed(Integer_64, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    ---
+    --- Conversion to Natural_8
+    ---
+
+    implementation Convertible_To_Natural_8(Natural_8) is
+        method As_Natural_8(value: Natural_8): Natural_8 is
+            return value;
+        end;
+    end;
+
+    implementation Convertible_To_Natural_8(Natural_16) is
+        method As_Natural_8(value: Natural_16): Natural_8 is
+            return @embed(Natural_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_8(Natural_32) is
+        method As_Natural_8(value: Natural_32): Natural_8 is
+            return @embed(Natural_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_8(Natural_64) is
+        method As_Natural_8(value: Natural_64): Natural_8 is
+            return @embed(Natural_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_8(Integer_8) is
+        method As_Natural_8(value: Integer_8): Natural_8 is
+            return @embed(Natural_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_8(Integer_16) is
+        method As_Natural_8(value: Integer_16): Natural_8 is
+            return @embed(Natural_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_8(Integer_32) is
+        method As_Natural_8(value: Integer_32): Natural_8 is
+            return @embed(Natural_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_8(Integer_64) is
+        method As_Natural_8(value: Integer_64): Natural_8 is
+            return @embed(Natural_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    ---
+    --- Conversion to Natural_16
+    ---
+
+    implementation Convertible_To_Natural_16(Natural_8) is
+        method As_Natural_16(value: Natural_8): Natural_16 is
+            return @embed(Natural_16, "((uint16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_16(Natural_16) is
+        method As_Natural_16(value: Natural_16): Natural_16 is
+            return value;
+        end;
+    end;
+
+    implementation Convertible_To_Natural_16(Natural_32) is
+        method As_Natural_16(value: Natural_32): Natural_16 is
+            return @embed(Natural_16, "((uint16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_16(Natural_64) is
+        method As_Natural_16(value: Natural_64): Natural_16 is
+            return @embed(Natural_16, "((uint16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_16(Integer_8) is
+        method As_Natural_16(value: Integer_8): Natural_16 is
+            return @embed(Natural_16, "((uint16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_16(Integer_16) is
+        method As_Natural_16(value: Integer_16): Natural_16 is
+            return @embed(Natural_16, "((uint16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_16(Integer_32) is
+        method As_Natural_16(value: Integer_32): Natural_16 is
+            return @embed(Natural_16, "((uint16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_16(Integer_64) is
+        method As_Natural_16(value: Integer_64): Natural_16 is
+            return @embed(Natural_16, "((uint16_t)($1))", value);
+        end;
+    end;
+
+    ---
+    --- Conversion to Natural_32
+    ---
+
+    implementation Convertible_To_Natural_32(Natural_8) is
+        method As_Natural_32(value: Natural_8): Natural_32 is
+            return @embed(Natural_32, "((uint32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_32(Natural_16) is
+        method As_Natural_32(value: Natural_16): Natural_32 is
+            return @embed(Natural_32, "((uint32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_32(Natural_32) is
+        method As_Natural_32(value: Natural_32): Natural_32 is
+            return value;
+        end;
+    end;
+
+    implementation Convertible_To_Natural_32(Natural_64) is
+        method As_Natural_32(value: Natural_64): Natural_32 is
+            return @embed(Natural_32, "((uint32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_32(Integer_8) is
+        method As_Natural_32(value: Integer_8): Natural_32 is
+            return @embed(Natural_32, "((uint32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_32(Integer_16) is
+        method As_Natural_32(value: Integer_16): Natural_32 is
+            return @embed(Natural_32, "((uint32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_32(Integer_32) is
+        method As_Natural_32(value: Integer_32): Natural_32 is
+            return @embed(Natural_32, "((uint32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_32(Integer_64) is
+        method As_Natural_32(value: Integer_64): Natural_32 is
+            return @embed(Natural_32, "((uint32_t)($1))", value);
+        end;
+    end;
+
+    ---
+    --- Conversion to Natural_64
+    ---
+
+    implementation Convertible_To_Natural_64(Natural_8) is
+        method As_Natural_64(value: Natural_8): Natural_64 is
+            return @embed(Natural_64, "((uint64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_64(Natural_16) is
+        method As_Natural_64(value: Natural_16): Natural_64 is
+            return @embed(Natural_64, "((uint64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_64(Natural_32) is
+        method As_Natural_64(value: Natural_32): Natural_64 is
+            return @embed(Natural_64, "((uint64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_64(Natural_64) is
+        method As_Natural_64(value: Natural_64): Natural_64 is
+            return value;
+        end;
+    end;
+
+    implementation Convertible_To_Natural_64(Integer_8) is
+        method As_Natural_64(value: Integer_8): Natural_64 is
+            return @embed(Natural_64, "((uint64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_64(Integer_16) is
+        method As_Natural_64(value: Integer_16): Natural_64 is
+            return @embed(Natural_64, "((uint64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_64(Integer_32) is
+        method As_Natural_64(value: Integer_32): Natural_64 is
+            return @embed(Natural_64, "((uint64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Natural_64(Integer_64) is
+        method As_Natural_64(value: Integer_64): Natural_64 is
+            return @embed(Natural_64, "((uint64_t)($1))", value);
+        end;
+    end;
+
+    ---
+    --- Conversion to Integer_8
+    ---
+
+    implementation Convertible_To_Integer_8(Natural_8) is
+        method As_Integer_8(value: Natural_8): Integer_8 is
+            return @embed(Integer_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_8(Natural_16) is
+        method As_Integer_8(value: Natural_16): Integer_8 is
+            return @embed(Integer_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_8(Natural_32) is
+        method As_Integer_8(value: Natural_32): Integer_8 is
+            return @embed(Integer_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_8(Natural_64) is
+        method As_Integer_8(value: Natural_64): Integer_8 is
+            return @embed(Integer_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_8(Integer_8) is
+        method As_Integer_8(value: Integer_8): Integer_8 is
+            return @embed(Integer_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_8(Integer_16) is
+        method As_Integer_8(value: Integer_16): Integer_8 is
+            return @embed(Integer_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_8(Integer_32) is
+        method As_Integer_8(value: Integer_32): Integer_8 is
+            return @embed(Integer_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_8(Integer_64) is
+        method As_Integer_8(value: Integer_64): Integer_8 is
+            return @embed(Integer_8, "((uint8_t)($1))", value);
+        end;
+    end;
+
+    ---
+    --- Conversion to Integer_16
+    ---
+
+    implementation Convertible_To_Integer_16(Natural_8) is
+        method As_Integer_16(value: Natural_8): Integer_16 is
+            return @embed(Integer_16, "((int16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_16(Natural_16) is
+        method As_Integer_16(value: Natural_16): Integer_16 is
+            return @embed(Integer_16, "((int16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_16(Natural_32) is
+        method As_Integer_16(value: Natural_32): Integer_16 is
+            return @embed(Integer_16, "((int16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_16(Natural_64) is
+        method As_Integer_16(value: Natural_64): Integer_16 is
+            return @embed(Integer_16, "((int16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_16(Integer_8) is
+        method As_Integer_16(value: Integer_8): Integer_16 is
+            return @embed(Integer_16, "((int16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_16(Integer_16) is
+        method As_Integer_16(value: Integer_16): Integer_16 is
+            return @embed(Integer_16, "((int16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_16(Integer_32) is
+        method As_Integer_16(value: Integer_32): Integer_16 is
+            return @embed(Integer_16, "((int16_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_16(Integer_64) is
+        method As_Integer_16(value: Integer_64): Integer_16 is
+            return @embed(Integer_16, "((int16_t)($1))", value);
+        end;
+    end;
+
+    ---
+    --- Conversion to Integer_32
+    ---
+
+    implementation Convertible_To_Integer_32(Natural_8) is
+        method As_Integer_32(value: Natural_8): Integer_32 is
+            return @embed(Integer_32, "((int32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_32(Natural_16) is
+        method As_Integer_32(value: Natural_16): Integer_32 is
+            return @embed(Integer_32, "((int32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_32(Natural_32) is
+        method As_Integer_32(value: Natural_32): Integer_32 is
+            return @embed(Integer_32, "((int32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_32(Natural_64) is
+        method As_Integer_32(value: Natural_64): Integer_32 is
+            return @embed(Integer_32, "((int32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_32(Integer_8) is
+        method As_Integer_32(value: Integer_8): Integer_32 is
+            return @embed(Integer_32, "((int32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_32(Integer_16) is
+        method As_Integer_32(value: Integer_16): Integer_32 is
+            return @embed(Integer_32, "((int32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_32(Integer_32) is
+        method As_Integer_32(value: Integer_32): Integer_32 is
+            return @embed(Integer_32, "((int32_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_32(Integer_64) is
+        method As_Integer_32(value: Integer_64): Integer_32 is
+            return @embed(Integer_32, "((int32_t)($1))", value);
+        end;
+    end;
+
+    ---
+    --- Conversion to Integer_64
+    ---
+
+    implementation Convertible_To_Integer_64(Natural_8) is
+        method As_Integer_64(value: Natural_8): Integer_64 is
+            return @embed(Integer_64, "((int64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_64(Natural_16) is
+        method As_Integer_64(value: Natural_16): Integer_64 is
+            return @embed(Integer_64, "((int64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_64(Natural_32) is
+        method As_Integer_64(value: Natural_32): Integer_64 is
+            return @embed(Integer_64, "((int64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_64(Natural_64) is
+        method As_Integer_64(value: Natural_64): Integer_64 is
+            return @embed(Integer_64, "((int64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_64(Integer_8) is
+        method As_Integer_64(value: Integer_8): Integer_64 is
+            return @embed(Integer_64, "((int64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_64(Integer_16) is
+        method As_Integer_64(value: Integer_16): Integer_64 is
+            return @embed(Integer_64, "((int64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_64(Integer_32) is
+        method As_Integer_64(value: Integer_32): Integer_64 is
+            return @embed(Integer_64, "((int64_t)($1))", value);
+        end;
+    end;
+
+    implementation Convertible_To_Integer_64(Integer_64) is
+        method As_Integer_64(value: Integer_64): Integer_64 is
+            return @embed(Integer_64, "((int64_t)($1))", value);
         end;
     end;
 end module body.
