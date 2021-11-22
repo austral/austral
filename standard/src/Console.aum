@@ -1,0 +1,20 @@
+module body Standard.IO.Console is
+    pragma Unsafe_Module;
+
+    function Put_Character(character: Natural_8): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
+    function Print_Constant(string: Fixed_Array[Natural_8]): Unit is
+        for i from 0 to Fixed_Array_Size(string) do
+            Put_Character(string[i]);
+        end for;
+        return nil;
+    end;
+
+    function Print_Constant_Line(string: Fixed_Array[Natural_8]): Unit is
+        Print_Constant(string);
+        Put_Character(10);
+        return nil;
+    end;
+end module body.

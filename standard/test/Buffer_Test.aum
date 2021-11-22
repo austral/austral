@@ -1,0 +1,39 @@
+import Standard.Test.Unit (
+    Suite_Heading,
+    Test_Heading,
+    Assert_True
+);
+import Standard.Buffer (
+    Buffer,
+    Initialize,
+    Buffer_Size,
+    Nth_Free,
+    Destroy_Buffer
+);
+
+module body Standard.Test.Buffer is
+    function Buffer_Test_Suite(): Unit is
+        Suite_Heading("Standard.Buffer");
+        Basic_Test();
+        return nil;
+    end;
+
+    function Basic_Test(): Unit is
+        Test_Heading("Basic array test");
+        let buf: Buffer[Integer_32] := Initialize(3, 'e');
+        borrow buf as bufref in rho do
+            let size: Natural_64 := Buffer_Size(bufref);
+            Assert_True(
+                value => size = 3,
+                message => "Size equals 3"
+            );
+            let first: Integer_32 := Nth_Free(bufref, 0);
+            Assert_True(
+                value => first = 'e',
+                message => "First element is the character 'e'"
+            );
+        end;
+        Destroy_Buffer(buf);
+        return nil;
+    end;
+end module body.

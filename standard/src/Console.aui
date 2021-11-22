@@ -1,0 +1,4 @@
+module Standard.IO.Console is
+    function Print_Constant(string: Fixed_Array[Natural_8]): Unit;
+    function Print_Constant_Line(string: Fixed_Array[Natural_8]): Unit;
+end module.

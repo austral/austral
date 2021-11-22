@@ -1,0 +1,37 @@
+module Standard.Buffer is
+    type Buffer[T: Type]: Linear;
+
+    -- Lifecycle
+
+    --    generic [T: Type]
+    --   function Empty_Buffer(): Buffer[T];
+
+    generic [T: Free]
+    function Initialize(size: Natural_64, elem: T): Buffer[T];
+
+    generic [T: Type]
+    function Destroy_Buffer(buffer: Buffer[T]): Unit;
+
+    -- Query
+
+    generic [T: Free, R: Region]
+    function Buffer_Size(buffer: Reference[Buffer[T], R]): Natural_64;
+
+    -- Retrieval
+
+    generic [T: Type, R: Region]
+    function Nth_Ref(buffer: Reference[Buffer[T], R], index: Natural_64): Reference[T, R];
+
+    generic [T: Free, R: Region]
+    function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T;
+
+    -- Insertion
+
+    --generic [T: Type, R: Region]
+    --function Insert_After(buffer: WriteReference[Buffer[T], R], elem: T): Unit;
+
+    -- Removal
+
+    --generic [T: Type, R: Region]
+    --function Remove_Nth(buffer: WriteReference[Buffer[T], R], index: Natural_64): T;
+end module.

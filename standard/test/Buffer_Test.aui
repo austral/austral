@@ -1,0 +1,3 @@
+module Standard.Test.Buffer is
+    function Buffer_Test_Suite(): Unit;
+end module.

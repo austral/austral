@@ -1,0 +1,74 @@
+import Austral.Memory (
+    Pointer,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
+
+module body Standard.Box is
+    pragma Unsafe_Module;
+
+    record Box[T: Type]: Linear is
+        pointer: Pointer[T];
+    end;
+
+    generic [T: Type]
+    function Make(val: T): Option[Box[T]] is
+        let ptr: Option[Pointer[T]] := Allocate(val);
+        case ptr of
+            when Some(value: Pointer[T]) do
+                let box: Box[T] := Box(pointer => value);
+                let boxopt: Option[Box[T]] := Some(value => box);
+                return boxopt;
+            when None do
+                let boxopt: Option[Box[T]] := None();
+                return boxopt;
+        end case;
+    end;
+
+    generic [T: Type]
+    function Unbox(box: Box[T]): T is
+        let { pointer: Pointer[T] } := box;
+        let value: T := Load(pointer);
+        Deallocate(pointer);
+        return value;
+    end;
+
+    generic [T: Free]
+    function Swap_Free(box: Box[T], new: T): Box[T] is
+        let { pointer: Pointer[T] } := box;
+        let old: T := Load(pointer);
+        Store(pointer, new);
+        let newbox: Box[T] := Box(pointer => pointer);
+        return newbox;
+    end;
+
+    generic [T: Free, R: Region]
+    function Read_Free(boxref: Reference[Box[T], R]): T is
+        let ptr: Pointer[T] := boxref->pointer;
+        let value: T := Load(ptr);
+        return value;
+    end;
+
+    generic [T: Free, R: Region]
+    function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit is
+        let ptr: Pointer[T] := boxref->pointer;
+        Store(ptr, value);
+        return nil;
+    end;
+
+    generic [T: Type, R: Region]
+    function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R] is
+        let ref: Reference[T, R] := &boxref->pointer;
+        return ref;
+    end;
+
+    generic [T: Free, R: Region]
+    function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
+        let ptr: Pointer[T] := boxref->pointer;
+        let old_value: T := Load(ptr);
+        Store(ptr, value);
+        return old_value;
+    end;
+end module body.

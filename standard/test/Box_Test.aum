@@ -1,0 +1,121 @@
+import Standard.Test.Unit (
+    Suite_Heading,
+    Test_Heading,
+    Assert_True
+);
+import Standard.Box (
+    Box,
+    Make,
+    Swap_Free,
+    Read_Free,
+    Store_Free,
+    Get_Value_Ref,
+    Swap_Mut,
+    Unbox
+);
+
+module body Standard.Test.Box is
+    function Box_Test_Suite(): Unit is
+        Suite_Heading("Standard.Box");
+        Test_Box_Swap_Unbox();
+        Test_Box_Read_Free_Unbox();
+        Test_Box_Store_Unbox();
+        Test_Box_Load_Unbox();
+        Test_Box_Swap_Mut_Unbox();
+        return nil;
+    end;
+
+    function Test_Box_Swap_Unbox(): Unit is
+        Test_Heading("Box, swap, unbox");
+        let box: Option[Box[Integer_32]] := Make('e');
+        case box of
+            when Some(value: Box[Integer_32]) do
+                let newbox: Box[Integer_32] := Swap_Free(value, 'a');
+                let contents: Integer_32 := Unbox(newbox);
+                Assert_True(
+                    value => (contents = 'a'),
+                    message => "Content is the letter 'a'"
+                );
+            when None do
+                Abort("Unexpected.");
+        end case;
+        return nil;
+    end;
+
+    function Test_Box_Read_Free_Unbox(): Unit is
+        Test_Heading("Box, read free, unbox");
+        let box: Option[Box[Integer_32]] := Make('a');
+        case box of
+            when Some(value: Box[Integer_32]) do
+                borrow value as value2 in rho do
+                    let contents: Integer_32 := Read_Free(value2);
+                    Assert_True(
+                        value => (contents = 'a'),
+                        message => "Content is the letter 'a'"
+                    );
+                end;
+                Unbox(value);
+            when None do
+                Abort("Unexpected.");
+        end case;
+        return nil;
+    end;
+
+    function Test_Box_Store_Unbox(): Unit is
+        Test_Heading("Box, store, unbox");
+        let box: Option[Box[Integer_32]] := Make('e');
+        case box of
+            when Some(value: Box[Integer_32]) do
+                borrow! value as value2 in rho do
+                    Store_Free(value2, 'a');
+                end;
+                let contents: Integer_32 := Unbox(value);
+                Assert_True(
+                    value => (contents = 'a'),
+                    message => "Content is the letter 'a'"
+                );
+            when None do
+                Abort("Unexpected.");
+        end case;
+        return nil;
+    end;
+
+    function Test_Box_Load_Unbox(): Unit is
+        Test_Heading("Box, load, unbox");
+        let box: Option[Box[Integer_32]] := Make('a');
+        case box of
+            when Some(value: Box[Integer_32]) do
+                borrow value as boxref in rho do
+                    let valueref: Reference[Integer_32, rho] := Get_Value_Ref(boxref);
+                    let contents: Integer_32 := Deref(valueref);
+                    Assert_True(
+                        value => (contents = 'a'),
+                        message => "Content is the letter 'a'"
+                    );
+                    Unbox(value);
+                end;
+            when None do
+                Abort("Unexpected.");
+        end case;
+        return nil;
+    end;
+
+    function Test_Box_Swap_Mut_Unbox(): Unit is
+        Test_Heading("Box, swap mut, unbox");
+        let box: Option[Box[Integer_32]] := Make(101);
+        case box of
+            when Some(value: Box[Integer_32]) do
+                borrow! value as boxmutref in rho do
+                    Swap_Mut(boxmutref, 'a');
+                end;
+                let contents: Integer_32 := Unbox(value);
+                Assert_True(
+                    value => (contents = 'a'),
+                    message => "Content is the letter 'a'"
+                );
+            when None do
+                Abort("Unexpected.");
+        end case;
+        return nil;
+    end;
+end module body.

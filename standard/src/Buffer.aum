@@ -1,0 +1,109 @@
+import Austral.Memory (
+    Heap_Array,
+    Allocate_Array,
+    Resize_Array,
+    Deallocate_Array,
+    Heap_Array_Size
+);
+
+module body Standard.Buffer is
+    -- Need this to use Austral.Memory.
+    pragma Unsafe_Module;
+
+    ----------
+    -- Private
+    ----------
+
+    -- The growth factor times the array's capacity tells us the next size of
+    -- the array when resizing. Naively, we double the size of the array when
+    -- hitting the capacity.
+    constant Growth_Factor: Natural_64 := 2;
+
+    -- Allocate an array, and abort if allocation fails.
+    generic [T: Type]
+    function Allocate_Or_Die(size: Natural_64): Heap_Array[T] is
+        let arropt: Option[Heap_Array[T]] := Allocate_Array(size);
+        case arropt of
+            when Some(value: Heap_Array[T]) do
+                return value;
+            when None do
+                Abort("Array allocation failed.");
+        end case;
+    end;
+
+    ---------
+    -- Public
+    ---------
+
+    record Buffer[T: Type]: Linear is
+        -- The capacity is the true underlying size. It is different from the
+        -- size since we allocate more space than we need in order to minimize
+        -- frequent reallocation.
+        capacity: Natural_64;
+        -- The number of elements actually stored in the array.
+        size: Natural_64;
+        -- The underlying heap array.
+        array: Heap_Array[T];
+
+        -- Invariants:
+        --
+        --   capacity >= size
+    end;
+
+    -- Lifecycle functions.
+
+    -- generic [T: Type]
+    -- function Empty_Buffer(): Buffer[T] is
+    --     -- For simplicity, we want the buffer to always be non-empty. Also, most
+    --     -- empty buffers won't stay empty in perpetuity. So to create an empty
+    --     -- buffer we allocate Initial_Size.
+    --     let Initial_Size: Natural_64 := 16;
+    --     let array: Heap_Array[T] := Allocate_Or_Die(Initial_Size);
+    --     return Buffer(
+    --         capacity => Initial_Size,
+    --         size => 0,
+    --         array => array
+    --     );
+    -- end;
+
+    generic [T: Free]
+    function Initialize(size: Natural_64, elem: T): Buffer[T] is
+        let array: Heap_Array[T] := Allocate_Or_Die(size);
+        for i from 0 to size - 1 do
+            array[i] := elem;
+        end for;
+        let buf: Buffer[T] := Buffer(
+            capacity => size,
+            size => size,
+            array => array
+        );
+        return buf;
+    end;
+
+    generic [T: Type]
+    function Destroy_Buffer(buffer: Buffer[T]): Unit is
+        let { capacity: Natural_64, size: Natural_64, array: Heap_Array[T] } := buffer;
+        Deallocate_Array(array);
+        return nil;
+    end;
+
+    -- Query
+
+    generic [T: Free, R: Region]
+    function Buffer_Size(buffer: Reference[Buffer[T], R]): Natural_64 is
+        return buffer->size;
+    end;
+
+    -- Retrieval
+
+    generic [T: Free, R: Region]
+    function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T is
+        let arr: Heap_Array[T] := buffer->array;
+        return arr[index];
+    end;
+
+    generic [T: Type, R: Region]
+    function Nth_Ref(buffer: Reference[Buffer[T], R], index: Natural_64): Reference[T, R] is
+        return &buffer->array[index];
+    end;
+end module body.
