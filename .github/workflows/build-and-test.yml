@@ -32,6 +32,9 @@ jobs:
       - name: Build
         run: opam exec -- dune build && cp _build/default/bin/austral.exe austral
 
+      - name: Install
+        run: sudo make install
+
       - name: Run OCaml tests
         run: opam exec -- dune runtest
         if: runner.os == 'Linux'
