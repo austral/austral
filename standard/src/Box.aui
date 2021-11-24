@@ -1,24 +1,60 @@
+"""
+
+This module implements the Box type, a linear pointer to an object in the heap.
+
+"""
+
 module Standard.Box is
+    """
+    The Box type is a linear pointer to an object in the heap.
+
+    Boxes are always linear regardless of what they point to.
+    """
     type Box[T: Type]: Linear;
 
+    """
+    Create a Box from the value it contains. If the allocation succeeds, returns
+    Some of a box. Otherwise returns None.
+    """
     generic [T: Type]
     function Make(val: T): Option[Box[T]];
 
+    """
+    Deallocate the memory and return the value pointed to by the Box.
+    """
     generic [T: Type]
     function Unbox(box: Box[T]): T;
 
+    """
+    If the Box contains a value of a Free type, then replace its contents with
+    the given value. The old value is silently discarded.
+    """
     generic [T: Free]
     function Swap_Free(box: Box[T], new: T): Box[T];
 
+    """
+    If the Box contains a value of a Free type, we can extract it through a reference.
+    """
     generic [T: Free, R: Region]
     function Read_Free(boxref: Reference[Box[T], R]): T;
 
+    """
+    If the Box contains a value of a free type, we can store new data in it. The
+    old data is silently discarded.
+    """
     generic [T: Free, R: Region]
     function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit;
 
+    """
+    Given a write reference to a box, replace the contents of the box with a new
+    value, returning the old one.
+    """
     generic [T: Free, R: Region]
     function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T;
 
+    """
+    Given a read reference to a Box, return a reference to the Box's contents.
+    """
     generic [T: Type, R: Region]
     function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R];
 end module.
