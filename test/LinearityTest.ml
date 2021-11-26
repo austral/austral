@@ -205,7 +205,8 @@ end module body.
     Austral_error _ ->
     assert_bool "Passed" true
 
-(* Test that forgetting to consume a linear value bound in a `case` statement fails. *)
+(* Test that forgetting to consume a linear value bound in a `case` statement
+   fails. *)
 let test_forget_case_binding _ =
   let i = {code|
 
