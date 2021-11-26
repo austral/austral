@@ -390,6 +390,41 @@ end module body.
   eq 0 code;
   eq "" stdout
 
+(* Test that a linear value created outside a loop cannot be used inside that
+   loop. *)
+let test_for_loop_with_external_linear_value _ =
+  let i = {code|
+
+module Example is
+    function Main(root: Root_Capability): Root_Capability;
+end module.
+
+|code}
+  and b = {code|
+
+module body Example is
+    record R : Linear is
+        x: Integer_32;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        let r: R := R(x => 32);
+        for i from 0 to 10 do
+            let { x: Integer_32 } := r;
+        end for;
+        return root;
+    end;
+end module body.
+
+|code}
+  in
+  try
+    let _ = compile_and_run [(i, b)] "Example:Main" in
+    assert_failure "This should have failed."
+  with
+    Austral_error _ ->
+    assert_bool "Passed" true
+
 let suite =
   "Linearity checker tests" >::: [
       "Destructure record" >:: test_destructure_record;
@@ -401,7 +436,8 @@ let suite =
       "Forget a case binding" >:: test_forget_case_binding;
       "Consume a case binding twice" >:: test_consume_case_binding_twice;
       "Unbox a box twice" >:: test_unbox_twice;
-      "Create and consume a linear value within a loop" >:: test_for_loop_with_internal_linear_value
+      "Create and consume a linear value within a loop" >:: test_for_loop_with_internal_linear_value;
+      "Create a linear value outside a loop and consume it inside" >:: test_for_loop_with_external_linear_value
     ]
 
 let _ = run_test_tt_main suite
