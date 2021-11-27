@@ -1,5 +1,6 @@
 open Identifier
 open Region
+open Error
 
 type universe =
   | FreeUniverse
@@ -13,6 +14,7 @@ type integer_width =
   | Width16
   | Width32
   | Width64
+  | WidthIndex
 [@@deriving eq, show]
 
 type signedness =
@@ -59,7 +61,11 @@ let rec type_string = function
   | Boolean ->
      "Boolean"
   | Integer (s, w) ->
-     (signedness_string s) ^ "_" ^ (width_string w)
+     (match w with
+      | WidthIndex ->
+         "Index"
+      | _ ->
+         (signedness_string s) ^ "_" ^ (width_string w))
   | SingleFloat ->
      "SingleFloat"
   | DoubleFloat ->
@@ -86,6 +92,8 @@ and width_int = function
   | Width16 -> 16
   | Width32 -> 32
   | Width64 -> 64
+  | WidthIndex ->
+     err "Should not use width_int with a value of WidthIndex"
 
 and width_string w = string_of_int (width_int w)
 
