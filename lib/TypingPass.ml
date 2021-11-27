@@ -311,7 +311,7 @@ and augment_function_call name typarams params rt asserted_ty args =
   let bindings = check_argument_list params arguments in
   (* Use the bindings to get the effective return type *)
   let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism typarams rt' asserted_ty in
+  let (bindings', rt'') = handle_return_type_polymorphism (local_name name) typarams rt' asserted_ty in
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings typarams (merge_bindings bindings bindings');
   let arguments' = cast_arguments bindings' params arguments in
@@ -337,7 +337,7 @@ and augment_typealias_callable name typarams universe asserted_ty definition_ty 
              )
   in
   let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism typarams rt' asserted_ty in
+  let (bindings', rt'') = handle_return_type_polymorphism (local_name name) typarams rt' asserted_ty in
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings typarams (merge_bindings bindings bindings');
   TCast (arg, rt'')
@@ -369,7 +369,7 @@ and augment_record_constructor (name: qident) (typarams: type_parameter list) (u
                         universe)
     in
     let rt' = replace_variables bindings rt in
-    let (bindings', rt'') = handle_return_type_polymorphism typarams rt' asserted_ty in
+    let (bindings', rt'') = handle_return_type_polymorphism (local_name name) typarams rt' asserted_ty in
     (* Check: the set of bindings equals the set of type parameters *)
     check_bindings typarams (merge_bindings bindings bindings');
     (* Check the resulting type is in the correct universe *)
@@ -406,7 +406,7 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
                         universe)
     in
     let rt' = replace_variables bindings rt in
-    let (bindings', rt'') = handle_return_type_polymorphism typarams rt' asserted_ty in
+    let (bindings', rt'') = handle_return_type_polymorphism case_name typarams rt' asserted_ty in
     (* Check: the set of bindings equals the set of type parameters *)
     check_bindings typarams (merge_bindings bindings bindings');
     (* Check the resulting type is in the correct universe *)
@@ -427,7 +427,7 @@ and augment_method_call menv source_module_name type_class_name typaram callable
   let bindings = check_argument_list params arguments in
   (* Use the bindings to get the effective return type *)
   let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism [typaram] rt' asserted_ty in
+  let (bindings', rt'') = handle_return_type_polymorphism (local_name callable_name) [typaram] rt' asserted_ty in
   let bindings'' = merge_bindings bindings bindings' in
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings [typaram] bindings'';
@@ -571,13 +571,15 @@ and make_substs (bindings: type_bindings) (typarams: type_parameter list): (iden
   in
   List.filter_map f typarams
 
-and handle_return_type_polymorphism (typarams: type_parameter list) (rt: ty) (asserted_ty: ty option): (type_bindings * ty) =
+and handle_return_type_polymorphism (name: identifier) (typarams: type_parameter list) (rt: ty) (asserted_ty: ty option): (type_bindings * ty) =
   if is_return_type_polymorphic typarams rt then
     match asserted_ty with
     | (Some asserted_ty') ->
        let bindings = match_type rt asserted_ty' in
        (bindings, replace_variables bindings rt)
-    | None -> err "Callable is polymorphic in the return type but has no asserted type."
+    | None -> err ("Callable '"
+                   ^ (ident_string name)
+                   ^ "' is polymorphic in the return type but has no asserted type.")
   else
     (empty_bindings, rt)
 

@@ -28,7 +28,7 @@ module Standard.Buffer is
     -- Insertion
 
     --generic [T: Type, R: Region]
-    --function Insert_After(buffer: WriteReference[Buffer[T], R], elem: T): Unit;
+    --function Insert(buffer: WriteReference[Buffer[T], R], index: Natural_64, elem: T): Unit;
 
     -- Removal
 
