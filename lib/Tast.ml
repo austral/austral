@@ -5,6 +5,7 @@ open Escape
 open Type
 open Span
 open Semantic
+open Error
 
 type typed_module = TypedModule of module_name * typed_decl list
 
@@ -71,6 +72,7 @@ and texpr =
       ty: ty
     }
   | TEmbed of ty * string * texpr list
+  | TDeref of texpr
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt
@@ -152,6 +154,14 @@ let rec get_type = function
      ty
   | TEmbed (ty, _, _) ->
      ty
+  | TDeref e ->
+     match get_type e with
+     | ReadRef (t, _) ->
+        t
+     | WriteRef (t, _) ->
+        t
+     | _ ->
+        err ("Internal error: a dereference expression was constructed whose argument is not a reference type.")
 
 and path_elem_type = function
   | TSlotAccessor (_, t) ->
