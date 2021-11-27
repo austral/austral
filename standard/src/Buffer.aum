@@ -45,7 +45,7 @@ module body Standard.Buffer is
 
     -- Grow a buffer by one element, reallocating if necessary.
     generic [T: Type, R: Region]
-    function Increase_Size_By_One(buffer: WriteReference[Buffer[T], R], new_size: Natural_64): Unit is
+    function Increase_Size_By_One(buffer: WriteReference[Buffer[T], R]): Unit is
         let old_size: Natural_64 := Deref_Write(buffer->size);
         let old_capacity: Natural_64 := Deref_Write(buffer->capacity);
         -- If size = capacity, then we need to resize first.
@@ -141,13 +141,33 @@ module body Standard.Buffer is
 
     -- generic [T: Type, R: Region]
     -- function Insert(buffer: WriteReference[Buffer[T], R], index: Natural_64, elem: T): Unit is
+    --     let old_size: Natural_64 := Deref_Write(buffer->size);
     --     -- The insertion index is the position the element will have when the
     --     -- buffer is modified. It is a natural number in the closed interval [0, size].
     --     --
     --     -- If index = 0, the element will be placed at the zeroth position. If
     --     -- index = size, the element will be placed in the last position.
-    --     if index > Deref_Write(buffer->size) then
+    --     if index > old_size then
     --         Abort("Insertion index out of bounds.");
+    --     end if;
+    --     -- Increase the size by one, reallocating if necessary.
+    --     Increase_Size_By_One(buffer);
+    --     -- Cases:
+    --     --
+    --     --   1. If the array had a size of zero, just insert the element at the
+    --     --      zeroth position.
+    --     --   2. If the array has a size >= 1, then count backwards from the
+    --     --      size, moving each element over, until you get to the index.
+    --     if old_size = 0 then
+    --         buffer->array[0] := elem;
+    --     else
+    --         let idx: Natural_64 := old_size + 1;
+    --         while idx /= index do
+    --             let arr: Heap_Array[T] := Deref_Write(buffer->array);
+    --             let elem_to_move: T := arr[idx - 1];
+    --             buffer[idx] := elem_to_move;
+    --         end while;
+
     --     end if;
     --     return nil;
     -- end;
