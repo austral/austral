@@ -39,6 +39,9 @@ module Austral.Pervasive is
     constant Minimum_Integer_64: Integer_64;
     constant Maximum_Integer_64: Integer_64;
 
+    constant Minimum_Index: Index;
+    constant Maximum_Index: Index;
+
     interface Trapping_Arithmetic(T: Type) is
         method Trapping_Add(lhs: T, rhs: T): T;
         method Trapping_Subtract(lhs: T, rhs: T): T;
@@ -103,6 +106,9 @@ module body Austral.Pervasive is
 
     constant Minimum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MIN");
     constant Maximum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MAX");
+
+    constant Minimum_Index: Index := 0;
+    constant Maximum_Index: Index := @embed(Index, "SIZE_MAX");
 
     ---
     --- Trapping Arithmetic
