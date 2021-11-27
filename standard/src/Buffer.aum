@@ -52,19 +52,20 @@ module body Standard.Buffer is
 
     -- Lifecycle functions.
 
-    -- generic [T: Type]
-    -- function Empty_Buffer(): Buffer[T] is
-    --     -- For simplicity, we want the buffer to always be non-empty. Also, most
-    --     -- empty buffers won't stay empty in perpetuity. So to create an empty
-    --     -- buffer we allocate Initial_Size.
-    --     let Initial_Size: Natural_64 := 16;
-    --     let array: Heap_Array[T] := Allocate_Or_Die(Initial_Size);
-    --     return Buffer(
-    --         capacity => Initial_Size,
-    --         size => 0,
-    --         array => array
-    --     );
-    -- end;
+    generic [T: Type]
+    function Empty_Buffer(): Buffer[T] is
+        -- For simplicity, we want the buffer to always be non-empty. Also, most
+        -- empty buffers won't stay empty in perpetuity. So to create an empty
+        -- buffer we allocate Initial_Size.
+        let initial_size: Natural_64 := 16;
+        let array: Heap_Array[T] := Allocate_Or_Die(initial_size);
+        let buf: Buffer[T] := Buffer(
+            capacity => initial_size,
+            size => 0,
+            array => array
+        );
+        return buf;
+    end;
 
     generic [T: Free]
     function Initialize(size: Natural_64, elem: T): Buffer[T] is

@@ -3,8 +3,8 @@ module Standard.Buffer is
 
     -- Lifecycle
 
-    --    generic [T: Type]
-    --   function Empty_Buffer(): Buffer[T];
+    generic [T: Type]
+    function Empty_Buffer(): Buffer[T];
 
     generic [T: Free]
     function Initialize(size: Natural_64, elem: T): Buffer[T];

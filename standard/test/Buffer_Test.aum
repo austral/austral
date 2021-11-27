@@ -6,6 +6,7 @@ import Standard.Test.Unit (
 import Standard.Buffer (
     Buffer,
     Initialize,
+    Empty_Buffer,
     Buffer_Size,
     Nth_Free,
     Destroy_Buffer
@@ -15,6 +16,7 @@ module body Standard.Test.Buffer is
     function Buffer_Test_Suite(): Unit is
         Suite_Heading("Standard.Buffer");
         Basic_Test();
+        Empty_Buffer_Test();
         return nil;
     end;
 
@@ -31,6 +33,20 @@ module body Standard.Test.Buffer is
             Assert_True(
                 value => first = 'e',
                 message => "First element is the character 'e'"
+            );
+        end;
+        Destroy_Buffer(buf);
+        return nil;
+    end;
+
+    function Empty_Buffer_Test(): Unit is
+        Test_Heading("Empty buffer test");
+        let buf: Buffer[Integer_32] := Empty_Buffer();
+        borrow buf as bufref in rho do
+            let size: Natural_64 := Buffer_Size(bufref);
+            Assert_True(
+                value => size = 0,
+                message => "Size equals 0"
             );
         end;
         Destroy_Buffer(buf);
