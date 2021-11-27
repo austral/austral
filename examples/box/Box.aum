@@ -49,7 +49,7 @@ module body Example.Box is
     generic [T: Free, R: Region]
     function Read_Free(boxref: Reference[Box[T], R]): T is
         let ptrref: Reference[Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := Deref(ptrref);
+        let ptr: Pointer[T] := !ptrref;
         let value: T := Load(ptr);
         return value;
     end;
@@ -57,7 +57,7 @@ module body Example.Box is
     generic [T: Free, R: Region]
     function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit is
         let ptrref: WriteReference[Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := Deref_Write(ptrref);
+        let ptr: Pointer[T] := !(ptrref);
         Store(ptr, value);
         return nil;
     end;
@@ -70,7 +70,7 @@ module body Example.Box is
 
     generic [T: Free, R: Region]
     function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
-        let ptr: Pointer[T] := Deref_Write(boxref->pointer);
+        let ptr: Pointer[T] := !(boxref->pointer);
         let old_value: T := Load(ptr);
         Store(ptr, value);
         return old_value;
@@ -121,7 +121,7 @@ module body Example.Box is
             when Some(value: Box[Integer_32]) do
                 borrow value as boxref in rho do
                     let valueref: Reference[Integer_32, rho] := Get_Value_Ref(boxref);
-                    let contents: Integer_32 := Deref(valueref);
+                    let contents: Integer_32 := !(valueref);
                     Put_Character(contents);
                 end;
                 Unbox(value);
