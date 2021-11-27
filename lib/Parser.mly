@@ -76,6 +76,7 @@ open Span
 %token HYPHEN_RIGHT
 %token RIGHT_ARROW
 %token ASSIGN
+%token DEREF
 /* Strings and docstrings */
 %token <string> STRING_CONSTANT
 %token <string> TRIPLE_STRING_CONSTANT
@@ -437,6 +438,7 @@ compound_expression:
   | atomic_expression AND atomic_expression { CConjunction (from_loc $loc, $1, $3) }
   | atomic_expression OR atomic_expression { CDisjunction (from_loc $loc, $1, $3) }
   | NOT atomic_expression { CNegation (from_loc $loc, $2) }
+  | DEREF atomic_expression { CDeref (from_loc $loc, $2) }
   | arith_expr { $1 }
   | IF expression THEN expression ELSE expression { CIfExpression (from_loc $loc, $2, $4, $6) }
   ;

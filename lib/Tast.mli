@@ -70,6 +70,7 @@ and texpr =
       ty: ty
     }
   | TEmbed of ty * string * texpr list
+  | TDeref of texpr
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt

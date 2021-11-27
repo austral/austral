@@ -143,6 +143,18 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
          expr,
          List.map aug args
        )
+  | Deref expr ->
+     (* The type of the expression being dereferenced must be either a read-only
+        reference or a write reference. *)
+     let expr' = aug expr in
+     let ty = get_type expr' in
+     match ty with
+     | ReadRef _ ->
+        TDeref expr'
+     | WriteRef _ ->
+        TDeref expr'
+     | _ ->
+        err "The dereference operator must be applied to an expression of a reference type."
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
@@ -966,6 +978,8 @@ and is_constant = function
      (is_constant head) && (List.for_all is_path_elem_constant elems)
   | TEmbed _ ->
      true
+  | TDeref _ ->
+     false
 
 and is_path_elem_constant = function
   | TSlotAccessor _ ->

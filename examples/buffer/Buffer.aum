@@ -94,14 +94,14 @@ module body Example.Buffer is
 
     generic [T: Free, R: Region]
     function Buffer_Size(buffer: Reference[Buffer[T], R]): Natural_64 is
-        return Deref(buffer->size);
+        return !(buffer->size);
     end;
 
     -- Retrieval
 
     generic [T: Free, R: Region]
     function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T is
-        let arr: Heap_Array[T] := Deref(buffer->array);
+        let arr: Heap_Array[T] := !(buffer->array);
         return arr[index];
     end;
 

@@ -244,6 +244,8 @@ and render_expr = function
      in
      let expr' = replace_all expr strs 1 in
      "((" ^ (render_type ty) ^ ")(" ^ expr' ^ "))"
+  | CDeref expr ->
+     "*" ^ (e expr)
 
 and e expr = render_expr expr
 
