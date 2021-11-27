@@ -152,12 +152,12 @@ let memory_module =
     let name = i "Allocate_Array" in
     let qname = make_qident (memory_module_name, name, name) in
     (* generic T: Type
-       function Allocate_Array(size: Natural_64): Optional[Heap_Array[T]] *)
+       function Allocate_Array(size: Index): Optional[Heap_Array[T]] *)
     SFunctionDeclaration (
         VisPublic,
         name,
         typarams qname,
-        [ValueParameter (i "size", Integer (Unsigned, Width64))],
+        [ValueParameter (i "size", Integer (Unsigned, WidthIndex))],
         NamedType (option_type_qname, [heap_array_t qname], FreeUniverse)
       )
   and resize_array_def =
