@@ -30,6 +30,8 @@ let parse_built_in_type name args =
      Some (Integer (Signed, Width32))
   | "Integer_64" ->
      Some (Integer (Signed, Width64))
+  | "Index" ->
+     Some (Integer (Unsigned, WidthIndex))
   | "Single_Float" ->
      Some SingleFloat
   | "Double_Float" ->
