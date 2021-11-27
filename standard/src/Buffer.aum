@@ -43,6 +43,23 @@ module body Standard.Buffer is
         end case;
     end;
 
+    -- Grow a buffer by one element, reallocating if necessary.
+    generic [T: Type, R: Region]
+    function Increase_Size_By_One(buffer: WriteReference[Buffer[T], R], new_size: Natural_64): Unit is
+        let old_size: Natural_64 := Deref_Write(buffer->size);
+        let old_capacity: Natural_64 := Deref_Write(buffer->capacity);
+        -- If size = capacity, then we need to resize first.
+        if old_size = Deref_Write(buffer->capacity) then
+            let old_array: Heap_Array[T] := Deref_Write(buffer->array);
+            let new_capacity: Natural_64 := old_capacity * Growth_Factor;
+            let new_array: Heap_Array[T] := Resize_Or_Die(old_array, new_capacity);
+            buffer->capacity := new_capacity;
+            buffer->array := new_array;
+        end if;
+        buffer->size := old_size + 1;
+        return nil;
+    end;
+
     ---------
     -- Public
     ---------
