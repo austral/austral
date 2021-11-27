@@ -46,11 +46,11 @@ module body Standard.Buffer is
     -- Grow a buffer by one element, reallocating if necessary.
     generic [T: Type, R: Region]
     function Increase_Size_By_One(buffer: WriteReference[Buffer[T], R]): Unit is
-        let old_size: Natural_64 := Deref_Write(buffer->size);
-        let old_capacity: Natural_64 := Deref_Write(buffer->capacity);
+        let old_size: Natural_64 := !(buffer->size);
+        let old_capacity: Natural_64 := !(buffer->capacity);
         -- If size = capacity, then we need to resize first.
-        if old_size = Deref_Write(buffer->capacity) then
-            let old_array: Heap_Array[T] := Deref_Write(buffer->array);
+        if old_size = (!(buffer->capacity)) then
+            let old_array: Heap_Array[T] := !(buffer->array);
             let new_capacity: Natural_64 := old_capacity * Growth_Factor;
             let new_array: Heap_Array[T] := Resize_Or_Die(old_array, new_capacity);
             buffer->capacity := new_capacity;
@@ -121,14 +121,14 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function Buffer_Size(buffer: Reference[Buffer[T], R]): Natural_64 is
-        return Deref(buffer->size);
+        return !(buffer->size);
     end;
 
     -- Retrieval
 
     generic [T: Free, R: Region]
     function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T is
-        let arr: Heap_Array[T] := Deref(buffer->array);
+        let arr: Heap_Array[T] := !(buffer->array);
         return arr[index];
     end;
 
@@ -141,7 +141,7 @@ module body Standard.Buffer is
 
     -- generic [T: Type, R: Region]
     -- function Insert(buffer: WriteReference[Buffer[T], R], index: Natural_64, elem: T): Unit is
-    --     let old_size: Natural_64 := Deref_Write(buffer->size);
+    --     let old_size: Natural_64 := !(buffer->size);
     --     -- The insertion index is the position the element will have when the
     --     -- buffer is modified. It is a natural number in the closed interval [0, size].
     --     --
@@ -163,7 +163,7 @@ module body Standard.Buffer is
     --     else
     --         let idx: Natural_64 := old_size + 1;
     --         while idx /= index do
-    --             let arr: Heap_Array[T] := Deref_Write(buffer->array);
+    --             let arr: Heap_Array[T] := !(buffer->array);
     --             let elem_to_move: T := arr[idx - 1];
     --             buffer[idx] := elem_to_move;
     --         end while;
