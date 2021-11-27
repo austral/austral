@@ -112,11 +112,15 @@ let rec gen_type (ty: ty): cpp_ty =
   | Boolean ->
      t "bool"
   | Integer (s, w) ->
-     let s' = (match s with
-               | Unsigned -> "u"
-               | Signed -> "")
-     and w' = string_of_int (width_int w) in
-     t (s' ^ "int" ^ w' ^ "_t")
+     (match w with
+      | WidthIndex ->
+         t "size_t"
+      | _ ->
+         let s' = (match s with
+                   | Unsigned -> "u"
+                   | Signed -> "")
+         and w' = string_of_int (width_int w) in
+         t (s' ^ "int" ^ w' ^ "_t"))
   | SingleFloat ->
      t "float"
   | DoubleFloat ->
