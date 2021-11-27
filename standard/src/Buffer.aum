@@ -31,6 +31,18 @@ module body Standard.Buffer is
         end case;
     end;
 
+    -- Resize the array, aborting if allocation fails
+    generic [T: Type]
+    function Resize_Or_Die(array: Heap_Array[T], new_size: Natural_64): Heap_Array[T] is
+        let arropt: Option[Heap_Array[T]] := Resize_Array(array, new_size);
+        case arropt of
+            when Some(value: Heap_Array[T]) do
+                return value;
+            when None do
+                Abort("Array resizing failed.");
+        end case;
+    end;
+
     ---------
     -- Public
     ---------
@@ -107,4 +119,19 @@ module body Standard.Buffer is
     function Nth_Ref(buffer: Reference[Buffer[T], R], index: Natural_64): Reference[T, R] is
         return buffer->array[index];
     end;
+
+    -- Insertion
+
+    -- generic [T: Type, R: Region]
+    -- function Insert(buffer: WriteReference[Buffer[T], R], index: Natural_64, elem: T): Unit is
+    --     -- The insertion index is the position the element will have when the
+    --     -- buffer is modified. It is a natural number in the closed interval [0, size].
+    --     --
+    --     -- If index = 0, the element will be placed at the zeroth position. If
+    --     -- index = size, the element will be placed in the last position.
+    --     if index > Deref_Write(buffer->size) then
+    --         Abort("Insertion index out of bounds.");
+    --     end if;
+    --     return nil;
+    -- end;
 end module body.
