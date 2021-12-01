@@ -186,7 +186,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
         | Integer (signedness, width) ->
            let s = (match signedness with
                     | Unsigned -> "u"
-                    | Signed -> "i")
+                    | Signed -> "")
            and w = (match width with
                     | Width8 -> "8"
                     | Width16 -> "16"
