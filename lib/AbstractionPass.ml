@@ -81,6 +81,8 @@ and abs_expr im expr =
      Embed (qualify_typespec im ty, expr, List.map (abs_expr im) args)
   | CDeref (_, e) ->
      Deref (abs_expr im e)
+  | CTypecast (_, e, ty) ->
+     Typecast (abs_expr im e, qualify_typespec im ty)
 
 and abs_when im (ConcreteWhen (name, params, body)) =
   AbstractWhen (name,
