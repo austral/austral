@@ -82,6 +82,7 @@ and cexpr =
   | CPath of span * cexpr * concrete_path_elem list
   | CEmbed of span * typespec * string * cexpr list
   | CDeref of span * cexpr
+  | CTypecast of span * cexpr * typespec
 
 and cstmt =
   | CSkip of span
