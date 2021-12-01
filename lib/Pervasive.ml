@@ -414,6 +414,45 @@ module body Austral.Pervasive is
         end;
     end;
 
+    implementation Trapping_Arithmetic(Index) is
+        method Trapping_Add(lhs: Index, rhs: Index): Index is
+            let result: Index := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Add (Index)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Subtract(lhs: Index, rhs: Index): Index is
+            let result: Index := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Subtract (Index)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Multiply(lhs: Index, rhs: Index): Index is
+            let result: Index := 0;
+            let did_overflow: Boolean := @embed(Boolean, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                Abort("Overflow in Trapping_Multiply (Index)");
+            end if;
+            return result;
+        end;
+
+        method Trapping_Divide(lhs: Index, rhs: Index): Index is
+            if rhs = 0 then
+                Abort("Division by zero in Trapping_Divide (Index)");
+            end if;
+            if (lhs = Minimum_Index) and (rhs = -1) then
+                Abort("Overflow in Trapping_Divide (Index)");
+            end if;
+            return 0;
+        end;
+    end;
+
     implementation Trapping_Arithmetic(Double_Float) is
         method Trapping_Add(lhs: Double_Float, rhs: Double_Float): Double_Float is
             return @embed(Double_Float, "$1 + $2", lhs, rhs);
@@ -605,6 +644,27 @@ module body Austral.Pervasive is
                 Abort("Division by zero in Modular_Divide (Integer_64)");
             end if;
             return @embed(Integer_64, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
+    implementation Modular_Arithmetic(Index) is
+        method Modular_Add(lhs: Index, rhs: Index): Index is
+            return @embed(Index, "$1 + $2", lhs, rhs);
+        end;
+
+        method Modular_Subtract(lhs: Index, rhs: Index): Index is
+            return @embed(Index, "$1 - $2", lhs, rhs);
+        end;
+
+        method Modular_Multiply(lhs: Index, rhs: Index): Index is
+            return @embed(Index, "$1 * $2", lhs, rhs);
+        end;
+
+        method Modular_Divide(lhs: Index, rhs: Index): Index is
+            if rhs = 0 then
+                Abort("Division by zero in Modular_Divide (Index)");
+            end if;
+            return @embed(Index, "$1 / $2", lhs, rhs);
         end;
     end;
 end module body.
