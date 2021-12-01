@@ -148,13 +148,84 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
         reference or a write reference. *)
      let expr' = aug expr in
      let ty = get_type expr' in
-     match ty with
-     | ReadRef _ ->
-        TDeref expr'
-     | WriteRef _ ->
-        TDeref expr'
-     | _ ->
-        err "The dereference operator must be applied to an expression of a reference type."
+     (match ty with
+      | ReadRef _ ->
+         TDeref expr'
+      | WriteRef _ ->
+         TDeref expr'
+      | _ ->
+         err "The dereference operator must be applied to an expression of a reference type.")
+  | Typecast (expr, ty) ->
+     (* The typecast operator has four uses:
+
+          1. Clarifying the type of integer and floating point constants.
+
+          2. Converting between different integer and floating point types
+             (otherwise, you get a combinatorial explosion of typeclasses).
+
+          3. Converting write references to read references.
+
+          4. Clarifying the type of return type polymorphic functions.
+
+      *)
+
+     let rec is_int_or_float_type = function
+       | Integer _ -> true
+       | SingleFloat -> true
+       | DoubleFloat -> true
+       | _ -> false
+
+     and augment_numeric_conversion (expr: texpr) (ty: ty): texpr =
+       let source_type_name = type_conversion_name (get_type expr)
+       and target_type_name = type_conversion_name ty in
+       let conversion_function_call = "Austral__Core::convert_" ^ source_type_name ^ "_to_" ^ target_type_name ^ "($1)" in
+       TEmbed (ty, conversion_function_call, [expr])
+
+     and type_conversion_name (ty: ty): string =
+       (match ty with
+        | Integer (signedness, width) ->
+           let s = (match signedness with
+                    | Unsigned -> "u"
+                    | Signed -> "i")
+           and w = (match width with
+                    | Width8 -> "8"
+                    | Width16 -> "16"
+                    | Width32 -> "32"
+                    | Width64 -> "64")
+           in
+           s ^ "int" ^ w
+        | SingleFloat ->
+           "f"
+        | DoubleFloat ->
+           "d"
+        | _ ->
+           err "Invalid type for numeric conversion.")
+     in
+
+     let target_type = parse_typespec menv rm typarams ty in
+     (* By passing target_type as the asserted type we're doing point 4. *)
+     let expr' = augment_expr module_name menv rm typarams lexenv (Some target_type) expr in
+     (* For 1 and 2: if the expression has an int or float type, and the type is
+        an integer or float constant, do the conversion: *)
+     if (is_int_or_float_type (get_type expr')) && (is_int_or_float_type target_type) then
+       augment_numeric_conversion expr' target_type
+     else
+       (* Otherwise, if the expression has a mutable reference type and the
+          target type is a read reference, and they point to the same underlying
+          type and underlying region, just convert it to a read ref. This does
+          point 3. *)
+       match (get_type expr') with
+       | WriteRef (underlying_ty, region) ->
+          (match target_type with
+           | ReadRef (underlying_ty', region') ->
+              if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
+                TTypecast (expr', target_type)
+              else
+                err "Cannot convert because the references have different underlying types or regions."
+           | _ ->
+              err "Bad conversion.")
+       | _ ->
+          err "Bad conversion"
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
@@ -980,6 +1051,8 @@ and is_constant = function
      true
   | TDeref _ ->
      false
+  | TTypecast _ ->
+     true
 
 and is_path_elem_constant = function
   | TSlotAccessor _ ->
