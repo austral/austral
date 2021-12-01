@@ -441,6 +441,7 @@ compound_expression:
   | DEREF atomic_expression { CDeref (from_loc $loc, $2) }
   | arith_expr { $1 }
   | IF expression THEN expression ELSE expression { CIfExpression (from_loc $loc, $2, $4, $6) }
+  | atomic_expression COLON typespec { CTypecast (from_loc $loc, $1, $3) }
   ;
 
 path:

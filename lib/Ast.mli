@@ -49,6 +49,7 @@ and aexpr =
   | Path of aexpr * path_elem list
   | Embed of qtypespec * string * aexpr list
   | Deref of aexpr
+  | Typecast of aexpr * qtypespec
 
 and abstract_when =
   | AbstractWhen of identifier * (identifier * qtypespec) list * astmt
