@@ -590,7 +590,7 @@ and get_instance (menv: menv) (source_module_name: module_name) (dispatch_ty: ty
   in
   match List.find_opt finder (visible_instances m) with
   | (Some i) -> i
-  | None -> err "No instance for this method call"
+  | None -> err ("Method resolution error: no instance for the typeclass " ^ (qident_debug_name type_class_name) ^ " with dispatch type " ^ (type_string dispatch_ty))
 
 
 (* Given a list of type parameters, and a list of arguments, check that the
