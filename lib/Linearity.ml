@@ -91,7 +91,9 @@ let rec count_appearances (name: identifier) (expr: texpr) =
   | TEmbed (_, _, args) ->
      sum (List.map ca args)
   | TDeref e ->
-     (ca e)
+     ca e
+  | TTypecast (e, _) ->
+     ca e
 
 (* Represents the state of a linear variable *)
 type state =

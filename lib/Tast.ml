@@ -156,13 +156,15 @@ let rec get_type = function
   | TEmbed (ty, _, _) ->
      ty
   | TDeref e ->
-     match get_type e with
-     | ReadRef (t, _) ->
-        t
-     | WriteRef (t, _) ->
-        t
-     | _ ->
-        err ("Internal error: a dereference expression was constructed whose argument is not a reference type.")
+     (match get_type e with
+      | ReadRef (t, _) ->
+         t
+      | WriteRef (t, _) ->
+         t
+      | _ ->
+         err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
+  | TTypecast (_, ty) ->
+     ty
 
 and path_elem_type = function
   | TSlotAccessor (_, t) ->
