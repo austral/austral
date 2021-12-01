@@ -188,12 +188,13 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
                     | Unsigned -> "u"
                     | Signed -> "")
            and w = (match width with
-                    | Width8 -> "8"
-                    | Width16 -> "16"
-                    | Width32 -> "32"
-                    | Width64 -> "64")
+                    | Width8 -> "int8"
+                    | Width16 -> "int16"
+                    | Width32 -> "int32"
+                    | Width64 -> "int64"
+                    | WidthIndex -> "size")
            in
-           s ^ "int" ^ w
+           s ^ w
         | SingleFloat ->
            "f"
         | DoubleFloat ->
