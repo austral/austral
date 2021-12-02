@@ -1,5 +1,6 @@
 open Type
 open TypeVarSet
+open BuiltIn
 open Region
 
 let type_universe = function
@@ -41,3 +42,24 @@ let rec type_variables = function
 
 let region_map_from_typarams _ =
   empty_region_map
+
+let rec is_concrete = function
+  | Unit -> true
+  | Boolean -> true
+  | Integer _ -> true
+  | SingleFloat -> true
+  | DoubleFloat -> true
+  | NamedType (name, _, _) ->
+     (* The only named type that is concrete is the built-in pointer type. *)
+     is_pointer_type name
+  | Array (ty, _) ->
+     is_concrete ty
+  | RegionTy _ ->
+     true
+  | ReadRef (ty, _) ->
+     is_concrete ty
+  | WriteRef (ty, _) ->
+     is_concrete ty
+  | TyVar _ ->
+     (* Individual type variables need not be instantiated. *)
+     true

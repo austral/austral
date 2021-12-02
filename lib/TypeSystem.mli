@@ -18,3 +18,5 @@ val is_comparable : ty -> bool
 val type_variables : ty -> TypeVarSet.t
 
 val region_map_from_typarams : type_parameter list -> region_map
+
+val is_concrete : ty -> bool
