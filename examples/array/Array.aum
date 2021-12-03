@@ -1,8 +1,7 @@
 import Austral.Memory (
-    Heap_Array,
+    Pointer,
     Allocate_Array,
-    Deallocate_Array,
-    Heap_Array_Size
+    Deallocate
 );
 
 module body Example.Array is
@@ -22,23 +21,20 @@ module body Example.Array is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let arropt: Option[Heap_Array[Boolean]] := Allocate_Array(3);
+        let arropt: Option[Pointer[Boolean]] := Allocate_Array(3);
         case arropt of
-        when Some(value: Heap_Array[Boolean]) do
-                let len: Natural_64 := Heap_Array_Size(value);
-                if len = 3 then
-                    value[0] := true;
-                    value[2] := true;
-                    let first: Boolean := value[0];
-                    let second: Boolean := value[1];
-                    let third: Boolean := value[2];
-                    Show_Bool(first);
-                    Show_Bool(second);
-                    Show_Bool(third);
-                    Deallocate_Array(value);
-                end if;
-            when None do
-                skip;
+        when Some(value: Pointer[Boolean]) do
+            value[0] := true;
+            value[2] := true;
+            let first: Boolean := value[0];
+            let second: Boolean := value[1];
+            let third: Boolean := value[2];
+            Show_Bool(first);
+            Show_Bool(second);
+            Show_Bool(third);
+            Deallocate(value);
+        when None do
+            skip;
         end case;
         return root;
     end;
