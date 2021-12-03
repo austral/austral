@@ -35,7 +35,7 @@ type cpp_expr =
   | CAddressOf of cpp_expr
   | CEmbed of cpp_ty * string * cpp_expr list
   | CDeref of cpp_expr
-  | CSizeOf cpp_ty
+  | CSizeOf of cpp_ty
 
 type cpp_stmt =
   | CLet of string * cpp_ty * cpp_expr
