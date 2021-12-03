@@ -50,6 +50,7 @@ and aexpr =
   | Embed of qtypespec * string * aexpr list
   | Deref of aexpr
   | Typecast of aexpr * qtypespec
+  | SizeOf of qtypespec
 
 and abstract_when =
   | AbstractWhen of identifier * (identifier * qtypespec) list * astmt

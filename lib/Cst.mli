@@ -82,6 +82,7 @@ and cexpr =
   | CEmbed of span * typespec * string * cexpr list
   | CDeref of span * cexpr
   | CTypecast of span * cexpr * typespec
+  | CSizeOf of span * typespec
 
 and cstmt =
   | CSkip of span

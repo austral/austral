@@ -74,6 +74,7 @@ and texpr =
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TTypecast of texpr * ty
+  | TSizeOf of ty
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt
@@ -165,6 +166,8 @@ let rec get_type = function
          err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
   | TTypecast (_, ty) ->
      ty
+  | TSizeOf _ ->
+     Integer (Unsigned, Width64)
 
 and path_elem_type = function
   | TSlotAccessor (_, t) ->

@@ -246,6 +246,8 @@ and render_expr = function
      "((" ^ (render_type ty) ^ ")(" ^ expr' ^ "))"
   | CDeref expr ->
      "*" ^ (e expr)
+  | CSizeOf ty ->
+     "sizeof(" ^ (render_type ty) ^ ")"
 
 and e expr = render_expr expr
 

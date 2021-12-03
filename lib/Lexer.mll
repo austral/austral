@@ -112,6 +112,7 @@ rule token = parse
   | "Type" { UNIVERSE_TYPE }
   | "Region" { UNIVERSE_REGION }
   | "pragma" { PRAGMA }
+  | "sizeof" { SIZEOF }
   (* Symbols *)
   | ";" { SEMI }
   | "," { COMMA }

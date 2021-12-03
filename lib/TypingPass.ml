@@ -214,18 +214,21 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
           target type is a read reference, and they point to the same underlying
           type and underlying region, just convert it to a read ref. This does
           point 3. *)
-       match (get_type expr') with
-       | WriteRef (underlying_ty, region) ->
-          (match target_type with
-           | ReadRef (underlying_ty', region') ->
-              if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
-                TTypecast (expr', target_type)
-              else
-                err "Cannot convert because the references have different underlying types or regions."
-           | _ ->
-              err "Bad conversion.")
-       | _ ->
-          err "Bad conversion"
+       (match (get_type expr') with
+        | WriteRef (underlying_ty, region) ->
+           (match target_type with
+            | ReadRef (underlying_ty', region') ->
+               if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
+                 TTypecast (expr', target_type)
+               else
+                 err "Cannot convert because the references have different underlying types or regions."
+            | _ ->
+               err "Bad conversion.")
+        | _ ->
+           err "Bad conversion")
+  | SizeOf ty ->
+     TSizeOf (parse_typespec menv rm typarams ty)
+
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
@@ -1052,6 +1055,8 @@ and is_constant = function
   | TDeref _ ->
      false
   | TTypecast _ ->
+     true
+  | TSizeOf _ ->
      true
 
 and is_path_elem_constant = function
