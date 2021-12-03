@@ -47,13 +47,11 @@ let pointer_type_name = make_ident "Pointer"
 let memory_module =
   let i = make_ident in
   let pointer_type_qname = make_qident (memory_module_name, pointer_type_name, pointer_type_name)
-  and heap_array_type_qname = make_qident (memory_module_name, heap_array_type_name, heap_array_type_name)
   in
   let typarams name = [TypeParameter(i "T", TypeUniverse, name)]
   and type_t name = TyVar (TypeVariable (i "T", TypeUniverse, name))
   in
   let pointer_t name = NamedType (pointer_type_qname, [type_t name], FreeUniverse)
-  and heap_array_t name = NamedType (heap_array_type_qname, [type_t name], FreeUniverse)
   in
   let pointer_type_def =
     (* type Pointer[T: Type]: Free is Unit *)
