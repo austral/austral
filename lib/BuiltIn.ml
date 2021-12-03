@@ -152,25 +152,25 @@ let memory_module =
     let name = i "Allocate_Array" in
     let qname = make_qident (memory_module_name, name, name) in
     (* generic T: Type
-       function Allocate_Array(size: Natural_64): Optional[Heap_Array[T]] *)
+       function Allocate_Array(size: Natural_64): Optional[Pointer[T]] *)
     SFunctionDeclaration (
         VisPublic,
         name,
         typarams qname,
         [ValueParameter (i "size", Integer (Unsigned, Width64))],
-        NamedType (option_type_qname, [heap_array_t qname], FreeUniverse)
+        NamedType (option_type_qname, [pointer_t qname], FreeUniverse)
       )
   and resize_array_def =
     let name = i "Resize_Array" in
     let qname = make_qident (memory_module_name, name, name) in
     (* generic T: Type
-       functpion Resize_Array(array: Heap_Array[T], size: Natural_64): Optional[Heap_Array[T]] *)
+       functpion Resize_Array(array: Pointer[T], size: Natural_64): Optional[Pointer[T]] *)
     SFunctionDeclaration (
         VisPublic,
         name,
         typarams qname,
-        [ValueParameter (i "array", heap_array_t qname); ValueParameter (i "size", Integer (Unsigned, Width64))],
-        NamedType (option_type_qname, [heap_array_t qname], FreeUniverse)
+        [ValueParameter (i "array", pointer_t qname); ValueParameter (i "size", Integer (Unsigned, Width64))],
+        NamedType (option_type_qname, [pointer_t qname], FreeUniverse)
       )
   and deallocate_array_def =
     let name = i "Deallocate_Array" in
