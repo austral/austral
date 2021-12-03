@@ -9,6 +9,13 @@ module Austral.Pervasive is
             value: T;
     end;
 
+    union Either[L: Type, R: Type]: Type is
+        case Left is
+            left: L;
+        case Right is
+            right: R;
+    end;
+
     generic [T: Free, R: Region]
     function Deref(ref: Reference[T, R]): T;
 
