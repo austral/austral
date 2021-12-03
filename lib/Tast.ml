@@ -166,6 +166,8 @@ let rec get_type = function
          err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
   | TTypecast (_, ty) ->
      ty
+  | TSizeOf _ ->
+     Integer (Unsigned, Width64)
 
 and path_elem_type = function
   | TSlotAccessor (_, t) ->
