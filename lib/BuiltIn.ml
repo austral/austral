@@ -44,8 +44,6 @@ let memory_module_name = make_mod_name "Austral.Memory"
 
 let pointer_type_name = make_ident "Pointer"
 
-let heap_array_type_name = make_ident "Heap_Array"
-
 let memory_module =
   let i = make_ident in
   let pointer_type_qname = make_qident (memory_module_name, pointer_type_name, pointer_type_name)
@@ -63,15 +61,6 @@ let memory_module =
         TypeVisOpaque,
         pointer_type_name,
         typarams pointer_type_qname,
-        FreeUniverse,
-        Unit
-      )
-  and heap_array_type_def =
-    (* type Heap_Array[T: Type]: Free is Unit *)
-    STypeAliasDefinition (
-        TypeVisOpaque,
-        heap_array_type_name,
-        typarams (make_qident (memory_module_name, heap_array_type_name, heap_array_type_name)),
         FreeUniverse,
         Unit
       )
@@ -175,7 +164,6 @@ let memory_module =
   in
   let decls = [
       pointer_type_def;
-      heap_array_type_def;
       allocate_def;
       load_def;
       store_def;
