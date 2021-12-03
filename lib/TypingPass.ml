@@ -308,7 +308,7 @@ and augment_path_elem (menv: menv) (module_name: module_name) (rm: region_map) (
            | _ ->
               err "Invalid usage of Pointer type"
          else
-           err "Can't index this type"
+           err ("Can't index this type: " ^ (type_string head_ty))
       | _ ->
          err "Array index operator doesn't work for this type.")
 
@@ -944,7 +944,7 @@ and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (rm: region
            | _ ->
               err "Invalid usage of Pointer type"
          else
-           err "Can't index this type"
+           err ("Can't index this type: " ^ (type_string head_ty))
       | WriteRef (ref_ty, _) ->
          (match ref_ty with
           | NamedType (name, args, _) ->
@@ -955,9 +955,9 @@ and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (rm: region
                 | _ ->
                    err "Invalid usage of Pointer type")
              else
-               err "Can't index this type"
+               err ("Can't index this type: " ^ (type_string ref_ty))
           | _ ->
-             err "Can't index this type")
+             err ("Can't index this type: " ^ (type_string ref_ty)))
       | _ ->
          err "Array index operator doesn't work for this type.")
 
