@@ -1,0 +1,31 @@
+module body Example.Either is
+    pragma Unsafe_Module;
+
+    function Put_Char(character: Integer_32): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        -- Left case.
+        let l: Either[Boolean, Integer_32] := Left(left => true);
+        case l of
+            when Left(left: Boolean) do
+                if left then
+                    Put_Char('a');
+                end if;
+            when Right(right: Integer_32) do
+                skip;
+        end case;
+        -- Right case.
+        let r: Either[Boolean, Integer_32] := Right(right => 10);
+        case r of
+            when Left(left: Boolean) do
+                skip;
+            when Right(right: Integer_32) do
+                if right = 10 then
+                    Put_Char('a');
+                end if;
+        end case;
+        return root;
+    end;
+end module body.

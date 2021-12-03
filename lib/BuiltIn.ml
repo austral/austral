@@ -20,6 +20,9 @@ let pervasive_imports =
         ConcreteImport (option_type_name, None);
         ConcreteImport (make_ident "Some", None);
         ConcreteImport (make_ident "None", None);
+        ConcreteImport (make_ident "Either", None);
+        ConcreteImport (make_ident "Left", None);
+        ConcreteImport (make_ident "Right", None);
         ConcreteImport (make_ident "Deref", None);
         ConcreteImport (make_ident "Deref_Write", None);
         ConcreteImport (make_ident "Fixed_Array_Size", None);
