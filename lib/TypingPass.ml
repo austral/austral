@@ -226,6 +226,8 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
                err "Bad conversion.")
         | _ ->
            err "Bad conversion")
+  | SizeOf ty ->
+     TSizeOf (parse_typespec menv rm typarams ty)
 
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
