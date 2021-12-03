@@ -1056,6 +1056,8 @@ and is_constant = function
      false
   | TTypecast _ ->
      true
+  | TSizeOf _ ->
+     true
 
 and is_path_elem_constant = function
   | TSlotAccessor _ ->
