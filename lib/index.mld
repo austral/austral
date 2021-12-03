@@ -1,0 +1,68 @@
+{0 Austral Boostrapping Compiler}
+
+{1 Common}
+
+Code used throughout the compiler.
+
+- {!Austral_core.Identifier}
+- {!Austral_core.IdentifierMap}
+- {!Austral_core.Common}
+- {!Austral_core.Span}
+- {!Austral_core.Error}
+- {!Austral_core.Util}
+- {!Austral_core.StringSet}
+
+{1 Frontend}
+
+The compiler frontend.
+
+- {!Austral_core.Cst}
+- {!Austral_core.Ast}
+- {!Austral_core.Combined}
+- {!Austral_core.Lexer}
+- {!Austral_core.Parser}
+- {!Austral_core.ParserInterface}
+- {!Austral_core.AbstractionPass}
+- {!Austral_core.CombiningPass}
+- {!Austral_core.Escape}
+- {!Austral_core.ExtractionPass}
+- {!Austral_core.Imports}
+- {!Austral_core.ImportResolution}
+- {!Austral_core.Qualifier}
+
+
+{1 Middle}
+
+The compiler's middle end.
+
+- {!Austral_core.ModuleSystem}
+- {!Austral_core.Region}
+- {!Austral_core.Semantic}
+- {!Austral_core.Tast}
+- {!Austral_core.TypeBindings}
+- {!Austral_core.TypeMatch}
+- {!Austral_core.Type}
+- {!Austral_core.TypeParser}
+- {!Austral_core.TypeSystem}
+- {!Austral_core.TypeVarSet}
+- {!Austral_core.LexEnv}
+- {!Austral_core.TypingPass}
+- {!Austral_core.Pervasive}
+- {!Austral_core.BuiltIn}
+- {!Austral_core.Linearity}
+
+{1 Backend}
+
+The compiler backend.
+
+- {!Austral_core.CodeGen}
+- {!Austral_core.Cpp}
+- {!Austral_core.CppPrelude}
+- {!Austral_core.CppRenderer}
+
+{1 Integration}
+
+The compiler's large-scale control structures.
+
+- {!Austral_core.Cli}
+- {!Austral_core.Compiler}
