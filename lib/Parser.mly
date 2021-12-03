@@ -68,6 +68,7 @@ open Span
 %token UNIVERSE_TYPE
 %token UNIVERSE_REGION
 %token PRAGMA
+%token SIZEOF
 /* Symbols */
 %token SEMI
 %token COMMA
@@ -377,6 +378,7 @@ atomic_expression:
   | funcall { $1 }
   | parenthesized_expr { $1 }
   | intrinsic { $1 }
+  | SIZEOF LPAREN typespec RPAREN { CSizeOf (from_loc $loc, $3) }
   ;
 
 int_constant:
