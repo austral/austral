@@ -143,20 +143,13 @@ and gen_named_type (name: qident) (args: ty list): cpp_ty =
     | _ ->
        err "Invalid Pointer type usage"
   else
-    if is_heap_array_type name then
-      match args with
-      | [t] ->
-         CNamedType ("Austral__Core::Array", [gen_type t])
-      | _ ->
-         err "Invalid Heap_Array type usage."
-    else
-      (* Option[Pointer[T]] types are compiled specially *)
-      match is_optional_pointer_named_type name args with
-      | Some target_ty ->
-         CPointer (gen_type target_ty)
-      | None ->
-         (* It's a regular user defined type. *)
-         CNamedType (gen_qident name, List.map gen_type args)
+    (* Option[Pointer[T]] types are compiled specially *)
+    match is_optional_pointer_named_type name args with
+    | Some target_ty ->
+       CPointer (gen_type target_ty)
+    | None ->
+       (* It's a regular user defined type. *)
+       CNamedType (gen_qident name, List.map gen_type args)
 
 (* Expressions *)
 
