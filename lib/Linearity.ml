@@ -94,6 +94,8 @@ let rec count_appearances (name: identifier) (expr: texpr) =
      ca e
   | TTypecast (e, _) ->
      ca e
+  | TSizeOf _ ->
+     0
 
 (* Represents the state of a linear variable *)
 type state =
