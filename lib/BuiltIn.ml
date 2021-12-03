@@ -172,30 +172,6 @@ let memory_module =
         [ValueParameter (i "array", pointer_t qname); ValueParameter (i "size", Integer (Unsigned, Width64))],
         NamedType (option_type_qname, [pointer_t qname], FreeUniverse)
       )
-  and deallocate_array_def =
-    let name = i "Deallocate_Array" in
-    let qname = make_qident (memory_module_name, name, name) in
-    (* generic T: Type
-       function Deallocate_Array(array: Heap_Array[T]): Unit *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [ValueParameter (i "array", heap_array_t qname)],
-        Unit
-      )
-  and heap_array_size_def =
-    let name = i "Heap_Array_Size" in
-    let qname = make_qident (memory_module_name, name, name) in
-    (* generic T: Type
-       function Heap_Array_Size(array: Heap_Array[T]): Natural_64 *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [ValueParameter (i "array", heap_array_t qname)],
-        Integer (Unsigned, Width64)
-      )
   in
   let decls = [
       pointer_type_def;
@@ -207,9 +183,7 @@ let memory_module =
       load_read_ref_def;
       load_write_ref_def;
       allocate_array_def;
-      resize_array_def;
-      deallocate_array_def;
-      heap_array_size_def
+      resize_array_def
     ]
   in
   SemanticModule {
