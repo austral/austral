@@ -83,6 +83,8 @@ and abs_expr im expr =
      Deref (abs_expr im e)
   | CTypecast (_, e, ty) ->
      Typecast (abs_expr im e, qualify_typespec im ty)
+  | CSizeOf (_, ty) ->
+     SizeOf (qualify_typespec im ty)
 
 and abs_when im (ConcreteWhen (name, params, body)) =
   AbstractWhen (name,
