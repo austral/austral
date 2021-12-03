@@ -100,10 +100,7 @@ let rec effective_universe name typarams declared_universe args =
        if is_pointer_type name then
          FreeUniverse
        else
-         if is_heap_array_type name then
-           FreeUniverse
-         else
-           err ("Free type called with non-free argument: " ^ (qident_debug_name name))
+         err ("Free type called with non-free argument: " ^ (qident_debug_name name))
   | LinearUniverse ->
      LinearUniverse
   | RegionUniverse ->

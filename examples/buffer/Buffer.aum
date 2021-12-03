@@ -1,9 +1,8 @@
 import Austral.Memory (
-    Heap_Array,
+    Pointer,
     Allocate_Array,
     Resize_Array,
-    Deallocate_Array,
-    Heap_Array_Size
+    Deallocate
 );
 
 module body Example.Buffer is
@@ -24,10 +23,10 @@ module body Example.Buffer is
 
     -- Allocate an array, and abort if allocation fails.
     generic [T: Type]
-    function Allocate_Or_Die(size: Natural_64): Heap_Array[T] is
-        let arropt: Option[Heap_Array[T]] := Allocate_Array(size);
+    function Allocate_Or_Die(size: Natural_64): Pointer[T] is
+        let arropt: Option[Pointer[T]] := Allocate_Array(size);
         case arropt of
-            when Some(value: Heap_Array[T]) do
+            when Some(value: Pointer[T]) do
                 return value;
             when None do
                 skip;
@@ -46,7 +45,7 @@ module body Example.Buffer is
         -- The number of elements actually stored in the array.
         size: Natural_64;
         -- The underlying heap array.
-        array: Heap_Array[T];
+        array: Pointer[T];
 
         -- Invariants:
         --
@@ -71,7 +70,7 @@ module body Example.Buffer is
 
     generic [T: Free]
     function Initialize(size: Natural_64, elem: T): Buffer[T] is
-        let array: Heap_Array[T] := Allocate_Or_Die(size);
+        let array: Pointer[T] := Allocate_Or_Die(size);
         for i from 0 to size - 1 do
             array[i] := elem;
         end for;
@@ -85,8 +84,8 @@ module body Example.Buffer is
 
     generic [T: Type]
     function Destroy_Buffer(buffer: Buffer[T]): Unit is
-        let { capacity: Natural_64, size: Natural_64, array: Heap_Array[T] } := buffer;
-        Deallocate_Array(array);
+        let { capacity: Natural_64, size: Natural_64, array: Pointer[T] } := buffer;
+        Deallocate(array);
         return nil;
     end;
 
@@ -101,7 +100,7 @@ module body Example.Buffer is
 
     generic [T: Free, R: Region]
     function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T is
-        let arr: Heap_Array[T] := !(buffer->array);
+        let arr: Pointer[T] := !(buffer->array);
         return arr[index];
     end;
 

@@ -1,9 +1,8 @@
 import Austral.Memory (
-    Heap_Array,
+    Pointer,
     Allocate_Array,
     Resize_Array,
-    Deallocate_Array,
-    Heap_Array_Size
+    Deallocate
 );
 
 module body Standard.Buffer is
@@ -21,10 +20,10 @@ module body Standard.Buffer is
 
     -- Allocate an array, and abort if allocation fails.
     generic [T: Type]
-    function Allocate_Or_Die(size: Natural_64): Heap_Array[T] is
-        let arropt: Option[Heap_Array[T]] := Allocate_Array(size);
+    function Allocate_Or_Die(size: Natural_64): Pointer[T] is
+        let arropt: Option[Pointer[T]] := Allocate_Array(size);
         case arropt of
-            when Some(value: Heap_Array[T]) do
+            when Some(value: Pointer[T]) do
                 return value;
             when None do
                 Abort("Array allocation failed.");
@@ -33,10 +32,10 @@ module body Standard.Buffer is
 
     -- Resize the array, aborting if allocation fails
     generic [T: Type]
-    function Resize_Or_Die(array: Heap_Array[T], new_size: Natural_64): Heap_Array[T] is
-        let arropt: Option[Heap_Array[T]] := Resize_Array(array, new_size);
+    function Resize_Or_Die(array: Pointer[T], new_size: Natural_64): Pointer[T] is
+        let arropt: Option[Pointer[T]] := Resize_Array(array, new_size);
         case arropt of
-            when Some(value: Heap_Array[T]) do
+            when Some(value: Pointer[T]) do
                 return value;
             when None do
                 Abort("Array resizing failed.");
@@ -50,9 +49,9 @@ module body Standard.Buffer is
         let old_capacity: Natural_64 := !(buffer->capacity);
         -- If size = capacity, then we need to resize first.
         if old_size = (!(buffer->capacity)) then
-            let old_array: Heap_Array[T] := !(buffer->array);
+            let old_array: Pointer[T] := !(buffer->array);
             let new_capacity: Natural_64 := old_capacity * Growth_Factor;
-            let new_array: Heap_Array[T] := Resize_Or_Die(old_array, new_capacity);
+            let new_array: Pointer[T] := Resize_Or_Die(old_array, new_capacity);
             buffer->capacity := new_capacity;
             buffer->array := new_array;
         end if;
@@ -72,7 +71,7 @@ module body Standard.Buffer is
         -- The number of elements actually stored in the array.
         size: Natural_64;
         -- The underlying heap array.
-        array: Heap_Array[T];
+        array: Pointer[T];
 
         -- Invariants:
         --
@@ -87,7 +86,7 @@ module body Standard.Buffer is
         -- empty buffers won't stay empty in perpetuity. So to create an empty
         -- buffer we allocate Initial_Size.
         let initial_size: Natural_64 := 16;
-        let array: Heap_Array[T] := Allocate_Or_Die(initial_size);
+        let array: Pointer[T] := Allocate_Or_Die(initial_size);
         let buf: Buffer[T] := Buffer(
             capacity => initial_size,
             size => 0,
@@ -98,7 +97,7 @@ module body Standard.Buffer is
 
     generic [T: Free]
     function Initialize(size: Natural_64, elem: T): Buffer[T] is
-        let array: Heap_Array[T] := Allocate_Or_Die(size);
+        let array: Pointer[T] := Allocate_Or_Die(size);
         for i from 0 to size - 1 do
             array[i] := elem;
         end for;
@@ -112,8 +111,8 @@ module body Standard.Buffer is
 
     generic [T: Type]
     function Destroy_Buffer(buffer: Buffer[T]): Unit is
-        let { capacity: Natural_64, size: Natural_64, array: Heap_Array[T] } := buffer;
-        Deallocate_Array(array);
+        let { capacity: Natural_64, size: Natural_64, array: Pointer[T] } := buffer;
+        Deallocate(array);
         return nil;
     end;
 
@@ -128,7 +127,7 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T is
-        let arr: Heap_Array[T] := !(buffer->array);
+        let arr: Pointer[T] := !(buffer->array);
         return arr[index];
     end;
 
@@ -163,7 +162,7 @@ module body Standard.Buffer is
     --     else
     --         let idx: Natural_64 := old_size + 1;
     --         while idx /= index do
-    --             let arr: Heap_Array[T] := !(buffer->array);
+    --             let arr: Pointer[T] := !(buffer->array);
     --             let elem_to_move: T := arr[idx - 1];
     --             buffer[idx] := elem_to_move;
     --         end while;

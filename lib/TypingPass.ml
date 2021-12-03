@@ -301,14 +301,14 @@ and augment_path_elem (menv: menv) (module_name: module_name) (rm: region_map) (
       | Array (elem_ty, _) ->
          TArrayIndex (ie', elem_ty)
       | NamedType (name, args, _) ->
-         if is_heap_array_type name then
+         if is_pointer_type name then
            match args with
            | [elem_ty] ->
               TArrayIndex (ie', elem_ty)
            | _ ->
-              err "Invalid usage of Heap_Array"
+              err "Invalid usage of Pointer type"
          else
-           err "Can't index this type"
+           err ("Can't index this type: " ^ (type_string head_ty))
       | _ ->
          err "Array index operator doesn't work for this type.")
 
@@ -937,27 +937,27 @@ and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (rm: region
      let ie' = augment_expr module_name menv rm typarams lexenv None ie in
      (match head_ty with
       | NamedType (name, args, _) ->
-         if is_heap_array_type name then
+         if is_pointer_type name then
            match args with
            | [elem_ty] ->
               TArrayIndex (ie', elem_ty)
            | _ ->
-              err "Invalid usage of Heap_Array"
+              err "Invalid usage of Pointer type"
          else
-           err "Can't index this type"
+           err ("Can't index this type: " ^ (type_string head_ty))
       | WriteRef (ref_ty, _) ->
          (match ref_ty with
           | NamedType (name, args, _) ->
-             if is_heap_array_type name then
+             if is_pointer_type name then
                (match args with
                 | [elem_ty] ->
                    TArrayIndex (ie', elem_ty)
                 | _ ->
-                   err "Invalid usage of Heap_Array")
+                   err "Invalid usage of Pointer type")
              else
-               err "Can't index this type"
+               err ("Can't index this type: " ^ (type_string ref_ty))
           | _ ->
-             err "Can't index this type")
+             err ("Can't index this type: " ^ (type_string ref_ty)))
       | _ ->
          err "Array index operator doesn't work for this type.")
 

@@ -216,24 +216,16 @@ namespace A_Austral__Memory {
 
 
     template<typename T>
-    A_Option<Austral__Core::Array<T>> A_Allocate_Array(uint64_t number) {
+    T* A_Allocate_Array(uint64_t number) {
         unsigned long long elem_size = sizeof(T);
         unsigned long long num = number;
         unsigned long long array_size = 0;
         bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
         if (has_overflowed) {
-            A_Option<Austral__Core::Array<T>> result = Make_None<Austral__Core::Array<T>>();
-            return result;
+            return NULL;
         } else {
             T* ptr = (T*) calloc(num, array_size);
-            if (ptr == NULL) {
-                A_Option<Austral__Core::Array<T>> result = Make_None<Austral__Core::Array<T>>();
-                return result;
-            } else {
-                Austral__Core::Array<T> arr = Austral__Core::Make_Array(number, ptr);
-                A_Option<Austral__Core::Array<T>> result = Make_Some(arr);
-                return result;
-            }
+            return ptr;
         }
     }
 
