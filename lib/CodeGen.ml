@@ -261,6 +261,8 @@ let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
      CDeref (g e)
   | TTypecast (e, ty) ->
      CCast (g e, gen_type ty)
+  | TSizeOf ty ->
+     CSizeOf (gen_type ty)
 
 and gen_path (mn: module_name) (expr: cpp_expr) (elems: typed_path_elem list): cpp_expr =
   match elems with
