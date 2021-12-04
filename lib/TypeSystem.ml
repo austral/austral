@@ -17,10 +17,6 @@ let type_universe = function
   | TyVar (TypeVariable (_, u, _)) -> u
   | RawPointer _ -> FreeUniverse
 
-let type_arguments = function
-  | NamedType (_, args, _) -> args
-  | _ -> []
-
 let is_numeric = function
   | Integer _ -> true
   | SingleFloat -> true
