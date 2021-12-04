@@ -48,7 +48,9 @@ let memory_module_name = make_mod_name "Austral.Memory"
 let pointer_type_name = make_ident "Pointer"
 
 let memory_module =
-  let i = make_ident in
+  let i = make_ident
+  and size_t = Integer (Unsigned, Width64)
+  in
   let pointer_type_qname = make_qident (memory_module_name, pointer_type_name, pointer_type_name)
   in
   let typarams name = [TypeParameter(i "T", TypeUniverse, name)]
@@ -162,6 +164,25 @@ let memory_module =
         [ValueParameter (i "array", pointer_t qname); ValueParameter (i "size", Integer (Unsigned, Width64))],
         NamedType (option_type_qname, [pointer_t qname], FreeUniverse)
       )
+  and memmove_def =
+    let name = i "memmove" in
+    let qname = make_qident (memory_module_name, name, name) in
+    (* generic [T: Type, U: Type]
+       function memmove(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit *)
+    SFunctionDeclaration (
+        VisPublic,
+        name,
+        [
+          TypeParameter(i "T", TypeUniverse, qname);
+          TypeParameter(i "U", TypeUniverse, qname)
+        ],
+        [
+          ValueParameter (i "source", NamedType (pointer_type_qname, [TyVar (TypeVariable (i "T", TypeUniverse, qname))], FreeUniverse));
+          ValueParameter (i "destination", NamedType (pointer_type_qname, [TyVar (TypeVariable (i "U", TypeUniverse, qname))], FreeUniverse));
+          ValueParameter (i "count", size_t)
+        ],
+        Unit
+      )
   in
   let decls = [
       pointer_type_def;
@@ -172,7 +193,8 @@ let memory_module =
       load_read_ref_def;
       load_write_ref_def;
       allocate_array_def;
-      resize_array_def
+      resize_array_def;
+      memmove_def
     ]
   in
   SemanticModule {

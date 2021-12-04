@@ -261,5 +261,10 @@ namespace A_Austral__Memory {
     size_t A_Heap_Array_Size(Austral__Core::Array<T> arr) {
         return arr.size;
     }
+
+    template<typename T, typename U>
+    void A_memmove(T* source, T* destination, size_t count) {
+        memmove(source, destination, count);
+    }
 }
 |code}
