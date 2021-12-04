@@ -109,6 +109,14 @@ let rec match_type a b =
          type_mismatch "Expected a write reference, but got another type." a b)
   | TyVar (TypeVariable (i, u, from)) ->
      match_type_var i u from b
+  | RawPointer ty ->
+     (match b with
+      | RawPointer ty' ->
+         match_type ty ty'
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected a Pointer, but got another type." a b)
 
 and match_type_var name universe from ty =
   (* Check if the argument type is a variable. *)
