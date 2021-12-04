@@ -35,7 +35,14 @@ val get_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_id opti
 (** Add a new monomorph to the table. Throws an error if it already exists. *)
 val add_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_tbl
 
-(** Monmorphize a type.
+(** A stripped type specifier is the same as a type specifier, but the region
+   and type variable cases have been removed. *)
+type stripped_ty
+
+(** Strip a type specifier. *)
+val strip_type : ty -> stripped_ty option
+
+(** Monomorphize a type.
 
    This function works bottom up, looking for invocations of `NamedType` with
    monomorphic arguments. When it finds one, it adds it to the table of type
@@ -73,4 +80,4 @@ val add_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_tbl
                                                  |  (Map,    [Int, Mono{2}],    3)
 
  *)
-val monomorphize_type : mono_type_tbl -> ty -> (mono_ty * mono_type_tbl)
+val monomorphize_type : mono_type_tbl -> stripped_ty -> (mono_ty * mono_type_tbl)
