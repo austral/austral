@@ -36,8 +36,13 @@ let is_comparable = function
   | Integer _ -> true
   | SingleFloat -> true
   | DoubleFloat -> true
+  | NamedType _ -> false
+  | Array _ -> false
+  | RegionTy _ -> false
+  | ReadRef _ -> false
+  | WriteRef _ -> false
+  | TyVar _ -> false
   | RawPointer _ -> true
-  | _ -> false
 
 let rec type_variables = function
   | Unit ->
