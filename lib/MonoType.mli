@@ -17,3 +17,4 @@ type mono_ty =
   | MonoArray of mono_ty
   | MonoReadRef of mono_ty
   | MoonWriteRef of mono_ty
+  | MonoRawPointer of mono_ty
