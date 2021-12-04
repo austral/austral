@@ -124,7 +124,7 @@ let memory_module =
         VisPublic,
         name,
         [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)],
-        [ValueParameter (i "ref", ReadRef (NamedType (pointer_type_qname, [type_t qname], FreeUniverse), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
+        [ValueParameter (i "ref", ReadRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
         ReadRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname)))
       )
   and load_write_ref_def =
