@@ -25,8 +25,52 @@ type mono_ty =
    monomorphic type arguments to its type monomorph ID. *)
 type mono_type_tbl
 
+(** An empty table of type monomorphs. *)
 val empty_mono_type_tbl : mono_type_tbl
 
+(** Retrieve the ID of the monomorph for the given generic type name and
+   argument list. *)
 val get_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_id option
 
+(** Add a new monomorph to the table. Throws an error if it already exists. *)
 val add_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_tbl
+
+(** Monmorphize a type.
+
+   This function works bottom up, looking for invocations of `NamedType` with
+   monomorphic arguments. When it finds one, it adds it to the table of type
+   monomorphs and replaces it with an instance of `MonoNamedType` with a fresh
+   monomorph ID.
+
+   To illustrate how it works, consider this type specifier:
+
+       Map[Int, Pair[String, Option[Array[Int]]]]
+
+   At each step in recursive monomorphization, the type specifier and the table
+   of monomorphs looks like this:
+
+                      Expression                 |             Table
+       ------------------------------------------|---------------------------------
+                                                 |
+        Map[Int, Pair[String, Option[Mono{0}]]]  |  (Array,  [Int],             0)
+                                                 |
+       ------------------------------------------|---------------------------------
+                                                 |
+        Map[Int, Pair[String, Mono{1}]]          |  (Array,  [Int],             0)
+                                                 |  (Option, [Mono{0}],         1)
+                                                 |
+       ------------------------------------------|---------------------------------
+                                                 |
+        Map[Int, Mono{2}],                       |  (Array,  [Int],             0)
+                                                 |  (Option, [Mono{0}],         1)
+                                                 |  (Pair,   [String, Mono{1}], 2)
+                                                 |
+       ------------------------------------------|---------------------------------
+                                                 |
+        Mono{3}                                  |  (Array,  [Int],             0)
+                                                 |  (Option, [Mono{0}],         1)
+                                                 |  (Pair,   [String, Mono{1}], 2)
+                                                 |  (Map,    [Int, Mono{2}],    3)
+
+ *)
+val monomorphize_type : mono_type_tbl -> ty -> (mono_ty * mono_type_tbl)

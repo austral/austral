@@ -44,3 +44,6 @@ let add_monomorph (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): mono
      err "Monomorph exists in table."
   | None ->
      (name, args, fresh_mono_type_id ()) :: tbl
+
+let monomorphize_type _ _: (mono_ty * mono_type_tbl) =
+  err "Not implemented yet."
