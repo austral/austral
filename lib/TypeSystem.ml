@@ -17,10 +17,18 @@ let type_universe = function
   | RawPointer _ -> FreeUniverse
 
 let is_numeric = function
+  | Unit -> false
+  | Boolean -> false
   | Integer _ -> true
   | SingleFloat -> true
   | DoubleFloat -> true
-  | _ -> false
+  | NamedType _ -> false
+  | Array _ -> false
+  | RegionTy _ -> false
+  | ReadRef _ -> false
+  | WriteRef _ -> false
+  | TyVar _ -> false
+  | RawPointer _ -> false
 
 let is_comparable = function
   | Unit -> true
