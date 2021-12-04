@@ -9,8 +9,10 @@ type mono_ty =
   | MonoInteger of signedness * integer_width
   | MonoSingleFloat
   | MonoDoubleFloat
-  | NamedType of qident * mono_ty list * mono_type_id
+  | NamedType of qident * mono_type_id
   | MonoArray of mono_ty
   | MonoReadRef of mono_ty
   | MonoWriteRef of mono_ty
   | MonoRawPointer of mono_ty
+
+type mono_type_tbl = (qident * mono_ty list * mono_type_id) list
