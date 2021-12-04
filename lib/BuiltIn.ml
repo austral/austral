@@ -50,7 +50,6 @@ let pointer_type_name = make_ident "Pointer"
 let memory_module =
   let i = make_ident
   and size_t = Integer (Unsigned, Width64)
-  and pointer_type_qname = make_qident (memory_module_name, pointer_type_name, pointer_type_name)
   in
   let typarams name = [TypeParameter(i "T", TypeUniverse, name)]
   and type_t name = TyVar (TypeVariable (i "T", TypeUniverse, name))
@@ -62,7 +61,7 @@ let memory_module =
     STypeAliasDefinition (
         TypeVisOpaque,
         pointer_type_name,
-        typarams pointer_type_qname,
+        typarams (make_qident (memory_module_name, pointer_type_name, pointer_type_name)),
         FreeUniverse,
         Unit
       )
