@@ -387,9 +387,10 @@ and augment_function_call name typarams params rt asserted_ty args =
   let rt' = replace_variables bindings rt in
   let (bindings', rt'') = handle_return_type_polymorphism (local_name name) typarams rt' asserted_ty in
   (* Check: the set of bindings equals the set of type parameters *)
-  check_bindings typarams (merge_bindings bindings bindings');
-  let arguments' = cast_arguments bindings' params arguments in
-  let substs = make_substs bindings' typarams in
+  let bindings'' = merge_bindings bindings bindings' in
+  check_bindings typarams bindings'';
+  let arguments' = cast_arguments bindings'' params arguments in
+  let substs = make_substs bindings'' typarams in
   TFuncall (name, arguments', rt'', substs)
 
 and augment_typealias_callable name typarams universe asserted_ty definition_ty args =
