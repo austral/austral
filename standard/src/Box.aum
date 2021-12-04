@@ -65,7 +65,8 @@ module body Standard.Box is
     generic [T: Type, R: Region]
     function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R] is
         let ptrref: Reference[Pointer[T], R] := boxref->pointer;
-        return Load_Read_Reference(ptrref);
+        let ref: Reference[T, R] := Load_Read_Reference(ptrref);
+        return ref;
     end;
 
     generic [T: Free, R: Region]
