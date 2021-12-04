@@ -4,6 +4,7 @@ open Type
 
 (** The ID of a type monomorph. *)
 type mono_type_id
+[@@deriving eq]
 
 (** A monomorphic, or concrete, type. *)
 type mono_ty =
@@ -18,9 +19,12 @@ type mono_ty =
   | MonoReadRef of mono_ty
   | MonoWriteRef of mono_ty
   | MonoRawPointer of mono_ty
+[@@deriving eq]
 
 (** The table of type monomorphs associates a generic type's name and list of
    monomorphic type arguments to its type monomorph ID. *)
 type mono_type_tbl
 
 val empty_mono_type_tbl : mono_type_tbl
+
+val get_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_id option
