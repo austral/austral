@@ -1,5 +1,6 @@
-(* The Austral.Pervasive module. *)
+(** The Austral.Pervasive module. *)
 
+(** The source code of the Austral.Pervasive module interface file. *)
 let pervasive_interface_source = {code|
 
 module Austral.Pervasive is
@@ -63,6 +64,7 @@ end module.
 
 |code}
 
+(** The source code of the Austral.Pervasive module body file. *)
 let pervasive_body_source = {code|
 
 module body Austral.Pervasive is
