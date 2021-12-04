@@ -37,6 +37,7 @@ type ty =
   | ReadRef of ty * ty
   | WriteRef of ty * ty
   | TyVar of type_var
+  | RawPointer of ty
 [@@deriving show]
 
 type typed_slot = TypedSlot of identifier * ty

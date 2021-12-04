@@ -37,6 +37,7 @@ type ty =
   | ReadRef of ty * ty
   | WriteRef of ty * ty
   | TyVar of type_var
+  | RawPointer of ty
 [@@deriving show]
 
 type typed_slot = TypedSlot of identifier * ty
@@ -76,6 +77,8 @@ let rec type_string = function
      "WriteReference[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Linear"
   | TyVar (TypeVariable (n, u, from)) ->
      (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ " : " ^ (universe_string u)
+  | RawPointer ty ->
+     "Pointer[" ^ (type_string ty) ^ "]"
 
 and signedness_string = function
   | Unsigned -> "Natural"

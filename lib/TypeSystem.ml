@@ -15,6 +15,7 @@ let type_universe = function
   | ReadRef _ -> FreeUniverse
   | WriteRef _ -> FreeUniverse
   | TyVar (TypeVariable (_, u, _)) -> u
+  | RawPointer _ -> FreeUniverse
 
 let type_arguments = function
   | NamedType (_, args, _) -> args
@@ -32,6 +33,7 @@ let is_comparable = function
   | Integer _ -> true
   | SingleFloat -> true
   | DoubleFloat -> true
+  | RawPointer -> true
   | _ -> false
 
 let rec type_variables = function
@@ -62,4 +64,6 @@ let rec is_concrete = function
      is_concrete ty
   | TyVar _ ->
      (* Individual type variables need not be instantiated. *)
+     true
+  | RawPointer _ ->
      true
