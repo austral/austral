@@ -50,6 +50,7 @@ The compiler's middle end.
 - {!Austral_core.Pervasive}
 - {!Austral_core.BuiltIn}
 - {!Austral_core.Linearity}
+- {!Austral_core.MonoType}
 
 {1 Backend}
 
