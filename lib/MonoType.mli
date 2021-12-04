@@ -12,7 +12,7 @@ type mono_ty =
   | MonoInteger of signedness * integer_width
   | MonoSingleFloat
   | MonoDoubleFloat
-  | NamedType of qident * mono_type_id
+  | MonoNamedType of qident * mono_type_id
   (** A monomorphic instance of a generic type, identified by the name of the type, its monomorphic arguments, and a monomorph ID. *)
   | MonoArray of mono_ty
   | MonoReadRef of mono_ty

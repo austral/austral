@@ -9,7 +9,7 @@ type mono_ty =
   | MonoInteger of signedness * integer_width
   | MonoSingleFloat
   | MonoDoubleFloat
-  | NamedType of qident * mono_type_id
+  | MonoNamedType of qident * mono_type_id
   | MonoArray of mono_ty
   | MonoReadRef of mono_ty
   | MonoWriteRef of mono_ty
