@@ -107,7 +107,7 @@ let memory_module =
   and deallocate_def =
     let name = i "Deallocate" in
     let qname = make_qident (memory_module_name, name, name) in
-    (* generic T: Free
+    (* generic T: Type
        function Deallocate(pointer: Pointer[T]): Unit *)
     SFunctionDeclaration (
         VisPublic,
