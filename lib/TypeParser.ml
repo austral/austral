@@ -8,7 +8,7 @@ open BuiltIn
 open Semantic
 open Error
 
-let parse_built_in_type name args =
+let parse_built_in_type (name: string) (args: ty list): ty option =
   match name with
   | "Unit" ->
      Some Unit
