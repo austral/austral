@@ -12,8 +12,8 @@ type mono_ty =
   | MonoInteger of signedness * integer_width
   | MonoSingleFloat
   | MonoDoubleFloat
-  (** A monomorphic instance of a generic type, identified by the name of the type, its monomorphic arguments, and a monomorph ID. *)
   | NamedType of qident * mono_ty list * mono_type_id
+  (** A monomorphic instance of a generic type, identified by the name of the type, its monomorphic arguments, and a monomorph ID. *)
   | MonoArray of mono_ty
   | MonoReadRef of mono_ty
   | MonoWriteRef of mono_ty
