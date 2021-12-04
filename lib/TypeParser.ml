@@ -78,7 +78,8 @@ let rec effective_universe name typarams declared_universe args =
 
      1. If the declared universe is Free then none of the type parameters can be Linear or Type.
 
-         1.1 Unless it's `Pointer[T]`.
+         1.1 Unless it's `Pointer[T]`. But we don't have to take care of that here, since `Pointer`
+             is a built in type, and the `type_universe` function determines its universe.
 
      2. If the declared universe is Linear, then no type parameter can change this. Therefore, the effective
         universe is Linear.
