@@ -251,17 +251,6 @@ namespace A_Austral__Memory {
         }
     }
 
-    template<typename T>
-    bool A_Deallocate_Array(Austral__Core::Array<T> array) {
-        free(array.data);
-        return false;
-    }
-
-    template<typename T>
-    size_t A_Heap_Array_Size(Austral__Core::Array<T> arr) {
-        return arr.size;
-    }
-
     template<typename T, typename U>
     void A_memmove(T* source, T* destination, size_t count) {
         memmove(source, destination, count);
