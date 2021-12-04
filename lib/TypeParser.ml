@@ -8,8 +8,9 @@ open BuiltIn
 open Semantic
 open Error
 
-let parse_built_in_type (name: string) (args: ty list): ty option =
-  match name with
+let parse_built_in_type (name: qident) (args: ty list): ty option =
+  let name_str: string = ident_string (original_name name) in
+  match name_str with
   | "Unit" ->
      Some Unit
   | "Boolean" ->
@@ -163,7 +164,7 @@ let get_type_signature menv sigs name =
 
 let rec parse_type (menv: menv) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
   let args' = List.map (parse_type menv sigs rm typarams) args in
-  match parse_built_in_type (ident_string (original_name name)) args' with
+  match parse_built_in_type name args' with
   | Some ty ->
      ty
   | None ->
