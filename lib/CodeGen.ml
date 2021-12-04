@@ -85,7 +85,7 @@ let is_optional_pointer_named_type (name: qident) (args: ty list): ty option =
   if ((source_module_name name) = pervasive_module_name) && ((original_name name) = option_type_name) then
     (match args with
      | [RawPointer arg] ->
-        Some arg'
+        Some arg
      | _ ->
         None)
   else
@@ -134,21 +134,13 @@ let rec gen_type (ty: ty): cpp_ty =
      CPointer (gen_type t)
 
 and gen_named_type (name: qident) (args: ty list): cpp_ty =
-  (* Pointer types are compiled specially *)
-  if is_pointer_type name then
-    match args with
-    | [t] ->
-       CPointer (gen_type t)
-    | _ ->
-       err "Invalid Pointer type usage"
-  else
-    (* Option[Pointer[T]] types are compiled specially *)
-    (match is_optional_pointer_named_type name args with
-     | Some target_ty ->
-        CPointer (gen_type target_ty)
-     | None ->
-        (* It's a regular user defined type. *)
-        CNamedType (gen_qident name, List.map gen_type args))
+  (* Option[Pointer[T]] types are compiled specially *)
+  match is_optional_pointer_named_type name args with
+  | Some target_ty ->
+     CPointer (gen_type target_ty)
+  | None ->
+     (* It's a regular user defined type. *)
+     CNamedType (gen_qident name, List.map gen_type args)
 
 (* Expressions *)
 
@@ -307,8 +299,8 @@ let rec gen_stmt (mn: module_name) (stmt: tstmt): cpp_stmt =
   | TBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
        (match orig_type with
-        | NamedType (name, _, _) ->
-           is_pointer_type name
+        | RawPointer _ ->
+           true
         | _ ->
            false)
      in
@@ -492,15 +484,14 @@ let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
              c_string_type
            else
              err "Not allowed"
+        | RawPointer _ ->
+           gen_type t
         | NamedType (n, args, _) ->
-           if is_pointer_type n then
-             gen_type t
-           else
-             (match is_optional_pointer_named_type n args with
-              | Some _ ->
-                 gen_type t
-              | None ->
-                 err "Pointers and optional pointers are the only named type allowed as parameters of C functions.")
+           (match is_optional_pointer_named_type n args with
+            | Some _ ->
+               gen_type t
+            | None ->
+               err "Optional pointers are the only named type allowed as parameters of C functions.")
         | _ ->
            err "Not allowed")
      in
