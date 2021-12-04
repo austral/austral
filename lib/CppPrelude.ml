@@ -255,5 +255,10 @@ namespace A_Austral__Memory {
     void A_memmove(T* source, T* destination, size_t count) {
         memmove(source, destination, count);
     }
+
+    template<typename T, typename U>
+    void A_memcpy(T* source, T* destination, size_t count) {
+        memcpy(source, destination, count);
+    }
 }
 |code}

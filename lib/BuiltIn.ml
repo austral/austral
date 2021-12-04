@@ -183,6 +183,25 @@ let memory_module =
         ],
         Unit
       )
+  and memcpy_def =
+    let name = i "memcpy" in
+    let qname = make_qident (memory_module_name, name, name) in
+    (* generic [T: Type, U: Type]
+       function memcpy(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit *)
+    SFunctionDeclaration (
+        VisPublic,
+        name,
+        [
+          TypeParameter(i "T", TypeUniverse, qname);
+          TypeParameter(i "U", TypeUniverse, qname)
+        ],
+        [
+          ValueParameter (i "source", NamedType (pointer_type_qname, [TyVar (TypeVariable (i "T", TypeUniverse, qname))], FreeUniverse));
+          ValueParameter (i "destination", NamedType (pointer_type_qname, [TyVar (TypeVariable (i "U", TypeUniverse, qname))], FreeUniverse));
+          ValueParameter (i "count", size_t)
+        ],
+        Unit
+      )
   in
   let decls = [
       pointer_type_def;
@@ -194,7 +213,8 @@ let memory_module =
       load_write_ref_def;
       allocate_array_def;
       resize_array_def;
-      memmove_def
+      memmove_def;
+      memcpy_def
     ]
   in
   SemanticModule {
