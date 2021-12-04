@@ -112,8 +112,7 @@ let rec match_type a b =
   | RawPointer t ->
      (match b with
       | RawPointer t' ->
-         let bindings = match_type t t' in
-         merge_bindings bindings empty_bindings
+         match_type t t'
       | TyVar tyvar ->
          match_type_var tyvar a
       | _ ->
