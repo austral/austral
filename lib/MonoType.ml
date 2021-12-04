@@ -1,5 +1,6 @@
 open Identifier
 open Type
+open Error
 
 type mono_type_id = int
 [@@deriving eq]
@@ -29,3 +30,17 @@ let get_monomorph (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): mono
       None
   in
   List.find_map filter tbl
+
+let mono_type_counter: int ref = ref 1
+
+let fresh_mono_type_id _ =
+  let id = !mono_type_counter in
+  mono_type_counter := id + 1;
+  id
+
+let add_monomorph (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): mono_type_tbl =
+  match get_monomorph tbl name args with
+  | Some _ ->
+     err "Monomorph exists in table."
+  | None ->
+     (name, args, fresh_mono_type_id ()) :: tbl

@@ -28,3 +28,5 @@ type mono_type_tbl
 val empty_mono_type_tbl : mono_type_tbl
 
 val get_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_id option
+
+val add_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_tbl
