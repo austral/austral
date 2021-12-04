@@ -1,6 +1,5 @@
 open Type
 open TypeVarSet
-open BuiltIn
 open Region
 
 let type_universe = function
@@ -47,9 +46,7 @@ let rec is_concrete = function
   | Integer _ -> true
   | SingleFloat -> true
   | DoubleFloat -> true
-  | NamedType (name, _, _) ->
-     (* The only named type that is concrete is the built-in pointer type. *)
-     is_pointer_type name
+  | NamedType _ -> false
   | Array (ty, _) ->
      is_concrete ty
   | RegionTy _ ->
