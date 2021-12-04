@@ -37,6 +37,7 @@ type ty =
   | ReadRef of ty * ty
   | WriteRef of ty * ty
   | TyVar of type_var
+  | RawPointer of ty
 [@@deriving show]
 
 type typed_slot = TypedSlot of identifier * ty
@@ -76,6 +77,8 @@ let rec type_string = function
      "WriteReference[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Linear"
   | TyVar (TypeVariable (n, u, from)) ->
      (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ " : " ^ (universe_string u)
+  | RawPointer ty ->
+     "Pointer[" ^ (type_string ty) ^ "]"
 
 and signedness_string = function
   | Unsigned -> "Natural"
@@ -98,24 +101,78 @@ let size_type = Integer (Unsigned, Width64)
 let string_type = Array (Integer (Unsigned, Width8), static_region)
 
 let rec equal_ty a b =
-  match (a, b) with
-  | (Unit, Unit) ->
-     true
-  | (Boolean, Boolean) ->
-     true
-  | (Integer (s, w), Integer (s', w')) ->
-     (equal_signedness s s') && (equal_integer_width w w')
-  | (SingleFloat, SingleFloat) ->
-     true
-  | (DoubleFloat, DoubleFloat) ->
-     true
-  | (NamedType (n, args, u), NamedType (n', args', u')) ->
-     (equal_qident n n')
-     && (List.for_all (fun (a', b') -> equal_ty a' b') (List.map2 (fun a' b' -> (a',b')) args args'))
-     && (equal_universe u u')
-  | (Array (t, r), Array (t', r')) ->
-     (equal_ty t t') && (equal_region r r')
-  | (TyVar v, TyVar v') ->
-     equal_type_var v v'
-  | _ ->
-     false
+  match a with
+  | Unit ->
+     (match b with
+      | Unit ->
+         true
+      | _ ->
+         false)
+  | Boolean ->
+     (match b with
+      | Boolean ->
+         true
+      | _ ->
+         false)
+  | Integer (s, w) ->
+     (match b with
+      | Integer (s', w') ->
+         (equal_signedness s s') && (equal_integer_width w w')
+      | _ ->
+         false)
+  | SingleFloat ->
+     (match b with
+      | SingleFloat ->
+         true
+      | _ ->
+         false)
+  | DoubleFloat ->
+     (match b with
+      | DoubleFloat ->
+         true
+      | _ ->
+         false)
+  | NamedType (n, args, u) ->
+     (match b with
+      | NamedType (n', args', u') ->
+         (equal_qident n n')
+         && (List.for_all (fun (a', b') -> equal_ty a' b') (List.map2 (fun a' b' -> (a',b')) args args'))
+         && (equal_universe u u')
+      | _ ->
+         false)
+  | Array (t, r) ->
+     (match b with
+      | Array (t', r') ->
+         (equal_ty t t') && (equal_region r r')
+      | _ ->
+         false)
+  | RegionTy r ->
+     (match b with
+      | RegionTy r' ->
+         equal_region r r'
+      | _ ->
+         false)
+  | ReadRef (ty, r) ->
+     (match b with
+      | ReadRef (ty', r') ->
+         (equal_ty ty ty') && (equal_ty r r')
+      | _ ->
+         false)
+  | WriteRef (ty, r) ->
+     (match b with
+      | WriteRef (ty', r') ->
+         (equal_ty ty ty') && (equal_ty r r')
+      | _ ->
+         false)
+  | TyVar v ->
+     (match b with
+      | TyVar v' ->
+         equal_type_var v v'
+      | _ ->
+         false)
+  | RawPointer ty ->
+     (match b with
+      | RawPointer ty' ->
+         equal_ty ty ty'
+      | _ ->
+         false)

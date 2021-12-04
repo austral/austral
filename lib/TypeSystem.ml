@@ -1,6 +1,5 @@
 open Type
 open TypeVarSet
-open BuiltIn
 open Region
 
 let type_universe = function
@@ -15,16 +14,21 @@ let type_universe = function
   | ReadRef _ -> FreeUniverse
   | WriteRef _ -> FreeUniverse
   | TyVar (TypeVariable (_, u, _)) -> u
-
-let type_arguments = function
-  | NamedType (_, args, _) -> args
-  | _ -> []
+  | RawPointer _ -> FreeUniverse
 
 let is_numeric = function
+  | Unit -> false
+  | Boolean -> false
   | Integer _ -> true
   | SingleFloat -> true
   | DoubleFloat -> true
-  | _ -> false
+  | NamedType _ -> false
+  | Array _ -> false
+  | RegionTy _ -> false
+  | ReadRef _ -> false
+  | WriteRef _ -> false
+  | TyVar _ -> false
+  | RawPointer _ -> false
 
 let is_comparable = function
   | Unit -> true
@@ -32,13 +36,39 @@ let is_comparable = function
   | Integer _ -> true
   | SingleFloat -> true
   | DoubleFloat -> true
-  | _ -> false
+  | NamedType _ -> false
+  | Array _ -> false
+  | RegionTy _ -> false
+  | ReadRef _ -> false
+  | WriteRef _ -> false
+  | TyVar _ -> false
+  | RawPointer _ -> true
 
 let rec type_variables = function
+  | Unit ->
+     TypeVarSet.empty
+  | Boolean ->
+     TypeVarSet.empty
+  | Integer _ ->
+     TypeVarSet.empty
+  | SingleFloat ->
+     TypeVarSet.empty
+  | DoubleFloat ->
+     TypeVarSet.empty
   | NamedType (_, a, _) ->
      List.fold_left TypeVarSet.union TypeVarSet.empty (List.map type_variables a)
-  | TyVar v -> TypeVarSet.singleton v
-  | _ -> TypeVarSet.empty
+  | Array (ty, _) ->
+     type_variables ty
+  | RegionTy _ ->
+     TypeVarSet.empty
+  | ReadRef (ty, r) ->
+     TypeVarSet.union (type_variables ty) (type_variables r)
+  | WriteRef (ty, r) ->
+     TypeVarSet.union (type_variables ty) (type_variables r)
+  | TyVar v ->
+     TypeVarSet.singleton v
+  | RawPointer ty ->
+     type_variables ty
 
 let region_map_from_typarams _ =
   empty_region_map
@@ -49,9 +79,7 @@ let rec is_concrete = function
   | Integer _ -> true
   | SingleFloat -> true
   | DoubleFloat -> true
-  | NamedType (name, _, _) ->
-     (* The only named type that is concrete is the built-in pointer type. *)
-     is_pointer_type name
+  | NamedType _ -> false
   | Array (ty, _) ->
      is_concrete ty
   | RegionTy _ ->
@@ -62,4 +90,6 @@ let rec is_concrete = function
      is_concrete ty
   | TyVar _ ->
      (* Individual type variables need not be instantiated. *)
+     true
+  | RawPointer _ ->
      true

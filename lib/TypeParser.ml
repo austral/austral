@@ -8,67 +8,78 @@ open BuiltIn
 open Semantic
 open Error
 
-let parse_built_in_type name args =
-  match name with
-  | "Unit" ->
-     Some Unit
-  | "Boolean" ->
-     Some Boolean
-  | "Natural_8" ->
-     Some (Integer (Unsigned, Width8))
-  | "Natural_16" ->
-     Some (Integer (Unsigned, Width16))
-  | "Natural_32" ->
-     Some (Integer (Unsigned, Width32))
-  | "Natural_64" ->
-     Some (Integer (Unsigned, Width64))
-  | "Integer_8" ->
-     Some (Integer (Signed, Width8))
-  | "Integer_16" ->
-     Some (Integer (Signed, Width16))
-  | "Integer_32" ->
-     Some (Integer (Signed, Width32))
-  | "Integer_64" ->
-     Some (Integer (Signed, Width64))
-  | "Single_Float" ->
-     Some SingleFloat
-  | "Double_Float" ->
-     Some DoubleFloat
-  | "Static" ->
-     Some (RegionTy static_region)
-  | "Fixed_Array" ->
-     (match args with
-      | [ty] ->
-         Some (Array (ty, static_region))
-      | _ ->
-         err "Invalid Fixed_Array type specifier.")
-  | "Reference" ->
-     (match args with
-      | [ty; ty'] ->
-         let u = type_universe ty' in
+let parse_built_in_type (name: qident) (args: ty list): ty option =
+  if is_pointer_type name then
+    match args with
+    | [ty] ->
+       Some (RawPointer ty)
+    | _ ->
+       err "Invalid Pointer type specifier."
+  else
+    let name_str: string = ident_string (original_name name) in
+    match name_str with
+    | "Unit" ->
+       Some Unit
+    | "Boolean" ->
+       Some Boolean
+    | "Natural_8" ->
+       Some (Integer (Unsigned, Width8))
+    | "Natural_16" ->
+       Some (Integer (Unsigned, Width16))
+    | "Natural_32" ->
+       Some (Integer (Unsigned, Width32))
+    | "Natural_64" ->
+       Some (Integer (Unsigned, Width64))
+    | "Integer_8" ->
+       Some (Integer (Signed, Width8))
+    | "Integer_16" ->
+       Some (Integer (Signed, Width16))
+    | "Integer_32" ->
+       Some (Integer (Signed, Width32))
+    | "Integer_64" ->
+       Some (Integer (Signed, Width64))
+    | "Single_Float" ->
+       Some SingleFloat
+    | "Double_Float" ->
+       Some DoubleFloat
+    | "Static" ->
+       Some (RegionTy static_region)
+    | "Fixed_Array" ->
+       (match args with
+        | [ty] ->
+           Some (Array (ty, static_region))
+        | _ ->
+           err "Invalid Fixed_Array type specifier.")
+    | "Reference" ->
+       (match args with
+        | [ty; ty'] ->
+           let u = type_universe ty' in
            if (u = RegionUniverse) then
              Some (ReadRef (ty, ty'))
            else
              err "Reference error: Not a region"
-      | _ ->
-         err "Invalid Reference type specifier.")
-  | "WriteReference" ->
-     (match args with
-      | [ty; ty'] ->
-         let u' = type_universe ty' in
-         if (u' = RegionUniverse) then
-           Some (WriteRef (ty, ty'))
-         else
-           err "WriteReference error: Not a region"
-      | _ ->
-         err "Invalid WriteReference type specifier.")
-  | _ ->
-     None
+        | _ ->
+           err "Invalid Reference type specifier.")
+    | "WriteReference" ->
+       (match args with
+        | [ty; ty'] ->
+           let u' = type_universe ty' in
+           if (u' = RegionUniverse) then
+             Some (WriteRef (ty, ty'))
+           else
+             err "WriteReference error: Not a region"
+        | _ ->
+           err "Invalid WriteReference type specifier.")
+    | _ ->
+       None
 
 let rec effective_universe name typarams declared_universe args =
   (* Algorithm:
 
      1. If the declared universe is Free then none of the type parameters can be Linear or Type.
+
+         1.1 Unless it's `Pointer[T]`. But we don't have to take care of that here, since `Pointer`
+             is a built in type, and the `type_universe` function determines its universe.
 
      2. If the declared universe is Linear, then no type parameter can change this. Therefore, the effective
         universe is Linear.
@@ -91,16 +102,7 @@ let rec effective_universe name typarams declared_universe args =
      if all_arguments_are_free args then
        FreeUniverse
      else
-       (* This is an error, because if a generic type is said to be in the Free
-          universe, its arguments cannot be Linear or Type. However, there is an
-          exception to this rule: the Pointer and Heap_Array types from
-          Austral.Memory are non-linear. These are escape hatches of the
-          linearity checker and are necessary to implement low-level data
-          structures. *)
-       if is_pointer_type name then
-         FreeUniverse
-       else
-         err ("Free type called with non-free argument: " ^ (qident_debug_name name))
+       err ("Free type called with non-free argument: " ^ (qident_debug_name name))
   | LinearUniverse ->
      LinearUniverse
   | RegionUniverse ->
@@ -163,7 +165,7 @@ let get_type_signature menv sigs name =
 
 let rec parse_type (menv: menv) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
   let args' = List.map (parse_type menv sigs rm typarams) args in
-  match parse_built_in_type (ident_string (original_name name)) args' with
+  match parse_built_in_type name args' with
   | Some ty ->
      ty
   | None ->

@@ -19,6 +19,7 @@ let i = make_ident
 
 let test_successful_matches _ =
   let t = v "T" FreeUniverse
+  (* Make a named type from its name and arglist *)
   and fnt n a = NamedType (make_qident (make_mod_name "", i n, i n), a, FreeUniverse) in
   meq Unit Unit [];
   meq t Unit [("T", Unit)];
@@ -27,6 +28,18 @@ let test_successful_matches _ =
   meq param arg [("T", Unit)];
   let param = fnt "Option" [Unit]
   and arg = fnt "Option" [t] in
+  meq param arg [("T", Unit)];
+  let param = RawPointer t
+  and arg = RawPointer Unit in
+  meq param arg [("T", Unit)];
+  let param = RawPointer (RawPointer t)
+  and arg = RawPointer (RawPointer Unit) in
+  meq param arg [("T", Unit)];
+  let param = fnt "A" [RawPointer t]
+  and arg = fnt "A" [RawPointer Unit] in
+  meq param arg [("T", Unit)];
+  let param = fnt "A" [fnt "B" [RawPointer t]]
+  and arg = fnt "A" [fnt "B" [RawPointer Unit]] in
   meq param arg [("T", Unit)]
 
 let suite =
