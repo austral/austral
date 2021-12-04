@@ -78,6 +78,8 @@ let rec effective_universe name typarams declared_universe args =
 
      1. If the declared universe is Free then none of the type parameters can be Linear or Type.
 
+         1.1 Unless it's `Pointer[T]`.
+
      2. If the declared universe is Linear, then no type parameter can change this. Therefore, the effective
         universe is Linear.
 
@@ -99,16 +101,7 @@ let rec effective_universe name typarams declared_universe args =
      if all_arguments_are_free args then
        FreeUniverse
      else
-       (* This is an error, because if a generic type is said to be in the Free
-          universe, its arguments cannot be Linear or Type. However, there is an
-          exception to this rule: the Pointer and Heap_Array types from
-          Austral.Memory are non-linear. These are escape hatches of the
-          linearity checker and are necessary to implement low-level data
-          structures. *)
-       if is_pointer_type name then
-         FreeUniverse
-       else
-         err ("Free type called with non-free argument: " ^ (qident_debug_name name))
+       err ("Free type called with non-free argument: " ^ (qident_debug_name name))
   | LinearUniverse ->
      LinearUniverse
   | RegionUniverse ->
