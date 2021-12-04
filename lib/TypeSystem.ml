@@ -33,7 +33,7 @@ let is_comparable = function
   | Integer _ -> true
   | SingleFloat -> true
   | DoubleFloat -> true
-  | RawPointer -> true
+  | RawPointer _ -> true
   | _ -> false
 
 let rec type_variables = function
