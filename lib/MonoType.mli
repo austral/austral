@@ -22,3 +22,5 @@ type mono_ty =
 (** The table of type monomorphs associates a generic type's name and list of
    monomorphic type arguments to its type monomorph ID. *)
 type mono_type_tbl
+
+val empty_mono_type_tbl : mono_type_tbl

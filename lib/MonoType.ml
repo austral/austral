@@ -16,3 +16,5 @@ type mono_ty =
   | MonoRawPointer of mono_ty
 
 type mono_type_tbl = (qident * mono_ty list * mono_type_id) list
+
+let empty_mono_type_tbl: mono_type_tbl = []
