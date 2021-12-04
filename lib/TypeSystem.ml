@@ -32,10 +32,30 @@ let is_comparable = function
   | _ -> false
 
 let rec type_variables = function
+  | Unit ->
+     TypeVarSet.empty
+  | Boolean ->
+     TypeVarSet.empty
+  | Integer _ ->
+     TypeVarSet.empty
+  | SingleFloat ->
+     TypeVarSet.empty
+  | DoubleFloat ->
+     TypeVarSet.empty
   | NamedType (_, a, _) ->
      List.fold_left TypeVarSet.union TypeVarSet.empty (List.map type_variables a)
-  | TyVar v -> TypeVarSet.singleton v
-  | _ -> TypeVarSet.empty
+  | Array (ty, _) ->
+     type_variables ty
+  | RegionTy _ ->
+     TypeVarSet.empty
+  | ReadRef (ty, r) ->
+     TypeVarSet.union (type_variables ty) (type_variables r)
+  | WriteRef (ty, r) ->
+     TypeVarSet.union (type_variables ty) (type_variables r)
+  | TyVar v ->
+     TypeVarSet.singleton v
+  | RawPointer ty ->
+     type_variables ty
 
 let region_map_from_typarams _ =
   empty_region_map
