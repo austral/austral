@@ -101,5 +101,44 @@ let rec strip_type (ty: ty): stripped_ty option =
       | None ->
          err "Internal: raw pointer type instantiated with a region type.")
 
-let monomorphize_type _ _: (mono_ty * mono_type_tbl) =
-  err "Not implemented"
+let rec monomorphize_type (tbl: mono_type_tbl) (ty: stripped_ty): (mono_ty * mono_type_tbl) =
+  match ty with
+  | SUnit ->
+     (MonoUnit, tbl)
+  | SBoolean ->
+     (MonoBoolean, tbl)
+  | SInteger (s, w) ->
+     (MonoInteger (s, w), tbl)
+  | SSingleFloat ->
+     (MonoSingleFloat, tbl)
+  | SDoubleFloat ->
+     (MonoDoubleFloat, tbl)
+  | SArray elem_ty ->
+     let (elem_ty, tbl) = monomorphize_type tbl elem_ty in
+     (MonoArray elem_ty, tbl)
+  | SReadRef ty ->
+     let (ty, tbl) = monomorphize_type tbl ty in
+     (MonoReadRef ty, tbl)
+  | SWriteRef ty ->
+     let (ty, tbl) = monomorphize_type tbl ty in
+     (MonoWriteRef ty, tbl)
+  | SRawPointer ty ->
+     let (ty, tbl) = monomorphize_type tbl ty in
+     (MonoRawPointer ty, tbl)
+  | SNamedType (name, args) ->
+     let (args, tbl) = monomorphize_list tbl args in
+     (match get_monomorph tbl name args with
+      | Some id ->
+         (MonoNamedType (name, id), tbl)
+      | None ->
+         let (id, tbl) = add_monomorph tbl name args in
+         (MonoNamedType (name, id), tbl))
+
+and monomorphize_list (tbl: mono_type_tbl) (tys: stripped_ty list): (mono_ty list * mono_type_tbl) =
+  match tys with
+  | first::rest ->
+     let (first, tbl) = monomorphize_type tbl first in
+     let (rest, tbl) = monomorphize_list tbl rest in
+     (first :: rest, tbl)
+  | [] ->
+     ([], tbl)
