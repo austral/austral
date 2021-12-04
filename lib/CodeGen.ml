@@ -84,11 +84,8 @@ let gen_qident (i: qident): string =
 let is_optional_pointer_named_type (name: qident) (args: ty list): ty option =
   if ((source_module_name name) = pervasive_module_name) && ((original_name name) = option_type_name) then
     (match args with
-     | [NamedType (n', [arg'], _)] ->
-        if is_pointer_type n' then
-          Some arg'
-        else
-          None
+     | [RawPointer arg] ->
+        Some arg'
      | _ ->
         None)
   else
