@@ -137,6 +137,7 @@ let rec equal_ty a b =
       | NamedType (n', args', u') ->
          (equal_qident n n')
          && (List.for_all (fun (a', b') -> equal_ty a' b') (List.map2 (fun a' b' -> (a',b')) args args'))
+         && (equal_universe u u')
       | _ ->
          false)
   | Array (t, r) ->
@@ -145,9 +146,33 @@ let rec equal_ty a b =
          (equal_ty t t') && (equal_region r r')
       | _ ->
          false)
+  | RegionTy r ->
+     (match b with
+      | RegionTy r' ->
+         equal_region r r'
+      | _ ->
+         false)
+  | ReadRef (ty, r) ->
+     (match b with
+      | ReadRef (ty', r') ->
+         (equal_ty ty ty') && (equal_ty r r')
+      | _ ->
+         false)
+  | WriteRef (ty, r) ->
+     (match b with
+      | WriteRef (ty', r') ->
+         (equal_ty ty ty') && (equal_ty r r')
+      | _ ->
+         false)
   | TyVar v ->
      (match b with
       | TyVar v' ->
          equal_type_var v v'
+      | _ ->
+         false)
+  | RawPointer ty ->
+     (match b with
+      | RawPointer ty' ->
+         equal_ty ty ty'
       | _ ->
          false)
