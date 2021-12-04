@@ -8,48 +8,107 @@ let type_mismatch _ a b =
   raise_type_mismatch_error (type_string a) (type_string b)
 
 let rec match_type a b =
-  match (a, b) with
-  | (Unit, Unit) -> empty_bindings
-  | (Boolean, Boolean) -> empty_bindings
-  | (Integer (s, w), Integer (s', w')) ->
-     if (s = s') && (w = w') then
-       empty_bindings
-     else
-       type_mismatch "Integer types don't match" a b
-  | (SingleFloat, SingleFloat) -> empty_bindings
-  | (DoubleFloat, DoubleFloat) -> empty_bindings
-  | (NamedType (n, args, _), NamedType (n', args', _)) ->
-     (* We ignore the universe, since the type system
-        is nominal. *)
-     if n = n' then
-       match_type_list args args'
-     else
-       type_mismatch "Type mismatch" a b
-  | (Array (t, r), Array (t', r')) ->
-     let bindings = match_type t t' in
-     if r = r' then
-       bindings
-     else
-       type_mismatch "Array type mismatch" a b
-  | (RegionTy r, RegionTy r') ->
-     if r = r' then
-       empty_bindings
-     else
-       type_mismatch "Region type mismatch" a b
-  | (ReadRef (t, r), ReadRef (t', r')) ->
-     let bindings = match_type t t' in
-     let bindings' = match_type r r' in
-     merge_bindings bindings bindings'
-  | (WriteRef (t, r), WriteRef (t', r')) ->
-     let bindings = match_type t t' in
-     let bindings' = match_type r r' in
-     merge_bindings bindings bindings'
-  | (TyVar (TypeVariable (i, u, from)), t) ->
-     match_type_var i u from t
-  | (t, TyVar (TypeVariable (i, u, from))) ->
-     match_type_var i u from t
-  | _ ->
-     type_mismatch "Type mismatch" a b
+  match a with
+  | Unit ->
+     (match b with
+      | Unit ->
+         empty_bindings
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected Unit, but got another type." a b)
+  | Boolean ->
+     (match b with
+      | Boolean ->
+         empty_bindings
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected Boolean, but got another type." a b)
+  | Integer (s, w) ->
+     (match b with
+      | Integer (s', w') ->
+         if (s = s') && (w = w') then
+           empty_bindings
+         else
+           type_mismatch "Integer types don't match" a b
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected an integer, but got another type." a b)
+  | SingleFloat ->
+     (match b with
+      | SingleFloat ->
+         empty_bindings
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected SingleFloat, but got another type." a b)
+  | DoubleFloat ->
+     (match b with
+      | DoubleFloat ->
+         empty_bindings
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected DoubleFloat, but got another type." a b)
+  | NamedType (n, args, _) ->
+     (match b with
+      | NamedType (n', args', _) ->
+         (* We ignore the universe, since the type system is nominal. *)
+         if n = n' then
+           match_type_list args args'
+         else
+           type_mismatch "Type mismatch" a b
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected a named type, but got something else." a b)
+  | Array (t, r) ->
+     (match b with
+      | Array (t', r') ->
+         let bindings = match_type t t' in
+         if r = r' then
+           bindings
+         else
+           type_mismatch "Array type mismatch" a b
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected an array, but got another type." a b)
+  | RegionTy r ->
+     (match b with
+      | RegionTy r' ->
+         if r = r' then
+           empty_bindings
+         else
+           type_mismatch "Region type mismatch" a b
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected a region, but got another type." a b)
+  | ReadRef (t, r) ->
+     (match b with
+      | ReadRef (t', r') ->
+         let bindings = match_type t t' in
+         let bindings' = match_type r r' in
+         merge_bindings bindings bindings'
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected a read reference, but got another type." a b)
+  | WriteRef (t, r) ->
+     (match b with
+      | WriteRef (t', r') ->
+         let bindings = match_type t t' in
+         let bindings' = match_type r r' in
+         merge_bindings bindings bindings'
+      | TyVar (TypeVariable (i, u, from)) ->
+         match_type_var i u from a
+      | _ ->
+         type_mismatch "Expected a write reference, but got another type." a b)
+  | TyVar (TypeVariable (i, u, from)) ->
+     match_type_var i u from b
 
 and match_type_var name universe from ty =
   (* Check if the argument type is a variable. *)
