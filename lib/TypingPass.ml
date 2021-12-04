@@ -300,15 +300,8 @@ and augment_path_elem (menv: menv) (module_name: module_name) (rm: region_map) (
      (match head_ty with
       | Array (elem_ty, _) ->
          TArrayIndex (ie', elem_ty)
-      | NamedType (name, args, _) ->
-         if is_pointer_type name then
-           match args with
-           | [elem_ty] ->
-              TArrayIndex (ie', elem_ty)
-           | _ ->
-              err "Invalid usage of Pointer type"
-         else
-           err ("Can't index this type: " ^ (type_string head_ty))
+      | RawPointer elem_ty ->
+         TArrayIndex (ie', elem_ty)
       | _ ->
          err "Array index operator doesn't work for this type.")
 
@@ -936,26 +929,12 @@ and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (rm: region
   | ArrayIndex ie ->
      let ie' = augment_expr module_name menv rm typarams lexenv None ie in
      (match head_ty with
-      | NamedType (name, args, _) ->
-         if is_pointer_type name then
-           match args with
-           | [elem_ty] ->
-              TArrayIndex (ie', elem_ty)
-           | _ ->
-              err "Invalid usage of Pointer type"
-         else
-           err ("Can't index this type: " ^ (type_string head_ty))
+      | RawPointer elem_ty ->
+         TArrayIndex (ie', elem_ty)
       | WriteRef (ref_ty, _) ->
          (match ref_ty with
-          | NamedType (name, args, _) ->
-             if is_pointer_type name then
-               (match args with
-                | [elem_ty] ->
-                   TArrayIndex (ie', elem_ty)
-                | _ ->
-                   err "Invalid usage of Pointer type")
-             else
-               err ("Can't index this type: " ^ (type_string ref_ty))
+          | RawPointer elem_ty ->
+             TArrayIndex (ie', elem_ty)
           | _ ->
              err ("Can't index this type: " ^ (type_string ref_ty)))
       | _ ->
