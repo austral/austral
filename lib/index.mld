@@ -51,6 +51,7 @@ The compiler's middle end.
 - {!Austral_core.BuiltIn}
 - {!Austral_core.Linearity}
 - {!Austral_core.MonoType}
+- {!Austral_core.Mtast}
 
 {1 Backend}
 
