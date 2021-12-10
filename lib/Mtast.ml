@@ -79,6 +79,8 @@ and mtyped_lvalue =
 and mvalue_parameter =
   MValueParameter of identifier * mono_ty
 
-and mtyped_slot = MTypedSlot of identifier * mono_ty
+and mtyped_slot =
+  MTypedSlot of identifier * mono_ty
 
-and mtyped_case = MTypedCase of identifier * mtyped_slot list
+and mtyped_case =
+  MTypedCase of identifier * mtyped_slot list
