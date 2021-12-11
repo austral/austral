@@ -127,8 +127,18 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      else
        (* The function is concrete. *)
        (MConcreteFuncall (name, args, rt), tbl)
-  | TMethodCall _ ->
-     err "Not done yet"
+  | TMethodCall (name, STypeClassInstance (_, _, typarams, tyarg, _), args, rt) ->
+     (* Monomorphize the return type. *)
+     let rt = strip_type rt in
+     let (rt, tbl) = monomorphize_type tbl rt in
+     (* Monomorphize the arglist *)
+     let (args, tbl) = monomorphize_expr_list tbl args in
+     (* Does the funcall have a list of type params? *)
+     if List.length typarams > 0 then
+       err "Derp"
+     else
+       (* The function is concrete. *)
+       (MConcreteFuncall (name, args, rt), tbl)
   | TCast (expr, ty) ->
      let ty = strip_type ty in
      let (ty, tbl) = monomorphize_type tbl ty in
