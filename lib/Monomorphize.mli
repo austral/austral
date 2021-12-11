@@ -62,3 +62,6 @@ val monomorphize_type : mono_tbl -> stripped_ty -> (mono_ty * mono_tbl)
 
 (** Monomorphize an expression. *)
 val monomorphize_expr : mono_tbl -> texpr -> (mexpr * mono_tbl)
+
+(** Monomorphize a statement. *)
+val monomorphize_stmt : mono_tbl -> tstmt -> (mstmt * mono_tbl)

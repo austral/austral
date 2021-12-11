@@ -114,6 +114,10 @@ and monomorphize_ty_list (tbl: mono_tbl) (tys: stripped_ty list): (mono_ty list 
   | [] ->
      ([], tbl)
 
+let strip_and_mono (tbl: mono_tbl) (ty: ty): (mono_ty * mono_tbl) =
+  let ty = strip_type ty in
+  monomorphize_type tbl ty
+
 let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
   match expr with
   | TNilConstant ->
@@ -127,8 +131,7 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
   | TStringConstant s ->
      (MStringConstant s, tbl)
   | TVariable (name, ty) ->
-     let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
+     let (ty, tbl) = strip_and_mono tbl ty in
      (MVariable (name, ty), tbl)
   | TArithmetic (oper, lhs, rhs) ->
      let (lhs, tbl) = monomorphize_expr tbl lhs in
@@ -136,8 +139,7 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      (MArithmetic (oper, lhs, rhs), tbl)
   | TFuncall (name, args, rt, substs) ->
      (* Monomorphize the return type. *)
-     let rt = strip_type rt in
-     let (rt, tbl) = monomorphize_type tbl rt in
+     let (rt, tbl) = strip_and_mono tbl rt in
      (* Monomorphize the arglist *)
      let (args, tbl) = monomorphize_expr_list tbl args in
      (* Does the funcall have a substitution list? *)
@@ -157,8 +159,7 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
        (MConcreteFuncall (name, args, rt), tbl)
   | TMethodCall (name, STypeClassInstance (_, _, typarams, _, _), args, rt, substs) ->
      (* Monomorphize the return type. *)
-     let rt = strip_type rt in
-     let (rt, tbl) = monomorphize_type tbl rt in
+     let (rt, tbl) = strip_and_mono tbl rt in
      (* Monomorphize the arglist *)
      let (args, tbl) = monomorphize_expr_list tbl args in
      (* Does the funcall have a list of type params? *)
@@ -177,8 +178,7 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
        (* The instance is concrete. *)
        (MConcreteFuncall (name, args, rt), tbl)
   | TCast (expr, ty) ->
-     let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
+     let (ty, tbl) = strip_and_mono tbl ty in
      let (expr, tbl) = monomorphize_expr tbl expr in
      (MCast (expr, ty), tbl)
   | TComparison (oper, lhs, rhs) ->
@@ -202,32 +202,27 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      let (f, tbl) = monomorphize_expr tbl f in
      (MIfExpression (c, t, f), tbl)
   | TRecordConstructor (ty, args) ->
-     let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
+     let (ty, tbl) = strip_and_mono tbl ty in
      let (args, tbl) = monomorphize_named_expr_list tbl args in
      (MRecordConstructor (ty, args), tbl)
   | TUnionConstructor (ty, case_name, args) ->
-     let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
+     let (ty, tbl) = strip_and_mono tbl ty in
      let (args, tbl) = monomorphize_named_expr_list tbl args in
      (MUnionConstructor (ty, case_name, args), tbl)
   | TPath { head; elems; ty } ->
-     let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
+     let (ty, tbl) = strip_and_mono tbl ty in
      let (head, tbl) = monomorphize_expr tbl head in
      let (elems, tbl) = monomorphize_path_elems tbl elems in
      (MPath { head = head; elems = elems; ty = ty }, tbl)
   | TEmbed (ty, fmt, args) ->
-     let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
+     let (ty, tbl) = strip_and_mono tbl ty in
      let (args, tbl) = monomorphize_expr_list tbl args in
      (MEmbed (ty, fmt, args), tbl)
   | TDeref expr ->
      let (expr, tbl) = monomorphize_expr tbl expr in
      (MDeref expr, tbl)
   | TSizeOf ty ->
-     let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
+     let (ty, tbl) = strip_and_mono tbl ty in
      (MSizeOf ty, tbl)
 
 and monomorphize_expr_list (tbl: mono_tbl) (exprs: texpr list): (mexpr list * mono_tbl) =
@@ -272,3 +267,10 @@ and monomorphize_path_elem (tbl: mono_tbl) (elem: typed_path_elem): (mtyped_path
      let (ty, tbl) = monomorphize_type tbl ty in
      let (idx, tbl) = monomorphize_expr tbl idx in
      (MArrayIndex (idx, ty), tbl)
+
+let rec monomorphize_stmt (tbl: mono_tbl) (stmt: tstmt): (mstmt * mono_tbl) =
+  match stmt with
+  | TSkip _ ->
+     (MSkip, tbl)
+  | _ ->
+     err "Not done"
