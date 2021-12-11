@@ -55,7 +55,7 @@ and texpr =
   | TVariable of qident * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of qident * texpr list * ty * (identifier * ty) list
-  | TMethodCall of qident * semantic_instance * texpr list * ty
+  | TMethodCall of qident * semantic_instance * texpr list * ty * (identifier * ty) list
   | TCast of texpr * ty
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr
