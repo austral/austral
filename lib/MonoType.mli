@@ -100,5 +100,8 @@ val strip_type : ty -> stripped_ty option
 
    ]}
 
+   For simplicity, the instantiation state is elided, since it's always
+   {!NotInstantiated} when a new monomorph is added to the table.
+
  *)
 val monomorphize_type : mono_type_tbl -> stripped_ty -> (mono_ty * mono_type_tbl)

@@ -22,12 +22,12 @@ type mono_status =
   | NotInstantiated
   | Instantiated
 
-type mono_type_tbl = (qident * mono_ty list * mono_type_id) list
+type mono_type_tbl = (qident * mono_ty list * mono_type_id * mono_status) list
 
 let empty_mono_type_tbl: mono_type_tbl = []
 
 let get_monomorph (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): mono_type_id option =
-  let filter (name', args', id) =
+  let filter (name', args', id, _) =
     if (equal_qident name name') && (List.for_all2 equal_mono_ty args args') then
       Some id
     else
@@ -48,7 +48,7 @@ let add_monomorph (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): (mon
      err "Monomorph exists in table."
   | None ->
      let id = fresh_mono_type_id () in
-     (id, (name, args, id) :: tbl)
+     (id, (name, args, id, NotInstantiated) :: tbl)
 
 type stripped_ty =
   | SUnit
