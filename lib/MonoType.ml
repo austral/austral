@@ -45,7 +45,7 @@ let fresh_mono_type_id _ =
   mono_type_counter := id + 1;
   id
 
-let add_monomorph (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): (mono_type_id * mono_type_tbl) =
+let add_mono_ty (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): (mono_type_id * mono_type_tbl) =
   match get_mono_ty_id tbl name args with
   | Some _ ->
      err "Monomorph exists in table."
@@ -138,7 +138,7 @@ let rec monomorphize_type (tbl: mono_type_tbl) (ty: stripped_ty): (mono_ty * mon
       | Some id ->
          (MonoNamedType (name, id), tbl)
       | None ->
-         let (id, tbl) = add_monomorph tbl name args in
+         let (id, tbl) = add_mono_ty tbl name args in
          (MonoNamedType (name, id), tbl))
 
 and monomorphize_list (tbl: mono_type_tbl) (tys: stripped_ty list): (mono_ty list * mono_type_tbl) =

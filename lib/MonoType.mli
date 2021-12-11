@@ -47,12 +47,12 @@ val empty_mono_type_tbl : mono_type_tbl
    argument list. *)
 val get_mono_ty_id : mono_type_tbl -> qident -> mono_ty list -> mono_type_id option
 
-(** Add a new monomorph to the table, returning a tuple of the monomorph's ID
+(** Add a new type monomorph to the table, returning a tuple of the monomorph's ID
    and the updated table. By default, the status of the new monomorph is
    {!NotInstantiated}.
 
    Throws an error if it already exists. *)
-val add_monomorph : mono_type_tbl -> qident -> mono_ty list -> (mono_type_id * mono_type_tbl)
+val add_mono_ty : mono_type_tbl -> qident -> mono_ty list -> (mono_type_id * mono_type_tbl)
 
 (** A stripped type specifier is the same as a type specifier, but the region
    and type variable cases have been removed. *)
