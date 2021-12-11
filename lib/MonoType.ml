@@ -8,6 +8,10 @@ type mono_type_id = int
 type mono_fun_id = int
 [@@deriving eq]
 
+type mono_status =
+  | NotInstantiated
+  | Instantiated
+
 type mono_ty =
   | MonoUnit
   | MonoBoolean
@@ -20,10 +24,6 @@ type mono_ty =
   | MonoWriteRef of mono_ty
   | MonoRawPointer of mono_ty
 [@@deriving eq]
-
-type mono_status =
-  | NotInstantiated
-  | Instantiated
 
 type mono_type_tbl = (qident * mono_ty list * mono_type_id * mono_status) list
 

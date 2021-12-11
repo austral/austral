@@ -10,6 +10,11 @@ type mono_type_id
 type mono_fun_id
 [@@deriving eq]
 
+(** Represents whether a monomorph has been instantiated. *)
+type mono_status =
+  | NotInstantiated
+  | Instantiated
+
 (** A monomorphic, or concrete, type. *)
 type mono_ty =
   | MonoUnit
@@ -25,10 +30,7 @@ type mono_ty =
   | MonoRawPointer of mono_ty
 [@@deriving eq]
 
-(** Represents whether a monomorph has been instantiated. *)
-type mono_status =
-  | NotInstantiated
-  | Instantiated
+
 
 (** The table of type monomorphs associates a generic type's name and list of
    monomorphic type arguments to:
