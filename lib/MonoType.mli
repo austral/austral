@@ -19,7 +19,8 @@ type mono_ty =
   | MonoSingleFloat
   | MonoDoubleFloat
   | MonoNamedType of qident * mono_id
-  (** A monomorphic instance of a generic type, identified by the name of the type, its monomorphic arguments, and a monomorph ID. *)
+  (** A monomorphic instance of a generic type, identified by the name of the
+     type, its monomorphic arguments, and a monomorph ID. *)
   | MonoArray of mono_ty
   | MonoReadRef of mono_ty
   | MonoWriteRef of mono_ty
