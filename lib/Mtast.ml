@@ -1,7 +1,6 @@
 open Identifier
 open Common
 open Escape
-open Span
 open MonoType
 
 type mono_module = MonoModule of module_name * mtyped_decl list
@@ -14,16 +13,15 @@ and mtyped_decl =
   | MForeignFunction of identifier * mvalue_parameter list * mono_ty * string
 
 and mstmt =
-  | MSkip of span
-  | MLet of span * identifier * mono_ty * mexpr * mstmt
-  | MDestructure of span * (identifier * mono_ty) list * mexpr * mstmt
-  | MAssign of span * mtyped_lvalue * mexpr
-  | MIf of span * mexpr * mstmt * mstmt
-  | MCase of span * mexpr * mtyped_when list
-  | MWhile of span * mexpr * mstmt
-  | MFor of span * identifier * mexpr * mexpr * mstmt
+  | MSkip
+  | MLet of identifier * mono_ty * mexpr * mstmt
+  | MDestructure of (identifier * mono_ty) list * mexpr * mstmt
+  | MAssign of mtyped_lvalue * mexpr
+  | MIf of mexpr * mstmt * mstmt
+  | MCase of mexpr * mtyped_when list
+  | MWhile of mexpr * mstmt
+  | MFor of identifier * mexpr * mexpr * mstmt
   | MBorrow of {
-      span: span;
       original: identifier;
       rename: identifier;
       region: identifier;
@@ -32,9 +30,9 @@ and mstmt =
       body: mstmt;
       mode: borrowing_mode
     }
-  | MBlock of span * mstmt * mstmt
-  | MDiscarding of span * mexpr
-  | MReturn of span * mexpr
+  | MBlock of mstmt * mstmt
+  | MDiscarding of mexpr
+  | MReturn of mexpr
 
 and mexpr =
   | MNilConstant
