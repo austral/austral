@@ -21,8 +21,19 @@ type mono_ty =
   | MonoRawPointer of mono_ty
 [@@deriving eq]
 
+(** Represents whether a monomorph has been instantiated. *)
+type mono_status =
+  | NotInstantiated
+  | Instantiated
+
 (** The table of type monomorphs associates a generic type's name and list of
-   monomorphic type arguments to its type monomorph ID. *)
+   monomorphic type arguments to:
+
+     1. Its type monomorph ID.
+
+     2. A {!mono_status} value that indicates whether the monomorph has
+        been instantiated.
+*)
 type mono_type_tbl
 
 (** An empty table of type monomorphs. *)
@@ -33,7 +44,10 @@ val empty_mono_type_tbl : mono_type_tbl
 val get_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_id option
 
 (** Add a new monomorph to the table, returning a tuple of the monomorph's ID
-   and the updated table. Throws an error if it already exists. *)
+   and the updated table. By default, the status of the new monomorph is
+   {!NotInstantiated}.
+
+   Throws an error if it already exists. *)
 val add_monomorph : mono_type_tbl -> qident -> mono_ty list -> (mono_type_id * mono_type_tbl)
 
 (** A stripped type specifier is the same as a type specifier, but the region
@@ -52,10 +66,14 @@ val strip_type : ty -> stripped_ty option
 
    To illustrate how it works, consider this type specifier:
 
-       Map[Int, Pair[String, Option[Array[Int]]]]
+   {[
+   Map[Int, Pair[String, Option[Array[Int]]]]
+   ]}
 
    At each step in recursive monomorphization, the type specifier and the table
    of monomorphs looks like this:
+
+   {[
 
                       Expression                 |             Table
        ------------------------------------------|---------------------------------
@@ -79,6 +97,8 @@ val strip_type : ty -> stripped_ty option
                                                  |  (Option, [Mono{0}],         1)
                                                  |  (Pair,   [String, Mono{1}], 2)
                                                  |  (Map,    [Int, Mono{2}],    3)
+
+   ]}
 
  *)
 val monomorphize_type : mono_type_tbl -> stripped_ty -> (mono_ty * mono_type_tbl)
