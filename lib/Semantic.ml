@@ -1,14 +1,7 @@
 open Identifier
+open Common
 open Type
-
-type type_vis =
-  | TypeVisPublic
-  | TypeVisOpaque
-  | TypeVisPrivate
-
-type vis =
-  | VisPublic
-  | VisPrivate
+open Tast
 
 (* Semantic modules represent everything we need to know
    about a module to perform semantic analysis on it. That
@@ -27,7 +20,7 @@ and sem_decl =
   | STypeAliasDefinition of type_vis * identifier * type_parameter list * universe * ty
   | SRecordDefinition of module_name * type_vis * identifier * type_parameter list * universe * typed_slot list
   | SUnionDefinition of module_name * type_vis * identifier * type_parameter list * universe * typed_case list
-  | SFunctionDeclaration of vis * identifier * type_parameter list * value_parameter list * ty
+  | SFunctionDeclaration of vis * identifier * type_parameter list * value_parameter list * ty * tstmt option
   | STypeClassDecl of semantic_typeclass
   | STypeClassInstanceDecl of semantic_instance
 
@@ -72,7 +65,7 @@ let get_declaration (SemanticModule { decls; _ }, name) =
     | STypeAliasDefinition (_, n, _, _, _) -> name = n
     | SRecordDefinition (_, _, n, _, _, _) -> name = n
     | SUnionDefinition (_, _, n, _, _, _) -> name = n
-    | SFunctionDeclaration (_, n, _, _, _) -> name = n
+    | SFunctionDeclaration (_, n, _, _, _, _) -> name = n
     | STypeClassDecl (STypeClass (_, n, _, _)) -> name = n
     | STypeClassInstanceDecl _ -> false
   in
@@ -101,7 +94,7 @@ let get_callable_typeclass source_module importing_module callable_name (STypeCl
    importing module, and the name of a callable, see if they match. *)
 let get_callable_decl source_module importing_module callable_name decl  =
   match decl with
-  | SFunctionDeclaration (vis, name, typarams, params, rt) ->
+  | SFunctionDeclaration (vis, name, typarams, params, rt, _) ->
      (* A function is callable if its name is the same as the callable name,
         and if it's either public or in the same module. *)
      if (name = callable_name) && ((vis = VisPublic) || (source_module = importing_module)) then
@@ -179,7 +172,7 @@ let rec is_importable = function
      is_public_or_opaque vis
   | SUnionDefinition (_, vis, _, _, _, _) ->
      is_public_or_opaque vis
-  | SFunctionDeclaration (vis, _, _, _, _) ->
+  | SFunctionDeclaration (vis, _, _, _, _, _) ->
      is_public vis
   | STypeClassDecl (STypeClass (vis, _, _, _)) ->
      is_public vis

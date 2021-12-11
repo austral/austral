@@ -76,7 +76,8 @@ let memory_module =
         name,
         typarams qname,
         [ValueParameter (i "value", type_t qname)],
-        NamedType (option_type_qname, [pointer_t qname], FreeUniverse)
+        NamedType (option_type_qname, [pointer_t qname], FreeUniverse),
+        None
       )
   and load_def =
     let name = i "Load" in
@@ -88,7 +89,8 @@ let memory_module =
         name,
         typarams qname,
         [ValueParameter (i "pointer", pointer_t qname)],
-        type_t qname
+        type_t qname,
+        None
       )
   and store_def =
     let name = i "Store" in
@@ -100,7 +102,8 @@ let memory_module =
         name,
         typarams qname,
         [ValueParameter (i "pointer", pointer_t qname); ValueParameter (i "value", type_t qname)],
-        Unit
+        Unit,
+        None
       )
   and deallocate_def =
     let name = i "Deallocate" in
@@ -112,7 +115,8 @@ let memory_module =
         name,
         typarams qname,
         [ValueParameter (i "pointer", pointer_t qname)],
-        Unit
+        Unit,
+        None
       )
   and load_read_ref_def =
     let name = i "Load_Read_Reference" in
@@ -124,7 +128,8 @@ let memory_module =
         name,
         [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)],
         [ValueParameter (i "ref", ReadRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
-        ReadRef (type_t qname, TyVar (TypeVariable (i "R", RegionUniverse, qname)))
+        ReadRef (type_t qname, TyVar (TypeVariable (i "R", RegionUniverse, qname))),
+        None
       )
   and load_write_ref_def =
     let name = i "Load_Write_Reference" in
@@ -136,7 +141,8 @@ let memory_module =
         name,
         [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)],
         [ValueParameter (i "ref", WriteRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
-        WriteRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname)))
+        WriteRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))),
+        None
       )
   and allocate_array_def =
     let name = i "Allocate_Array" in
@@ -148,7 +154,8 @@ let memory_module =
         name,
         typarams qname,
         [ValueParameter (i "size", Integer (Unsigned, Width64))],
-        NamedType (option_type_qname, [pointer_t qname], FreeUniverse)
+        NamedType (option_type_qname, [pointer_t qname], FreeUniverse),
+        None
       )
   and resize_array_def =
     let name = i "Resize_Array" in
@@ -160,7 +167,8 @@ let memory_module =
         name,
         typarams qname,
         [ValueParameter (i "array", pointer_t qname); ValueParameter (i "size", Integer (Unsigned, Width64))],
-        NamedType (option_type_qname, [pointer_t qname], FreeUniverse)
+        NamedType (option_type_qname, [pointer_t qname], FreeUniverse),
+        None
       )
   and memmove_def =
     let name = i "memmove" in
@@ -179,7 +187,8 @@ let memory_module =
           ValueParameter (i "destination", RawPointer (TyVar (TypeVariable (i "U", TypeUniverse, qname))));
           ValueParameter (i "count", size_t)
         ],
-        Unit
+        Unit,
+        None
       )
   and memcpy_def =
     let name = i "memcpy" in
@@ -198,7 +207,8 @@ let memory_module =
           ValueParameter (i "destination", RawPointer (TyVar (TypeVariable (i "U", TypeUniverse, qname))));
           ValueParameter (i "count", size_t)
         ],
-        Unit
+        Unit,
+        None
       )
   in
   let decls = [

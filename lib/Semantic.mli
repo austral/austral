@@ -1,14 +1,7 @@
 open Identifier
+open Common
 open Type
-
-type type_vis =
-  | TypeVisPublic
-  | TypeVisOpaque
-  | TypeVisPrivate
-
-type vis =
-  | VisPublic
-  | VisPrivate
+open Tast
 
 (* Semantic modules represent everything we need to know
    about a module to perform semantic analysis on it. That
@@ -27,7 +20,7 @@ and sem_decl =
   | STypeAliasDefinition of type_vis * identifier * type_parameter list * universe * ty
   | SRecordDefinition of module_name * type_vis * identifier * type_parameter list * universe * typed_slot list
   | SUnionDefinition of module_name * type_vis * identifier * type_parameter list * universe * typed_case list
-  | SFunctionDeclaration of vis * identifier * type_parameter list * value_parameter list * ty
+  | SFunctionDeclaration of vis * identifier * type_parameter list * value_parameter list * ty * tstmt option
   | STypeClassDecl of semantic_typeclass
   | STypeClassInstanceDecl of semantic_instance
 

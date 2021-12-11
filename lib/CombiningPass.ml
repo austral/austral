@@ -5,7 +5,6 @@ open Type
 open AbstractionPass
 open Cst
 open Combined
-open Semantic
 open ModuleSystem
 open ImportResolution
 open Error

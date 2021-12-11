@@ -512,10 +512,9 @@ and augment_method_call menv source_module_name type_class_name typaram callable
      let instance = get_instance menv source_module_name dispatch_ty type_class_name in
      let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables bindings'' t)) params in
      let arguments' = cast_arguments bindings'' params' arguments in
-     let substs =
-       let (STypeClassInstance (_, _, typarams, _, _)) = instance in
-       make_substs bindings'' typarams in
-     TMethodCall (callable_name, instance, arguments', rt'', substs)
+     let (STypeClassInstance (_, _, typarams, _, _)) = instance in
+     let substs = make_substs bindings'' typarams in
+     TMethodCall (callable_name, typarams, arguments', rt'', substs)
   | None ->
      err "Internal: couldn't extract dispatch type."
 

@@ -167,7 +167,7 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      else
        (* The function is concrete. *)
        (MConcreteFuncall (name, args, rt), tbl)
-  | TMethodCall (name, STypeClassInstance (_, _, typarams, _, _), args, rt, substs) ->
+  | TMethodCall (name, typarams, args, rt, substs) ->
      (* Monomorphize the return type. *)
      let (rt, tbl) = strip_and_mono tbl rt in
      (* Monomorphize the arglist *)

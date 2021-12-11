@@ -65,7 +65,7 @@ let rec check_entrypoint_validity menv qi =
   match get_decl menv qi with
   | Some decl ->
      (match decl with
-      | SFunctionDeclaration (vis, _, typarams, params, rt) ->
+      | SFunctionDeclaration (vis, _, typarams, params, rt, _) ->
          if vis = VisPublic then
            if typarams = [] then
              match params with

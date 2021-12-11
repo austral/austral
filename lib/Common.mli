@@ -25,3 +25,12 @@ type borrowing_mode =
 type module_kind =
   | SafeModule
   | UnsafeModule
+
+type type_vis =
+  | TypeVisPublic
+  | TypeVisOpaque
+  | TypeVisPrivate
+
+type vis =
+  | VisPublic
+  | VisPrivate

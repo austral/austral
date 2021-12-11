@@ -60,7 +60,7 @@ and extract_declaration (module_name: module_name) (menv: menv) (local_types: ty
      SUnionDefinition (module_name, vis, name, typarams, universe, List.map (parse_case typarams) cases)
   | CFunction (vis, name, typarams, params, rt, _, _, _) ->
      let rm = region_map_from_typarams typarams in
-     SFunctionDeclaration (vis, name, typarams, List.map (parse_param typarams) params, parse' rm typarams rt)
+     SFunctionDeclaration (vis, name, typarams, List.map (parse_param typarams) params, parse' rm typarams rt, None)
   | CTypeclass (vis, name, typaram, methods, _) ->
      STypeClassDecl (STypeClass (vis, name, typaram, List.map (parse_method_decl [typaram]) methods))
   | CInstance (vis, name, typarams, argument, methods, _) ->
