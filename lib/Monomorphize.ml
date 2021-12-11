@@ -114,6 +114,15 @@ and monomorphize_ty_list (tbl: mono_tbl) (tys: stripped_ty list): (mono_ty list 
   | [] ->
      ([], tbl)
 
+let rec monomorphize_named_ty_list (tbl: mono_tbl) (tys: (identifier * stripped_ty) list): ((identifier * mono_ty) list * mono_tbl) =
+  match tys with
+  | (name, first)::rest ->
+     let (first, tbl) = monomorphize_type tbl first in
+     let (rest, tbl) = monomorphize_named_ty_list tbl rest in
+     ((name, first) :: rest, tbl)
+  | [] ->
+     ([], tbl)
+
 let strip_and_mono (tbl: mono_tbl) (ty: ty): (mono_ty * mono_tbl) =
   let ty = strip_type ty in
   monomorphize_type tbl ty
@@ -272,5 +281,86 @@ let rec monomorphize_stmt (tbl: mono_tbl) (stmt: tstmt): (mstmt * mono_tbl) =
   match stmt with
   | TSkip _ ->
      (MSkip, tbl)
-  | _ ->
-     err "Not done"
+  | TLet (_, name, ty, value, body) ->
+     let (ty, tbl) = strip_and_mono tbl ty in
+     let (value, tbl) = monomorphize_expr tbl value in
+     let (body, tbl) = monomorphize_stmt tbl body in
+     (MLet (name, ty, value, body), tbl)
+  | TDestructure (_, bindings, value, body) ->
+     let (bindings, tbl) = monomorphize_named_ty_list tbl (List.map (fun (n, t) -> (n, strip_type t)) bindings) in
+     let (value, tbl) = monomorphize_expr tbl value in
+     let (body, tbl) = monomorphize_stmt tbl body in
+     (MDestructure (bindings, value, body), tbl)
+  | TAssign (_, lvalue, value) ->
+     let (lvalue, tbl) = monomorphize_lvalue tbl lvalue in
+     let (value, tbl) = monomorphize_expr tbl value in
+     (MAssign (lvalue, value), tbl)
+  | TIf (_, c, t, f) ->
+     let (c, tbl) = monomorphize_expr tbl c in
+     let (t, tbl) = monomorphize_stmt tbl t in
+     let (f, tbl) = monomorphize_stmt tbl f in
+     (MIf (c, t, f), tbl)
+  | TCase (_, value, whens) ->
+     let (value, tbl) = monomorphize_expr tbl value in
+     let (whens, tbl) = monomorphize_whens tbl whens in
+     (MCase (value, whens), tbl)
+  | TWhile (_, value, body) ->
+     let (value, tbl) = monomorphize_expr tbl value in
+     let (body, tbl) = monomorphize_stmt tbl body in
+     (MWhile (value, body), tbl)
+  | TFor (_, name, start, final, body) ->
+     let (start, tbl) = monomorphize_expr tbl start in
+     let (final, tbl) = monomorphize_expr tbl final in
+     let (body, tbl) = monomorphize_stmt tbl body in
+     (MFor (name, start, final, body), tbl)
+  | TBorrow { span; original; rename; region; orig_type; ref_type; body; mode } ->
+     let _ = span in
+     let (orig_type, tbl) = strip_and_mono tbl orig_type in
+     let (ref_type, tbl) = strip_and_mono tbl ref_type in
+     let (body, tbl) = monomorphize_stmt tbl body in
+     (MBorrow { original = original; rename = rename; region = region; orig_type = orig_type; ref_type = ref_type; body = body; mode = mode }, tbl)
+  | TBlock (_, a, b) ->
+     let (a, tbl) = monomorphize_stmt tbl a in
+     let (b, tbl) = monomorphize_stmt tbl b in
+     (MBlock (a, b), tbl)
+  | TDiscarding (_, value) ->
+     let (value, tbl) = monomorphize_expr tbl value in
+     (MDiscarding value, tbl)
+  | TReturn (_, value) ->
+     let (value, tbl) = monomorphize_expr tbl value in
+     (MReturn value, tbl)
+
+and monomorphize_lvalue (tbl: mono_tbl) (lvalue: typed_lvalue): (mtyped_lvalue * mono_tbl) =
+  match lvalue with
+  | TypedLValue (name, elems) ->
+     let (elems, tbl) = monomorphize_path_elems tbl elems in
+     (MTypedLValue (name, elems), tbl)
+
+and monomorphize_whens (tbl: mono_tbl) (whens: typed_when list): (mtyped_when list * mono_tbl) =
+  match whens with
+  | first::rest ->
+     let (first, tbl) = monomorphize_when tbl first in
+     let (rest, tbl) = monomorphize_whens tbl rest in
+     (first :: rest, tbl)
+  | [] ->
+     ([], tbl)
+
+and monomorphize_when (tbl: mono_tbl) (w: typed_when): (mtyped_when * mono_tbl) =
+  let (TypedWhen (name, params, body)) = w in
+  let (params, tbl) = monomorphize_params tbl params in
+  let (body, tbl) = monomorphize_stmt tbl body in
+  (MTypedWhen (name, params, body), tbl)
+
+and monomorphize_params (tbl: mono_tbl) (params: value_parameter list): (mvalue_parameter list * mono_tbl) =
+  match params with
+  | first::rest ->
+     let (first, tbl) = monomorphize_param tbl first in
+     let (rest, tbl) = monomorphize_params tbl rest in
+     (first :: rest, tbl)
+  | [] ->
+     ([], tbl)
+
+and monomorphize_param (tbl: mono_tbl) (param: value_parameter): (mvalue_parameter * mono_tbl) =
+  let (ValueParameter (name, ty)) = param in
+  let (ty, tbl) = strip_and_mono tbl ty in
+  (MValueParameter (name, ty), tbl)
