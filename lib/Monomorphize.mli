@@ -3,6 +3,7 @@ open Type
 open MonoType
 open Tast
 open Mtast
+open TypeBindings
 
 (** A stripped type specifier is the same as a type specifier, but the region
    and type variable cases have been removed. *)
@@ -65,3 +66,9 @@ val monomorphize_expr : mono_tbl -> texpr -> (mexpr * mono_tbl)
 
 (** Monomorphize a statement. *)
 val monomorphize_stmt : mono_tbl -> tstmt -> (mstmt * mono_tbl)
+
+(** Replace the type variables in a typed expression. *)
+val replace_tyvars_expr : type_bindings -> texpr -> texpr
+
+(** Replace the type variables in a typed statement. *)
+val replace_tyvars_stmt : type_bindings -> tstmt -> tstmt

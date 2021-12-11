@@ -3,6 +3,7 @@ open Type
 open MonoType
 open Tast
 open Mtast
+open TypeBindings
 open Error
 
 type stripped_ty =
@@ -364,3 +365,93 @@ and monomorphize_param (tbl: mono_tbl) (param: value_parameter): (mvalue_paramet
   let (ValueParameter (name, ty)) = param in
   let (ty, tbl) = strip_and_mono tbl ty in
   (MValueParameter (name, ty), tbl)
+
+let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
+  match expr with
+  | TNilConstant ->
+     TNilConstant
+  | TBoolConstant b ->
+     TBoolConstant b
+  | TIntConstant i ->
+     TIntConstant i
+  | TFloatConstant f ->
+     TFloatConstant f
+  | TStringConstant s ->
+     TStringConstant s
+  | TVariable (name, ty) ->
+     let ty = replace_variables bindings ty in
+     TVariable (name, ty)
+  | TArithmetic (oper, lhs, rhs) ->
+     let lhs = replace_tyvars_expr bindings lhs
+     and rhs = replace_tyvars_expr bindings rhs in
+     TArithmetic (oper, lhs, rhs)
+  | TFuncall (name, args, rt, substs) ->
+     let args = List.map (replace_tyvars_expr bindings) args
+     and rt = replace_variables bindings rt
+     and substs = List.map (fun (n, t) -> (n, replace_variables bindings t)) substs in
+     TFuncall (name, args, rt, substs)
+  | TMethodCall (name, instance, args, rt, substs) ->
+     let args = List.map (replace_tyvars_expr bindings) args
+     and rt = replace_variables bindings rt
+     and substs = List.map (fun (n, t) -> (n, replace_variables bindings t)) substs in
+     TMethodCall (name, instance, args, rt, substs)
+  | TCast (expr, ty) ->
+     let expr = replace_tyvars_expr bindings expr
+     and ty = replace_variables bindings ty in
+     TCast (expr, ty)
+  | TComparison (oper, lhs, rhs) ->
+     let lhs = replace_tyvars_expr bindings lhs
+     and rhs = replace_tyvars_expr bindings rhs in
+     TComparison (oper, lhs, rhs)
+  | TConjunction (lhs, rhs) ->
+     let lhs = replace_tyvars_expr bindings lhs
+     and rhs = replace_tyvars_expr bindings rhs in
+     TConjunction (lhs, rhs)
+  | TDisjunction (lhs, rhs) ->
+     let lhs = replace_tyvars_expr bindings lhs
+     and rhs = replace_tyvars_expr bindings rhs in
+     TDisjunction (lhs, rhs)
+  | TNegation expr ->
+     let expr = replace_tyvars_expr bindings expr in
+     TNegation expr
+  | TIfExpression (c, t, f) ->
+     let c = replace_tyvars_expr bindings c
+     and t = replace_tyvars_expr bindings t
+     and f = replace_tyvars_expr bindings f in
+     TIfExpression (c, t, f)
+  | TRecordConstructor (ty, args) ->
+     let ty = replace_variables bindings ty
+     and args = List.map (fun (n, e) -> (n, replace_tyvars_expr bindings e)) args in
+     TRecordConstructor (ty, args)
+  | TUnionConstructor (ty, case_name, args) ->
+     let ty = replace_variables bindings ty
+     and args = List.map (fun (n, e) -> (n, replace_tyvars_expr bindings e)) args in
+     TUnionConstructor (ty, case_name, args)
+  | TPath { head; elems; ty } ->
+     let head = replace_tyvars_expr bindings head
+     and elems = List.map (replace_tyvars_path bindings) elems
+     and ty = replace_variables bindings ty in
+    TPath { head = head; elems = elems; ty = ty }
+  | TEmbed (ty, fmt, args) ->
+     let ty = replace_variables bindings ty
+     and args = List.map (replace_tyvars_expr bindings) args in
+     TEmbed (ty, fmt, args)
+  | TDeref expr ->
+     let expr = replace_tyvars_expr bindings expr in
+     TDeref expr
+  | TSizeOf ty ->
+     let ty = replace_variables bindings ty in
+     TSizeOf ty
+
+and replace_tyvars_path (bindings: type_bindings) (elem: typed_path_elem): typed_path_elem =
+  match elem with
+  | TSlotAccessor (name, ty) ->
+     let ty = replace_variables bindings ty in
+     TSlotAccessor (name, ty)
+  | TPointerSlotAccessor (name, ty) ->
+     let ty = replace_variables bindings ty in
+     TPointerSlotAccessor (name, ty)
+  | TArrayIndex (idx, ty) ->
+     let idx = replace_tyvars_expr bindings idx
+     and ty = replace_variables bindings ty in
+     TArrayIndex (idx, ty)
