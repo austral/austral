@@ -114,10 +114,10 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      let (args, tbl) = monomorphize_expr_list tbl args in
      (* Does the funcall have a substitution list? *)
      if List.length substs > 0 then
+       (* The function is generic. *)
        (* Monomorphize the tyargs *)
        let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
        let (tyargs, tbl) = monomorphize_ty_list tbl tyargs in
-       (* The function is generic. *)
        (match get_monomorph_id tbl name tyargs with
         | Some id ->
            (MGenericFuncall (id, args, rt), tbl)
@@ -127,7 +127,7 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      else
        (* The function is concrete. *)
        (MConcreteFuncall (name, args, rt), tbl)
-  | TMethodCall (name, STypeClassInstance (_, _, typarams, tyarg, _), args, rt) ->
+  | TMethodCall (name, STypeClassInstance (_, _, typarams, _, _), args, rt) ->
      (* Monomorphize the return type. *)
      let rt = strip_type rt in
      let (rt, tbl) = monomorphize_type tbl rt in
@@ -135,9 +135,10 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      let (args, tbl) = monomorphize_expr_list tbl args in
      (* Does the funcall have a list of type params? *)
      if List.length typarams > 0 then
+       (* The instance is generic. *)
        err "Derp"
      else
-       (* The function is concrete. *)
+       (* The instance is concrete. *)
        (MConcreteFuncall (name, args, rt), tbl)
   | TCast (expr, ty) ->
      let ty = strip_type ty in
