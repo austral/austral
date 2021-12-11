@@ -9,7 +9,7 @@ open Mtast
 type stripped_ty
 
 (** Strip a type specifier. *)
-val strip_type : ty -> stripped_ty option
+val strip_type : ty -> stripped_ty
 
 (** Monomorphize a type.
 
