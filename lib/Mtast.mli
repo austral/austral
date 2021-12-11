@@ -3,7 +3,6 @@ open Identifier
 open Common
 open Escape
 open Span
-open Semantic
 open MonoType
 
 (** Represents a module where all types and functions have been monomorphized. *)
@@ -50,8 +49,8 @@ and mexpr =
   | MStringConstant of escaped_string
   | MVariable of qident * mono_ty
   | MArithmetic of arithmetic_operator * mexpr * mexpr
-  | MFuncall of qident * mexpr list * mono_ty * (identifier * mono_ty) list
-  | MMethodCall of qident * semantic_instance * mexpr list * mono_ty
+  | MConcreteFuncall of qident * mexpr list * mono_ty
+  | MGenericFuncall of mono_id * mexpr list * mono_ty
   | MCast of mexpr * mono_ty
   | MComparison of comparison_operator * mexpr * mexpr
   | MConjunction of mexpr * mexpr

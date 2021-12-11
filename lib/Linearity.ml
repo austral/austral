@@ -40,7 +40,7 @@ let rec count_appearances (name: identifier) (expr: texpr) =
      (ca lhs) + (ca rhs)
   | TFuncall (_, args, _, _) ->
      sum (List.map ca args)
-  | TMethodCall (_, _, args, _) ->
+  | TMethodCall (_, _, args, _, _) ->
      sum (List.map ca args)
   | TCast (e, _) ->
      ca e
@@ -91,8 +91,6 @@ let rec count_appearances (name: identifier) (expr: texpr) =
   | TEmbed (_, _, args) ->
      sum (List.map ca args)
   | TDeref e ->
-     ca e
-  | TTypecast (e, _) ->
      ca e
   | TSizeOf _ ->
      0

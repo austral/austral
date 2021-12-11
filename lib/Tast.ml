@@ -57,7 +57,7 @@ and texpr =
   | TVariable of qident * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of qident * texpr list * ty * (identifier * ty) list
-  | TMethodCall of qident * semantic_instance * texpr list * ty
+  | TMethodCall of qident * semantic_instance * texpr list * ty * (identifier * ty) list
   | TCast of texpr * ty
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr
@@ -73,7 +73,6 @@ and texpr =
     }
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
-  | TTypecast of texpr * ty
   | TSizeOf of ty
 
 and typed_when =
@@ -134,7 +133,7 @@ let rec get_type = function
      get_type lhs
   | TFuncall (_, _, ty, _) ->
      ty
-  | TMethodCall (_, _, _, ty) ->
+  | TMethodCall (_, _, _, ty, _) ->
      ty
   | TCast (_, ty) ->
      ty
@@ -164,8 +163,6 @@ let rec get_type = function
          t
       | _ ->
          err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
-  | TTypecast (_, ty) ->
-     ty
   | TSizeOf _ ->
      Integer (Unsigned, Width64)
 
