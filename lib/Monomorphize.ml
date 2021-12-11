@@ -18,31 +18,54 @@ type stripped_ty =
   | SRawPointer of stripped_ty
 
 let rec strip_type (ty: ty): stripped_ty =
+  match strip_type' ty with
+  | Some ty ->
+     ty
+  | None ->
+     err "strip_type called with a region type as its argument"
+
+and strip_type' (ty: ty): stripped_ty option =
   match ty with
   | Unit ->
-     SUnit
+     Some SUnit
   | Boolean ->
-     SBoolean
+     Some SBoolean
   | Integer (s, w) ->
-     SInteger (s, w)
+     Some (SInteger (s, w))
   | SingleFloat ->
-     SSingleFloat
+     Some SSingleFloat
   | DoubleFloat ->
-     SDoubleFloat
+     Some SDoubleFloat
   | NamedType (n, args, _) ->
-     SNamedType (n, List.map strip_type args)
+     Some (SNamedType (n, List.filter_map strip_type' args))
   | Array (elem_ty, _) ->
-     SArray (strip_type elem_ty)
+     (match (strip_type' elem_ty) with
+      | Some elem_ty ->
+         Some (SArray elem_ty)
+      | None ->
+         err "Internal: array instantiated with a region type.")
   | RegionTy _ ->
-     err "Region type."
+     None
   | ReadRef (ty, _) ->
-     SReadRef (strip_type ty)
+     (match (strip_type' ty) with
+      | Some ty ->
+         Some (SReadRef ty)
+      | None ->
+         err "Internal: read ref instantiated with a region type.")
   | WriteRef (ty, _) ->
-     SWriteRef (strip_type ty)
+     (match (strip_type' ty) with
+      | Some ty ->
+         Some (SWriteRef ty)
+      | None ->
+         err "Internal: write ref instantiated with a region type.")
   | TyVar _ ->
-     err "Type variable not yet replaced."
+     None
   | RawPointer ty ->
-     SRawPointer (strip_type ty)
+     (match (strip_type' ty) with
+      | Some ty ->
+         Some (SRawPointer ty)
+      | None ->
+         err "Internal: raw pointer type instantiated with a region type.")
 
 let rec monomorphize_type (tbl: mono_tbl) (ty: stripped_ty): (mono_ty * mono_tbl) =
   match ty with
