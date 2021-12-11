@@ -52,6 +52,7 @@ The compiler's middle end.
 - {!Austral_core.Linearity}
 - {!Austral_core.MonoType}
 - {!Austral_core.Mtast}
+- {!Austral_core.Monomorphize}
 
 {1 Backend}
 
