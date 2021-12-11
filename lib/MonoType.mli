@@ -61,7 +61,7 @@ val strip_type : ty -> stripped_ty option
 (** Monomorphize a type.
 
    This function works bottom up, looking for invocations of `NamedType` with
-   monomorphic arguments. When it finds one, it adds it to the table of type
+   monomorphic arguments. When it finds one, it adds it to the table of
    monomorphs and replaces it with an instance of `MonoNamedType` with a fresh
    monomorph ID.
 
