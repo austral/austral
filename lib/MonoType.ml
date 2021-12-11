@@ -5,6 +5,9 @@ open Error
 type mono_type_id = int
 [@@deriving eq]
 
+type mono_fun_id = int
+[@@deriving eq]
+
 type mono_ty =
   | MonoUnit
   | MonoBoolean

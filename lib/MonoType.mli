@@ -6,6 +6,10 @@ open Type
 type mono_type_id
 [@@deriving eq]
 
+(** The ID of a function monomorph. *)
+type mono_fun_id
+[@@deriving eq]
+
 (** A monomorphic, or concrete, type. *)
 type mono_ty =
   | MonoUnit
