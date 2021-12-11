@@ -106,8 +106,27 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      let (lhs, tbl) = monomorphize_expr tbl lhs in
      let (rhs, tbl) = monomorphize_expr tbl rhs in
      (MArithmetic (oper, lhs, rhs), tbl)
-  | TFuncall _ ->
-     err "Not done yet"
+  | TFuncall (name, args, rt, substs) ->
+     (* Monomorphize the return type. *)
+     let rt = strip_type rt in
+     let (rt, tbl) = monomorphize_type tbl rt in
+     (* Monomorphize the arglist *)
+     let (args, tbl) = monomorphize_expr_list tbl args in
+     (* Does the funcall have a substitution list? *)
+     if List.length substs > 0 then
+       (* Monomorphize the tyargs *)
+       let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
+       let (tyargs, tbl) = monomorphize_ty_list tbl tyargs in
+       (* The function is generic. *)
+       (match get_monomorph_id tbl name tyargs with
+        | Some id ->
+           (MGenericFuncall (id, args, rt), tbl)
+        | None ->
+           let (id, tbl) = add_monomorph tbl name tyargs in
+           (MGenericFuncall (id, args, rt), tbl))
+     else
+       (* The function is concrete. *)
+       (MConcreteFuncall (name, args, rt), tbl)
   | TMethodCall _ ->
      err "Not done yet"
   | TCast (expr, ty) ->
