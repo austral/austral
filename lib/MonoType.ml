@@ -2,10 +2,7 @@ open Identifier
 open Type
 open Error
 
-type mono_type_id = int
-[@@deriving eq]
-
-type mono_fun_id = int
+type mono_id = int
 [@@deriving eq]
 
 type mono_status =
@@ -18,18 +15,18 @@ type mono_ty =
   | MonoInteger of signedness * integer_width
   | MonoSingleFloat
   | MonoDoubleFloat
-  | MonoNamedType of qident * mono_type_id
+  | MonoNamedType of qident * mono_id
   | MonoArray of mono_ty
   | MonoReadRef of mono_ty
   | MonoWriteRef of mono_ty
   | MonoRawPointer of mono_ty
 [@@deriving eq]
 
-type mono_type_tbl = (qident * mono_ty list * mono_type_id * mono_status) list
+type mono_tbl = (qident * mono_ty list * mono_id * mono_status) list
 
-let empty_mono_type_tbl: mono_type_tbl = []
+let empty_mono_tbl: mono_tbl = []
 
-let get_mono_ty_id (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): mono_type_id option =
+let get_monomorph_id (tbl: mono_tbl) (name: qident) (args: mono_ty list): mono_id option =
   let filter (name', args', id, _) =
     if (equal_qident name name') && (List.for_all2 equal_mono_ty args args') then
       Some id
@@ -40,17 +37,17 @@ let get_mono_ty_id (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): mon
 
 let mono_type_counter: int ref = ref 1
 
-let fresh_mono_type_id _ =
+let fresh_mono_id _ =
   let id = !mono_type_counter in
   mono_type_counter := id + 1;
   id
 
-let add_mono_ty (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): (mono_type_id * mono_type_tbl) =
-  match get_mono_ty_id tbl name args with
+let add_monomorph (tbl: mono_tbl) (name: qident) (args: mono_ty list): (mono_id * mono_tbl) =
+  match get_monomorph_id tbl name args with
   | Some _ ->
      err "Monomorph exists in table."
   | None ->
-     let id = fresh_mono_type_id () in
+     let id = fresh_mono_id () in
      (id, (name, args, id, NotInstantiated) :: tbl)
 
 type stripped_ty =
@@ -108,7 +105,7 @@ let rec strip_type (ty: ty): stripped_ty option =
       | None ->
          err "Internal: raw pointer type instantiated with a region type.")
 
-let rec monomorphize_type (tbl: mono_type_tbl) (ty: stripped_ty): (mono_ty * mono_type_tbl) =
+let rec monomorphize_type (tbl: mono_tbl) (ty: stripped_ty): (mono_ty * mono_tbl) =
   match ty with
   | SUnit ->
      (MonoUnit, tbl)
@@ -134,14 +131,14 @@ let rec monomorphize_type (tbl: mono_type_tbl) (ty: stripped_ty): (mono_ty * mon
      (MonoRawPointer ty, tbl)
   | SNamedType (name, args) ->
      let (args, tbl) = monomorphize_list tbl args in
-     (match get_mono_ty_id tbl name args with
+     (match get_monomorph_id tbl name args with
       | Some id ->
          (MonoNamedType (name, id), tbl)
       | None ->
-         let (id, tbl) = add_mono_ty tbl name args in
+         let (id, tbl) = add_monomorph tbl name args in
          (MonoNamedType (name, id), tbl))
 
-and monomorphize_list (tbl: mono_type_tbl) (tys: stripped_ty list): (mono_ty list * mono_type_tbl) =
+and monomorphize_list (tbl: mono_tbl) (tys: stripped_ty list): (mono_ty list * mono_tbl) =
   match tys with
   | first::rest ->
      let (first, tbl) = monomorphize_type tbl first in

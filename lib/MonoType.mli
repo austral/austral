@@ -2,12 +2,8 @@
 open Identifier
 open Type
 
-(** The ID of a type monomorph. *)
-type mono_type_id
-[@@deriving eq]
-
-(** The ID of a function monomorph. *)
-type mono_fun_id
+(** The ID of a monomorph. *)
+type mono_id
 [@@deriving eq]
 
 (** Represents whether a monomorph has been instantiated. *)
@@ -22,7 +18,7 @@ type mono_ty =
   | MonoInteger of signedness * integer_width
   | MonoSingleFloat
   | MonoDoubleFloat
-  | MonoNamedType of qident * mono_type_id
+  | MonoNamedType of qident * mono_id
   (** A monomorphic instance of a generic type, identified by the name of the type, its monomorphic arguments, and a monomorph ID. *)
   | MonoArray of mono_ty
   | MonoReadRef of mono_ty
@@ -30,29 +26,29 @@ type mono_ty =
   | MonoRawPointer of mono_ty
 [@@deriving eq]
 
-(** The table of type monomorphs associates a generic type's name and list of
-   monomorphic type arguments to:
+(** The table of monomorphs associates a generic type, function, or method's
+   name and list of monomorphic type arguments to:
 
-     1. Its type monomorph ID.
+1. Its monomorph ID.
 
-     2. A {!mono_status} value that indicates whether the monomorph has
-        been instantiated.
+2. A {!mono_status} value that indicates whether the monomorph has been
+   instantiated.
+
 *)
-type mono_type_tbl
+type mono_tbl
 
-(** An empty table of type monomorphs. *)
-val empty_mono_type_tbl : mono_type_tbl
+(** An empty table of monomorphs. *)
+val empty_mono_tbl : mono_tbl
 
-(** Retrieve the ID of the monomorph for the given generic type name and
-   argument list. *)
-val get_mono_ty_id : mono_type_tbl -> qident -> mono_ty list -> mono_type_id option
+(** Retrieve the ID of the monomorph for the given name and argument list. *)
+val get_monomorph_id : mono_tbl -> qident -> mono_ty list -> mono_id option
 
-(** Add a new type monomorph to the table, returning a tuple of the monomorph's ID
+(** Add a new monomorph to the table, returning a tuple of the monomorph's ID
    and the updated table. By default, the status of the new monomorph is
    {!NotInstantiated}.
 
    Throws an error if it already exists. *)
-val add_mono_ty : mono_type_tbl -> qident -> mono_ty list -> (mono_type_id * mono_type_tbl)
+val add_monomorph : mono_tbl -> qident -> mono_ty list -> (mono_id * mono_tbl)
 
 (** A stripped type specifier is the same as a type specifier, but the region
    and type variable cases have been removed. *)
@@ -108,4 +104,4 @@ val strip_type : ty -> stripped_ty option
    {!NotInstantiated} when a new monomorph is added to the table.
 
  *)
-val monomorphize_type : mono_type_tbl -> stripped_ty -> (mono_ty * mono_type_tbl)
+val monomorphize_type : mono_tbl -> stripped_ty -> (mono_ty * mono_tbl)
