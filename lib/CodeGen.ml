@@ -243,8 +243,6 @@ let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
      CEmbed (gen_type ty, expr, List.map g args)
   | TDeref e ->
      CDeref (g e)
-  | TTypecast (e, ty) ->
-     CCast (g e, gen_type ty)
   | TSizeOf ty ->
      CSizeOf (gen_type ty)
 

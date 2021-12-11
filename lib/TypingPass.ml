@@ -218,7 +218,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
            (match target_type with
             | ReadRef (underlying_ty', region') ->
                if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
-                 TTypecast (expr', target_type)
+                 TCast (expr', target_type)
                else
                  err "Cannot convert because the references have different underlying types or regions."
             | _ ->
@@ -1032,8 +1032,6 @@ and is_constant = function
      true
   | TDeref _ ->
      false
-  | TTypecast _ ->
-     true
   | TSizeOf _ ->
      true
 

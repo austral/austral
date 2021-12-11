@@ -73,7 +73,6 @@ and texpr =
     }
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
-  | TTypecast of texpr * ty
   | TSizeOf of ty
 
 and typed_when =
@@ -164,8 +163,6 @@ let rec get_type = function
          t
       | _ ->
          err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
-  | TTypecast (_, ty) ->
-     ty
   | TSizeOf _ ->
      Integer (Unsigned, Width64)
 

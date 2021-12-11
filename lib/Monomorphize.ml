@@ -197,8 +197,6 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
   | TDeref expr ->
      let (expr, tbl) = monomorphize_expr tbl expr in
      (MDeref expr, tbl)
-  | TTypecast _ ->
-     err "TODO: remove TTypecast"
   | TSizeOf ty ->
      let ty = strip_type ty in
      let (ty, tbl) = monomorphize_type tbl ty in

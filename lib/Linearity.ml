@@ -92,8 +92,6 @@ let rec count_appearances (name: identifier) (expr: texpr) =
      sum (List.map ca args)
   | TDeref e ->
      ca e
-  | TTypecast (e, _) ->
-     ca e
   | TSizeOf _ ->
      0
 

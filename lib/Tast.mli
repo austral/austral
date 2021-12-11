@@ -71,7 +71,6 @@ and texpr =
     }
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
-  | TTypecast of texpr * ty
   | TSizeOf of ty
 
 and typed_when =
