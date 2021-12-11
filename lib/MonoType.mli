@@ -30,8 +30,6 @@ type mono_ty =
   | MonoRawPointer of mono_ty
 [@@deriving eq]
 
-
-
 (** The table of type monomorphs associates a generic type's name and list of
    monomorphic type arguments to:
 
@@ -47,7 +45,7 @@ val empty_mono_type_tbl : mono_type_tbl
 
 (** Retrieve the ID of the monomorph for the given generic type name and
    argument list. *)
-val get_monomorph : mono_type_tbl -> qident -> mono_ty list -> mono_type_id option
+val get_mono_ty_id : mono_type_tbl -> qident -> mono_ty list -> mono_type_id option
 
 (** Add a new monomorph to the table, returning a tuple of the monomorph's ID
    and the updated table. By default, the status of the new monomorph is

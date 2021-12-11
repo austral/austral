@@ -29,7 +29,7 @@ type mono_type_tbl = (qident * mono_ty list * mono_type_id * mono_status) list
 
 let empty_mono_type_tbl: mono_type_tbl = []
 
-let get_monomorph (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): mono_type_id option =
+let get_mono_ty_id (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): mono_type_id option =
   let filter (name', args', id, _) =
     if (equal_qident name name') && (List.for_all2 equal_mono_ty args args') then
       Some id
@@ -46,7 +46,7 @@ let fresh_mono_type_id _ =
   id
 
 let add_monomorph (tbl: mono_type_tbl) (name: qident) (args: mono_ty list): (mono_type_id * mono_type_tbl) =
-  match get_monomorph tbl name args with
+  match get_mono_ty_id tbl name args with
   | Some _ ->
      err "Monomorph exists in table."
   | None ->
@@ -134,7 +134,7 @@ let rec monomorphize_type (tbl: mono_type_tbl) (ty: stripped_ty): (mono_ty * mon
      (MonoRawPointer ty, tbl)
   | SNamedType (name, args) ->
      let (args, tbl) = monomorphize_list tbl args in
-     (match get_monomorph tbl name args with
+     (match get_mono_ty_id tbl name args with
       | Some id ->
          (MonoNamedType (name, id), tbl)
       | None ->
