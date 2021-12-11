@@ -1,6 +1,8 @@
 (** Code for monomorphizing types and ASTs. *)
 open Type
 open MonoType
+open Tast
+open Mtast
 
 (** A stripped type specifier is the same as a type specifier, but the region
    and type variable cases have been removed. *)
@@ -57,3 +59,6 @@ val strip_type : ty -> stripped_ty option
 
  *)
 val monomorphize_type : mono_tbl -> stripped_ty -> (mono_ty * mono_tbl)
+
+(** Monomorphize an expression. *)
+val monomorphize_expr : mono_tbl -> texpr -> (mexpr * mono_tbl)

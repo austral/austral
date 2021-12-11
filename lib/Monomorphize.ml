@@ -1,6 +1,8 @@
 open Identifier
 open Type
 open MonoType
+open Tast
+open Mtast
 open Error
 
 type stripped_ty =
@@ -99,3 +101,16 @@ and monomorphize_list (tbl: mono_tbl) (tys: stripped_ty list): (mono_ty list * m
      (first :: rest, tbl)
   | [] ->
      ([], tbl)
+
+let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
+  match expr with
+  | TNilConstant ->
+     (MNilConstant, tbl)
+  | TBoolConstant b ->
+     (MBoolConstant b, tbl)
+  | TIntConstant i ->
+     (MIntConstant i, tbl)
+  | TFloatConstant f ->
+     (MFloatConstant f, tbl)
+  | _ ->
+     err "Not done yet"
