@@ -260,5 +260,15 @@ namespace A_Austral__Memory {
     void A_memcpy(T* source, T* destination, size_t count) {
         memcpy(source, destination, count);
     }
+
+    template<typename T, typename U>
+    void A_Positive_Offset(T* pointer, size_t offset) {
+        return pointer + offset;
+    }
+
+    template<typename T, typename U>
+    void A_Negative_Offset(T* pointer, size_t offset) {
+        return pointer - offset;
+    }
 }
 |code}
