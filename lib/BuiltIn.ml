@@ -210,6 +210,38 @@ let memory_module =
         Unit,
         None
       )
+  and positive_offset_def =
+    let name = i "Positive_Offset" in
+    let qname = make_qident (memory_module_name, name, name) in
+    (* generic T: Type
+       functpion Positive_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T] *)
+    SFunctionDeclaration (
+        VisPublic,
+        name,
+        typarams qname,
+        [
+          ValueParameter (i "array", pointer_t qname);
+          ValueParameter (i "offset", Integer (Unsigned, Width64))
+        ],
+        pointer_t qname,
+        None
+      )
+  and negative_offset_def =
+    let name = i "Negative_Offset" in
+    let qname = make_qident (memory_module_name, name, name) in
+    (* generic T: Type
+       functpion Negative_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T] *)
+    SFunctionDeclaration (
+        VisPublic,
+        name,
+        typarams qname,
+        [
+          ValueParameter (i "array", pointer_t qname);
+          ValueParameter (i "offset", Integer (Unsigned, Width64))
+        ],
+        pointer_t qname,
+        None
+      )
   in
   let decls = [
       pointer_type_def;
@@ -222,7 +254,9 @@ let memory_module =
       allocate_array_def;
       resize_array_def;
       memmove_def;
-      memcpy_def
+      memcpy_def;
+      positive_offset_def;
+      negative_offset_def
     ]
   in
   SemanticModule {
