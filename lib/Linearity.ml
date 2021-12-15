@@ -58,6 +58,8 @@ let rec count_appearances (name: identifier) (expr: texpr) =
      sum (List.map (fun (_, e) -> ca e) args)
   | TUnionConstructor (_, _, args) ->
      sum (List.map (fun (_, e) -> ca e) args)
+  | TTypeAliasConstructor (_, e) ->
+     ca e
   | TPath { head; elems; _ } ->
      (* All paths end in a free value. If the head of the path is the variable
         we're counting, we don't count this as an appearance. This is for

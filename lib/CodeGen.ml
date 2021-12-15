@@ -225,6 +225,10 @@ let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
              ("tag", union_tag_value ty case_name);
              ("data", CStructInitializer [(gen_ident case_name, args)])
            ])
+  | TTypeAliasConstructor (ty, expr) ->
+     let ty = gen_type ty
+     and expr = CStructInitializer [("value", g expr)] in
+     CCast (expr, ty)
   | TPath { head; elems; _ } ->
      let p = gen_path mn (g head) (List.rev elems) in
      (match (get_type head) with
@@ -434,7 +438,17 @@ let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
   | TConstant (_, n, ty, e, _) ->
      [CConstantDefinition (gen_ident n, gen_type ty, gen_exp mn e)]
   | TTypeAlias (_, n, typarams, _, ty, _) ->
-     [CTypeDefinition (gen_ident n, gen_typarams typarams, gen_type ty)]
+     [
+       CStructDefinition (
+           gen_typarams typarams,
+           CStruct (
+               Some (gen_ident n),
+               [
+                 CSlot ("value", gen_type ty)
+               ]
+             )
+         )
+     ]
   | TRecord (_, n, typarams, _, slots, _) ->
      [
        CStructDefinition (

@@ -219,6 +219,10 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      let (ty, tbl) = strip_and_mono tbl ty in
      let (args, tbl) = monomorphize_named_expr_list tbl args in
      (MUnionConstructor (ty, case_name, args), tbl)
+  | TTypeAliasConstructor (ty, expr) ->
+     let (ty, tbl) = strip_and_mono tbl ty in
+     let (expr, tbl) = monomorphize_expr tbl expr in
+     (MTypeAliasConstructor (ty, expr), tbl)
   | TPath { head; elems; ty } ->
      let (ty, tbl) = strip_and_mono tbl ty in
      let (head, tbl) = monomorphize_expr tbl head in
@@ -427,6 +431,10 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      let ty = replace_variables bindings ty
      and args = List.map (fun (n, e) -> (n, replace_tyvars_expr bindings e)) args in
      TUnionConstructor (ty, case_name, args)
+  | TTypeAliasConstructor (ty, expr) ->
+     let ty = replace_variables bindings ty
+     and expr = replace_tyvars_expr bindings expr in
+     TTypeAliasConstructor (ty, expr)
   | TPath { head; elems; ty } ->
      let head = replace_tyvars_expr bindings head
      and elems = List.map (replace_tyvars_path bindings) elems

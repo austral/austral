@@ -198,7 +198,7 @@ and render_expr = function
   | (CCast (e, t)) ->
      let e' = render_expr e
      and t' = render_type t in
-     paren ((paren t') ^ (paren e'))
+     paren ((paren t') ^ " " ^ e')
   | (CArithmetic (op, l, r)) ->
      paren ((e l) ^ " " ^ render_arith op ^ " " ^ (e r))
   | (CComparison (op, l, r)) ->

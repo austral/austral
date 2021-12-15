@@ -63,6 +63,7 @@ and texpr =
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
+  | TTypeAliasConstructor of ty * texpr
   | TPath of {
       head: texpr;
       elems: typed_path_elem list;

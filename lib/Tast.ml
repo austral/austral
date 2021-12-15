@@ -65,6 +65,7 @@ and texpr =
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
+  | TTypeAliasConstructor of ty * texpr
   | TPath of {
       head: texpr;
       elems: typed_path_elem list;
@@ -149,6 +150,8 @@ let rec get_type = function
   | TRecordConstructor (ty, _) ->
      ty
   | TUnionConstructor (ty, _, _) ->
+     ty
+  | TTypeAliasConstructor (ty, _) ->
      ty
   | TPath { ty; _ } ->
      ty

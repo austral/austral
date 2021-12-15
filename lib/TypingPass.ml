@@ -415,7 +415,7 @@ and augment_typealias_callable name typarams universe asserted_ty definition_ty 
   let (bindings', rt'') = handle_return_type_polymorphism (local_name name) typarams rt' asserted_ty in
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings typarams (merge_bindings bindings bindings');
-  TCast (arg, rt'')
+  TTypeAliasConstructor (rt'', arg)
 
 and augment_record_constructor (name: qident) (typarams: type_parameter list) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
   (* Check: the argument list must be named *)
@@ -1025,6 +1025,8 @@ and is_constant = function
      List.for_all (fun (_, v) -> is_constant v) values
   | TUnionConstructor (_, _, values) ->
      List.for_all (fun (_, v) -> is_constant v) values
+  | TTypeAliasConstructor (_, e) ->
+     is_constant e
   | TPath { head; elems; _ } ->
      (is_constant head) && (List.for_all is_path_elem_constant elems)
   | TEmbed _ ->
