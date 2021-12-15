@@ -43,10 +43,10 @@ and extract_declaration (module_name: module_name) (menv: menv) (local_types: ty
     ValueParameter (n, parse' rm typarams ts)
   and parse_method_decl (typarams: type_parameter list) (CMethodDecl (name, params, rt, _)): semantic_method_decl =
     let rm = region_map_from_typarams typarams in
-    SMethodDecl (name, List.map (parse_param typarams) params, parse' rm typarams rt)
+    SMethodDecl (name, List.map (parse_param typarams) params, parse' rm typarams rt, None)
   and parse_method_def (typarams: type_parameter list) (CMethodDef (name, params, rt, _, _)): semantic_method_decl =
     let rm = region_map_from_typarams typarams in
-    SMethodDecl (name, List.map (parse_param typarams) params, parse' rm typarams rt)
+    SMethodDecl (name, List.map (parse_param typarams) params, parse' rm typarams rt, None)
   in
   match def with
   | CConstant (vis, name, typespec, _, _) ->

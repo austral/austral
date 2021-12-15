@@ -31,7 +31,7 @@ and semantic_instance =
   STypeClassInstance of vis * identifier * type_parameter list * ty * semantic_method_decl list
 
 and semantic_method_decl =
-  SMethodDecl of identifier * value_parameter list * ty
+  SMethodDecl of identifier * value_parameter list * ty * tstmt option
 
 and callable =
   | FunctionCallable of type_parameter list * value_parameter list * ty
@@ -75,8 +75,8 @@ let get_callable_typeclass source_module importing_module callable_name (STypeCl
   (* A typeclass is callable if the callable name is the name of one of the
      methods and the typeclass is public. *)
   (* TODO: Same as above *)
-  match (List.find_opt (fun (SMethodDecl (n, _, _)) -> n = callable_name) methods) with
-  | (Some (SMethodDecl (_, params, rt))) ->
+  match (List.find_opt (fun (SMethodDecl (n, _, _, _)) -> n = callable_name) methods) with
+  | (Some (SMethodDecl (_, params, rt, _))) ->
      let type_class_name' = make_qident (source_module, type_class_name, type_class_name) in
      if ((vis = VisPublic) || (source_module = importing_module)) then
        Some (MethodCallable {
@@ -206,7 +206,7 @@ let has_union_constructor_with_name (SemanticModule { decls; _ }) name =
 let has_method_with_name (SemanticModule { decls; _ }) name =
   let pred = function
     | STypeClassDecl (STypeClass (_, _, _, methods)) ->
-       let pred' (SMethodDecl (n, _, _)) =
+       let pred' (SMethodDecl (n, _, _, _)) =
          if equal_identifier name n then
            true
          else

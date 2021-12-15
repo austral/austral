@@ -31,7 +31,7 @@ and semantic_instance =
   STypeClassInstance of vis * identifier * type_parameter list * ty * semantic_method_decl list
 
 and semantic_method_decl =
-  SMethodDecl of identifier * value_parameter list * ty
+  SMethodDecl of identifier * value_parameter list * ty * tstmt option
 
 and callable =
   | FunctionCallable of type_parameter list * value_parameter list * ty
