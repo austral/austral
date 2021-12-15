@@ -57,6 +57,7 @@ and mexpr =
   | MIfExpression of mexpr * mexpr * mexpr
   | MRecordConstructor of mono_ty * (identifier * mexpr) list
   | MUnionConstructor of mono_ty * identifier * (identifier * mexpr) list
+  | MTypeAliasConstructor of mono_ty * mexpr
   | MPath of {
       head: mexpr;
       elems: mtyped_path_elem list;
