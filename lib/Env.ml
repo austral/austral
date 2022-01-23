@@ -6,16 +6,16 @@ open Tast
 (** A set of type parameters. *)
 type typarams = type_parameter list
 
-(** The ID of a file. *)
+(** The type of file IDs. *)
 type file_id = FileId of int
 
-(** The ID of a module. *)
+(** The type of module IDs. *)
 type mod_id = ModId of int
 
-(** The ID of a declaration. *)
+(** The type of declaration IDs. *)
 type decl_id = DeclId of int
 
-(** The ID of an instance method. *)
+(** The type of instance method IDs. *)
 type ins_meth_id = InsMethId of int
 
 (** A file record contains a file's path and contents. *)
@@ -120,7 +120,7 @@ type decl_rec =
       argument: ty;
     }
 
-(** An instance method record represents an instance method. *)
+(** Represents an instance method. *)
 type ins_meth_rec = InsMethRec of {
       id: ins_meth_id;
       instance_id: decl_id;
@@ -141,6 +141,16 @@ type ins_meth_env = ins_meth_rec list
 
 (** The declaration environment contains declarations. *)
 type decl_env = decl_rec list
+
+(** The env type implements the global compiler environment. *)
+type env = Env of {
+      files: file_env;
+      mods: mod_env;
+      methods: ins_meth_env;
+      decls: decl_env;
+    }
+
+(* ID utilities *)
 
 let file_counter: int ref = ref 1
 
@@ -169,3 +179,15 @@ let fresh_ins_meth_id _: ins_meth_id =
   let id = !ins_meth_counter in
   ins_meth_counter := id + 1;
   InsMethId id
+
+(** An empty environment. *)
+let empty_env: env =
+  Env { files = []; mods = []; methods = []; decls = [] }
+
+(** Add a file to an environment. *)
+let add_file (env: env) (path: string) (contents: string): (env * file_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_file_id () in
+  let file = FileRec { id = id; path = path; contents = contents } in
+  let env = Env { files = file :: files; mods = mods; methods = methods; decls = decls } in
+  (env, id)
