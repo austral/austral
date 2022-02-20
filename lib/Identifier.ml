@@ -10,6 +10,14 @@ type module_name = string
 let make_mod_name n = n
 let mod_name_string n = n
 
+type sident = module_name * identifier
+
+let make_sident mn n =
+  (mn, n)
+
+let sident_module_name (mn, _) = mn
+let sident_name (_, n) = n
+
 type qident = {
     source: module_name;
     original: identifier;

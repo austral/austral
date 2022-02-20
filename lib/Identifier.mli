@@ -22,6 +22,19 @@ val make_mod_name : string -> module_name
 (** The string representation of a module name. *)
 val mod_name_string : module_name -> string
 
+(** A sourced identifier is a module name plus an identifier from that
+    module. *)
+type sident
+
+(** Make a sourced identifier. *)
+val make_sident : module_name -> identifier -> sident
+
+(** The module the sourced identifier comes from. *)
+val sident_module_name : sident -> module_name
+
+(** The sourced identifier's name component. *)
+val sident_name : sident -> identifier
+
 (** A qualified identifier is:
 
     1. The name of the module the identifier was imported from (or the name of
