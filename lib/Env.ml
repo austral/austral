@@ -2,17 +2,21 @@ open Identifier
 open Common
 open Type
 open Tast
+open Error
 
 type typarams = type_parameter list
 
 type file_id = FileId of int
+[@@deriving eq]
 
 type mod_id = ModId of int
 [@@deriving eq]
 
 type decl_id = DeclId of int
+[@@deriving eq]
 
 type ins_meth_id = InsMethId of int
+[@@deriving eq]
 
 type file_rec = FileRec of { id: file_id; path: string; contents: string }
 
@@ -25,16 +29,7 @@ type mod_rec = ModRec of {
       is_unsafe: bool
     }
 
-(** A declaration record represents a declaration.
-
-   The definition of declaration here is slightly different than that of the
-   spec: we include union cases and typeclass methods as "declarations". The
-   reason being that we want union cases and typeclass methods to share a
-   namespace with real declarations, and this is an easy way to make that
-   happen.
-
-*)
-type decl_rec =
+type decl =
   | Constant of {
       id: decl_id;
       mod_id: mod_id;
@@ -133,7 +128,7 @@ type mod_env = mod_rec list
 type ins_meth_env = ins_meth_rec list
 
 (** The declaration environment contains declarations. *)
-type decl_env = decl_rec list
+type decl_env = decl list
 
 type env = Env of {
       files: file_env;
@@ -379,3 +374,64 @@ let add_instance_method (env: env) (input: instance_method_input): (env * ins_me
   let meth = InsMethRec { id; instance_id; docstring; value_params; rt; body } in
   let env = Env { files = files; mods = mods; methods = meth :: methods; decls = decls } in
   (env, id)
+
+let decl_id (decl: decl): decl_id =
+  match decl with
+  | Constant { id; _ } -> id
+  | TypeAlias { id; _ } -> id
+  | Record { id; _ } -> id
+  | Union { id; _ } -> id
+  | UnionCase { id; _ } -> id
+  | Function { id; _ } -> id
+  | TypeClass { id; _ } -> id
+  | TypeClassMethod { id; _ } -> id
+  | Instance { id; _ } -> id
+
+let decl_mod_id (decl: decl): mod_id =
+  match decl with
+  | Constant { mod_id; _ } -> mod_id
+  | TypeAlias { mod_id; _ } -> mod_id
+  | Record { mod_id; _ } -> mod_id
+  | Union { mod_id; _ } -> mod_id
+  | UnionCase { mod_id; _ } -> mod_id
+  | Function { mod_id; _ } -> mod_id
+  | TypeClass { mod_id; _ } -> mod_id
+  | TypeClassMethod { mod_id; _ } -> mod_id
+  | Instance { mod_id; _ } -> mod_id
+
+let decl_name (decl: decl): identifier option =
+  match decl with
+  | Constant { name; _ } -> Some name
+  | TypeAlias { name; _ } -> Some name
+  | Record { name; _ } -> Some name
+  | Union { name; _ } -> Some name
+  | UnionCase { name; _ } -> Some name
+  | Function { name; _ } -> Some name
+  | TypeClass { name; _ } -> Some name
+  | TypeClassMethod { name; _ } -> Some name
+  | Instance _ -> None
+
+let get_decl_by_id (env: env) (id: decl_id): decl option =
+  let (Env { decls; _ }) = env in
+  List.find_opt (fun d -> equal_decl_id id (decl_id d)) decls
+
+let get_decl_by_name (env: env) (name: sident): decl option =
+  match get_module_by_name env (sident_module_name name) with
+  | Some (ModRec { id=target_mod_id; _ }) ->
+     let (Env { decls; _ }) = env in
+     let pred (d: decl) =
+       let mid = decl_mod_id d in
+       if equal_mod_id target_mod_id mid then
+         (* Module matches. *)
+         (match (decl_name d) with
+          | (Some dname) ->
+             (* Does the name match? *)
+             equal_identifier dname (sident_name name)
+          | None ->
+             false)
+       else
+         false
+     in
+     List.find_opt (fun d -> pred d) decls
+  | None ->
+     err "No such module."
