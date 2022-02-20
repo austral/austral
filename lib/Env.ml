@@ -3,26 +3,19 @@ open Common
 open Type
 open Tast
 
-(** A set of type parameters. *)
 type typarams = type_parameter list
 
-(** The type of file IDs. *)
 type file_id = FileId of int
 
-(** The type of module IDs. *)
 type mod_id = ModId of int
+[@@deriving eq]
 
-(** The type of declaration IDs. *)
 type decl_id = DeclId of int
 
-(** The type of instance method IDs. *)
 type ins_meth_id = InsMethId of int
 
-(** A file record contains a file's path and contents. *)
 type file_rec = FileRec of { id: file_id; path: string; contents: string }
 
-(** A module record contains a module's name, docstring, and pointers to the
-   interface and body files. *)
 type mod_rec = ModRec of {
       id: mod_id;
       name: module_name;
@@ -142,7 +135,6 @@ type ins_meth_env = ins_meth_rec list
 (** The declaration environment contains declarations. *)
 type decl_env = decl_rec list
 
-(** The env type implements the global compiler environment. *)
 type env = Env of {
       files: file_env;
       mods: mod_env;
@@ -180,14 +172,210 @@ let fresh_ins_meth_id _: ins_meth_id =
   ins_meth_counter := id + 1;
   InsMethId id
 
-(** An empty environment. *)
 let empty_env: env =
   Env { files = []; mods = []; methods = []; decls = [] }
 
-(** Add a file to an environment. *)
-let add_file (env: env) (path: string) (contents: string): (env * file_id) =
+type file_input = { path: string; contents: string }
+
+let add_file (env: env) (input: file_input): (env * file_id) =
+  let { path; contents } = input in
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_file_id () in
   let file = FileRec { id = id; path = path; contents = contents } in
   let env = Env { files = file :: files; mods = mods; methods = methods; decls = decls } in
+  (env, id)
+
+type mod_input = {
+    name: module_name;
+    docstring: docstring;
+    interface_file: file_id;
+    body_file: file_id;
+    is_unsafe: bool;
+  }
+
+let add_module (env: env) (input: mod_input): (env * mod_id) =
+  let { name; docstring; interface_file; body_file; is_unsafe } = input in
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_mod_id () in
+  let md = ModRec {
+               id = id;
+               name = name;
+               docstring = docstring;
+               interface_file = interface_file;
+               body_file = body_file;
+               is_unsafe = is_unsafe;
+             }
+  in
+  let env = Env { files = files; mods = md :: mods; methods = methods; decls = decls } in
+  (env, id)
+
+let get_module_by_id (env: env) (mod_id: mod_id): mod_rec option =
+  let (Env { mods; _ }) = env in
+  List.find_opt (fun (ModRec { id; _ }) -> equal_mod_id mod_id id) mods
+
+let get_module_by_name (env: env) (mod_name: module_name): mod_rec option =
+  let (Env { mods; _ }) = env in
+  List.find_opt (fun (ModRec { name; _ }) -> equal_module_name mod_name name) mods
+
+type const_input = {
+    mod_id: mod_id;
+    name: identifier;
+    docstring: docstring;
+  }
+
+let add_constant (env: env) (input: const_input): (env * decl_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_decl_id () in
+  let { mod_id; name; docstring } = input in
+  let decl = Constant { id; mod_id; name; docstring } in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type type_alias_input = {
+    mod_id: mod_id;
+    name: identifier;
+    docstring: docstring;
+    typarams: typarams;
+    universe: universe;
+    def: ty;
+  }
+
+let add_type_alias (env: env) (input: type_alias_input): (env * decl_id) =
+  let id = fresh_decl_id () in
+  let { mod_id; name; docstring; typarams; universe; def } = input in
+  let decl = TypeAlias { id; mod_id; name; docstring; typarams; universe; def } in
+  let (Env { files; mods; methods; decls }) = env in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type record_input = {
+    mod_id: mod_id;
+    name: identifier;
+    docstring: docstring;
+    typarams: typarams;
+    universe: universe;
+    slots: typed_slot list;
+  }
+
+let add_record (env: env) (input: record_input): (env * decl_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_decl_id () in
+  let { mod_id; name; docstring; typarams; universe; slots } = input in
+  let decl = Record { id; mod_id; name; docstring; typarams; universe; slots } in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type union_input = {
+    mod_id: mod_id;
+    name: identifier;
+    docstring: docstring;
+    typarams: typarams;
+    universe: universe;
+  }
+
+let add_union (env: env) (input: union_input): (env * decl_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_decl_id () in
+  let { mod_id; name; docstring; typarams; universe } = input in
+  let decl = Union { id; mod_id; name; docstring; typarams; universe } in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type union_case_input = {
+    mod_id: mod_id;
+    union_id: decl_id;
+    name: identifier;
+    docstring: docstring;
+    slots: typed_slot list;
+  }
+
+let add_union_case (env: env) (input: union_case_input): (env * decl_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_decl_id () in
+  let { mod_id; union_id; name; docstring; slots } = input in
+  let decl = UnionCase { id; mod_id; union_id; name; docstring; slots } in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type function_input = {
+    mod_id: mod_id;
+    name: identifier;
+    docstring: docstring;
+    typarams: typarams;
+    value_params: value_parameter list;
+    rt: ty;
+    external_name: string option;
+    body: tstmt option;
+  }
+
+let add_function (env: env) (input: function_input): (env * decl_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_decl_id () in
+  let { mod_id; name; docstring; typarams; value_params; rt; external_name; body } = input in
+  let decl = Function { id; mod_id; name; docstring; typarams; value_params; rt; external_name; body } in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type type_class_input = {
+    mod_id: mod_id;
+    name: identifier;
+    docstring: docstring;
+    param: type_parameter;
+  }
+
+let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_decl_id () in
+  let { mod_id; name; docstring; param } = input in
+  let decl = TypeClass { id; mod_id; name; docstring; param } in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type type_class_method_input = {
+    mod_id: mod_id;
+    typeclass_id: decl_id;
+    name: identifier;
+    docstring: docstring;
+    value_params: value_parameter list;
+    rt: ty;
+  }
+
+let add_type_class_method (env: env) (input: type_class_method_input): (env * decl_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_decl_id () in
+  let { mod_id; typeclass_id; name; docstring; value_params; rt } = input in
+  let decl = TypeClassMethod { id; mod_id; typeclass_id; name; docstring; value_params; rt } in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type instance_input = {
+    mod_id: mod_id;
+    typeclass_id: decl_id;
+    docstring: docstring;
+    typarams: typarams;
+    argument: ty;
+  }
+
+let add_instance (env: env) (input: instance_input): (env * decl_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_decl_id () in
+  let { mod_id; typeclass_id; docstring; typarams; argument } = input in
+  let decl = Instance { id; mod_id; typeclass_id; docstring; typarams; argument } in
+  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  (env, id)
+
+type instance_method_input = {
+    instance_id: decl_id;
+    docstring: docstring;
+    value_params: value_parameter list;
+    rt: ty;
+    body: tstmt option;
+  }
+
+let add_instance_method (env: env) (input: instance_method_input): (env * ins_meth_id) =
+  let (Env { files; mods; methods; decls }) = env in
+  let id = fresh_ins_meth_id () in
+  let { instance_id; docstring; value_params; rt; body } = input in
+  let meth = InsMethRec { id; instance_id; docstring; value_params; rt; body } in
+  let env = Env { files = files; mods = mods; methods = meth :: methods; decls = decls } in
   (env, id)
