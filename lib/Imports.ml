@@ -1,6 +1,7 @@
 open Identifier
 open IdentifierMap
 open Env
+open Error
 
 type import_map =
   ImportMap of {
