@@ -37,9 +37,9 @@ let importing_module (im: import_map): module_name =
   import_into
 
 let get_symbol (im: import_map) (name: identifier) =
-  let (ImportMap { import_into; symbols; instances }) = im in
-  IdentifierMap.find_opt name m
+  let (ImportMap { symbols; _ }) = im in
+  IdentifierMap.find_opt name symbols
 
 let imported_instances (im: import_map): decl_id list =
-  let (ImportMap { instannces; _ }) = im in
+  let (ImportMap { instances; _ }) = im in
   instances
