@@ -467,3 +467,22 @@ let get_decl_by_name (env: env) (name: sident): decl option =
   | None ->
      err "No such module."
 
+let is_importable (decl: decl): bool =
+  let importable_vis = function
+    | VisPublic -> true
+    | VisPrivate -> false
+  and importable_type = function
+    | TypeVisPublic -> true
+    | TypeVisOpaque -> true
+    | TypeVisPrivate -> false
+  in
+  match decl with
+  | Constant { vis; _ } -> importable_vis vis
+  | TypeAlias { vis; _ } -> importable_type vis
+  | Record { vis; _ } -> importable_type vis
+  | Union { vis; _ } -> importable_type vis
+  | UnionCase { vis; _ } -> importable_vis vis
+  | Function { vis; _ } -> importable_vis vis
+  | TypeClass { vis; _ } -> importable_vis vis
+  | TypeClassMethod { vis; _ } -> importable_vis vis
+  | Instance _ -> true
