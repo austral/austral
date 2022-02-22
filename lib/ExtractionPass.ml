@@ -83,7 +83,7 @@ let extract menv cmodule =
   let sigs = extract_type_signatures cmodule in
   let sem_decls = extract_declarations name menv sigs cmodule in
   (* TODO: This can be safely replaced with the empty list, since it would always be empty. *)
-  let (classes': semantic_typeclass list) = []
+  let (classes': semantic_typeclass list) = [] in
   let (instances': semantic_instance list) = merge_without_duplicates (imported_instances interface_imports)
                    (imported_instances body_imports)
                    (fun (STypeClassInstance (_, n, _, _, _)) -> n) in
