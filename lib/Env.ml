@@ -69,6 +69,7 @@ type decl =
   | UnionCase of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       union_id: decl_id;
       name: identifier;
       docstring: docstring;
@@ -99,6 +100,7 @@ type decl =
   | TypeClassMethod of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       typeclass_id: decl_id;
       name: identifier;
       docstring: docstring;
@@ -225,11 +227,15 @@ type const_input = {
     docstring: docstring;
   }
 
+let const_input_to_const (id: decl_id) (input: const_input): decl =
+  let { mod_id; vis; name; docstring } = input in
+  Constant { id; mod_id; vis; name; docstring } in
+    
 let add_constant (env: env) (input: const_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
   let { mod_id; vis; name; docstring } = input in
-  let decl = Constant { id; mod_id; vis; name; docstring } in
+  let decl = const_input_to_const id input in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 

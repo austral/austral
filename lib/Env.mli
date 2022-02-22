@@ -117,6 +117,7 @@ val add_union : env -> union_input -> (env * decl_id)
 (** Input to the {!add_union_case} function. *)
 type union_case_input = {
     mod_id: mod_id;
+    vis: vis;
     union_id: decl_id;
     name: identifier;
     docstring: docstring;
@@ -154,6 +155,7 @@ val add_type_class : env -> type_class_input -> (env * decl_id)
 (** Input to the {!add_type_class_method} function. *)
 type type_class_method_input = {
     mod_id: mod_id;
+    vis: vis;
     typeclass_id: decl_id;
     name: identifier;
     docstring: docstring;
@@ -234,6 +236,8 @@ type decl =
   | UnionCase of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
+      (** This is {!VisPublic} if the parent union is public, {!VisPrivate} otherwise. *)
       union_id: decl_id;
       name: identifier;
       docstring: docstring;
@@ -264,6 +268,8 @@ type decl =
   | TypeClassMethod of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
+      (** This is the visibility of the parent typeclass. *)
       typeclass_id: decl_id;
       name: identifier;
       docstring: docstring;
@@ -286,3 +292,6 @@ val get_decl_by_id : env -> decl_id -> decl option
 
     If a module with the given name doesn't exist, raises an error. *)
 val get_decl_by_name : env -> sident -> decl option
+
+(** Return whether a declaration is importable by a foreign module. *)
+val is_importable: decl -> bool
