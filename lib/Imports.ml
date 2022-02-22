@@ -6,7 +6,7 @@ type import_map =
   ImportMap of {
       import_into: module_name;
       symbols: qident IdentifierMap.t;
-      instances: semantic_instance list;
+      instances: decl_id list;
     }
 
 let empty_map (n: module_name): import_map =
@@ -29,7 +29,6 @@ let add_instance (im: import_map) (id: decl_id): import_map =
   ImportMap {
       import_into = import_into;
       symbols = symbols;
-      classes = classes;
       instances = id :: instances
     }
 
