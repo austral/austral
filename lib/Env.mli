@@ -295,3 +295,6 @@ val get_decl_by_name : env -> sident -> decl option
 
 (** Return whether a declaration is importable by a foreign module. *)
 val is_importable: decl -> bool
+
+(** Return the typeclass instances defined in a module. *)
+val module_instances: env -> mod_id -> decl list

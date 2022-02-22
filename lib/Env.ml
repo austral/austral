@@ -486,3 +486,12 @@ let is_importable (decl: decl): bool =
   | TypeClass { vis; _ } -> importable_vis vis
   | TypeClassMethod { vis; _ } -> importable_vis vis
   | Instance _ -> true
+
+let module_instances (env: env) (id: mod_id): decl list =
+  let (Env { decls; _ }) = env
+  and pred = function
+    | Instance { mod_id; _ } ->
+       equal_mod_id mod_id id
+    | _ -> false
+  in
+  List.filter pred decls
