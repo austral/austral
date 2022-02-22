@@ -7,14 +7,23 @@ open Semantic
 open BuiltIn
 open Error
 
+(** Represents an Austral import declaration, that is, in some code like:
+
+        import Foo.Bar (A as D, B, C);
+
+    The first symbol would correspond to this {ImportDecl}:
+
+        ImportDecl ("Foo.Bar", "A", D")
+ *)
 type import_decl = ImportDecl of module_name * identifier * identifier
 
+(** Return the nickname if non-{None}, otherwise return the name. *)
 let nickname_or_real_name (name: identifier) (nickname: identifier option): identifier =
   match nickname with
   | (Some nick) -> nick
   | None -> name
 
-(* Take a list of import lists, and flatten it to a list of import decls *)
+(** Take a list of import lists, and flatten it to a list of import decls *)
 let flatten_imports (list: concrete_import_list list): import_decl list =
   let ll = List.map
              (fun (ConcreteImportList (mn, imports)) ->
@@ -26,6 +35,17 @@ let flatten_imports (list: concrete_import_list list): import_decl list =
 
 let resolve_import (menv: menv) (kind: module_kind) (imports: import_map) (idecl: import_decl): import_map =
   let (ImportDecl (module_name, name, nickname)) = idecl in
+  let sname = make_sident module_name name in
+  match get_decl_by_name env sname with
+  | Some decl ->
+     
+  | None ->
+     err ("No declaration with the name '"
+          ^ (ident_string name)
+          ^ "' in the module '"
+          ^ (mod_name_string module_name)
+          ^ "'")
+
   match get_module menv module_name with
   | (Some smodule) ->
      (match get_declaration (smodule, name) with
