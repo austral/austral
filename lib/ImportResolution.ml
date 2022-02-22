@@ -3,7 +3,6 @@ open Common
 open ModuleSystem
 open Imports
 open Cst
-open Semantic
 open BuiltIn
 open Error
 open Env
@@ -88,6 +87,6 @@ let import_instances (env: env) (list: concrete_import_list list): decl_id list 
   List.flatten instances
 
 let resolve (importing_module: module_name) (kind: module_kind) (env: env) (list: concrete_import_list list): import_map =
-  let im = resolve' env kind (empty_map importing_module) (flatten_imports list) in
-  let ins = import_instances env list in
+  let im: import_map = resolve' env kind (empty_map importing_module) (flatten_imports list) in
+  let ins: decl_id list = import_instances env list in
   add_instances im ins
