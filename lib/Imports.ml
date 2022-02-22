@@ -1,33 +1,46 @@
 open Identifier
 open IdentifierMap
-open Semantic
+open Env
 
 type import_map =
-  ImportMap of module_name * qident IdentifierMap.t * semantic_typeclass list * semantic_instance list
+  ImportMap of {
+      import_into: module_name;
+      symbols: qident IdentifierMap.t;
+      instances: semantic_instance list;
+    }
 
-let empty_map n =
-  ImportMap (n, IdentifierMap.empty, [], [])
+let empty_map (n: module_name): import_map =
+  ImportMap {
+      import_into = n;
+      symbols = IdentifierMap.empty;
+      instances = [];
+    }
 
-let add_symbol (ImportMap (n, m, cs, is)) q =
-  ImportMap (n, IdentifierMap.add (local_name q) q m, cs, is)
+let add_symbol (im: import_map) (q: qident) =
+  let (ImportMap { import_into; symbols; instances }) = im in
+  ImportMap {
+      import_into = import_into;
+      symbols = IdentifierMap.add (local_name q) q symbols;
+      instances = instances
+    }
 
-let add_instance (ImportMap (n, m, cs, is)) ins =
-  ImportMap (n, m, cs, ins :: is)
+let add_instance (im: import_map) (id: decl_id): import_map =
+  let (ImportMap { import_into; symbols; instances }) = im in
+  ImportMap {
+      import_into = import_into;
+      symbols = symbols;
+      classes = classes;
+      instances = id :: instances
+    }
 
-let importing_module (ImportMap (n, _, _, _)) =
-  n
+let importing_module (im: import_map): module_name =
+  let (ImportMap { import_into; _ }) = im in
+  import_into
 
-let get_symbol (ImportMap (_, m, _, _)) name =
+let get_symbol (im: import_map) (name: identifier) =
+  let (ImportMap { import_into; symbols; instances }) = im in
   IdentifierMap.find_opt name m
 
-let imported_classes (ImportMap (_, _, cs, _)) =
-  cs
-
-let imported_instances (ImportMap (_, _, _, is)) =
-  is
-
-let dump_import_map (ImportMap (n, m, _, _)) =
-  "ImportMap:\n"
-  ^ "    name=" ^ (mod_name_string n) ^ "\n"
-  ^ "    imports:\n"
-  ^ (String.concat "\n" (List.map (fun (k, v) -> (ident_string k) ^ " -> " ^ (qident_debug_name v) ^ "\n") (IdentifierMap.bindings m)))
+let imported_instances (im: import_map): decl_id list =
+  let (ImportMap { instannces; _ }) = im in
+  instances
