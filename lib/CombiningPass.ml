@@ -49,8 +49,6 @@ let parse_method_defs (imports: import_map) (methods: concrete_method_def list):
 let name_typarams (typarams: concrete_type_param list) (name: qident): type_parameter list =
   List.map (fun (ConcreteTypeParam (n, u)) -> TypeParameter (n, u, name)) typarams
 
-(* Given an interface declaration, and a body declaration, return the combined
-   declaration if they're the same, and fail otherwise. *)
 let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: concrete_def): combined_definition =
   let make_qname n =
     make_qident (module_name, n, n)
