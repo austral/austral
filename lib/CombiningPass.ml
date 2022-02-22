@@ -5,7 +5,7 @@ open Type
 open AbstractionPass
 open Cst
 open Combined
-open ModuleSystem
+open Env
 open ImportResolution
 open Error
 
@@ -191,7 +191,7 @@ let private_def module_name im def =
                 parse_method_defs im methods,
                 docstring)
 
-let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
+let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
   let (ConcreteModuleInterface (mn, interface_imports, decls)) = cmi
   and (ConcreteModuleBody (mn', kind, body_imports, defs)) = cmb
   in
@@ -201,8 +201,8 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
          ^ " and "
          ^ (mod_name_string mn'))
   else
-    let im = resolve mn kind menv interface_imports
-    and bm = resolve mn kind menv body_imports
+    let im = resolve mn kind env interface_imports
+    and bm = resolve mn kind env body_imports
     in
     let public_decls = List.map (parse_decl mn im bm cmb) decls
     and private_decls = parse_defs mn cmi bm defs
