@@ -1,7 +1,7 @@
 open Identifier
 open Env
 
-(** Represents the imports into a module. *)
+(** Represents the set of all imports into a module. *)
 type import_map
 
 (** Create an empty map, given the name of the module that's we're importing
