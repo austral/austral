@@ -33,12 +33,14 @@ type decl =
   | Constant of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       name: identifier;
       docstring: docstring;
     }
   | TypeAlias of {
       id: decl_id;
       mod_id: mod_id;
+      vis: type_vis;
       name: identifier;
       docstring: docstring;
       typarams: typarams;
@@ -48,6 +50,7 @@ type decl =
   | Record of {
       id: decl_id;
       mod_id: mod_id;
+      vis: type_vis;
       name: identifier;
       docstring: docstring;
       typarams: typarams;
@@ -57,6 +60,7 @@ type decl =
   | Union of {
       id: decl_id;
       mod_id: mod_id;
+      vis: type_vis;
       name: identifier;
       docstring: docstring;
       typarams: typarams;
@@ -73,6 +77,7 @@ type decl =
   | Function of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       name: identifier;
       docstring: docstring;
       typarams: typarams;
@@ -86,6 +91,7 @@ type decl =
   | TypeClass of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       name: identifier;
       docstring: docstring;
       param: type_parameter;
@@ -214,6 +220,7 @@ let get_module_by_name (env: env) (mod_name: module_name): mod_rec option =
 
 type const_input = {
     mod_id: mod_id;
+    vis: vis;
     name: identifier;
     docstring: docstring;
   }
@@ -221,13 +228,14 @@ type const_input = {
 let add_constant (env: env) (input: const_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; name; docstring } = input in
-  let decl = Constant { id; mod_id; name; docstring } in
+  let { mod_id; vis; name; docstring } = input in
+  let decl = Constant { id; mod_id; vis; name; docstring } in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
 type type_alias_input = {
     mod_id: mod_id;
+    vis: type_vis;
     name: identifier;
     docstring: docstring;
     typarams: typarams;
@@ -237,14 +245,15 @@ type type_alias_input = {
 
 let add_type_alias (env: env) (input: type_alias_input): (env * decl_id) =
   let id = fresh_decl_id () in
-  let { mod_id; name; docstring; typarams; universe; def } = input in
-  let decl = TypeAlias { id; mod_id; name; docstring; typarams; universe; def } in
+  let { mod_id; vis; name; docstring; typarams; universe; def } = input in
+  let decl = TypeAlias { id; mod_id; vis; name; docstring; typarams; universe; def } in
   let (Env { files; mods; methods; decls }) = env in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
 type record_input = {
     mod_id: mod_id;
+    vis: type_vis;
     name: identifier;
     docstring: docstring;
     typarams: typarams;
@@ -255,13 +264,14 @@ type record_input = {
 let add_record (env: env) (input: record_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; name; docstring; typarams; universe; slots } = input in
-  let decl = Record { id; mod_id; name; docstring; typarams; universe; slots } in
+  let { mod_id; vis; name; docstring; typarams; universe; slots } = input in
+  let decl = Record { id; mod_id; vis; name; docstring; typarams; universe; slots } in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
 type union_input = {
     mod_id: mod_id;
+    vis: type_vis;
     name: identifier;
     docstring: docstring;
     typarams: typarams;
@@ -271,8 +281,8 @@ type union_input = {
 let add_union (env: env) (input: union_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; name; docstring; typarams; universe } = input in
-  let decl = Union { id; mod_id; name; docstring; typarams; universe } in
+  let { mod_id; vis; name; docstring; typarams; universe } = input in
+  let decl = Union { id; mod_id; vis; name; docstring; typarams; universe } in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
@@ -294,6 +304,7 @@ let add_union_case (env: env) (input: union_case_input): (env * decl_id) =
 
 type function_input = {
     mod_id: mod_id;
+    vis: vis;
     name: identifier;
     docstring: docstring;
     typarams: typarams;
@@ -306,13 +317,14 @@ type function_input = {
 let add_function (env: env) (input: function_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; name; docstring; typarams; value_params; rt; external_name; body } = input in
-  let decl = Function { id; mod_id; name; docstring; typarams; value_params; rt; external_name; body } in
+  let { mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } = input in
+  let decl = Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
 type type_class_input = {
     mod_id: mod_id;
+    vis: vis;
     name: identifier;
     docstring: docstring;
     param: type_parameter;
@@ -321,8 +333,8 @@ type type_class_input = {
 let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; name; docstring; param } = input in
-  let decl = TypeClass { id; mod_id; name; docstring; param } in
+  let { mod_id; vis; name; docstring; param } = input in
+  let decl = TypeClass { id; mod_id; vis; name; docstring; param } in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 

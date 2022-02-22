@@ -69,6 +69,7 @@ val get_module_by_name : env -> module_name -> mod_rec option
 (** Input to the {!add_const} function. *)
 type const_input = {
     mod_id: mod_id;
+    vis: vis;
     name: identifier;
     docstring: docstring;
   }
@@ -78,6 +79,7 @@ val add_constant : env -> const_input -> (env * decl_id)
 (** Input to the {!add_type_alias} function. *)
 type type_alias_input = {
     mod_id: mod_id;
+    vis: type_vis;
     name: identifier;
     docstring: docstring;
     typarams: typarams;
@@ -90,6 +92,7 @@ val add_type_alias : env -> type_alias_input -> (env * decl_id)
 (** Input to the {!add_record} function. *)
 type record_input = {
     mod_id: mod_id;
+    vis: type_vis;
     name: identifier;
     docstring: docstring;
     typarams: typarams;
@@ -102,6 +105,7 @@ val add_record : env -> record_input -> (env * decl_id)
 (** Input to the {!add_union} function. *)
 type union_input = {
     mod_id: mod_id;
+    vis: type_vis;
     name: identifier;
     docstring: docstring;
     typarams: typarams;
@@ -124,6 +128,7 @@ val add_union_case : env -> union_case_input -> (env * decl_id)
 (** Input to the {!add_function} function. *)
 type function_input = {
     mod_id: mod_id;
+    vis: vis;
     name: identifier;
     docstring: docstring;
     typarams: typarams;
@@ -138,6 +143,7 @@ val add_function : env -> function_input -> (env * decl_id)
 (** Input to the {!add_type_class} function. *)
 type type_class_input = {
     mod_id: mod_id;
+    vis: vis;
     name: identifier;
     docstring: docstring;
     param: type_parameter;
@@ -192,12 +198,14 @@ type decl =
   | Constant of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       name: identifier;
       docstring: docstring;
     }
   | TypeAlias of {
       id: decl_id;
       mod_id: mod_id;
+      vis: type_vis;
       name: identifier;
       docstring: docstring;
       typarams: typarams;
@@ -207,6 +215,7 @@ type decl =
   | Record of {
       id: decl_id;
       mod_id: mod_id;
+      vis: type_vis;
       name: identifier;
       docstring: docstring;
       typarams: typarams;
@@ -216,6 +225,7 @@ type decl =
   | Union of {
       id: decl_id;
       mod_id: mod_id;
+      vis: type_vis;
       name: identifier;
       docstring: docstring;
       typarams: typarams;
@@ -232,6 +242,7 @@ type decl =
   | Function of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       name: identifier;
       docstring: docstring;
       typarams: typarams;
@@ -245,6 +256,7 @@ type decl =
   | TypeClass of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       name: identifier;
       docstring: docstring;
       param: type_parameter;
