@@ -38,7 +38,6 @@ let rec extract (env: env) (cmodule: combined_module): env =
            body_file;
            body_docstring;
            decls;
-           _
       }) = cmodule in
   (* Add the module to the environment. *)
   let input: mod_input = {
@@ -174,7 +173,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let rm = region_map_from_typarams typarams in
      let argument = parse' rm typarams argument in
      let typeclass_id: decl_id =
-       match get_decl_by_name env name with
+       match get_decl_by_name env (qident_to_sident name) with
        | Some decl ->
           (match decl with
            | TypeClass { id; _ } ->
@@ -190,11 +189,19 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let method_map (CMethodDef (name, params, rt, _, _)): instance_method_input =
        let rm = region_map_from_typarams typarams in
        let value_params = List.map (parse_param typarams) params
-       and rt = parse' rm typarams rt in
+       and rt = parse' rm typarams rt
+       and method_id: decl_id =
+         (match get_method_from_typeclass_id_and_name env typeclass_id name with
+          | Some (TypeClassMethod { id; _ }) ->
+             id
+          | _ ->
+             err "No method with this name.")
+       in
        {
          instance_id = instance_id;
          method_id = method_id;
          docstring = docstring;
+         name = name;
          value_params = value_params;
          rt = rt;
          body = None;
