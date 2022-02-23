@@ -191,9 +191,9 @@ let private_def module_name im def =
                 parse_method_defs im methods,
                 docstring)
 
-let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
-  let (ConcreteModuleInterface (mn, interface_imports, decls)) = cmi
-  and (ConcreteModuleBody (mn', kind, body_imports, defs)) = cmb
+let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body) (interface_file: file_id) (body_file: file_id): combined_module =
+  let (ConcreteModuleInterface (mn, interface_docstring, interface_imports, decls)) = cmi
+  and (ConcreteModuleBody (mn', kind, body_docstring, body_imports, defs)) = cmb
   in
   if mn <> mn' then
     err ("Interface and body have mismatching names: "
@@ -210,7 +210,11 @@ let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_modul
     CombinedModule {
         name = mn;
         kind = kind;
+        interface_file = interface_file;
+        interface_docstring = interface_docstring;
         interface_imports = im;
+        body_file = body_file;
+        body_docstring = body_docstring;
         body_imports = bm;
         decls = List.concat [public_decls; private_decls];
       }
