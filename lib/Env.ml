@@ -121,7 +121,9 @@ type decl =
 type ins_meth_rec = InsMethRec of {
       id: ins_meth_id;
       instance_id: decl_id;
+      method_id: decl_id;
       docstring: docstring;
+      name: identifier;
       value_params: value_parameter list;
       rt: ty;
       body: tstmt option;
@@ -395,7 +397,9 @@ let add_instance (env: env) (input: instance_input): (env * decl_id) =
 
 type instance_method_input = {
     instance_id: decl_id;
+    method_id: decl_id;
     docstring: docstring;
+    name: identifier;
     value_params: value_parameter list;
     rt: ty;
     body: tstmt option;

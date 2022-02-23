@@ -181,7 +181,9 @@ val add_instance : env -> instance_input -> (env * decl_id)
 (** Input to the {!add_instance_method} function. *)
 type instance_method_input = {
     instance_id: decl_id;
+    method_id: decl_id;
     docstring: docstring;
+    name: identifier;
     value_params: value_parameter list;
     rt: ty;
     body: tstmt option;
