@@ -7,6 +7,8 @@ open Type
 type combined_module = CombinedModule of {
       name: module_name;
       kind: module_kind;
+      interface_docstring: docstring;
+      body_docstring: docstring;
       interface_imports: import_map;
       body_imports: import_map;
       decls: combined_definition list;
