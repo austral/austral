@@ -23,10 +23,11 @@ type file_rec = FileRec of { id: file_id; path: string; contents: string }
 type mod_rec = ModRec of {
       id: mod_id;
       name: module_name;
-      docstring: docstring;
+      interface_docstring: docstring;
+      body_docstring: docstring;
       interface_file: file_id;
       body_file: file_id;
-      is_unsafe: bool
+      kind: module_kind
     }
 
 type decl =
@@ -190,23 +191,25 @@ let add_file (env: env) (input: file_input): (env * file_id) =
 
 type mod_input = {
     name: module_name;
-    docstring: docstring;
+    interface_docstring: docstring;
+    body_docstring: docstring;
     interface_file: file_id;
     body_file: file_id;
-    is_unsafe: bool;
+    kind: module_kind;
   }
 
 let add_module (env: env) (input: mod_input): (env * mod_id) =
-  let { name; docstring; interface_file; body_file; is_unsafe } = input in
+  let { name; docstring; interface_file; body_file; kind } = input in
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_mod_id () in
   let md = ModRec {
-               id = id;
-               name = name;
-               docstring = docstring;
-               interface_file = interface_file;
-               body_file = body_file;
-               is_unsafe = is_unsafe;
+               id;
+               name;
+               interface_docstring;
+               body_docstring;
+               interface_file;
+               body_file;
+               kind;
              }
   in
   let env = Env { files = files; mods = md :: mods; methods = methods; decls = decls } in

@@ -40,10 +40,11 @@ val add_file : env -> file_input -> (env * file_id)
 (** Type of the input to the {!add_module} function. *)
 type mod_input = {
     name: module_name;
-    docstring: docstring;
+    interface_docstring: docstring;
+    body_docstring: docstring;
     interface_file: file_id;
     body_file: file_id;
-    is_unsafe: bool;
+    kind: module_kind
   }
 
 (** Add a module's information to the environment. *)
@@ -54,10 +55,11 @@ val add_module : env -> mod_input -> (env * mod_id)
 type mod_rec = ModRec of {
       id: mod_id;
       name: module_name;
-      docstring: docstring;
+      interface_docstring: docstring;
+      body_docstring: docstring;
       interface_file: file_id;
       body_file: file_id;
-      is_unsafe: bool
+      kind: module_kind
     }
 
 (** Retrieve a module by its module ID. *)
