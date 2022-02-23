@@ -396,7 +396,7 @@ type instance_input = {
     argument: ty;
   }
 
-let make_instance_decl (id: decl_id) (input: instance_input): env =
+let make_instance_decl (id: decl_id) (input: instance_input): decl =
   let { mod_id; typeclass_id; docstring; typarams; argument } = input in
   Instance { id; mod_id; typeclass_id; docstring; typarams; argument }
 
