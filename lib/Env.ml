@@ -201,7 +201,7 @@ type mod_input = {
   }
 
 let add_module (env: env) (input: mod_input): (env * mod_id) =
-  let { name; docstring; interface_file; body_file; kind } = input in
+  let { name; inteface_docstring; body_docstring; interface_file; body_file; kind } = input in
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_mod_id () in
   let md = ModRec {
