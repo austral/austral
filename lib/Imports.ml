@@ -33,7 +33,7 @@ let add_symbol (im: import_map) (q: qident) =
          instances = instances
        }
 
-let add_instance (im: import_map) (id: decl_id): import_map =
+let add_instance_to_imports (im: import_map) (id: decl_id): import_map =
   let (ImportMap { import_into; symbols; instances }) = im in
   ImportMap {
       import_into = import_into;

@@ -12,7 +12,7 @@ val empty_map : module_name -> import_map
 val add_symbol : import_map -> qident -> import_map
 
 (** Add the ID of a typeclass instance into the import map. *)
-val add_instance : import_map -> decl_id -> import_map
+val add_instance_to_imports : import_map -> decl_id -> import_map
 
 (** The name of the module we're importing into. *)
 val importing_module : import_map -> module_name
