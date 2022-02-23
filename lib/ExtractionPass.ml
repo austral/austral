@@ -166,8 +166,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let methods: type_class_method_input list = List.map method_map methods in
      (* Add the methods to the env *)
      add_type_class_methods env methods
-  | CInstance (_, name, typarams, argument, methods, docstring) ->
-     (* TODO: private instances? *)
+  | CInstance (vis, name, typarams, argument, methods, docstring) ->
      (* Add the instance itself to the env *)
      let rm = region_map_from_typarams typarams in
      let argument = parse' rm typarams argument in
@@ -182,7 +181,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
        | None ->
           err "Type class with this name does not exist."
      in
-     let input: instance_input = { mod_id; typeclass_id; docstring; typarams; argument } in
+     let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
      let method_map (CMethodDef (name, params, rt, _, _)): instance_method_input =

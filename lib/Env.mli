@@ -171,6 +171,7 @@ val add_type_class_method : env -> type_class_method_input -> (env * decl_id)
 (** Input to the {!add_instance} function. *)
 type instance_input = {
     mod_id: mod_id;
+    vis: vis;
     typeclass_id: decl_id;
     docstring: docstring;
     typarams: typarams;
@@ -285,6 +286,7 @@ type decl =
   | Instance of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       typeclass_id: decl_id;
       docstring: docstring;
       typarams: typarams;

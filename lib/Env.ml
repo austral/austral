@@ -112,6 +112,7 @@ type decl =
   | Instance of {
       id: decl_id;
       mod_id: mod_id;
+      vis: vis;
       typeclass_id: decl_id;
       docstring: docstring;
       typarams: typarams;
@@ -392,6 +393,7 @@ let add_type_class_method (env: env) (input: type_class_method_input): (env * de
 
 type instance_input = {
     mod_id: mod_id;
+    vis: vis;
     typeclass_id: decl_id;
     docstring: docstring;
     typarams: typarams;
@@ -399,8 +401,8 @@ type instance_input = {
   }
 
 let make_instance_decl (id: decl_id) (input: instance_input): decl =
-  let { mod_id; typeclass_id; docstring; typarams; argument } = input in
-  Instance { id; mod_id; typeclass_id; docstring; typarams; argument }
+  let { mod_id; vis; typeclass_id; docstring; typarams; argument } = input in
+  Instance { id; mod_id; vis; typeclass_id; docstring; typarams; argument }
 
 let add_instance (env: env) (input: instance_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
