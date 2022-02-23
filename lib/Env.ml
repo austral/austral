@@ -491,6 +491,18 @@ let get_decl_by_name (env: env) (name: sident): decl option =
   | None ->
      err "No such module."
 
+let get_method_from_typeclass_id_and_name (env: env) (typeclass_id: decl_id) (name: identifier): decl option =
+  let (Env { decls; _ }) = env in
+  let pred (decl: decl): bool =
+    match decl with
+    | TypeClassMethod { typeclass_id=target_typeclass_id; name=target_name; _ } ->
+       (equal_decl_id target_typeclass_id typeclass_id)
+       && (equal_identifier target_name name)
+    | _ ->
+       false
+  in
+  List.find_opt pred decls
+
 let is_importable (decl: decl): bool =
   let importable_vis = function
     | VisPublic -> true

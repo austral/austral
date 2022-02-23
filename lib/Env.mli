@@ -299,6 +299,9 @@ val get_decl_by_id : env -> decl_id -> decl option
     If a module with the given name doesn't exist, raises an error. *)
 val get_decl_by_name : env -> sident -> decl option
 
+(** Find a typeclass method from its typeclass ID and name. *)
+val get_method_from_typeclass_id_and_name : env -> decl_id -> identifier -> decl option
+
 (** Return whether a declaration is importable by a foreign module. *)
 val is_importable: decl -> bool
 
