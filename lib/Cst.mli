@@ -129,6 +129,7 @@ and concrete_path_elem =
 and concrete_lvalue =
   ConcreteLValue of identifier * concrete_path_elem list
 
+(** Used by the parser to easily create a module body from its components and a list of pragmas. *)
 val make_module_body : module_name -> concrete_import_list list -> pragma list -> concrete_def list -> concrete_module_body
 
 val decl_name : concrete_decl -> identifier option
