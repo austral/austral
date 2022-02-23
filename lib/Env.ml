@@ -337,11 +337,14 @@ type function_input = {
     body: tstmt option;
   }
 
+let make_function_decl (id: decl_id) (input: function_input): decl =
+  let { mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } = input in
+  Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body }
+
 let add_function (env: env) (input: function_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } = input in
-  let decl = Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } in
+  let decl = make_function_decl id input in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
@@ -353,11 +356,14 @@ type type_class_input = {
     param: type_parameter;
   }
 
+let make_type_class_decl (id: decl_id) (input: type_class_input): decl =
+  let { mod_id; vis; name; docstring; param } = input in
+  TypeClass { id; mod_id; vis; name; docstring; param }
+
 let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; vis; name; docstring; param } = input in
-  let decl = TypeClass { id; mod_id; vis; name; docstring; param } in
+  let decl = make_type_class_decl id input in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
@@ -371,11 +377,14 @@ type type_class_method_input = {
     rt: ty;
   }
 
+let make_type_class_method_decl (id: decl_id) (input: type_class_method_input): decl =
+  let { mod_id; vis; typeclass_id; name; docstring; value_params; rt } = input in
+  TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; value_params; rt }
+
 let add_type_class_method (env: env) (input: type_class_method_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; vis; typeclass_id; name; docstring; value_params; rt } = input in
-  let decl = TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; value_params; rt } in
+  let decl = make_type_class_method_decl id input in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
@@ -387,11 +396,14 @@ type instance_input = {
     argument: ty;
   }
 
+let make_instance_decl (id: decl_id) (input: instance_input): env =
+  let { mod_id; typeclass_id; docstring; typarams; argument } = input in
+  Instance { id; mod_id; typeclass_id; docstring; typarams; argument }
+
 let add_instance (env: env) (input: instance_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
   let id = fresh_decl_id () in
-  let { mod_id; typeclass_id; docstring; typarams; argument } = input in
-  let decl = Instance { id; mod_id; typeclass_id; docstring; typarams; argument } in
+  let decl = make_instance_decl id input in
   let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
   (env, id)
 
