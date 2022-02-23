@@ -1,9 +1,7 @@
 open Identifier
 open Common
-open Imports
 open Type
 open TypeSystem
-open Region
 open Combined
 open Env
 open TypeParser
