@@ -221,7 +221,6 @@ and add_type_class_methods (env: env) (cases: type_class_method_input list): env
   | [] ->
      env
 
-
 and add_instance_methods (env: env) (cases: instance_method_input list): env =
   match cases with
   | first::rest ->
