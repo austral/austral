@@ -41,15 +41,20 @@ let rec extract (env: env) (cmodule: combined_module): env =
       }) = cmodule in
   (* Add the module to the environment. *)
   let input: mod_input = {
-      name = name;
-      docstring = docstring;
-      interface_file = ifile;
-      body_file = bfile;
-      kind = kind;
+      name;
+      interface_file;
+      interface_docstring;
+      body_file;
+      body_docstring;
+      kind
     }
   in
+  let (env, mod_id) = add_module env input in
+  (* Extract the list of local type signatures. This lets us parse type
+     specifiers without reference to the environment. *)
   let sigs: type_signature list = extract_type_signatures cmodule in
-  let env: env = extract_definitions env mod_id sigs de in
+  (* Extract all declarations from the module into the environment. *)
+  let env: env = extract_definitions env mod_id sigs decls in
   env
 
 (** Given the environment, the ID of the module we're extracting, the list of
@@ -58,8 +63,8 @@ let rec extract (env: env) (cmodule: combined_module): env =
 and extract_definitions (env: env) (mod_id: mod_id) (local_types: type_signature list) (defs: combined_definition list): env =
   match defs with
   | first::rest ->
-     let env = extract_definition env mod_id first in
-     extract_definitions env mod_id rest
+     let env = extract_definition env mod_id local_types first in
+     extract_definitions env mod_id local_types rest
   | [] ->
      env
 
@@ -67,7 +72,7 @@ and extract_definitions (env: env) (mod_id: mod_id) (local_types: type_signature
     local type signatures, and a combined definition, add all relevant decls to
     the environment. *)
 and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature list) (def: combined_definition): env =
-  let parse' = parse_type menv local_types in
+  let parse' = parse_type env local_types in
   match def with
   | CConstant (vis, name, typespec, _, docstring) ->
      add_constant env { mod_id; vis; name; docstring }
