@@ -65,7 +65,7 @@ let rec resolve' (env: env) (kind: module_kind) (imports: import_map) (list: imp
 let rec add_instances (im: import_map) (is: decl_id list): import_map =
   match is with
   | first::rest ->
-     add_instance (add_instances im rest) first
+     add_instance_to_imports (add_instances im rest) first
   | [] ->
      im
 
@@ -75,8 +75,9 @@ let module_names (cil: concrete_import_list list): module_name list =
 let module_defined_instances (env: env) (mn: module_name): decl_id list =
   match (get_module_by_name env mn) with
   | Some mod_rec ->
-     let { id; _ } = mod_rec in
-     module_instances env id
+     let ModRec { id; _ } = mod_rec in
+     let decls: decl list = module_instances env id in
+     List.map decl_id decls
   | None ->
      []
 
