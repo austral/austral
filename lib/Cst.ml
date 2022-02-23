@@ -5,10 +5,10 @@ open Error
 open Span
 
 type concrete_module_interface =
-  ConcreteModuleInterface of module_name * concrete_import_list list * concrete_decl list
+  ConcreteModuleInterface of module_name * docstring * concrete_import_list list * concrete_decl list
 
 and concrete_module_body =
-  ConcreteModuleBody of module_name * module_kind * concrete_import_list list * concrete_def list
+  ConcreteModuleBody of module_name * module_kind * docstring * concrete_import_list list * concrete_def list
 
 and concrete_import_list =
   ConcreteImportList of module_name * concrete_import list
