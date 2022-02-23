@@ -16,18 +16,18 @@ open Util
 open Filename
 
 let append_import_to_interface ci import =
-  let (ConcreteModuleInterface (mn, imports, decls)) = ci in
+  let (ConcreteModuleInterface (mn, docstring, imports, decls)) = ci in
   if equal_module_name mn pervasive_module_name then
     ci
   else
-    ConcreteModuleInterface (mn, import :: imports, decls)
+    ConcreteModuleInterface (mn, docstring, import :: imports, decls)
 
 let append_import_to_body cb import =
-  let (ConcreteModuleBody (mn, kind, imports, decls)) = cb in
+  let (ConcreteModuleBody (mn, kind, docstring, imports, decls)) = cb in
   if equal_module_name mn pervasive_module_name then
     cb
   else
-    ConcreteModuleBody (mn, kind, import :: imports, decls)
+    ConcreteModuleBody (mn, kind, docstring, import :: imports, decls)
 
 type compiler = Compiler of menv * string
 
