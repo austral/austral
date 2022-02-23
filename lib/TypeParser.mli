@@ -2,7 +2,7 @@ open Identifier
 open Type
 open Region
 open Ast
-open ModuleSystem
+open Env
 
 (* Given a type's list of type parameters, its declared universe, and a list of
    supplied type arguments, evaluate the effective universe the type belongs to.
@@ -16,7 +16,7 @@ val any_arg_is_type : ty list -> bool
 
 (* Find the type signature of the type with the given name, if any
    exists. Searches the local type signature list first. *)
-val get_type_signature : menv -> type_signature list -> qident -> type_signature option
+val get_type_signature : env -> type_signature list -> qident -> type_signature option
 
 (* Parse a qualified type specifier.
 
@@ -24,6 +24,6 @@ val get_type_signature : menv -> type_signature list -> qident -> type_signature
    type specifier is being parsed in.Arith_status
 
    The third argument is the list of type parameters known at parse time.  *)
-val parse_type : menv -> type_signature list -> region_map -> type_parameter list -> qtypespec -> ty
+val parse_type : env -> type_signature list -> region_map -> type_parameter list -> qtypespec -> ty
 
 val universe_compatible : universe -> universe -> bool
