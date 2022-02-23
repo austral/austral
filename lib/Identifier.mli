@@ -66,3 +66,6 @@ val qident_debug_name : qident -> string
 (** Equality for qualified identifiers only considers the original rather than
     local names *)
 val equal_qident : qident -> qident -> bool
+
+(** Convert a qualified identifier to a sourced identifier. *)
+val qident_to_sident : qident -> sident

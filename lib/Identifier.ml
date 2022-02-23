@@ -41,3 +41,6 @@ let qident_debug_name { source; original; local } =
 
 let equal_qident { source; original; _ } { source=source'; original=original'; _ } =
   (equal_module_name source source') && (equal_identifier original original')
+
+let qident_to_sident { source; original; _ }: sident =
+  (source, original)
