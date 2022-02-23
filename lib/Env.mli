@@ -73,6 +73,7 @@ type const_input = {
     mod_id: mod_id;
     vis: vis;
     name: identifier;
+    ty: ty;
     docstring: docstring;
   }
 
@@ -206,6 +207,7 @@ type decl =
       mod_id: mod_id;
       vis: vis;
       name: identifier;
+      ty: ty;
       docstring: docstring;
     }
   | TypeAlias of {

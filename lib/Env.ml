@@ -36,6 +36,7 @@ type decl =
       mod_id: mod_id;
       vis: vis;
       name: identifier;
+      ty: ty;
       docstring: docstring;
     }
   | TypeAlias of {
@@ -229,12 +230,13 @@ type const_input = {
     mod_id: mod_id;
     vis: vis;
     name: identifier;
+    ty: ty;
     docstring: docstring;
   }
 
 let make_const_decl (id: decl_id) (input: const_input): decl =
-  let { mod_id; vis; name; docstring } = input in
-  Constant { id; mod_id; vis; name; docstring }
+  let { mod_id; vis; name; ty; docstring } = input in
+  Constant { id; mod_id; vis; name; ty; docstring }
 
 let add_constant (env: env) (input: const_input): (env * decl_id) =
   let (Env { files; mods; methods; decls }) = env in
