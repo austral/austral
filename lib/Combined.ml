@@ -24,7 +24,7 @@ and combined_definition =
   | CUnion of type_vis * identifier * type_parameter list * universe * qcase list * docstring
   | CFunction of vis * identifier * type_parameter list * qparam list * qtypespec * astmt * docstring * pragma list
   | CTypeclass of vis * identifier * type_parameter * combined_method_decl list * docstring
-  | CInstance of vis * identifier * type_parameter list * qtypespec * combined_method_def list * docstring
+  | CInstance of vis * qident * type_parameter list * qtypespec * combined_method_def list * docstring
 
 and qslot = QualifiedSlot of identifier * qtypespec
 
