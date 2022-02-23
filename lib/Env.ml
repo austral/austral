@@ -418,8 +418,8 @@ type instance_method_input = {
   }
 
 let make_ins_meth (id: ins_meth_id) (input: instance_method_input): ins_meth_rec =
-  let { instance_id; docstring; value_params; rt; body } = input in
-  InsMethRec { id; instance_id; docstring; value_params; rt; body }
+  let { instance_id; method_id; docstring; name; value_params; rt; body } = input in
+  InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body }
 
 let add_instance_method (env: env) (input: instance_method_input): (env * ins_meth_id) =
   let (Env { files; mods; methods; decls }) = env in
