@@ -116,9 +116,14 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
      (match def with
       | ConcreteInstanceDef (ConcreteInstance (name', typarams', argument', methods, _)) ->
          if (name = name') && (typarams = typarams') && (argument = argument') then
-           let qname = make_qname name' in
+           (* Instance names might refer to an imported typeclass, so we have to
+              qualify them. Since we're parsing a public declaration, which
+              means the instance (and thus the name of the typeclass) appears in
+              the interface file, we use the interface imports for
+              qualification. *)
+           let qname = qualify_identifier ii name in
            CInstance (VisPublic,
-                      name,
+                      qname,
                       name_typarams typarams qname,
                       qualify_typespec ii argument,
                       parse_method_defs bi methods,
@@ -183,9 +188,13 @@ let private_def module_name im def =
                  parse_method_decls im methods,
                  docstring)
   | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
-     let qname = make_qname name in
+     (* Instance names might refer to an imported typeclass, so we have to
+        qualify them. Since we're parsing a private declaration, which means the
+        instance (and thus the name of the typeclass) appears in the body file,
+        we can use the body imports for qualification. *)
+     let qname = qualify_identifier im name in
      CInstance (VisPrivate,
-                name,
+                qname,
                 name_typarams typarams qname,
                 qualify_typespec im argument,
                 parse_method_defs im methods,
