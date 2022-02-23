@@ -38,6 +38,7 @@ let rec extract (env: env) (cmodule: combined_module): env =
            body_file;
            body_docstring;
            decls;
+           _
       }) = cmodule in
   (* Add the module to the environment. *)
   let input: mod_input = {
