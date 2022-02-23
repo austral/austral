@@ -28,7 +28,17 @@ and extract_type_signatures' (def: combined_definition): type_signature option =
      None
 
 let rec extract (env: env) (cmodule: combined_module): env =
-  let (CombinedModule { name; kind; interface_imports; body_imports; decls }) = cmodule in
+  let (CombinedModule {
+           name;
+           kind;
+           interface_file;
+           interface_docstring;
+           interface_imports;
+           body_file;
+           body_docstring;
+           body_imports;
+           decls
+      }) = cmodule in
   (* Add the module to the environment. *)
   let input: mod_input = {
       name = name;
