@@ -35,9 +35,7 @@ let rec extract (env: env) (cmodule: combined_module): env =
       docstring = docstring;
       interface_file = ifile;
       body_file = bfile;
-      is_unsafe = (match kind with
-                   | SafeModule -> false
-                   | UnsafeModule -> true)
+      kind = kind;
     }
   in
   let sigs: type_signature list = extract_type_signatures cmodule in
