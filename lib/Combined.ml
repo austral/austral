@@ -3,15 +3,12 @@ open Common
 open Imports
 open Ast
 open Type
-open Env
 
 type combined_module = CombinedModule of {
       name: module_name;
       kind: module_kind;
-      interface_file: file_id;
       interface_docstring: docstring;
       interface_imports: import_map;
-      body_file: file_id;
       body_docstring: docstring;
       body_imports: import_map;
       decls: combined_definition list;

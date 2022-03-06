@@ -12,5 +12,5 @@ val match_decls : module_name -> import_map -> import_map -> concrete_decl -> co
 val private_def : module_name -> import_map -> concrete_def -> combined_definition
 
 (** Combine a concrete module interface and a concrete module body into a
-    combined module. We have to pass the file IDs of the interface and body. *)
-val combine : env -> concrete_module_interface -> concrete_module_body -> file_id -> file_id -> combined_module
+    combined module. *)
+val combine : env -> concrete_module_interface -> concrete_module_body -> combined_module

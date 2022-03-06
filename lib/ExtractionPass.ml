@@ -27,13 +27,11 @@ and extract_type_signatures' (def: combined_definition): type_signature option =
   | CInstance _ ->
      None
 
-let rec extract (env: env) (cmodule: combined_module): env =
+let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) (body_file: file_id): env =
   let (CombinedModule {
            name;
            kind;
-           interface_file;
            interface_docstring;
-           body_file;
            body_docstring;
            decls;
            _

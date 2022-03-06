@@ -7,4 +7,4 @@ open Env
 val extract_type_signatures : combined_module -> type_signature list
 
 (** Extract a combined module's declarations and put them in the environment. *)
-val extract : env -> combined_module -> env
+val extract : env -> combined_module -> file_id -> file_id -> env
