@@ -14,16 +14,17 @@ open Type
 open Error
 open Util
 open Imports
+open Combined
 open Filename
 
-let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import): concrete_module_interface =
+let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import_list): concrete_module_interface =
   let (ConcreteModuleInterface (mn, docstring, imports, decls)) = ci in
   if equal_module_name mn pervasive_module_name then
     ci
   else
     ConcreteModuleInterface (mn, docstring, import :: imports, decls)
 
-let append_import_to_body (cb: concrete_module_body) (import: concrete_import): concrete_module_body =
+let append_import_to_body (cb: concrete_module_body) (import: concrete_import_list): concrete_module_body =
   let (ConcreteModuleBody (mn, kind, docstring, imports, decls)) = cb in
   if equal_module_name mn pervasive_module_name then
     cb
@@ -104,20 +105,20 @@ let entrypoint_code mn i =
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in
-  check_entrypoint_validity (cmenv c) qi;
+  check_entrypoint_validity (cenv c) qi;
   let (Compiler (m, c)) = c in
   Compiler (m, c ^ "\n" ^ (entrypoint_code mn i))
 
 let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
 
-let empty_compiler =
+let empty_compiler: compiler =
   (* Add the main prelude. Then compile the Austral.Pervasive module. *Then* add
      the source code of the FFI module. This is because the FFI module uses the
      Option type, which is defined in the Austral.Pervasive module and has to be
      compiled first. *)
-  let menv = put_module empty_menv memory_module in
-  let c = Compiler (menv, prelude) in
+  let env: env = add_memory_module empty_env in
+  let c = Compiler (env, prelude) in
   let c =
     (* Handle errors during the compilation of the Austral,Pervasive
        module. Otherwise, a typo in the source code of this module will cause a

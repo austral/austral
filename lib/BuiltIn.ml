@@ -1,7 +1,7 @@
 open Identifier
 open Type
 open Cst
-open Semantic
+open Env
 
 (* Austral.Pervasive *)
 
@@ -47,7 +47,27 @@ let memory_module_name = make_mod_name "Austral.Memory"
 
 let pointer_type_name = make_ident "Pointer"
 
-let memory_module =
+let is_pointer_type (name: qident): bool =
+  let s = source_module_name name
+  and o = original_name name
+  in
+  (equal_module_name s memory_module_name) && (equal_identifier o pointer_type_name)
+
+let add_memory_module (env: env): env =
+  (* Add fake files for the module source *)
+  let (env, int_file_id) = add_file env { path = ""; contents = "" } in
+  let (env, body_file_id) = add_file env { path = ""; contents = "" } in
+  (* Add module *)
+  let (env, mod_id) = add_module env {
+                          name = memory_module_name;
+                          interface_file = int_file_id;
+                          interface_docstring = Docstring "";
+                          body_file = body_file_id;
+                          body_docstring = Docstring "";
+                          kind = UnsafeModule;
+                        }
+  in
+  (* Utilities *)
   let i = make_ident
   and size_t = Integer (Unsigned, Width64)
   in
@@ -56,218 +76,253 @@ let memory_module =
   in
   let pointer_t name = RawPointer (type_t name)
   in
-  let pointer_type_def =
-    (* type Pointer[T: Type]: Free is Unit *)
-    STypeAliasDefinition (
-        TypeVisOpaque,
-        pointer_type_name,
-        typarams (make_qident (memory_module_name, pointer_type_name, pointer_type_name)),
-        FreeUniverse,
-        Unit
-      )
+  (* Add declarations *)
+  (* type Pointer[T: Type]: Free is Unit *)
+  let (env, _) = add_type_alias env
+                   {
+                     mod_id = mod_id;
+                     vis = TypeVisOpaque;
+                     name = pointer_type_name;
+                     docstring = Docstring "";
+                     typarams = typarams (make_qident (memory_module_name, pointer_type_name, pointer_type_name));
+                     universe = FreeUniverse;
+                     def = Unit;
+                   }
   in
-  let allocate_def =
-    let name = i "Allocate" in
-    let qname = make_qident (memory_module_name, name, name) in
+  let (env, _) =
     (* generic T: Type
        function Allocate(value: T): Optional[Pointer[T]] *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [ValueParameter (i "value", type_t qname)],
-        NamedType (option_type_qname, [pointer_t qname], FreeUniverse),
-        None
-      )
-  and load_def =
-    let name = i "Load" in
+    let name = i "Allocate" in
     let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = typarams qname;
+        value_params = [ValueParameter (i "value", type_t qname)];
+        rt = NamedType (option_type_qname, [pointer_t qname], FreeUniverse);
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic T: Type
        function Load(pointer: Pointer[T]): T *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [ValueParameter (i "pointer", pointer_t qname)],
-        type_t qname,
-        None
-      )
-  and store_def =
-    let name = i "Store" in
+    let name = i "Load" in
     let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = typarams qname;
+        value_params = [ValueParameter (i "pointer", pointer_t qname)];
+        rt = type_t qname;
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic T: Type
        function Store(pointer: Pointer[T], value: T): Unit *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [ValueParameter (i "pointer", pointer_t qname); ValueParameter (i "value", type_t qname)],
-        Unit,
-        None
-      )
-  and deallocate_def =
-    let name = i "Deallocate" in
+    let name = i "Store" in
     let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = typarams qname;
+        value_params = [ValueParameter (i "pointer", pointer_t qname); ValueParameter (i "value", type_t qname)];
+        rt = Unit;
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic T: Type
        function Deallocate(pointer: Pointer[T]): Unit *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [ValueParameter (i "pointer", pointer_t qname)],
-        Unit,
-        None
-      )
-  and load_read_ref_def =
-    let name = i "Load_Read_Reference" in
+    let name = i "Deallocate" in
     let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = typarams qname;
+        value_params = [ValueParameter (i "pointer", pointer_t qname)];
+        rt = Unit;
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic [T: Free, R: Region]
        function Load_Read_Reference(ref: Reference[Pointer[T], R]): Reference[T, R] *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)],
-        [ValueParameter (i "ref", ReadRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
-        ReadRef (type_t qname, TyVar (TypeVariable (i "R", RegionUniverse, qname))),
-        None
-      )
-  and load_write_ref_def =
-    let name = i "Load_Write_Reference" in
+    let name = i "Load_Read_Reference" in
     let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)];
+        value_params = [ValueParameter (i "ref", ReadRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))))];
+        rt = ReadRef (type_t qname, TyVar (TypeVariable (i "R", RegionUniverse, qname)));
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic [T: Free, R: Region]
        function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R] *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)],
-        [ValueParameter (i "ref", WriteRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))))],
-        WriteRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))),
-        None
-      )
-  and allocate_array_def =
-    let name = i "Allocate_Array" in
+    let name = i "Load_Write_Reference" in
     let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = [TypeParameter(i "T", TypeUniverse, qname); TypeParameter (i "R", RegionUniverse, qname)];
+        value_params = [ValueParameter (i "ref", WriteRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname))))];
+        rt = WriteRef (RawPointer (type_t qname), TyVar (TypeVariable (i "R", RegionUniverse, qname)));
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic T: Type
        function Allocate_Array(size: Natural_64): Optional[Pointer[T]] *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [ValueParameter (i "size", Integer (Unsigned, Width64))],
-        NamedType (option_type_qname, [pointer_t qname], FreeUniverse),
-        None
-      )
-  and resize_array_def =
+    let name = i "Allocate_Array" in
+    let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = typarams qname;
+        value_params = [ValueParameter (i "size", Integer (Unsigned, Width64))];
+        rt = NamedType (option_type_qname, [pointer_t qname], FreeUniverse);
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
+    (* generic T: Type
+       function Resize_Array(array: Pointer[T], size: Natural_64): Optional[Pointer[T]] *)
     let name = i "Resize_Array" in
     let qname = make_qident (memory_module_name, name, name) in
-    (* generic T: Type
-       functpion Resize_Array(array: Pointer[T], size: Natural_64): Optional[Pointer[T]] *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [ValueParameter (i "array", pointer_t qname); ValueParameter (i "size", Integer (Unsigned, Width64))],
-        NamedType (option_type_qname, [pointer_t qname], FreeUniverse),
-        None
-      )
-  and memmove_def =
-    let name = i "memmove" in
-    let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = typarams qname;
+        value_params = [ValueParameter (i "array", pointer_t qname); ValueParameter (i "size", Integer (Unsigned, Width64))];
+        rt = NamedType (option_type_qname, [pointer_t qname], FreeUniverse);
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic [T: Type, U: Type]
        function memmove(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        [
+    let name = i "memmove" in
+    let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = [
           TypeParameter(i "T", TypeUniverse, qname);
           TypeParameter(i "U", TypeUniverse, qname)
-        ],
-        [
+        ];
+        value_params = [
           ValueParameter (i "source", RawPointer (TyVar (TypeVariable (i "T", TypeUniverse, qname))));
           ValueParameter (i "destination", RawPointer (TyVar (TypeVariable (i "U", TypeUniverse, qname))));
           ValueParameter (i "count", size_t)
-        ],
-        Unit,
-        None
-      )
-  and memcpy_def =
-    let name = i "memcpy" in
-    let qname = make_qident (memory_module_name, name, name) in
+        ];
+        rt = Unit;
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic [T: Type, U: Type]
        function memcpy(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        [
+    let name = i "memcpy" in
+    let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = [
           TypeParameter(i "T", TypeUniverse, qname);
           TypeParameter(i "U", TypeUniverse, qname)
-        ],
-        [
+        ];
+        value_params = [
           ValueParameter (i "source", RawPointer (TyVar (TypeVariable (i "T", TypeUniverse, qname))));
           ValueParameter (i "destination", RawPointer (TyVar (TypeVariable (i "U", TypeUniverse, qname))));
           ValueParameter (i "count", size_t)
-        ],
-        Unit,
-        None
-      )
-  and positive_offset_def =
-    let name = i "Positive_Offset" in
-    let qname = make_qident (memory_module_name, name, name) in
+        ];
+        rt = Unit;
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic T: Type
        functpion Positive_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T] *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [
+    let name = i "Positive_Offset" in
+    let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = typarams qname;
+        value_params = [
           ValueParameter (i "array", pointer_t qname);
           ValueParameter (i "offset", Integer (Unsigned, Width64))
-        ],
-        pointer_t qname,
-        None
-      )
-  and negative_offset_def =
-    let name = i "Negative_Offset" in
-    let qname = make_qident (memory_module_name, name, name) in
+        ];
+        rt = pointer_t qname;
+        external_name = None;
+        body = None;
+      }
+  in
+  let (env, _) =
     (* generic T: Type
        functpion Negative_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T] *)
-    SFunctionDeclaration (
-        VisPublic,
-        name,
-        typarams qname,
-        [
+    let name = i "Negative_Offset" in
+    let qname = make_qident (memory_module_name, name, name) in
+    add_function env
+      {
+        mod_id = mod_id;
+        vis = VisPublic;
+        name = name;
+        docstring = Docstring "";
+        typarams = typarams qname;
+        value_params = [
           ValueParameter (i "array", pointer_t qname);
           ValueParameter (i "offset", Integer (Unsigned, Width64))
-        ],
-        pointer_t qname,
-        None
-      )
+        ];
+        rt = pointer_t qname;
+        external_name = None;
+        body = None;
+      }
   in
-  let decls = [
-      pointer_type_def;
-      allocate_def;
-      load_def;
-      store_def;
-      deallocate_def;
-      load_read_ref_def;
-      load_write_ref_def;
-      allocate_array_def;
-      resize_array_def;
-      memmove_def;
-      memcpy_def;
-      positive_offset_def;
-      negative_offset_def
-    ]
-  in
-  SemanticModule {
-      name = memory_module_name;
-      decls = decls;
-      imported_classes = [];
-      imported_instances = []
-    }
-
-let is_pointer_type (name: qident): bool =
-  let s = source_module_name name
-  and o = original_name name
-  in
-  (equal_module_name s memory_module_name) && (equal_identifier o pointer_type_name)
+  env
