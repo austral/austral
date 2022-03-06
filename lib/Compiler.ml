@@ -46,18 +46,20 @@ type module_source = ModuleSource of {
     }
 
 let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; body_code }) =
+  let env: env = cenv c in
+  let (env, int_file_id) = add_file env { path = int_filename; contents = int_code } in
+  let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
   let ci: concrete_module_interface = parse_module_int int_code int_filename
   and cb: concrete_module_body = parse_module_body body_code body_filename
-  and env: env = cenv c in
-  let ci': concrete_module_interface = append_import_to_interface ci pervasive_imports
-  and cb': concrete_module_body = append_import_to_body cb pervasive_imports in
-  let combined: combined_module = combine env ci' cb' in
-  let env: env = extract env combined in
-  let menv' = put_module (cmenv c) semantic in
-  let typed = augment_module menv' combined in
+  in
+  let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
+  and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
+  let combined: combined_module = combine env ci cb in
+  let env: env = extract env combined int_file_id body_file_id in
+  let typed = augment_module env combined in
   let cpp = gen_module typed in
   let code = render_module cpp in
-  Compiler (menv', (compiler_code c) ^ "\n" ^ code)
+  Compiler (env, (compiler_code c) ^ "\n" ^ code)
 
 let rec compile_multiple c modules =
   match modules with
