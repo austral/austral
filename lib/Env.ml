@@ -562,7 +562,7 @@ type callable =
   | TypeAliasCallable of type_parameter list * universe * ty
   | RecordConstructor of type_parameter list * universe * typed_slot list
   | UnionConstructor of {
-      union_id: mod_id;
+      union_id: decl_id;
       type_params: type_parameter list;
       universe: universe;
       case: typed_case;
@@ -574,4 +574,37 @@ type callable =
     }
 
 let get_callable (env: env) (name: sident): callable option =
-  
+  match get_decl_by_name env name with
+  | Some decl ->
+     (match decl with
+      | TypeAlias { typarams; universe; def; _ } ->
+         Some (TypeAliasCallable (typarams, universe, def))
+      | Record { typarams; universe; slots; _ } ->
+         Some (RecordConstructor (typarams, universe, slots))
+      | UnionCase { name; union_id; slots; _ } ->
+         let (typarams, universe) =
+           (match get_decl_by_id env union_id with
+            | Some (Union { typarams; universe; _}) -> (typarams, universe)
+            | _ -> err "No union with ID")
+         in
+         Some (
+             UnionConstructor {
+                 union_id = union_id;
+                 type_params = typarams;
+                 universe = universe;
+                 case = TypedCase (name, slots)
+           })
+      | Function { typarams; value_params; rt; _ } ->
+         Some (FunctionCallable (typarams, value_params, rt))
+      | TypeClassMethod { typeclass_id; value_params; rt; _ } ->
+         Some (
+             MethodCallable {
+                 typeclass_id = typeclass_id;
+                 value_parameters = value_params;
+                 return_type = rt;
+               }
+           )
+      | _ ->
+         None)
+  | None ->
+     None

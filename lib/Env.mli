@@ -326,7 +326,7 @@ type callable =
   | TypeAliasCallable of type_parameter list * universe * ty
   | RecordConstructor of type_parameter list * universe * typed_slot list
   | UnionConstructor of {
-      union_id: mod_id;
+      union_id: decl_id;
       type_params: type_parameter list;
       universe: universe;
       case: typed_case;
