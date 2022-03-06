@@ -13,7 +13,6 @@ open Cst
 open Type
 open Error
 open Util
-open Imports
 open Combined
 open Filename
 
@@ -66,14 +65,14 @@ let rec compile_multiple c modules =
   | m::rest -> compile_multiple (compile_mod c m) rest
   | [] -> c
 
-let rec check_entrypoint_validity menv qi =
-  match get_decl menv qi with
+let rec check_entrypoint_validity (env: env) (qi: qident): unit =
+  match get_decl_by_name env (qident_to_sident qi) with
   | Some decl ->
      (match decl with
-      | SFunctionDeclaration (vis, _, typarams, params, rt, _) ->
+      | Function { vis; typarams; value_params; rt; _ } ->
          if vis = VisPublic then
            if typarams = [] then
-             match params with
+             match value_params with
              | [ValueParameter (_, pt)] ->
                 if is_root_cap_type pt then
                   if is_root_cap_type rt then
