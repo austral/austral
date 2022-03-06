@@ -7,7 +7,9 @@ open Type
 type combined_module = CombinedModule of {
       name: module_name;
       kind: module_kind;
+      interface_docstring: docstring;
       interface_imports: import_map;
+      body_docstring: docstring;
       body_imports: import_map;
       decls: combined_definition list;
     }
@@ -19,7 +21,7 @@ and combined_definition =
   | CUnion of type_vis * identifier * type_parameter list * universe * qcase list * docstring
   | CFunction of vis * identifier * type_parameter list * qparam list * qtypespec * astmt * docstring * pragma list
   | CTypeclass of vis * identifier * type_parameter * combined_method_decl list * docstring
-  | CInstance of vis * identifier * type_parameter list * qtypespec * combined_method_def list * docstring
+  | CInstance of vis * qident * type_parameter list * qtypespec * combined_method_def list * docstring
 
 and qslot = QualifiedSlot of identifier * qtypespec
 

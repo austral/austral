@@ -1,5 +1,5 @@
 open Identifier
-open ModuleSystem
+open Env
 open BuiltIn
 open Pervasive
 open CppPrelude
@@ -13,27 +13,29 @@ open Cst
 open Type
 open Error
 open Util
+open Combined
 open Filename
 
-let append_import_to_interface ci import =
-  let (ConcreteModuleInterface (mn, imports, decls)) = ci in
+let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import_list): concrete_module_interface =
+  let (ConcreteModuleInterface (mn, docstring, imports, decls)) = ci in
   if equal_module_name mn pervasive_module_name then
     ci
   else
-    ConcreteModuleInterface (mn, import :: imports, decls)
+    ConcreteModuleInterface (mn, docstring, import :: imports, decls)
 
-let append_import_to_body cb import =
-  let (ConcreteModuleBody (mn, kind, imports, decls)) = cb in
+let append_import_to_body (cb: concrete_module_body) (import: concrete_import_list): concrete_module_body =
+  let (ConcreteModuleBody (mn, kind, docstring, imports, decls)) = cb in
   if equal_module_name mn pervasive_module_name then
     cb
   else
-    ConcreteModuleBody (mn, kind, import :: imports, decls)
+    ConcreteModuleBody (mn, kind, docstring, import :: imports, decls)
 
-type compiler = Compiler of menv * string
+type compiler = Compiler of env * string
 
-let cmenv (Compiler (m, _)) = m
+(** Extract the env from the compiler. *)
+let cenv (Compiler (m, _)): env = m
 
-let compiler_code (Compiler (_, c)) = c
+let compiler_code (Compiler (_, c)): string = c
 
 type module_source = ModuleSource of {
       int_filename: string;
@@ -43,32 +45,34 @@ type module_source = ModuleSource of {
     }
 
 let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; body_code }) =
-  let ci = parse_module_int int_code int_filename
-  and cb = parse_module_body body_code body_filename
-  and menv = cmenv c in
-  let ci' = append_import_to_interface ci pervasive_imports
-  and cb' = append_import_to_body cb pervasive_imports in
-  let combined = combine menv ci' cb' in
-  let semantic = extract menv combined in
-  let menv' = put_module (cmenv c) semantic in
-  let typed = augment_module menv' combined in
+  let env: env = cenv c in
+  let (env, int_file_id) = add_file env { path = int_filename; contents = int_code } in
+  let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
+  let ci: concrete_module_interface = parse_module_int int_code int_filename
+  and cb: concrete_module_body = parse_module_body body_code body_filename
+  in
+  let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
+  and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
+  let combined: combined_module = combine env ci cb in
+  let env: env = extract env combined int_file_id body_file_id in
+  let typed = augment_module env combined in
   let cpp = gen_module typed in
   let code = render_module cpp in
-  Compiler (menv', (compiler_code c) ^ "\n" ^ code)
+  Compiler (env, (compiler_code c) ^ "\n" ^ code)
 
 let rec compile_multiple c modules =
   match modules with
   | m::rest -> compile_multiple (compile_mod c m) rest
   | [] -> c
 
-let rec check_entrypoint_validity menv qi =
-  match get_decl menv qi with
+let rec check_entrypoint_validity (env: env) (qi: qident): unit =
+  match get_decl_by_name env (qident_to_sident qi) with
   | Some decl ->
      (match decl with
-      | SFunctionDeclaration (vis, _, typarams, params, rt, _) ->
+      | Function { vis; typarams; value_params; rt; _ } ->
          if vis = VisPublic then
            if typarams = [] then
-             match params with
+             match value_params with
              | [ValueParameter (_, pt)] ->
                 if is_root_cap_type pt then
                   if is_root_cap_type rt then
@@ -102,20 +106,20 @@ let entrypoint_code mn i =
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in
-  check_entrypoint_validity (cmenv c) qi;
+  check_entrypoint_validity (cenv c) qi;
   let (Compiler (m, c)) = c in
   Compiler (m, c ^ "\n" ^ (entrypoint_code mn i))
 
 let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
 
-let empty_compiler =
+let empty_compiler: compiler =
   (* Add the main prelude. Then compile the Austral.Pervasive module. *Then* add
      the source code of the FFI module. This is because the FFI module uses the
      Option type, which is defined in the Austral.Pervasive module and has to be
      compiled first. *)
-  let menv = put_module empty_menv memory_module in
-  let c = Compiler (menv, prelude) in
+  let env: env = add_memory_module empty_env in
+  let c = Compiler (env, prelude) in
   let c =
     (* Handle errors during the compilation of the Austral,Pervasive
        module. Otherwise, a typo in the source code of this module will cause a

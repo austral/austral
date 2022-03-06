@@ -16,7 +16,7 @@ and typed_decl =
   | TFunction of vis * identifier * type_parameter list * value_parameter list * ty * tstmt * docstring
   | TForeignFunction of vis * identifier * value_parameter list * ty * string * docstring
   | TTypeClass of vis * identifier * type_parameter * typed_method_decl list * docstring
-  | TInstance of vis * identifier * type_parameter list * ty * typed_method_def list * docstring
+  | TInstance of vis * qident * type_parameter list * ty * typed_method_def list * docstring
 
 and typed_method_decl =
   TypedMethodDecl of identifier * value_parameter list * ty

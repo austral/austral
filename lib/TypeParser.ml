@@ -3,10 +3,30 @@ open Type
 open TypeSystem
 open Region
 open Ast
-open ModuleSystem
+open Env
 open BuiltIn
-open Semantic
 open Error
+
+let decl_type_signature (decl: decl): type_signature option =
+  match decl with
+  | Constant _ ->
+     None
+  | TypeAlias { name; typarams; universe; _ } ->
+     Some (TypeSignature (name, typarams, universe))
+  | Record { name; typarams; universe; _ } ->
+     Some (TypeSignature (name, typarams, universe))
+  | Union { name; typarams; universe; _ } ->
+     Some (TypeSignature (name, typarams, universe))
+  | UnionCase _ ->
+     None
+  | Function _ ->
+     None
+  | TypeClass _ ->
+     None
+  | TypeClassMethod _ ->
+     None
+  | Instance _ ->
+     None
 
 let parse_built_in_type (name: qident) (args: ty list): ty option =
   if is_pointer_type name then
@@ -117,6 +137,8 @@ let rec effective_universe name typarams declared_universe args =
        else
          FreeUniverse
 
+(** Given a list of types, check that all of them are either in the Free or
+    Region universes. *)
 and all_arguments_are_free (args: ty list): bool =
   let is_compatible_with_free = function
     | FreeUniverse ->
@@ -128,6 +150,8 @@ and all_arguments_are_free (args: ty list): bool =
   in
   List.for_all is_compatible_with_free (List.map type_universe args)
 
+(** Given a list of types, return whether any of them are in the Linear
+    universe. *)
 and any_arg_is_linear (args: ty list) =
   let is_linear = function
     | LinearUniverse -> true
@@ -135,6 +159,8 @@ and any_arg_is_linear (args: ty list) =
   in
   List.exists is_linear (List.map type_universe args)
 
+(** Given a list of types, return whether any of them are in the Type
+    universe. *)
 and any_arg_is_type (args: ty list) =
   let is_type = function
     | TypeUniverse -> true
@@ -144,27 +170,27 @@ and any_arg_is_type (args: ty list) =
 
 (* Type signature retrieval *)
 
-let get_type_signature menv sigs name =
+let get_type_signature (env: env) (sigs: type_signature list) (name: qident) =
   let get_local_type_signature (sigs: type_signature list) (name: qident): type_signature option =
     List.find_opt (fun (TypeSignature (n, _, _)) -> n = (local_name name)) sigs
 
-  and get_foreign_type_signature (menv: menv) (name: qident): type_signature option =
-    match get_decl menv name with
+  and get_foreign_type_signature (env: env) (name: qident): type_signature option =
+    match get_decl_by_name env (qident_to_sident name) with
     | (Some decl) ->
        decl_type_signature decl
     | None ->
-     None
+       None
   in
   match get_local_type_signature sigs name with
   | (Some ts) ->
      Some ts
   | None ->
-     get_foreign_type_signature menv name
+     get_foreign_type_signature env name
 
 (* Parsing *)
 
-let rec parse_type (menv: menv) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
-  let args' = List.map (parse_type menv sigs rm typarams) args in
+let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
+  let args' = List.map (parse_type env sigs rm typarams) args in
   match parse_built_in_type name args' with
   | Some ty ->
      ty
@@ -177,7 +203,7 @@ let rec parse_type (menv: menv) (sigs: type_signature list) (rm: region_map) (ty
           | Some ty ->
              ty
           | None ->
-             parse_user_defined_type menv sigs name args'))
+             parse_user_defined_type env sigs name args'))
 
 (* Is the given name a type parameter in the list of type paramters? If so,
    return it as a type variable. *)
@@ -197,8 +223,8 @@ and is_region (rm: region_map) (name: qident): ty option =
   | (Some r) -> Some (RegionTy r)
   | None -> None
 
-and parse_user_defined_type (menv: menv) (sigs: type_signature list) (name: qident) (args: ty list): ty =
-  match get_type_signature menv sigs name with
+and parse_user_defined_type (env: env) (sigs: type_signature list) (name: qident) (args: ty list): ty =
+  match get_type_signature env sigs name with
   | Some ts ->
      parse_user_defined_type' ts name args
   | None ->

@@ -8,22 +8,93 @@ open TypeVarSet
 open TypeParser
 open Region
 open LexEnv
-open ModuleSystem
+open Env
 open Ast
 open Tast
 open Combined
-open Semantic
 open Linearity
 open Util
 open Error
 
+let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): decl =
+  let _ = source_module_name in
+  (* This comment describes the process of finding an instance of the typeclass
+     given the argument list.
+
+     Suppose we have a typeclass:
+
+         interface Printable(T: Free) is
+             method Print(t: T): Unit;
+         end;
+
+     And an instance:
+
+         implementation Printable(Integer_32) is
+             method Print(t: Integer_32) is
+                 ...
+             end;
+         end;
+
+     Then, if we have a call like `Print(30)`, we know which typeclass it's
+     coming from, because the method name `Print` points to the typeclass. As
+     part of the type matching process, we match the parameter list from the
+     typeclass against the argument list in the method call, and get a set of
+     bindings that maps `T` to `Integer_32`.
+
+     We ask the binding map for the value of the binding with the name of the
+     typeclass parameter. In this case, the typeclass parameter is `T`, so we
+     get `Integer_32`. This is called the dispatch type. We then iterate over
+     all visible instances of this typeclass, and find one where the instance
+     argument matches the dispatch type.
+
+     Note: the types have to _match_, not be equal, that is, the matching
+     process produces bindings. This is important when finding generic
+     instances.
+
+         generic (U: Free)
+         implementation Printable(List[U]) is
+             method Print(t: List[U]) is
+                 ...
+             end;
+         end;
+
+     Here, a call like `print(listOfInts)` will yield a binding map that maps
+     `T` to `List[Integer_32]`. When we search the list of visible instances,
+     we'll find `List[U]`, and matching these types will produce another binding
+     map that maps `U` to `Integer_32`.
+
+     We use this second binding map to replace the variables in the dispatch
+     type: in our case, `List[U]` becomes `List[Integer_32]`. *)
+    let pred = function
+      | Instance { typeclass_id; argument; _ } ->
+         if equal_decl_id typeclass_id typeclass then
+           try
+             let _ = match_type argument dispatch_ty in
+             (* TODO: the rest of the process described above. *)
+             true
+           with
+             Austral_error _ ->
+             (* Does not match, just skip to the next instance, *)
+             false
+         else
+           false
+      | _ -> false
+    in
+    match (List.filter pred (visible_instances env)) with
+    | [a] ->
+       a
+    | _::_ ->
+       err "Overlapping typeclasses"
+    | [] ->
+       err "Typeclass resolution failed"
+
 (* Since the semantic extraction pass has already happened, we can simplify the
    call to `parse_type` by passing an empty list of local type signatures. *)
-let parse_typespec (menv: menv) (rm: region_map) (typarams: type_parameter list) (ty: qtypespec): ty =
-  parse_type menv [] rm typarams ty
+let parse_typespec (env: env) (rm: region_map) (typarams: type_parameter list) (ty: qtypespec): ty =
+  parse_type env [] rm typarams ty
 
-let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
-  let aug = augment_expr module_name menv rm typarams lexenv None in
+let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
+  let aug = augment_expr module_name env rm typarams lexenv None in
   match expr with
   | NilConstant ->
      TNilConstant
@@ -36,13 +107,13 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
   | StringConstant s ->
      TStringConstant s
   | Variable name ->
-     (match menv_get_var menv lexenv name with
+     (match get_variable env lexenv name with
       | Some ty ->
          TVariable (name, ty)
       | None ->
          err ("I can't find the variable named " ^ (ident_string (original_name name))))
   | FunctionCall (name, args) ->
-     augment_call module_name menv asserted_ty name (augment_arglist module_name menv rm typarams lexenv None args)
+     augment_call module_name env asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
   | ArithmeticExpression (op, lhs, rhs) ->
      let lhs' = aug lhs
      and rhs' = aug rhs in
@@ -114,7 +185,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
         | _ ->
            (false, None))
      in
-     let elems' = augment_path menv module_name rm typarams lexenv (get_type e') elems in
+     let elems' = augment_path env module_name rm typarams lexenv (get_type e') elems in
      let path_ty: ty = get_path_ty_from_elems elems' in
      let path_ty: ty =
        (* If the path starts in a reference it should end in one. *)
@@ -138,7 +209,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
        err ("Paths must end in the free universe: " ^ (show_ty path_ty))
   | Embed (ty, expr, args) ->
      TEmbed (
-         parse_typespec menv rm typarams ty,
+         parse_typespec env rm typarams ty,
          expr,
          List.map aug args
        )
@@ -201,9 +272,9 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
            err "Invalid type for numeric conversion.")
      in
 
-     let target_type = parse_typespec menv rm typarams ty in
+     let target_type = parse_typespec env rm typarams ty in
      (* By passing target_type as the asserted type we're doing point 4. *)
-     let expr' = augment_expr module_name menv rm typarams lexenv (Some target_type) expr in
+     let expr' = augment_expr module_name env rm typarams lexenv (Some target_type) expr in
      (* For 1 and 2: if the expression has an int or float type, and the type is
         an integer or float constant, do the conversion: *)
      if (is_int_or_float_type (get_type expr')) && (is_int_or_float_type target_type) then
@@ -226,7 +297,7 @@ let rec augment_expr (module_name: module_name) (menv: menv) (rm: region_map) (t
         | _ ->
            err "Bad conversion")
   | SizeOf ty ->
-     TSizeOf (parse_typespec menv rm typarams ty)
+     TSizeOf (parse_typespec env rm typarams ty)
 
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
@@ -249,53 +320,53 @@ and is_float_constant e =
   | FloatConstant _ -> true
   | _ -> false
 
-and augment_arglist (module_name: module_name) (menv: menv) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (asserted_ty: ty option) (args: abstract_arglist): typed_arglist =
-  let aug = augment_expr module_name menv rm typarams lexenv asserted_ty in
+and augment_arglist (module_name: module_name) (env: env) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (asserted_ty: ty option) (args: abstract_arglist): typed_arglist =
+  let aug = augment_expr module_name env rm typarams lexenv asserted_ty in
   match args with
   | Positional args' ->
      TPositionalArglist (List.map aug args')
   | Named pairs ->
      TNamedArglist (List.map (fun (n, v) -> (n, aug v)) pairs)
 
-and augment_path (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
+and augment_path (env: env) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
   | [elem] ->
-     [augment_path_elem menv module_name rm typarams lexenv head_ty elem]
+     [augment_path_elem env module_name rm typarams lexenv head_ty elem]
   | elem::rest ->
-     let elem' = augment_path_elem menv module_name rm typarams lexenv head_ty elem in
-     let rest' = augment_path menv module_name rm typarams lexenv (path_elem_type elem') rest in
+     let elem' = augment_path_elem env module_name rm typarams lexenv head_ty elem in
+     let rest' = augment_path env module_name rm typarams lexenv (path_elem_type elem') rest in
      elem' :: rest'
   | [] ->
      err "Path is empty"
 
-and augment_path_elem (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
+and augment_path_elem (env: env) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
   match elem with
   | SlotAccessor slot_name ->
      (match head_ty with
       | NamedType (name, args, _) ->
-         augment_slot_accessor_elem menv module_name slot_name name args
+         augment_slot_accessor_elem env module_name slot_name name args
       | _ ->
          err "Not a record type")
   | PointerSlotAccessor slot_name ->
      (match head_ty with
       | RawPointer pointed_to ->
-         augment_pointer_slot_accessor_elem menv module_name slot_name pointed_to
+         augment_pointer_slot_accessor_elem env module_name slot_name pointed_to
       | ReadRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem menv module_name slot_name name args
+             augment_reference_slot_accessor_elem env module_name slot_name name args
           | _ ->
              err "Not a record type")
       | WriteRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem menv module_name slot_name name args
+             augment_reference_slot_accessor_elem env module_name slot_name name args
           | _ ->
              err "Not a record type")
       | _ ->
          err "Not a record type")
   | ArrayIndex ie ->
-     let ie' = augment_expr module_name menv rm typarams lexenv None ie in
+     let ie' = augment_expr module_name env rm typarams lexenv None ie in
      (match head_ty with
       | Array (elem_ty, _) ->
          TArrayIndex (ie', elem_ty)
@@ -304,9 +375,9 @@ and augment_path_elem (menv: menv) (module_name: module_name) (rm: region_map) (
       | _ ->
          err "Array index operator doesn't work for this type.")
 
-and augment_slot_accessor_elem (menv: menv) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
+and augment_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
   (* Check: e' is a public record type *)
-  let (source_module, vis, typarams, slots) = get_record_definition menv type_name in
+  let (source_module, vis, typarams, slots) = get_record_definition env type_name in
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
@@ -316,11 +387,11 @@ and augment_slot_accessor_elem (menv: menv) (module_name: module_name) (slot_nam
   else
     err "Trying to read a slot from a non-public record"
 
-and augment_pointer_slot_accessor_elem (menv: menv) (module_name: module_name) (slot_name: identifier) (pointed_to: ty): typed_path_elem =
+and augment_pointer_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (pointed_to: ty): typed_path_elem =
   match pointed_to with
   | NamedType (type_name, type_args, _) ->
      (* Check arg is a public record *)
-     let (source_module, vis, typarams, slots) = get_record_definition menv type_name in
+     let (source_module, vis, typarams, slots) = get_record_definition env type_name in
      if (vis = TypeVisPublic) || (module_name = source_module) then
        (* Check: the given slot name must exist in this record type. *)
        let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
@@ -332,9 +403,9 @@ and augment_pointer_slot_accessor_elem (menv: menv) (module_name: module_name) (
   | _ ->
      err "Pointer does not point to a record type."
 
-and augment_reference_slot_accessor_elem (menv: menv) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
+and augment_reference_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
   (* Check: e' is a public record type *)
-  let (source_module, vis, typarams, slots) = get_record_definition menv type_name in
+  let (source_module, vis, typarams, slots) = get_record_definition env type_name in
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
@@ -344,9 +415,10 @@ and augment_reference_slot_accessor_elem (menv: menv) (module_name: module_name)
   else
     err "Trying to read a slot from a reference to a non-public record"
 
-and get_record_definition menv name =
-  match get_decl menv name with
-  | (Some (SRecordDefinition (mod_name, vis, _, typarams, _, slots))) ->
+and get_record_definition (env: env) (name: qident) =
+  match get_decl_by_name env (qident_to_sident name) with
+  | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
+     let mod_name: module_name = module_name_from_id env mod_id in
      (mod_name, vis, typarams, slots)
   | _ ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
@@ -356,14 +428,14 @@ and get_slot_with_name slots slot_name =
   | Some s -> s
   | None -> err "No slot with this name"
 
-and augment_call (module_name: module_name) (menv: menv) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
-  match get_callable menv module_name name with
+and augment_call (module_name: module_name) (env: env) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
+  match get_callable env module_name (qident_to_sident name) with
   | Some callable ->
-     augment_callable module_name menv name callable asserted_ty args
+     augment_callable module_name env name callable asserted_ty args
   | None ->
      err ("No callable with this name: " ^ (qident_debug_name name))
 
-and augment_callable (module_name: module_name) (menv: menv) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
+and augment_callable (module_name: module_name) (env: env) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
   match callable with
   | FunctionCallable (typarams, params, rt) ->
      augment_function_call name typarams params rt asserted_ty args
@@ -371,10 +443,23 @@ and augment_callable (module_name: module_name) (menv: menv) (name: qident) (cal
      augment_typealias_callable name typarams universe asserted_ty ty args
   | RecordConstructor (typarams, universe, slots) ->
      augment_record_constructor name typarams universe slots asserted_ty args
-  | UnionConstructor { type_name; type_params; universe; case } ->
+  | UnionConstructor { union_id; type_params; universe; case } ->
+     let type_name: qident = (match get_decl_by_id env union_id with
+                              | Some (Union { name; mod_id; _ }) ->
+                                 (* TODO: constructing a fake qident *)
+                                 make_qident (module_name_from_id env mod_id, name, name)
+                              | _ ->
+                                 err "Internal")
+     in
      augment_union_constructor type_name type_params universe case asserted_ty args
-  | MethodCallable { type_class_name; type_class_type_parameter; value_parameters; return_type; _ } ->
-     augment_method_call menv module_name type_class_name type_class_type_parameter name value_parameters return_type asserted_ty args
+  | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
+     let param = (match get_decl_by_id env typeclass_id with
+                  | Some (TypeClass { param; _ }) ->
+                     param
+                  | _ ->
+                     err "Internal")
+     in
+     augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args
 
 and augment_function_call name typarams params rt asserted_ty args =
   (* For simplicity, and to reduce duplication of code, we convert the argument
@@ -490,7 +575,7 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
     else
       err "Universe mismatch"
 
-and augment_method_call menv source_module_name type_class_name typaram callable_name params rt asserted_ty args =
+and augment_method_call (env: env) (source_module_name: module_name) (typeclass_id: decl_id) (typaram: type_parameter) (callable_name: qident) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
   (* At this point, we know the method's name and the typeclass it belongs
      to. We pull the parameter list from the typeclass, and compare that against
      the argument list. *)
@@ -509,82 +594,17 @@ and augment_method_call menv source_module_name type_class_name typaram callable
   let (TypeParameter (type_parameter_name, _, from)) = typaram in
   match get_binding bindings'' type_parameter_name from with
   | (Some dispatch_ty) ->
-     let instance = get_instance menv source_module_name dispatch_ty type_class_name in
+     let instance = get_instance env source_module_name dispatch_ty typeclass_id in
      let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables bindings'' t)) params in
      let arguments' = cast_arguments bindings'' params' arguments in
-     let (STypeClassInstance (_, _, typarams, _, _)) = instance in
+     let typarams = (match instance with
+                     | Instance { typarams; _ } -> typarams
+                     | _ -> err "Internal")
+     in
      let substs = make_substs bindings'' typarams in
      TMethodCall (callable_name, typarams, arguments', rt'', substs)
   | None ->
      err "Internal: couldn't extract dispatch type."
-
-and get_instance (menv: menv) (source_module_name: module_name) (dispatch_ty: ty) (type_class_name: qident): semantic_instance =
-  (* This comment describes the process of finding an instance of the typeclass
-     given the argument list.
-
-     Suppose we have a typeclass:
-
-         interface Printable(T: Free) is
-             method Print(t: T): Unit;
-         end;
-
-     And an instance:
-
-         implementation Printable(Integer_32) is
-             method Print(t: Integer_32) is
-                 ...
-             end;
-         end;
-
-     Then, if we have a call like `Print(30)`, we know which typeclass it's
-     coming from. As part of the type matching process, we match the parameter
-     list from the typeclass against the argument list in the method call, and
-     get a set of bindings that maps `T` to `Integer_32`.
-
-     We ask the binding map for the value of the binding with the name of the
-     typeclass parameter. In this case, the typeclass parameter is `T`, so we
-     get `Integer_32`. This is called the dispatch type. We then iterate over
-     all visible instances of this typeclass, and find one where the instance
-     argument matches the dispatch type.
-
-     Note: the types have to _match_, not be equal, that is, the matching
-     process produces bindings. This is important when finding generic
-     instances.
-
-         generic (U: Free)
-         implementation Printable(List[U]) is
-             method Print(t: List[U]) is
-                 ...
-             end;
-         end;
-
-     Here, a call like `print(listOfInts)` will yield a binding map that maps
-     `T` to `List[Integer_32]`. When we search the list of visible instances,
-     we'll find `List[U]`, and matching these types will produce another binding
-     map that maps `U` to `Integer_32`.
-
-     We use this second binding map to replace the variables in the dispatch
-     type: in our case, `List[U]` becomes `List[Integer_32]`. *)
-  let m = (match get_module menv source_module_name with
-           | (Some m) -> m
-           | None -> err "Internal: current module does not exist in the menv.") in
-  let finder (STypeClassInstance (_, name, _, arg, _)) =
-    if name = (original_name type_class_name) then
-      try
-        let _ = match_type arg dispatch_ty in
-        (* TODO: the rest of the process described above. *)
-        true
-      with
-        Austral_error _ ->
-        (* Does not match, just skip to the next instance, *)
-        false
-    else
-      false
-  in
-  match List.find_opt finder (visible_instances m) with
-  | (Some i) -> i
-  | None -> err "No instance for this method call"
-
 
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
@@ -703,7 +723,7 @@ let is_compatible_with_size_type = function
   | e ->
      (get_type e) = size_type
 
-type stmt_ctx = module_name * menv * region_map * type_parameter list * lexenv * ty
+type stmt_ctx = module_name * env * region_map * type_parameter list * lexenv * ty
 
 let update_lexenv (mn, menv, rm, typarams, _, rt) lexenv =
   (mn, menv, rm, typarams, lexenv, rt)
@@ -712,15 +732,15 @@ let update_rm (mn, menv, _, typarams, lexenv, rt) rm =
   (mn, menv, rm, typarams, lexenv, rt)
 
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
-  let (module_name, menv, rm, typarams, lexenv, rt) = ctx in
+  let (module_name, env, rm, typarams, lexenv, rt) = ctx in
   match stmt with
   | ASkip span ->
      TSkip span
   | ALet (span, name, ty, value, body) ->
      adorn_error_with_span span
        (fun _ ->
-         let expected_ty = parse_typespec menv rm typarams ty in
-         let value' = augment_expr module_name menv rm typarams lexenv (Some expected_ty) value in
+         let expected_ty = parse_typespec env rm typarams ty in
+         let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
          let bindings = match_type_with_value expected_ty value' in
          let ty = replace_variables bindings expected_ty in
          let lexenv' = push_var lexenv name ty in
@@ -729,12 +749,12 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | ADestructure (span, bindings, value, body) ->
      adorn_error_with_span span
        (fun _ ->
-         let value' = augment_expr module_name menv rm typarams lexenv None value in
+         let value' = augment_expr module_name env rm typarams lexenv None value in
          (* Check: the value must be a public record type *)
          let rec_ty = get_type value' in
          (match rec_ty with
           | (NamedType (name, _, u)) ->
-             let (source_module, vis, typarams, slots) = get_record_definition menv name in
+             let (source_module, vis, typarams, slots) = get_record_definition env name in
              let orig_type = NamedType (
                                  make_qident (source_module, original_name name, original_name name),
                                  List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams,
@@ -748,7 +768,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
                if ident_set_eq binding_names slot_names then
                  let bindings' = group_bindings_slots bindings slots in
-                 let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
+                 let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual)) bindings' in
                  let newvars = List.map (fun (n, ty, actual) ->
                                    let _ = match_type ty actual in
                                    (n, ty))
@@ -772,8 +792,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
        (fun _ ->
          (match get_var lexenv var with
           | Some var_ty ->
-             let elems = augment_lvalue_path menv module_name rm typarams lexenv var_ty elems in
-             let value = augment_expr module_name menv rm typarams lexenv None value in
+             let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
+             let value = augment_expr module_name env rm typarams lexenv None value in
              let path = TPath {
                             head = value;
                             elems = elems;
@@ -790,7 +810,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | AIf (span, c, t, f) ->
      adorn_error_with_span span
        (fun _ ->
-         let c' = augment_expr module_name menv rm typarams lexenv None c in
+         let c' = augment_expr module_name env rm typarams lexenv None c in
          if is_boolean (get_type c') then
            TIf (span, c', augment_stmt ctx t, augment_stmt ctx f)
          else
@@ -805,11 +825,11 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       *)
      adorn_error_with_span span
        (fun _ ->
-         let expr' = augment_expr module_name menv rm typarams lexenv None expr in
+         let expr' = augment_expr module_name env rm typarams lexenv None expr in
          let ty = get_type expr' in
-         let (union_ty, cases) = get_union_type_definition module_name menv (get_type expr') in
+         let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
          let typebindings = match_type union_ty ty in
-         let case_names = List.map (fun (TypedCase (n, _)) -> n) cases in
+         let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
          let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
          if ident_set_eq case_names when_names then
            (* Group the cases and whens *)
@@ -821,7 +841,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | AWhile (span, c, body) ->
      adorn_error_with_span span
        (fun _ ->
-         let c' = augment_expr module_name menv rm typarams lexenv None c in
+         let c' = augment_expr module_name env rm typarams lexenv None c in
          if is_boolean (get_type c') then
            TWhile (span, c', augment_stmt ctx body)
          else
@@ -829,8 +849,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | AFor { span; name; initial; final; body; } ->
      adorn_error_with_span span
        (fun _ ->
-         let i' = augment_expr module_name menv rm typarams lexenv None initial
-         and f' = augment_expr module_name menv rm typarams lexenv None final in
+         let i' = augment_expr module_name env rm typarams lexenv None initial
+         and f' = augment_expr module_name env rm typarams lexenv None final in
          if is_compatible_with_size_type i' then
            if is_compatible_with_size_type f' then
              let lexenv' = push_var lexenv name size_type in
@@ -880,7 +900,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | ADiscarding (span, e) ->
      adorn_error_with_span span
        (fun _ ->
-         let e' = augment_expr module_name menv rm typarams lexenv None e in
+         let e' = augment_expr module_name env rm typarams lexenv None e in
          let u = type_universe (get_type e') in
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
            err "Discarding a linear value"
@@ -889,43 +909,43 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   | AReturn (span, e) ->
      adorn_error_with_span span
        (fun _ ->
-         let e' = augment_expr module_name menv rm typarams lexenv None e in
+         let e' = augment_expr module_name env rm typarams lexenv None e in
          let _ = match_type_with_value rt e' in
          TReturn (span, e'))
 
-and augment_lvalue_path (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
+and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
   | [elem] ->
-     [augment_lvalue_path_elem menv module_name rm typarams lexenv head_ty elem]
+     [augment_lvalue_path_elem env module_name rm typarams lexenv head_ty elem]
   | elem::rest ->
-     let elem' = augment_lvalue_path_elem menv module_name rm typarams lexenv head_ty elem in
-     let rest' = augment_lvalue_path menv module_name rm typarams lexenv (path_elem_type elem') rest in
+     let elem' = augment_lvalue_path_elem env module_name rm typarams lexenv head_ty elem in
+     let rest' = augment_lvalue_path env module_name rm typarams lexenv (path_elem_type elem') rest in
      elem' :: rest'
   | [] ->
      err "Path is empty"
 
-and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
+and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
   match elem with
   | SlotAccessor slot_name ->
      (match head_ty with
       | NamedType (name, args, _) ->
-         augment_slot_accessor_elem menv module_name slot_name name args
+         augment_slot_accessor_elem env module_name slot_name name args
       | _ ->
          err "Not a record type")
   | PointerSlotAccessor slot_name ->
      (match head_ty with
       | RawPointer pointed_to ->
-         augment_pointer_slot_accessor_elem menv module_name slot_name pointed_to
+         augment_pointer_slot_accessor_elem env module_name slot_name pointed_to
       | WriteRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem menv module_name slot_name name args
+             augment_reference_slot_accessor_elem env module_name slot_name name args
           | _ ->
              err "Not a record type")
       | _ ->
          err "Not a record type")
   | ArrayIndex ie ->
-     let ie' = augment_expr module_name menv rm typarams lexenv None ie in
+     let ie' = augment_expr module_name env rm typarams lexenv None ie in
      (match head_ty with
       | RawPointer elem_ty ->
          TArrayIndex (ie', elem_ty)
@@ -939,24 +959,30 @@ and augment_lvalue_path_elem (menv: menv) (module_name: module_name) (rm: region
          err "Array index operator doesn't work for this type.")
 
 
-and get_union_type_definition (importing_module: module_name) (menv: menv) (ty: ty) =
-  let name = (match ty with
-              | NamedType (n, _, _) ->
-                 n
-              | _ ->
-                 err "Not a named type") in
-  match get_decl menv name with
-  | (Some (SUnionDefinition (module_name, vis, name, typarams, universe, cases))) ->
+and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty): (ty * decl list) =
+  let name: qident = (match ty with
+                      | NamedType (n, _, _) ->
+                         n
+                      | _ ->
+                         err "Not a named type") in
+  match get_decl_by_name env (qident_to_sident name) with
+  | Some (Union { id; vis; name; mod_id; typarams; universe; _ }) ->
+     let module_name = module_name_from_id env mod_id in
      if (vis = TypeVisPublic) || (importing_module = module_name) then
-       (NamedType (make_qident (module_name, name, name), List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams, universe),
-        cases)
+       let n = make_qident (module_name, name, name)
+       and args = List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams
+       in
+       let ty = NamedType (n, args, universe)
+       and cases = get_union_cases env id in
+       (ty, cases)
      else
        err "Union must be public or from the same module to be used in a case statement."
   | _ ->
      err "Not a union type"
 
-and group_cases_whens (cases: typed_case list) (whens: abstract_when list): (typed_case * abstract_when) list =
-  List.map (fun (TypedCase (n, s)) -> (TypedCase (n, s), List.find (fun (AbstractWhen (n', _, _)) -> n = n') whens)) cases
+and group_cases_whens (cases: decl list) (whens: abstract_when list): (typed_case * abstract_when) list =
+  List.map (fun (TypedCase (n, s)) -> (TypedCase (n, s), List.find (fun (AbstractWhen (n', _, _)) -> n = n') whens))
+    (List.map union_case_to_typed_case cases)
 
 and group_bindings_slots (bindings: (identifier * qtypespec) list) (slots: typed_slot list): (identifier * qtypespec * ty) list =
   List.map (fun (n, t) -> (n, t, let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> n = n') slots in ty')) bindings
@@ -1044,30 +1070,30 @@ and is_path_elem_constant = function
   | TArrayIndex (e, _) ->
      is_constant e
 
-let rec augment_decl (module_name: module_name) (kind: module_kind) (menv: menv) (decl: combined_definition): typed_decl =
+let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: combined_definition): typed_decl =
   match decl with
   | CConstant (vis, name, ts, expr, doc) ->
-     let ty = parse_typespec menv empty_region_map [] ts in
-     let expr' = augment_expr module_name menv empty_region_map [] empty_lexenv (Some ty) expr in
+     let ty = parse_typespec env empty_region_map [] ts in
+     let expr' = augment_expr module_name env empty_region_map [] empty_lexenv (Some ty) expr in
      let _ = match_type_with_value ty expr' in
      let _ = validate_constant_expression expr' in
      TConstant (vis, name, ty, expr', doc)
   | CTypeAlias (vis, name, typarams, universe, ts, doc) ->
      let rm = region_map_from_typarams typarams in
-     let ty = parse_typespec menv rm typarams ts in
+     let ty = parse_typespec env rm typarams ts in
      TTypeAlias (vis, name, typarams, universe, ty, doc)
   | CRecord (vis, name, typarams, universe, slots, doc) ->
      let rm = region_map_from_typarams typarams in
-     let slots' = augment_slots menv rm typarams slots in
+     let slots' = augment_slots env rm typarams slots in
      TRecord (vis, name, typarams, universe, slots', doc)
   | CUnion (vis, name, typarams, universe, cases, doc) ->
      let rm = region_map_from_typarams typarams in
-     let cases' = augment_cases menv rm typarams cases in
+     let cases' = augment_cases env rm typarams cases in
      TUnion (vis, name, typarams, universe, cases', doc)
   | CFunction (vis, name, typarams, params, rt, body, doc, pragmas) ->
      let rm = region_map_from_typarams typarams in
-     let params' = augment_params menv rm typarams params
-     and rt' = parse_typespec menv rm typarams rt in
+     let params' = augment_params env rm typarams params
+     and rt' = parse_typespec env rm typarams rt in
      (match pragmas with
       | [ForeignImportPragma s] ->
          if typarams = [] then
@@ -1078,20 +1104,20 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (menv: menv)
          else
            err "Foreign functions can't have type parameters."
       | [] ->
-         let ctx = (module_name, menv, rm, typarams, (lexenv_from_params params'), rt') in
+         let ctx = (module_name, env, rm, typarams, (lexenv_from_params params'), rt') in
          let body' = augment_stmt ctx body in
          TFunction (vis, name, typarams, params', rt', body', doc)
       | _ ->
          err "Invalid pragmas")
   | CTypeclass (vis, name, typaram, methods, doc) ->
      let rm = region_map_from_typarams [typaram] in
-     TTypeClass (vis, name, typaram, List.map (augment_method_decl menv rm typaram) methods, doc)
+     TTypeClass (vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)
   | CInstance (vis, name, typarams, arg, methods, doc) ->
      (* TODO: the universe of the type parameter matches the universe of the type argument *)
      (* TODO: Check the methods in the instance match the methods in the class *)
      let rm = region_map_from_typarams typarams in
-     let arg' = parse_typespec menv rm typarams arg in
-     TInstance (vis, name, typarams, arg', List.map (augment_method_def module_name menv rm typarams) methods, doc)
+     let arg' = parse_typespec env rm typarams arg in
+     TInstance (vis, name, typarams, arg', List.map (augment_method_def module_name env rm typarams) methods, doc)
 
 and augment_slots menv rm typarams slots =
   List.map (fun (QualifiedSlot (n, ts)) -> TypedSlot (n, parse_typespec menv rm typarams ts)) slots

@@ -5,7 +5,7 @@ open Type
 open AbstractionPass
 open Cst
 open Combined
-open ModuleSystem
+open Env
 open ImportResolution
 open Error
 
@@ -49,8 +49,6 @@ let parse_method_defs (imports: import_map) (methods: concrete_method_def list):
 let name_typarams (typarams: concrete_type_param list) (name: qident): type_parameter list =
   List.map (fun (ConcreteTypeParam (n, u)) -> TypeParameter (n, u, name)) typarams
 
-(* Given an interface declaration, and a body declaration, return the combined
-   declaration if they're the same, and fail otherwise. *)
 let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: concrete_def): combined_definition =
   let make_qname n =
     make_qident (module_name, n, n)
@@ -118,9 +116,14 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
      (match def with
       | ConcreteInstanceDef (ConcreteInstance (name', typarams', argument', methods, _)) ->
          if (name = name') && (typarams = typarams') && (argument = argument') then
-           let qname = make_qname name' in
+           (* Instance names might refer to an imported typeclass, so we have to
+              qualify them. Since we're parsing a public declaration, which
+              means the instance (and thus the name of the typeclass) appears in
+              the interface file, we use the interface imports for
+              qualification. *)
+           let qname = qualify_identifier ii name in
            CInstance (VisPublic,
-                      name,
+                      qname,
                       name_typarams typarams qname,
                       qualify_typespec ii argument,
                       parse_method_defs bi methods,
@@ -185,17 +188,21 @@ let private_def module_name im def =
                  parse_method_decls im methods,
                  docstring)
   | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
-     let qname = make_qname name in
+     (* Instance names might refer to an imported typeclass, so we have to
+        qualify them. Since we're parsing a private declaration, which means the
+        instance (and thus the name of the typeclass) appears in the body file,
+        we can use the body imports for qualification. *)
+     let qname = qualify_identifier im name in
      CInstance (VisPrivate,
-                name,
+                qname,
                 name_typarams typarams qname,
                 qualify_typespec im argument,
                 parse_method_defs im methods,
                 docstring)
 
-let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
-  let (ConcreteModuleInterface (mn, interface_imports, decls)) = cmi
-  and (ConcreteModuleBody (mn', kind, body_imports, defs)) = cmb
+let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
+  let (ConcreteModuleInterface (mn, interface_docstring, interface_imports, decls)) = cmi
+  and (ConcreteModuleBody (mn', kind, body_docstring, body_imports, defs)) = cmb
   in
   if mn <> mn' then
     err ("Interface and body have mismatching names: "
@@ -203,8 +210,8 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
          ^ " and "
          ^ (mod_name_string mn'))
   else
-    let im = resolve mn kind menv interface_imports
-    and bm = resolve mn kind menv body_imports
+    let im = resolve mn kind env interface_imports
+    and bm = resolve mn kind env body_imports
     in
     let public_decls = List.map (parse_decl mn im bm cmb) decls
     and private_decls = parse_defs mn cmi bm defs
@@ -212,7 +219,9 @@ let rec combine (menv: menv) (cmi: concrete_module_interface) (cmb: concrete_mod
     CombinedModule {
         name = mn;
         kind = kind;
+        interface_docstring = interface_docstring;
         interface_imports = im;
+        body_docstring = body_docstring;
         body_imports = bm;
         decls = List.concat [public_decls; private_decls];
       }

@@ -16,4 +16,5 @@ val get_decl : menv -> qident -> sem_decl option
 (* The second argument is the name of the module where typechecking is taking place. *)
 val get_callable : menv -> module_name -> qident -> callable option
 
+(** Get a variable either from a lexenv or from a constant. *)
 val menv_get_var : menv -> lexenv -> qident -> ty option

@@ -5,10 +5,10 @@ open Error
 open Span
 
 type concrete_module_interface =
-  ConcreteModuleInterface of module_name * concrete_import_list list * concrete_decl list
+  ConcreteModuleInterface of module_name * docstring * concrete_import_list list * concrete_decl list
 
 and concrete_module_body =
-  ConcreteModuleBody of module_name * module_kind * concrete_import_list list * concrete_def list
+  ConcreteModuleBody of module_name * module_kind * docstring * concrete_import_list list * concrete_def list
 
 and concrete_import_list =
   ConcreteImportList of module_name * concrete_import list
@@ -130,7 +130,7 @@ and concrete_path_elem =
 and concrete_lvalue =
   ConcreteLValue of identifier * concrete_path_elem list
 
-let make_module_body (name: module_name) (imports: concrete_import_list list) (pragmas: pragma list) (defs: concrete_def list) =
+let make_module_body (name: module_name) (imports: concrete_import_list list) (pragmas: pragma list) (defs: concrete_def list) (docstring: docstring) =
   let is_unsafe_module p =
     match p with
     | UnsafeModulePragma -> true
@@ -144,7 +144,7 @@ let make_module_body (name: module_name) (imports: concrete_import_list list) (p
   in
   let kind = kind_from_pragmas pragmas
   in
-  ConcreteModuleBody (name, kind, imports, defs)
+  ConcreteModuleBody (name, kind, docstring, imports, defs)
 
 let decl_name = function
   | ConcreteConstantDecl (n, _, _) -> Some n
@@ -165,7 +165,7 @@ let def_name = function
   | ConcreteTypeClassDef (ConcreteTypeClass (n, _, _, _)) -> Some n
   | ConcreteInstanceDef _ -> None
 
-let get_concrete_decl (ConcreteModuleInterface (_, _, decls)) name =
+let get_concrete_decl (ConcreteModuleInterface (_, _, _, decls)) name =
   let pred decl =
     match decl_name decl with
     | (Some name') ->
@@ -175,7 +175,7 @@ let get_concrete_decl (ConcreteModuleInterface (_, _, decls)) name =
   in
   List.find_opt pred decls
 
-let get_concrete_def (ConcreteModuleBody (_, _, _, defs)) name =
+let get_concrete_def (ConcreteModuleBody (_, _, _, _, defs)) name =
   let pred def =
     match def_name def with
     | (Some name') ->
@@ -185,7 +185,7 @@ let get_concrete_def (ConcreteModuleBody (_, _, _, defs)) name =
   in
   List.find_opt pred defs
 
-let has_instance_decl (ConcreteModuleInterface (_, _, decls)) (name: identifier) (typarams: concrete_type_param list) (ty: typespec): bool =
+let has_instance_decl (ConcreteModuleInterface (_, _, _, decls)) (name: identifier) (typarams: concrete_type_param list) (ty: typespec): bool =
   let pred = function
     | ConcreteInstanceDecl (name', typarams', ty', _) ->
        (name = name') && (typarams = typarams') && (ty = ty')
@@ -194,7 +194,7 @@ let has_instance_decl (ConcreteModuleInterface (_, _, decls)) (name: identifier)
   in
   List.exists pred decls
 
-let get_instance_def (ConcreteModuleBody (_, _, _, defs)) (name: identifier) (typarams: concrete_type_param list) (ty: typespec): concrete_instance option =
+let get_instance_def (ConcreteModuleBody (_, _, _, _, defs)) (name: identifier) (typarams: concrete_type_param list) (ty: typespec): concrete_instance option =
   let filter = function
     | ConcreteInstanceDef ci -> Some ci
     | _ -> None

@@ -136,17 +136,17 @@ standalone_identifier:
 /* Module interfaces and bodies */
 
 module_int:
-  | docstringopt imports=import_stmt* MODULE
+  | doc=docstringopt imports=import_stmt* MODULE
     name=module_name IS decls=interface_decl*
     END MODULE PERIOD EOF
-    { ConcreteModuleInterface (name, imports, decls) }
+    { ConcreteModuleInterface (name, doc, imports, decls) }
   ;
 
 module_body:
-  | docstringopt imports=import_stmt* MODULE BODY
+  | doc=docstringopt imports=import_stmt* MODULE BODY
     name=module_name IS pragmas=pragma* decls=body_decl*
     END MODULE BODY PERIOD EOF
-    { make_module_body name imports pragmas decls }
+    { make_module_body name imports pragmas decls doc }
   ;
 
 /* Imports */

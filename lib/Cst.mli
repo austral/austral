@@ -4,10 +4,10 @@ open Type
 open Span
 
 type concrete_module_interface =
-  ConcreteModuleInterface of module_name * concrete_import_list list * concrete_decl list
+  ConcreteModuleInterface of module_name * docstring * concrete_import_list list * concrete_decl list
 
 and concrete_module_body =
-  ConcreteModuleBody of module_name * module_kind * concrete_import_list list * concrete_def list
+  ConcreteModuleBody of module_name * module_kind * docstring * concrete_import_list list * concrete_def list
 
 and concrete_import_list =
   ConcreteImportList of module_name * concrete_import list
@@ -129,7 +129,8 @@ and concrete_path_elem =
 and concrete_lvalue =
   ConcreteLValue of identifier * concrete_path_elem list
 
-val make_module_body : module_name -> concrete_import_list list -> pragma list -> concrete_def list -> concrete_module_body
+(** Used by the parser to easily create a module body from its components and a list of pragmas. *)
+val make_module_body : module_name -> concrete_import_list list -> pragma list -> concrete_def list -> docstring -> concrete_module_body
 
 val decl_name : concrete_decl -> identifier option
 

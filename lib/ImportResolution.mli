@@ -1,8 +1,8 @@
 open Identifier
 open Common
-open ModuleSystem
 open Imports
 open Cst
+open Env
 
 (* Import resolution means taking a list of imports and resolving them to a map
    of nicknames to qualified identifiers.
@@ -31,4 +31,4 @@ open Cst
    The first argument is the name of the module we're importing into.
 
 *)
-val resolve : module_name -> module_kind -> menv -> concrete_import_list list -> import_map
+val resolve : module_name -> module_kind -> env -> concrete_import_list list -> import_map

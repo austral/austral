@@ -1,8 +1,4 @@
-open Imports
-open Cst
-open Ast
-
-(* In the abstraction pass, we:
+(** In the abstraction pass, we:
 
     1. Qualify identifiers.
     2. Qualify type specifiers.
@@ -10,6 +6,9 @@ open Ast
        under the let.
     4. Turn blocks from lists to pairs.
  *)
+open Imports
+open Cst
+open Ast
 
 val abs_stmt : import_map -> cstmt -> astmt
 
