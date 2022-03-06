@@ -34,7 +34,7 @@ and semantic_method_decl =
   SMethodDecl of identifier * value_parameter list * ty * tstmt option
 
 and callable =
-  | FunctionCallable of type_parameter list * value_parameter list * ty
+  | FunctionCallable of type_parameter list * value_p0arameter list * ty
   | TypeAliasCallable of type_parameter list * universe * ty
   | RecordConstructor of type_parameter list * universe * typed_slot list
   | UnionConstructor of {

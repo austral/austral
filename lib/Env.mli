@@ -311,3 +311,30 @@ val is_importable: decl -> bool
 
 (** Return the typeclass instances defined in a module. *)
 val module_instances: env -> mod_id -> decl list
+
+(** Return a module's name from its ID. *)
+val module_name_from_id : env -> mod_id -> module_name
+
+(** Return the list of cases of a union. *)
+val get_union_cases : env -> decl_id -> decl list
+
+val union_case_to_typed_case : decl -> typed_case
+
+(** Callable things. *)
+type callable =
+  | FunctionCallable of type_parameter list * value_parameter list * ty
+  | TypeAliasCallable of type_parameter list * universe * ty
+  | RecordConstructor of type_parameter list * universe * typed_slot list
+  | UnionConstructor of {
+      union_id: mod_id;
+      type_params: type_parameter list;
+      universe: universe;
+      case: typed_case;
+    }
+  | MethodCallable of {
+      typeclass_id: decl_id;
+      value_parameters: value_parameter list;
+      return_type: ty
+    }
+
+val get_callable : env -> sident -> callable option

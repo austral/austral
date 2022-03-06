@@ -533,3 +533,45 @@ let module_instances (env: env) (id: mod_id): decl list =
     | _ -> false
   in
   List.filter pred decls
+
+let module_name_from_id (env: env) (mod_id: mod_id): module_name =
+  match get_module_by_id env mod_id with
+  | Some (ModRec { name; _ }) ->
+     name
+  | _ ->
+     err "Internal error: no module with ID"
+
+let get_union_cases (env: env) (id: decl_id): decl list =
+  let (Env { decls; _ }) = env
+  and pred = function
+    | UnionCase { union_id; _ } ->
+       equal_decl_id union_id id
+    | _ -> false
+  in
+  List.filter pred decls
+
+let union_case_to_typed_case (decl: decl): typed_case =
+  match decl with
+  | UnionCase { name; slots; _ } ->
+     TypedCase (name, slots)
+  | _ ->
+     err "Internal: not a union case"
+
+type callable =
+  | FunctionCallable of type_parameter list * value_parameter list * ty
+  | TypeAliasCallable of type_parameter list * universe * ty
+  | RecordConstructor of type_parameter list * universe * typed_slot list
+  | UnionConstructor of {
+      union_id: mod_id;
+      type_params: type_parameter list;
+      universe: universe;
+      case: typed_case;
+    }
+  | MethodCallable of {
+      typeclass_id: decl_id;
+      value_parameters: value_parameter list;
+      return_type: ty
+    }
+
+let get_callable (env: env) (name: sident): callable option =
+  
