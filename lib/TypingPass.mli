@@ -4,6 +4,7 @@ open Env
 open Ast
 open Combined
 open Tast
+open Type
 
 (** Find an instance of the given typeclass given the dispatch type.
 
