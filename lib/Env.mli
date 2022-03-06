@@ -2,6 +2,7 @@ open Identifier
 open Common
 open Type
 open Tast
+open LexEnv
 
 (** A set of type parameters. *)
 type typarams = type_parameter list
@@ -338,3 +339,7 @@ type callable =
     }
 
 val get_callable : env -> sident -> callable option
+
+(** Get the type of a variable, trying first the lexenv and then the env for
+    constants. *)
+val get_variable : env -> lexenv -> qident -> ty option
