@@ -35,7 +35,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
   | StringConstant s ->
      TStringConstant s
   | Variable name ->
-     (match env_get_var env lexenv name with
+     (match get_variable env lexenv name with
       | Some ty ->
          TVariable (name, ty)
       | None ->
@@ -343,9 +343,10 @@ and augment_reference_slot_accessor_elem (env: env) (module_name: module_name) (
   else
     err "Trying to read a slot from a reference to a non-public record"
 
-and get_record_definition (menv: menv) (name: qiedent) =
-  match get_decl menv name with
-  | (Some (SRecordDefinition (mod_name, vis, _, typarams, _, slots))) ->
+and get_record_definition (env: env) (name: qident) =
+  match get_decl_by_name env (qident_to_sident name) with
+  | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
+     let mod_name: module_name = module_name_from_id env mod_id in
      (mod_name, vis, typarams, slots)
   | _ ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
@@ -356,7 +357,7 @@ and get_slot_with_name slots slot_name =
   | None -> err "No slot with this name"
 
 and augment_call (module_name: module_name) (env: env) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
-  match get_callable env module_name name with
+  match get_callable env module_name (qident_to_sident name) with
   | Some callable ->
      augment_callable module_name env name callable asserted_ty args
   | None ->
@@ -370,10 +371,23 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
      augment_typealias_callable name typarams universe asserted_ty ty args
   | RecordConstructor (typarams, universe, slots) ->
      augment_record_constructor name typarams universe slots asserted_ty args
-  | UnionConstructor { type_name; type_params; universe; case } ->
+  | UnionConstructor { union_id; type_params; universe; case } ->
+     let type_name: qident = (match get_decl_by_id env union_id with
+                              | Some (Union { name; mod_id; _ }) ->
+                                 (* TODO: constructing a fake qident *)
+                                 make_qident (module_name_from_id env mod_id, name, name)
+                              | _ ->
+                                 err "Internal")
+     in
      augment_union_constructor type_name type_params universe case asserted_ty args
-  | MethodCallable { type_class_name; type_class_type_parameter; value_parameters; return_type; _ } ->
-     augment_method_call menv module_name type_class_name type_class_type_parameter name value_parameters return_type asserted_ty args
+  | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
+     let param = (match get_decl_by_id env typeclass_id with
+                  | Some (TypeClass { param; _ }) ->
+                     param
+                  | _ ->
+                     err "Internal")
+     in
+     augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args
 
 and augment_function_call name typarams params rt asserted_ty args =
   (* For simplicity, and to reduce duplication of code, we convert the argument
@@ -489,7 +503,7 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
     else
       err "Universe mismatch"
 
-and augment_method_call menv source_module_name type_class_name typaram callable_name params rt asserted_ty args =
+and augment_method_call (env: env) (source_module_name: module_name) (typeclass_id: decl_id) (typaram: type_parameter) (callable_name: qident) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
   (* At this point, we know the method's name and the typeclass it belongs
      to. We pull the parameter list from the typeclass, and compare that against
      the argument list. *)
@@ -508,82 +522,17 @@ and augment_method_call menv source_module_name type_class_name typaram callable
   let (TypeParameter (type_parameter_name, _, from)) = typaram in
   match get_binding bindings'' type_parameter_name from with
   | (Some dispatch_ty) ->
-     let instance = get_instance menv source_module_name dispatch_ty type_class_name in
+     let instance = get_instance env source_module_name dispatch_ty typeclass_id in
      let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables bindings'' t)) params in
      let arguments' = cast_arguments bindings'' params' arguments in
-     let (STypeClassInstance (_, _, typarams, _, _)) = instance in
+     let typarams = (match instance with
+                     | Instance { typarams; _ } -> typarams
+                     | _ -> err "Internal")
+     in
      let substs = make_substs bindings'' typarams in
      TMethodCall (callable_name, typarams, arguments', rt'', substs)
   | None ->
      err "Internal: couldn't extract dispatch type."
-
-and get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (type_class_name: qident): decl =
-  (* This comment describes the process of finding an instance of the typeclass
-     given the argument list.
-
-     Suppose we have a typeclass:
-
-         interface Printable(T: Free) is
-             method Print(t: T): Unit;
-         end;
-
-     And an instance:
-
-         implementation Printable(Integer_32) is
-             method Print(t: Integer_32) is
-                 ...
-             end;
-         end;
-
-     Then, if we have a call like `Print(30)`, we know which typeclass it's
-     coming from. As part of the type matching process, we match the parameter
-     list from the typeclass against the argument list in the method call, and
-     get a set of bindings that maps `T` to `Integer_32`.
-
-     We ask the binding map for the value of the binding with the name of the
-     typeclass parameter. In this case, the typeclass parameter is `T`, so we
-     get `Integer_32`. This is called the dispatch type. We then iterate over
-     all visible instances of this typeclass, and find one where the instance
-     argument matches the dispatch type.
-
-     Note: the types have to _match_, not be equal, that is, the matching
-     process produces bindings. This is important when finding generic
-     instances.
-
-         generic (U: Free)
-         implementation Printable(List[U]) is
-             method Print(t: List[U]) is
-                 ...
-             end;
-         end;
-
-     Here, a call like `print(listOfInts)` will yield a binding map that maps
-     `T` to `List[Integer_32]`. When we search the list of visible instances,
-     we'll find `List[U]`, and matching these types will produce another binding
-     map that maps `U` to `Integer_32`.
-
-     We use this second binding map to replace the variables in the dispatch
-     type: in our case, `List[U]` becomes `List[Integer_32]`. *)
-  let m = (match get_module menv source_module_name with
-           | (Some m) -> m
-           | None -> err "Internal: current module does not exist in the menv.") in
-  let finder (STypeClassInstance (_, name, _, arg, _)) =
-    if name = (original_name type_class_name) then
-      try
-        let _ = match_type arg dispatch_ty in
-        (* TODO: the rest of the process described above. *)
-        true
-      with
-        Austral_error _ ->
-        (* Does not match, just skip to the next instance, *)
-        false
-    else
-      false
-  in
-  match List.find_opt finder (visible_instances m) with
-  | (Some i) -> i
-  | None -> err "No instance for this method call"
-
 
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
@@ -808,7 +757,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let ty = get_type expr' in
          let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
          let typebindings = match_type union_ty ty in
-         let case_names = List.map (fun (TypedCase (n, _)) -> n) cases in
+         let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
          let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
          if ident_set_eq case_names when_names then
            (* Group the cases and whens *)
@@ -1049,30 +998,30 @@ and is_path_elem_constant = function
   | TArrayIndex (e, _) ->
      is_constant e
 
-let rec augment_decl (module_name: module_name) (kind: module_kind) (menv: menv) (decl: combined_definition): typed_decl =
+let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: combined_definition): typed_decl =
   match decl with
   | CConstant (vis, name, ts, expr, doc) ->
-     let ty = parse_typespec menv empty_region_map [] ts in
-     let expr' = augment_expr module_name menv empty_region_map [] empty_lexenv (Some ty) expr in
+     let ty = parse_typespec env empty_region_map [] ts in
+     let expr' = augment_expr module_name env empty_region_map [] empty_lexenv (Some ty) expr in
      let _ = match_type_with_value ty expr' in
      let _ = validate_constant_expression expr' in
      TConstant (vis, name, ty, expr', doc)
   | CTypeAlias (vis, name, typarams, universe, ts, doc) ->
      let rm = region_map_from_typarams typarams in
-     let ty = parse_typespec menv rm typarams ts in
+     let ty = parse_typespec env rm typarams ts in
      TTypeAlias (vis, name, typarams, universe, ty, doc)
   | CRecord (vis, name, typarams, universe, slots, doc) ->
      let rm = region_map_from_typarams typarams in
-     let slots' = augment_slots menv rm typarams slots in
+     let slots' = augment_slots env rm typarams slots in
      TRecord (vis, name, typarams, universe, slots', doc)
   | CUnion (vis, name, typarams, universe, cases, doc) ->
      let rm = region_map_from_typarams typarams in
-     let cases' = augment_cases menv rm typarams cases in
+     let cases' = augment_cases env rm typarams cases in
      TUnion (vis, name, typarams, universe, cases', doc)
   | CFunction (vis, name, typarams, params, rt, body, doc, pragmas) ->
      let rm = region_map_from_typarams typarams in
-     let params' = augment_params menv rm typarams params
-     and rt' = parse_typespec menv rm typarams rt in
+     let params' = augment_params env rm typarams params
+     and rt' = parse_typespec env rm typarams rt in
      (match pragmas with
       | [ForeignImportPragma s] ->
          if typarams = [] then
@@ -1083,20 +1032,20 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (menv: menv)
          else
            err "Foreign functions can't have type parameters."
       | [] ->
-         let ctx = (module_name, menv, rm, typarams, (lexenv_from_params params'), rt') in
+         let ctx = (module_name, env, rm, typarams, (lexenv_from_params params'), rt') in
          let body' = augment_stmt ctx body in
          TFunction (vis, name, typarams, params', rt', body', doc)
       | _ ->
          err "Invalid pragmas")
   | CTypeclass (vis, name, typaram, methods, doc) ->
      let rm = region_map_from_typarams [typaram] in
-     TTypeClass (vis, name, typaram, List.map (augment_method_decl menv rm typaram) methods, doc)
+     TTypeClass (vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)
   | CInstance (vis, name, typarams, arg, methods, doc) ->
      (* TODO: the universe of the type parameter matches the universe of the type argument *)
      (* TODO: Check the methods in the instance match the methods in the class *)
      let rm = region_map_from_typarams typarams in
-     let arg' = parse_typespec menv rm typarams arg in
-     TInstance (vis, name, typarams, arg', List.map (augment_method_def module_name menv rm typarams) methods, doc)
+     let arg' = parse_typespec env rm typarams arg in
+     TInstance (vis, name, typarams, arg', List.map (augment_method_def module_name env rm typarams) methods, doc)
 
 and augment_slots menv rm typarams slots =
   List.map (fun (QualifiedSlot (n, ts)) -> TypedSlot (n, parse_typespec menv rm typarams ts)) slots

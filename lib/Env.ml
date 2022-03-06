@@ -1,6 +1,7 @@
 open Identifier
 open Common
 open Type
+open TypeMatch
 open Tast
 open LexEnv
 open Error
@@ -574,7 +575,8 @@ type callable =
       return_type: ty
     }
 
-let get_callable (env: env) (name: sident): callable option =
+let get_callable (env: env) (importing_module_name: module_name) (name: sident): callable option =
+  let _ = importing_module_name in 
   match get_decl_by_name env name with
   | Some decl ->
      (match decl with
@@ -624,3 +626,76 @@ let get_variable (env: env) (lexenv: lexenv) (name: qident): ty option =
              None)
       | None ->
          None)
+
+let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): decl =
+  let _ = source_module_name in
+  (* This comment describes the process of finding an instance of the typeclass
+     given the argument list.
+
+     Suppose we have a typeclass:
+
+         interface Printable(T: Free) is
+             method Print(t: T): Unit;
+         end;
+
+     And an instance:
+
+         implementation Printable(Integer_32) is
+             method Print(t: Integer_32) is
+                 ...
+             end;
+         end;
+
+     Then, if we have a call like `Print(30)`, we know which typeclass it's
+     coming from, because the method name `Print` points to the typeclass. As
+     part of the type matching process, we match the parameter list from the
+     typeclass against the argument list in the method call, and get a set of
+     bindings that maps `T` to `Integer_32`.
+
+     We ask the binding map for the value of the binding with the name of the
+     typeclass parameter. In this case, the typeclass parameter is `T`, so we
+     get `Integer_32`. This is called the dispatch type. We then iterate over
+     all visible instances of this typeclass, and find one where the instance
+     argument matches the dispatch type.
+
+     Note: the types have to _match_, not be equal, that is, the matching
+     process produces bindings. This is important when finding generic
+     instances.
+
+         generic (U: Free)
+         implementation Printable(List[U]) is
+             method Print(t: List[U]) is
+                 ...
+             end;
+         end;
+
+     Here, a call like `print(listOfInts)` will yield a binding map that maps
+     `T` to `List[Integer_32]`. When we search the list of visible instances,
+     we'll find `List[U]`, and matching these types will produce another binding
+     map that maps `U` to `Integer_32`.
+
+     We use this second binding map to replace the variables in the dispatch
+     type: in our case, `List[U]` becomes `List[Integer_32]`. *)
+    let (Env { decls; _ }) = env
+    and pred = function
+      | Instance { typeclass_id; argument; _ } ->
+         if equal_decl_id typeclass_id typeclass then
+           try
+             let _ = match_type argument dispatch_ty in
+             (* TODO: the rest of the process described above. *)
+             true
+           with
+             Austral_error _ ->
+             (* Does not match, just skip to the next instance, *)
+             false
+         else
+           false
+      | _ -> false
+    in
+    match (List.filter pred decls) with
+    | [a] ->
+       a
+    | _::_ ->
+       err "Overlapping typeclasses"
+    | [] ->
+       err "Typeclass resolution failed"

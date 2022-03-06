@@ -338,8 +338,20 @@ type callable =
       return_type: ty
     }
 
-val get_callable : env -> sident -> callable option
+(** Get a callable given its name and the name of the importing module. *)
+val get_callable : env -> module_name -> sident -> callable option
 
 (** Get the type of a variable, trying first the lexenv and then the env for
     constants. *)
 val get_variable : env -> lexenv -> qident -> ty option
+
+(** Return all typeclass instances visible from a module. These are not only the
+    instances that are defined in the module itself, but the instances imported
+    by the module. *)
+(*val visible_instances : env -> mod_id -> decl_id list*)
+
+(** Find an instance of the given typeclass given the dispatch type.
+
+Parameters are: environment, source module name, dispatch type, and ID of the
+typeclass. *)
+val get_instance : env -> module_name -> ty -> decl_id -> decl

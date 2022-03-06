@@ -1,5 +1,5 @@
 open Identifier
-open ModuleSystem
+open Env
 open BuiltIn
 open Pervasive
 open CppPrelude
@@ -13,27 +13,29 @@ open Cst
 open Type
 open Error
 open Util
+open Imports
 open Filename
 
-let append_import_to_interface ci import =
+let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import): concrete_module_interface =
   let (ConcreteModuleInterface (mn, docstring, imports, decls)) = ci in
   if equal_module_name mn pervasive_module_name then
     ci
   else
     ConcreteModuleInterface (mn, docstring, import :: imports, decls)
 
-let append_import_to_body cb import =
+let append_import_to_body (cb: concrete_module_body) (import: concrete_import): concrete_module_body =
   let (ConcreteModuleBody (mn, kind, docstring, imports, decls)) = cb in
   if equal_module_name mn pervasive_module_name then
     cb
   else
     ConcreteModuleBody (mn, kind, docstring, import :: imports, decls)
 
-type compiler = Compiler of menv * string
+type compiler = Compiler of env * string
 
-let cmenv (Compiler (m, _)) = m
+(** Extract the env from the compiler. *)
+let cenv (Compiler (m, _)): env = m
 
-let compiler_code (Compiler (_, c)) = c
+let compiler_code (Compiler (_, c)): string = c
 
 type module_source = ModuleSource of {
       int_filename: string;
@@ -43,13 +45,13 @@ type module_source = ModuleSource of {
     }
 
 let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; body_code }) =
-  let ci = parse_module_int int_code int_filename
-  and cb = parse_module_body body_code body_filename
-  and menv = cmenv c in
-  let ci' = append_import_to_interface ci pervasive_imports
-  and cb' = append_import_to_body cb pervasive_imports in
-  let combined = combine menv ci' cb' in
-  let semantic = extract menv combined in
+  let ci: concrete_module_interface = parse_module_int int_code int_filename
+  and cb: concrete_module_body = parse_module_body body_code body_filename
+  and env: env = cenv c in
+  let ci': concrete_module_interface = append_import_to_interface ci pervasive_imports
+  and cb': concrete_module_body = append_import_to_body cb pervasive_imports in
+  let combined: combined_module = combine env ci' cb' in
+  let env: env = extract env combined in
   let menv' = put_module (cmenv c) semantic in
   let typed = augment_module menv' combined in
   let cpp = gen_module typed in
