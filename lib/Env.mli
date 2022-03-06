@@ -348,4 +348,4 @@ val get_variable : env -> lexenv -> qident -> ty option
 (** Return all typeclass instances visible from a module. These are not only the
     instances that are defined in the module itself, but the instances imported
     by the module. *)
-val visible_instances : env -> decl_id list
+val visible_instances : env -> decl list
