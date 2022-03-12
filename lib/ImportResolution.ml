@@ -4,6 +4,7 @@ open Imports
 open Cst
 open BuiltIn
 open Error
+open Id
 open Env
 
 (** Represents an Austral import declaration, that is, in some code like:

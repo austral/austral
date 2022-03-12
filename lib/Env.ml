@@ -2,22 +2,11 @@ open Identifier
 open Common
 open Type
 open Tast
+open Id
 open LexEnv
 open Error
 
 type typarams = type_parameter list
-
-type file_id = FileId of int
-[@@deriving eq]
-
-type mod_id = ModId of int
-[@@deriving eq]
-
-type decl_id = DeclId of int
-[@@deriving eq]
-
-type ins_meth_id = InsMethId of int
-[@@deriving eq]
 
 type file_rec = FileRec of { id: file_id; path: string; contents: string }
 
@@ -150,36 +139,6 @@ type env = Env of {
       methods: ins_meth_env;
       decls: decl_env;
     }
-
-(* ID utilities *)
-
-let file_counter: int ref = ref 1
-
-let fresh_file_id _: file_id =
-  let id = !file_counter in
-  file_counter := id + 1;
-  FileId id
-
-let mod_counter: int ref = ref 1
-
-let fresh_mod_id _: mod_id =
-  let id = !mod_counter in
-  mod_counter := id + 1;
-  ModId id
-
-let decl_counter: int ref = ref 1
-
-let fresh_decl_id _: decl_id =
-  let id = !decl_counter in
-  decl_counter := id + 1;
-  DeclId id
-
-let ins_meth_counter: int ref = ref 1
-
-let fresh_ins_meth_id _: ins_meth_id =
-  let id = !ins_meth_counter in
-  ins_meth_counter := id + 1;
-  InsMethId id
 
 let empty_env: env =
   Env { files = []; mods = []; methods = []; decls = [] }
@@ -575,7 +534,7 @@ type callable =
     }
 
 let get_callable (env: env) (importing_module_name: module_name) (name: sident): callable option =
-  let _ = importing_module_name in 
+  let _ = importing_module_name in
   match get_decl_by_name env name with
   | Some decl ->
      (match decl with

@@ -6,6 +6,7 @@ open Region
 open Cpp
 open Util
 open Escape
+open Linked
 open Error
 
 (* Codegen implementation notes:
@@ -428,7 +429,7 @@ let gen_slots slots =
   List.map (fun (TypedSlot (n, t)) -> CSlot (gen_ident n, gen_type t)) slots
 
 let gen_cases cases =
-  List.map (fun (TypedCase (n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
+  List.map (fun (LCase (_, n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
 
 let gen_method mn typarams (TypedMethodDef (n, params, rt, body)) =
   CFunctionDefinition (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt mn body)
@@ -462,7 +463,7 @@ let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
   | TUnion (_, n, typarams, _, cases, _) ->
      let enum_def = CEnumDefinition (
                         local_union_tag_enum_name n,
-                        List.map (fun (TypedCase (n, _)) -> gen_ident n) cases
+                        List.map (fun (LCase (_, n, _)) -> gen_ident n) cases
                       )
      and union_def = CStructDefinition (
                          gen_typarams typarams,

@@ -1,6 +1,6 @@
 open Identifier
 open IdentifierMap
-open Env
+open Id
 open Error
 
 type import_map =

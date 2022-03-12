@@ -2,6 +2,7 @@ open Type
 open Combined
 open Linked
 open Env
+open Id
 
 (** Go through all the types in a combined module, convert them into type
     signatures, and return those signatures as a list. *)

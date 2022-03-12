@@ -1,5 +1,5 @@
 open Identifier
-open Env
+open Id
 
 (** Represents the set of all imports into a module. *)
 type import_map

@@ -1,8 +1,9 @@
 open Identifier
 open Common
+open Id
 open Env
 open Ast
-open Combined
+open Linked
 open Tast
 open Type
 
@@ -16,6 +17,6 @@ type stmt_ctx
 
 val augment_stmt: stmt_ctx -> astmt -> tstmt
 
-val augment_decl : module_name -> module_kind -> env -> combined_definition -> typed_decl
+val augment_decl : module_name -> module_kind -> env -> linked_definition -> typed_decl
 
-val augment_module : env -> combined_module -> typed_module
+val augment_module : env -> linked_module -> typed_module
