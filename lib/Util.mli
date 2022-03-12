@@ -65,3 +65,6 @@ val run_command : string -> command_output
 
     The second argument is the output binary file path. *)
 val compile_cpp_code : string -> string -> command_output
+
+(** Not sure what the standard name for this is. *)
+val map_with_context : (('c * 'a) -> ('c * 'b)) -> 'c -> 'a list -> ('c * ('b list))

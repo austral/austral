@@ -159,3 +159,12 @@ let compile_cpp_code (source_path: string) (output_path: string): command_output
     err ("Error when running C++ compiler.\n  Command: " ^ command ^ "\n  Exit code: " ^ (string_of_int code) ^ "\n  Standard output:\n" ^ stdout ^ "\n  Standard error:\n" ^ stderr ^ "\n")
   else
     o
+
+let rec map_with_context (f: ('c * 'a) -> ('c * 'b)) (ctx: 'c) (list: 'a list): ('c * ('b list)) =
+  match list with
+  | first::rest ->
+     let (ctx', b) = f (ctx, first) in
+     let (ctx'', rest') = map_with_context f ctx' rest in
+     (ctx'', b :: rest')
+  | [] ->
+     (ctx, [])
