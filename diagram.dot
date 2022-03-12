@@ -1,0 +1,60 @@
+digraph G {
+    node[style=filled]
+
+    aui[shape=rect fillcolor=coral label=".aui file"]
+    aum[shape=rect fillcolor=coral label=".aum file"]
+
+    subgraph cluster_0 {
+        label="Frontend"
+
+        icst[shape=rect fillcolor=coral1 label="Interface Concrete Syntax Tree (CST)"]
+        bcst[shape=rect fillcolor=coral1 label="Body Concrete Syntax Tree (CST)"]
+        ast[shape=rect fillcolor=aquamarine label="Abstract Syntax Tree (AST)"]
+
+        ip[label="Interface File Parser"]
+        bp[label="Body File Parser"]
+        combining[label="Combining Pass"]
+        res[label="Import Resolution"]
+        abs[label="Abstraction Pass"]
+    }
+
+    subgraph cluster_1 {
+        label="Middleend"
+
+        tast[shape=rect fillcolor=chartreuse1 label="Typed Abstract Syntax Tree (TAST)"]
+        linked[shape=rect fillcolor=aquamarine4 label="Linked Representation"]
+        mtast[shape=rect fillcolor=firebrick2 label="Monomorphic Typed Abstract Syntax Tree (MTAST)"]
+
+        ext[label="Extraction Pass"]
+        typing[label="Typing Pass"]
+        mono[label="Monomorphization"]
+    }
+
+    subgraph cluster_2 {
+        label="Backend"
+
+        c[shape=rect fillcolor=coral label="C code"]
+
+        codegen[label="Code Generation"]
+    }
+
+    env[label="Environment" fillcolor=forestgreen shape=cylinder]
+
+    // Links
+    aui -> ip -> icst -> combining
+    aum -> bp -> bcst -> combining
+    combining -> abs -> ast
+    res -> combining
+    combining -> res
+    env -> res
+    ast -> ext
+    ext -> env
+    env -> ext
+    ext -> linked
+    linked -> typing
+    typing -> tast
+    tast -> mono -> mtast
+    env -> mono
+    mono -> env
+    mtast -> codegen -> c
+}
