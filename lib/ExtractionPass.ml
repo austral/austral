@@ -3,8 +3,11 @@ open Common
 open Type
 open TypeSystem
 open Combined
+open Linked
+open Ast
 open Env
 open TypeParser
+open Util
 open Error
 
 let rec extract_type_signatures (CombinedModule { decls; _ }): type_signature list =
@@ -27,12 +30,14 @@ and extract_type_signatures' (def: combined_definition): type_signature option =
   | CInstance _ ->
      None
 
-let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) (body_file: file_id): env =
+let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) (body_file: file_id): (env * linked_module) =
   let (CombinedModule {
            name;
            kind;
            interface_docstring;
+           interface_imports;
            body_docstring;
+           body_imports;
            decls;
            _
       }) = cmodule in
@@ -51,24 +56,34 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) 
      specifiers without reference to the environment. *)
   let sigs: type_signature list = extract_type_signatures cmodule in
   (* Extract all declarations from the module into the environment. *)
-  let env: env = extract_definitions env mod_id sigs decls in
-  env
+  let (env, linked_defs): (env * linked_definition list) = extract_definitions env mod_id sigs decls in
+  (* Construct the linked module *)
+  let lmod = LinkedModule {
+                 mod_id = mod_id;
+                 name = name;
+                 kind = kind;
+                 interface_docstring = interface_docstring;
+                 interface_imports = interface_imports;
+                 body_docstring = body_docstring;
+                 body_imports = body_imports;
+                 decls = linked_defs
+               }
+  in
+  (env, lmod)
 
 (** Given the environment, the ID of the module we're extracting, the list of
     local type signatures, and a list of combined definitions, add all relevant
-    decls to the environment. *)
-and extract_definitions (env: env) (mod_id: mod_id) (local_types: type_signature list) (defs: combined_definition list): env =
-  match defs with
-  | first::rest ->
-     let env = extract_definition env mod_id local_types first in
-     extract_definitions env mod_id local_types rest
-  | [] ->
-     env
+    decls to the environment, and return all corresponding linked decls. *)
+and extract_definitions (env: env) (mod_id: mod_id) (local_types: type_signature list) (defs: combined_definition list): (env * (linked_definition list)) =
+  let f ((env, comb_def): (env * combined_definition)): (env * linked_definition) =
+    extract_definition env mod_id local_types comb_def
+  in
+  map_with_context f env defs
 
 (** Given the environment, the ID of the module we're extracting, the list of
     local type signatures, and a combined definition, add all relevant decls to
-    the environment. *)
-and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature list) (def: combined_definition): env =
+    the environment, and return a linked definition. *)
+and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature list) (def: combined_definition): (env * linked_definition)  =
   let parse' = parse_type env local_types in
   let rec parse_slot (typarams: type_parameter list) (QualifiedSlot (n, ts)): typed_slot =
     let rm = region_map_from_typarams typarams in
@@ -78,20 +93,23 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
     ValueParameter (n, parse' rm typarams ts)
   in
   match def with
-  | CConstant (vis, name, typespec, _, docstring) ->
+  | CConstant (vis, name, typespec, def, docstring) ->
      let rm = region_map_from_typarams [] in
      let ty = parse' rm [] typespec in
-     let (env, _) = add_constant env { mod_id; vis; name; ty; docstring } in
-     env
+     let (env, decl_id) = add_constant env { mod_id; vis; name; ty; docstring } in
+     let decl = LConstant (decl_id, vis, name, ty, def, docstring) in
+     (env, decl)
   | CTypeAlias (vis, name, typarams, universe, typespec, docstring) ->
      let rm = region_map_from_typarams typarams in
      let def = parse' rm typarams typespec in
-     let (env, _) = add_type_alias env { mod_id; vis; name; docstring; typarams; universe; def } in
-     env
+     let (env, decl_id) = add_type_alias env { mod_id; vis; name; docstring; typarams; universe; def } in
+     let decl = LTypeAlias (decl_id, vis, name, typarams, universe, def, docstring) in
+     (env, decl)
   | CRecord (vis, name, typarams, universe, slots, docstring) ->
      let slots = List.map (parse_slot typarams) slots in
-     let (env, _) = add_record env { mod_id; vis; name; docstring; typarams; universe; slots } in
-     env
+     let (env, decl_id) = add_record env { mod_id; vis; name; docstring; typarams; universe; slots } in
+     let decl = LRecord (decl_id, vis, name, typarams, universe, slots, docstring) in
+     (env, decl)
   | CUnion (vis, name, typarams, universe, cases, docstring) ->
      (* Add the union itself to the env *)
      let (env, union_id) = add_union env { mod_id; vis; name; docstring; typarams; universe } in
@@ -116,8 +134,11 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      in
      let cases: union_case_input list = List.map case_map cases in
      (* Add the union cases to the environmenmt *)
-     add_union_cases env cases
-  | CFunction (vis, name, typarams, params, rt, _, docstring, pragmas) ->
+     let (env, linked_cases) = add_union_cases env cases in
+     (* Construct the decl *)
+     let decl = LUnion (union_id, vis, name, typarams, universe, linked_cases, docstring) in
+     (env, decl)
+  | CFunction (vis, name, typarams, params, rt, body, docstring, pragmas) ->
      let rm = region_map_from_typarams typarams in
      let value_params = List.map (parse_param typarams) params
      and rt = parse' rm typarams rt
@@ -140,8 +161,9 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
          body = None
        }
      in
-     let (env, _) = add_function env fn_input in
-     env
+     let (env, decl_id) = add_function env fn_input in
+     let decl = LFunction (decl_id, vis, name, typarams, value_params, rt, body, docstring, pragmas) in
+     (env, decl)
   | CTypeclass (vis, name, typaram, methods, docstring) ->
      (* Add the typeclass itself to the env *)
      let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
@@ -163,7 +185,10 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      in
      let methods: type_class_method_input list = List.map method_map methods in
      (* Add the methods to the env *)
-     add_type_class_methods env methods
+     let (env, linked_methods) = add_type_class_methods env methods in
+     (* Construct the decl *)
+     let decl = LTypeclass (typeclass_id, vis, name, typaram, linked_methods, docstring) in
+     (env, decl)
   | CInstance (vis, name, typarams, argument, methods, docstring) ->
      (* Add the instance itself to the env *)
      let rm = region_map_from_typarams typarams in
@@ -182,7 +207,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
-     let method_map (CMethodDef (name, params, rt, _, _)): instance_method_input =
+     let method_map (CMethodDef (name, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
        let rm = region_map_from_typarams typarams in
        let value_params = List.map (parse_param typarams) params
        and rt = parse' rm typarams rt
@@ -193,41 +218,53 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
           | _ ->
              err "No method with this name.")
        in
-       {
-         instance_id = instance_id;
-         method_id = method_id;
-         docstring = docstring;
-         name = name;
-         value_params = value_params;
-         rt = rt;
-         body = None;
-       }
+       ({
+           instance_id = instance_id;
+           method_id = method_id;
+           docstring = meth_docstring;
+           name = name;
+           value_params = value_params;
+           rt = rt;
+           body = None;
+         },
+        body)
      in
-     let methods: instance_method_input list = List.map method_map methods in
+     let methods: (instance_method_input * astmt) list = List.map method_map methods in
      (* Add the methods to the env *)
-     add_instance_methods env methods
+     let (env, linked_methods) = add_instance_methods env methods in
+     (* Construct the decl *)
+     let decl = LInstance (instance_id, vis, name, typarams, argument, linked_methods, docstring) in
+     (env, decl)
 
 (** Utility functions to add lists of things to the environment. *)
-and add_union_cases (env: env) (cases: union_case_input list): env =
-  match cases with
-  | first::rest ->
-     let (env, _) = add_union_case env first in
-     add_union_cases env rest
-  | [] ->
-     env
+and add_union_cases (env: env) (cases: union_case_input list): (env * (linked_case list)) =
+  let f ((env, input): (env * union_case_input)): (env * linked_case) =
+    let (env, decl_id) = add_union_case env input in
+    let { name; slots; _ } = input in
+    let case = LCase (decl_id, name, slots) in
+    (env, case)
+  in
+  map_with_context f env cases
 
-and add_type_class_methods (env: env) (cases: type_class_method_input list): env =
-  match cases with
-  | first::rest ->
-     let (env, _) = add_type_class_method env first in
-     add_type_class_methods env rest
-  | [] ->
-     env
+and add_type_class_methods (env: env) (cases: type_class_method_input list): (env * (linked_method_decl list)) =
+  let f ((env, input): (env * type_class_method_input)): (env * linked_method_decl) =
+    let (env, decl_id) = add_type_class_method env input in
+    let { name; value_params; rt; docstring; vis; _ } = input in
+    (* LOAD-BEARING HACK: need to destructure `vis` because otherwise the
+       compiler thinks `input` is supposed to be an instance of
+       `instance_method_input` (???). *)
+    let _ = vis in
+    let decl = LMethodDecl (decl_id, name, value_params, rt, docstring) in
+    (env, decl)
+  in
+  map_with_context f env cases
 
-and add_instance_methods (env: env) (cases: instance_method_input list): env =
-  match cases with
-  | first::rest ->
-     let (env, _) = add_instance_method env first in
-     add_instance_methods env rest
-  | [] ->
-     env
+and add_instance_methods (env: env) (cases: (instance_method_input * astmt) list): (env * (linked_method_def list)) =
+  let f ((env, pair): (env * (instance_method_input * astmt))): (env * linked_method_def) =
+    let (input, body) = pair in
+    let (env, decl_id) = add_instance_method env input in
+    let { name; value_params; rt; docstring; _ } = input in
+    let decl = LMethodDef (decl_id, name, value_params, rt, docstring, body) in
+    (env, decl)
+  in
+  map_with_context f env cases
