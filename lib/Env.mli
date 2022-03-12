@@ -2,26 +2,11 @@ open Identifier
 open Common
 open Type
 open Tast
+open Id
 open LexEnv
 
 (** A set of type parameters. *)
 type typarams = type_parameter list
-
-(** The type of file IDs. *)
-type file_id
-[@@deriving eq]
-
-(** The type of module IDs. *)
-type mod_id = ModId of int
-[@@deriving eq]
-
-(** The type of declaration IDs. *)
-type decl_id = DeclId of int
-[@@deriving eq]
-
-(** The type of instance method IDs. *)
-type ins_meth_id = InsMethId of int
-[@@deriving eq]
 
 (** The global compiler environment. *)
 type env

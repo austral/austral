@@ -5,6 +5,7 @@ open TypeSystem
 open Combined
 open Linked
 open Ast
+open Id
 open Env
 open TypeParser
 open Util

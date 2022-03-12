@@ -7,11 +7,12 @@ open TypeMatch
 open TypeVarSet
 open TypeParser
 open Region
+open Id
 open LexEnv
 open Env
 open Ast
 open Tast
-open Combined
+open Linked
 open Linearity
 open Util
 open Error
@@ -88,8 +89,8 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
     | [] ->
        err "Typeclass resolution failed"
 
-(* Since the semantic extraction pass has already happened, we can simplify the
-   call to `parse_type` by passing an empty list of local type signatures. *)
+(* Since the extraction pass has already happened, we can simplify the call to
+   `parse_type` by passing an empty list of local type signatures. *)
 let parse_typespec (env: env) (rm: region_map) (typarams: type_parameter list) (ty: qtypespec): ty =
   parse_type env [] rm typarams ty
 
@@ -1070,63 +1071,44 @@ and is_path_elem_constant = function
   | TArrayIndex (e, _) ->
      is_constant e
 
-let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: combined_definition): typed_decl =
+let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: linked_definition): typed_decl =
   match decl with
-  | CConstant (vis, name, ts, expr, doc) ->
-     let ty = parse_typespec env empty_region_map [] ts in
+  | LConstant (_, vis, name, ty, expr, doc) ->
      let expr' = augment_expr module_name env empty_region_map [] empty_lexenv (Some ty) expr in
      let _ = match_type_with_value ty expr' in
      let _ = validate_constant_expression expr' in
      TConstant (vis, name, ty, expr', doc)
-  | CTypeAlias (vis, name, typarams, universe, ts, doc) ->
-     let rm = region_map_from_typarams typarams in
-     let ty = parse_typespec env rm typarams ts in
+  | LTypeAlias (_, vis, name, typarams, universe, ty, doc) ->
      TTypeAlias (vis, name, typarams, universe, ty, doc)
-  | CRecord (vis, name, typarams, universe, slots, doc) ->
+  | LRecord (_, vis, name, typarams, universe, slots, doc) ->
+     TRecord (vis, name, typarams, universe, slots, doc)
+  | LUnion (_, vis, name, typarams, universe, cases, doc) ->
+     TUnion (vis, name, typarams, universe, cases, doc)
+  | LFunction (_, vis, name, typarams, params, rt, body, doc, pragmas) ->
      let rm = region_map_from_typarams typarams in
-     let slots' = augment_slots env rm typarams slots in
-     TRecord (vis, name, typarams, universe, slots', doc)
-  | CUnion (vis, name, typarams, universe, cases, doc) ->
-     let rm = region_map_from_typarams typarams in
-     let cases' = augment_cases env rm typarams cases in
-     TUnion (vis, name, typarams, universe, cases', doc)
-  | CFunction (vis, name, typarams, params, rt, body, doc, pragmas) ->
-     let rm = region_map_from_typarams typarams in
-     let params' = augment_params env rm typarams params
-     and rt' = parse_typespec env rm typarams rt in
      (match pragmas with
       | [ForeignImportPragma s] ->
          if typarams = [] then
            if kind = UnsafeModule then
-             TForeignFunction (vis, name, params', rt', s, doc)
+             TForeignFunction (vis, name, params, rt, s, doc)
            else
              err "Can't declare a foreign function in a safe module."
          else
            err "Foreign functions can't have type parameters."
       | [] ->
-         let ctx = (module_name, env, rm, typarams, (lexenv_from_params params'), rt') in
+         let ctx = (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
          let body' = augment_stmt ctx body in
-         TFunction (vis, name, typarams, params', rt', body', doc)
+         TFunction (vis, name, typarams, params, rt, body', doc)
       | _ ->
          err "Invalid pragmas")
-  | CTypeclass (vis, name, typaram, methods, doc) ->
+  | LTypeclass (_, vis, name, typaram, methods, doc) ->
      let rm = region_map_from_typarams [typaram] in
      TTypeClass (vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)
-  | CInstance (vis, name, typarams, arg, methods, doc) ->
+  | LInstance (_, vis, name, typarams, arg, methods, doc) ->
      (* TODO: the universe of the type parameter matches the universe of the type argument *)
      (* TODO: Check the methods in the instance match the methods in the class *)
      let rm = region_map_from_typarams typarams in
-     let arg' = parse_typespec env rm typarams arg in
-     TInstance (vis, name, typarams, arg', List.map (augment_method_def module_name env rm typarams) methods, doc)
-
-and augment_slots menv rm typarams slots =
-  List.map (fun (QualifiedSlot (n, ts)) -> TypedSlot (n, parse_typespec menv rm typarams ts)) slots
-
-and augment_cases menv rm typarams cases =
-  List.map (fun (QualifiedCase (n, ss)) -> TypedCase (n, augment_slots menv rm typarams ss)) cases
-
-and augment_params menv rm typarams params =
-  List.map (fun (QualifiedParameter (n, ts)) -> ValueParameter (n, parse_typespec menv rm typarams ts)) params
+     TInstance (vis, name, typarams, arg, List.map (augment_method_def module_name env rm typarams) methods, doc)
 
 and lexenv_from_params (params: value_parameter list): lexenv =
   match params with
@@ -1135,19 +1117,15 @@ and lexenv_from_params (params: value_parameter list): lexenv =
   | [] ->
      empty_lexenv
 
-and augment_method_decl menv rm typaram (CMethodDecl (name, params, rt, _)) =
-  let params' = augment_params menv rm [typaram] params
-  and rt' = parse_typespec menv rm [typaram] rt in
-  TypedMethodDecl (name, params', rt')
+and augment_method_decl _ _ _ (LMethodDecl (_, name, params, rt, _)) =
+  TypedMethodDecl (name, params, rt)
 
-and augment_method_def module_name menv rm typarams (CMethodDef (name, params, rt, _, body)) =
-  let params' = augment_params menv rm typarams params
-  and rt' = parse_typespec menv rm typarams rt in
-  let ctx = (module_name, menv, rm, typarams, (lexenv_from_params params'), rt') in
+and augment_method_def module_name menv rm typarams (LMethodDef (_, name, params, rt, _, body)) =
+  let ctx = (module_name, menv, rm, typarams, (lexenv_from_params params), rt) in
   let body' = augment_stmt ctx body in
-  TypedMethodDef (name, params', rt', body')
+  TypedMethodDef (name, params, rt, body')
 
-let augment_module menv (CombinedModule { name; decls; kind; _ }) =
+let augment_module menv (LinkedModule { name; decls; kind; _ }) =
   let decls' = List.map (augment_decl name kind menv) decls in
   let _ = List.map check_decl_linearity decls' in
   TypedModule (name, decls')
