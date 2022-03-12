@@ -19,6 +19,7 @@ The compiler frontend.
 - {!Austral_core.Cst}
 - {!Austral_core.Ast}
 - {!Austral_core.Combined}
+- {!Austral_core.Linked}
 - {!Austral_core.Lexer}
 - {!Austral_core.Parser}
 - {!Austral_core.ParserInterface}
@@ -35,6 +36,7 @@ The compiler frontend.
 
 The compiler's middle end.
 
+- {!Austral_core.Id}
 - {!Austral_core.Env}
 - {!Austral_core.ModuleSystem}
 - {!Austral_core.Region}
