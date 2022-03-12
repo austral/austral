@@ -14,6 +14,7 @@ open Type
 open Error
 open Util
 open Combined
+open Linked
 open Filename
 
 let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import_list): concrete_module_interface =
@@ -54,7 +55,7 @@ let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; bod
   let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
   and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
   let combined: combined_module = combine env ci cb in
-  let env: env = extract env combined int_file_id body_file_id in
+  let (env, _): (env * linked_module) = extract env combined int_file_id body_file_id in
   let typed = augment_module env combined in
   let cpp = gen_module typed in
   let code = render_module cpp in
