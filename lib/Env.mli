@@ -5,6 +5,8 @@ open Tast
 open Id
 open LexEnv
 
+(** {1 Types} *)
+
 (** A set of type parameters. *)
 type typarams = type_parameter list
 
@@ -14,14 +16,8 @@ type env
 (** A file record contains a file's path and contents. *)
 type file_rec = FileRec of { id: file_id; path: string; contents: string }
 
-(** The empty compiler. *)
-val empty_env : env
-
 (** Type of the input to the {!add_file} function. *)
 type file_input = { path: string; contents: string }
-
-(** Add a file's path and contents to the environment. *)
-val add_file : env -> file_input -> (env * file_id)
 
 (** Type of the input to the {!add_module} function. *)
 type mod_input = {
@@ -32,9 +28,6 @@ type mod_input = {
     body_docstring: docstring;
     kind: module_kind
   }
-
-(** Add a module's information to the environment. *)
-val add_module : env -> mod_input -> (env * mod_id)
 
 (** A module record contains a module's name, docstring, and pointers to the
    interface and body files. *)
@@ -48,12 +41,6 @@ type mod_rec = ModRec of {
       kind: module_kind
     }
 
-(** Retrieve a module by its module ID. *)
-val get_module_by_id : env -> mod_id -> mod_rec option
-
-(** Retrieve a module by its name. *)
-val get_module_by_name : env -> module_name -> mod_rec option
-
 (** Input to the {!add_const} function. *)
 type const_input = {
     mod_id: mod_id;
@@ -62,8 +49,6 @@ type const_input = {
     ty: ty;
     docstring: docstring;
   }
-
-val add_constant : env -> const_input -> (env * decl_id)
 
 (** Input to the {!add_type_alias} function. *)
 type type_alias_input = {
@@ -76,8 +61,6 @@ type type_alias_input = {
     def: ty;
   }
 
-val add_type_alias : env -> type_alias_input -> (env * decl_id)
-
 (** Input to the {!add_record} function. *)
 type record_input = {
     mod_id: mod_id;
@@ -89,8 +72,6 @@ type record_input = {
     slots: typed_slot list;
   }
 
-val add_record : env -> record_input -> (env * decl_id)
-
 (** Input to the {!add_union} function. *)
 type union_input = {
     mod_id: mod_id;
@@ -101,8 +82,6 @@ type union_input = {
     universe: universe;
   }
 
-val add_union : env -> union_input -> (env * decl_id)
-
 (** Input to the {!add_union_case} function. *)
 type union_case_input = {
     mod_id: mod_id;
@@ -112,8 +91,6 @@ type union_case_input = {
     docstring: docstring;
     slots: typed_slot list;
   }
-
-val add_union_case : env -> union_case_input -> (env * decl_id)
 
 (** Input to the {!add_function} function. *)
 type function_input = {
@@ -128,8 +105,6 @@ type function_input = {
     body: tstmt option;
   }
 
-val add_function : env -> function_input -> (env * decl_id)
-
 (** Input to the {!add_type_class} function. *)
 type type_class_input = {
     mod_id: mod_id;
@@ -138,8 +113,6 @@ type type_class_input = {
     docstring: docstring;
     param: type_parameter;
   }
-
-val add_type_class : env -> type_class_input -> (env * decl_id)
 
 (** Input to the {!add_type_class_method} function. *)
 type type_class_method_input = {
@@ -152,8 +125,6 @@ type type_class_method_input = {
     rt: ty;
   }
 
-val add_type_class_method : env -> type_class_method_input -> (env * decl_id)
-
 (** Input to the {!add_instance} function. *)
 type instance_input = {
     mod_id: mod_id;
@@ -163,8 +134,6 @@ type instance_input = {
     typarams: typarams;
     argument: ty;
   }
-
-val add_instance : env -> instance_input -> (env * decl_id)
 
 (** Input to the {!add_instance_method} function. *)
 type instance_method_input = {
@@ -176,8 +145,6 @@ type instance_method_input = {
     rt: ty;
     body: tstmt option;
   }
-
-val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
 
 (** A declaration record represents a declaration.
 
@@ -279,34 +246,6 @@ type decl =
       argument: ty;
     }
 
-(** Return the ID of a declaration. *)
-val decl_id : decl -> decl_id
-
-(** Retrieve a declaration by ID, returning {!None} if it doesn't exist. *)
-val get_decl_by_id : env -> decl_id -> decl option
-
-(** Retrieve a declaration by its sourced name, returning {!None} if it doesn't exist.
-
-    If a module with the given name doesn't exist, raises an error. *)
-val get_decl_by_name : env -> sident -> decl option
-
-(** Find a typeclass method from its typeclass ID and name. *)
-val get_method_from_typeclass_id_and_name : env -> decl_id -> identifier -> decl option
-
-(** Return whether a declaration is importable by a foreign module. *)
-val is_importable: decl -> bool
-
-(** Return the typeclass instances defined in a module. *)
-val module_instances: env -> mod_id -> decl list
-
-(** Return a module's name from its ID. *)
-val module_name_from_id : env -> mod_id -> module_name
-
-(** Return the list of cases of a union. *)
-val get_union_cases : env -> decl_id -> decl list
-
-val union_case_to_typed_case : decl -> typed_case
-
 (** Callable things. *)
 type callable =
   | FunctionCallable of type_parameter list * value_parameter list * ty
@@ -323,6 +262,69 @@ type callable =
       value_parameters: value_parameter list;
       return_type: ty
     }
+
+(** {1 Constants} *)
+
+(** The empty compiler. *)
+val empty_env : env
+
+(** {1 Functions} *)
+
+(** {2 Insertion Functions} *)
+
+(** Add a file's path and contents to the environment. *)
+val add_file : env -> file_input -> (env * file_id)
+
+(** Add a module's information to the environment. *)
+val add_module : env -> mod_input -> (env * mod_id)
+
+val add_constant : env -> const_input -> (env * decl_id)
+
+val add_type_alias : env -> type_alias_input -> (env * decl_id)
+
+val add_record : env -> record_input -> (env * decl_id)
+
+val add_union : env -> union_input -> (env * decl_id)
+
+val add_union_case : env -> union_case_input -> (env * decl_id)
+
+val add_function : env -> function_input -> (env * decl_id)
+
+val add_type_class : env -> type_class_input -> (env * decl_id)
+
+val add_type_class_method : env -> type_class_method_input -> (env * decl_id)
+
+val add_instance : env -> instance_input -> (env * decl_id)
+
+val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
+
+(** {2 Retrieval Functions} *)
+
+(** Retrieve a module by its module ID. *)
+val get_module_by_id : env -> mod_id -> mod_rec option
+
+(** Retrieve a module by its name. *)
+val get_module_by_name : env -> module_name -> mod_rec option
+
+(** Retrieve a declaration by ID, returning {!None} if it doesn't exist. *)
+val get_decl_by_id : env -> decl_id -> decl option
+
+(** Retrieve a declaration by its sourced name, returning {!None} if it doesn't exist.
+
+    If a module with the given name doesn't exist, raises an error. *)
+val get_decl_by_name : env -> sident -> decl option
+
+(** Find a typeclass method from its typeclass ID and name. *)
+val get_method_from_typeclass_id_and_name : env -> decl_id -> identifier -> decl option
+
+(** Return the typeclass instances defined in a module. *)
+val module_instances: env -> mod_id -> decl list
+
+(** Return a module's name from its ID. *)
+val module_name_from_id : env -> mod_id -> module_name
+
+(** Return the list of cases of a union. *)
+val get_union_cases : env -> decl_id -> decl list
 
 (** Get a callable given its name and the name of the importing module. *)
 val get_callable : env -> module_name -> sident -> callable option
@@ -343,3 +345,13 @@ val store_function_body : env -> decl_id -> tstmt -> env
 (** Store the given instance method body in the instance method with the given
     ID, returning the new environment. *)
 val store_method_body : env -> ins_meth_id -> tstmt -> env
+
+(** {2 Other Functions} *)
+
+(** Return the ID of a declaration. *)
+val decl_id : decl -> decl_id
+
+(** Return whether a declaration is importable by a foreign module. *)
+val is_importable: decl -> bool
+
+val union_case_to_typed_case : decl -> typed_case
