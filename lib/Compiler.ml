@@ -7,9 +7,11 @@ open ParserInterface
 open CombiningPass
 open ExtractionPass
 open TypingPass
+open BodyExtractionPass
 open CodeGen
 open CppRenderer
 open Cst
+open Tast
 open Type
 open Error
 open Util
@@ -56,7 +58,8 @@ let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; bod
   and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
   let combined: combined_module = combine env ci cb in
   let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
-  let typed = augment_module env linked in
+  let typed: typed_module = augment_module env linked in
+  let env: env = extract_bodies env typed in
   let cpp = gen_module typed in
   let code = render_module cpp in
   Compiler (env, (compiler_code c) ^ "\n" ^ code)
