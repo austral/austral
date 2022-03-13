@@ -168,3 +168,11 @@ let rec map_with_context (f: ('c * 'a) -> ('c * 'b)) (ctx: 'c) (list: 'a list): 
      (ctx'', b :: rest')
   | [] ->
      (ctx, [])
+
+let rec iter_with_context (f: ('c -> 'a -> 'c)) (ctx: 'c) (list: 'a list): 'c =
+  match list with
+  | first::rest ->
+     let ctx' = f ctx first in
+     iter_with_context f ctx' rest
+  | [] ->
+     ctx

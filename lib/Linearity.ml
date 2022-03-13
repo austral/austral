@@ -298,18 +298,18 @@ let rec check_linearity (stmt: tstmt): unit =
 
 let rec check_decl_linearity (decl: typed_decl): unit =
   match decl with
-  | TFunction (_, _, _, params, _, b, _) ->
+  | TFunction (_, _, _, _, params, _, b, _) ->
      (* Check linearity of parameters *)
      let _ = List.map (check_param b) params in
      (* Check linearity within the code *)
      check_linearity b
-  | TInstance (_, _, _, _, methods, _) ->
+  | TInstance (_, _, _, _, _, methods, _) ->
      let _ = List.map check_method_linearity methods in
      ()
   | _ ->
      ()
 
-and check_method_linearity (TypedMethodDef (_, params, _, b)) =
+and check_method_linearity (TypedMethodDef (_, _, params, _, b)) =
   (* Check linearity of parameters *)
   let _ = List.map (check_param b) params in
   (* Check linearity within the code *)
