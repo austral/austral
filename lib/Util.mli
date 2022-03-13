@@ -68,3 +68,5 @@ val compile_cpp_code : string -> string -> command_output
 
 (** Like `mapAccumL` in Haskell. *)
 val map_with_context : (('c * 'a) -> ('c * 'b)) -> 'c -> 'a list -> ('c * ('b list))
+
+val iter_with_context : ('c -> 'a -> 'c) -> 'c -> 'a list -> 'c
