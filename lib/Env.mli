@@ -246,6 +246,18 @@ type decl =
       argument: ty;
     }
 
+(** Represents an instance method. *)
+type ins_meth_rec = InsMethRec of {
+      id: ins_meth_id;
+      instance_id: decl_id;
+      method_id: decl_id;
+      docstring: docstring;
+      name: identifier;
+      value_params: value_parameter list;
+      rt: ty;
+      body: tstmt option;
+    }
+
 (** Callable things. *)
 type callable =
   | FunctionCallable of type_parameter list * value_parameter list * ty
@@ -298,6 +310,14 @@ val add_instance : env -> instance_input -> (env * decl_id)
 
 val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
 
+(** Store the given function body in the function with the given ID, returning
+    the new environment. *)
+val store_function_body : env -> decl_id -> tstmt -> env
+
+(** Store the given instance method body in the instance method with the given
+    ID, returning the new environment. *)
+val store_method_body : env -> ins_meth_id -> tstmt -> env
+
 (** {2 Retrieval Functions} *)
 
 (** Retrieve a module by its module ID. *)
@@ -338,14 +358,6 @@ val get_variable : env -> lexenv -> qident -> ty option
     by the module. *)
 val visible_instances : env -> decl list
 
-(** Store the given function body in the function with the given ID, returning
-    the new environment. *)
-val store_function_body : env -> decl_id -> tstmt -> env
-
-(** Store the given instance method body in the instance method with the given
-    ID, returning the new environment. *)
-val store_method_body : env -> ins_meth_id -> tstmt -> env
-
 (** {2 Other Functions} *)
 
 (** Return the ID of a declaration. *)
@@ -355,3 +367,6 @@ val decl_id : decl -> decl_id
 val is_importable: decl -> bool
 
 val union_case_to_typed_case : decl -> typed_case
+
+(** Get method from the instance ID and name. *)
+val get_instance_method_from_instance_id_and_method_name : env -> decl_id -> identifier -> ins_meth_rec option

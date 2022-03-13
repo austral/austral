@@ -187,7 +187,7 @@ let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
        CVar (gen_qident n)
   | TFuncall (name, args, _, substs) ->
      CFuncall (gen_qident name, List.map g args, List.map (fun (_, t) -> gen_type t) substs)
-  | TMethodCall (name, _, args, _, _) ->
+  | TMethodCall (_, name, _, args, _, _) ->
      CFuncall (gen_qident name, List.map g args, [])
   | TCast (e, t) ->
      CCast (g e, gen_type t)
