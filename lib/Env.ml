@@ -432,6 +432,10 @@ let get_decl_by_id (env: env) (id: decl_id): decl option =
   let (Env { decls; _ }) = env in
   List.find_opt (fun d -> equal_decl_id id (decl_id d)) decls
 
+let get_instance_method_by_id (env: env) (ins_meth_id: ins_meth_id): ins_meth_rec option =
+  let (Env { methods; _ }) = env in
+  List.find_opt (fun (InsMethRec { id; _ }) -> equal_ins_meth_id id ins_meth_id) methods
+
 let get_decl_by_name (env: env) (name: sident): decl option =
   match get_module_by_name env (sident_module_name name) with
   | Some (ModRec { id=target_mod_id; _ }) ->
@@ -593,3 +597,48 @@ let visible_instances (env: env): decl list =
       | _ -> false
   in
   List.filter pred decls
+
+let rec store_function_body (env: env) (fn_id: decl_id) (body: tstmt): env =
+  let (Env { files; mods; methods; decls }) = env in
+  let decl: decl = (match get_decl_by_id env fn_id with
+                    | Some d ->
+                       d
+                    | _ ->
+                       err "Internal: No function with this ID.")
+  in
+  let new_decl: decl = replace_function_body decl body in
+  let decls_without_existing_one: decl list = List.filter (fun (d: decl) -> not (equal_decl_id (decl_id d) fn_id)) decls in
+  let env = Env { files = files; mods = mods; methods = methods; decls = new_decl :: decls_without_existing_one } in
+  env
+
+and replace_function_body (decl: decl) (new_body: tstmt): decl =
+  match decl with
+  | Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } ->
+     (match body with
+      | Some _ ->
+         err "Internal: function already has a body"
+      | None ->
+         Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body=(Some new_body) })
+  | _ ->
+     err "Internal: not a function."
+
+let rec store_method_body (env: env) (ins_meth_id: ins_meth_id) (body: tstmt): env =
+  let (Env { files; mods; methods; decls }) = env in
+  let meth: ins_meth_rec = (match get_instance_method_by_id env ins_meth_id with
+                              | Some m ->
+                                 m
+                              | _ ->
+                                 err "Internal: No instance method with this ID.")
+  in
+  let new_method: ins_meth_rec = replace_method_body meth body in
+  let methods_without_existing_one: ins_meth_rec list = List.filter (fun (InsMethRec { id; _ }) -> not (equal_ins_meth_id id ins_meth_id)) methods in
+  let env = Env { files = files; mods = mods; methods = new_method :: methods_without_existing_one; decls = decls } in
+  env
+
+and replace_method_body (meth: ins_meth_rec) (new_body: tstmt): ins_meth_rec =
+  let (InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body }) = meth in
+  (match body with
+   | Some _ ->
+      err "Internal: function already has a body"
+   | None ->
+      InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body=(Some new_body) })

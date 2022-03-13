@@ -334,3 +334,11 @@ val get_variable : env -> lexenv -> qident -> ty option
     instances that are defined in the module itself, but the instances imported
     by the module. *)
 val visible_instances : env -> decl list
+
+(** Store the given function body in the function with the given ID, returning
+    the new environment. *)
+val store_function_body : env -> decl_id -> tstmt -> env
+
+(** Store the given instance method body in the instance method with the given
+    ID, returning the new environment. *)
+val store_method_body : env -> ins_meth_id -> tstmt -> env
