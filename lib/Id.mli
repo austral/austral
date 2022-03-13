@@ -19,7 +19,12 @@ type decl_id = DeclId of int
 type ins_meth_id = InsMethId of int
 [@@deriving eq]
 
+(** The type of monomorph IDs. *)
+type mono_id = MonoId of int
+[@@deriving eq]
+
 val fresh_file_id : unit -> file_id
 val fresh_mod_id : unit -> mod_id
 val fresh_decl_id : unit -> decl_id
 val fresh_ins_meth_id : unit -> ins_meth_id
+val fresh_mono_id : unit -> mono_id

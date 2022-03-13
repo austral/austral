@@ -10,6 +10,9 @@ type decl_id = DeclId of int
 type ins_meth_id = InsMethId of int
 [@@deriving eq]
 
+type mono_id = MonoId of int
+[@@deriving eq]
+
 (* ID utilities *)
 
 let file_counter: int ref = ref 1
@@ -39,3 +42,10 @@ let fresh_ins_meth_id _: ins_meth_id =
   let id = !ins_meth_counter in
   ins_meth_counter := id + 1;
   InsMethId id
+
+let mono_counter: int ref = ref 1
+
+let fresh_mono_id _: mono_id =
+  let id = !mono_counter in
+  mono_counter := id + 1;
+  MonoId id
