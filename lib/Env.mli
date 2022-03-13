@@ -279,6 +279,7 @@ type decl =
       argument: ty;
     }
 
+(** Return the ID of a declaration. *)
 val decl_id : decl -> decl_id
 
 (** Retrieve a declaration by ID, returning {!None} if it doesn't exist. *)
