@@ -167,7 +167,7 @@ let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
      else
        (* The function is concrete. *)
        (MConcreteFuncall (name, args, rt), tbl)
-  | TMethodCall (name, typarams, args, rt, substs) ->
+  | TMethodCall (_, name, typarams, args, rt, substs) ->
      (* Monomorphize the return type. *)
      let (rt, tbl) = strip_and_mono tbl rt in
      (* Monomorphize the arglist *)
@@ -394,11 +394,11 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      and rt = replace_variables bindings rt
      and substs = List.map (fun (n, t) -> (n, replace_variables bindings t)) substs in
      TFuncall (name, args, rt, substs)
-  | TMethodCall (name, instance, args, rt, substs) ->
+  | TMethodCall (meth_id, name, instance, args, rt, substs) ->
      let args = List.map (replace_tyvars_expr bindings) args
      and rt = replace_variables bindings rt
      and substs = List.map (fun (n, t) -> (n, replace_variables bindings t)) substs in
-     TMethodCall (name, instance, args, rt, substs)
+     TMethodCall (meth_id, name, instance, args, rt, substs)
   | TCast (expr, ty) ->
      let expr = replace_tyvars_expr bindings expr
      and ty = replace_variables bindings ty in

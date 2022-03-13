@@ -595,15 +595,21 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
   let (TypeParameter (type_parameter_name, _, from)) = typaram in
   match get_binding bindings'' type_parameter_name from with
   | (Some dispatch_ty) ->
-     let instance = get_instance env source_module_name dispatch_ty typeclass_id in
+     let instance: decl = get_instance env source_module_name dispatch_ty typeclass_id in
      let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables bindings'' t)) params in
      let arguments' = cast_arguments bindings'' params' arguments in
      let typarams = (match instance with
                      | Instance { typarams; _ } -> typarams
                      | _ -> err "Internal")
      in
+     let instance_id: decl_id = decl_id instance in
+     let meth_id: ins_meth_id =
+       (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
+        | Some (InsMethRec { id; _ }) -> id
+        | None -> err "Internal")
+     in
      let substs = make_substs bindings'' typarams in
-     TMethodCall (callable_name, typarams, arguments', rt'', substs)
+     TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs)
   | None ->
      err "Internal: couldn't extract dispatch type."
 
