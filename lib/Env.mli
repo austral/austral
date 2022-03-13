@@ -1,6 +1,7 @@
 open Identifier
 open Common
 open Type
+open MonoType2
 open Tast
 open Id
 open LexEnv
@@ -275,6 +276,24 @@ type callable =
       return_type: ty
     }
 
+(** Represents a monomorph. *)
+type monomorph =
+  | MonoTypeDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+    }
+  | MonoFunction of {
+      id: mono_id;
+      function_id: decl_id;
+      tyargs: mono_ty list;
+    }
+  | MonoInstance of {
+      id: mono_id;
+      instance_id: decl_id;
+      argument: mono_ty;
+    }
+
 (** {1 Constants} *)
 
 (** The empty compiler. *)
@@ -309,6 +328,12 @@ val add_type_class_method : env -> type_class_method_input -> (env * decl_id)
 val add_instance : env -> instance_input -> (env * decl_id)
 
 val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
+
+val add_type_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+val add_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+val add_instance_monomorph : env -> decl_id -> mono_ty -> (env * mono_id)
 
 (** Store the given function body in the function with the given ID, returning
     the new environment. *)
