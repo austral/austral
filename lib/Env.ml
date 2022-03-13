@@ -1,6 +1,7 @@
 open Identifier
 open Common
 open Type
+open MonoType2
 open Tast
 open Id
 open LexEnv
@@ -120,6 +121,23 @@ type ins_meth_rec = InsMethRec of {
       body: tstmt option;
     }
 
+type monomorph =
+  | MonoTypeDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+    }
+  | MonoFunction of {
+      id: mono_id;
+      function_id: decl_id;
+      tyargs: mono_ty list;
+    }
+  | MonoInstance of {
+      id: mono_id;
+      instance_id: decl_id;
+      argument: mono_ty;
+    }
+
 (** The file environment stores the contents of files for error reporting. *)
 type file_env = file_rec list
 
@@ -132,24 +150,28 @@ type ins_meth_env = ins_meth_rec list
 (** The declaration environment contains declarations. *)
 type decl_env = decl list
 
+(** The monomorph environment contains monomorphs. *)
+type mono_env = monomorph list
+
 type env = Env of {
       files: file_env;
       mods: mod_env;
       methods: ins_meth_env;
       decls: decl_env;
+      monos: mono_env;
     }
 
 let empty_env: env =
-  Env { files = []; mods = []; methods = []; decls = [] }
+  Env { files = []; mods = []; methods = []; decls = []; monos = []; }
 
 type file_input = { path: string; contents: string }
 
 let add_file (env: env) (input: file_input): (env * file_id) =
   let { path; contents } = input in
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_file_id () in
   let file = FileRec { id = id; path = path; contents = contents } in
-  let env = Env { files = file :: files; mods = mods; methods = methods; decls = decls } in
+  let env = Env { files = file :: files; mods; methods; decls; monos} in
   (env, id)
 
 type mod_input = {
@@ -163,7 +185,7 @@ type mod_input = {
 
 let add_module (env: env) (input: mod_input): (env * mod_id) =
   let { name; interface_file; interface_docstring; body_file; body_docstring; kind } = input in
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mod_id () in
   let md = ModRec {
                id;
@@ -175,7 +197,7 @@ let add_module (env: env) (input: mod_input): (env * mod_id) =
                kind;
              }
   in
-  let env = Env { files = files; mods = md :: mods; methods = methods; decls = decls } in
+  let env = Env { files; mods = md :: mods; methods; decls; monos } in
   (env, id)
 
 let get_module_by_id (env: env) (mod_id: mod_id): mod_rec option =
@@ -199,10 +221,10 @@ let make_const_decl (id: decl_id) (input: const_input): decl =
   Constant { id; mod_id; vis; name; ty; docstring }
 
 let add_constant (env: env) (input: const_input): (env * decl_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_const_decl id input in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type type_alias_input = {
@@ -222,8 +244,8 @@ let make_type_alias_decl (id: decl_id) (input: type_alias_input): decl =
 let add_type_alias (env: env) (input: type_alias_input): (env * decl_id) =
   let id = fresh_decl_id () in
   let decl = make_type_alias_decl id input in
-  let (Env { files; mods; methods; decls }) = env in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type record_input = {
@@ -241,10 +263,10 @@ let make_record_decl (id: decl_id) (input: record_input): decl =
   Record { id; mod_id; vis; name; docstring; typarams; universe; slots }
 
 let add_record (env: env) (input: record_input): (env * decl_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_record_decl id input in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type union_input = {
@@ -261,10 +283,10 @@ let make_union_decl (id: decl_id) (input: union_input): decl =
   Union { id; mod_id; vis; name; docstring; typarams; universe }
 
 let add_union (env: env) (input: union_input): (env * decl_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_union_decl id input in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type union_case_input = {
@@ -281,10 +303,10 @@ let make_union_case_decl (id: decl_id) (input: union_case_input): decl =
   UnionCase { id; vis; mod_id; union_id; name; docstring; slots }
 
 let add_union_case (env: env) (input: union_case_input): (env * decl_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_union_case_decl id input in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type function_input = {
@@ -304,10 +326,10 @@ let make_function_decl (id: decl_id) (input: function_input): decl =
   Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body }
 
 let add_function (env: env) (input: function_input): (env * decl_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_function_decl id input in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type type_class_input = {
@@ -323,10 +345,10 @@ let make_type_class_decl (id: decl_id) (input: type_class_input): decl =
   TypeClass { id; mod_id; vis; name; docstring; param }
 
 let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_type_class_decl id input in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type type_class_method_input = {
@@ -344,10 +366,10 @@ let make_type_class_method_decl (id: decl_id) (input: type_class_method_input): 
   TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; value_params; rt }
 
 let add_type_class_method (env: env) (input: type_class_method_input): (env * decl_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_type_class_method_decl id input in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type instance_input = {
@@ -364,10 +386,10 @@ let make_instance_decl (id: decl_id) (input: instance_input): decl =
   Instance { id; mod_id; vis; typeclass_id; docstring; typarams; argument }
 
 let add_instance (env: env) (input: instance_input): (env * decl_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_instance_decl id input in
-  let env = Env { files = files; mods = mods; methods = methods; decls = decl :: decls } in
+  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
 type instance_method_input = {
@@ -385,10 +407,10 @@ let make_ins_meth (id: ins_meth_id) (input: instance_method_input): ins_meth_rec
   InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body }
 
 let add_instance_method (env: env) (input: instance_method_input): (env * ins_meth_id) =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_ins_meth_id () in
   let meth = make_ins_meth id input in
-  let env = Env { files = files; mods = mods; methods = meth :: methods; decls = decls } in
+  let env = Env { files; mods; methods = meth :: methods; decls; monos } in
   (env, id)
 
 let decl_id (decl: decl): decl_id =
@@ -598,7 +620,7 @@ let visible_instances (env: env): decl list =
   List.filter pred decls
 
 let rec store_function_body (env: env) (fn_id: decl_id) (body: tstmt): env =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let decl: decl = (match get_decl_by_id env fn_id with
                     | Some d ->
                        d
@@ -607,7 +629,7 @@ let rec store_function_body (env: env) (fn_id: decl_id) (body: tstmt): env =
   in
   let new_decl: decl = replace_function_body decl body in
   let decls_without_existing_one: decl list = List.filter (fun (d: decl) -> not (equal_decl_id (decl_id d) fn_id)) decls in
-  let env = Env { files = files; mods = mods; methods = methods; decls = new_decl :: decls_without_existing_one } in
+  let env = Env { files; mods; methods; decls = new_decl :: decls_without_existing_one; monos } in
   env
 
 and replace_function_body (decl: decl) (new_body: tstmt): decl =
@@ -622,7 +644,7 @@ and replace_function_body (decl: decl) (new_body: tstmt): decl =
      err "Internal: not a function."
 
 let rec store_method_body (env: env) (ins_meth_id: ins_meth_id) (body: tstmt): env =
-  let (Env { files; mods; methods; decls }) = env in
+  let (Env { files; mods; methods; decls; monos }) = env in
   let meth: ins_meth_rec = (match get_instance_method_by_id env ins_meth_id with
                               | Some m ->
                                  m
@@ -631,7 +653,7 @@ let rec store_method_body (env: env) (ins_meth_id: ins_meth_id) (body: tstmt): e
   in
   let new_method: ins_meth_rec = replace_method_body meth body in
   let methods_without_existing_one: ins_meth_rec list = List.filter (fun (InsMethRec { id; _ }) -> not (equal_ins_meth_id id ins_meth_id)) methods in
-  let env = Env { files = files; mods = mods; methods = new_method :: methods_without_existing_one; decls = decls } in
+  let env = Env { files; mods; methods = new_method :: methods_without_existing_one; decls; monos } in
   env
 
 and replace_method_body (meth: ins_meth_rec) (new_body: tstmt): ins_meth_rec =
@@ -649,3 +671,24 @@ let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id
     && (equal_identifier name target_name)
   in
   List.find_opt pred methods
+
+let add_type_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let id = fresh_mono_id () in
+  let mono = MonoTypeDefinition { id; type_id; tyargs } in
+  let env = Env { files; mods; methods; decls; monos = mono :: monos } in
+  (env, id)
+
+let add_function_monomorph (env: env) (function_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let id = fresh_mono_id () in
+  let mono = MonoFunction { id; function_id; tyargs } in
+  let env = Env { files; mods; methods; decls; monos = mono :: monos } in
+  (env, id)
+
+let add_instance_monomorph (env: env) (instance_id: decl_id) (argument: mono_ty): (env * mono_id) =
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let id = fresh_mono_id () in
+  let mono = MonoInstance { id; instance_id; argument } in
+  let env = Env { files; mods; methods; decls; monos = mono :: monos } in
+  (env, id)
