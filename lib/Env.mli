@@ -246,6 +246,18 @@ type decl =
       argument: ty;
     }
 
+(** Represents an instance method. *)
+type ins_meth_rec = InsMethRec of {
+      id: ins_meth_id;
+      instance_id: decl_id;
+      method_id: decl_id;
+      docstring: docstring;
+      name: identifier;
+      value_params: value_parameter list;
+      rt: ty;
+      body: tstmt option;
+    }
+
 (** Callable things. *)
 type callable =
   | FunctionCallable of type_parameter list * value_parameter list * ty
@@ -355,3 +367,6 @@ val decl_id : decl -> decl_id
 val is_importable: decl -> bool
 
 val union_case_to_typed_case : decl -> typed_case
+
+(** Get method from the instance ID and name. *)
+val get_instance_method_from_instance_id_and_method_name : env -> decl_id -> identifier -> ins_meth_rec option

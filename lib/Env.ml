@@ -109,7 +109,6 @@ type decl =
       argument: ty;
     }
 
-(** Represents an instance method. *)
 type ins_meth_rec = InsMethRec of {
       id: ins_meth_id;
       instance_id: decl_id;
@@ -642,3 +641,11 @@ and replace_method_body (meth: ins_meth_rec) (new_body: tstmt): ins_meth_rec =
       err "Internal: function already has a body"
    | None ->
       InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body=(Some new_body) })
+
+let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id: decl_id) (name: identifier): ins_meth_rec option =
+  let (Env { methods; _ }) = env in
+  let pred (InsMethRec { instance_id=target_instance_id; name=target_name; _ }): bool =
+    (equal_decl_id instance_id target_instance_id)
+    && (equal_identifier name target_name)
+  in
+  List.find_opt pred methods
