@@ -1073,24 +1073,24 @@ and is_path_elem_constant = function
 
 let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: linked_definition): typed_decl =
   match decl with
-  | LConstant (_, vis, name, ty, expr, doc) ->
+  | LConstant (decl_id, vis, name, ty, expr, doc) ->
      let expr' = augment_expr module_name env empty_region_map [] empty_lexenv (Some ty) expr in
      let _ = match_type_with_value ty expr' in
      let _ = validate_constant_expression expr' in
-     TConstant (vis, name, ty, expr', doc)
-  | LTypeAlias (_, vis, name, typarams, universe, ty, doc) ->
-     TTypeAlias (vis, name, typarams, universe, ty, doc)
-  | LRecord (_, vis, name, typarams, universe, slots, doc) ->
-     TRecord (vis, name, typarams, universe, slots, doc)
-  | LUnion (_, vis, name, typarams, universe, cases, doc) ->
-     TUnion (vis, name, typarams, universe, cases, doc)
-  | LFunction (_, vis, name, typarams, params, rt, body, doc, pragmas) ->
+     TConstant (decl_id, vis, name, ty, expr', doc)
+  | LTypeAlias (decl_id, vis, name, typarams, universe, ty, doc) ->
+     TTypeAlias (decl_id, vis, name, typarams, universe, ty, doc)
+  | LRecord (decl_id, vis, name, typarams, universe, slots, doc) ->
+     TRecord (decl_id, vis, name, typarams, universe, slots, doc)
+  | LUnion (decl_id, vis, name, typarams, universe, cases, doc) ->
+     TUnion (decl_id, vis, name, typarams, universe, cases, doc)
+  | LFunction (decl_id, vis, name, typarams, params, rt, body, doc, pragmas) ->
      let rm = region_map_from_typarams typarams in
      (match pragmas with
       | [ForeignImportPragma s] ->
          if typarams = [] then
            if kind = UnsafeModule then
-             TForeignFunction (vis, name, params, rt, s, doc)
+             TForeignFunction (decl_id, vis, name, params, rt, s, doc)
            else
              err "Can't declare a foreign function in a safe module."
          else
@@ -1098,17 +1098,17 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
       | [] ->
          let ctx = (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
          let body' = augment_stmt ctx body in
-         TFunction (vis, name, typarams, params, rt, body', doc)
+         TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
       | _ ->
          err "Invalid pragmas")
-  | LTypeclass (_, vis, name, typaram, methods, doc) ->
+  | LTypeclass (decl_id, vis, name, typaram, methods, doc) ->
      let rm = region_map_from_typarams [typaram] in
-     TTypeClass (vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)
-  | LInstance (_, vis, name, typarams, arg, methods, doc) ->
+     TTypeClass (decl_id, vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)
+  | LInstance (decl_id, vis, name, typarams, arg, methods, doc) ->
      (* TODO: the universe of the type parameter matches the universe of the type argument *)
      (* TODO: Check the methods in the instance match the methods in the class *)
      let rm = region_map_from_typarams typarams in
-     TInstance (vis, name, typarams, arg, List.map (augment_method_def module_name env rm typarams) methods, doc)
+     TInstance (decl_id, vis, name, typarams, arg, List.map (augment_method_def module_name env rm typarams) methods, doc)
 
 and lexenv_from_params (params: value_parameter list): lexenv =
   match params with
@@ -1117,13 +1117,13 @@ and lexenv_from_params (params: value_parameter list): lexenv =
   | [] ->
      empty_lexenv
 
-and augment_method_decl _ _ _ (LMethodDecl (_, name, params, rt, _)) =
-  TypedMethodDecl (name, params, rt)
+and augment_method_decl _ _ _ (LMethodDecl (decl_id, name, params, rt, _)) =
+  TypedMethodDecl (decl_id, name, params, rt)
 
-and augment_method_def module_name menv rm typarams (LMethodDef (_, name, params, rt, _, body)) =
+and augment_method_def module_name menv rm typarams (LMethodDef (ins_meth_id, name, params, rt, _, body)) =
   let ctx = (module_name, menv, rm, typarams, (lexenv_from_params params), rt) in
   let body' = augment_stmt ctx body in
-  TypedMethodDef (name, params, rt, body')
+  TypedMethodDef (ins_meth_id, name, params, rt, body')
 
 let augment_module menv (LinkedModule { name; decls; kind; _ }) =
   let decls' = List.map (augment_decl name kind menv) decls in

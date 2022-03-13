@@ -3,25 +3,26 @@ open Common
 open Escape
 open Type
 open Linked
+open Id
 open Span
 
 type typed_module = TypedModule of module_name * typed_decl list
 
 and typed_decl =
-  | TConstant of vis * identifier * ty * texpr * docstring
-  | TTypeAlias of type_vis * identifier * type_parameter list * universe * ty * docstring
-  | TRecord of type_vis * identifier * type_parameter list * universe * typed_slot list * docstring
-  | TUnion of type_vis * identifier * type_parameter list * universe * linked_case list * docstring
-  | TFunction of vis * identifier * type_parameter list * value_parameter list * ty * tstmt * docstring
-  | TForeignFunction of vis * identifier * value_parameter list * ty * string * docstring
-  | TTypeClass of vis * identifier * type_parameter * typed_method_decl list * docstring
-  | TInstance of vis * qident * type_parameter list * ty * typed_method_def list * docstring
+  | TConstant of decl_id * vis * identifier * ty * texpr * docstring
+  | TTypeAlias of decl_id * type_vis * identifier * type_parameter list * universe * ty * docstring
+  | TRecord of decl_id * type_vis * identifier * type_parameter list * universe * typed_slot list * docstring
+  | TUnion of decl_id * type_vis * identifier * type_parameter list * universe * linked_case list * docstring
+  | TFunction of decl_id * vis * identifier * type_parameter list * value_parameter list * ty * tstmt * docstring
+  | TForeignFunction of decl_id * vis * identifier * value_parameter list * ty * string * docstring
+  | TTypeClass of decl_id * vis * identifier * type_parameter * typed_method_decl list * docstring
+  | TInstance of decl_id * vis * qident * type_parameter list * ty * typed_method_def list * docstring
 
 and typed_method_decl =
-  TypedMethodDecl of identifier * value_parameter list * ty
+  TypedMethodDecl of decl_id * identifier * value_parameter list * ty
 
 and typed_method_def =
-  TypedMethodDef of identifier * value_parameter list * ty * tstmt
+  TypedMethodDef of ins_meth_id * identifier * value_parameter list * ty * tstmt
 
 and tstmt =
   | TSkip of span

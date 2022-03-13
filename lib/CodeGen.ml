@@ -431,14 +431,14 @@ let gen_slots slots =
 let gen_cases cases =
   List.map (fun (LCase (_, n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
 
-let gen_method mn typarams (TypedMethodDef (n, params, rt, body)) =
+let gen_method mn typarams (TypedMethodDef (_, n, params, rt, body)) =
   CFunctionDefinition (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt mn body)
 
 let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
   match decl with
-  | TConstant (_, n, ty, e, _) ->
+  | TConstant (_, _, n, ty, e, _) ->
      [CConstantDefinition (gen_ident n, gen_type ty, gen_exp mn e)]
-  | TTypeAlias (_, n, typarams, _, ty, _) ->
+  | TTypeAlias (_, _, n, typarams, _, ty, _) ->
      [
        CStructDefinition (
            gen_typarams typarams,
@@ -450,7 +450,7 @@ let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
              )
          )
      ]
-  | TRecord (_, n, typarams, _, slots, _) ->
+  | TRecord (_, _, n, typarams, _, slots, _) ->
      [
        CStructDefinition (
            gen_typarams typarams,
@@ -460,7 +460,7 @@ let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
              )
          )
      ]
-  | TUnion (_, n, typarams, _, cases, _) ->
+  | TUnion (_, _, n, typarams, _, cases, _) ->
      let enum_def = CEnumDefinition (
                         local_union_tag_enum_name n,
                         List.map (fun (LCase (_, n, _)) -> gen_ident n) cases
@@ -477,9 +477,9 @@ let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
                        )
      in
      [enum_def; union_def]
-  | TFunction (_, name, typarams, params, rt, body, _) ->
+  | TFunction (_, _, name, typarams, params, rt, body, _) ->
      [CFunctionDefinition (gen_ident name, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt mn body)]
-  | TForeignFunction (_, n, params, rt, underlying, _) ->
+  | TForeignFunction (_, _, n, params, rt, underlying, _) ->
      let param_type_to_c_type t =
        (match t with
         | Unit ->
@@ -533,7 +533,7 @@ let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
   | TTypeClass _ ->
      (* Type class declarations are not compiled *)
      []
-  | TInstance (_, _, typarams, _, methods, _) ->
+  | TInstance (_, _, _, typarams, _, methods, _) ->
      List.map (gen_method mn typarams) methods
 
 (* Extract types into forward type declarations *)
@@ -544,9 +544,9 @@ let rec gen_type_decls decls =
 and gen_type_decl decl =
   let d n p = Some (CStructForwardDeclaration (gen_ident n, gen_typarams p)) in
   match decl with
-  | TRecord (_, n, p, _ ,_, _) ->
+  | TRecord (_, _, n, p, _ ,_, _) ->
      d n p
-  | TUnion (_, n, p, _, _ ,_) ->
+  | TUnion (_, _, n, p, _, _ ,_) ->
      d n p
   | _ ->
      None
@@ -558,16 +558,16 @@ let rec gen_fun_decls decls =
 
 and gen_fun_decl decl =
   match decl with
-  | TFunction (_, n, tp, p, rt, _, _) ->
+  | TFunction (_, _, n, tp, p, rt, _, _) ->
      Some [CFunctionDeclaration (gen_ident n, gen_typarams tp, gen_params p, gen_type rt, LinkageInternal)]
-  | TForeignFunction (_, n, p, rt, _, _) ->
+  | TForeignFunction (_, _, n, p, rt, _, _) ->
      Some [CFunctionDeclaration (gen_ident n, [], gen_params p, gen_type rt, LinkageInternal)]
-  | TInstance (_, _, tp, _, ms, _) ->
+  | TInstance (_, _, _, tp, _, ms, _) ->
      Some (List.map (gen_method_decl tp) ms)
   | _ ->
      None
 
-and gen_method_decl typarams (TypedMethodDef (n, params, rt, _)) =
+and gen_method_decl typarams (TypedMethodDef (_, n, params, rt, _)) =
   CFunctionDeclaration (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, LinkageInternal)
 
 (* Codegen a module *)
