@@ -358,6 +358,9 @@ val get_variable : env -> lexenv -> qident -> ty option
     by the module. *)
 val visible_instances : env -> decl list
 
+(** Get method from the instance ID and name. *)
+val get_instance_method_from_instance_id_and_method_name : env -> decl_id -> identifier -> ins_meth_rec option
+
 (** {2 Other Functions} *)
 
 (** Return the ID of a declaration. *)
@@ -367,6 +370,3 @@ val decl_id : decl -> decl_id
 val is_importable: decl -> bool
 
 val union_case_to_typed_case : decl -> typed_case
-
-(** Get method from the instance ID and name. *)
-val get_instance_method_from_instance_id_and_method_name : env -> decl_id -> identifier -> ins_meth_rec option
