@@ -65,6 +65,8 @@ The compiler backend.
 - {!Austral_core.Cpp}
 - {!Austral_core.CppPrelude}
 - {!Austral_core.CppRenderer}
+- {!Austral_core.CRepr}
+- {!Austral_core.CRenderer}
 
 {1 Integration}
 
