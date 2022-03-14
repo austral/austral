@@ -1,7 +1,9 @@
 (** An alternative implementation of the monomorphic type system. *)
 open Id
+open Identifier
 open Type
 
+(** A monomorphic type. *)
 type mono_ty =
   | MonoUnit
   | MonoBoolean
@@ -14,3 +16,9 @@ type mono_ty =
   | MonoWriteRef of mono_ty
   | MonoRawPointer of mono_ty
 [@@deriving eq]
+
+(** A monomorphic record slot. *)
+type mono_slot = MonoSlot of identifier * mono_ty
+
+(** A monomorphic union case. *)
+type mono_case = MonoCase of identifier * mono_slot list
