@@ -3,6 +3,7 @@ open Common
 open Type
 open MonoType2
 open Tast
+open Mtast
 open Id
 open LexEnv
 open Error
@@ -122,21 +123,36 @@ type ins_meth_rec = InsMethRec of {
     }
 
 type monomorph =
-  | MonoTypeDefinition of {
+  | MonoTypeAliasDefinition of {
       id: mono_id;
       type_id: decl_id;
       tyargs: mono_ty list;
       def: mono_ty option;
     }
+  | MonoRecordDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+      def: mono_ty option;
+      slots: (mono_slot list) option;
+    }
+  | MonoUnionDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+      cases: (mono_case list) option;
+    }
   | MonoFunction of {
       id: mono_id;
       function_id: decl_id;
       tyargs: mono_ty list;
+      body: mstmt option;
     }
   | MonoInstance of {
       id: mono_id;
       instance_id: decl_id;
       argument: mono_ty;
+      methods: (mono_method list) option;
     }
 
 (** The file environment stores the contents of files for error reporting. *)
@@ -673,23 +689,23 @@ let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id
   in
   List.find_opt pred methods
 
-let add_type_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+let add_type_alias_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
-  let mono = MonoTypeDefinition { id; type_id; tyargs; def=None } in
+  let mono = MonoTypeAliasDefinition { id; type_id; tyargs; def = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
 let add_function_monomorph (env: env) (function_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
-  let mono = MonoFunction { id; function_id; tyargs } in
+  let mono = MonoFunction { id; function_id; tyargs; body = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
 let add_instance_monomorph (env: env) (instance_id: decl_id) (argument: mono_ty): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
-  let mono = MonoInstance { id; instance_id; argument } in
+  let mono = MonoInstance { id; instance_id; argument; methods = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)

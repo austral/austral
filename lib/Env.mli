@@ -3,6 +3,7 @@ open Common
 open Type
 open MonoType2
 open Tast
+open Mtast
 open Id
 open LexEnv
 
@@ -278,22 +279,41 @@ type callable =
 
 (** Represents a monomorph. *)
 type monomorph =
-  | MonoTypeDefinition of {
+  | MonoTypeAliasDefinition of {
       id: mono_id;
       type_id: decl_id;
       tyargs: mono_ty list;
       def: mono_ty option;
       (** The definition of the type alias, present once it's instantiated. *)
     }
+  | MonoRecordDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+      def: mono_ty option;
+      slots: (mono_slot list) option;
+      (** The list of slots, if instantiated. *)
+    }
+  | MonoUnionDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+      cases: (mono_case list) option;
+      (** The list of cases, if instantiated. *)
+    }
   | MonoFunction of {
       id: mono_id;
       function_id: decl_id;
       tyargs: mono_ty list;
+      body: mstmt option;
+      (** The function body, if instantiated. *)
     }
   | MonoInstance of {
       id: mono_id;
       instance_id: decl_id;
       argument: mono_ty;
+      methods: (mono_method list) option;
+      (** The list of methods, if instantiated. *)
     }
 
 (** {1 Constants} *)
@@ -331,7 +351,7 @@ val add_instance : env -> instance_input -> (env * decl_id)
 
 val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
 
-val add_type_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+val add_type_alias_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
 val add_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
