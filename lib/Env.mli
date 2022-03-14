@@ -282,6 +282,8 @@ type monomorph =
       id: mono_id;
       type_id: decl_id;
       tyargs: mono_ty list;
+      def: mono_ty option;
+      (** The definition of the type alias, present once it's instantiated. *)
     }
   | MonoFunction of {
       id: mono_id;

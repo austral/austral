@@ -126,6 +126,7 @@ type monomorph =
       id: mono_id;
       type_id: decl_id;
       tyargs: mono_ty list;
+      def: mono_ty option;
     }
   | MonoFunction of {
       id: mono_id;
@@ -675,7 +676,7 @@ let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id
 let add_type_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
-  let mono = MonoTypeDefinition { id; type_id; tyargs } in
+  let mono = MonoTypeDefinition { id; type_id; tyargs; def=None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
