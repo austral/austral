@@ -1,14 +1,15 @@
+open Id
 open Identifier
 open Common
 open Escape
-open MonoType
+open MonoType2
 
 type mono_module = MonoModule of module_name * mtyped_decl list
 
 and mtyped_decl =
   | MConstant of identifier * mono_ty * mexpr
-  | MRecord of identifier * mtyped_slot list
-  | MUnion of identifier * mtyped_case list
+  | MRecord of identifier * mono_slot list
+  | MUnion of identifier * mono_case list
   | MFunction of identifier * mvalue_parameter list * mono_ty * mstmt
   | MForeignFunction of identifier * mvalue_parameter list * mono_ty * string
 
@@ -77,8 +78,10 @@ and mtyped_lvalue =
 and mvalue_parameter =
   MValueParameter of identifier * mono_ty
 
-and mtyped_slot =
-  MTypedSlot of identifier * mono_ty
-
-and mtyped_case =
-  MTypedCase of identifier * mtyped_slot list
+type mono_method =
+  MonoMethod of {
+      method_id: ins_meth_id;
+      params: mvalue_parameter list;
+      rt: mono_ty;
+      body: mstmt;
+    }
