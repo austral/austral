@@ -1,5 +1,6 @@
 open Identifier
 open Env
+open Type
 open TypeStripping
 open MonoType2
 open Error
@@ -55,3 +56,7 @@ and monomorphize_ty_list (env: env) (tys: stripped_ty list): (mono_ty list * env
      (first :: rest, env)
   | [] ->
      ([], env)
+
+let strip_and_mono (env: env) (ty: ty): (mono_ty * env) =
+  let ty = strip_type ty in
+  monomorphize_ty env ty
