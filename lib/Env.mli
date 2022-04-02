@@ -290,7 +290,6 @@ type monomorph =
       id: mono_id;
       type_id: decl_id;
       tyargs: mono_ty list;
-      def: mono_ty option;
       slots: (mono_slot list) option;
       (** The list of slots, if instantiated. *)
     }
@@ -353,9 +352,25 @@ val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
 
 val add_type_alias_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
+val add_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+val add_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
 val add_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
 val add_instance_monomorph : env -> decl_id -> mono_ty -> (env * mono_id)
+
+(** Given a type alias' ID and a list of arguments, register a monomorph and
+   return its ID, or return the ID if it exists. *)
+val add_or_get_type_alias_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+(** Given a record's ID and a list of arguments, register a monomorph and return
+   its ID, or return the ID if it exists. *)
+val add_or_get_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+(** Given a union's ID and a list of arguments, register a monomorph and return
+   its ID, or return the ID if it exists. *)
+val add_or_get_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
 (** Store the given function body in the function with the given ID, returning
     the new environment. *)

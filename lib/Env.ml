@@ -133,7 +133,6 @@ type monomorph =
       id: mono_id;
       type_id: decl_id;
       tyargs: mono_ty list;
-      def: mono_ty option;
       slots: (mono_slot list) option;
     }
   | MonoUnionDefinition of {
@@ -696,6 +695,20 @@ let add_type_alias_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
+let add_record_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let id = fresh_mono_id () in
+  let mono = MonoRecordDefinition { id; type_id; tyargs; slots = None } in
+  let env = Env { files; mods; methods; decls; monos = mono :: monos } in
+  (env, id)
+
+let add_union_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let id = fresh_mono_id () in
+  let mono = MonoUnionDefinition { id; type_id; tyargs; cases = None } in
+  let env = Env { files; mods; methods; decls; monos = mono :: monos } in
+  (env, id)
+
 let add_function_monomorph (env: env) (function_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
@@ -737,3 +750,23 @@ let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_
   match List.find_opt pred monos with
   | Some m -> Some (monomorph_id m)
   | None -> None
+
+let add_or_get_type_alias_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+  (* TODO: Possibly type confusion vulnerability, since `get_type_monomorph`
+     doesn't care whether the mono is a type alias or a record or a union? *)
+  match get_type_monomorph env decl_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_type_alias_monomorph env decl_id args
+
+let add_or_get_record_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+  match get_type_monomorph env decl_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_record_monomorph env decl_id args
+
+let add_or_get_union_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+  match get_type_monomorph env decl_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_union_monomorph env decl_id args
