@@ -709,3 +709,31 @@ let add_instance_monomorph (env: env) (instance_id: decl_id) (argument: mono_ty)
   let mono = MonoInstance { id; instance_id; argument; methods = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
+
+let monomorph_id (mono: monomorph): mono_id =
+  match mono with
+  | MonoTypeAliasDefinition { id; _ } -> id
+  | MonoRecordDefinition { id; _ } -> id
+  | MonoUnionDefinition { id; _ } -> id
+  | MonoFunction { id; _ } -> id
+  | MonoInstance { id; _ } -> id
+
+let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_id option =
+  let (Env { monos; _ }) = env in
+  let pred (mono: monomorph): bool =
+    match mono with
+    | MonoTypeAliasDefinition { type_id; tyargs; _ } ->
+      (equal_decl_id type_id decl_id)
+      && (List.equal equal_mono_ty tyargs args)
+    | MonoRecordDefinition { type_id; tyargs; _ } ->
+      (equal_decl_id type_id decl_id)
+      && (List.equal equal_mono_ty tyargs args)
+    | MonoUnionDefinition { type_id; tyargs; _ } ->
+      (equal_decl_id type_id decl_id)
+      && (List.equal equal_mono_ty tyargs args)
+    | _ ->
+      false
+  in
+  match List.find_opt pred monos with
+  | Some m -> Some (monomorph_id m)
+  | None -> None
