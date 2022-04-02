@@ -161,7 +161,7 @@ $ austral typecheck \
 
 # License
 
-Copyright 2018–2021 [Fernando Borretti][fernando].
+Copyright 2018–2022 [Fernando Borretti][fernando].
 
 Licensed under the GPLv3 license. See the COPYING file for details.
 
