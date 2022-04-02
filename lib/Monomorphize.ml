@@ -208,3 +208,100 @@ and monomorphize_path_elem (env: env) (elem: typed_path_elem): (mtyped_path_elem
      let (ty, env) = monomorphize_ty env ty in
      let (idx, env) = monomorphize_expr env idx in
      (MArrayIndex (idx, ty), env)
+
+let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
+  match stmt with
+  | TSkip _ ->
+     (MSkip, env)
+  | TLet (_, name, ty, value, body) ->
+     let (ty, env) = strip_and_mono env ty in
+     let (value, env) = monomorphize_expr env value in
+     let (body, env) = monomorphize_stmt env body in
+     (MLet (name, ty, value, body), env)
+  | TDestructure (_, bindings, value, body) ->
+     let (bindings, env) = monomorphize_named_ty_list env (List.map (fun (n, t) -> (n, strip_type t)) bindings) in
+     let (value, env) = monomorphize_expr env value in
+     let (body, env) = monomorphize_stmt env body in
+     (MDestructure (bindings, value, body), env)
+  | TAssign (_, lvalue, value) ->
+     let (lvalue, env) = monomorphize_lvalue env lvalue in
+     let (value, env) = monomorphize_expr env value in
+     (MAssign (lvalue, value), env)
+  | TIf (_, c, t, f) ->
+     let (c, env) = monomorphize_expr env c in
+     let (t, env) = monomorphize_stmt env t in
+     let (f, env) = monomorphize_stmt env f in
+     (MIf (c, t, f), env)
+  | TCase (_, value, whens) ->
+     let (value, env) = monomorphize_expr env value in
+     let (whens, env) = monomorphize_whens env whens in
+     (MCase (value, whens), env)
+  | TWhile (_, value, body) ->
+     let (value, env) = monomorphize_expr env value in
+     let (body, env) = monomorphize_stmt env body in
+     (MWhile (value, body), env)
+  | TFor (_, name, start, final, body) ->
+     let (start, env) = monomorphize_expr env start in
+     let (final, env) = monomorphize_expr env final in
+     let (body, env) = monomorphize_stmt env body in
+     (MFor (name, start, final, body), env)
+  | TBorrow { span; original; rename; region; orig_type; ref_type; body; mode } ->
+     let _ = span in
+     let (orig_type, env) = strip_and_mono env orig_type in
+     let (ref_type, env) = strip_and_mono env ref_type in
+     let (body, env) = monomorphize_stmt env body in
+     (MBorrow { original = original; rename = rename; region = region; orig_type = orig_type; ref_type = ref_type; body = body; mode = mode }, env)
+  | TBlock (_, a, b) ->
+     let (a, env) = monomorphize_stmt env a in
+     let (b, env) = monomorphize_stmt env b in
+     (MBlock (a, b), env)
+  | TDiscarding (_, value) ->
+     let (value, env) = monomorphize_expr env value in
+     (MDiscarding value, env)
+  | TReturn (_, value) ->
+     let (value, env) = monomorphize_expr env value in
+     (MReturn value, env)
+
+and monomorphize_lvalue (env: env) (lvalue: typed_lvalue): (mtyped_lvalue * env) =
+  match lvalue with
+  | TypedLValue (name, elems) ->
+     let (elems, env) = monomorphize_path_elems env elems in
+     (MTypedLValue (name, elems), env)
+
+and monomorphize_whens (env: env) (whens: typed_when list): (mtyped_when list * env) =
+  match whens with
+  | first::rest ->
+     let (first, env) = monomorphize_when env first in
+     let (rest, env) = monomorphize_whens env rest in
+     (first :: rest, env)
+  | [] ->
+     ([], env)
+
+and monomorphize_when (env: env) (w: typed_when): (mtyped_when * env) =
+  let (TypedWhen (name, params, body)) = w in
+  let (params, env) = monomorphize_params env params in
+  let (body, env) = monomorphize_stmt env body in
+  (MTypedWhen (name, params, body), env)
+
+and monomorphize_params (env: env) (params: value_parameter list): (mvalue_parameter list * env) =
+  match params with
+  | first::rest ->
+     let (first, env) = monomorphize_param env first in
+     let (rest, env) = monomorphize_params env rest in
+     (first :: rest, env)
+  | [] ->
+     ([], env)
+
+and monomorphize_param (env: env) (param: value_parameter): (mvalue_parameter * env) =
+  let (ValueParameter (name, ty)) = param in
+  let (ty, env) = strip_and_mono env ty in
+  (MValueParameter (name, ty), env)
+
+and monomorphize_named_ty_list (env: env) (tys: (identifier * stripped_ty) list): ((identifier * mono_ty) list * env) =
+  match tys with
+  | (name, first)::rest ->
+     let (first, env) = monomorphize_ty env first in
+     let (rest, env) = monomorphize_named_ty_list env rest in
+     ((name, first) :: rest, env)
+  | [] ->
+     ([], env)
