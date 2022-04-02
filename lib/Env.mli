@@ -372,6 +372,10 @@ val add_or_get_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_
    its ID, or return the ID if it exists. *)
 val add_or_get_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
+(** Given a function's ID and a list of arguments, register a monomorph and
+   return its ID, or return the ID if it exists. *)
+val add_or_get_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
 (** Store the given function body in the function with the given ID, returning
     the new environment. *)
 val store_function_body : env -> decl_id -> tstmt -> env

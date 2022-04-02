@@ -784,3 +784,9 @@ let get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): m
   match List.find_opt pred monos with
   | Some m -> Some (monomorph_id m)
   | None -> None
+
+let add_or_get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+  match get_function_monomorph env decl_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_function_monomorph env decl_id args
