@@ -307,12 +307,11 @@ type monomorph =
       body: mstmt option;
       (** The function body, if instantiated. *)
     }
-  | MonoInstance of {
+  | MonoInstanceMethod of {
       id: mono_id;
-      instance_id: decl_id;
-      argument: mono_ty;
-      methods: (mono_method list) option;
-      (** The list of methods, if instantiated. *)
+      method_id: ins_meth_id;
+      tyargs: mono_ty list;
+      body: mstmt option;
     }
 
 (** {1 Constants} *)
@@ -358,7 +357,7 @@ val add_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
 val add_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
-val add_instance_monomorph : env -> decl_id -> mono_ty -> (env * mono_id)
+val add_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
 
 (** Given a type alias' ID and a list of arguments, register a monomorph and
    return its ID, or return the ID if it exists. *)

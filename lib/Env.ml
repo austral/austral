@@ -147,11 +147,11 @@ type monomorph =
       tyargs: mono_ty list;
       body: mstmt option;
     }
-  | MonoInstance of {
+  | MonoInstanceMethod of {
       id: mono_id;
-      instance_id: decl_id;
-      argument: mono_ty;
-      methods: (mono_method list) option;
+      method_id: ins_meth_id;
+      tyargs: mono_ty list;
+      body: mstmt option;
     }
 
 (** The file environment stores the contents of files for error reporting. *)
@@ -716,10 +716,10 @@ let add_function_monomorph (env: env) (function_id: decl_id) (tyargs: mono_ty li
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
-let add_instance_monomorph (env: env) (instance_id: decl_id) (argument: mono_ty): (env * mono_id) =
+let add_instance_method_monomorph (env: env) (method_id: ins_meth_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
-  let mono = MonoInstance { id; instance_id; argument; methods = None } in
+  let mono = MonoInstanceMethod { id; method_id; tyargs; body = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
@@ -729,7 +729,7 @@ let monomorph_id (mono: monomorph): mono_id =
   | MonoRecordDefinition { id; _ } -> id
   | MonoUnionDefinition { id; _ } -> id
   | MonoFunction { id; _ } -> id
-  | MonoInstance { id; _ } -> id
+  | MonoInstanceMethod { id; _ } -> id
 
 let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_id option =
   let (Env { monos; _ }) = env in
