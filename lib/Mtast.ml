@@ -4,9 +4,9 @@ open Common
 open Escape
 open MonoType2
 
-type mono_module = MonoModule of module_name * mtyped_decl list
+type mono_module = MonoModule of module_name * mdecl list
 
-and mtyped_decl =
+and mdecl =
   | MConstant of identifier * mono_ty * mexpr
   | MRecord of identifier * mono_slot list
   | MUnion of identifier * mono_case list
