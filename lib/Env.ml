@@ -559,9 +559,9 @@ let union_case_to_typed_case (decl: decl): typed_case =
      err "Internal: not a union case"
 
 type callable =
-  | FunctionCallable of type_parameter list * value_parameter list * ty
-  | TypeAliasCallable of type_parameter list * universe * ty
-  | RecordConstructor of type_parameter list * universe * typed_slot list
+  | FunctionCallable of decl_id * type_parameter list * value_parameter list * ty
+  | TypeAliasCallable of decl_id * type_parameter list * universe * ty
+  | RecordConstructor of decl_id * type_parameter list * universe * typed_slot list
   | UnionConstructor of {
       union_id: decl_id;
       type_params: type_parameter list;
@@ -579,10 +579,10 @@ let get_callable (env: env) (importing_module_name: module_name) (name: sident):
   match get_decl_by_name env name with
   | Some decl ->
      (match decl with
-      | TypeAlias { typarams; universe; def; _ } ->
-         Some (TypeAliasCallable (typarams, universe, def))
-      | Record { typarams; universe; slots; _ } ->
-         Some (RecordConstructor (typarams, universe, slots))
+      | TypeAlias { id; typarams; universe; def; _ } ->
+         Some (TypeAliasCallable (id, typarams, universe, def))
+      | Record { id; typarams; universe; slots; _ } ->
+         Some (RecordConstructor (id, typarams, universe, slots))
       | UnionCase { name; union_id; slots; _ } ->
          let (typarams, universe) =
            (match get_decl_by_id env union_id with
@@ -596,8 +596,8 @@ let get_callable (env: env) (importing_module_name: module_name) (name: sident):
                  universe = universe;
                  case = TypedCase (name, slots)
            })
-      | Function { typarams; value_params; rt; _ } ->
-         Some (FunctionCallable (typarams, value_params, rt))
+      | Function { id; typarams; value_params; rt; _ } ->
+         Some (FunctionCallable (id, typarams, value_params, rt))
       | TypeClassMethod { typeclass_id; value_params; rt; _ } ->
          Some (
              MethodCallable {
