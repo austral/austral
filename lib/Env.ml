@@ -790,3 +790,23 @@ let add_or_get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty l
   | Some mono_id -> (env, mono_id)
   | None ->
     add_function_monomorph env decl_id args
+
+let get_instance_method_monomorph (env: env) (id: ins_meth_id) (args: mono_ty list): mono_id option =
+  let (Env { monos; _ }) = env in
+  let pred (mono: monomorph): bool =
+    match mono with
+    | MonoInstanceMethod { method_id; tyargs; _ } ->
+      (equal_ins_meth_id method_id id)
+      && (List.equal equal_mono_ty tyargs args)
+    | _ ->
+      false
+  in
+  match List.find_opt pred monos with
+  | Some m -> Some (monomorph_id m)
+  | None -> None
+
+let add_or_get_instance_method_monomorph (env: env) (method_id: ins_meth_id) (args: mono_ty list): (env * mono_id) =
+  match get_instance_method_monomorph env method_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_instance_method_monomorph env method_id args

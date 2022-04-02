@@ -371,9 +371,13 @@ val add_or_get_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_
    its ID, or return the ID if it exists. *)
 val add_or_get_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
-(** Given a function's ID and a list of arguments, register a monomorph and
+(** Given a function's ID and a list of type arguments, register a monomorph and
    return its ID, or return the ID if it exists. *)
 val add_or_get_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+(** Given an instance method's ID and a list of type arguments, register a
+   monomorph and return its ID, or return the ID if it exists. *)
+val add_or_get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
 
 (** Store the given function body in the function with the given ID, returning
     the new environment. *)
@@ -433,6 +437,10 @@ val get_type_monomorph : env -> decl_id -> mono_ty list -> mono_id option
 (** Given the ID of a function and a set of monomorphic type arguments, return
    the ID of the corresponding monomorph if it exists. *)
 val get_function_monomorph : env -> decl_id -> mono_ty list -> mono_id option
+
+(** Given the ID of an instance method and a set of monomorphic type arguments,
+   return the ID of the corresponding monomorph if it exists. *)
+val get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> mono_id option
 
 (** {2 Other Functions} *)
 
