@@ -66,7 +66,7 @@ Anti-features:
 Building the `austral` compiler requires `make` and the `dune` build system for
 OCaml, and a C++ compiler for building the resulting output.
 
-First, install [opam][opam].
+First, install [opam][opam]. On Debian/Ubuntu you can just do `sudo apt-get install opam`.
 
 Then:
 
