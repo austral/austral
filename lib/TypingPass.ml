@@ -438,11 +438,11 @@ and augment_call (module_name: module_name) (env: env) (asserted_ty: ty option) 
 
 and augment_callable (module_name: module_name) (env: env) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
   match callable with
-  | FunctionCallable (typarams, params, rt) ->
-     augment_function_call name typarams params rt asserted_ty args
-  | TypeAliasCallable (typarams, universe, ty) ->
+  | FunctionCallable (id, typarams, params, rt) ->
+     augment_function_call id name typarams params rt asserted_ty args
+  | TypeAliasCallable (_, typarams, universe, ty) ->
      augment_typealias_callable name typarams universe asserted_ty ty args
-  | RecordConstructor (typarams, universe, slots) ->
+  | RecordConstructor (_, typarams, universe, slots) ->
      augment_record_constructor name typarams universe slots asserted_ty args
   | UnionConstructor { union_id; type_params; universe; case } ->
      let type_name: qident = (match get_decl_by_id env union_id with
@@ -462,7 +462,7 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
      in
      augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args
 
-and augment_function_call name typarams params rt asserted_ty args =
+and augment_function_call (id: decl_id) name typarams params rt asserted_ty args =
   (* For simplicity, and to reduce duplication of code, we convert the argument
      list to a positional list. *)
   let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
@@ -477,7 +477,7 @@ and augment_function_call name typarams params rt asserted_ty args =
   check_bindings typarams bindings'';
   let arguments' = cast_arguments bindings'' params arguments in
   let substs = make_substs bindings'' typarams in
-  TFuncall (name, arguments', rt'', substs)
+  TFuncall (id, name, arguments', rt'', substs)
 
 and augment_typealias_callable name typarams universe asserted_ty definition_ty args =
   (* Check: the argument list is a positional list with a single argument *)
