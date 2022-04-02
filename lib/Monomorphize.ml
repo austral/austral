@@ -7,6 +7,8 @@ open Tast
 open Mtast
 open Error
 
+(* Monomorphize type specifiers *)
+
 let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
   match ty with
   | SUnit ->
@@ -62,6 +64,8 @@ and monomorphize_ty_list (env: env) (tys: stripped_ty list): (mono_ty list * env
 let strip_and_mono (env: env) (ty: ty): (mono_ty * env) =
   let ty = strip_type ty in
   monomorphize_ty env ty
+
+(* Monomorphize expressions *)
 
 let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   match expr with
@@ -208,6 +212,8 @@ and monomorphize_path_elem (env: env) (elem: typed_path_elem): (mtyped_path_elem
      let (ty, env) = monomorphize_ty env ty in
      let (idx, env) = monomorphize_expr env idx in
      (MArrayIndex (idx, ty), env)
+
+(* Monomorphize statements *)
 
 let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
   match stmt with
