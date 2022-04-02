@@ -770,3 +770,17 @@ let add_or_get_union_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list
   | Some mono_id -> (env, mono_id)
   | None ->
     add_union_monomorph env decl_id args
+
+let get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_id option =
+  let (Env { monos; _ }) = env in
+  let pred (mono: monomorph): bool =
+    match mono with
+    | MonoFunction { function_id; tyargs; _ } ->
+      (equal_decl_id function_id decl_id)
+      && (List.equal equal_mono_ty tyargs args)
+    | _ ->
+      false
+  in
+  match List.find_opt pred monos with
+  | Some m -> Some (monomorph_id m)
+  | None -> None

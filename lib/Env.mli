@@ -427,6 +427,10 @@ val get_instance_method_from_instance_id_and_method_name : env -> decl_id -> ide
    return the ID of the corresponding monomorph if it exists. *)
 val get_type_monomorph : env -> decl_id -> mono_ty list -> mono_id option
 
+(** Given the ID of a function and a set of monomorphic type arguments, return
+   the ID of the corresponding monomorph if it exists. *)
+val get_function_monomorph : env -> decl_id -> mono_ty list -> mono_id option
+
 (** {2 Other Functions} *)
 
 (** Return the ID of a declaration. *)
