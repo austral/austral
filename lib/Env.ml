@@ -1,8 +1,9 @@
 open Identifier
 open Common
 open Type
-open MonoType2
+open MonoType
 open Tast
+open Mtast
 open Id
 open LexEnv
 open Error
@@ -122,21 +123,35 @@ type ins_meth_rec = InsMethRec of {
     }
 
 type monomorph =
-  | MonoTypeDefinition of {
+  | MonoTypeAliasDefinition of {
       id: mono_id;
       type_id: decl_id;
       tyargs: mono_ty list;
       def: mono_ty option;
     }
+  | MonoRecordDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+      slots: (mono_slot list) option;
+    }
+  | MonoUnionDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+      cases: (mono_case list) option;
+    }
   | MonoFunction of {
       id: mono_id;
       function_id: decl_id;
       tyargs: mono_ty list;
+      body: mstmt option;
     }
-  | MonoInstance of {
+  | MonoInstanceMethod of {
       id: mono_id;
-      instance_id: decl_id;
-      argument: mono_ty;
+      method_id: ins_meth_id;
+      tyargs: mono_ty list;
+      body: mstmt option;
     }
 
 (** The file environment stores the contents of files for error reporting. *)
@@ -544,9 +559,9 @@ let union_case_to_typed_case (decl: decl): typed_case =
      err "Internal: not a union case"
 
 type callable =
-  | FunctionCallable of type_parameter list * value_parameter list * ty
-  | TypeAliasCallable of type_parameter list * universe * ty
-  | RecordConstructor of type_parameter list * universe * typed_slot list
+  | FunctionCallable of decl_id * type_parameter list * value_parameter list * ty
+  | TypeAliasCallable of decl_id * type_parameter list * universe * ty
+  | RecordConstructor of decl_id * type_parameter list * universe * typed_slot list
   | UnionConstructor of {
       union_id: decl_id;
       type_params: type_parameter list;
@@ -564,10 +579,10 @@ let get_callable (env: env) (importing_module_name: module_name) (name: sident):
   match get_decl_by_name env name with
   | Some decl ->
      (match decl with
-      | TypeAlias { typarams; universe; def; _ } ->
-         Some (TypeAliasCallable (typarams, universe, def))
-      | Record { typarams; universe; slots; _ } ->
-         Some (RecordConstructor (typarams, universe, slots))
+      | TypeAlias { id; typarams; universe; def; _ } ->
+         Some (TypeAliasCallable (id, typarams, universe, def))
+      | Record { id; typarams; universe; slots; _ } ->
+         Some (RecordConstructor (id, typarams, universe, slots))
       | UnionCase { name; union_id; slots; _ } ->
          let (typarams, universe) =
            (match get_decl_by_id env union_id with
@@ -581,8 +596,8 @@ let get_callable (env: env) (importing_module_name: module_name) (name: sident):
                  universe = universe;
                  case = TypedCase (name, slots)
            })
-      | Function { typarams; value_params; rt; _ } ->
-         Some (FunctionCallable (typarams, value_params, rt))
+      | Function { id; typarams; value_params; rt; _ } ->
+         Some (FunctionCallable (id, typarams, value_params, rt))
       | TypeClassMethod { typeclass_id; value_params; rt; _ } ->
          Some (
              MethodCallable {
@@ -673,23 +688,221 @@ let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id
   in
   List.find_opt pred methods
 
-let add_type_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+let add_type_alias_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
-  let mono = MonoTypeDefinition { id; type_id; tyargs; def=None } in
+  let mono = MonoTypeAliasDefinition { id; type_id; tyargs; def = None } in
+  let env = Env { files; mods; methods; decls; monos = mono :: monos } in
+  (env, id)
+
+let add_record_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let id = fresh_mono_id () in
+  let mono = MonoRecordDefinition { id; type_id; tyargs; slots = None } in
+  let env = Env { files; mods; methods; decls; monos = mono :: monos } in
+  (env, id)
+
+let add_union_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let id = fresh_mono_id () in
+  let mono = MonoUnionDefinition { id; type_id; tyargs; cases = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
 let add_function_monomorph (env: env) (function_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
-  let mono = MonoFunction { id; function_id; tyargs } in
+  let mono = MonoFunction { id; function_id; tyargs; body = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
-let add_instance_monomorph (env: env) (instance_id: decl_id) (argument: mono_ty): (env * mono_id) =
+let add_instance_method_monomorph (env: env) (method_id: ins_meth_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
-  let mono = MonoInstance { id; instance_id; argument } in
+  let mono = MonoInstanceMethod { id; method_id; tyargs; body = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
+
+let monomorph_id (mono: monomorph): mono_id =
+  match mono with
+  | MonoTypeAliasDefinition { id; _ } -> id
+  | MonoRecordDefinition { id; _ } -> id
+  | MonoUnionDefinition { id; _ } -> id
+  | MonoFunction { id; _ } -> id
+  | MonoInstanceMethod { id; _ } -> id
+
+let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_id option =
+  let (Env { monos; _ }) = env in
+  let pred (mono: monomorph): bool =
+    match mono with
+    | MonoTypeAliasDefinition { type_id; tyargs; _ } ->
+      (equal_decl_id type_id decl_id)
+      && (List.equal equal_mono_ty tyargs args)
+    | MonoRecordDefinition { type_id; tyargs; _ } ->
+      (equal_decl_id type_id decl_id)
+      && (List.equal equal_mono_ty tyargs args)
+    | MonoUnionDefinition { type_id; tyargs; _ } ->
+      (equal_decl_id type_id decl_id)
+      && (List.equal equal_mono_ty tyargs args)
+    | _ ->
+      false
+  in
+  match List.find_opt pred monos with
+  | Some m -> Some (monomorph_id m)
+  | None -> None
+
+let add_or_get_type_alias_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+  (* TODO: Possibly type confusion vulnerability, since `get_type_monomorph`
+     doesn't care whether the mono is a type alias or a record or a union? *)
+  match get_type_monomorph env decl_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_type_alias_monomorph env decl_id args
+
+let add_or_get_record_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+  match get_type_monomorph env decl_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_record_monomorph env decl_id args
+
+let add_or_get_union_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+  match get_type_monomorph env decl_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_union_monomorph env decl_id args
+
+let get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_id option =
+  let (Env { monos; _ }) = env in
+  let pred (mono: monomorph): bool =
+    match mono with
+    | MonoFunction { function_id; tyargs; _ } ->
+      (equal_decl_id function_id decl_id)
+      && (List.equal equal_mono_ty tyargs args)
+    | _ ->
+      false
+  in
+  match List.find_opt pred monos with
+  | Some m -> Some (monomorph_id m)
+  | None -> None
+
+let add_or_get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+  match get_function_monomorph env decl_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_function_monomorph env decl_id args
+
+let get_instance_method_monomorph (env: env) (id: ins_meth_id) (args: mono_ty list): mono_id option =
+  let (Env { monos; _ }) = env in
+  let pred (mono: monomorph): bool =
+    match mono with
+    | MonoInstanceMethod { method_id; tyargs; _ } ->
+      (equal_ins_meth_id method_id id)
+      && (List.equal equal_mono_ty tyargs args)
+    | _ ->
+      false
+  in
+  match List.find_opt pred monos with
+  | Some m -> Some (monomorph_id m)
+  | None -> None
+
+let add_or_get_instance_method_monomorph (env: env) (method_id: ins_meth_id) (args: mono_ty list): (env * mono_id) =
+  match get_instance_method_monomorph env method_id args with
+  | Some mono_id -> (env, mono_id)
+  | None ->
+    add_instance_method_monomorph env method_id args
+
+let is_instantiated (mono: monomorph): bool =
+  match mono with
+  | MonoTypeAliasDefinition { def; _ } ->
+    Option.is_some def
+  | MonoRecordDefinition { slots; _ } ->
+    Option.is_some slots
+  | MonoUnionDefinition { cases; _ } ->
+    Option.is_some cases
+  | MonoFunction { body; _ } ->
+    Option.is_some body
+  | MonoInstanceMethod { body; _ } ->
+    Option.is_some body
+
+let get_uninstantiated_monomorphs (env: env): monomorph list =
+  let (Env { monos; _ }) = env in
+  let pred (m: monomorph) =
+    not (is_instantiated m)
+  in
+  List.filter pred monos
+
+(** Find a monomorph by ID and return it, removing it from the
+   environment. Errors if it does not exist. *)
+let pop_monomorph (env: env) (id: mono_id): (env * monomorph) =
+  let (Env { files; mods; methods; decls; monos }) = env in
+  let pred (mono: monomorph): bool =
+    let target_id: mono_id = monomorph_id mono in
+    equal_mono_id target_id id
+  in
+  match List.find_opt pred monos with
+  | Some mono ->
+    let other_monos = List.filter (fun m -> not (pred m)) monos in
+    let env = Env { files; mods; methods; decls; monos = other_monos } in
+    (env, mono)
+  | None ->
+    err "internal: monomorph with this ID does not exist"
+
+let store_type_alias_monomorph_definition (env: env) (id: mono_id) (ty: mono_ty): env =
+  let (env, mono) = pop_monomorph env id in
+  match mono with
+  | MonoTypeAliasDefinition { id; type_id; tyargs; def; } ->
+    let _ = def in
+    let new_mono = MonoTypeAliasDefinition { id; type_id; tyargs; def = Some ty; } in
+    let (Env { files; mods; methods; decls; monos }) = env in
+    let env = Env { files; mods; methods; decls; monos = new_mono :: monos } in
+    env
+  | _ ->
+    err "internal"
+
+let store_record_monomorph_definition (env: env) (id: mono_id) (new_slots: mono_slot list): env =
+  let (env, mono) = pop_monomorph env id in
+  match mono with
+  | MonoRecordDefinition { id; type_id; tyargs; slots; } ->
+    let _ = slots in
+    let new_mono = MonoRecordDefinition { id; type_id; tyargs; slots = Some new_slots; } in
+    let (Env { files; mods; methods; decls; monos }) = env in
+    let env = Env { files; mods; methods; decls; monos = new_mono :: monos } in
+    env
+  | _ ->
+    err "internal"
+
+let store_union_monomorph_definition (env: env) (id: mono_id) (new_cases: mono_case list): env =
+  let (env, mono) = pop_monomorph env id in
+  match mono with
+  | MonoUnionDefinition { id; type_id; tyargs; cases; } ->
+    let _ = cases in
+    let new_mono = MonoUnionDefinition { id; type_id; tyargs; cases = Some new_cases; } in
+    let (Env { files; mods; methods; decls; monos }) = env in
+    let env = Env { files; mods; methods; decls; monos = new_mono :: monos } in
+    env
+  | _ ->
+    err "internal"
+
+let store_function_monomorph_definition (env: env) (id: mono_id) (new_body: mstmt): env =
+  let (env, mono) = pop_monomorph env id in
+  match mono with
+  | MonoFunction { id; function_id; tyargs; body; } ->
+    let _ = body in
+    let new_mono = MonoFunction { id; function_id; tyargs; body = Some new_body; } in
+    let (Env { files; mods; methods; decls; monos }) = env in
+    let env = Env { files; mods; methods; decls; monos = new_mono :: monos } in
+    env
+  | _ ->
+    err "internal"
+
+let store_instance_method_monomorph_definition (env: env) (id: mono_id) (new_body: mstmt): env =
+  let (env, mono) = pop_monomorph env id in
+  match mono with
+  | MonoInstanceMethod { id; method_id; tyargs; body; } ->
+    let _ = body in
+    let new_mono = MonoInstanceMethod { id; method_id; tyargs; body = Some new_body; } in
+    let (Env { files; mods; methods; decls; monos }) = env in
+    let env = Env { files; mods; methods; decls; monos = new_mono :: monos } in
+    env
+  | _ ->
+    err "internal"

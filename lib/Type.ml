@@ -1,5 +1,7 @@
+open Id
 open Identifier
 open Region
+open Error
 
 type universe =
   | FreeUniverse
@@ -38,6 +40,7 @@ type ty =
   | WriteRef of ty * ty
   | TyVar of type_var
   | RawPointer of ty
+  | MonoTy of mono_id
 [@@deriving show]
 
 type typed_slot = TypedSlot of identifier * ty
@@ -78,7 +81,9 @@ let rec type_string = function
   | TyVar (TypeVariable (n, u, from)) ->
      (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ " : " ^ (universe_string u)
   | RawPointer ty ->
-     "Pointer[" ^ (type_string ty) ^ "]"
+    "Pointer[" ^ (type_string ty) ^ "]"
+  | MonoTy _ ->
+    err "Not applicable"
 
 and signedness_string = function
   | Unsigned -> "Natural"
@@ -175,4 +180,10 @@ let rec equal_ty a b =
       | RawPointer ty' ->
          equal_ty ty ty'
       | _ ->
-         false)
+        false)
+  | MonoTy a ->
+    (match b with
+     | MonoTy b ->
+       equal_mono_id a b
+     | _ ->
+       false)

@@ -1,8 +1,9 @@
 open Identifier
 open Common
 open Type
-open MonoType2
+open MonoType
 open Tast
+open Mtast
 open Id
 open LexEnv
 
@@ -42,7 +43,7 @@ type mod_rec = ModRec of {
       kind: module_kind
     }
 
-(** Input to the {!add_const} function. *)
+(** Input to the {!add_constant} function. *)
 type const_input = {
     mod_id: mod_id;
     vis: vis;
@@ -261,9 +262,9 @@ type ins_meth_rec = InsMethRec of {
 
 (** Callable things. *)
 type callable =
-  | FunctionCallable of type_parameter list * value_parameter list * ty
-  | TypeAliasCallable of type_parameter list * universe * ty
-  | RecordConstructor of type_parameter list * universe * typed_slot list
+  | FunctionCallable of decl_id * type_parameter list * value_parameter list * ty
+  | TypeAliasCallable of decl_id * type_parameter list * universe * ty
+  | RecordConstructor of decl_id * type_parameter list * universe * typed_slot list
   | UnionConstructor of {
       union_id: decl_id;
       type_params: type_parameter list;
@@ -278,22 +279,39 @@ type callable =
 
 (** Represents a monomorph. *)
 type monomorph =
-  | MonoTypeDefinition of {
+  | MonoTypeAliasDefinition of {
       id: mono_id;
       type_id: decl_id;
       tyargs: mono_ty list;
       def: mono_ty option;
       (** The definition of the type alias, present once it's instantiated. *)
     }
+  | MonoRecordDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+      slots: (mono_slot list) option;
+      (** The list of slots, if instantiated. *)
+    }
+  | MonoUnionDefinition of {
+      id: mono_id;
+      type_id: decl_id;
+      tyargs: mono_ty list;
+      cases: (mono_case list) option;
+      (** The list of cases, if instantiated. *)
+    }
   | MonoFunction of {
       id: mono_id;
       function_id: decl_id;
       tyargs: mono_ty list;
+      body: mstmt option;
+      (** The function body, if instantiated. *)
     }
-  | MonoInstance of {
+  | MonoInstanceMethod of {
       id: mono_id;
-      instance_id: decl_id;
-      argument: mono_ty;
+      method_id: ins_meth_id;
+      tyargs: mono_ty list;
+      body: mstmt option;
     }
 
 (** {1 Constants} *)
@@ -331,11 +349,45 @@ val add_instance : env -> instance_input -> (env * decl_id)
 
 val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
 
-val add_type_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+val add_type_alias_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+val add_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+val add_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
 val add_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
-val add_instance_monomorph : env -> decl_id -> mono_ty -> (env * mono_id)
+val add_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
+
+(** Given a type alias' ID and a list of arguments, register a monomorph and
+   return its ID, or return the ID if it exists. *)
+val add_or_get_type_alias_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+(** Given a record's ID and a list of arguments, register a monomorph and return
+   its ID, or return the ID if it exists. *)
+val add_or_get_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+(** Given a union's ID and a list of arguments, register a monomorph and return
+   its ID, or return the ID if it exists. *)
+val add_or_get_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+(** Given a function's ID and a list of type arguments, register a monomorph and
+   return its ID, or return the ID if it exists. *)
+val add_or_get_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+
+(** Given an instance method's ID and a list of type arguments, register a
+   monomorph and return its ID, or return the ID if it exists. *)
+val add_or_get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
+
+val store_type_alias_monomorph_definition : env -> mono_id -> mono_ty -> env
+
+val store_record_monomorph_definition : env -> mono_id -> mono_slot list -> env
+
+val store_union_monomorph_definition : env -> mono_id -> mono_case list -> env
+
+val store_function_monomorph_definition : env -> mono_id -> mstmt -> env
+
+val store_instance_method_monomorph_definition : env -> mono_id -> mstmt -> env
 
 (** Store the given function body in the function with the given ID, returning
     the new environment. *)
@@ -387,6 +439,21 @@ val visible_instances : env -> decl list
 
 (** Get method from the instance ID and name. *)
 val get_instance_method_from_instance_id_and_method_name : env -> decl_id -> identifier -> ins_meth_rec option
+
+(** Given the ID of a type declaration and a set of monomorphic type arguments,
+   return the ID of the corresponding monomorph if it exists. *)
+val get_type_monomorph : env -> decl_id -> mono_ty list -> mono_id option
+
+(** Given the ID of a function and a set of monomorphic type arguments, return
+   the ID of the corresponding monomorph if it exists. *)
+val get_function_monomorph : env -> decl_id -> mono_ty list -> mono_id option
+
+(** Given the ID of an instance method and a set of monomorphic type arguments,
+   return the ID of the corresponding monomorph if it exists. *)
+val get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> mono_id option
+
+(** Get all uninstantiated monomorphs. *)
+val get_uninstantiated_monomorphs : env -> monomorph list
 
 (** {2 Other Functions} *)
 

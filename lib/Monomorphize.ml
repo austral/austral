@@ -1,537 +1,550 @@
 open Identifier
+open Env
 open Type
+open TypeStripping
 open MonoType
 open Tast
 open Mtast
-open TypeBindings
+open Linked
+open Id
 open Error
 
-type stripped_ty =
-  | SUnit
-  | SBoolean
-  | SInteger of signedness * integer_width
-  | SSingleFloat
-  | SDoubleFloat
-  | SNamedType of qident * stripped_ty list
-  | SArray of stripped_ty
-  | SReadRef of stripped_ty
-  | SWriteRef of stripped_ty
-  | SRawPointer of stripped_ty
+(* Monomorphize type specifiers *)
 
-let rec strip_type (ty: ty): stripped_ty =
-  match strip_type' ty with
-  | Some ty ->
-     ty
-  | None ->
-     err "strip_type called with a region type as its argument"
-
-and strip_type' (ty: ty): stripped_ty option =
-  match ty with
-  | Unit ->
-     Some SUnit
-  | Boolean ->
-     Some SBoolean
-  | Integer (s, w) ->
-     Some (SInteger (s, w))
-  | SingleFloat ->
-     Some SSingleFloat
-  | DoubleFloat ->
-     Some SDoubleFloat
-  | NamedType (n, args, _) ->
-     Some (SNamedType (n, List.filter_map strip_type' args))
-  | Array (elem_ty, _) ->
-     (match (strip_type' elem_ty) with
-      | Some elem_ty ->
-         Some (SArray elem_ty)
-      | None ->
-         err "Internal: array instantiated with a region type.")
-  | RegionTy _ ->
-     None
-  | ReadRef (ty, _) ->
-     (match (strip_type' ty) with
-      | Some ty ->
-         Some (SReadRef ty)
-      | None ->
-         err "Internal: read ref instantiated with a region type.")
-  | WriteRef (ty, _) ->
-     (match (strip_type' ty) with
-      | Some ty ->
-         Some (SWriteRef ty)
-      | None ->
-         err "Internal: write ref instantiated with a region type.")
-  | TyVar _ ->
-     (* Why? Because when instantiating a monomorph, we do search and replace of
-        type variables with their substitutions. So if there are variables left
-        over by stripping time, that's an error. Anyways, the search-and-replace
-        step should *also* have signalled an error if a type variable has no
-        replacement. *)
-     err "Variable not replaced."
-  | RawPointer ty ->
-     (match (strip_type' ty) with
-      | Some ty ->
-         Some (SRawPointer ty)
-      | None ->
-         err "Internal: raw pointer type instantiated with a region type.")
-
-let rec monomorphize_type (tbl: mono_tbl) (ty: stripped_ty): (mono_ty * mono_tbl) =
+let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
   match ty with
   | SUnit ->
-     (MonoUnit, tbl)
+    (MonoUnit, env)
   | SBoolean ->
-     (MonoBoolean, tbl)
+    (MonoBoolean, env)
   | SInteger (s, w) ->
-     (MonoInteger (s, w), tbl)
+    (MonoInteger (s, w), env)
   | SSingleFloat ->
-     (MonoSingleFloat, tbl)
+    (MonoSingleFloat, env)
   | SDoubleFloat ->
-     (MonoDoubleFloat, tbl)
-  | SArray elem_ty ->
-     let (elem_ty, tbl) = monomorphize_type tbl elem_ty in
-     (MonoArray elem_ty, tbl)
-  | SReadRef ty ->
-     let (ty, tbl) = monomorphize_type tbl ty in
-     (MonoReadRef ty, tbl)
-  | SWriteRef ty ->
-     let (ty, tbl) = monomorphize_type tbl ty in
-     (MonoWriteRef ty, tbl)
+    (MonoDoubleFloat, env)
+  | SRegionTy r ->
+    (MonoRegionTy r, env)
+  | SArray (elem_ty, region) ->
+    let (elem_ty, env) = monomorphize_ty env elem_ty in
+    (MonoArray (elem_ty, region), env)
+  | SReadRef (ty, region) ->
+    let (ty, env) = monomorphize_ty env ty in
+    let (region, env) = monomorphize_ty env region in
+    (MonoReadRef (ty, region), env)
+  | SWriteRef (ty, region) ->
+    let (ty, env) = monomorphize_ty env ty in
+    let (region, env) = monomorphize_ty env region in
+    (MonoWriteRef (ty, region), env)
   | SRawPointer ty ->
-     let (ty, tbl) = monomorphize_type tbl ty in
-     (MonoRawPointer ty, tbl)
+    let (ty, env) = monomorphize_ty env ty in
+    (MonoRawPointer ty, env)
   | SNamedType (name, args) ->
-     let (args, tbl) = monomorphize_ty_list tbl args in
-     (match get_monomorph_id tbl name args with
-      | Some id ->
-         (MonoNamedType (name, id), tbl)
-      | None ->
-         let (id, tbl) = add_monomorph tbl name args in
-         (MonoNamedType (name, id), tbl))
+    let (args, env) = monomorphize_ty_list env args in
+    (match get_decl_by_name env (qident_to_sident name) with
+     | Some decl ->
+       (match decl with
+        | TypeAlias { id; _} ->
+          let (env, mono_id) = add_or_get_type_alias_monomorph env id args in
+          (MonoNamedType mono_id, env)
+        | Record { id; _ } ->
+          let (env, mono_id) = add_or_get_record_monomorph env id args in
+          (MonoNamedType mono_id, env)
+        | Union { id; _ } ->
+          let (env, mono_id) = add_or_get_union_monomorph env id args in
+          (MonoNamedType mono_id, env)
+        | _ ->
+          err "internal: named type points to something that isn't a type")
+     | None ->
+       err "internal")
+  | SMonoTy id ->
+    (MonoNamedType id, env)
 
-and monomorphize_ty_list (tbl: mono_tbl) (tys: stripped_ty list): (mono_ty list * mono_tbl) =
+and monomorphize_ty_list (env: env) (tys: stripped_ty list): (mono_ty list * env) =
   match tys with
   | first::rest ->
-     let (first, tbl) = monomorphize_type tbl first in
-     let (rest, tbl) = monomorphize_ty_list tbl rest in
-     (first :: rest, tbl)
+     let (first, env) = monomorphize_ty env first in
+     let (rest, env) = monomorphize_ty_list env rest in
+     (first :: rest, env)
   | [] ->
-     ([], tbl)
+     ([], env)
 
-let rec monomorphize_named_ty_list (tbl: mono_tbl) (tys: (identifier * stripped_ty) list): ((identifier * mono_ty) list * mono_tbl) =
-  match tys with
-  | (name, first)::rest ->
-     let (first, tbl) = monomorphize_type tbl first in
-     let (rest, tbl) = monomorphize_named_ty_list tbl rest in
-     ((name, first) :: rest, tbl)
-  | [] ->
-     ([], tbl)
-
-let strip_and_mono (tbl: mono_tbl) (ty: ty): (mono_ty * mono_tbl) =
+let strip_and_mono (env: env) (ty: ty): (mono_ty * env) =
   let ty = strip_type ty in
-  monomorphize_type tbl ty
+  monomorphize_ty env ty
 
-let rec monomorphize_expr (tbl: mono_tbl) (expr: texpr): (mexpr * mono_tbl) =
+(* Monomorphize expressions *)
+
+let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   match expr with
   | TNilConstant ->
-     (MNilConstant, tbl)
+     (MNilConstant, env)
   | TBoolConstant b ->
-     (MBoolConstant b, tbl)
+     (MBoolConstant b, env)
   | TIntConstant i ->
-     (MIntConstant i, tbl)
+     (MIntConstant i, env)
   | TFloatConstant f ->
-     (MFloatConstant f, tbl)
+     (MFloatConstant f, env)
   | TStringConstant s ->
-     (MStringConstant s, tbl)
+     (MStringConstant s, env)
   | TVariable (name, ty) ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     (MVariable (name, ty), tbl)
+     let (ty, env) = strip_and_mono env ty in
+     (MVariable (name, ty), env)
   | TArithmetic (oper, lhs, rhs) ->
-     let (lhs, tbl) = monomorphize_expr tbl lhs in
-     let (rhs, tbl) = monomorphize_expr tbl rhs in
-     (MArithmetic (oper, lhs, rhs), tbl)
-  | TFuncall (name, args, rt, substs) ->
+     let (lhs, env) = monomorphize_expr env lhs in
+     let (rhs, env) = monomorphize_expr env rhs in
+     (MArithmetic (oper, lhs, rhs), env)
+  | TFuncall (decl_id, name, args, rt, substs) ->
      (* Monomorphize the return type. *)
-     let (rt, tbl) = strip_and_mono tbl rt in
+     let (rt, env) = strip_and_mono env rt in
      (* Monomorphize the arglist *)
-     let (args, tbl) = monomorphize_expr_list tbl args in
+     let (args, env) = monomorphize_expr_list env args in
      (* Does the funcall have a substitution list? *)
      if List.length substs > 0 then
        (* The function is generic. *)
        (* Monomorphize the tyargs *)
        let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
-       let (tyargs, tbl) = monomorphize_ty_list tbl tyargs in
-       (match get_monomorph_id tbl name tyargs with
-        | Some id ->
-           (MGenericFuncall (id, args, rt), tbl)
-        | None ->
-           let (id, tbl) = add_monomorph tbl name tyargs in
-           (MGenericFuncall (id, args, rt), tbl))
+       let (tyargs, env) = monomorphize_ty_list env tyargs in
+       let (env, mono_id) = add_or_get_function_monomorph env decl_id tyargs in
+       (MGenericFuncall (mono_id, args, rt), env)
      else
        (* The function is concrete. *)
-       (MConcreteFuncall (name, args, rt), tbl)
-  | TMethodCall (_, name, typarams, args, rt, substs) ->
+       (MConcreteFuncall (decl_id, name, args, rt), env)
+  | TMethodCall (ins_meth_id, name, typarams, args, rt, substs) ->
      (* Monomorphize the return type. *)
-     let (rt, tbl) = strip_and_mono tbl rt in
+     let (rt, env) = strip_and_mono env rt in
      (* Monomorphize the arglist *)
-     let (args, tbl) = monomorphize_expr_list tbl args in
+     let (args, env) = monomorphize_expr_list env args in
      (* Does the funcall have a list of type params? *)
      if List.length typarams > 0 then
        (* The instance is generic. *)
        (* Monomorphize the tyargs *)
        let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
-       let (tyargs, tbl) = monomorphize_ty_list tbl tyargs in
-       (match get_monomorph_id tbl name tyargs with
-        | Some id ->
-           (MGenericFuncall (id, args, rt), tbl)
-        | None ->
-           let (id, tbl) = add_monomorph tbl name tyargs in
-           (MGenericFuncall (id, args, rt), tbl))
+       let (tyargs, env) = monomorphize_ty_list env tyargs in
+       let (env, mono_id) = add_or_get_instance_method_monomorph env ins_meth_id tyargs in
+       (MGenericMethodCall (ins_meth_id, mono_id, args, rt), env)
      else
        (* The instance is concrete. *)
-       (MConcreteFuncall (name, args, rt), tbl)
+       (MConcreteMethodCall (ins_meth_id, name, args, rt), env)
   | TCast (expr, ty) ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     let (expr, tbl) = monomorphize_expr tbl expr in
-     (MCast (expr, ty), tbl)
+     let (ty, env) = strip_and_mono env ty in
+     let (expr, env) = monomorphize_expr env expr in
+     (MCast (expr, ty), env)
   | TComparison (oper, lhs, rhs) ->
-     let (lhs, tbl) = monomorphize_expr tbl lhs in
-     let (rhs, tbl) = monomorphize_expr tbl rhs in
-     (MComparison (oper, lhs, rhs), tbl)
+     let (lhs, env) = monomorphize_expr env lhs in
+     let (rhs, env) = monomorphize_expr env rhs in
+     (MComparison (oper, lhs, rhs), env)
   | TConjunction (lhs, rhs) ->
-     let (lhs, tbl) = monomorphize_expr tbl lhs in
-     let (rhs, tbl) = monomorphize_expr tbl rhs in
-     (MConjunction (lhs, rhs), tbl)
+     let (lhs, env) = monomorphize_expr env lhs in
+     let (rhs, env) = monomorphize_expr env rhs in
+     (MConjunction (lhs, rhs), env)
   | TDisjunction (lhs, rhs) ->
-     let (lhs, tbl) = monomorphize_expr tbl lhs in
-     let (rhs, tbl) = monomorphize_expr tbl rhs in
-     (MDisjunction (lhs, rhs), tbl)
+     let (lhs, env) = monomorphize_expr env lhs in
+     let (rhs, env) = monomorphize_expr env rhs in
+     (MDisjunction (lhs, rhs), env)
   | TNegation expr ->
-     let (expr, tbl) = monomorphize_expr tbl expr in
-     (MNegation expr, tbl)
+     let (expr, env) = monomorphize_expr env expr in
+     (MNegation expr, env)
   | TIfExpression (c, t, f) ->
-     let (c, tbl) = monomorphize_expr tbl c in
-     let (t, tbl) = monomorphize_expr tbl t in
-     let (f, tbl) = monomorphize_expr tbl f in
-     (MIfExpression (c, t, f), tbl)
+     let (c, env) = monomorphize_expr env c in
+     let (t, env) = monomorphize_expr env t in
+     let (f, env) = monomorphize_expr env f in
+     (MIfExpression (c, t, f), env)
   | TRecordConstructor (ty, args) ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     let (args, tbl) = monomorphize_named_expr_list tbl args in
-     (MRecordConstructor (ty, args), tbl)
+     let (ty, env) = strip_and_mono env ty in
+     let (args, env) = monomorphize_named_expr_list env args in
+     (MRecordConstructor (ty, args), env)
   | TUnionConstructor (ty, case_name, args) ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     let (args, tbl) = monomorphize_named_expr_list tbl args in
-     (MUnionConstructor (ty, case_name, args), tbl)
+     let (ty, env) = strip_and_mono env ty in
+     let (args, env) = monomorphize_named_expr_list env args in
+     (MUnionConstructor (ty, case_name, args), env)
   | TTypeAliasConstructor (ty, expr) ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     let (expr, tbl) = monomorphize_expr tbl expr in
-     (MTypeAliasConstructor (ty, expr), tbl)
+     let (ty, env) = strip_and_mono env ty in
+     let (expr, env) = monomorphize_expr env expr in
+     (MTypeAliasConstructor (ty, expr), env)
   | TPath { head; elems; ty } ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     let (head, tbl) = monomorphize_expr tbl head in
-     let (elems, tbl) = monomorphize_path_elems tbl elems in
-     (MPath { head = head; elems = elems; ty = ty }, tbl)
+     let (ty, env) = strip_and_mono env ty in
+     let (head, env) = monomorphize_expr env head in
+     let (elems, env) = monomorphize_path_elems env elems in
+     (MPath { head = head; elems = elems; ty = ty }, env)
   | TEmbed (ty, fmt, args) ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     let (args, tbl) = monomorphize_expr_list tbl args in
-     (MEmbed (ty, fmt, args), tbl)
+     let (ty, env) = strip_and_mono env ty in
+     let (args, env) = monomorphize_expr_list env args in
+     (MEmbed (ty, fmt, args), env)
   | TDeref expr ->
-     let (expr, tbl) = monomorphize_expr tbl expr in
-     (MDeref expr, tbl)
+     let (expr, env) = monomorphize_expr env expr in
+     (MDeref expr, env)
   | TSizeOf ty ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     (MSizeOf ty, tbl)
+     let (ty, env) = strip_and_mono env ty in
+     (MSizeOf ty, env)
 
-and monomorphize_expr_list (tbl: mono_tbl) (exprs: texpr list): (mexpr list * mono_tbl) =
+and monomorphize_expr_list (env: env) (exprs: texpr list): (mexpr list * env) =
   match exprs with
   | first::rest ->
-     let (first, tbl) = monomorphize_expr tbl first in
-     let (rest, tbl) = monomorphize_expr_list tbl rest in
-     (first :: rest, tbl)
+     let (first, env) = monomorphize_expr env first in
+     let (rest, env) = monomorphize_expr_list env rest in
+     (first :: rest, env)
   | [] ->
-     ([], tbl)
+     ([], env)
 
-and monomorphize_named_expr_list (tbl: mono_tbl) (exprs: (identifier * texpr) list): ((identifier * mexpr) list * mono_tbl) =
+and monomorphize_named_expr_list (env: env) (exprs: (identifier * texpr) list): ((identifier * mexpr) list * env) =
   match exprs with
   | (name, first)::rest ->
-     let (first, tbl) = monomorphize_expr tbl first in
-     let (rest, tbl) = monomorphize_named_expr_list tbl rest in
-     ((name, first) :: rest, tbl)
+     let (first, env) = monomorphize_expr env first in
+     let (rest, env) = monomorphize_named_expr_list env rest in
+     ((name, first) :: rest, env)
   | [] ->
-     ([], tbl)
+     ([], env)
 
-and monomorphize_path_elems (tbl: mono_tbl) (elems: typed_path_elem list): (mtyped_path_elem list * mono_tbl) =
+and monomorphize_path_elems (env: env) (elems: typed_path_elem list): (mtyped_path_elem list * env) =
   match elems with
   | first::rest ->
-     let (first, tbl) = monomorphize_path_elem tbl first in
-     let (rest, tbl) = monomorphize_path_elems tbl rest in
-     (first :: rest, tbl)
+     let (first, env) = monomorphize_path_elem env first in
+     let (rest, env) = monomorphize_path_elems env rest in
+     (first :: rest, env)
   | [] ->
-     ([], tbl)
+     ([], env)
 
-and monomorphize_path_elem (tbl: mono_tbl) (elem: typed_path_elem): (mtyped_path_elem * mono_tbl) =
+and monomorphize_path_elem (env: env) (elem: typed_path_elem): (mtyped_path_elem * env) =
   match elem with
   | TSlotAccessor (name, ty) ->
      let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
-     (MSlotAccessor (name, ty), tbl)
+     let (ty, env) = monomorphize_ty env ty in
+     (MSlotAccessor (name, ty), env)
   | TPointerSlotAccessor (name, ty) ->
      let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
-     (MPointerSlotAccessor (name, ty), tbl)
+     let (ty, env) = monomorphize_ty env ty in
+     (MPointerSlotAccessor (name, ty), env)
   | TArrayIndex (idx, ty) ->
      let ty = strip_type ty in
-     let (ty, tbl) = monomorphize_type tbl ty in
-     let (idx, tbl) = monomorphize_expr tbl idx in
-     (MArrayIndex (idx, ty), tbl)
+     let (ty, env) = monomorphize_ty env ty in
+     let (idx, env) = monomorphize_expr env idx in
+     (MArrayIndex (idx, ty), env)
 
-let rec monomorphize_stmt (tbl: mono_tbl) (stmt: tstmt): (mstmt * mono_tbl) =
+(* Monomorphize statements *)
+
+let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
   match stmt with
   | TSkip _ ->
-     (MSkip, tbl)
+     (MSkip, env)
   | TLet (_, name, ty, value, body) ->
-     let (ty, tbl) = strip_and_mono tbl ty in
-     let (value, tbl) = monomorphize_expr tbl value in
-     let (body, tbl) = monomorphize_stmt tbl body in
-     (MLet (name, ty, value, body), tbl)
+     let (ty, env) = strip_and_mono env ty in
+     let (value, env) = monomorphize_expr env value in
+     let (body, env) = monomorphize_stmt env body in
+     (MLet (name, ty, value, body), env)
   | TDestructure (_, bindings, value, body) ->
-     let (bindings, tbl) = monomorphize_named_ty_list tbl (List.map (fun (n, t) -> (n, strip_type t)) bindings) in
-     let (value, tbl) = monomorphize_expr tbl value in
-     let (body, tbl) = monomorphize_stmt tbl body in
-     (MDestructure (bindings, value, body), tbl)
+     let (bindings, env) = monomorphize_named_ty_list env (List.map (fun (n, t) -> (n, strip_type t)) bindings) in
+     let (value, env) = monomorphize_expr env value in
+     let (body, env) = monomorphize_stmt env body in
+     (MDestructure (bindings, value, body), env)
   | TAssign (_, lvalue, value) ->
-     let (lvalue, tbl) = monomorphize_lvalue tbl lvalue in
-     let (value, tbl) = monomorphize_expr tbl value in
-     (MAssign (lvalue, value), tbl)
+     let (lvalue, env) = monomorphize_lvalue env lvalue in
+     let (value, env) = monomorphize_expr env value in
+     (MAssign (lvalue, value), env)
   | TIf (_, c, t, f) ->
-     let (c, tbl) = monomorphize_expr tbl c in
-     let (t, tbl) = monomorphize_stmt tbl t in
-     let (f, tbl) = monomorphize_stmt tbl f in
-     (MIf (c, t, f), tbl)
+     let (c, env) = monomorphize_expr env c in
+     let (t, env) = monomorphize_stmt env t in
+     let (f, env) = monomorphize_stmt env f in
+     (MIf (c, t, f), env)
   | TCase (_, value, whens) ->
-     let (value, tbl) = monomorphize_expr tbl value in
-     let (whens, tbl) = monomorphize_whens tbl whens in
-     (MCase (value, whens), tbl)
+     let (value, env) = monomorphize_expr env value in
+     let (whens, env) = monomorphize_whens env whens in
+     (MCase (value, whens), env)
   | TWhile (_, value, body) ->
-     let (value, tbl) = monomorphize_expr tbl value in
-     let (body, tbl) = monomorphize_stmt tbl body in
-     (MWhile (value, body), tbl)
+     let (value, env) = monomorphize_expr env value in
+     let (body, env) = monomorphize_stmt env body in
+     (MWhile (value, body), env)
   | TFor (_, name, start, final, body) ->
-     let (start, tbl) = monomorphize_expr tbl start in
-     let (final, tbl) = monomorphize_expr tbl final in
-     let (body, tbl) = monomorphize_stmt tbl body in
-     (MFor (name, start, final, body), tbl)
+     let (start, env) = monomorphize_expr env start in
+     let (final, env) = monomorphize_expr env final in
+     let (body, env) = monomorphize_stmt env body in
+     (MFor (name, start, final, body), env)
   | TBorrow { span; original; rename; region; orig_type; ref_type; body; mode } ->
      let _ = span in
-     let (orig_type, tbl) = strip_and_mono tbl orig_type in
-     let (ref_type, tbl) = strip_and_mono tbl ref_type in
-     let (body, tbl) = monomorphize_stmt tbl body in
-     (MBorrow { original = original; rename = rename; region = region; orig_type = orig_type; ref_type = ref_type; body = body; mode = mode }, tbl)
+     let (orig_type, env) = strip_and_mono env orig_type in
+     let (ref_type, env) = strip_and_mono env ref_type in
+     let (body, env) = monomorphize_stmt env body in
+     (MBorrow { original = original; rename = rename; region = region; orig_type = orig_type; ref_type = ref_type; body = body; mode = mode }, env)
   | TBlock (_, a, b) ->
-     let (a, tbl) = monomorphize_stmt tbl a in
-     let (b, tbl) = monomorphize_stmt tbl b in
-     (MBlock (a, b), tbl)
+     let (a, env) = monomorphize_stmt env a in
+     let (b, env) = monomorphize_stmt env b in
+     (MBlock (a, b), env)
   | TDiscarding (_, value) ->
-     let (value, tbl) = monomorphize_expr tbl value in
-     (MDiscarding value, tbl)
+     let (value, env) = monomorphize_expr env value in
+     (MDiscarding value, env)
   | TReturn (_, value) ->
-     let (value, tbl) = monomorphize_expr tbl value in
-     (MReturn value, tbl)
+     let (value, env) = monomorphize_expr env value in
+     (MReturn value, env)
 
-and monomorphize_lvalue (tbl: mono_tbl) (lvalue: typed_lvalue): (mtyped_lvalue * mono_tbl) =
+and monomorphize_lvalue (env: env) (lvalue: typed_lvalue): (mtyped_lvalue * env) =
   match lvalue with
   | TypedLValue (name, elems) ->
-     let (elems, tbl) = monomorphize_path_elems tbl elems in
-     (MTypedLValue (name, elems), tbl)
+     let (elems, env) = monomorphize_path_elems env elems in
+     (MTypedLValue (name, elems), env)
 
-and monomorphize_whens (tbl: mono_tbl) (whens: typed_when list): (mtyped_when list * mono_tbl) =
+and monomorphize_whens (env: env) (whens: typed_when list): (mtyped_when list * env) =
   match whens with
   | first::rest ->
-     let (first, tbl) = monomorphize_when tbl first in
-     let (rest, tbl) = monomorphize_whens tbl rest in
-     (first :: rest, tbl)
+     let (first, env) = monomorphize_when env first in
+     let (rest, env) = monomorphize_whens env rest in
+     (first :: rest, env)
   | [] ->
-     ([], tbl)
+     ([], env)
 
-and monomorphize_when (tbl: mono_tbl) (w: typed_when): (mtyped_when * mono_tbl) =
+and monomorphize_when (env: env) (w: typed_when): (mtyped_when * env) =
   let (TypedWhen (name, params, body)) = w in
-  let (params, tbl) = monomorphize_params tbl params in
-  let (body, tbl) = monomorphize_stmt tbl body in
-  (MTypedWhen (name, params, body), tbl)
+  let (params, env) = monomorphize_params env params in
+  let (body, env) = monomorphize_stmt env body in
+  (MTypedWhen (name, params, body), env)
 
-and monomorphize_params (tbl: mono_tbl) (params: value_parameter list): (mvalue_parameter list * mono_tbl) =
+and monomorphize_params (env: env) (params: value_parameter list): (mvalue_parameter list * env) =
   match params with
   | first::rest ->
-     let (first, tbl) = monomorphize_param tbl first in
-     let (rest, tbl) = monomorphize_params tbl rest in
-     (first :: rest, tbl)
+     let (first, env) = monomorphize_param env first in
+     let (rest, env) = monomorphize_params env rest in
+     (first :: rest, env)
   | [] ->
-     ([], tbl)
+     ([], env)
 
-and monomorphize_param (tbl: mono_tbl) (param: value_parameter): (mvalue_parameter * mono_tbl) =
+and monomorphize_param (env: env) (param: value_parameter): (mvalue_parameter * env) =
   let (ValueParameter (name, ty)) = param in
-  let (ty, tbl) = strip_and_mono tbl ty in
-  (MValueParameter (name, ty), tbl)
+  let (ty, env) = strip_and_mono env ty in
+  (MValueParameter (name, ty), env)
 
-let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
-  match expr with
-  | TNilConstant ->
-     TNilConstant
-  | TBoolConstant b ->
-     TBoolConstant b
-  | TIntConstant i ->
-     TIntConstant i
-  | TFloatConstant f ->
-     TFloatConstant f
-  | TStringConstant s ->
-     TStringConstant s
-  | TVariable (name, ty) ->
-     let ty = replace_variables bindings ty in
-     TVariable (name, ty)
-  | TArithmetic (oper, lhs, rhs) ->
-     let lhs = replace_tyvars_expr bindings lhs
-     and rhs = replace_tyvars_expr bindings rhs in
-     TArithmetic (oper, lhs, rhs)
-  | TFuncall (name, args, rt, substs) ->
-     let args = List.map (replace_tyvars_expr bindings) args
-     and rt = replace_variables bindings rt
-     and substs = List.map (fun (n, t) -> (n, replace_variables bindings t)) substs in
-     TFuncall (name, args, rt, substs)
-  | TMethodCall (meth_id, name, instance, args, rt, substs) ->
-     let args = List.map (replace_tyvars_expr bindings) args
-     and rt = replace_variables bindings rt
-     and substs = List.map (fun (n, t) -> (n, replace_variables bindings t)) substs in
-     TMethodCall (meth_id, name, instance, args, rt, substs)
-  | TCast (expr, ty) ->
-     let expr = replace_tyvars_expr bindings expr
-     and ty = replace_variables bindings ty in
-     TCast (expr, ty)
-  | TComparison (oper, lhs, rhs) ->
-     let lhs = replace_tyvars_expr bindings lhs
-     and rhs = replace_tyvars_expr bindings rhs in
-     TComparison (oper, lhs, rhs)
-  | TConjunction (lhs, rhs) ->
-     let lhs = replace_tyvars_expr bindings lhs
-     and rhs = replace_tyvars_expr bindings rhs in
-     TConjunction (lhs, rhs)
-  | TDisjunction (lhs, rhs) ->
-     let lhs = replace_tyvars_expr bindings lhs
-     and rhs = replace_tyvars_expr bindings rhs in
-     TDisjunction (lhs, rhs)
-  | TNegation expr ->
-     let expr = replace_tyvars_expr bindings expr in
-     TNegation expr
-  | TIfExpression (c, t, f) ->
-     let c = replace_tyvars_expr bindings c
-     and t = replace_tyvars_expr bindings t
-     and f = replace_tyvars_expr bindings f in
-     TIfExpression (c, t, f)
-  | TRecordConstructor (ty, args) ->
-     let ty = replace_variables bindings ty
-     and args = List.map (fun (n, e) -> (n, replace_tyvars_expr bindings e)) args in
-     TRecordConstructor (ty, args)
-  | TUnionConstructor (ty, case_name, args) ->
-     let ty = replace_variables bindings ty
-     and args = List.map (fun (n, e) -> (n, replace_tyvars_expr bindings e)) args in
-     TUnionConstructor (ty, case_name, args)
-  | TTypeAliasConstructor (ty, expr) ->
-     let ty = replace_variables bindings ty
-     and expr = replace_tyvars_expr bindings expr in
-     TTypeAliasConstructor (ty, expr)
-  | TPath { head; elems; ty } ->
-     let head = replace_tyvars_expr bindings head
-     and elems = List.map (replace_tyvars_path bindings) elems
-     and ty = replace_variables bindings ty in
-    TPath { head = head; elems = elems; ty = ty }
-  | TEmbed (ty, fmt, args) ->
-     let ty = replace_variables bindings ty
-     and args = List.map (replace_tyvars_expr bindings) args in
-     TEmbed (ty, fmt, args)
-  | TDeref expr ->
-     let expr = replace_tyvars_expr bindings expr in
-     TDeref expr
-  | TSizeOf ty ->
-     let ty = replace_variables bindings ty in
-     TSizeOf ty
+and monomorphize_named_ty_list (env: env) (tys: (identifier * stripped_ty) list): ((identifier * mono_ty) list * env) =
+  match tys with
+  | (name, first)::rest ->
+     let (first, env) = monomorphize_ty env first in
+     let (rest, env) = monomorphize_named_ty_list env rest in
+     ((name, first) :: rest, env)
+  | [] ->
+     ([], env)
 
-and replace_tyvars_path (bindings: type_bindings) (elem: typed_path_elem): typed_path_elem =
-  match elem with
-  | TSlotAccessor (name, ty) ->
-     let ty = replace_variables bindings ty in
-     TSlotAccessor (name, ty)
-  | TPointerSlotAccessor (name, ty) ->
-     let ty = replace_variables bindings ty in
-     TPointerSlotAccessor (name, ty)
-  | TArrayIndex (idx, ty) ->
-     let idx = replace_tyvars_expr bindings idx
-     and ty = replace_variables bindings ty in
-     TArrayIndex (idx, ty)
+(* Monomorphize declarations *)
 
-let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
-  match stmt with
-  | TSkip span ->
-     TSkip span
-  | TLet (span, name, ty, value, body) ->
-     let ty = replace_variables bindings ty
-     and value = replace_tyvars_expr bindings value
-     and body = replace_tyvars_stmt bindings body in
-     TLet (span, name, ty, value, body)
-  | TDestructure (span, params, value, body) ->
-     let params = List.map (fun (n, ty) -> (n, replace_variables bindings ty)) params
-     and value = replace_tyvars_expr bindings value
-     and body = replace_tyvars_stmt bindings body in
-     TDestructure (span, params, value, body)
-  | TAssign (span, lvalue, value) ->
-     let lvalue = replace_tyvars_lvalue bindings lvalue
-     and value = replace_tyvars_expr bindings value in
-     TAssign (span, lvalue, value)
-  | TIf (span, c, t, f) ->
-     let c = replace_tyvars_expr bindings c
-     and t = replace_tyvars_stmt bindings t
-     and f = replace_tyvars_stmt bindings f in
-     TIf (span, c, t, f)
-  | TCase (span, value, whens) ->
-     let value = replace_tyvars_expr bindings value
-     and whens = List.map (replace_tyvars_when bindings) whens in
-     TCase (span, value, whens)
-  | TWhile (span, value, body) ->
-      let value = replace_tyvars_expr bindings value
-      and body = replace_tyvars_stmt bindings body in
-      TWhile (span, value, body)
-  | TFor (span, name, initial, final, body) ->
-     let initial = replace_tyvars_expr bindings initial
-     and final = replace_tyvars_expr bindings final
-     and body = replace_tyvars_stmt bindings body in
-     TFor (span, name, initial, final, body)
-  | TBorrow { span; original; rename; region; orig_type; ref_type; body; mode } ->
-     let orig_type = replace_variables bindings orig_type
-     and ref_type = replace_variables bindings ref_type
-     and body = replace_tyvars_stmt bindings body in
-     TBorrow {
-         span = span;
-         original = original;
-         rename = rename;
-         region = region;
-         orig_type = orig_type;
-         ref_type = ref_type;
-         body = body;
-         mode = mode
-       }
-  | TBlock (span, a, b) ->
-     let a = replace_tyvars_stmt bindings a
-     and b = replace_tyvars_stmt bindings b in
-     TBlock (span, a, b)
-  | TDiscarding (span, expr) ->
-     let expr = replace_tyvars_expr bindings expr in
-     TDiscarding (span, expr)
-  | TReturn (span, expr) ->
-     let expr = replace_tyvars_expr bindings expr in
-     TReturn (span, expr)
+let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
+  match decl with
+  | TConstant (id, _, name, ty, value, _) ->
+    (* Constant are intrinsically monomorphic, and can be monomorphized
+       painlessly. *)
+    let (ty, env) = strip_and_mono env ty in
+    let (value, env) = monomorphize_expr env value in
+    let decl = MConstant (id, name, ty, value) in
+    (Some decl, env)
+  | TTypeAlias (id, _, name, typarams, _, ty, _) ->
+    (* Concrete (i.e., no type parameters) type aliases can be monomorphized
+       immediately. Generic ones are monomorphized on demand. *)
+    (match typarams with
+     | [] ->
+       let (ty, env) = strip_and_mono env ty in
+       let decl = MTypeAlias (id, name, ty) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
+  | TRecord (id, _, name, typarams, _, slots, _) ->
+    (* Concrete records are monomorphized immediately. Generic records are
+       monomorphized on demand. *)
+    (match typarams with
+     | [] ->
+       let (env, slots) = monomorphize_slots env slots in
+       let decl = MRecord (id, name, slots) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
+  | TUnion (id, _, name, typarams, _, cases, _) ->
+    (* Concrete unions are monomorphized immediately. Generic unions are
+       monomorphized on demand. *)
+    (match typarams with
+     | [] ->
+       let (env, cases) = Util.map_with_context (fun (e, c) -> monomorphize_case e c) env cases in
+       let decl = MUnion (id, name, cases) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
+  | TFunction (id, _, name, typarams, value_params, rt, body, _) ->
+    (* Concrete functions are monomorphized immediately. Generic functions are
+       monomorphized on demand. *)
+    (match typarams with
+     | [] ->
+       let (env, params) = monomorphize_params env value_params in
+       let (rt, env) = strip_and_mono env rt in
+       let (body, env) = monomorphize_stmt env body in
+       let decl = MFunction (id, name, params, rt, body) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
+  | TForeignFunction (id, _, name, params, rt, underlying, _) ->
+    (* Foreign functions are intrinsically monomorphic. *)
+    let (env, params) = monomorphize_params env params in
+    let (rt, env) = strip_and_mono env rt in
+    let decl = MForeignFunction (id, name, params, rt, underlying) in
+    (Some decl, env)
+  | TTypeClass _ ->
+    (* Type classes are purely "informative" declarations: they have no physical
+       existence in the code. *)
+    (None, env)
+  | TInstance (decl_id, _, name, typarams, argument, methods, _) ->
+    (* Concrete instances can be monomorphized immediately. *)
+    (match typarams with
+     | [] ->
+       let (argument, env) = strip_and_mono env argument in
+       let (env, methods) = monomorphize_methods env methods in
+       let decl = MConcreteInstance (decl_id, name, argument, methods) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
 
-and replace_tyvars_lvalue (bindings: type_bindings) (lvalue: typed_lvalue): typed_lvalue =
-  let (TypedLValue (name, elems)) = lvalue in
-  let elems = List.map (replace_tyvars_path bindings) elems in
-  TypedLValue (name, elems)
+and monomorphize_slot (env: env) (slot: typed_slot): (env * mono_slot) =
+  let (TypedSlot (name, ty)) = slot in
+  let (ty, env) = strip_and_mono env ty in
+  (env, MonoSlot (name, ty))
 
-and replace_tyvars_when (bindings: type_bindings) (twhen: typed_when): typed_when =
-  let (TypedWhen (name, params, body)) = twhen in
-  let params = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables bindings t)) params
-  and body = replace_tyvars_stmt bindings body in
-  TypedWhen (name, params, body)
+and monomorphize_slots (env: env) (slots: typed_slot list): (env * mono_slot list) =
+  Util.map_with_context (fun (e, s) -> monomorphize_slot e s) env slots
+
+and monomorphize_case (env: env) (case: linked_case): (env * mono_case) =
+  let (LCase (_, name, slots)) = case in
+  let (env, slots) = monomorphize_slots env slots in
+  (env, MonoCase (name, slots))
+
+and monomorphize_param (env: env) (param: value_parameter): (env * mvalue_parameter) =
+  let (ValueParameter (name, ty)) = param in
+  let (ty, env) = strip_and_mono env ty in
+  (env, MValueParameter (name, ty))
+
+and monomorphize_params (env: env) (params: value_parameter list): (env * mvalue_parameter list) =
+  Util.map_with_context (fun (e, p) -> monomorphize_param e p) env params
+
+and monomorphize_methods (env: env) (methods: typed_method_def list): (env * concrete_method list) =
+  Util.map_with_context (fun (e, m) -> monomorphize_method e m) env methods
+
+and monomorphize_method (env: env) (meth: typed_method_def): (env * concrete_method) =
+  let (TypedMethodDef (id, name, params, rt, body)) = meth in
+  let (env, params) = monomorphize_params env params in
+  let (rt, env) = strip_and_mono env rt in
+  let (body, env) = monomorphize_stmt env body in
+  (env, MConcreteMethod (id, name, params, rt, body))
+
+(* Monomorphize modules *)
+
+let rec monomorphize (env: env) (m: typed_module): (env * mono_module) =
+  (* Monomorphize what we can: concrete definitions. *)
+  let (TypedModule (module_name, decls)) = m in
+  let (env, declopts) =
+    Util.map_with_context (fun (e, d) -> let (d, e) = monomorphize_decl e d in (e, d)) env decls in
+  let decls: mdecl list = List.filter_map (fun x -> x) declopts in
+  (* Recursively collect and instantiate monomorphs until everything's instantiated. *)
+  let (env, decls'): (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+  (env, MonoModule (module_name, decls @ decls'))
+
+and instantiate_monomorphs_until_exhausted (env: env): (env * mdecl list) =
+  (* Get uninstantiated monomorphs from the environment. *)
+  let monos: monomorph list = get_uninstantiated_monomorphs env in
+  match monos with
+  | first::rest ->
+    (* If there are uninstantiated monomorphs, instantite them, and repeat the
+       process. *)
+    let (env, decls): (env * mdecl list) = instantiate_monomorphs env (first::rest) in
+    let (env, decls') : (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+    (env, decls @ decls')
+  | [] ->
+    (* If there are no uninstantiated monomorphs, we're done. *)
+    (env, [])
+
+and instantiate_monomorphs (env: env) (monos: monomorph list): (env * mdecl list) =
+  (* Instantiate a list of monomorphs. *)
+  Util.map_with_context (fun (e, m) -> instantiate_monomorph e m) env monos
+
+and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
+  match mono with
+  | MonoTypeAliasDefinition { id; type_id; tyargs; _ } ->
+    (* Find the type alias declaration and extract the type parameters and the
+       definition. *)
+    let (typarams, ty) = get_type_alias_definition env type_id in
+    (* Search/replace the type variables in `def` with the type arguments from
+       this monomorph. *)
+    let ty = replace_type_variables typarams tyargs ty in
+    (* Strip and monomorphize the type. *)
+    let (ty, env) = strip_and_mono env ty in
+    (* Store the monomorphic type in the environment. *)
+    let env = store_type_alias_monomorph_definition env id ty in
+    (* Construct a monomorphic type alias decl. *)
+    let decl: mdecl = MTypeAliasMonomorph (id, ty) in
+    (* Return the new environment and the declaration. *)
+    (env, decl)
+  | _ ->
+    err "not implemented yet"
+
+(* Utils *)
+
+and get_type_alias_definition (env: env) (id: decl_id): (type_parameter list * ty) =
+  match get_decl_by_id env id with
+  | Some (TypeAlias { typarams; def; _ }) ->
+    (typarams, def)
+  | _ ->
+    err "internal"
+
+and replace_type_variables (typarams: type_parameter list) (args: mono_ty list) (ty: ty): ty =
+  (* Given a list of type parameters, a list of monomorphic type arguments (of
+     the same length), and a type expression, replace all instances of the type
+     variables in the type expression with their corresponding argument
+     (implicitly converting the `mono_ty` into a `ty`).
+
+     Ideally we shouldn't need to bring the type parameters, rather, monomorphs
+     should be stored in the environment with an `(identifier, mono_ty)` map
+     rather than as a bare list of monomorphic type arguments. *)
+  if (List.length typarams) <> (List.length args) then
+    err "internal: not the same number of type parameters and type arguments"
+  else
+    let typaram_names: identifier list = List.map (fun (TypeParameter (n, _, _)) -> n) typarams in
+    let args: ty list = List.map mono_to_ty args in
+    (* Pray that this assumption is not violated. *)
+    let combined: (identifier * ty) list = List.combine typaram_names args in
+    replace_vars combined ty
+
+and mono_to_ty (ty: mono_ty): ty =
+  let r = mono_to_ty in
+  match ty with
+  | MonoUnit -> Unit
+  | MonoBoolean -> Boolean
+  | MonoInteger (s, w) -> Integer (s, w)
+  | MonoSingleFloat -> SingleFloat
+  | MonoDoubleFloat -> DoubleFloat
+  | MonoNamedType mono_id ->
+    (* SPECIAL CASE *)
+    MonoTy mono_id
+  | MonoArray (elem_ty, region) ->
+    Array (r elem_ty, region)
+  | MonoRegionTy r ->
+    RegionTy r
+  | MonoReadRef (ty, region) ->
+    ReadRef (r ty, r region)
+  | MonoWriteRef (ty, region) ->
+    WriteRef (r ty, r region)
+  | MonoRawPointer ty ->
+    RawPointer (r ty)
+
+and replace_vars (bindings: (identifier * ty) list) (ty: ty): ty =
+  let r = replace_vars bindings in
+  match ty with
+  | Unit -> Unit
+  | Boolean -> Boolean
+  | Integer (s, w) -> Integer (s, w)
+  | SingleFloat -> SingleFloat
+  | DoubleFloat -> DoubleFloat
+  | NamedType (name, args, u) ->
+    NamedType (name, List.map r args, u)
+  | Array (ty, region) ->
+    Array (r ty, region)
+  | RegionTy r ->
+    RegionTy r
+  | ReadRef (ty, reg) ->
+    ReadRef (r ty, r reg)
+  | WriteRef (ty, reg) ->
+    WriteRef (r ty, r reg)
+  | TyVar (TypeVariable (name, _, _)) ->
+    List.assoc name bindings
+  | RawPointer ty ->
+    RawPointer (r ty)
+  | MonoTy id ->
+    MonoTy id

@@ -1,74 +1,47 @@
-(** Code for monomorphizing types and ASTs. *)
-open Type
+open Env
+open TypeStripping
 open MonoType
 open Tast
 open Mtast
-open TypeBindings
 
-(** A stripped type specifier is the same as a type specifier, but the region
-   and type variable cases have been removed. *)
-type stripped_ty
+(** Monomorphize a type specifier, returning a monomorphic type and the updated
+   environment. *)
+val monomorphize_ty : env -> stripped_ty -> (mono_ty * env)
 
-(** Strip a type specifier. *)
-val strip_type : ty -> stripped_ty
+(** Monomorphize an expression, returning a monomorphic expression and the
+   updated environment. *)
+val monomorphize_expr : env -> texpr -> (mexpr * env)
 
-(** Monomorphize a type.
+(** Monomorphize a statement, returning a monomorphic statement and the updated
+   environment. *)
+val monomorphize_stmt : env -> tstmt -> (mstmt * env)
 
-   This function works bottom up, looking for invocations of `NamedType` with
-   monomorphic arguments. When it finds one, it adds it to the table of
-   monomorphs and replaces it with an instance of `MonoNamedType` with a fresh
-   monomorph ID.
+(** Monomorphize a declaration, returning a monomorphic declaration and the
+   updated environment. Return {!None} where a declaration has no immediate
+   monomorph (e.g.: generic type definitions, which are monomorphized on
+   demand). *)
+val monomorphize_decl : env -> typed_decl -> (mdecl option * env)
 
-   To illustrate how it works, consider this type specifier:
+(** This is the entrypoint to the monomorphization pass.
 
-   {[
-   Map[Int, Pair[String, Option[Array[Int]]]]
-   ]}
+    Monomorphizing a module involves:
 
-   At each step in recursive monomorphization, the type specifier and the table
-   of monomorphs looks like this:
+    1. Take all the declarations and monomorphize the ones you can (e.g.:
+   concrete function definitions, concrete records, concrete instances).
 
-   {[
+    2. In the process, monomorphs will be collected into the environment.
 
-                      Expression                 |             Table
-       ------------------------------------------|---------------------------------
-                                                 |
-        Map[Int, Pair[String, Option[Mono{0}]]]  |  (Array,  [Int],             0)
-                                                 |
-       ------------------------------------------|---------------------------------
-                                                 |
-        Map[Int, Pair[String, Mono{1}]]          |  (Array,  [Int],             0)
-                                                 |  (Option, [Mono{0}],         1)
-                                                 |
-       ------------------------------------------|---------------------------------
-                                                 |
-        Map[Int, Mono{2}],                       |  (Array,  [Int],             0)
-                                                 |  (Option, [Mono{0}],         1)
-                                                 |  (Pair,   [String, Mono{1}], 2)
-                                                 |
-       ------------------------------------------|---------------------------------
-                                                 |
-        Mono{3}                                  |  (Array,  [Int],             0)
-                                                 |  (Option, [Mono{0}],         1)
-                                                 |  (Pair,   [String, Mono{1}], 2)
-                                                 |  (Map,    [Int, Mono{2}],    3)
+    3. Get all uninstantiated monomorphs from the environment, and instantiate
+   them. Again, new (uninstantiated) monomorphs will be collected and added to
+   the environment: for example, if you instantiate a generic function `f` and
+   the body of that function contains a call to a generic function `g` with
+   monomorphic arguments, that monomorph of `g` will be added to the
+   environment.
 
-   ]}
+    4. Repeat step #3 until there are no more uninstantiated monomorphs in the
+   environment.
 
-   For simplicity, the instantiation state is elided, since it's always
-   {!NotInstantiated} when a new monomorph is added to the table.
+    5. You're done.
 
- *)
-val monomorphize_type : mono_tbl -> stripped_ty -> (mono_ty * mono_tbl)
-
-(** Monomorphize an expression. *)
-val monomorphize_expr : mono_tbl -> texpr -> (mexpr * mono_tbl)
-
-(** Monomorphize a statement. *)
-val monomorphize_stmt : mono_tbl -> tstmt -> (mstmt * mono_tbl)
-
-(** Replace the type variables in a typed expression. *)
-val replace_tyvars_expr : type_bindings -> texpr -> texpr
-
-(** Replace the type variables in a typed statement. *)
-val replace_tyvars_stmt : type_bindings -> tstmt -> tstmt
+*)
+val monomorphize : env -> typed_module -> (env * mono_module)

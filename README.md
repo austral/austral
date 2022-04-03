@@ -66,7 +66,7 @@ Anti-features:
 Building the `austral` compiler requires `make` and the `dune` build system for
 OCaml, and a C++ compiler for building the resulting output.
 
-First, install [opam][opam].
+First, install [opam][opam]. On Debian/Ubuntu you can just do `sudo apt-get install opam`.
 
 Then:
 
@@ -161,7 +161,7 @@ $ austral typecheck \
 
 # License
 
-Copyright 2018–2021 [Fernando Borretti][fernando].
+Copyright 2018–2022 [Fernando Borretti][fernando].
 
 Licensed under the GPLv3 license. See the COPYING file for details.
 

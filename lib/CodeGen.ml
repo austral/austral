@@ -132,7 +132,9 @@ let rec gen_type (ty: ty): cpp_ty =
   | TyVar (TypeVariable (n, _, _)) ->
      CNamedType (gen_ident n, [])
   | RawPointer t ->
-     CPointer (gen_type t)
+    CPointer (gen_type t)
+  | MonoTy _ ->
+    err "Not applicable"
 
 and gen_named_type (name: qident) (args: ty list): cpp_ty =
   (* Option[Pointer[T]] types are compiled specially *)
@@ -185,7 +187,7 @@ let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
        CVar (gen_ident (original_name n))
      else
        CVar (gen_qident n)
-  | TFuncall (name, args, _, substs) ->
+  | TFuncall (_, name, args, _, substs) ->
      CFuncall (gen_qident name, List.map g args, List.map (fun (_, t) -> gen_type t) substs)
   | TMethodCall (_, name, _, args, _, _) ->
      CFuncall (gen_qident name, List.map g args, [])

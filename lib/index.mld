@@ -38,9 +38,7 @@ The compiler's middle end.
 
 - {!Austral_core.Id}
 - {!Austral_core.Env}
-- {!Austral_core.ModuleSystem}
 - {!Austral_core.Region}
-- {!Austral_core.Semantic}
 - {!Austral_core.Tast}
 - {!Austral_core.TypeBindings}
 - {!Austral_core.TypeMatch}
@@ -48,11 +46,13 @@ The compiler's middle end.
 - {!Austral_core.TypeParser}
 - {!Austral_core.TypeSystem}
 - {!Austral_core.TypeVarSet}
+- {!Austral_core.TypeReplace}
 - {!Austral_core.LexEnv}
 - {!Austral_core.TypingPass}
 - {!Austral_core.Pervasive}
 - {!Austral_core.BuiltIn}
 - {!Austral_core.Linearity}
+- {!Austral_core.TypeStripping}
 - {!Austral_core.MonoType}
 - {!Austral_core.Mtast}
 - {!Austral_core.Monomorphize}
