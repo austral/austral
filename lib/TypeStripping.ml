@@ -1,5 +1,6 @@
 open Type
 open Identifier
+open Region
 open Error
 
 type stripped_ty =
@@ -9,9 +10,10 @@ type stripped_ty =
   | SSingleFloat
   | SDoubleFloat
   | SNamedType of qident * stripped_ty list
-  | SArray of stripped_ty
-  | SReadRef of stripped_ty
-  | SWriteRef of stripped_ty
+  | SArray of stripped_ty * region
+  | SRegionTy of region
+  | SReadRef of stripped_ty * stripped_ty
+  | SWriteRef of stripped_ty * stripped_ty
   | SRawPointer of stripped_ty
 
 let rec strip_type (ty: ty): stripped_ty =
@@ -35,24 +37,32 @@ and strip_type' (ty: ty): stripped_ty option =
     Some SDoubleFloat
   | NamedType (n, args, _) ->
     Some (SNamedType (n, List.filter_map strip_type' args))
-  | Array (elem_ty, _) ->
+  | Array (elem_ty, r) ->
     (match (strip_type' elem_ty) with
      | Some elem_ty ->
-       Some (SArray elem_ty)
+       Some (SArray (elem_ty, r))
      | None ->
        err "Internal: array instantiated with a region type.")
-  | RegionTy _ ->
-    None
-  | ReadRef (ty, _) ->
+  | RegionTy r ->
+    Some (SRegionTy r)
+  | ReadRef (ty, r) ->
     (match (strip_type' ty) with
      | Some ty ->
-       Some (SReadRef ty)
+       (match (strip_type' r) with
+        | Some r ->
+          Some (SReadRef (ty, r))
+        | None ->
+          err "internal")
      | None ->
        err "Internal: read ref instantiated with a region type.")
-  | WriteRef (ty, _) ->
+  | WriteRef (ty, r) ->
     (match (strip_type' ty) with
      | Some ty ->
-       Some (SWriteRef ty)
+       (match (strip_type' r) with
+        | Some r ->
+          Some (SWriteRef (ty, r))
+        | None ->
+          err "internal")
      | None ->
        err "Internal: write ref instantiated with a region type.")
   | TyVar _ ->

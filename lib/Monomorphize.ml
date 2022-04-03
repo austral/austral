@@ -23,15 +23,19 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
     (MonoSingleFloat, env)
   | SDoubleFloat ->
     (MonoDoubleFloat, env)
-  | SArray elem_ty ->
+  | SRegionTy r ->
+    (MonoRegionTy r, env)
+  | SArray (elem_ty, region) ->
     let (elem_ty, env) = monomorphize_ty env elem_ty in
-    (MonoArray elem_ty, env)
-  | SReadRef ty ->
+    (MonoArray (elem_ty, region), env)
+  | SReadRef (ty, region) ->
     let (ty, env) = monomorphize_ty env ty in
-    (MonoReadRef ty, env)
-  | SWriteRef ty ->
+    let (region, env) = monomorphize_ty env region in
+    (MonoReadRef (ty, region), env)
+  | SWriteRef (ty, region) ->
     let (ty, env) = monomorphize_ty env ty in
-    (MonoWriteRef ty, env)
+    let (region, env) = monomorphize_ty env region in
+    (MonoWriteRef (ty, region), env)
   | SRawPointer ty ->
     let (ty, env) = monomorphize_ty env ty in
     (MonoRawPointer ty, env)

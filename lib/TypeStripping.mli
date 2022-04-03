@@ -1,13 +1,12 @@
 open Type
 open Identifier
+open Region
 
-(** A stripped type specifier is the same as a type specifier, but the region
-    and type variable cases have been removed.
+(** A stripped type specifier is the same as a type specifier, but type variable
+   case have been removed.
 
-    The reason for this is: by the time we get to the monomorphization stage, all
-    type variables should have been replaced by their type arguments. Also,
-    regions don't exist in the monomorphization phase.
-*)
+    The reason for this is: by the time we get to the monomorphization stage,
+   all type variables should have been replaced by their type arguments.  *)
 type stripped_ty =
   | SUnit
   | SBoolean
@@ -15,9 +14,10 @@ type stripped_ty =
   | SSingleFloat
   | SDoubleFloat
   | SNamedType of qident * stripped_ty list
-  | SArray of stripped_ty
-  | SReadRef of stripped_ty
-  | SWriteRef of stripped_ty
+  | SArray of stripped_ty * region
+  | SRegionTy of region
+  | SReadRef of stripped_ty * stripped_ty
+  | SWriteRef of stripped_ty * stripped_ty
   | SRawPointer of stripped_ty
 
 (** Strip a type specifier. *)

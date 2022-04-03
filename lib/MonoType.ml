@@ -2,6 +2,7 @@
 open Id
 open Identifier
 open Type
+open Region
 
 (** A monomorphic type. *)
 type mono_ty =
@@ -11,9 +12,10 @@ type mono_ty =
   | MonoSingleFloat
   | MonoDoubleFloat
   | MonoNamedType of mono_id
-  | MonoArray of mono_ty
-  | MonoReadRef of mono_ty
-  | MonoWriteRef of mono_ty
+  | MonoArray of mono_ty * region
+  | MonoRegionTy of region
+  | MonoReadRef of mono_ty * mono_ty
+  | MonoWriteRef of mono_ty * mono_ty
   | MonoRawPointer of mono_ty
 [@@deriving eq]
 
