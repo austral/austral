@@ -116,7 +116,9 @@ let rec match_type a b =
       | TyVar tyvar ->
          match_type_var tyvar a
       | _ ->
-         type_mismatch "Expected a Pointer, but got another type." a b)
+        type_mismatch "Expected a Pointer, but got another type." a b)
+  | MonoTy _ ->
+    err "Not applicable"
 
 and match_type_var (TypeVariable (name, universe, from)) ty =
   (* Check if the argument type is a variable. *)

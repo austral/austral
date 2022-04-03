@@ -78,3 +78,5 @@ and strip_type' (ty: ty): stripped_ty option =
        Some (SRawPointer ty)
      | None ->
        err "Internal: raw pointer type instantiated with a region type.")
+  | MonoTy _ ->
+    err "Not applicable"

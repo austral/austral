@@ -495,10 +495,33 @@ and replace_type_variables (typarams: type_parameter list) (args: mono_ty list) 
     err "internal: not the same number of type parameters and type arguments"
   else
     let typaram_names: identifier list = List.map (fun (TypeParameter (n, _, _)) -> n) typarams in
+    let args: ty list = List.map mono_to_ty args in
     (* Pray that this assumption is not violated. *)
-    let combined: (identifier * mono_ty) list = List.combine typaram_names args in
+    let combined: (identifier * ty) list = List.combine typaram_names args in
     replace_vars combined ty
 
-and replace_vars (bindings: (identifier * mono_ty) list) (ty: ty): ty =
+and mono_to_ty (ty: mono_ty): ty =
+  let r = mono_to_ty in
+  match ty with
+  | MonoUnit -> Unit
+  | MonoBoolean -> Boolean
+  | MonoInteger (s, w) -> Integer (s, w)
+  | MonoSingleFloat -> SingleFloat
+  | MonoDoubleFloat -> DoubleFloat
+  | MonoNamedType mono_id ->
+    (* SPECIAL CASE *)
+    MonoTy mono_id
+  | MonoArray (elem_ty, region) ->
+    Array (r elem_ty, region)
+  | MonoRegionTy r ->
+    RegionTy r
+  | MonoReadRef (ty, region) ->
+    ReadRef (r ty, r region)
+  | MonoWriteRef (ty, region) ->
+    WriteRef (r ty, r region)
+  | MonoRawPointer ty ->
+    RawPointer (r ty)
+
+and replace_vars (bindings: (identifier * ty) list) (ty: ty): ty =
   let _ = (bindings, ty) in
   err "internal"

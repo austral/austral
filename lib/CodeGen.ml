@@ -132,7 +132,9 @@ let rec gen_type (ty: ty): cpp_ty =
   | TyVar (TypeVariable (n, _, _)) ->
      CNamedType (gen_ident n, [])
   | RawPointer t ->
-     CPointer (gen_type t)
+    CPointer (gen_type t)
+  | MonoTy _ ->
+    err "Not applicable"
 
 and gen_named_type (name: qident) (args: ty list): cpp_ty =
   (* Option[Pointer[T]] types are compiled specially *)

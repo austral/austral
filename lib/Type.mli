@@ -1,3 +1,4 @@
+open Id
 open Identifier
 open Region
 
@@ -38,6 +39,10 @@ type ty =
   | WriteRef of ty * ty
   | TyVar of type_var
   | RawPointer of ty
+  | MonoTy of mono_id
+  (** Special case, see the `mono_to_ty` function. We need this to be able to do
+     monomorph instantiation, but this doesn't correspond to anything in the
+     code. *)
 [@@deriving show]
 
 type typed_slot = TypedSlot of identifier * ty

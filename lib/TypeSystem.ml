@@ -1,6 +1,7 @@
 open Type
 open TypeVarSet
 open Region
+open Error
 
 let type_universe = function
     Unit -> FreeUniverse
@@ -15,6 +16,7 @@ let type_universe = function
   | WriteRef _ -> FreeUniverse
   | TyVar (TypeVariable (_, u, _)) -> u
   | RawPointer _ -> FreeUniverse
+  | MonoTy _ -> err "Not applicable"
 
 let is_numeric = function
   | Unit -> false
@@ -29,6 +31,7 @@ let is_numeric = function
   | WriteRef _ -> false
   | TyVar _ -> false
   | RawPointer _ -> false
+  | MonoTy _ -> err "Not applicable"
 
 let is_comparable = function
   | Unit -> true
@@ -43,6 +46,7 @@ let is_comparable = function
   | WriteRef _ -> false
   | TyVar _ -> false
   | RawPointer _ -> true
+  | MonoTy _ -> err "Not applicable"
 
 let rec type_variables = function
   | Unit ->
@@ -69,6 +73,8 @@ let rec type_variables = function
      TypeVarSet.singleton v
   | RawPointer ty ->
      type_variables ty
+  | MonoTy _ ->
+    TypeVarSet.empty
 
 let region_map_from_typarams _ =
   empty_region_map
@@ -92,4 +98,6 @@ let rec is_concrete = function
      (* Individual type variables need not be instantiated. *)
      true
   | RawPointer _ ->
-     true
+    true
+  | MonoTy _ ->
+    true
