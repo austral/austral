@@ -490,5 +490,11 @@ and replace_type_variables (typarams: type_parameter list) (args: mono_ty list) 
   if (List.length typarams) <> (List.length args) then
     err "internal: not the same number of type parameters and type arguments"
   else
-    let _ = ty in
-    err "internal"
+    let typaram_names: identifier list = List.map (fun (TypeParameter (n, _, _)) -> n) typarams in
+    (* Pray that this assumption is not violated. *)
+    let combined: (identifier * mono_ty) list = List.combine typaram_names args in
+    replace_vars combined ty
+
+and replace_vars (bindings: (identifier * mono_ty) list) (ty: ty): ty =
+  let _ = (bindings, ty) in
+  err "internal"
