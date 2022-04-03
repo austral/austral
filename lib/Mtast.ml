@@ -7,7 +7,7 @@ open MonoType2
 type mono_module = MonoModule of module_name * mdecl list
 
 and mdecl =
-  | MConstant of identifier * mono_ty * mexpr
+  | MConstant of decl_id * identifier * mono_ty * mexpr
   | MRecord of identifier * mono_slot list
   | MUnion of identifier * mono_case list
   | MFunction of identifier * mvalue_parameter list * mono_ty * mstmt

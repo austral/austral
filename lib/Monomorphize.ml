@@ -311,3 +311,16 @@ and monomorphize_named_ty_list (env: env) (tys: (identifier * stripped_ty) list)
      ((name, first) :: rest, env)
   | [] ->
      ([], env)
+
+(* Monomorphize declarations *)
+
+let monomorphize_decl (env: env) (decl: typed_decl): (mdecl * env) =
+  match decl with
+  | TConstant (id, _, name, ty, value, _) ->
+    (* Constant are intrinsically monomorphic, and can be monomorphized
+       painlessly. *)
+    let (ty, env) = strip_and_mono env ty in
+    let (value, env) = monomorphize_expr env value in
+    (MConstant (id, name, ty, value), env)
+  | _ ->
+    err "not implemented yet"
