@@ -13,6 +13,10 @@ and mdecl =
   | MUnion of decl_id * identifier * mono_case list
   | MFunction of decl_id * identifier * mvalue_parameter list * mono_ty * mstmt
   | MForeignFunction of decl_id * identifier * mvalue_parameter list * mono_ty * string
+  | MConcreteInstance of decl_id * qident * mono_ty  * concrete_method list
+
+and concrete_method =
+  MConcreteMethod of ins_meth_id * identifier * mvalue_parameter list * mono_ty * mstmt
 
 and mstmt =
   | MSkip
