@@ -48,6 +48,7 @@ The compiler's middle end.
 - {!Austral_core.TypeParser}
 - {!Austral_core.TypeSystem}
 - {!Austral_core.TypeVarSet}
+- {!Austral_core.TypeReplace}
 - {!Austral_core.LexEnv}
 - {!Austral_core.TypingPass}
 - {!Austral_core.Pervasive}
