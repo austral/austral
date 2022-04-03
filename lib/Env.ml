@@ -823,3 +823,10 @@ let is_instantiated (mono: monomorph): bool =
     Option.is_some body
   | MonoInstanceMethod { body; _ } ->
     Option.is_some body
+
+let get_uninstantiated_monomorphs (env: env): monomorph list =
+  let (Env { monos; _ }) = env in
+  let pred (m: monomorph) =
+    not (is_instantiated m)
+  in
+  List.filter pred monos

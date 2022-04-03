@@ -43,7 +43,7 @@ type mod_rec = ModRec of {
       kind: module_kind
     }
 
-(** Input to the {!add_const} function. *)
+(** Input to the {!add_constant} function. *)
 type const_input = {
     mod_id: mod_id;
     vis: vis;
@@ -441,6 +441,9 @@ val get_function_monomorph : env -> decl_id -> mono_ty list -> mono_id option
 (** Given the ID of an instance method and a set of monomorphic type arguments,
    return the ID of the corresponding monomorph if it exists. *)
 val get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> mono_id option
+
+(** Get all uninstantiated monomorphs. *)
+val get_uninstantiated_monomorphs : env -> monomorph list
 
 (** {2 Other Functions} *)
 
