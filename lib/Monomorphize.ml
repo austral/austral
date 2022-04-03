@@ -420,7 +420,34 @@ and monomorphize_method (env: env) (meth: typed_method_def): (env * concrete_met
 
 (* Monomorphize modules *)
 
-let monomorphize (env: env) (m: typed_module): (env * mono_module) =
-  let _ = env in
-  let _ = m in
-  err "Not implemented yet"
+let rec monomorphize (env: env) (m: typed_module): (env * mono_module) =
+  (* Monomorphize what we can: concrete definitions. *)
+  let (TypedModule (module_name, decls)) = m in
+  let (env, declopts) =
+    Util.map_with_context (fun (e, d) -> let (d, e) = monomorphize_decl e d in (e, d)) env decls in
+  let decls: mdecl list = List.filter_map (fun x -> x) declopts in
+  (* Recursively collect and instantiate monomorphs until everything's instantiated. *)
+  let (env, decls'): (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+  (env, MonoModule (module_name, decls @ decls'))
+
+and instantiate_monomorphs_until_exhausted (env: env): (env * mdecl list) =
+  (* Get uninstantiated monomorphs from the environment. *)
+  let monos: monomorph list = get_uninstantiated_monomorphs env in
+  match monos with
+  | first::rest ->
+    (* If there are uninstantiated monomorphs, instantite them, and repeat the
+       process. *)
+    let (env, decls): (env * mdecl list) = instantiate_monomorphs env (first::rest) in
+    let (env, decls') : (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+    (env, decls @ decls')
+  | [] ->
+    (* If there are no uninstantiated monomorphs, we're done. *)
+    (env, [])
+
+and instantiate_monomorphs (env: env) (monos: monomorph list): (env * mdecl list) =
+  (* Instantiate a list of monomorphs. *)
+  Util.map_with_context (fun (e, m) -> instantiate_monomorph e m) env monos
+
+and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
+  let _ = (env, mono) in
+  err "not implemented yet"
