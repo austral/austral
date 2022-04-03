@@ -5,6 +5,7 @@ open TypeStripping
 open MonoType2
 open Tast
 open Mtast
+open Linked
 open Error
 
 (* Monomorphize type specifiers *)
@@ -314,7 +315,7 @@ and monomorphize_named_ty_list (env: env) (tys: (identifier * stripped_ty) list)
 
 (* Monomorphize declarations *)
 
-let monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
+let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
   match decl with
   | TConstant (id, _, name, ty, value, _) ->
     (* Constant are intrinsically monomorphic, and can be monomorphized
@@ -325,7 +326,7 @@ let monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
     (Some decl, env)
   | TTypeAlias (id, _, name, typarams, _, ty, _) ->
     (* Concrete (i.e., no type parameters) type aliases can be monomorphized
-       painlessly. Generic ones are monomorphized on demand. *)
+       immediately. Generic ones are monomorphized on demand. *)
     (match typarams with
      | [] ->
        let (ty, env) = strip_and_mono env ty in
@@ -333,5 +334,38 @@ let monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
        (Some decl, env)
      | _ ->
        (None, env))
+  | TRecord (id, _, name, typarams, _, slots, _) ->
+    (* Concrete records are monomorphized immediately. Generic records are
+       monomorphized on demand. *)
+    (match typarams with
+     | [] ->
+       let (env, slots) = monomorphize_slots env slots in
+       let decl = MRecord (id, name, slots) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
+  | TUnion (id, _, name, typarams, _, cases, _) ->
+    (* Concrete unions are monomorphized immediately. Generic unions are
+       monomorphized on demand. *)
+    (match typarams with
+     | [] ->
+       let (env, cases) = Util.map_with_context (fun (e, c) -> monomorphize_case e c) env cases in
+       let decl = MUnion (id, name, cases) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
   | _ ->
     err "not implemented yet"
+
+and monomorphize_slot (env: env) (slot: typed_slot): (env * mono_slot) =
+  let (TypedSlot (name, ty)) = slot in
+  let (ty, env) = strip_and_mono env ty in
+  (env, MonoSlot (name, ty))
+
+and monomorphize_slots (env: env) (slots: typed_slot list): (env * mono_slot list) =
+  Util.map_with_context (fun (e, s) -> monomorphize_slot e s) env slots
+
+and monomorphize_case (env: env) (case: linked_case): (env * mono_case) =
+  let (LCase (_, name, slots)) = case in
+  let (env, slots) = monomorphize_slots env slots in
+  (env, MonoCase (name, slots))
