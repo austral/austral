@@ -354,8 +354,31 @@ let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
        (Some decl, env)
      | _ ->
        (None, env))
-  | _ ->
-    err "not implemented yet"
+  | TFunction (id, _, name, typarams, value_params, rt, body, _) ->
+    (* Concrete functions are monomorphized immediately. Generic functions are
+       monomorphized on demand. *)
+    (match typarams with
+     | [] ->
+       let (env, params) = monomorphize_params env value_params in
+       let (rt, env) = strip_and_mono env rt in
+       let (body, env) = monomorphize_stmt env body in
+       let decl = MFunction (id, name, params, rt, body) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
+  | TForeignFunction (id, _, name, params, rt, underlying, _) ->
+    (* Foreign functions are intrinsically monomorphic. *)
+    let (env, params) = monomorphize_params env params in
+    let (rt, env) = strip_and_mono env rt in
+    let decl = MForeignFunction (id, name, params, rt, underlying) in
+    (Some decl, env)
+  | TTypeClass _ ->
+    (* Type classes are purely "informative" declarations: they have no physical
+       existence in the code. *)
+    (None, env)
+  | TInstance _ ->
+    (* TODO: Monomorphize non-generic instances lol. *)
+    err "Not implemented yet"
 
 and monomorphize_slot (env: env) (slot: typed_slot): (env * mono_slot) =
   let (TypedSlot (name, ty)) = slot in
@@ -369,3 +392,11 @@ and monomorphize_case (env: env) (case: linked_case): (env * mono_case) =
   let (LCase (_, name, slots)) = case in
   let (env, slots) = monomorphize_slots env slots in
   (env, MonoCase (name, slots))
+
+and monomorphize_param (env: env) (param: value_parameter): (env * mvalue_parameter) =
+  let (ValueParameter (name, ty)) = param in
+  let (ty, env) = strip_and_mono env ty in
+  (env, MValueParameter (name, ty))
+
+and monomorphize_params (env: env) (params: value_parameter list): (env * mvalue_parameter list) =
+  Util.map_with_context (fun (e, p) -> monomorphize_param e p) env params

@@ -11,8 +11,8 @@ and mdecl =
   | MTypeAlias of decl_id * identifier * mono_ty
   | MRecord of decl_id * identifier * mono_slot list
   | MUnion of decl_id * identifier * mono_case list
-  | MFunction of identifier * mvalue_parameter list * mono_ty * mstmt
-  | MForeignFunction of identifier * mvalue_parameter list * mono_ty * string
+  | MFunction of decl_id * identifier * mvalue_parameter list * mono_ty * mstmt
+  | MForeignFunction of decl_id * identifier * mvalue_parameter list * mono_ty * string
 
 and mstmt =
   | MSkip
