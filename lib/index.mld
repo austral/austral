@@ -38,9 +38,7 @@ The compiler's middle end.
 
 - {!Austral_core.Id}
 - {!Austral_core.Env}
-- {!Austral_core.ModuleSystem}
 - {!Austral_core.Region}
-- {!Austral_core.Semantic}
 - {!Austral_core.Tast}
 - {!Austral_core.TypeBindings}
 - {!Austral_core.TypeMatch}
