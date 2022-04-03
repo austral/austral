@@ -449,5 +449,16 @@ and instantiate_monomorphs (env: env) (monos: monomorph list): (env * mdecl list
   Util.map_with_context (fun (e, m) -> instantiate_monomorph e m) env monos
 
 and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
-  let _ = (env, mono) in
-  err "not implemented yet"
+  match mono with
+  | MonoTypeAliasDefinition { id; type_id; tyargs; _ } ->
+    (* Find the type alias declaration and extract the definition. *)
+    (match get_decl_by_id env type_id with
+     | Some (TypeAlias { def; _ }) ->
+       (* Search/replace the type variables in `def` with the type arguments
+          from this monomorph. *)
+       let _ = (id, tyargs, def) in
+       err "not implemented yet"
+     | _ ->
+       err "internal")
+  | _ ->
+    err "not implemented yet"
