@@ -810,3 +810,16 @@ let add_or_get_instance_method_monomorph (env: env) (method_id: ins_meth_id) (ar
   | Some mono_id -> (env, mono_id)
   | None ->
     add_instance_method_monomorph env method_id args
+
+let is_instantiated (mono: monomorph): bool =
+  match mono with
+  | MonoTypeAliasDefinition { def; _ } ->
+    Option.is_some def
+  | MonoRecordDefinition { slots; _ } ->
+    Option.is_some slots
+  | MonoUnionDefinition { cases; _ } ->
+    Option.is_some cases
+  | MonoFunction { body; _ } ->
+    Option.is_some body
+  | MonoInstanceMethod { body; _ } ->
+    Option.is_some body
