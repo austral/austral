@@ -314,13 +314,24 @@ and monomorphize_named_ty_list (env: env) (tys: (identifier * stripped_ty) list)
 
 (* Monomorphize declarations *)
 
-let monomorphize_decl (env: env) (decl: typed_decl): (mdecl * env) =
+let monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
   match decl with
   | TConstant (id, _, name, ty, value, _) ->
     (* Constant are intrinsically monomorphic, and can be monomorphized
        painlessly. *)
     let (ty, env) = strip_and_mono env ty in
     let (value, env) = monomorphize_expr env value in
-    (MConstant (id, name, ty, value), env)
+    let decl = MConstant (id, name, ty, value) in
+    (Some decl, env)
+  | TTypeAlias (id, _, name, typarams, _, ty, _) ->
+    (* Concrete (i.e., no type parameters) type aliases can be monomorphized
+       painlessly. Generic ones are monomorphized on demand. *)
+    (match typarams with
+     | [] ->
+       let (ty, env) = strip_and_mono env ty in
+       let decl = MTypeAlias (id, name, ty) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
   | _ ->
     err "not implemented yet"
