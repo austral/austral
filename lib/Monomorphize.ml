@@ -57,6 +57,8 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
           err "internal: named type points to something that isn't a type")
      | None ->
        err "internal")
+  | SMonoTy id ->
+    (MonoNamedType id, env)
 
 and monomorphize_ty_list (env: env) (tys: stripped_ty list): (mono_ty list * env) =
   match tys with
@@ -523,5 +525,26 @@ and mono_to_ty (ty: mono_ty): ty =
     RawPointer (r ty)
 
 and replace_vars (bindings: (identifier * ty) list) (ty: ty): ty =
-  let _ = (bindings, ty) in
-  err "internal"
+  let r = replace_vars bindings in
+  match ty with
+  | Unit -> Unit
+  | Boolean -> Boolean
+  | Integer (s, w) -> Integer (s, w)
+  | SingleFloat -> SingleFloat
+  | DoubleFloat -> DoubleFloat
+  | NamedType (name, args, u) ->
+    NamedType (name, List.map r args, u)
+  | Array (ty, region) ->
+    Array (r ty, region)
+  | RegionTy r ->
+    RegionTy r
+  | ReadRef (ty, reg) ->
+    ReadRef (r ty, r reg)
+  | WriteRef (ty, reg) ->
+    WriteRef (r ty, r reg)
+  | TyVar (TypeVariable (name, _, _)) ->
+    List.assoc name bindings
+  | RawPointer ty ->
+    RawPointer (r ty)
+  | MonoTy id ->
+    MonoTy id

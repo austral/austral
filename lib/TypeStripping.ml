@@ -1,4 +1,5 @@
 open Type
+open Id
 open Identifier
 open Region
 open Error
@@ -15,6 +16,7 @@ type stripped_ty =
   | SReadRef of stripped_ty * stripped_ty
   | SWriteRef of stripped_ty * stripped_ty
   | SRawPointer of stripped_ty
+  | SMonoTy of mono_id
 
 let rec strip_type (ty: ty): stripped_ty =
   match strip_type' ty with
@@ -78,5 +80,5 @@ and strip_type' (ty: ty): stripped_ty option =
        Some (SRawPointer ty)
      | None ->
        err "Internal: raw pointer type instantiated with a region type.")
-  | MonoTy _ ->
-    err "Not applicable"
+  | MonoTy id ->
+    Some (SMonoTy id)

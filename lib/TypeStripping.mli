@@ -1,3 +1,4 @@
+open Id
 open Type
 open Identifier
 open Region
@@ -19,6 +20,7 @@ type stripped_ty =
   | SReadRef of stripped_ty * stripped_ty
   | SWriteRef of stripped_ty * stripped_ty
   | SRawPointer of stripped_ty
+  | SMonoTy of mono_id
 
 (** Strip a type specifier. *)
 val strip_type : ty -> stripped_ty
