@@ -379,10 +379,15 @@ val add_or_get_function_monomorph : env -> decl_id -> mono_ty list -> (env * mon
    monomorph and return its ID, or return the ID if it exists. *)
 val add_or_get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
 
-(** Given the ID of a type alias monomorph, and a type definition, store the
-   definiton in the monomorphs's entry in the environment. This is used by the
-   monomorph instantiation pass. *)
 val store_type_alias_monomorph_definition : env -> mono_id -> mono_ty -> env
+
+val store_record_monomorph_definition : env -> mono_id -> mono_slot list -> env
+
+val store_union_monomorph_definition : env -> mono_id -> mono_case list -> env
+
+val store_function_monomorph_definition : env -> mono_id -> mstmt -> env
+
+val store_instance_method_monomorph_definition : env -> mono_id -> mstmt -> env
 
 (** Store the given function body in the function with the given ID, returning
     the new environment. *)
