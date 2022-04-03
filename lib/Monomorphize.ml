@@ -376,9 +376,16 @@ let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
     (* Type classes are purely "informative" declarations: they have no physical
        existence in the code. *)
     (None, env)
-  | TInstance _ ->
-    (* TODO: Monomorphize non-generic instances lol. *)
-    err "Not implemented yet"
+  | TInstance (decl_id, _, name, typarams, argument, methods, _) ->
+    (* Concrete instances can be monomorphized immediately. *)
+    (match typarams with
+     | [] ->
+       let (argument, env) = strip_and_mono env argument in
+       let (env, methods) = monomorphize_methods env methods in
+       let decl = MConcreteInstance (decl_id, name, argument, methods) in
+       (Some decl, env)
+     | _ ->
+       (None, env))
 
 and monomorphize_slot (env: env) (slot: typed_slot): (env * mono_slot) =
   let (TypedSlot (name, ty)) = slot in
@@ -400,3 +407,13 @@ and monomorphize_param (env: env) (param: value_parameter): (env * mvalue_parame
 
 and monomorphize_params (env: env) (params: value_parameter list): (env * mvalue_parameter list) =
   Util.map_with_context (fun (e, p) -> monomorphize_param e p) env params
+
+and monomorphize_methods (env: env) (methods: typed_method_def list): (env * concrete_method list) =
+  Util.map_with_context (fun (e, m) -> monomorphize_method e m) env methods
+
+and monomorphize_method (env: env) (meth: typed_method_def): (env * concrete_method) =
+  let (TypedMethodDef (id, name, params, rt, body)) = meth in
+  let (env, params) = monomorphize_params env params in
+  let (rt, env) = strip_and_mono env rt in
+  let (body, env) = monomorphize_stmt env body in
+  (env, MConcreteMethod (id, name, params, rt, body))
