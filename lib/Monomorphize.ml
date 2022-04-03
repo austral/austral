@@ -452,20 +452,43 @@ and instantiate_monomorphs (env: env) (monos: monomorph list): (env * mdecl list
 and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
   match mono with
   | MonoTypeAliasDefinition { id; type_id; tyargs; _ } ->
-    (* Find the type alias declaration and extract the definition. *)
-    let ty: ty = get_type_alias_definition env type_id in
+    (* Find the type alias declaration and extract the type parameters and the
+       definition. *)
+    let (typarams, ty) = get_type_alias_definition env type_id in
     (* Search/replace the type variables in `def` with the type arguments from
        this monomorph. *)
-    let _ = (id, tyargs, ty) in
-    err "not implemented yet"
+    let ty = replace_type_variables typarams tyargs ty in
+    (* Strip and monomorphize the type. *)
+    let (ty, env) = strip_and_mono env ty in
+    (* Store the monomorphic type in the environment. *)
+    let env = store_type_alias_monomorph_definition env id ty in
+    (* Construct a monomorphic type alias decl. *)
+    let decl: mdecl = MTypeAliasMonomorph (id, ty) in
+    (* Return the new environment and the declaration. *)
+    (env, decl)
   | _ ->
     err "not implemented yet"
 
 (* Utils *)
 
-and get_type_alias_definition (env: env) (id: decl_id): ty =
+and get_type_alias_definition (env: env) (id: decl_id): (type_parameter list * ty) =
   match get_decl_by_id env id with
-  | Some (TypeAlias { def; _ }) ->
-    def
+  | Some (TypeAlias { typarams; def; _ }) ->
+    (typarams, def)
   | _ ->
+    err "internal"
+
+and replace_type_variables (typarams: type_parameter list) (args: mono_ty list) (ty: ty): ty =
+  (* Given a list of type parameters, a list of monomorphic type arguments (of
+     the same length), and a type expression, replace all instances of the type
+     variables in the type expression with their corresponding argument
+     (implicitly converting the `mono_ty` into a `ty`).
+
+     Ideally we shouldn't need to bring the type parameters, rather, monomorphs
+     should be stored in the environment with an `(identifier, mono_ty)` map
+     rather than as a bare list of monomorphic type arguments. *)
+  if (List.length typarams) <> (List.length args) then
+    err "internal: not the same number of type parameters and type arguments"
+  else
+    let _ = ty in
     err "internal"
