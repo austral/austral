@@ -102,7 +102,7 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
        (MGenericFuncall (mono_id, args, rt), env)
      else
        (* The function is concrete. *)
-       (MConcreteFuncall (name, args, rt), env)
+       (MConcreteFuncall (decl_id, name, args, rt), env)
   | TMethodCall (ins_meth_id, name, typarams, args, rt, substs) ->
      (* Monomorphize the return type. *)
      let (rt, env) = strip_and_mono env rt in
@@ -115,10 +115,10 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
        let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
        let (tyargs, env) = monomorphize_ty_list env tyargs in
        let (env, mono_id) = add_or_get_instance_method_monomorph env ins_meth_id tyargs in
-       (MGenericFuncall (mono_id, args, rt), env)
+       (MGenericMethodCall (ins_meth_id, mono_id, args, rt), env)
      else
        (* The instance is concrete. *)
-       (MConcreteFuncall (name, args, rt), env)
+       (MConcreteMethodCall (ins_meth_id, name, args, rt), env)
   | TCast (expr, ty) ->
      let (ty, env) = strip_and_mono env ty in
      let (expr, env) = monomorphize_expr env expr in

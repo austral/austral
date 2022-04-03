@@ -44,10 +44,14 @@ and mexpr =
   | MStringConstant of escaped_string
   | MVariable of qident * mono_ty
   | MArithmetic of arithmetic_operator * mexpr * mexpr
-  | MConcreteFuncall of qident * mexpr list * mono_ty
+  | MConcreteFuncall of decl_id * qident * mexpr list * mono_ty
   (** Represents a call to a concrete function. *)
   | MGenericFuncall of mono_id * mexpr list * mono_ty
   (** Represents a call to a generic function. *)
+  | MConcreteMethodCall of ins_meth_id * qident * mexpr list * mono_ty
+  (** Represents a call to an instance method of a concrete instance. *)
+  | MGenericMethodCall of ins_meth_id * mono_id * mexpr list * mono_ty
+  (** Represents a call to an instance method of a generic instance. *)
   | MCast of mexpr * mono_ty
   | MComparison of comparison_operator * mexpr * mexpr
   | MConjunction of mexpr * mexpr
