@@ -6,6 +6,7 @@ open MonoType
 open Tast
 open Mtast
 open Linked
+open Id
 open Error
 
 (* Monomorphize type specifiers *)
@@ -452,13 +453,19 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
   match mono with
   | MonoTypeAliasDefinition { id; type_id; tyargs; _ } ->
     (* Find the type alias declaration and extract the definition. *)
-    (match get_decl_by_id env type_id with
-     | Some (TypeAlias { def; _ }) ->
-       (* Search/replace the type variables in `def` with the type arguments
-          from this monomorph. *)
-       let _ = (id, tyargs, def) in
-       err "not implemented yet"
-     | _ ->
-       err "internal")
+    let ty: ty = get_type_alias_definition env type_id in
+    (* Search/replace the type variables in `def` with the type arguments from
+       this monomorph. *)
+    let _ = (id, tyargs, ty) in
+    err "not implemented yet"
   | _ ->
     err "not implemented yet"
+
+(* Utils *)
+
+and get_type_alias_definition (env: env) (id: decl_id): ty =
+  match get_decl_by_id env id with
+  | Some (TypeAlias { def; _ }) ->
+    def
+  | _ ->
+    err "internal"
