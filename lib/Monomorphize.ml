@@ -417,3 +417,10 @@ and monomorphize_method (env: env) (meth: typed_method_def): (env * concrete_met
   let (rt, env) = strip_and_mono env rt in
   let (body, env) = monomorphize_stmt env body in
   (env, MConcreteMethod (id, name, params, rt, body))
+
+(* Monomorphize modules *)
+
+let monomorphize (env: env) (m: typed_module): (env * mono_module) =
+  let _ = env in
+  let _ = m in
+  err "Not implemented yet"
