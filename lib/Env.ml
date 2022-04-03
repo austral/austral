@@ -830,3 +830,7 @@ let get_uninstantiated_monomorphs (env: env): monomorph list =
     not (is_instantiated m)
   in
   List.filter pred monos
+
+let store_type_alias_monomorph_definition (env: env) (id: mono_id) (def: mono_ty): env =
+  let _ = (env, id, def) in
+  err "derp"
