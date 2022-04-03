@@ -1,6 +1,6 @@
 open Env
 open TypeStripping
-open MonoType2
+open MonoType
 open Tast
 open Mtast
 

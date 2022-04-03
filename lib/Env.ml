@@ -1,7 +1,7 @@
 open Identifier
 open Common
 open Type
-open MonoType2
+open MonoType
 open Tast
 open Mtast
 open Id

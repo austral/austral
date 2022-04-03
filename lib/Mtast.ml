@@ -2,7 +2,7 @@ open Id
 open Identifier
 open Common
 open Escape
-open MonoType2
+open MonoType
 
 type mono_module = MonoModule of module_name * mdecl list
 

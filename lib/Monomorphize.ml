@@ -2,7 +2,7 @@ open Identifier
 open Env
 open Type
 open TypeStripping
-open MonoType2
+open MonoType
 open Tast
 open Mtast
 open Linked
