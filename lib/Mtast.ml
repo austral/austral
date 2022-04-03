@@ -45,7 +45,9 @@ and mexpr =
   | MVariable of qident * mono_ty
   | MArithmetic of arithmetic_operator * mexpr * mexpr
   | MConcreteFuncall of qident * mexpr list * mono_ty
+  (** Represents a call to a concrete function. *)
   | MGenericFuncall of mono_id * mexpr list * mono_ty
+  (** Represents a call to a generic function. *)
   | MCast of mexpr * mono_ty
   | MComparison of comparison_operator * mexpr * mexpr
   | MConjunction of mexpr * mexpr
