@@ -3,6 +3,7 @@ open Identifier
 open Common
 open Escape
 open MonoType
+open Error
 
 type mono_module = MonoModule of module_name * mdecl list
 
@@ -97,3 +98,62 @@ type mono_method =
       rt: mono_ty;
       body: mstmt;
     }
+
+let rec get_type (e: mexpr): mono_ty =
+  match e with
+  | MNilConstant ->
+     MonoUnit
+  | MBoolConstant _ ->
+     MonoBoolean
+  | MIntConstant _ ->
+     MonoInteger (Signed, Width32)
+  | MFloatConstant _ ->
+     MonoDoubleFloat
+  | MStringConstant _ ->
+     err "Type of the string constant"
+  | MVariable (_, ty) ->
+     ty
+  | MArithmetic (_, lhs, _) ->
+     get_type lhs
+  | MConcreteFuncall (_, _, _, ty) ->
+     ty
+  | MGenericFuncall (_, _, ty) ->
+     ty
+  | MConcreteMethodCall (_, _, _, ty) ->
+     ty
+  | MGenericMethodCall (_, _, _, ty) ->
+     ty
+  | MCast (_, ty) ->
+     ty
+  | MComparison _ ->
+     MonoBoolean
+  | MConjunction _ ->
+     MonoBoolean
+  | MDisjunction _ ->
+     MonoBoolean
+  | MNegation _ ->
+     MonoBoolean
+  | MIfExpression (_, t, _) ->
+     get_type t
+  | MRecordConstructor (ty, _) ->
+     ty
+  | MUnionConstructor (ty, _, _) ->
+     ty
+  | MTypeAliasConstructor (ty, _) ->
+     ty
+  | MPath { ty; _ } ->
+     ty
+  | MEmbed (ty, _, _) ->
+     ty
+  | MDeref e ->
+     (match get_type e with
+      | MonoReadRef (t, _) ->
+         t
+      | MonoWriteRef (t, _) ->
+         t
+      | _ ->
+         err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
+  | MTypecast (_, ty) ->
+     ty
+  | MSizeOf _ ->
+     MonoInteger (Unsigned, Width64)
