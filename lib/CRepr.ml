@@ -66,3 +66,5 @@ type c_decl =
   | CFunctionDefinition of string * c_param list * c_ty * c_stmt
 
 and c_param = CValueParam of string * c_ty
+
+type c_unit = CUnit of c_decl list
