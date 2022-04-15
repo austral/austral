@@ -487,6 +487,7 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      let slots: typed_slot list =
        List.map
          (fun (TypedSlot (name, ty)) ->
+           (* TODO: extract decl name, make it a qname, pass that here *)
            TypedSlot (name, replace_type_variables typarams tyargs ty))
          slots
      in
