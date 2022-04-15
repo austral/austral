@@ -17,8 +17,8 @@ open Error
 open Util
 open Combined
 open Linked
-open Mtast
-open Monomorphize
+(*open Mtast
+open Monomorphize*)
 open Filename
 
 let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import_list): concrete_module_interface =
@@ -62,8 +62,8 @@ let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; bod
   let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
   let typed: typed_module = augment_module env linked in
   let env: env = extract_bodies env typed in
-  let (env, mono): (env * mono_module) = monomorphize env typed in
-  let _ = mono in
+  (*let (env, mono): (env * mono_module) = monomorphize env typed in
+  let _ = mono in *)
   let cpp = gen_module typed in
   let code = render_module cpp in
   Compiler (env, (compiler_code c) ^ "\n" ^ code)
