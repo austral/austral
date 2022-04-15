@@ -148,115 +148,23 @@ namespace Austral__Core {
     double convert_d_to_d(double value) { return (double)(value); }
 }
 
+extern "C" void* calloc(size_t num, size_t size);
+extern "C" void free(void* ptr);
+
+template <typename T>
+bool au_store(T* source, T value) {
+    *source = value;
+    return false;
+};
+
+bool au_free(void* ptr) {
+    free(ptr);
+    return false;
+};
+
 |code}
 
 let austral_memory_code = {code|
 
-namespace A_Austral__Memory {
-    extern "C" void* malloc(size_t size);
-    extern "C" void* calloc(size_t num, size_t size);
-    extern "C" void free(void* ptr);
 
-    template<typename T>
-    T A_Load(T* pointer) {
-        return *pointer;
-    }
-
-    template<typename T>
-    bool A_Store(T* pointer, T value) {
-        *pointer = value;
-        return false;
-    }
-
-    template<typename T>
-    bool A_Deallocate(T* pointer) {
-        free(pointer);
-        return false;
-    }
-
-    template<typename T>
-    T* A_Load_Read_Reference(T** ref) {
-        return *ref;
-    }
-
-    template<typename T>
-    T* A_Load_Write_Reference(T** ref) {
-        return *ref;
-    }
-
-    using namespace A_Austral__Pervasive;
-
-    template <typename T>
-    A_Option<T> Make_Some(T value) {
-        return {
-            .tag = A_Option_Tag::A_Some,
-            .data = { .A_Some = { .A_value = value } }
-        };
-    }
-
-    template <typename T>
-    A_Option<T> Make_None() {
-        return {
-            .tag = A_Option_Tag::A_None,
-            .data = { .A_None = {} }
-        };
-    }
-
-
-    template<typename T>
-    T* A_Allocate(uint64_t number) {
-        unsigned long long elem_size = sizeof(T);
-        unsigned long long num = number;
-        unsigned long long array_size = 0;
-        bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
-        if (has_overflowed) {
-            return NULL;
-        } else {
-            T* ptr = (T*) calloc(num, array_size);
-            return ptr;
-        }
-    }
-
-    template<typename T>
-    A_Option<Austral__Core::Array<T>> A_Resize_Array(Austral__Core::Array<T> array, uint64_t new_number) {
-        unsigned long long elem_size = sizeof(T);
-        unsigned long long num = new_number;
-        unsigned long long array_size = 0;
-        bool has_overflowed = __builtin_umulll_overflow(elem_size, num, &array_size);
-        if (has_overflowed) {
-            A_Option<Austral__Core::Array<T>> result = Make_None<Austral__Core::Array<T>>();
-            return result;
-        } else {
-            T* new_ptr = realloc(array.data, array_size);
-            if (new_ptr == NULL) {
-                A_Option<Austral__Core::Array<T>> result = Make_None<Austral__Core::Array<T>>();
-                return result;
-            } else {
-                Austral__Core::Array<T> arr = Austral__Core::Make_Array(new_number, new_ptr);
-                A_Option<Austral__Core::Array<T>> result = Make_Some(arr);
-                return result;
-            }
-        }
-    }
-
-    template<typename T, typename U>
-    void A_memmove(T* source, T* destination, size_t count) {
-        memmove(source, destination, count);
-    }
-
-    template<typename T, typename U>
-    void A_memcpy(T* source, T* destination, size_t count) {
-        memcpy(source, destination, count);
-    }
-
-    template<typename T, typename U>
-    void A_Positive_Offset(T* pointer, size_t offset) {
-        return pointer + offset;
-    }
-
-    template<typename T, typename U>
-    void A_Negative_Offset(T* pointer, size_t offset) {
-        return pointer - offset;
-    }
-}
 |code}

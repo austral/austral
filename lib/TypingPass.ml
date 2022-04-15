@@ -707,7 +707,10 @@ and check_bindings (typarams: type_parameter list) (bindings: type_bindings): un
           if universe_compatible u (type_universe ty) then
             ()
           else
-            err "Mismatched universes"
+            err ("Mismatched universes: expected "
+                 ^ (show_universe u)
+                 ^ " and got "
+                 ^ (show_universe (type_universe ty)))
        | None ->
           err ("No binding for this parameter: " ^ (ident_string n)))
     in

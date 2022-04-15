@@ -2,6 +2,7 @@ open Identifier
 open Env
 open BuiltIn
 open Pervasive
+open MemoryModule
 open CppPrelude
 open ParserInterface
 open CombiningPass
@@ -122,11 +123,10 @@ let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
 
 let empty_compiler: compiler =
-  (* Add the main prelude. Then compile the Austral.Pervasive module. *Then* add
-     the source code of the FFI module. This is because the FFI module uses the
-     Option type, which is defined in the Austral.Pervasive module and has to be
-     compiled first. *)
-  let env: env = add_memory_module empty_env in
+  (* We have to compile the Austral.Pervasive module, followed by
+     Austral.Memory, since the latter uses declarations from the former. *)
+  let env: env = empty_env in
+  (* Start with the C++ prelude. *)
   let c = Compiler (env, prelude) in
   let c =
     (* Handle errors during the compilation of the Austral,Pervasive
@@ -135,6 +135,13 @@ let empty_compiler: compiler =
        happens). *)
     try
       compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
+    with Austral_error error ->
+      Printf.eprintf "%s" (render_error error None);
+      exit (-1)
+  in
+  let c =
+    try
+      compile_mod c (fake_mod_source memory_interface_source memory_body_source)
     with Austral_error error ->
       Printf.eprintf "%s" (render_error error None);
       exit (-1)

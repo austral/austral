@@ -1,6 +1,5 @@
 open Identifier
 open Cst
-open Env
 
 (* Austral.Pervasive *)
 
@@ -17,5 +16,3 @@ val pervasive_imports: concrete_import_list
 val memory_module_name : module_name
 
 val is_pointer_type : qident -> bool
-
-val add_memory_module : env -> env
