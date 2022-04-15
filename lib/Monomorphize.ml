@@ -489,33 +489,92 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
          slots
      in
      (* Strip and monomorphize the slot list. *)
-     let names: identifier list = List.map (fun (TypedSlot (n, _)) -> n) slots in
-     let (tys, env): (mono_ty list * env) = strip_and_mono_list env (List.map (fun (TypedSlot (_, t)) -> t) slots) in
-     let (slots: mono_slot list) = List.map2 (fun name ty -> MonoSlot (name, ty)) names tys in
+     let (env, slots): (env * mono_slot list) = monomorphize_slot_list env slots in
      (* Store the monomorphic slot list in the environment. *)
      let env = store_record_monomorph_definition env id slots in
      (* Construct a monomorphic record decl. *)
      let decl: mdecl = MRecordMonomorph (id, slots) in
      (* Return the new environment and the declaration. *)
      (env, decl)
+  | MonoUnionDefinition { id; type_id; tyargs; _ } ->
+     (* Find the list of type parameters from the union definition. *)
+     let typarams = get_union_typarams env type_id in
+     (* Find the list of cases from the env. *)
+     let cases: typed_case list = get_union_typed_cases env type_id in
+     (* Search/replace the type variables in the case list with the type
+        arguments from this monomorph. *)
+     let cases: typed_case list =
+       List.map
+         (fun (TypedCase (name, slots)) ->
+           let slots: typed_slot list =
+             List.map
+               (fun (TypedSlot (name, ty)) ->
+                 TypedSlot (name, replace_type_variables typarams tyargs ty))
+               slots
+           in
+           TypedCase (name, slots))
+         cases
+     in
+     (* Strip and monomorphize the case list. *)
+     let (env, cases): (env * mono_case list) = monomorphize_case_list env cases in
+     (* Store the monomorphic slot list in the environment. *)
+     let env = store_union_monomorph_definition env id cases in
+     (* Construct a monomorphic record decl. *)
+     let decl: mdecl = MUnionMonomorph (id, cases) in
+     (* Return the new environment and the declaration. *)
+     (env, decl)
   | _ ->
-    err "not implemented yet"
+     err "not implemented yet"
+
+
 
 (* Utils *)
 
 and get_type_alias_definition (env: env) (id: decl_id): (type_parameter list * ty) =
   match get_decl_by_id env id with
   | Some (TypeAlias { typarams; def; _ }) ->
-    (typarams, def)
+     (typarams, def)
   | _ ->
-    err "internal"
+     err "internal"
 
 and get_record_definition (env: env) (id: decl_id): (type_parameter list * typed_slot list) =
   match get_decl_by_id env id with
   | Some (Record { typarams; slots; _ }) ->
-    (typarams, slots)
+     (typarams, slots)
   | _ ->
-    err "internal"
+     err "internal"
+
+and get_union_typarams (env: env) (id: decl_id): type_parameter list =
+  match get_decl_by_id env id with
+  | Some (Union { typarams; _ }) ->
+    typarams
+  | _ ->
+     err "internal"
+
+and get_union_typed_cases (env: env) (union_id: decl_id): typed_case list =
+  let cases: decl list = get_union_cases env union_id in
+  let mapper (decl: decl): typed_case =
+    match decl with
+    | UnionCase { name; slots; _ } ->
+       TypedCase (name, slots)
+    | _ ->
+       err "Internal: not a union"
+  in
+  List.map mapper cases
+
+and monomorphize_slot_list (env: env) (slots: typed_slot list): (env * mono_slot list) =
+  let names: identifier list = List.map (fun (TypedSlot (n, _)) -> n) slots in
+  let (tys, env): (mono_ty list * env) = strip_and_mono_list env (List.map (fun (TypedSlot (_, t)) -> t) slots) in
+  let (slots: mono_slot list) = List.map2 (fun name ty -> MonoSlot (name, ty)) names tys in
+  (env, slots)
+
+and monomorphize_case_list (env: env) (cases: typed_case list): (env * mono_case list) =
+  Util.map_with_context
+    (fun (env, TypedCase (name, slots)) ->
+      let (env, slots) = monomorphize_slot_list env slots in
+      (env, MonoCase (name, slots)))
+    env
+    cases
 
 and replace_type_variables (typarams: type_parameter list) (args: mono_ty list) (ty: ty): ty =
   (* Given a list of type parameters, a list of monomorphic type arguments (of
