@@ -660,11 +660,15 @@ and monomorphize_case_list (env: env) (cases: typed_case list): (env * mono_case
     env
     cases
 
-and replace_type_variables (typarams: type_parameter list) (args: mono_ty list) (ty: ty): ty =
-  let bindings: type_bindings = make_bindings typarams args in
-  replace_variables bindings ty
+and replace_type_variables (typarams: type_parameter list) (source: qident) (args: mono_ty list) (ty: ty): ty =
+  let bindings: type_bindings = make_bindings typarams source args in
+  print_endline ("Replacing with bindings: " ^ (show_bindings bindings));
+  print_endline ("Old type: " ^ (show_ty ty));
+  let ty' = replace_variables bindings ty in
+  print_endline ("New type: " ^ (show_ty ty'));
+  ty'
 
-and make_bindings (typarams: type_parameter list) (args: mono_ty list): type_bindings =
+and make_bindings (typarams: type_parameter list) (source: qident) (args: mono_ty list): type_bindings =
   (* Given a list of type parameters, a list of monomorphic type arguments (of
      qthe same length), return a type bindings object (implicitly converting the
      `mono_ty` into a `ty`).
@@ -672,20 +676,15 @@ and make_bindings (typarams: type_parameter list) (args: mono_ty list): type_bin
      Ideally we shouldn't need to bring the type parameters, rather, monomorphs
      should be stored in the environment with an `(identifier, mono_ty)` map
      rather than as a bare list of monomorphic type arguments. *)
-  let pairs: (identifier * ty) list =
+  let triples: (identifier * source * ty) list =
     List.map2
       (fun typaram mty ->
         let (TypeParameter (name, _, _)) = typaram in
-        (name, mono_to_ty mty))
+        (name, source, mono_to_ty mty))
       typarams
       args
   in
-  bindings_from_list' pairs
-
-and bindings_from_list' (args: (identifier * ty) list): type_bindings =
-  let empty_qident = make_qident (make_mod_name "", make_ident "", make_ident "") in
-  let args = List.map (fun (n, t) -> (n, empty_qident, t)) args in
-  bindings_from_list args
+  bindings_from_list pairs
 
 and mono_to_ty (ty: mono_ty): ty =
   let r = mono_to_ty in
