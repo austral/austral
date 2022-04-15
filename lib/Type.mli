@@ -7,7 +7,7 @@ type universe =
   | LinearUniverse
   | TypeUniverse
   | RegionUniverse
-[@@deriving eq]
+[@@deriving (eq, show)]
 
 type integer_width =
   | Width8
