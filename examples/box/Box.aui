@@ -2,7 +2,7 @@ module Example.Box is
     type Box[T: Type]: Linear;
 
     generic [T: Type]
-    function Make(val: T): Option[Box[T]];
+    function Make(val: T): Either[Box[T], T];
 
     generic [T: Type]
     function Unbox(box: Box[T]): T;
