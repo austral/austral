@@ -722,6 +722,10 @@ and make_bindings (typarams: type_parameter list) (source: qident) (args: mono_t
      Ideally we shouldn't need to bring the type parameters, rather, monomorphs
      should be stored in the environment with an `(identifier, mono_ty)` map
      rather than as a bare list of monomorphic type arguments. *)
+  let is_not_region (TypeParameter (_, u, _)): bool =
+    u <> RegionUniverse
+  in
+  let typarams = List.filter is_not_region typarams in
   if (List.length typarams) = (List.length args) then
     let triples: (identifier * qident * ty) list =
       List.map2
