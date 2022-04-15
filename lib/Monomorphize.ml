@@ -722,15 +722,21 @@ and make_bindings (typarams: type_parameter list) (source: qident) (args: mono_t
      Ideally we shouldn't need to bring the type parameters, rather, monomorphs
      should be stored in the environment with an `(identifier, mono_ty)` map
      rather than as a bare list of monomorphic type arguments. *)
-  let triples: (identifier * qident * ty) list =
-    List.map2
-      (fun typaram mty ->
-        let (TypeParameter (name, _, _)) = typaram in
-        (name, source, mono_to_ty mty))
-      typarams
-      args
-  in
-  bindings_from_list triples
+  if (List.length typarams) = (List.length args) then
+    let triples: (identifier * qident * ty) list =
+      List.map2
+        (fun typaram mty ->
+          let (TypeParameter (name, _, _)) = typaram in
+          (name, source, mono_to_ty mty))
+        typarams
+        args
+    in
+    bindings_from_list triples
+  else
+    err ("Parameter list and argument list don't have the same length:\n\nparameters:\n"
+         ^ (String.concat ", " (List.map show_type_parameter typarams))
+         ^ "\narguments:\n"
+         ^ (String.concat ", " (List.map show_mono_ty args)))
 
 and mono_to_ty (ty: mono_ty): ty =
   let r = mono_to_ty in
