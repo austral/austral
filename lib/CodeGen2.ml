@@ -69,7 +69,7 @@ let new_variable _: string =
 
 (* Identifiers *)
 
-let austral_prefix: string = "A_"
+let austral_prefix: string = ""
 
 let gen_ident (i: identifier): string =
   austral_prefix ^ (ident_string i)
@@ -78,7 +78,7 @@ let gen_module_name (n: module_name): string =
   austral_prefix ^ replace_char (mod_name_string n) '.' "__"
 
 let gen_qident (i: qident): string =
-  (gen_module_name (source_module_name i)) ^ "::" ^ (gen_ident (original_name i))
+  (gen_module_name (source_module_name i)) ^ "____" ^ (gen_ident (original_name i))
 
 let gen_decl_id (id: decl_id): string =
   let (DeclId i) = id in
@@ -97,15 +97,15 @@ let gen_ins_meth_id (id: ins_meth_id): string =
 let rec gen_type (ty: mono_ty): c_ty =
   match ty with
   | MonoUnit ->
-     CNamedType "unit_t"
+     CNamedType "au_unit_t"
   | MonoBoolean ->
-     CNamedType "bool_t"
+     CNamedType "au_bool_t"
   | MonoInteger (s, w) ->
      let s' = (match s with
                | Unsigned -> "nat"
                | Signed -> "int")
      and w' = string_of_int (width_int w) in
-     CNamedType (s' ^ w' ^ "_t")
+     CNamedType ("au_" ^ s' ^ w' ^ "_t")
   | MonoSingleFloat ->
      CNamedType "float"
   | MonoDoubleFloat ->
