@@ -114,3 +114,12 @@ let rec replace_variables bindings ty =
      Array (replace_variables bindings ty, r)
   | t ->
      t
+
+let rec bindings_from_list lst =
+  match lst with
+  | (name, source, ty)::rest ->
+     let bindings = empty_bindings in
+     let bindings = add_binding bindings name source ty in
+     merge_bindings bindings (bindings_from_list rest)
+  | [] ->
+   empty_bindings
