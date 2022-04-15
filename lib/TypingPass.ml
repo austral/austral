@@ -92,6 +92,7 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
 (* Since the extraction pass has already happened, we can simplify the call to
    `parse_type` by passing an empty list of local type signatures. *)
 let parse_typespec (env: env) (rm: region_map) (typarams: type_parameter list) (ty: qtypespec): ty =
+  print_endline ("Parsing typespec: " ^ (show_qtypespec ty));
   parse_type env [] rm typarams ty
 
 let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
@@ -765,10 +766,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let rec_ty = get_type value' in
          (match rec_ty with
           | (NamedType (name, _, u)) ->
-             let (source_module, vis, typarams, slots) = get_record_definition env name in
+             let (source_module, vis, record_typarams, slots) = get_record_definition env name in
              let orig_type = NamedType (
                                  make_qident (source_module, original_name name, original_name name),
-                                 List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams,
+                                 List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) record_typarams,
                                  u
                                )
              in
@@ -779,6 +780,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
                if ident_set_eq binding_names slot_names then
                  let bindings' = group_bindings_slots bindings slots in
+                 print_endline "DESTRUCTURING";
+                 print_endline ("Typarams: " ^ (String.concat ", " (List.map show_type_parameter typarams)));
                  let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual)) bindings' in
                  let newvars = List.map (fun (n, ty, actual) ->
                                    let _ = match_type ty actual in
@@ -1082,6 +1085,7 @@ and is_path_elem_constant = function
      is_constant e
 
 let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: linked_definition): typed_decl =
+  print_endline "augmenting decl";
   match decl with
   | LConstant (decl_id, vis, name, ty, expr, doc) ->
      let expr' = augment_expr module_name env empty_region_map [] empty_lexenv (Some ty) expr in
@@ -1095,6 +1099,8 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
   | LUnion (decl_id, vis, name, typarams, universe, cases, doc) ->
      TUnion (decl_id, vis, name, typarams, universe, cases, doc)
   | LFunction (decl_id, vis, name, typarams, params, rt, body, doc, pragmas) ->
+     print_endline ("Augmenting " ^ (ident_string name));
+     print_endline ("Typarams: " ^ (String.concat ", " (List.map show_type_parameter typarams)));
      let rm = region_map_from_typarams typarams in
      (match pragmas with
       | [ForeignImportPragma s] ->

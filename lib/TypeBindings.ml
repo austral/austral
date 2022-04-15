@@ -14,10 +14,11 @@ module BindingsMap =
             ^ (ident_string (original_name qname))
             ^ (ident_string (local_name qname))
           in
+          let _ = (qs, f, f') in
           let a =
-            (ident_string n) ^ (qs f)
+            (ident_string n)
           and b =
-            (ident_string n') ^ (qs f')
+            (ident_string n')
           in
           compare a b
       end

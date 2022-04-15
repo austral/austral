@@ -131,6 +131,7 @@ let adorn_error_with_span (spn: span) (f: unit -> 'a): 'a =
   try
     f ()
   with Austral_error error ->
+    print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     let (Error { span; data }) = error in
     match span with
     | Some _ ->

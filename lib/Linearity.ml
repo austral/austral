@@ -248,6 +248,7 @@ let rec check_linearity (stmt: tstmt): unit =
      let u = type_universe t in
      (* Check this var in the body *)
      if universe_linear_ish u then
+       let _ = print_endline ("Name: " ^ (ident_string n)) in
        check_consistency n (type_is_write_ref t) b
      else
        ();

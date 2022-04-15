@@ -39,12 +39,12 @@ module body Example.Box is
         return value;
     end;
 
-    generic [T: Free]
-    function Swap_Free(box: Box[T], new: T): Box[T] is
-        let { pointer: Pointer[T] } := box;
-        let old: T := Load(pointer);
+    generic [X: Free]
+    function Swap_Free(box: Box[X], new: X): Box[X] is
+        let { pointer: Pointer[X] } := box;
+        let old: X := Load(pointer);
         Store(pointer, new);
-        let newbox: Box[T] := Box(pointer => pointer);
+        let newbox: Box[X] := Box(pointer => pointer);
         return newbox;
     end;
 
