@@ -15,8 +15,11 @@ type line = Line of indentation * string
 let render_line (Line (Indentation i, s)) =
   (String.make i ' ') ^ s
 
-let rec render_module d =
-  String.concat "\n" (List.map render_line (render_decl zero_indent d))
+let rec render_unit (CUnit decls): string =
+  let rd d =
+    String.concat "\n" (List.map render_line (render_decl zero_indent d))
+  in
+  String.concat "\n\n" (List.map rd decls)
 
 and render_decl i d =
   match d with

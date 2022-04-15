@@ -21,6 +21,7 @@ type stripped_ty =
   | SWriteRef of stripped_ty * stripped_ty
   | SRawPointer of stripped_ty
   | SMonoTy of mono_id
+  | SRegionTyVar of identifier * qident
 
 (** Strip a type specifier. *)
 val strip_type : ty -> stripped_ty

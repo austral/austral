@@ -15,14 +15,15 @@ type integer_width =
   | Width16
   | Width32
   | Width64
-[@@deriving eq, show]
+[@@deriving (eq, show)]
 
 type signedness =
   | Unsigned
   | Signed
-[@@deriving eq, show]
+[@@deriving (eq, show)]
 
 type type_parameter = TypeParameter of identifier * universe * qident
+[@@deriving show]
 
 type type_var = TypeVariable of identifier * universe * qident
 [@@deriving eq, show]
@@ -48,6 +49,7 @@ type typed_slot = TypedSlot of identifier * ty
 type typed_case = TypedCase of identifier * typed_slot list
 
 type value_parameter = ValueParameter of identifier * ty
+[@@deriving show]
 
 type type_signature = TypeSignature of identifier * type_parameter list * universe
 

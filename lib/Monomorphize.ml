@@ -16,51 +16,53 @@ open Error
 let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
   match ty with
   | SUnit ->
-    (MonoUnit, env)
+     (MonoUnit, env)
   | SBoolean ->
-    (MonoBoolean, env)
+     (MonoBoolean, env)
   | SInteger (s, w) ->
-    (MonoInteger (s, w), env)
+     (MonoInteger (s, w), env)
   | SSingleFloat ->
-    (MonoSingleFloat, env)
+     (MonoSingleFloat, env)
   | SDoubleFloat ->
-    (MonoDoubleFloat, env)
+     (MonoDoubleFloat, env)
   | SRegionTy r ->
-    (MonoRegionTy r, env)
+     (MonoRegionTy r, env)
   | SArray (elem_ty, region) ->
-    let (elem_ty, env) = monomorphize_ty env elem_ty in
-    (MonoArray (elem_ty, region), env)
+     let (elem_ty, env) = monomorphize_ty env elem_ty in
+     (MonoArray (elem_ty, region), env)
   | SReadRef (ty, region) ->
-    let (ty, env) = monomorphize_ty env ty in
-    let (region, env) = monomorphize_ty env region in
-    (MonoReadRef (ty, region), env)
+     let (ty, env) = monomorphize_ty env ty in
+     let (region, env) = monomorphize_ty env region in
+     (MonoReadRef (ty, region), env)
   | SWriteRef (ty, region) ->
-    let (ty, env) = monomorphize_ty env ty in
-    let (region, env) = monomorphize_ty env region in
-    (MonoWriteRef (ty, region), env)
+     let (ty, env) = monomorphize_ty env ty in
+     let (region, env) = monomorphize_ty env region in
+     (MonoWriteRef (ty, region), env)
   | SRawPointer ty ->
-    let (ty, env) = monomorphize_ty env ty in
-    (MonoRawPointer ty, env)
+     let (ty, env) = monomorphize_ty env ty in
+     (MonoRawPointer ty, env)
   | SNamedType (name, args) ->
-    let (args, env) = monomorphize_ty_list env args in
-    (match get_decl_by_name env (qident_to_sident name) with
-     | Some decl ->
-       (match decl with
-        | TypeAlias { id; _} ->
-          let (env, mono_id) = add_or_get_type_alias_monomorph env id args in
-          (MonoNamedType mono_id, env)
-        | Record { id; _ } ->
-          let (env, mono_id) = add_or_get_record_monomorph env id args in
-          (MonoNamedType mono_id, env)
-        | Union { id; _ } ->
-          let (env, mono_id) = add_or_get_union_monomorph env id args in
-          (MonoNamedType mono_id, env)
-        | _ ->
-          err "internal: named type points to something that isn't a type")
-     | None ->
-       err "internal")
+     let (args, env) = monomorphize_ty_list env args in
+     (match get_decl_by_name env (qident_to_sident name) with
+      | Some decl ->
+         (match decl with
+          | TypeAlias { id; _} ->
+             let (env, mono_id) = add_or_get_type_alias_monomorph env id args in
+             (MonoNamedType mono_id, env)
+          | Record { id; _ } ->
+             let (env, mono_id) = add_or_get_record_monomorph env id args in
+             (MonoNamedType mono_id, env)
+          | Union { id; _ } ->
+             let (env, mono_id) = add_or_get_union_monomorph env id args in
+             (MonoNamedType mono_id, env)
+          | _ ->
+             err "internal: named type points to something that isn't a type")
+      | None ->
+         err "internal")
   | SMonoTy id ->
-    (MonoNamedType id, env)
+     (MonoNamedType id, env)
+  | SRegionTyVar (name, source) ->
+     (MonoRegionTyVar (name, source), env)
 
 and monomorphize_ty_list (env: env) (tys: stripped_ty list): (mono_ty list * env) =
   match tys with
@@ -94,6 +96,8 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   | TStringConstant s ->
      (MStringConstant s, env)
   | TVariable (name, ty) ->
+     (*print_endline (qident_debug_name name);*)
+     (*print_endline ("Type: " ^ (show_ty ty));*)
      let (ty, env) = strip_and_mono env ty in
      (MVariable (name, ty), env)
   | TArithmetic (oper, lhs, rhs) ->
@@ -625,10 +629,14 @@ and get_mono_qname (env: env) (mono: monomorph): qident =
          err "internal")
   | MonoInstanceMethod { method_id;  _ } ->
      (match get_instance_method env method_id with
-      | Some (InsMethRec { name; instance_id; _ }) ->
+      | Some (InsMethRec { instance_id; _ }) ->
          (match get_decl_by_id env instance_id with
-          | Some (Instance { mod_id; _ }) ->
-             make_qident (get_module_name mod_id, name, name)
+          | Some (Instance { mod_id; typeclass_id; _ }) ->
+             (match get_decl_by_id env typeclass_id with
+              | (Some (TypeClass { name; _ })) ->
+                 make_qident (get_module_name mod_id, name, name)
+              | _ ->
+                 err "internal")
           | _ ->
              err "internal")
       | _ ->
@@ -718,15 +726,25 @@ and make_bindings (typarams: type_parameter list) (source: qident) (args: mono_t
      Ideally we shouldn't need to bring the type parameters, rather, monomorphs
      should be stored in the environment with an `(identifier, mono_ty)` map
      rather than as a bare list of monomorphic type arguments. *)
-  let triples: (identifier * qident * ty) list =
-    List.map2
-      (fun typaram mty ->
-        let (TypeParameter (name, _, _)) = typaram in
-        (name, source, mono_to_ty mty))
-      typarams
-      args
+  let is_not_region (TypeParameter (_, u, _)): bool =
+    u <> RegionUniverse
   in
-  bindings_from_list triples
+  let typarams = List.filter is_not_region typarams in
+  if (List.length typarams) = (List.length args) then
+    let triples: (identifier * qident * ty) list =
+      List.map2
+        (fun typaram mty ->
+          let (TypeParameter (name, _, _)) = typaram in
+          (name, source, mono_to_ty mty))
+        typarams
+        args
+    in
+    bindings_from_list triples
+  else
+    err ("Parameter list and argument list don't have the same length:\n\nparameters:\n"
+         ^ (String.concat ", " (List.map show_type_parameter typarams))
+         ^ "\narguments:\n"
+         ^ (String.concat ", " (List.map show_mono_ty args)))
 
 and mono_to_ty (ty: mono_ty): ty =
   let r = mono_to_ty in
@@ -749,3 +767,5 @@ and mono_to_ty (ty: mono_ty): ty =
      WriteRef (r ty, r region)
   | MonoRawPointer ty ->
      RawPointer (r ty)
+  | MonoRegionTyVar (name, source) ->
+     TyVar (TypeVariable (name, RegionUniverse, source))

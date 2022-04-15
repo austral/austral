@@ -765,10 +765,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let rec_ty = get_type value' in
          (match rec_ty with
           | (NamedType (name, _, u)) ->
-             let (source_module, vis, typarams, slots) = get_record_definition env name in
+             let (source_module, vis, record_typarams, slots) = get_record_definition env name in
              let orig_type = NamedType (
                                  make_qident (source_module, original_name name, original_name name),
-                                 List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams,
+                                 List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) record_typarams,
                                  u
                                )
              in

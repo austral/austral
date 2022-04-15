@@ -4,6 +4,7 @@ open Span
 open Escape
 
 type qtypespec = QTypeSpecifier of qident * qtypespec list
+[@@deriving show]
 
 type astmt =
   | ASkip of span

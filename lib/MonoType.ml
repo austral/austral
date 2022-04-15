@@ -17,7 +17,8 @@ type mono_ty =
   | MonoReadRef of mono_ty * mono_ty
   | MonoWriteRef of mono_ty * mono_ty
   | MonoRawPointer of mono_ty
-[@@deriving eq]
+  | MonoRegionTyVar of identifier * qident
+[@@deriving (eq, show)]
 
 (** A monomorphic record slot. *)
 type mono_slot = MonoSlot of identifier * mono_ty
