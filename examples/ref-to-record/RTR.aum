@@ -1,11 +1,3 @@
-import Austral.Memory (
-    Pointer,
-    Allocate,
-    Load,
-    Store,
-    Deallocate
-);
-
 module body Example.RTR is
     pragma Unsafe_Module;
 
