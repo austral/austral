@@ -526,7 +526,8 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      (* Return the new environment and the declaration. *)
      (env, decl)
   | MonoFunction { id; function_id; tyargs; _ } ->
-     (* Find the function's type parameters and body. *)
+     (* Find the function's type parameters, value parameters, return type, and
+        body. *)
      let (typarams, params, rt, body) = get_function_definition env function_id in
      (* Search/replace the type variables in the parameter list with the type
         arguments. *)
@@ -554,8 +555,36 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      let decl: mdecl = MFunctionMonomorph (id, params, rt, body) in
      (* Return the new environment and the declaration. *)
      (env, decl)
-  | _ ->
-     err "not implemented yet"
+  | MonoInstanceMethod { id; method_id; tyargs; _ } ->
+     (* Find the methods's type parameters, value parameters, return type, and
+        body. *)
+     let (typarams, params, rt, body) = get_method_definition env method_id in
+     (* Search/replace the type variables in the parameter list with the type
+        arguments. *)
+     let params: value_parameter list =
+       List.map
+         (fun (ValueParameter (name, ty)) ->
+           ValueParameter (name, replace_type_variables typarams tyargs ty))
+         params
+     in
+     (* Monomorphize the parameter list. *)
+     let (env, params) = monomorphize_params env params in
+     (* Search/replace the type variables in the return type. *)
+     let rt = replace_type_variables typarams tyargs rt in
+     (* Monomorphize the return type. *)
+     let (rt, env) = strip_and_mono env rt in
+     (* Search/replace the type variables in the body with the type
+        arguments. *)
+     let bindings = make_bindings typarams tyargs in
+     let body = replace_tyvars_stmt bindings body in
+     (* Monomorphize the body *)
+     let (body, env) = monomorphize_stmt env body in
+     (* Store the monomorphic body in the environment. *)
+     let env = store_instance_method_monomorph_definition env id body in
+     (* Construct a monomorphic record decl. *)
+     let decl: mdecl = MMethodMonomorph (id, params, rt, body) in
+     (* Return the new environment and the declaration. *)
+     (env, decl)
 
 (* Utils *)
 
@@ -599,6 +628,21 @@ and get_function_definition (env: env) (id: decl_id): (type_parameter list * val
          (typarams, value_params, rt, body)
       | None ->
          err "internal: function has no body")
+  | _ ->
+     err "internal"
+
+and get_method_definition (env: env) (id: ins_meth_id): (type_parameter list * value_parameter list * ty * tstmt) =
+  match get_instance_method env id with
+  | Some (InsMethRec { instance_id; value_params; rt; body; _ }) ->
+     (match get_decl_by_id env instance_id with
+      | Some (Instance { typarams; _ }) ->
+         (match body with
+          | Some body ->
+             (typarams, value_params, rt, body)
+          | None ->
+             err "internal: method has no body")
+      | _ ->
+         err "internal: not an instance")
   | _ ->
      err "internal"
 
