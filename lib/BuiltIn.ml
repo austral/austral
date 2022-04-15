@@ -91,24 +91,6 @@ let add_memory_module (env: env): env =
   in
   let (env, _) =
     (* generic T: Type
-       function Allocate(value: T): Optional[Pointer[T]] *)
-    let name = i "Allocate" in
-    let qname = make_qident (memory_module_name, name, name) in
-    add_function env
-      {
-        mod_id = mod_id;
-        vis = VisPublic;
-        name = name;
-        docstring = Docstring "";
-        typarams = typarams qname;
-        value_params = [ValueParameter (i "value", type_t qname)];
-        rt = NamedType (option_type_qname, [pointer_t qname], FreeUniverse);
-        external_name = None;
-        body = None;
-      }
-  in
-  let (env, _) =
-    (* generic T: Type
        function Load(pointer: Pointer[T]): T *)
     let name = i "Load" in
     let qname = make_qident (memory_module_name, name, name) in
