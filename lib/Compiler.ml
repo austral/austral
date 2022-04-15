@@ -3,7 +3,8 @@ open Env
 open BuiltIn
 open Pervasive
 open MemoryModule
-open CppPrelude
+(*open CppPrelude*)
+open CPrelude
 open ParserInterface
 open CombiningPass
 open ExtractionPass
@@ -11,6 +12,7 @@ open TypingPass
 open BodyExtractionPass
 open CodeGen
 open CppRenderer
+open CRenderer
 open Cst
 open Tast
 open Type
@@ -64,12 +66,12 @@ let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; bod
   let typed: typed_module = augment_module env linked in
   let env: env = extract_bodies env typed in
   let (env, mono): (env * mono_module) = monomorphize env typed in
-  (*let unit = CodeGen2.gen_module mono in
-  let c_code: string = render_unit unit in*)
-  let _ = mono in
+  let unit = CodeGen2.gen_module mono in
+  let c_code: string = render_unit unit in
   let cpp = gen_module typed in
   let code = render_module cpp in
-  Compiler (env, (compiler_code c) ^ "\n" ^ code)
+  let _ = code in
+  Compiler (env, (compiler_code c) ^ "\n" ^ c_code)
 
 let rec compile_multiple c modules =
   match modules with
@@ -129,7 +131,7 @@ let empty_compiler: compiler =
      Austral.Memory, since the latter uses declarations from the former. *)
   let env: env = empty_env in
   (* Start with the C++ prelude. *)
-  let c = Compiler (env, prelude) in
+  let c = Compiler (env, prelude_source) in
   let c =
     (* Handle errors during the compilation of the Austral,Pervasive
        module. Otherwise, a typo in the source code of this module will cause a
@@ -148,8 +150,7 @@ let empty_compiler: compiler =
       Printf.eprintf "%s" (render_error error None);
       exit (-1)
   in
-  let (Compiler (menv, code)) = c in
-  Compiler (menv, code ^ austral_memory_code)
+  c
 
 let compile_and_run (modules: (string * string) list) (entrypoint: string): (int * string) =
   let compiler = compile_multiple empty_compiler (List.map (fun (i, b) -> fake_mod_source i b) modules) in
