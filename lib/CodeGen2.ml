@@ -463,6 +463,8 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      [ff_decl; def]
   | MConcreteInstance (_, _, _, methods) ->
      List.map (gen_method mn) methods
+  | MMethodMonomorph (id, params, rt, body) ->
+     [CFunctionDefinition (gen_mono_id id, gen_params params, gen_type rt, gen_stmt mn body)]
 
 (* Extract types into forward type declarations *)
 
