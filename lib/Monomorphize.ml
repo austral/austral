@@ -708,11 +708,7 @@ and monomorphize_case_list (env: env) (cases: typed_case list): (env * mono_case
 
 and replace_type_variables (typarams: type_parameter list) (source: qident) (args: mono_ty list) (ty: ty): ty =
   let bindings: type_bindings = make_bindings typarams source args in
-  print_endline ("Replacing with bindings: " ^ (show_bindings bindings));
-  print_endline ("Old type: " ^ (show_ty ty));
-  let ty' = replace_variables bindings ty in
-  print_endline ("New type: " ^ (show_ty ty'));
-  ty'
+  replace_variables bindings ty
 
 and make_bindings (typarams: type_parameter list) (source: qident) (args: mono_ty list): type_bindings =
   (* Given a list of type parameters, a list of monomorphic type arguments (of
