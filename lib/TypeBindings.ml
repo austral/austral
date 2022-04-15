@@ -36,7 +36,7 @@ let empty_bindings = TypeBindings BindingsMap.empty
 
 let show_bindings (TypeBindings m) =
   let show_binding ((n, f), t) =
-    (show_identifier n) ^ " from  " ^ (qident_debug_name f) ^ " => " ^ (show_ty t)
+    (show_identifier n) ^ " from " ^ (qident_debug_name f) ^ " => " ^ (show_ty t)
   in
   "TypeBindings {" ^ (String.concat ", " (List.map show_binding (BindingsMap.bindings m))) ^ "}"
 
@@ -88,10 +88,16 @@ let merge_bindings (TypeBindings a) (TypeBindings b) =
 
 let rec replace_variables bindings ty =
   match ty with
-  | TyVar (TypeVariable (n, u, from)) ->
-     (match get_binding bindings n from with
-      | Some ty -> ty
-      | None -> TyVar (TypeVariable (n, u, from)))
+  | Unit ->
+     Unit
+  | Boolean ->
+     Boolean
+  | Integer (s, w) ->
+     Integer (s, w)
+  | SingleFloat ->
+     SingleFloat
+  | DoubleFloat ->
+     DoubleFloat
   | NamedType (n, a, u) ->
      let a' = List.map (replace_variables bindings) a in
      if u = TypeUniverse then
@@ -106,14 +112,22 @@ let rec replace_variables bindings ty =
        NamedType (n, a', u')
      else
        NamedType (n, a', u)
+  | TyVar (TypeVariable (n, u, from)) ->
+     (match get_binding bindings n from with
+      | Some ty -> ty
+      | None -> TyVar (TypeVariable (n, u, from)))
+  | Array (ty, r) ->
+     Array (replace_variables bindings ty, r)
+  | RegionTy r ->
+     RegionTy r
   | ReadRef (ty, region) ->
      ReadRef (replace_variables bindings ty, replace_variables bindings region)
   | WriteRef (ty, region) ->
      WriteRef (replace_variables bindings ty, replace_variables bindings region)
-  | Array (ty, r) ->
-     Array (replace_variables bindings ty, r)
-  | t ->
-     t
+  | RawPointer ty ->
+     RawPointer (replace_variables bindings ty)
+  | MonoTy id ->
+     MonoTy id
 
 let rec bindings_from_list lst =
   match lst with

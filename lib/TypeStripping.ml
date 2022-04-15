@@ -67,13 +67,13 @@ and strip_type' (ty: ty): stripped_ty option =
           err "internal")
      | None ->
        err "Internal: write ref instantiated with a region type.")
-  | TyVar _ ->
+  | TyVar (TypeVariable (name, _, _)) ->
     (* Why? Because when instantiating a monomorph, we do search and replace of
        type variables with their substitutions. So if there are variables left
        over by stripping time, that's an error. Anyways, the search-and-replace
        step should *also* have signalled an error if a type variable has no
        replacement. *)
-    err "Variable not replaced."
+    err ("strip_type': Variable not replaced: '" ^ (ident_string name) ^ "'")
   | RawPointer ty ->
     (match (strip_type' ty) with
      | Some ty ->
