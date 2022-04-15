@@ -907,6 +907,6 @@ let store_instance_method_monomorph_definition (env: env) (id: mono_id) (new_bod
   | _ ->
     err "internal"
 
-let get_instance_method_by_id (env: env) (target_id: ins_meth_id): ins_meth_rec option =
+let get_instance_method (env: env) (target_id: ins_meth_id): ins_meth_rec option =
   let (Env { methods; _ }) = env in
   List.find_opt (fun (InsMethRec { id; _ }) -> equal_ins_meth_id id target_id) methods
