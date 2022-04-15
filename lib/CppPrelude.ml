@@ -162,6 +162,15 @@ bool au_free(void* ptr) {
     return false;
 };
 
+typedef struct {
+    void*  data;
+    size_t size;
+} au_array_t;
+
+au_array_t au_make_array_from_string(void* data, size_t size) {
+    return { .data = data, .size = size };
+}
+
 |code}
 
 let austral_memory_code = {code|
