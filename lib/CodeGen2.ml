@@ -141,6 +141,9 @@ let union_tag_enum_name (id: mono_id): string =
 let local_union_tag_enum_name (n: identifier): string =
   (gen_ident n) ^ "_tag"
 
+let local_union_tag_enum_name_from_id (id: mono_id): string =
+  (gen_mono_id id) ^ "_tag"
+
 (* Given a union type and the name of a case, return the
    value of the tag enum for that case. *)
 let union_tag_value (ty: mono_ty) (case_name: identifier): c_expr =
@@ -367,6 +370,15 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
              )
          )
      ]
+  | MRecordMonomorph (id, slots) ->
+     [
+       CStructDefinition (
+           CStruct (
+               Some (gen_mono_id id),
+               gen_slots slots
+             )
+         )
+     ]
   | MUnion (_, n, cases) ->
      let enum_def = CEnumDefinition (
                         local_union_tag_enum_name n,
@@ -383,8 +395,26 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
                        )
      in
      [enum_def; union_def]
+  | MUnionMonomorph (id, cases) ->
+     let enum_def = CEnumDefinition (
+                        local_union_tag_enum_name_from_id id,
+                        List.map (fun (MonoCase (n, _)) -> gen_ident n) cases
+                      )
+     and union_def = CStructDefinition (
+                         CStruct (
+                             Some (gen_mono_id id),
+                             [
+                               CSlot ("tag", CNamedType (local_union_tag_enum_name_from_id id));
+                               CSlot ("data", CUnionType (gen_cases cases))
+                             ]
+                           )
+                       )
+     in
+     [enum_def; union_def]
   | MFunction (_, name, params, rt, body) ->
      [CFunctionDefinition (gen_ident name, gen_params params, gen_type rt, gen_stmt mn body)]
+  | MFunctionMonomorph (id, params, rt, body) ->
+     [CFunctionDefinition (gen_mono_id id, gen_params params, gen_type rt, gen_stmt mn body)]
   | MForeignFunction (_, n, params, rt, underlying) ->
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
@@ -433,6 +463,8 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      [ff_decl; def]
   | MConcreteInstance (_, _, _, methods) ->
      List.map (gen_method mn) methods
+  | MMethodMonomorph (id, params, rt, body) ->
+     [CFunctionDefinition (gen_mono_id id, gen_params params, gen_type rt, gen_stmt mn body)]
 
 (* Extract types into forward type declarations *)
 

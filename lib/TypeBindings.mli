@@ -11,6 +11,8 @@ val bindings_list : type_bindings -> (identifier * qident * ty) list
 
 val empty_bindings : type_bindings
 
+val bindings_from_list : (identifier * qident * ty) list -> type_bindings
+
 val merge_bindings : type_bindings -> type_bindings -> type_bindings
 
 val add_binding : type_bindings -> identifier -> qident -> ty -> type_bindings

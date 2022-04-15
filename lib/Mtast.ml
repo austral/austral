@@ -12,10 +12,14 @@ and mdecl =
   | MTypeAlias of decl_id * identifier * mono_ty
   | MTypeAliasMonomorph of mono_id * mono_ty
   | MRecord of decl_id * identifier * mono_slot list
+  | MRecordMonomorph of mono_id * mono_slot list
   | MUnion of decl_id * identifier * mono_case list
+  | MUnionMonomorph of mono_id * mono_case list
   | MFunction of decl_id * identifier * mvalue_parameter list * mono_ty * mstmt
+  | MFunctionMonomorph of mono_id * mvalue_parameter list * mono_ty * mstmt
   | MForeignFunction of decl_id * identifier * mvalue_parameter list * mono_ty * string
   | MConcreteInstance of decl_id * qident * mono_ty  * concrete_method list
+  | MMethodMonomorph of mono_id * mvalue_parameter list * mono_ty * mstmt
 
 and concrete_method =
   MConcreteMethod of ins_meth_id * identifier * mvalue_parameter list * mono_ty * mstmt
