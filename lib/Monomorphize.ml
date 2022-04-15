@@ -492,7 +492,7 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      let names: identifier list = List.map (fun (TypedSlot (n, _)) -> n) slots in
      let (tys, env): (mono_ty list * env) = strip_and_mono_list env (List.map (fun (TypedSlot (_, t)) -> t) slots) in
      let (slots: mono_slot list) = List.map2 (fun name ty -> MonoSlot (name, ty)) names tys in
-      (* Store the monomorphic slot list in the environment. *)
+     (* Store the monomorphic slot list in the environment. *)
      let env = store_record_monomorph_definition env id slots in
      (* Construct a monomorphic record decl. *)
      let decl: mdecl = MRecordMonomorph (id, slots) in
