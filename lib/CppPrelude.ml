@@ -151,6 +151,21 @@ namespace Austral__Core {
 extern "C" void* calloc(size_t num, size_t size);
 extern "C" void free(void* ptr);
 
+typedef unsigned char unit_t;
+
+typedef unsigned char bool_t;
+
+typedef unsigned char nat8_t;
+typedef signed   char int8_t;
+typedef unsigned short nat16_t;
+typedef signed   short int16_t;
+
+typedef unsigned int nat32_t;
+typedef signed   int int32_t;
+
+typedef unsigned long nat64_t;
+typedef signed   long int32_t;
+
 template <typename T>
 bool au_store(T* source, T value) {
     *source = value;
