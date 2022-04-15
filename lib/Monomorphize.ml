@@ -61,6 +61,8 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
          err "internal")
   | SMonoTy id ->
      (MonoNamedType id, env)
+  | SRegionTyVar (name, source) ->
+     (MonoRegionTyVar (name, source), env)
 
 and monomorphize_ty_list (env: env) (tys: stripped_ty list): (mono_ty list * env) =
   match tys with
@@ -763,3 +765,5 @@ and mono_to_ty (ty: mono_ty): ty =
      WriteRef (r ty, r region)
   | MonoRawPointer ty ->
      RawPointer (r ty)
+  | MonoRegionTyVar (name, source) ->
+     TyVar (TypeVariable (name, RegionUniverse, source))

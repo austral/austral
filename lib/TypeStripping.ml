@@ -17,6 +17,7 @@ type stripped_ty =
   | SWriteRef of stripped_ty * stripped_ty
   | SRawPointer of stripped_ty
   | SMonoTy of mono_id
+  | SRegionTyVar of identifier * qident
 
 let rec strip_type (ty: ty): stripped_ty =
   match strip_type' ty with
@@ -67,9 +68,9 @@ and strip_type' (ty: ty): stripped_ty option =
           err "internal")
      | None ->
        err "Internal: write ref instantiated with a region type.")
-  | TyVar (TypeVariable (name, u, _)) ->
+  | TyVar (TypeVariable (name, u, source)) ->
      if u = RegionUniverse then
-
+       Some (SRegionTyVar (name, source))
      else
        (* Why? Because when instantiating a monomorph, we do search and replace
           of type variables with their substitutions. So if there are variables

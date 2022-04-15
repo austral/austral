@@ -120,7 +120,9 @@ let rec gen_type (ty: mono_ty): c_ty =
   | MonoWriteRef (t, _) ->
      CPointer (gen_type t)
   | MonoRawPointer t ->
-    CPointer (gen_type t)
+     CPointer (gen_type t)
+  | MonoRegionTyVar _ ->
+     err "internal"
 
 (* Expressions *)
 
