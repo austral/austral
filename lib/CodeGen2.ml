@@ -413,6 +413,8 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      [enum_def; union_def]
   | MFunction (_, name, params, rt, body) ->
      [CFunctionDefinition (gen_ident name, gen_params params, gen_type rt, gen_stmt mn body)]
+  | MFunctionMonomorph (id, params, rt, body) ->
+     [CFunctionDefinition (gen_mono_id id, gen_params params, gen_type rt, gen_stmt mn body)]
   | MForeignFunction (_, n, params, rt, underlying) ->
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
