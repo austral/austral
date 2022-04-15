@@ -440,6 +440,9 @@ val visible_instances : env -> decl list
 (** Get method from the instance ID and name. *)
 val get_instance_method_from_instance_id_and_method_name : env -> decl_id -> identifier -> ins_meth_rec option
 
+(** Get an instance method by ID. *)
+val get_instance_method : env -> ins_meth_id -> ins_meth_rec option
+
 (** Given the ID of a type declaration and a set of monomorphic type arguments,
    return the ID of the corresponding monomorph if it exists. *)
 val get_type_monomorph : env -> decl_id -> mono_ty list -> mono_id option
