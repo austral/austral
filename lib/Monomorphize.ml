@@ -625,10 +625,14 @@ and get_mono_qname (env: env) (mono: monomorph): qident =
          err "internal")
   | MonoInstanceMethod { method_id;  _ } ->
      (match get_instance_method env method_id with
-      | Some (InsMethRec { name; instance_id; _ }) ->
+      | Some (InsMethRec { instance_id; _ }) ->
          (match get_decl_by_id env instance_id with
-          | Some (Instance { mod_id; _ }) ->
-             make_qident (get_module_name mod_id, name, name)
+          | Some (Instance { mod_id; typeclass_id; _ }) ->
+             (match get_decl_by_id env typeclass_id with
+              | (Some (TypeClass { name; _ })) ->
+                 make_qident (get_module_name mod_id, name, name)
+              | _ ->
+                 err "internal")
           | _ ->
              err "internal")
       | _ ->
