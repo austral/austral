@@ -158,18 +158,6 @@ namespace A_Austral__Memory {
     extern "C" void free(void* ptr);
 
     template<typename T>
-    T* A_Allocate(T value) {
-        // Note: we use malloc rather than calloc here
-        // because we're going to write to the pointer
-        // immediately.
-        T* ptr = (T*) malloc(sizeof(T));
-        if (ptr != NULL) {
-            *ptr = value;
-        }
-        return ptr;
-    }
-
-    template<typename T>
     T A_Load(T* pointer) {
         return *pointer;
     }
@@ -216,7 +204,7 @@ namespace A_Austral__Memory {
 
 
     template<typename T>
-    T* A_Allocate_Array(uint64_t number) {
+    T* A_Allocate(uint64_t number) {
         unsigned long long elem_size = sizeof(T);
         unsigned long long num = number;
         unsigned long long array_size = 0;

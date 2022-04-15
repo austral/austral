@@ -1,6 +1,6 @@
 import Austral.Memory (
     Pointer,
-    Allocate_Array,
+    Allocate,
     Deallocate
 );
 
@@ -21,7 +21,7 @@ module body Example.Array is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let arropt: Option[Pointer[Boolean]] := Allocate_Array(3);
+        let arropt: Option[Pointer[Boolean]] := Allocate(3);
         case arropt of
         when Some(value: Pointer[Boolean]) do
             value[0] := true;

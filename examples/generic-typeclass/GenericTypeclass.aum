@@ -1,4 +1,4 @@
-import Austral.Memory (Pointer, Allocate_Array);
+import Austral.Memory (Pointer, Allocate);
 
 module body Example.GenericTypeclass is
     pragma Unsafe_Module;
@@ -15,7 +15,7 @@ module body Example.GenericTypeclass is
     end;
 
     function Pointer_To_Integer(): Integer_32 is
-        let opt: Option[Pointer[Integer_32]] := Allocate_Array(sizeof(Integer_32));
+        let opt: Option[Pointer[Integer_32]] := Allocate(sizeof(Integer_32));
         case opt of
           when Some(value: Pointer[Integer_32]) do
             let X: Integer_32 := To_Integer(value);

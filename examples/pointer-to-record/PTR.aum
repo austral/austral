@@ -1,6 +1,6 @@
 import Austral.Memory (
     Pointer,
-    Allocate_Array,
+    Allocate,
     Load,
     Store,
     Deallocate
@@ -19,7 +19,7 @@ module body Example.PTR is
 
     function Main(root: Root_Capability): Root_Capability is
         let r: R := R(X => 97);
-        let optptr: Option[Pointer[R]] := Allocate_Array(sizeof(R));
+        let optptr: Option[Pointer[R]] := Allocate(sizeof(R));
         case optptr of
             when Some(value: Pointer[R]) do
                 Store(value, r);

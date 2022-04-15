@@ -181,8 +181,8 @@ let add_memory_module (env: env): env =
   in
   let (env, _) =
     (* generic T: Type
-       function Allocate_Array(size: Natural_64): Optional[Pointer[T]] *)
-    let name = i "Allocate_Array" in
+       function Allocate(size: Natural_64): Optional[Pointer[T]] *)
+    let name = i "Allocate" in
     let qname = make_qident (memory_module_name, name, name) in
     add_function env
       {

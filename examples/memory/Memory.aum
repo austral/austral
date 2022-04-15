@@ -1,6 +1,6 @@
 import Austral.Memory (
     Pointer,
-    Allocate_Array,
+    Allocate,
     Load,
     Store,
     Deallocate
@@ -10,7 +10,7 @@ module body Example.Memory is
     pragma Unsafe_Module;
 
     function Main(root: Root_Capability): Root_Capability is
-        let opt: Option[Pointer[Integer_32]] := Allocate_Array(sizeof(Integer_32));
+        let opt: Option[Pointer[Integer_32]] := Allocate(sizeof(Integer_32));
         case opt of
             when Some(value: Pointer[Integer_32]) do
               Deallocate(value);

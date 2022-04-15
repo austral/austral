@@ -1,6 +1,6 @@
 import Austral.Memory (
     Pointer,
-    Allocate_Array,
+    Allocate,
     Resize_Array,
     Deallocate
 );
@@ -24,7 +24,7 @@ module body Example.Buffer is
     -- Allocate an array, and abort if allocation fails.
     generic [T: Type]
     function Allocate_Or_Die(size: Natural_64): Pointer[T] is
-        let arropt: Option[Pointer[T]] := Allocate_Array(size);
+        let arropt: Option[Pointer[T]] := Allocate(size);
         case arropt of
             when Some(value: Pointer[T]) do
                 return value;
