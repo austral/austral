@@ -110,20 +110,16 @@ double convert_d_to_d(double value) { return (double)(value); }
 extern "C" void* calloc(size_t num, size_t size);
 extern "C" void free(void* ptr);
 
-typedef unsigned char unit_t;
-
-typedef unsigned char bool_t;
-
-typedef unsigned char nat8_t;
-typedef signed   char int8_t;
-typedef unsigned short nat16_t;
-typedef signed   short int16_t;
-
-typedef unsigned int nat32_t;
-typedef signed   int int32_t;
-
-typedef unsigned long nat64_t;
-typedef signed   long int32_t;
+typedef unsigned char  au_unit_t;
+typedef unsigned char  au_bool_t;
+typedef unsigned char  au_nat8_t;
+typedef signed   char  au_int8_t;
+typedef unsigned short au_nat16_t;
+typedef signed   short au_int16_t;
+typedef unsigned int   au_nat32_t;
+typedef signed   int   au_int32_t;
+typedef unsigned long  au_nat64_t;
+typedef signed   long  au_int64_t;
 
 template <typename T>
 bool au_store(T* source, T value) {
@@ -141,8 +137,20 @@ typedef struct {
     size_t size;
 } au_array_t;
 
-au_array_t au_make_array_from_string(void* data, size_t size) {
-    return { .data = data, .size = size };
+au_array_t au_make_array_from_string(const char* data, size_t size) {
+    return { .data = (void*) data, .size = size };
+}
+
+extern "C" void* stderr;
+extern "C" int fprintf(void* stream, const char* format, ...);
+extern "C" int fflush(void* stream);
+extern "C" void _Exit(int exit_code);
+
+au_unit_t au_abort(au_array_t message) {
+    fprintf(stderr, "%s\n", (char*) message.data);
+    fflush(stderr);
+    _Exit(-1);
+    return false;
 }
 
 /* --- END PRELUDE --- */

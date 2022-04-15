@@ -84,7 +84,7 @@ module body Austral.Pervasive is
     end;
 
     function Abort(message: Fixed_Array[Natural_8]): Unit is
-        return @embed(Unit, "Austral__Core::Abort($1)", message);
+        return @embed(Unit, "au_abort($1)", message);
     end;
 
     type Root_Capability : Linear is Unit;
