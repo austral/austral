@@ -367,6 +367,15 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
              )
          )
      ]
+  | MRecordMonomorph (id, slots) ->
+     [
+       CStructDefinition (
+           CStruct (
+               Some (gen_mono_id id),
+               gen_slots slots
+             )
+         )
+     ]
   | MUnion (_, n, cases) ->
      let enum_def = CEnumDefinition (
                         local_union_tag_enum_name n,

@@ -73,6 +73,10 @@ let strip_and_mono (env: env) (ty: ty): (mono_ty * env) =
   let ty = strip_type ty in
   monomorphize_ty env ty
 
+let strip_and_mono_list (env: env) (tys: ty list): (mono_ty list * env) =
+  let tys = List.map strip_type tys in
+  monomorphize_ty_list env tys
+
 (* Monomorphize expressions *)
 
 let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
@@ -472,6 +476,28 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
     let decl: mdecl = MTypeAliasMonomorph (id, ty) in
     (* Return the new environment and the declaration. *)
     (env, decl)
+  | MonoRecordDefinition { id; type_id; tyargs; _ } ->
+     (* Find the record definition and extract the type parameters and the slot
+        list. *)
+     let (typarams, slots) = get_record_definition env type_id in
+     (* Search/replace the type variables in the slot list with the type
+        arguments from this monomorph. *)
+     let slots: typed_slot list =
+       List.map
+         (fun (TypedSlot (name, ty)) ->
+           TypedSlot (name, replace_type_variables typarams tyargs ty))
+         slots
+     in
+     (* Strip and monomorphize the slot list. *)
+     let names: identifier list = List.map (fun (TypedSlot (n, _)) -> n) slots in
+     let (tys, env): (mono_ty list * env) = strip_and_mono_list env (List.map (fun (TypedSlot (_, t)) -> t) slots) in
+     let (slots: mono_slot list) = List.map2 (fun name ty -> MonoSlot (name, ty)) names tys in
+      (* Store the monomorphic slot list in the environment. *)
+     let env = store_record_monomorph_definition env id slots in
+     (* Construct a monomorphic record decl. *)
+     let decl: mdecl = MRecordMonomorph (id, slots) in
+     (* Return the new environment and the declaration. *)
+     (env, decl)
   | _ ->
     err "not implemented yet"
 
@@ -481,6 +507,13 @@ and get_type_alias_definition (env: env) (id: decl_id): (type_parameter list * t
   match get_decl_by_id env id with
   | Some (TypeAlias { typarams; def; _ }) ->
     (typarams, def)
+  | _ ->
+    err "internal"
+
+and get_record_definition (env: env) (id: decl_id): (type_parameter list * typed_slot list) =
+  match get_decl_by_id env id with
+  | Some (Record { typarams; slots; _ }) ->
+    (typarams, slots)
   | _ ->
     err "internal"
 

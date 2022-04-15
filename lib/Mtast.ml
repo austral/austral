@@ -12,6 +12,7 @@ and mdecl =
   | MTypeAlias of decl_id * identifier * mono_ty
   | MTypeAliasMonomorph of mono_id * mono_ty
   | MRecord of decl_id * identifier * mono_slot list
+  | MRecordMonomorph of mono_id * mono_slot list
   | MUnion of decl_id * identifier * mono_case list
   | MFunction of decl_id * identifier * mvalue_parameter list * mono_ty * mstmt
   | MForeignFunction of decl_id * identifier * mvalue_parameter list * mono_ty * string
