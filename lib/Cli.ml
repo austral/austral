@@ -114,6 +114,7 @@ let compile_main (args: string list): unit =
          None
     in
     Printf.eprintf "%s" (render_error error code);
+    print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     exit (-1)
 
 let typecheck_main (args: string list): unit =
@@ -131,6 +132,7 @@ let typecheck_main (args: string list): unit =
          None
     in
     Printf.eprintf "%s" (render_error error code);
+    print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     exit (-1)
 
 let main' (args: string list): unit =
@@ -148,8 +150,10 @@ let main' (args: string list): unit =
 
 let main (args: string list): unit =
   try
+    Printexc.record_backtrace true;
     main' args;
     exit 0
   with Austral_error error ->
     Printf.eprintf "%s" (render_error error None);
+    print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     exit (-1)
