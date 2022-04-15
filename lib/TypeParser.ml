@@ -190,11 +190,6 @@ let get_type_signature (env: env) (sigs: type_signature list) (name: qident) =
 (* Parsing *)
 
 let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
-  let _ = if (qident_debug_name name) = "X from Example.Box" then
-            print_endline ("Typarams: " ^ (String.concat ", " (List.map show_type_parameter typarams)))
-          else
-            ()
-  in
   let args' = List.map (parse_type env sigs rm typarams) args in
   match parse_built_in_type name args' with
   | Some ty ->
