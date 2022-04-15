@@ -6,6 +6,7 @@ open Mtast
 open CRepr
 open Util
 open Region
+open Escape
 open Error
 
 (* Codegen implementation notes:
@@ -112,7 +113,7 @@ let rec gen_type (ty: mono_ty): c_ty =
   | MonoNamedType id ->
      CNamedType (gen_mono_id id)
   | MonoArray (_, _) ->
-     err "Array codegen"
+     CNamedType "au_array_t"
   | MonoRegionTy _ ->
      err "TODO: Codegen for region types"
   | MonoReadRef (t, _) ->
@@ -162,8 +163,14 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CInt i
   | MFloatConstant f ->
      CFloat f
-  | MStringConstant _ ->
-     err "String constant"
+  | MStringConstant s ->
+     CFuncall (
+         "au_make_array_from_string",
+         [
+           CString s;
+           CInt (string_of_int (String.length (escaped_to_string s)))
+         ]
+       )
   | MVariable (n, _) ->
      if (equal_module_name (source_module_name n) mn) then
        CVar (gen_ident (original_name n))
