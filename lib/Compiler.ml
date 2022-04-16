@@ -10,7 +10,7 @@ open CombiningPass
 open ExtractionPass
 open TypingPass
 open BodyExtractionPass
-open CodeGen2
+open CodeGen
 open CRenderer
 open Cst
 open Tast
