@@ -33,6 +33,8 @@ and render_decl i d =
      [Line (i, "typedef " ^ (render_type def) ^ " " ^ name ^ ";")]
   | CStructDefinition (record) ->
      [Line (i, (render_struct record) ^ ";")]
+  | CNamedStructDefinition (name, slots) ->
+     [Line (i, "typedef struct {" ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots)) ^ "} " ^ name ^ ";")]
   | CEnumDefinition (name, cases) ->
      List.concat [
          [Line (i, "enum " ^ name ^ " {")];

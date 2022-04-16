@@ -361,32 +361,20 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      ]
   | MTypeAliasMonomorph (id, ty) ->
      [
-       CStructDefinition (
-           CStruct (
-               Some (gen_mono_id id),
-               [
-                 CSlot ("value", gen_type ty)
-               ]
-             )
+       CNamedStructDefinition (
+           gen_mono_id id,
+           [
+             CSlot ("value", gen_type ty)
+           ]
          )
      ]
-  | MRecord (_, n, slots) ->
+  | MRecord (id, _, slots) ->
      [
-       CStructDefinition (
-           CStruct (
-               Some (gen_ident n),
-               gen_slots slots
-             )
-         )
+       CNamedStructDefinition (gen_decl_id id, gen_slots slots)
      ]
   | MRecordMonomorph (id, slots) ->
      [
-       CStructDefinition (
-           CStruct (
-               Some (gen_mono_id id),
-               gen_slots slots
-             )
-         )
+       CNamedStructDefinition (gen_mono_id id, gen_slots slots)
      ]
   | MUnion (_, n, cases) ->
      let enum_def = CEnumDefinition (
@@ -518,14 +506,16 @@ let decl_order = function
      1
   | CStructDefinition _ ->
      2
-  | CTypeDefinition _ ->
+  | CNamedStructDefinition _ ->
      3
-  | CConstantDefinition _ ->
+  | CTypeDefinition _ ->
      4
-  | CFunctionDeclaration _ ->
+  | CConstantDefinition _ ->
      5
-  | CFunctionDefinition _ ->
+  | CFunctionDeclaration _ ->
      6
+  | CFunctionDefinition _ ->
+     7
 
 let gen_module (MonoModule (name, decls)) =
   let type_decls = gen_type_decls decls
