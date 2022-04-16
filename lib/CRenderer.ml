@@ -37,9 +37,9 @@ and render_decl i d =
      [Line (i, "typedef struct {" ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots)) ^ "} " ^ name ^ ";")]
   | CEnumDefinition (name, cases) ->
      List.concat [
-         [Line (i, "enum " ^ name ^ " {")];
+         [Line (i, "typedef enum {")];
          [Line (indent i, comma_sep (List.map (fun case -> case) cases))];
-         [Line (i, "};")];
+         [Line (i, "} " ^ name ^ ";")];
        ]
   | CFunctionDeclaration (name, params, rt, linkage) ->
      let s = (render_linkage linkage)
