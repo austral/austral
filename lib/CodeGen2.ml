@@ -251,7 +251,7 @@ and gen_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_path_elem): c_e
   | MPointerSlotAccessor (n, _) ->
      CPointerStructAccessor (expr, gen_ident n)
   | MArrayIndex (e, _) ->
-     CIndex (expr, gen_exp mn e)
+     CIndex (CStructAccessor (expr, "data"), gen_exp mn e)
 
 (* Statements *)
 
@@ -538,8 +538,8 @@ let decl_order = function
 let gen_module (env: env) (MonoModule (name, decls)) =
   let type_decls = gen_type_decls decls
   and fun_decls = List.concat (gen_fun_decls name decls)
-  and decls' = List.concat (List.map (gen_decl env name) decls) in
-  let decls'' = List.concat [type_decls; fun_decls; decls'] in
+  and decls = List.concat (List.map (gen_decl env name) decls) in
+  let decls = List.concat [type_decls; fun_decls; decls] in
   let sorter a b = compare (decl_order a) (decl_order b) in
-  let sorted_decls = List.sort sorter decls'' in
+  let sorted_decls = List.sort sorter decls in
   CUnit (mod_name_string name, sorted_decls)
