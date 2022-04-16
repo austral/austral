@@ -378,8 +378,8 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      ]
   | MUnion (_, n, cases) ->
      let enum_def = CEnumDefinition (
-                        local_union_tag_enum_name n,
-                        List.map (fun (MonoCase (n, _)) -> gen_ident n) cases
+                        (gen_ident n),
+                        List.map (fun (MonoCase (n', _)) -> (gen_ident n) ^ "_tag_" ^ (gen_ident n')) cases
                       )
      and union_def = CNamedStructDefinition (
                          gen_ident n,
@@ -393,7 +393,7 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
   | MUnionMonomorph (id, cases) ->
      let enum_def = CEnumDefinition (
                         local_union_tag_enum_name_from_id id,
-                        List.map (fun (MonoCase (n, _)) -> gen_ident n) cases
+                        List.map (fun (MonoCase (n', _)) -> (gen_mono_id id) ^ "_tag_" ^ (gen_ident n')) cases
                       )
      and union_def = CNamedStructDefinition (
                          gen_mono_id id,
