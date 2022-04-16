@@ -5,7 +5,7 @@ opam exec -- dune build
 
 function compile() {
     ./_build/default/bin/austral.exe compile --module=$1/$2 --entrypoint=Example.$2:Main --output=code.c
-    gcc lib/prelude.c code.c -o testbin
+    gcc -Wno-builtin-declaration-mismatch lib/prelude.c code.c -o testbin
     ./testbin > actual.txt
     echo -n -e "$3" > expected.txt
     diff actual.txt expected.txt
