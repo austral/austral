@@ -394,7 +394,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      ]
   | MUnion (_, n, cases) ->
      let enum_def = CEnumDefinition (
-                        (gen_ident n),
+                        (gen_ident n) ^ "_tag",
                         List.map (fun (MonoCase (n', _)) -> (gen_ident n) ^ "_tag_" ^ (gen_ident n')) cases
                       )
      and union_def = CNamedStructDefinition (
@@ -485,12 +485,12 @@ let rec gen_type_decls decls =
   List.filter_map gen_type_decl decls
 
 and gen_type_decl decl =
-  let d n = Some (CStructForwardDeclaration (gen_decl_id n)) in
+  (*let d n = Some (CStructForwardDeclaration (gen_decl_id n)) in*)
   match decl with
-  | MRecord (id, _, _) ->
-     d id
-  | MUnion (id, _, _) ->
-     d id
+  (*| MRecord (id, _, _) ->
+     d id*)
+  (*| MUnion (id, _, _) ->
+     d id*)
   | _ ->
      None
 
