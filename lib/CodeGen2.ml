@@ -448,8 +448,9 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      and ff_rt = return_type_to_c_type rt in
      let ff_decl = CFunctionDeclaration (underlying, ff_params, ff_rt, LinkageExternal) in
      let make_param (n: identifier) (t: mono_ty) =
-       if (gen_type t) = c_string_type then
-         err "Not supported"
+       if (gen_type t) = (CNamedType "au_array_t") then
+         (* Extract the pointer from the Array struct *)
+         CStructAccessor (CVar (gen_ident n), "data")
        else
          CVar (gen_ident n)
      in
