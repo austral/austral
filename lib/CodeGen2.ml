@@ -291,10 +291,10 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
            false)
      in
      if is_pointer then
-       let l = CLet (gen_sident mn rename, gen_type orig_type, CVar (gen_ident original)) in
+       let l = CLet (gen_sident mn rename, gen_type orig_type, CVar (gen_sident mn original)) in
        CBlock [l; gs body]
      else
-       let l = CLet (gen_sident mn rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
+       let l = CLet (gen_sident mn rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_sident mn original))) in
        CBlock [l; gs body]
   | MBlock (a, b) ->
      CBlock [gs a; gs b]
