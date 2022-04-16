@@ -25,10 +25,10 @@ module Austral.Memory is
     function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R];
 
     generic [T: Type]
-    function Allocate(size: Natural_64): Option[Pointer[T]];
+    function Allocate(size: Natural_64): Pointer[T];
 
     generic [T: Type]
-    function Resize_Array(array: Pointer[T], size: Natural_64): Option[Pointer[T]];
+    function Resize_Array(array: Pointer[T], size: Natural_64): Pointer[T];
 
     generic [T: Type, U: Type]
     function memmove(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit;
@@ -84,25 +84,25 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function Allocate(size: Natural_64): Option[Pointer[T]] is
-        return @embed(Option[Pointer[T]], "au_calloc($1, $2)", sizeof(T), size);
+    function Allocate(size: Natural_64): Pointer[T] is
+        return @embed(Pointer[T], "au_calloc($1, $2)", sizeof(T), size);
     end;
 
     generic [T: Type]
-    function Resize_Array(array: Pointer[T], size: Natural_64): Option[Pointer[T]] is
+    function Resize_Array(array: Pointer[T], size: Natural_64): Pointer[T] is
         let total: Natural_64 := (sizeof(T)) * size;
-        return @embed(Option[Pointer[T]], "au_realloc($1, $2)", array, total);
+        return @embed(Pointer[T], "au_realloc($1, $2)", array, total);
     end;
 
     generic [T: Type, U: Type]
     function memmove(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit is
-        @embed(Option[Pointer[T]], "au_memmove($1, $2, $3)", destination, source, count);
+        @embed(Pointer[T], "au_memmove($1, $2, $3)", destination, source, count);
         return nil;
     end;
 
     generic [T: Type, U: Type]
     function memcpy(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit is
-        @embed(Option[Pointer[T]], "au_memcpy($1, $2, $3)", destination, source, count);
+        @embed(Pointer[T], "au_memcpy($1, $2, $3)", destination, source, count);
         return nil;
     end;
 
