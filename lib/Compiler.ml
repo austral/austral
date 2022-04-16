@@ -115,7 +115,7 @@ and is_root_cap_type = function
 
 let entrypoint_code mn i =
   let f = (gen_module_name mn) ^ "::" ^ (gen_ident i) in
-  "int main() {\n    " ^ f ^ "((A_Austral__Pervasive::A_Root_Capability) { .value = false });\n    return 0;\n}\n"
+  "int main() {\n    " ^ f ^ "({ .value = false });\n    return 0;\n}\n"
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in
