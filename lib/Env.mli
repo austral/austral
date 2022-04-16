@@ -458,6 +458,9 @@ val get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> mono_i
 (** Get all uninstantiated monomorphs. *)
 val get_uninstantiated_monomorphs : env -> monomorph list
 
+(** Get a monomorph by ID. *)
+val get_monomorph : env -> mono_id -> monomorph option
+
 (** {2 Other Functions} *)
 
 (** Return the ID of a declaration. *)

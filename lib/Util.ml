@@ -151,12 +151,12 @@ let run_command (command: string): command_output =
       stderr = stderr
     }
 
-let compile_cpp_code (source_path: string) (output_path: string): command_output =
-  let cmd = "g++ -std=c++11 " ^ source_path ^ " -o " ^ output_path in
+let compile_c_code (source_path: string) (output_path: string): command_output =
+  let cmd = "gcc -Wno-builtin-declaration-mismatch ../lib/prelude.c " ^ source_path ^ " -lm -o " ^ output_path in
   let o = run_command cmd in
   let (CommandOutput { command; code; stdout; stderr }) = o in
   if code <> 0 then
-    err ("Error when running C++ compiler.\n  Command: " ^ command ^ "\n  Exit code: " ^ (string_of_int code) ^ "\n  Standard output:\n" ^ stdout ^ "\n  Standard error:\n" ^ stderr ^ "\n")
+    err ("Error when running C compiler.\n  Command: " ^ command ^ "\n  Exit code: " ^ (string_of_int code) ^ "\n  Standard output:\n" ^ stdout ^ "\n  Standard error:\n" ^ stderr ^ "\n")
   else
     o
 

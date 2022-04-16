@@ -59,12 +59,12 @@ type command_output =
 (** Run a shell command, and return its output. *)
 val run_command : string -> command_output
 
-(** Call the C++ compiler on the given file.
+(** Call the C compiler on the given file.
 
     The first argument is the source file path.
 
     The second argument is the output binary file path. *)
-val compile_cpp_code : string -> string -> command_output
+val compile_c_code : string -> string -> command_output
 
 (** Like `mapAccumL` in Haskell. *)
 val map_with_context : (('c * 'a) -> ('c * 'b)) -> 'c -> 'a list -> ('c * ('b list))

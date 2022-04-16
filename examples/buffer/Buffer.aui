@@ -19,8 +19,8 @@ module Example.Buffer is
 
     -- Retrieval
 
-    generic [T: Type, R: Region]
-    function Nth_Ref(buffer: Reference[Buffer[T], R], index: Natural_64): Reference[T, R];
+    -- generic [T: Type, R: Region]
+    -- function Nth_Ref(buffer: Reference[Buffer[T], R], index: Natural_64): Reference[T, R];
 
     -- Insertion
 

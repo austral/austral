@@ -1,12 +1,13 @@
+open Id
 open Identifier
 open Type
-open BuiltIn
-open Tast
-open Region
-open Cpp
+open Env
+open MonoType
+open Mtast
+open CRepr
 open Util
+open Region
 open Escape
-open Linked
 open Error
 
 (* Codegen implementation notes:
@@ -62,14 +63,14 @@ open Error
 
 let counter = ref 0
 
-let new_variable _ =
+let new_variable _: string =
   let v = "tmp" ^ (string_of_int !counter) in
   counter := !counter + 1;
   v
 
 (* Identifiers *)
 
-let austral_prefix: string = "A_"
+let austral_prefix: string = ""
 
 let gen_ident (i: identifier): string =
   austral_prefix ^ (ident_string i)
@@ -78,161 +79,139 @@ let gen_module_name (n: module_name): string =
   austral_prefix ^ replace_char (mod_name_string n) '.' "__"
 
 let gen_qident (i: qident): string =
-  (gen_module_name (source_module_name i)) ^ "::" ^ (gen_ident (original_name i))
+  (gen_module_name (source_module_name i)) ^ "____" ^ (gen_ident (original_name i))
 
-(* Utilities for compiling special types and expressions *)
+let gen_sident (mn: module_name) (i: identifier): string =
+  (gen_module_name mn) ^ "____" ^ (gen_ident i)
 
-let is_optional_pointer_named_type (name: qident) (args: ty list): ty option =
-  if ((source_module_name name) = pervasive_module_name) && ((original_name name) = option_type_name) then
-    (match args with
-     | [RawPointer arg] ->
-        Some arg
-     | _ ->
-        None)
-  else
-    None
+let gen_decl_id (id: decl_id): string =
+  let (DeclId i) = id in
+  austral_prefix ^ "decl_" ^ (string_of_int i)
 
-(* If ty is of the form Optional[Pointer[T]], return Some T, otherwise None. *)
-let is_optional_pointer_type (ty: ty): ty option =
-  match ty with
-  | NamedType (name, args, _) ->
-     is_optional_pointer_named_type name args
-  | _ ->
-     None
+let gen_mono_id (id: mono_id): string =
+  let (MonoId i) = id in
+  austral_prefix ^ "mono_" ^ (string_of_int i)
+
+let gen_ins_meth_id (id: ins_meth_id): string =
+  let (InsMethId i) = id in
+  austral_prefix ^ "meth_" ^ (string_of_int i)
 
 (* Types *)
 
-let rec gen_type (ty: ty): cpp_ty =
-  let t s = CNamedType (s, []) in
+let rec gen_type (ty: mono_ty): c_ty =
   match ty with
-  | Unit ->
-     t "bool"
-  | Boolean ->
-     t "bool"
-  | Integer (s, w) ->
+  | MonoUnit ->
+     CNamedType "au_unit_t"
+  | MonoBoolean ->
+     CNamedType "au_bool_t"
+  | MonoInteger (s, w) ->
      let s' = (match s with
-               | Unsigned -> "u"
-               | Signed -> "")
+               | Unsigned -> "nat"
+               | Signed -> "int")
      and w' = string_of_int (width_int w) in
-     t (s' ^ "int" ^ w' ^ "_t")
-  | SingleFloat ->
-     t "float"
-  | DoubleFloat ->
-     t "double"
-  | NamedType (n, a, _) ->
-     gen_named_type n a
-  | Array (t, _) ->
-     CNamedType ("Austral__Core::Array", [gen_type t])
-  | RegionTy _ ->
+     CNamedType ("au_" ^ s' ^ w' ^ "_t")
+  | MonoSingleFloat ->
+     CNamedType "float"
+  | MonoDoubleFloat ->
+     CNamedType "double"
+  | MonoNamedType id ->
+     CNamedType (gen_mono_id id)
+  | MonoArray (_, _) ->
+     CNamedType "au_array_t"
+  | MonoRegionTy _ ->
      err "TODO: Codegen for region types"
-  | ReadRef (t, _) ->
+  | MonoReadRef (t, _) ->
      CPointer (gen_type t)
-  | WriteRef (t, _) ->
+  | MonoWriteRef (t, _) ->
      CPointer (gen_type t)
-  | TyVar (TypeVariable (n, _, _)) ->
-     CNamedType (gen_ident n, [])
-  | RawPointer t ->
-    CPointer (gen_type t)
-  | MonoTy _ ->
-    err "Not applicable"
-
-and gen_named_type (name: qident) (args: ty list): cpp_ty =
-  (* Option[Pointer[T]] types are compiled specially *)
-  match is_optional_pointer_named_type name args with
-  | Some target_ty ->
-     CPointer (gen_type target_ty)
-  | None ->
-     (* It's a regular user defined type. *)
-     CNamedType (gen_qident name, List.map gen_type args)
+  | MonoRawPointer t ->
+     CPointer (gen_type t)
+  | MonoRegionTyVar _ ->
+     err "internal"
 
 (* Expressions *)
 
-let union_type_name = function
-  | NamedType (n, _, _) ->
-     n
+let c_string_type = CPointer (CNamedType "uint8_t")
+
+let union_type_id = function
+  | MonoNamedType id ->
+     id
   | _ ->
      err "Internal error: Union is not a named type?"
 
-(* Given the name of a union type, returns the name of the
-   union's tag enum name. *)
-let union_tag_enum_name (n: qident): string =
-  (gen_qident n) ^ "_Tag"
+(* Given the ID of a union type, returns the name of the
+   union's tag enum. *)
+let union_tag_enum_name (id: mono_id): string =
+  (gen_mono_id id) ^ "_tag"
 
 (* Like union_tag_enum_name but for union definitions. *)
 let local_union_tag_enum_name (n: identifier): string =
-  (gen_ident n) ^ "_Tag"
+  (gen_ident n) ^ "_tag"
+
+let local_union_tag_enum_name_from_id (id: mono_id): string =
+  (gen_mono_id id) ^ "_tag"
 
 (* Given a union type and the name of a case, return the
    value of the tag enum for that case. *)
-let union_tag_value (ty: ty) (case_name: identifier): cpp_expr =
-  CVar (union_tag_enum_name (union_type_name ty) ^ "::" ^ (gen_ident case_name))
+let union_tag_value (ty: mono_ty) (case_name: identifier): c_expr =
+  CVar ((union_tag_enum_name (union_type_id ty)) ^ "_" ^ (gen_ident case_name))
 
-let c_string_type = CPointer (CNamedType ("uint8_t", []))
-
-let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
+let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
   let g = gen_exp mn in
   match e with
-  | TNilConstant ->
+  | MNilConstant ->
      CBool false
-  | TBoolConstant b ->
+  | MBoolConstant b ->
      CBool b
-  | TIntConstant i ->
+  | MIntConstant i ->
      CInt i
-  | TFloatConstant f ->
+  | MFloatConstant f ->
      CFloat f
-  | TStringConstant s ->
-     CFuncall ("Austral__Core::Make_Array", [CInt (string_of_int (String.length (escaped_to_string s))); CCast (CString s, c_string_type)], [])
-  | TVariable (n, _) ->
-     if (equal_module_name (source_module_name n) mn) then
-       CVar (gen_ident (original_name n))
-     else
-       CVar (gen_qident n)
-  | TFuncall (_, name, args, _, substs) ->
-     CFuncall (gen_qident name, List.map g args, List.map (fun (_, t) -> gen_type t) substs)
-  | TMethodCall (_, name, _, args, _, _) ->
-     CFuncall (gen_qident name, List.map g args, [])
-  | TCast (e, t) ->
+  | MStringConstant s ->
+     CFuncall (
+         "au_make_array_from_string",
+         [
+           CString s;
+           CInt (string_of_int (String.length (escaped_to_string s)))
+         ]
+       )
+  | MVariable (n, _) ->
+     CVar (gen_qident n)
+  | MConcreteFuncall (id, _, args, _) ->
+     CFuncall (gen_decl_id id, List.map g args)
+  | MGenericFuncall (id, args, _) ->
+     CFuncall (gen_mono_id id, List.map g args)
+  | MConcreteMethodCall (id, _, args, _) ->
+     CFuncall (gen_ins_meth_id id, List.map g args)
+  | MGenericMethodCall (_, id, args, _) ->
+     CFuncall (gen_mono_id id, List.map g args)
+  | MCast (e, t) ->
      CCast (g e, gen_type t)
-  | TArithmetic (op, lhs, rhs) ->
+  | MArithmetic (op, lhs, rhs) ->
      CArithmetic (op, g lhs, g rhs)
-  | TComparison (op, lhs, rhs) ->
+  | MComparison (op, lhs, rhs) ->
      CComparison (op, g lhs, g rhs)
-  | TConjunction (lhs, rhs) ->
+  | MConjunction (lhs, rhs) ->
      CConjunction (g lhs, g rhs)
-  | TDisjunction (lhs, rhs) ->
+  | MDisjunction (lhs, rhs) ->
      CDisjunction (g lhs, g rhs)
-  | TNegation e ->
+  | MNegation e ->
      CNegation (g e)
-  | TIfExpression (c, t, f) ->
+  | MIfExpression (c, t, f) ->
      CIfExpression (g c, g t, g f)
-  | TRecordConstructor (_, values) ->
+  | MRecordConstructor (_, values) ->
      CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values)
-  | TUnionConstructor (ty, case_name, values) ->
-     (match is_optional_pointer_type ty with
-      | Some _ ->
-         (* Constructors for values of type Option[Pointer[T]] must be compiled specially *)
-         if (equal_identifier case_name (make_ident "Some")) then
-           match values with
-           | [(_, v)] ->
-              g v
-           | _ ->
-              err "Bad constructor"
-         else
-           if (equal_identifier case_name (make_ident "None")) then
-             CVar "NULL"
-           else
-             err "Invalid case"
-      | None ->
-         let args = CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values) in
-         CStructInitializer [
-             ("tag", union_tag_value ty case_name);
-             ("data", CStructInitializer [(gen_ident case_name, args)])
-           ])
-  | TTypeAliasConstructor (ty, expr) ->
+  | MUnionConstructor (ty, case_name, values) ->
+     let args = CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values) in
+     CStructInitializer [
+         ("tag", union_tag_value ty case_name);
+         ("data", CStructInitializer [(gen_ident case_name, args)])
+       ]
+  | MTypeAliasConstructor (ty, expr) ->
      let ty = gen_type ty
      and expr = CStructInitializer [("value", g expr)] in
      CCast (expr, ty)
-  | TPath { head; elems; _ } ->
+  | MPath { head; elems; _ } ->
      let p = gen_path mn (g head) (List.rev elems) in
      (match (get_type head) with
       (* References get wrapped in the address-of operator '&' to match C
@@ -240,20 +219,22 @@ let rec gen_exp (mn: module_name) (e: texpr): cpp_expr =
          compiled straight to C would evaluate to the type of `y`, rather than
          the type reference-to-`y`. So we turn it into `&x.y` so evaluates to
          reference-to-`y`. *)
-      | ReadRef _ ->
+      | MonoReadRef _ ->
          CAddressOf p
-      | WriteRef _ ->
+      | MonoWriteRef _ ->
          CAddressOf p
       | _ ->
          p)
-  | TEmbed (ty, expr, args) ->
+  | MEmbed (ty, expr, args) ->
      CEmbed (gen_type ty, expr, List.map g args)
-  | TDeref e ->
+  | MDeref e ->
      CDeref (g e)
-  | TSizeOf ty ->
+  | MTypecast (e, ty) ->
+     CCast (g e, gen_type ty)
+  | MSizeOf ty ->
      CSizeOf (gen_type ty)
 
-and gen_path (mn: module_name) (expr: cpp_expr) (elems: typed_path_elem list): cpp_expr =
+and gen_path (mn: module_name) (expr: c_expr) (elems: mtyped_path_elem list): c_expr =
   match elems with
   | [elem] ->
      gen_path_elem mn expr elem
@@ -263,132 +244,69 @@ and gen_path (mn: module_name) (expr: cpp_expr) (elems: typed_path_elem list): c
   | [] ->
      err "Empty path"
 
-and gen_path_elem (mn: module_name) (expr: cpp_expr) (elem: typed_path_elem): cpp_expr =
+and gen_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_path_elem): c_expr =
   match elem with
-  | TSlotAccessor (n, _) ->
+  | MSlotAccessor (n, _) ->
      CStructAccessor (expr, gen_ident n)
-  | TPointerSlotAccessor (n, _) ->
+  | MPointerSlotAccessor (n, _) ->
      CPointerStructAccessor (expr, gen_ident n)
-  | TArrayIndex (e, _) ->
-     CIndex (expr, gen_exp mn e)
+  | MArrayIndex (e, _) ->
+     CIndex (CCast (CStructAccessor (expr, "data"), CPointer (gen_type (get_type e))), gen_exp mn e)
 
 (* Statements *)
 
-let rec gen_stmt (mn: module_name) (stmt: tstmt): cpp_stmt =
+let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   let ge = gen_exp mn
   and gs = gen_stmt mn
   in
   match stmt with
-  | TSkip _ ->
+  | MSkip ->
      CBlock []
-  | TLet (_, n, t, v, b) ->
-     let l = CLet (gen_ident n, gen_type t, ge v) in
+  | MLet (n, t, v, b) ->
+     let l = CLet (gen_sident mn n, gen_type t, ge v) in
      CBlock [l; gs b]
-  | TDestructure (_, bs, e, b) ->
+  | MDestructure (bs, e, b) ->
      let tmp = new_variable () in
      let vardecl = CLet (tmp, gen_type (get_type e), ge e)
-     and bs' = List.map (fun (n, t) -> CLet (gen_ident n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
+     and bs' = List.map (fun (n, t) -> CLet (gen_sident mn n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
      and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
-  | TAssign (_, lvalue, v) ->
+  | MAssign (lvalue, v) ->
      CAssign (gen_lvalue mn lvalue, ge v)
-  | TIf (_, c, tb, fb) ->
+  | MIf (c, tb, fb) ->
      CIf (ge c, gs tb, gs fb)
-  | TCase (_, e, whens) ->
+  | MCase (e, whens) ->
      gen_case mn e whens
-  | TWhile (_, c, b) ->
+  | MWhile (c, b) ->
      CWhile (ge c, gs b)
-  | TFor (_, v, i, f, b) ->
-     CFor (gen_ident v, ge i, ge f, gs b)
-  | TBorrow { original; rename; orig_type; body; _ } ->
+  | MFor (v, i, f, b) ->
+     CFor (gen_sident mn v, ge i, ge f, gs b)
+  | MBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
        (match orig_type with
-        | RawPointer _ ->
+        | MonoRawPointer _ ->
            true
         | _ ->
            false)
      in
      if is_pointer then
-       let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
+       let l = CLet (gen_sident mn rename, gen_type orig_type, CVar (gen_sident mn original)) in
        CBlock [l; gs body]
      else
-       let l = CLet (gen_ident rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
+       let l = CLet (gen_sident mn rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_sident mn original))) in
        CBlock [l; gs body]
-  | TBlock (_, a, b) ->
+  | MBlock (a, b) ->
      CBlock [gs a; gs b]
-  | TDiscarding (_, e) ->
+  | MDiscarding e ->
      CDiscarding (ge e)
-  | TReturn (_, e) ->
+  | MReturn e ->
      CReturn (ge e)
 
-and gen_lvalue mn (TypedLValue (name, elems)) =
-  gen_path mn (CVar (gen_ident name)) elems
+and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
+  gen_path mn (CVar (gen_sident mn name)) elems
 
-and gen_case (mn: module_name) (e: texpr) (whens: typed_when list): cpp_stmt =
-  (* If the expression is of type Option[Pointer[T]], we compile this specially. *)
-  let ty = get_type e in
-  match is_optional_pointer_type ty with
-  | Some _ ->
-     gen_option_pointer_case mn e whens
-  | None ->
-     gen_ordinary_case mn e whens
-
-and gen_option_pointer_case (mn: module_name) (e: texpr) (whens: typed_when list): cpp_stmt =
-  (* Codegen: a case statement of the form:
-
-         case optptr of
-             when Some(value: Pointer[T]) do
-                 f(value);
-             when None do
-                 g();
-         end case;
-
-     Compiles to:
-
-         T* tmp = optptr;
-         if (tmp != NULL) {
-             T* value = tmp;
-             f(value);
-         } else {
-             g();
-         }
-   *)
-  let is_some (TypedWhen (name, _, body)): tstmt option =
-    if (equal_identifier name (make_ident "Some")) then
-      Some body
-    else
-      None
-  and is_none (TypedWhen (name, _, body)): tstmt option =
-    if (equal_identifier name (make_ident "None")) then
-      Some body
-    else
-      None
-  in
-  let ty = get_type e
-  and var = new_variable () in
-  match List.find_map is_some whens with
-  | Some some_body ->
-     (match List.find_map is_none whens with
-      | Some none_body ->
-         let cond = CComparison (NotEqual, CVar var, CVar "NULL")
-         and tb = CBlock [
-                      CLet (austral_prefix ^ "value", gen_type ty, CVar var);
-                      gen_stmt mn some_body
-                    ]
-         in
-         let ifstmt = CIf (cond, tb, gen_stmt mn none_body) in
-         CBlock [
-             CLet (var, gen_type ty, gen_exp mn e);
-             ifstmt
-           ]
-      | _ ->
-         err "No None case")
-  | None ->
-     err "No Some case"
-
-
-and gen_ordinary_case (mn: module_name) (e: texpr) (whens: typed_when list): cpp_stmt =
+and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
      being pattern-matched to that variable. Generate a switch statement over
      the tag enum. Each when statement that has bindings needs to generate some
@@ -402,48 +320,53 @@ and gen_ordinary_case (mn: module_name) (e: texpr) (whens: typed_when list): cpp
       switch
     ]
 
-and when_to_case mn ty var (TypedWhen (n, bindings, body)) =
+and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, bindings, body)) =
   let case_name = gen_ident n
   and tag_value = union_tag_value ty n
   in
   let get_binding binding_name =
     CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
   in
-  let bindings' = List.map (fun (ValueParameter (n, t)) -> CLet (gen_ident n, gen_type t, get_binding n)) bindings in
+  let bindings' = List.map (fun (MValueParameter (n, t)) -> CLet (gen_sident mn n, gen_type t, get_binding n)) bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 
 (* Declarations *)
 
-let gen_params params =
-  List.map (fun (ValueParameter (n, t)) -> CValueParam (gen_ident n, gen_type t)) params
+let gen_params mn params =
+  List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_sident mn n, gen_type t)) params
 
-let gen_typarams params =
-  let f (TypeParameter (n, u, _)) =
-    if u = RegionUniverse then
-      None
-    else
-      Some (CTypeParam (gen_ident n))
-  in
-  List.filter_map f params
+let gen_slots (slots: mono_slot list) =
+  List.map (fun (MonoSlot (n, t)) -> CSlot (gen_ident n, gen_type t)) slots
 
-let gen_slots slots =
-  List.map (fun (TypedSlot (n, t)) -> CSlot (gen_ident n, gen_type t)) slots
+let gen_cases (cases: mono_case list) =
+  List.map (fun (MonoCase (n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
 
-let gen_cases cases =
-  List.map (fun (LCase (_, n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
+let gen_method (mn: module_name) (MConcreteMethod (id, _, params, rt, body)) =
+  CFunctionDefinition (gen_ins_meth_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
 
-let gen_method mn typarams (TypedMethodDef (_, n, params, rt, body)) =
-  CFunctionDefinition (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt mn body)
+let get_original_module_name (env: env) (id: mono_id): module_name =
+  match get_monomorph env id with
+  | Some (MonoFunction { function_id; _ }) ->
+     (match get_decl_by_id env function_id with
+      | Some (Function { mod_id; _ }) ->
+         (match get_module_by_id env mod_id with
+          | Some (ModRec { name; _ }) ->
+             name
+          | _ ->
+             err "Internal")
+      | _ ->
+         err "internal")
+  | _ ->
+     err "internal"
 
-let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
+let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   match decl with
-  | TConstant (_, _, n, ty, e, _) ->
-     [CConstantDefinition (gen_ident n, gen_type ty, gen_exp mn e)]
-  | TTypeAlias (_, _, n, typarams, _, ty, _) ->
+  | MConstant (_, n, ty, e) ->
+     [CConstantDefinition (gen_sident mn n, gen_type ty, gen_exp mn e)]
+  | MTypeAlias (_, n, ty) ->
      [
        CStructDefinition (
-           gen_typarams typarams,
            CStruct (
                Some (gen_ident n),
                [
@@ -452,91 +375,109 @@ let gen_decl (mn: module_name) (decl: typed_decl): cpp_decl list =
              )
          )
      ]
-  | TRecord (_, _, n, typarams, _, slots, _) ->
+  | MTypeAliasMonomorph (id, ty) ->
      [
-       CStructDefinition (
-           gen_typarams typarams,
-           CStruct (
-               Some (gen_ident n),
-               gen_slots slots
-             )
+       CNamedStructDefinition (
+           gen_mono_id id,
+           [
+             CSlot ("value", gen_type ty)
+           ]
          )
      ]
-  | TUnion (_, _, n, typarams, _, cases, _) ->
+  | MRecord (id, _, slots) ->
+     [
+       CNamedStructDefinition (gen_decl_id id, gen_slots slots)
+     ]
+  | MRecordMonomorph (id, slots) ->
+     [
+       CNamedStructDefinition (gen_mono_id id, gen_slots slots)
+     ]
+  | MUnion (_, n, cases) ->
      let enum_def = CEnumDefinition (
-                        local_union_tag_enum_name n,
-                        List.map (fun (LCase (_, n, _)) -> gen_ident n) cases
+                        (gen_ident n) ^ "_tag",
+                        List.map (fun (MonoCase (n', _)) -> (gen_ident n) ^ "_tag_" ^ (gen_ident n')) cases
                       )
-     and union_def = CStructDefinition (
-                         gen_typarams typarams,
-                         CStruct (
-                             Some (gen_ident n),
-                             [
-                               CSlot ("tag", CNamedType (local_union_tag_enum_name n, []));
-                               CSlot ("data", CUnionType (gen_cases cases))
-                             ]
-                           )
+     and union_def = CNamedStructDefinition (
+                         gen_ident n,
+                         [
+                           CSlot ("tag", CNamedType (local_union_tag_enum_name n));
+                           CSlot ("data", CUnionType (gen_cases cases))
+                         ]
                        )
      in
      [enum_def; union_def]
-  | TFunction (_, _, name, typarams, params, rt, body, _) ->
-     [CFunctionDefinition (gen_ident name, gen_typarams typarams, gen_params params, gen_type rt, gen_stmt mn body)]
-  | TForeignFunction (_, _, n, params, rt, underlying, _) ->
-     let param_type_to_c_type t =
+  | MUnionMonomorph (id, cases) ->
+     let enum_def = CEnumDefinition (
+                        local_union_tag_enum_name_from_id id,
+                        List.map (fun (MonoCase (n', _)) -> (gen_mono_id id) ^ "_tag_" ^ (gen_ident n')) cases
+                      )
+     and union_def = CNamedStructDefinition (
+                         gen_mono_id id,
+                         [
+                           CSlot ("tag", CNamedType (local_union_tag_enum_name_from_id id));
+                           CSlot ("data", CUnionType (gen_cases cases))
+                         ]
+                       )
+     in
+     [enum_def; union_def]
+  | MFunction (id, _, params, rt, body) ->
+     [CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
+  | MFunctionMonomorph (id, params, rt, body) ->
+     (* Load-bearing hack: prefix parameters not with the current module name,
+        but with the name of the module the monomorph's declaration is from. *)
+     let mn': module_name = get_original_module_name env id in
+     [CFunctionDefinition (gen_mono_id id, gen_params mn' params, gen_type rt, gen_stmt mn body)]
+  | MForeignFunction (id, _, params, rt, underlying) ->
+     let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
-        | Unit ->
+        | MonoUnit ->
            err "Not allowed"
-        | Boolean ->
+        | MonoBoolean ->
            gen_type t
-        | Integer _ ->
+        | MonoInteger _ ->
            gen_type t
-        | SingleFloat ->
+        | MonoSingleFloat ->
            gen_type t
-        | DoubleFloat ->
+        | MonoDoubleFloat ->
            gen_type t
-        | Array (Integer (Unsigned, Width8), r) ->
+        | MonoArray (MonoInteger (Unsigned, Width8), r) ->
            if r = static_region then
              c_string_type
            else
              err "Not allowed"
-        | RawPointer _ ->
+        | MonoRawPointer _ ->
            gen_type t
-        | NamedType (n, args, _) ->
-           (match is_optional_pointer_named_type n args with
-            | Some _ ->
-               gen_type t
-            | None ->
-               err "Optional pointers are the only named type allowed as parameters of C functions.")
+        | MonoNamedType _ ->
+           err "Not implemented"
         | _ ->
            err "Not allowed")
      in
      let return_type_to_c_type t =
        match t with
-       | Array _ ->
+       | MonoArray _ ->
           err "Foreign functions cannot return arrays."
        | _ ->
           param_type_to_c_type t
      in
-     let ff_params = List.map (fun (ValueParameter (n, t)) -> CValueParam (gen_ident n, param_type_to_c_type t)) params
+     let ff_params = List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_sident mn n, param_type_to_c_type t)) params
      and ff_rt = return_type_to_c_type rt in
-     let ff_decl = CFunctionDeclaration (underlying, [], ff_params, ff_rt, LinkageExternal) in
-     let make_param n t =
-       if t = string_type then
+     let ff_decl = CFunctionDeclaration (underlying, ff_params, ff_rt, LinkageExternal) in
+     let make_param (n: identifier) (t: mono_ty) =
+       if (gen_type t) = (CNamedType "au_array_t") then
          (* Extract the pointer from the Array struct *)
-         CStructAccessor (CVar (gen_ident n), "data")
+         CStructAccessor (CVar (gen_sident mn n), "data")
        else
-         CVar (gen_ident n)
+         CVar (gen_sident mn n)
      in
-     let args = List.map (fun (ValueParameter (n, t)) -> make_param n t) params in
-     let funcall = CFuncall (underlying, args, []) in
+     let args = List.map (fun (MValueParameter (n, t)) -> make_param n t) params in
+     let funcall = CFuncall (underlying, args) in
      let body = CReturn funcall in
-     let def = CFunctionDefinition (gen_ident n, [], gen_params params, gen_type rt, body) in
+     let def = CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, body) in
      [ff_decl; def]
-  | TTypeClass _ ->
-     (* Type class declarations are not compiled *)
-     []
-  | TInstance (_, _, _, typarams, _, methods, _) ->
-     List.map (gen_method mn typarams) methods
+  | MConcreteInstance (_, _, _, methods) ->
+     List.map (gen_method mn) methods
+  | MMethodMonomorph (id, params, rt, body) ->
+     [CFunctionDefinition (gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
 
 (* Extract types into forward type declarations *)
 
@@ -544,61 +485,63 @@ let rec gen_type_decls decls =
   List.filter_map gen_type_decl decls
 
 and gen_type_decl decl =
-  let d n p = Some (CStructForwardDeclaration (gen_ident n, gen_typarams p)) in
+  (*let d n = Some (CStructForwardDeclaration (gen_decl_id n)) in*)
   match decl with
-  | TRecord (_, _, n, p, _ ,_, _) ->
-     d n p
-  | TUnion (_, _, n, p, _, _ ,_) ->
-     d n p
+  (*| MRecord (id, _, _) ->
+     d id*)
+  (*| MUnion (id, _, _) ->
+     d id*)
   | _ ->
      None
 
 (* Extract functions into forward function declarations *)
 
-let rec gen_fun_decls decls =
-  List.filter_map gen_fun_decl decls
+let rec gen_fun_decls mn decls =
+  List.filter_map (gen_fun_decl mn) decls
 
-and gen_fun_decl decl =
+and gen_fun_decl mn decl =
   match decl with
-  | TFunction (_, _, n, tp, p, rt, _, _) ->
-     Some [CFunctionDeclaration (gen_ident n, gen_typarams tp, gen_params p, gen_type rt, LinkageInternal)]
-  | TForeignFunction (_, _, n, p, rt, _, _) ->
-     Some [CFunctionDeclaration (gen_ident n, [], gen_params p, gen_type rt, LinkageInternal)]
-  | TInstance (_, _, _, tp, _, ms, _) ->
-     Some (List.map (gen_method_decl tp) ms)
+  | MFunction (id, _, p, rt, _) ->
+     Some [CFunctionDeclaration (gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
+  | MFunctionMonomorph (id, p, rt, _) ->
+     Some [CFunctionDeclaration (gen_mono_id id, gen_params mn p, gen_type rt, LinkageInternal)]
+  | MForeignFunction (id, _, p, rt, _) ->
+     Some [CFunctionDeclaration (gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
+  | MConcreteInstance (_, _, _, ms) ->
+     Some (List.map (gen_method_decl mn) ms)
+  | MMethodMonomorph (id, p, rt, _) ->
+     Some [CFunctionDeclaration (gen_mono_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | _ ->
      None
 
-and gen_method_decl typarams (TypedMethodDef (_, n, params, rt, _)) =
-  CFunctionDeclaration (gen_ident n, gen_typarams typarams, gen_params params, gen_type rt, LinkageInternal)
+and gen_method_decl mn (MConcreteMethod (id, _, params, rt, _)) =
+  CFunctionDeclaration (gen_ins_meth_id id, gen_params mn params, gen_type rt, LinkageInternal)
 
 (* Codegen a module *)
 
 let decl_order = function
-  | CNamespace _ ->
-     0
-  | CUsingDeclaration _ ->
-     1
   | CEnumDefinition _ ->
-     2
+     0
   | CStructForwardDeclaration _ ->
-     3
+     1
   | CStructDefinition _ ->
-     4
+     2
+  | CNamedStructDefinition _ ->
+     3
   | CTypeDefinition _ ->
-     5
+     4
   | CConstantDefinition _ ->
-     6
+     5
   | CFunctionDeclaration _ ->
-     7
+     6
   | CFunctionDefinition _ ->
-     8
+     7
 
-let gen_module (TypedModule (name, decls)) =
+let gen_module (env: env) (MonoModule (name, decls)) =
   let type_decls = gen_type_decls decls
-  and fun_decls = List.concat (gen_fun_decls decls)
-  and decls' = List.concat (List.map (gen_decl name) decls) in
-  let decls'' = List.concat [type_decls; fun_decls; decls'] in
+  and fun_decls = List.concat (gen_fun_decls name decls)
+  and decls = List.concat (List.map (gen_decl env name) decls) in
+  let decls = List.concat [type_decls; fun_decls; decls] in
   let sorter a b = compare (decl_order a) (decl_order b) in
-  let sorted_decls = List.sort sorter decls'' in
-  CNamespace (gen_module_name name, sorted_decls)
+  let sorted_decls = List.sort sorter decls in
+  CUnit (mod_name_string name, sorted_decls)

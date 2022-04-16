@@ -61,10 +61,11 @@ type c_decl =
   | CStructForwardDeclaration of string
   | CTypeDefinition of string * c_ty
   | CStructDefinition of c_struct
+  | CNamedStructDefinition of string * c_slot list
   | CEnumDefinition of string * string list
   | CFunctionDeclaration of string * c_param list * c_ty * c_function_linkage
   | CFunctionDefinition of string * c_param list * c_ty * c_stmt
 
 and c_param = CValueParam of string * c_ty
 
-type c_unit = CUnit of c_decl list
+type c_unit = CUnit of string * c_decl list

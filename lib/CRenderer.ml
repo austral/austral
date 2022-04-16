@@ -15,27 +15,31 @@ type line = Line of indentation * string
 let render_line (Line (Indentation i, s)) =
   (String.make i ' ') ^ s
 
-let rec render_unit (CUnit decls): string =
+let rec render_unit (CUnit (name, decls)): string =
   let rd d =
     String.concat "\n" (List.map render_line (render_decl zero_indent d))
   in
-  String.concat "\n\n" (List.map rd decls)
+  "/* --- BEGIN translation unit for module '" ^ name ^ "' --- */\n"
+  ^ (String.concat "\n\n" (List.map rd decls))
+  ^ "\n/* --- END translation unit for module '" ^ name ^ "' --- */\n"
 
 and render_decl i d =
   match d with
   | CConstantDefinition (name, ty, value) ->
      [Line (i, (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";")]
   | CStructForwardDeclaration (name) ->
-     [Line (i, "struct " ^ name ^ ";")]
+     [Line (i, "typedef struct " ^ name ^ " " ^ name ^ ";")]
   | CTypeDefinition (name, def) ->
      [Line (i, "typedef " ^ (render_type def) ^ " " ^ name ^ ";")]
   | CStructDefinition (record) ->
      [Line (i, (render_struct record) ^ ";")]
+  | CNamedStructDefinition (name, slots) ->
+     [Line (i, "typedef struct {" ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots)) ^ "} " ^ name ^ ";")]
   | CEnumDefinition (name, cases) ->
      List.concat [
-         [Line (i, "enum " ^ name ^ " {")];
+         [Line (i, "typedef enum {")];
          [Line (indent i, comma_sep (List.map (fun case -> case) cases))];
-         [Line (i, "};")];
+         [Line (i, "} " ^ name ^ ";")];
        ]
   | CFunctionDeclaration (name, params, rt, linkage) ->
      let s = (render_linkage linkage)
@@ -63,7 +67,7 @@ and render_decl i d =
 
 and render_linkage = function
   | LinkageInternal -> ""
-  | LinkageExternal -> "extern \"C\" "
+  | LinkageExternal -> "extern "
 
 and render_stmt (i: indentation) (stmt: c_stmt): line list =
   match stmt with

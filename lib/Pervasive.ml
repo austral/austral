@@ -84,7 +84,7 @@ module body Austral.Pervasive is
     end;
 
     function Abort(message: Fixed_Array[Natural_8]): Unit is
-        return @embed(Unit, "Austral__Core::Abort($1)", message);
+        return @embed(Unit, "au_abort($1)", message);
     end;
 
     type Root_Capability : Linear is Unit;
@@ -149,7 +149,7 @@ module body Austral.Pervasive is
             if rhs = 0 then
                 Abort("Division by zero in Trapping_Divide (Natural_8)");
             end if;
-            return lhs / rhs;
+            return @embed(Natural_8, "$1 / $2", lhs, rhs);
         end;
     end;
 
@@ -188,7 +188,7 @@ module body Austral.Pervasive is
             if (lhs = Minimum_Integer_8) and (rhs = -1) then
                 Abort("Overflow in Trapping_Divide (Integer_8)");
             end if;
-            return 0;
+            return @embed(Integer_8, "$1 / $2", lhs, rhs);
         end;
     end;
 
@@ -224,7 +224,7 @@ module body Austral.Pervasive is
             if rhs = 0 then
                 Abort("Division by zero in Trapping_Divide (Natural_16)");
             end if;
-            return lhs / rhs;
+            return @embed(Natural_16, "$1 / $2", lhs, rhs);
         end;
     end;
 
@@ -263,7 +263,7 @@ module body Austral.Pervasive is
             if (lhs = Minimum_Integer_16) and (rhs = -1) then
                 Abort("Overflow in Trapping_Divide (Integer_16)");
             end if;
-            return 0;
+            return @embed(Integer_16, "$1 / $2", lhs, rhs);
         end;
     end;
 
@@ -299,7 +299,7 @@ module body Austral.Pervasive is
             if rhs = 0 then
                 Abort("Division by zero in Trapping_Divide (Natural_32)");
             end if;
-            return lhs / rhs;
+            return @embed(Natural_32, "$1 / $2", lhs, rhs);
         end;
     end;
 
@@ -338,7 +338,7 @@ module body Austral.Pervasive is
             if (lhs = Minimum_Integer_32) and (rhs = -1) then
                 Abort("Overflow in Trapping_Divide (Integer_32)");
             end if;
-            return 0;
+            return @embed(Integer_32, "$1 / $2", lhs, rhs);
         end;
     end;
 
@@ -374,7 +374,7 @@ module body Austral.Pervasive is
             if rhs = 0 then
                 Abort("Division by zero in Trapping_Divide (Natural_64)");
             end if;
-            return lhs / rhs;
+            return @embed(Natural_64, "$1 / $2", lhs, rhs);
         end;
     end;
 
@@ -413,7 +413,7 @@ module body Austral.Pervasive is
             if (lhs = Minimum_Integer_64) and (rhs = -1) then
                 Abort("Overflow in Trapping_Divide (Integer_64)");
             end if;
-            return 0;
+            return @embed(Integer_64, "$1 / $2", lhs, rhs);
         end;
     end;
 

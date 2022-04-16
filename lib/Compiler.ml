@@ -1,16 +1,17 @@
 open Identifier
+open Id
 open Env
 open BuiltIn
 open Pervasive
 open MemoryModule
-open CppPrelude
+open CPrelude
 open ParserInterface
 open CombiningPass
 open ExtractionPass
 open TypingPass
 open BodyExtractionPass
 open CodeGen
-open CppRenderer
+open CRenderer
 open Cst
 open Tast
 open Type
@@ -64,30 +65,27 @@ let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; bod
   let typed: typed_module = augment_module env linked in
   let env: env = extract_bodies env typed in
   let (env, mono): (env * mono_module) = monomorphize env typed in
-  (*let unit = CodeGen2.gen_module mono in
-  let c_code: string = render_unit unit in*)
-  let _ = mono in
-  let cpp = gen_module typed in
-  let code = render_module cpp in
-  Compiler (env, (compiler_code c) ^ "\n" ^ code)
+  let unit = gen_module env mono in
+  let c_code: string = render_unit unit in
+  Compiler (env, (compiler_code c) ^ "\n" ^ c_code)
 
 let rec compile_multiple c modules =
   match modules with
   | m::rest -> compile_multiple (compile_mod c m) rest
   | [] -> c
 
-let rec check_entrypoint_validity (env: env) (qi: qident): unit =
+let rec check_entrypoint_validity (env: env) (qi: qident): decl_id =
   match get_decl_by_name env (qident_to_sident qi) with
   | Some decl ->
      (match decl with
-      | Function { vis; typarams; value_params; rt; _ } ->
+      | Function { id; vis; typarams; value_params; rt; _ } ->
          if vis = VisPublic then
            if typarams = [] then
              match value_params with
              | [ValueParameter (_, pt)] ->
                 if is_root_cap_type pt then
                   if is_root_cap_type rt then
-                    ()
+                    id
                   else
                     err "Entrypoint function must return a value of type Root_Capability."
                 else
@@ -111,15 +109,29 @@ and is_root_cap_type = function
   | _ ->
      false
 
-let entrypoint_code mn i =
-  let f = (gen_module_name mn) ^ "::" ^ (gen_ident i) in
-  "int main() {\n    " ^ f ^ "((A_Austral__Pervasive::A_Root_Capability) { .value = false });\n    return 0;\n}\n"
+let entrypoint_code root_cap_mono_id id =
+  let f = gen_decl_id id in
+  "int main() {\n    " ^ f ^ "((" ^ (gen_mono_id root_cap_mono_id) ^ "){ .value = false });\n    return 0;\n}\n"
+
+let get_root_capability_monomorph (env: env): mono_id =
+  let mn: module_name = make_mod_name "Austral.Pervasive"
+  and n: identifier = make_ident "Root_Capability" in
+  let sn: sident = make_sident mn n in
+  match get_decl_by_name env sn with
+  | Some (TypeAlias { id; _ }) ->
+     (match get_type_monomorph env id [] with
+      | Some id ->
+         id
+      | _ ->
+         err "No monomorph of Root_Capability.")
+  | _ ->
+     err "Can't find the Root_Capability type in the environment."
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in
-  check_entrypoint_validity (cenv c) qi;
-  let (Compiler (m, c)) = c in
-  Compiler (m, c ^ "\n" ^ (entrypoint_code mn i))
+  let entrypoint_id = check_entrypoint_validity (cenv c) qi in
+  let (Compiler (m, code)) = c in
+  Compiler (m, code ^ "\n" ^ (entrypoint_code (get_root_capability_monomorph (cenv c)) entrypoint_id))
 
 let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
@@ -129,7 +141,7 @@ let empty_compiler: compiler =
      Austral.Memory, since the latter uses declarations from the former. *)
   let env: env = empty_env in
   (* Start with the C++ prelude. *)
-  let c = Compiler (env, prelude) in
+  let c = Compiler (env, prelude_source) in
   let c =
     (* Handle errors during the compilation of the Austral,Pervasive
        module. Otherwise, a typo in the source code of this module will cause a
@@ -148,8 +160,7 @@ let empty_compiler: compiler =
       Printf.eprintf "%s" (render_error error None);
       exit (-1)
   in
-  let (Compiler (menv, code)) = c in
-  Compiler (menv, code ^ austral_memory_code)
+  c
 
 let compile_and_run (modules: (string * string) list) (entrypoint: string): (int * string) =
   let compiler = compile_multiple empty_compiler (List.map (fun (i, b) -> fake_mod_source i b) modules) in
@@ -163,9 +174,9 @@ let compile_and_run (modules: (string * string) list) (entrypoint: string): (int
   in
   let compiler = compile_entrypoint compiler entrypoint_mod entrypoint_name in
   let code = compiler_code compiler in
-  let code_path = temp_file "code" ".cpp"
+  let code_path = temp_file "code" ".c"
   and bin_path = temp_file "program" ".exe" in
   write_string_to_file code_path code;
-  let _ = compile_cpp_code code_path bin_path in
+  let _ = compile_c_code code_path bin_path in
   let (CommandOutput { code; stdout; _ }) = run_command bin_path in
   (code, stdout)
