@@ -829,7 +829,7 @@ let get_uninstantiated_monomorphs (env: env): monomorph list =
   let pred (m: monomorph) =
     not (is_instantiated m)
   in
-  List.filter pred monos
+  List.rev (List.filter pred monos)
 
 (** Find a monomorph by ID and return it, removing it from the
    environment. Errors if it does not exist. *)
