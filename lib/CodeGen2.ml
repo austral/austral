@@ -381,14 +381,12 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
                         local_union_tag_enum_name n,
                         List.map (fun (MonoCase (n, _)) -> gen_ident n) cases
                       )
-     and union_def = CStructDefinition (
-                         CStruct (
-                             Some (gen_ident n),
-                             [
-                               CSlot ("tag", CNamedType (local_union_tag_enum_name n));
-                               CSlot ("data", CUnionType (gen_cases cases))
-                             ]
-                           )
+     and union_def = CNamedStructDefinition (
+                         gen_ident n,
+                         [
+                           CSlot ("tag", CNamedType (local_union_tag_enum_name n));
+                           CSlot ("data", CUnionType (gen_cases cases))
+                         ]
                        )
      in
      [enum_def; union_def]
@@ -397,14 +395,12 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
                         local_union_tag_enum_name_from_id id,
                         List.map (fun (MonoCase (n, _)) -> gen_ident n) cases
                       )
-     and union_def = CStructDefinition (
-                         CStruct (
-                             Some (gen_mono_id id),
-                             [
-                               CSlot ("tag", CNamedType (local_union_tag_enum_name_from_id id));
-                               CSlot ("data", CUnionType (gen_cases cases))
-                             ]
-                           )
+     and union_def = CNamedStructDefinition (
+                         gen_mono_id id,
+                         [
+                           CSlot ("tag", CNamedType (local_union_tag_enum_name_from_id id));
+                           CSlot ("data", CUnionType (gen_cases cases))
+                         ]
                        )
      in
      [enum_def; union_def]
