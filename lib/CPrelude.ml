@@ -167,6 +167,14 @@ extern au_unit_t au_abort(au_array_t message);
  * Memory functions
  */
 
+extern void* au_calloc(size_t size, size_t count);
+
+extern void* au_realloc(void* ptr, size_t count);
+
+extern void* au_memmove(void* destination, void* source, size_t count);
+
+extern void* au_memcpy(void* destination, void* source, size_t count);
+
 extern au_unit_t au_free(void* ptr);
 
 /* --- END PRELUDE --- */

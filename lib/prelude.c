@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 /*
  * Austral types
@@ -149,6 +150,22 @@ au_unit_t au_abort(au_array_t message) {
 /*
  * Memory functions
  */
+
+void* au_calloc(size_t size, size_t count) {
+  return calloc(size, count);
+}
+
+void* au_realloc(void* ptr, size_t count) {
+  return realloc(ptr, count);
+}
+
+void* au_memmove(void* destination, void* source, size_t count) {
+  return memmove(destination, source, count);
+}
+
+void* au_memcpy(void* destination, void* source, size_t count) {
+  return memcpy(destination, source, count);
+}
 
 au_unit_t au_free(void* ptr) {
     free(ptr);
