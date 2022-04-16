@@ -19,6 +19,7 @@ typedef signed   int   au_int32_t;
 typedef unsigned long  au_nat64_t;
 typedef signed   long  au_int64_t;
 
+#define nil   0
 #define false 0
 #define true  1
 
