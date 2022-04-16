@@ -1,5 +1,6 @@
 import Austral.Memory (
     Pointer,
+    Null_Pointer,
     Allocate,
     Deallocate
 );
@@ -21,21 +22,21 @@ module body Example.Array is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let arropt: Option[Pointer[Boolean]] := Allocate(3);
-        case arropt of
-        when Some(value: Pointer[Boolean]) do
-            value[0] := true;
-            value[2] := true;
-            let first: Boolean := value[0];
-            let second: Boolean := value[1];
-            let third: Boolean := value[2];
+        let arr: Pointer[Boolean] := Allocate(3);
+        let null: Pointer[Boolean] := Null_Pointer();
+        if arr = null then
+            skip;
+        else
+            arr[0] := true;
+            arr[2] := true;
+            let first: Boolean := arr[0];
+            let second: Boolean := arr[1];
+            let third: Boolean := arr[2];
             Show_Bool(first);
             Show_Bool(second);
             Show_Bool(third);
-            Deallocate(value);
-        when None do
-            skip;
-        end case;
+            Deallocate(arr);
+        end if;
         return root;
     end;
 end module body.
