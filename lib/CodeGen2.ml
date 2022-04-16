@@ -487,6 +487,8 @@ and gen_fun_decl decl =
   match decl with
   | MFunction (id, _, p, rt, _) ->
      Some [CFunctionDeclaration (gen_decl_id id, gen_params p, gen_type rt, LinkageInternal)]
+  | MFunctionMonomorph (id, p, rt, _) ->
+     Some [CFunctionDeclaration (gen_mono_id id, gen_params p, gen_type rt, LinkageInternal)]
   | MForeignFunction (id, _, p, rt, _) ->
      Some [CFunctionDeclaration (gen_decl_id id, gen_params p, gen_type rt, LinkageInternal)]
   | MConcreteInstance (_, _, _, ms) ->
