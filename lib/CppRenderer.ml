@@ -88,7 +88,7 @@ and render_typarams i params =
 
 and render_linkage = function
   | LinkageInternal -> ""
-  | LinkageExternal -> "extern \"C\" "
+  | LinkageExternal -> "extern "
 
 and render_stmt (i: indentation) (stmt: cpp_stmt): line list =
   match stmt with
