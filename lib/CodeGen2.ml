@@ -80,6 +80,9 @@ let gen_module_name (n: module_name): string =
 let gen_qident (i: qident): string =
   (gen_module_name (source_module_name i)) ^ "____" ^ (gen_ident (original_name i))
 
+let gen_sident (mn: module_name) (i: identifier): string =
+  (gen_module_name mn) ^ "____" ^ (gen_ident i)
+
 let gen_decl_id (id: decl_id): string =
   let (DeclId i) = id in
   austral_prefix ^ "decl_" ^ (string_of_int i)
@@ -172,10 +175,7 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
          ]
        )
   | MVariable (n, _) ->
-     if (equal_module_name (source_module_name n) mn) then
-       CVar (gen_ident (original_name n))
-     else
-       CVar (gen_qident n)
+     CVar (gen_qident n)
   | MConcreteFuncall (id, _, args, _) ->
      CFuncall (gen_decl_id id, List.map g args)
   | MGenericFuncall (id, args, _) ->
@@ -262,12 +262,12 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   | MSkip ->
      CBlock []
   | MLet (n, t, v, b) ->
-     let l = CLet (gen_ident n, gen_type t, ge v) in
+     let l = CLet (gen_sident mn n, gen_type t, ge v) in
      CBlock [l; gs b]
   | MDestructure (bs, e, b) ->
      let tmp = new_variable () in
      let vardecl = CLet (tmp, gen_type (get_type e), ge e)
-     and bs' = List.map (fun (n, t) -> CLet (gen_ident n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
+     and bs' = List.map (fun (n, t) -> CLet (gen_sident mn n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
      and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
@@ -280,7 +280,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   | MWhile (c, b) ->
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
-     CFor (gen_ident v, ge i, ge f, gs b)
+     CFor (gen_sident mn v, ge i, ge f, gs b)
   | MBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
        (match orig_type with
@@ -290,10 +290,10 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
            false)
      in
      if is_pointer then
-       let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
+       let l = CLet (gen_sident mn rename, gen_type orig_type, CVar (gen_ident original)) in
        CBlock [l; gs body]
      else
-       let l = CLet (gen_ident rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
+       let l = CLet (gen_sident mn rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
        CBlock [l; gs body]
   | MBlock (a, b) ->
      CBlock [gs a; gs b]
@@ -320,20 +320,20 @@ and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
     ]
 
 and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, bindings, body)) =
-  let case_name = gen_ident n
+  let case_name = gen_sident mn n
   and tag_value = union_tag_value ty n
   in
   let get_binding binding_name =
-    CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+    CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_sident mn binding_name)
   in
-  let bindings' = List.map (fun (MValueParameter (n, t)) -> CLet (gen_ident n, gen_type t, get_binding n)) bindings in
+  let bindings' = List.map (fun (MValueParameter (n, t)) -> CLet (gen_sident mn n, gen_type t, get_binding n)) bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 
 (* Declarations *)
 
-let gen_params params =
-  List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_ident n, gen_type t)) params
+let gen_params mn params =
+  List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_sident mn n, gen_type t)) params
 
 let gen_slots (slots: mono_slot list) =
   List.map (fun (MonoSlot (n, t)) -> CSlot (gen_ident n, gen_type t)) slots
@@ -342,12 +342,12 @@ let gen_cases (cases: mono_case list) =
   List.map (fun (MonoCase (n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
 
 let gen_method (mn: module_name) (MConcreteMethod (id, _, params, rt, body)) =
-  CFunctionDefinition (gen_ins_meth_id id, gen_params params, gen_type rt, gen_stmt mn body)
+  CFunctionDefinition (gen_ins_meth_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
 
 let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
   match decl with
   | MConstant (_, n, ty, e) ->
-     [CConstantDefinition (gen_ident n, gen_type ty, gen_exp mn e)]
+     [CConstantDefinition (gen_sident mn n, gen_type ty, gen_exp mn e)]
   | MTypeAlias (_, n, ty) ->
      [
        CStructDefinition (
@@ -405,9 +405,9 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      in
      [enum_def; union_def]
   | MFunction (id, _, params, rt, body) ->
-     [CFunctionDefinition (gen_decl_id id, gen_params params, gen_type rt, gen_stmt mn body)]
+     [CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
   | MFunctionMonomorph (id, params, rt, body) ->
-     [CFunctionDefinition (gen_mono_id id, gen_params params, gen_type rt, gen_stmt mn body)]
+     [CFunctionDefinition (gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
   | MForeignFunction (id, _, params, rt, underlying) ->
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
@@ -440,25 +440,25 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
        | _ ->
           param_type_to_c_type t
      in
-     let ff_params = List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_ident n, param_type_to_c_type t)) params
+     let ff_params = List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_sident mn n, param_type_to_c_type t)) params
      and ff_rt = return_type_to_c_type rt in
      let ff_decl = CFunctionDeclaration (underlying, ff_params, ff_rt, LinkageExternal) in
      let make_param (n: identifier) (t: mono_ty) =
        if (gen_type t) = (CNamedType "au_array_t") then
          (* Extract the pointer from the Array struct *)
-         CStructAccessor (CVar (gen_ident n), "data")
+         CStructAccessor (CVar (gen_sident mn n), "data")
        else
-         CVar (gen_ident n)
+         CVar (gen_sident mn n)
      in
      let args = List.map (fun (MValueParameter (n, t)) -> make_param n t) params in
      let funcall = CFuncall (underlying, args) in
      let body = CReturn funcall in
-     let def = CFunctionDefinition (gen_decl_id id, gen_params params, gen_type rt, body) in
+     let def = CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, body) in
      [ff_decl; def]
   | MConcreteInstance (_, _, _, methods) ->
      List.map (gen_method mn) methods
   | MMethodMonomorph (id, params, rt, body) ->
-     [CFunctionDefinition (gen_mono_id id, gen_params params, gen_type rt, gen_stmt mn body)]
+     [CFunctionDefinition (gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
 
 (* Extract types into forward type declarations *)
 
@@ -477,24 +477,24 @@ and gen_type_decl decl =
 
 (* Extract functions into forward function declarations *)
 
-let rec gen_fun_decls decls =
-  List.filter_map gen_fun_decl decls
+let rec gen_fun_decls mn decls =
+  List.filter_map (gen_fun_decl mn) decls
 
-and gen_fun_decl decl =
+and gen_fun_decl mn decl =
   match decl with
   | MFunction (id, _, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_decl_id id, gen_params p, gen_type rt, LinkageInternal)]
+     Some [CFunctionDeclaration (gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | MFunctionMonomorph (id, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_mono_id id, gen_params p, gen_type rt, LinkageInternal)]
+     Some [CFunctionDeclaration (gen_mono_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | MForeignFunction (id, _, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_decl_id id, gen_params p, gen_type rt, LinkageInternal)]
+     Some [CFunctionDeclaration (gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | MConcreteInstance (_, _, _, ms) ->
-     Some (List.map gen_method_decl ms)
+     Some (List.map (gen_method_decl mn) ms)
   | _ ->
      None
 
-and gen_method_decl (MConcreteMethod (id, _, params, rt, _)) =
-  CFunctionDeclaration (gen_ins_meth_id id, gen_params params, gen_type rt, LinkageInternal)
+and gen_method_decl mn (MConcreteMethod (id, _, params, rt, _)) =
+  CFunctionDeclaration (gen_ins_meth_id id, gen_params mn params, gen_type rt, LinkageInternal)
 
 (* Codegen a module *)
 
@@ -518,7 +518,7 @@ let decl_order = function
 
 let gen_module (MonoModule (name, decls)) =
   let type_decls = gen_type_decls decls
-  and fun_decls = List.concat (gen_fun_decls decls)
+  and fun_decls = List.concat (gen_fun_decls name decls)
   and decls' = List.concat (List.map (gen_decl name) decls) in
   let decls'' = List.concat [type_decls; fun_decls; decls'] in
   let sorter a b = compare (decl_order a) (decl_order b) in
