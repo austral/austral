@@ -509,6 +509,8 @@ and gen_fun_decl mn decl =
      Some [CFunctionDeclaration (gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | MConcreteInstance (_, _, _, ms) ->
      Some (List.map (gen_method_decl mn) ms)
+  | MMethodMonomorph (id, p, rt, _) ->
+     Some [CFunctionDeclaration (gen_mono_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | _ ->
      None
 
