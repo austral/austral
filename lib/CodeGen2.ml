@@ -412,7 +412,7 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      [CFunctionDefinition (gen_decl_id id, gen_params params, gen_type rt, gen_stmt mn body)]
   | MFunctionMonomorph (id, params, rt, body) ->
      [CFunctionDefinition (gen_mono_id id, gen_params params, gen_type rt, gen_stmt mn body)]
-  | MForeignFunction (_, n, params, rt, underlying) ->
+  | MForeignFunction (id, _, params, rt, underlying) ->
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
         | MonoUnit ->
@@ -457,7 +457,7 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
      let args = List.map (fun (MValueParameter (n, t)) -> make_param n t) params in
      let funcall = CFuncall (underlying, args) in
      let body = CReturn funcall in
-     let def = CFunctionDefinition (gen_ident n, gen_params params, gen_type rt, body) in
+     let def = CFunctionDefinition (gen_decl_id id, gen_params params, gen_type rt, body) in
      [ff_decl; def]
   | MConcreteInstance (_, _, _, methods) ->
      List.map (gen_method mn) methods
