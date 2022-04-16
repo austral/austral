@@ -321,11 +321,11 @@ and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
     ]
 
 and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, bindings, body)) =
-  let case_name = gen_sident mn n
+  let case_name = gen_ident n
   and tag_value = union_tag_value ty n
   in
   let get_binding binding_name =
-    CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_sident mn binding_name)
+    CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
   in
   let bindings' = List.map (fun (MValueParameter (n, t)) -> CLet (gen_sident mn n, gen_type t, get_binding n)) bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
