@@ -67,4 +67,4 @@ type c_decl =
 
 and c_param = CValueParam of string * c_ty
 
-type c_unit = CUnit of c_decl list
+type c_unit = CUnit of string * c_decl list

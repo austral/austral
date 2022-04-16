@@ -534,4 +534,4 @@ let gen_module (MonoModule (name, decls)) =
   let decls'' = List.concat [type_decls; fun_decls; decls'] in
   let sorter a b = compare (decl_order a) (decl_order b) in
   let sorted_decls = List.sort sorter decls'' in
-  CUnit sorted_decls
+  CUnit (mod_name_string name, sorted_decls)
