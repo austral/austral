@@ -145,7 +145,7 @@ au_unit_t au_abort(au_array_t message) {
     fprintf(stderr, "%s\n", (char*) message.data);
     fflush(stderr);
     _Exit(-1);
-    return false;
+    return nil;
 }
 
 /*
@@ -170,5 +170,5 @@ void* au_memcpy(void* destination, void* source, size_t count) {
 
 au_unit_t au_free(void* ptr) {
     free(ptr);
-    return false;
+    return nil;
 };
