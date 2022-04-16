@@ -304,7 +304,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CReturn (ge e)
 
 and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
-  gen_path mn (CVar (gen_ident name)) elems
+  gen_path mn (CVar (gen_sident mn name)) elems
 
 and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
