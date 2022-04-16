@@ -64,7 +64,7 @@ Anti-features:
 ## Building
 
 Building the `austral` compiler requires `make` and the `dune` build system for
-OCaml, and a C++ compiler for building the resulting output.
+OCaml, and a C compiler for building the resulting output.
 
 First, install [opam][opam]. On Debian/Ubuntu you can just do `sudo apt-get install opam`.
 
@@ -107,7 +107,7 @@ $ austral compile \
     --module=src/B.aui,src/B.aum \
     --module=src/C.aui,src/C.aum \
     --entrypoint=C:Main \
-    --output=program.cpp
+    --output=program.c
 ```
 
 This is the most general invocation. Where module interface and module body
@@ -133,9 +133,10 @@ followed by the name of a public function with the following signature:
 function Main(root: Root_Capability): Root_Capability;
 ```
 
-Finally, the `--output` option is just the path to dump the compiled C++ to.
+Finally, the `--output` option is just the path to dump the compiled C to.
 
-There's also a command to typecheck a program without outputting anything. Only `--module` flags are accepted:
+There's also a command to typecheck a program without outputting anything. Only
+`--module` flags are accepted:
 
 ```bash
 $ austral typecheck \
@@ -146,15 +147,9 @@ $ austral typecheck \
 
 ## Status
 
-1. The bootstrapping compiler, written in OCaml, is implemented. It has a couple
-   of limitations, these are to speed up development so I can iterate on a
-   working compiler as early as possible:
-
-    1. The compiler outputs templated C++ so I don't have to bother implementing
-       a monomorphization step.
-
-    2. The compiler does not support separate compilation. In practice this is
-       not a problem: there's not enough Austral code for this to matter.
+1. The bootstrapping compiler, written in OCaml, is implemented. The main
+   limitation is it does not support separate compilation. In practice this is
+   not a problem: there's not enough Austral code for this to matter.
 
 2. A standard library with a few basic data structures and capability-based
    filesystem access is being designed.
