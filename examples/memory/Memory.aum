@@ -3,7 +3,8 @@ import Austral.Memory (
     Allocate,
     Load,
     Store,
-    Deallocate
+    Deallocate,
+    Null_Pointer
 );
 
 module body Example.Memory is
@@ -11,8 +12,10 @@ module body Example.Memory is
 
     function Main(root: Root_Capability): Root_Capability is
         let ptr: Pointer[Integer_32] := Allocate(sizeof(Integer_32));
-        if ptr = (Null_Pointer() : Pointer[Integer_32]) then
+        let null: Pointer[Integer_32] := Null_Pointer();
+        if ptr = null then
             -- Do nothing.
+            skip;
         else
             Deallocate(ptr);
         end if;
