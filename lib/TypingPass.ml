@@ -953,7 +953,9 @@ and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_m
              err "Not a record type")
       | _ ->
          err "Not a record type")
-  | ArrayIndex _ ->
+  | ArrayIndex ie ->
+     let ie' = augment_expr module_name env rm typarams lexenv None ie in
+     let _ = ie' in
      (match head_ty with
       | WriteRef (ref_ty, _) ->
          (match ref_ty with
