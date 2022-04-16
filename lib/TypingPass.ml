@@ -371,8 +371,6 @@ and augment_path_elem (env: env) (module_name: module_name) (rm: region_map) (ty
      (match head_ty with
       | Array (elem_ty, _) ->
          TArrayIndex (ie', elem_ty)
-      | RawPointer elem_ty ->
-         TArrayIndex (ie', elem_ty)
       | _ ->
          err "Array index operator doesn't work for this type.")
 
