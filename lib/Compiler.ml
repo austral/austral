@@ -1,17 +1,16 @@
 open Identifier
+open Id
 open Env
 open BuiltIn
 open Pervasive
 open MemoryModule
-(*open CppPrelude*)
 open CPrelude
 open ParserInterface
 open CombiningPass
 open ExtractionPass
 open TypingPass
 open BodyExtractionPass
-open CodeGen
-open CppRenderer
+open CodeGen2
 open CRenderer
 open Cst
 open Tast
@@ -66,11 +65,8 @@ let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; bod
   let typed: typed_module = augment_module env linked in
   let env: env = extract_bodies env typed in
   let (env, mono): (env * mono_module) = monomorphize env typed in
-  let unit = CodeGen2.gen_module mono in
+  let unit = gen_module mono in
   let c_code: string = render_unit unit in
-  let cpp = gen_module typed in
-  let code = render_module cpp in
-  let _ = code in
   Compiler (env, (compiler_code c) ^ "\n" ^ c_code)
 
 let rec compile_multiple c modules =
@@ -78,18 +74,18 @@ let rec compile_multiple c modules =
   | m::rest -> compile_multiple (compile_mod c m) rest
   | [] -> c
 
-let rec check_entrypoint_validity (env: env) (qi: qident): unit =
+let rec check_entrypoint_validity (env: env) (qi: qident): decl_id =
   match get_decl_by_name env (qident_to_sident qi) with
   | Some decl ->
      (match decl with
-      | Function { vis; typarams; value_params; rt; _ } ->
+      | Function { id; vis; typarams; value_params; rt; _ } ->
          if vis = VisPublic then
            if typarams = [] then
              match value_params with
              | [ValueParameter (_, pt)] ->
                 if is_root_cap_type pt then
                   if is_root_cap_type rt then
-                    ()
+                    id
                   else
                     err "Entrypoint function must return a value of type Root_Capability."
                 else
@@ -113,15 +109,15 @@ and is_root_cap_type = function
   | _ ->
      false
 
-let entrypoint_code mn i =
-  let f = (gen_module_name mn) ^ "::" ^ (gen_ident i) in
+let entrypoint_code id =
+  let f = gen_decl_id id in
   "int main() {\n    " ^ f ^ "({ .value = false });\n    return 0;\n}\n"
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in
-  check_entrypoint_validity (cenv c) qi;
+  let entrypoint_id = check_entrypoint_validity (cenv c) qi in
   let (Compiler (m, c)) = c in
-  Compiler (m, c ^ "\n" ^ (entrypoint_code mn i))
+  Compiler (m, c ^ "\n" ^ (entrypoint_code entrypoint_id))
 
 let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }

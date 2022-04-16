@@ -1,6 +1,9 @@
 open Identifier
+open Id
 open Mtast
 open CRepr
+
+val gen_decl_id : decl_id -> string
 
 val gen_ident : identifier -> string
 
