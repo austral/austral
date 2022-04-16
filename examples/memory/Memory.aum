@@ -10,14 +10,12 @@ module body Example.Memory is
     pragma Unsafe_Module;
 
     function Main(root: Root_Capability): Root_Capability is
-        let opt: Option[Pointer[Integer_32]] := Allocate(sizeof(Integer_32));
-        case opt of
-            when Some(value: Pointer[Integer_32]) do
-              Deallocate(value);
-            when None do
-              -- Do nothing.
-              skip;
-        end case;
+        let ptr: Pointer[Integer_32] := Allocate(sizeof(Integer_32));
+        if ptr = (Null_Pointer() : Pointer[Integer_32]) then
+            -- Do nothing.
+        else
+            Deallocate(ptr);
+        end if;
         return root;
     end;
 end module body.
