@@ -2,7 +2,10 @@ import Austral.Memory (
     Pointer,
     Null_Pointer,
     Allocate,
-    Deallocate
+    Deallocate,
+    Positive_Offset,
+    Load,
+    Store
 );
 
 module body Example.Array is
@@ -27,11 +30,15 @@ module body Example.Array is
         if arr = null then
             skip;
         else
-            arr[0] := true;
-            arr[2] := true;
-            let first: Boolean := arr[0];
-            let second: Boolean := arr[1];
-            let third: Boolean := arr[2];
+            let firstp: Pointer[Boolean] := arr;
+            let secondp: Pointer[Boolean] := Positive_Offset(arr, 1);
+            let thirdp: Pointer[Boolean] := Positive_Offset(arr, 2);
+            Store(firstp, true);
+            Store(secondp, false);
+            Store(thirdp, true);
+            let first: Boolean := Load(firstp);
+            let second: Boolean := Load(secondp);
+            let third: Boolean := Load(thirdp);
             Show_Bool(first);
             Show_Bool(second);
             Show_Bool(third);
