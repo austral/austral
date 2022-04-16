@@ -341,8 +341,8 @@ let gen_slots (slots: mono_slot list) =
 let gen_cases (cases: mono_case list) =
   List.map (fun (MonoCase (n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
 
-let gen_method (mn: module_name) (MConcreteMethod (_, n, params, rt, body)) =
-  CFunctionDefinition (gen_ident n, gen_params params, gen_type rt, gen_stmt mn body)
+let gen_method (mn: module_name) (MConcreteMethod (id, _, params, rt, body)) =
+  CFunctionDefinition (gen_ins_meth_id id, gen_params params, gen_type rt, gen_stmt mn body)
 
 let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
   match decl with
