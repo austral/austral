@@ -7,6 +7,9 @@ module Austral.Memory is
     type Pointer[T: Type]: Free;
 
     generic [T: Type]
+    function Null_Pointer(): Pointer[T];
+
+    generic [T: Type]
     function Load(pointer: Pointer[T]): T;
 
     generic [T: Type]
@@ -47,6 +50,11 @@ let memory_body_source = {code|
 
 module body Austral.Memory is
     type Pointer[T: Type]: Free is Unit;
+
+    generic [T: Type]
+    function Null_Pointer(): Pointer[T] is
+        return @embed(Pointer[T], "NULL");
+    end;
 
     generic [T: Type]
     function Load(pointer: Pointer[T]): T is
