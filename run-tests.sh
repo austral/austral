@@ -4,12 +4,12 @@ set -euxo pipefail
 opam exec -- dune build
 
 function compile() {
-    ./_build/default/bin/austral.exe compile --module=$1/$2 --entrypoint=Example.$2:Main --output=code.cpp
-    g++ -std=c++11 code.cpp -o testbin
+    ./_build/default/bin/austral.exe compile --module=$1/$2 --entrypoint=Example.$2:Main --output=code.c
+    gcc lib/prelude.c code.c -o testbin
     ./testbin > actual.txt
     echo -n -e "$3" > expected.txt
     diff actual.txt expected.txt
-    rm code.cpp
+    rm code.c
     rm testbin
     rm actual.txt
     rm expected.txt

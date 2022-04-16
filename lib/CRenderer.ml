@@ -28,7 +28,7 @@ and render_decl i d =
   | CConstantDefinition (name, ty, value) ->
      [Line (i, (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";")]
   | CStructForwardDeclaration (name) ->
-     [Line (i, "struct " ^ name ^ ";")]
+     [Line (i, "typedef struct " ^ name ^ " " ^ name ^ ";")]
   | CTypeDefinition (name, def) ->
      [Line (i, "typedef " ^ (render_type def) ^ " " ^ name ^ ";")]
   | CStructDefinition (record) ->
