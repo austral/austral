@@ -65,7 +65,7 @@ let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; bod
   let typed: typed_module = augment_module env linked in
   let env: env = extract_bodies env typed in
   let (env, mono): (env * mono_module) = monomorphize env typed in
-  let unit = gen_module mono in
+  let unit = gen_module env mono in
   let c_code: string = render_unit unit in
   Compiler (env, (compiler_code c) ^ "\n" ^ c_code)
 

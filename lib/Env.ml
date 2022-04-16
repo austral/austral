@@ -910,3 +910,10 @@ let store_instance_method_monomorph_definition (env: env) (id: mono_id) (new_bod
 let get_instance_method (env: env) (target_id: ins_meth_id): ins_meth_rec option =
   let (Env { methods; _ }) = env in
   List.find_opt (fun (InsMethRec { id; _ }) -> equal_ins_meth_id id target_id) methods
+
+let get_monomorph (env: env) (id: mono_id): monomorph option =
+  let (Env { monos; _ }) = env in
+  let pred (mono: monomorph): bool =
+    equal_mono_id id (monomorph_id mono)
+  in
+  List.find_opt pred monos

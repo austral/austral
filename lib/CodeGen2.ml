@@ -1,6 +1,7 @@
 open Id
 open Identifier
 open Type
+open Env
 open MonoType
 open Mtast
 open CRepr
@@ -344,7 +345,22 @@ let gen_cases (cases: mono_case list) =
 let gen_method (mn: module_name) (MConcreteMethod (id, _, params, rt, body)) =
   CFunctionDefinition (gen_ins_meth_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
 
-let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
+let get_original_module_name (env: env) (id: mono_id): module_name =
+  match get_monomorph env id with
+  | Some (MonoFunction { function_id; _ }) ->
+     (match get_decl_by_id env function_id with
+      | Some (Function { mod_id; _ }) ->
+         (match get_module_by_id env mod_id with
+          | Some (ModRec { name; _ }) ->
+             name
+          | _ ->
+             err "Internal")
+      | _ ->
+         err "internal")
+  | _ ->
+     err "internal"
+
+let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   match decl with
   | MConstant (_, n, ty, e) ->
      [CConstantDefinition (gen_sident mn n, gen_type ty, gen_exp mn e)]
@@ -407,7 +423,10 @@ let gen_decl (mn: module_name) (decl: mdecl): c_decl list =
   | MFunction (id, _, params, rt, body) ->
      [CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
   | MFunctionMonomorph (id, params, rt, body) ->
-     [CFunctionDefinition (gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
+     (* Load-bearing hack: prefix parameters not with the current module name,
+        but with the name of the module the monomorph's declaration is from. *)
+     let mn': module_name = get_original_module_name env id in
+     [CFunctionDefinition (gen_mono_id id, gen_params mn' params, gen_type rt, gen_stmt mn body)]
   | MForeignFunction (id, _, params, rt, underlying) ->
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
@@ -516,10 +535,10 @@ let decl_order = function
   | CFunctionDefinition _ ->
      7
 
-let gen_module (MonoModule (name, decls)) =
+let gen_module (env: env) (MonoModule (name, decls)) =
   let type_decls = gen_type_decls decls
   and fun_decls = List.concat (gen_fun_decls name decls)
-  and decls' = List.concat (List.map (gen_decl name) decls) in
+  and decls' = List.concat (List.map (gen_decl env name) decls) in
   let decls'' = List.concat [type_decls; fun_decls; decls'] in
   let sorter a b = compare (decl_order a) (decl_order b) in
   let sorted_decls = List.sort sorter decls'' in
