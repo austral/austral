@@ -497,17 +497,17 @@ let rec gen_fun_decls decls =
 
 and gen_fun_decl decl =
   match decl with
-  | MFunction (_, n, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_ident n, gen_params p, gen_type rt, LinkageInternal)]
-  | MForeignFunction (_, n, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_ident n, gen_params p, gen_type rt, LinkageInternal)]
+  | MFunction (id, _, p, rt, _) ->
+     Some [CFunctionDeclaration (gen_decl_id id, gen_params p, gen_type rt, LinkageInternal)]
+  | MForeignFunction (id, _, p, rt, _) ->
+     Some [CFunctionDeclaration (gen_decl_id id, gen_params p, gen_type rt, LinkageInternal)]
   | MConcreteInstance (_, _, _, ms) ->
      Some (List.map gen_method_decl ms)
   | _ ->
      None
 
-and gen_method_decl (MConcreteMethod (_, n, params, rt, _)) =
-  CFunctionDeclaration (gen_ident n, gen_params params, gen_type rt, LinkageInternal)
+and gen_method_decl (MConcreteMethod (id, _, params, rt, _)) =
+  CFunctionDeclaration (gen_ins_meth_id id, gen_params params, gen_type rt, LinkageInternal)
 
 (* Codegen a module *)
 
