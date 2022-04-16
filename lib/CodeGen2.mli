@@ -5,6 +5,8 @@ open CRepr
 
 val gen_decl_id : decl_id -> string
 
+val gen_mono_id : mono_id -> string
+
 val gen_ident : identifier -> string
 
 val gen_module_name : module_name -> string

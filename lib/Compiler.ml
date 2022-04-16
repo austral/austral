@@ -109,15 +109,29 @@ and is_root_cap_type = function
   | _ ->
      false
 
-let entrypoint_code id =
+let entrypoint_code root_cap_mono_id id =
   let f = gen_decl_id id in
-  "int main() {\n    " ^ f ^ "({ .value = false });\n    return 0;\n}\n"
+  "int main() {\n    " ^ f ^ "((" ^ (gen_mono_id root_cap_mono_id) ^ "){ .value = false });\n    return 0;\n}\n"
+
+let get_root_capability_monomorph (env: env): mono_id =
+  let mn: module_name = make_mod_name "Austral.Pervasive"
+  and n: identifier = make_ident "Root_Capability" in
+  let sn: sident = make_sident mn n in
+  match get_decl_by_name env sn with
+  | Some (TypeAlias { id; _ }) ->
+     (match get_type_monomorph env id [] with
+      | Some id ->
+         id
+      | _ ->
+         err "No monomorph of Root_Capability.")
+  | _ ->
+     err "Can't find the Root_Capability type in the environment."
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in
   let entrypoint_id = check_entrypoint_validity (cenv c) qi in
-  let (Compiler (m, c)) = c in
-  Compiler (m, c ^ "\n" ^ (entrypoint_code entrypoint_id))
+  let (Compiler (m, code)) = c in
+  Compiler (m, code ^ "\n" ^ (entrypoint_code (get_root_capability_monomorph (cenv c)) entrypoint_id))
 
 let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
