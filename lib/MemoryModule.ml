@@ -63,7 +63,7 @@ module body Austral.Memory is
 
     generic [T: Type]
     function Store(pointer: Pointer[T], value: T): Unit is
-        @embed(Unit, "(*$1) = ($2)", pointer, value);
+        @embed(Unit, "AU_STORE($1, $2)", pointer, value);
         return nil;
     end;
 
