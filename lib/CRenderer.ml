@@ -67,7 +67,7 @@ and render_decl i d =
 
 and render_linkage = function
   | LinkageInternal -> ""
-  | LinkageExternal -> "extern \"C\" "
+  | LinkageExternal -> "extern "
 
 and render_stmt (i: indentation) (stmt: c_stmt): line list =
   match stmt with
