@@ -1,5 +1,6 @@
 open Identifier
-open Tast
+open Ast
+open Combined
 open Error
 
 let is_abort (name: qident): bool =
@@ -9,40 +10,42 @@ let is_abort (name: qident): bool =
   (((mod_name_string mn) = "Austral.Pervasive")
    && ((ident_string orig) = "Abort"))
 
-let rec ends_in_return (stmt: tstmt): bool =
+let rec ends_in_return (stmt: astmt): bool =
   match stmt with
-  | TSkip _ ->
+  | ASkip _ ->
      false
-  | TLet (_, _, _, _, body) ->
+  | ALet (_, _, _, _, body) ->
      ends_in_return body
-  | TDestructure (_, _, _, body) ->
+  | ADestructure (_, _, _, body) ->
      ends_in_return body
-  | TAssign _ ->
+  | AAssign _ ->
      false
-  | TIf (_, _, tb, fb) ->
+  | AIf (_, _, tb, fb) ->
      (ends_in_return tb) && (ends_in_return fb)
-  | TCase (_, _, whens) ->
-     let l = List.map (fun (TypedWhen (_, _, body)) -> ends_in_return body) whens in
+  | AWhen (_, _, b) ->
+     ends_in_return b
+  | ACase (_, _, whens) ->
+     let l = List.map (fun (AbstractWhen (_, _, body)) -> ends_in_return body) whens in
      List.for_all (fun x -> x) l
-  | TWhile (_, _, body) ->
+  | AWhile (_, _, body) ->
      ends_in_return body
-  | TFor (_, _, _, _, body) ->
+  | AFor { body; _ } ->
      ends_in_return body
-  | TBorrow { body; _ } ->
+  | ABorrow { body; _ } ->
      ends_in_return body
-  | TBlock (_, _, body) ->
+  | ABlock (_, _, body) ->
      ends_in_return body
-  | TDiscarding (_, e) ->
+  | ADiscarding (_, e) ->
      (match e with
-      | TFuncall (_, name, _, _, _) ->
+      | FunctionCall (name, _) ->
          is_abort name
       | _ ->
          false)
-  | TReturn _ ->
+  | AReturn _ ->
      true
 
-let check_ends_in_return (TypedModule (mn, decls)): unit =
-  let check_method_ends_in_return (TypedMethodDef (_, name, _, _, body)): unit =
+let check_ends_in_return (CombinedModule { name=mn; decls; _ }): unit =
+  let check_method_ends_in_return (CMethodDef (name, _, _, _, body)): unit =
     if ends_in_return body then
       ()
     else
@@ -52,30 +55,35 @@ let check_ends_in_return (TypedModule (mn, decls)): unit =
            ^ (mod_name_string mn)
            ^ " doesn't end in a return statement.")
   in
-  let check_decl_ends_in_return (decl: typed_decl): unit =
+  let check_decl_ends_in_return (decl: combined_definition): unit =
     match decl with
-    | TConstant _ ->
+    | CConstant _ ->
        ()
-    | TTypeAlias _ ->
+    | CTypeAlias _ ->
        ()
-    | TRecord _ ->
+    | CRecord _ ->
        ()
-    | TUnion _ ->
+    | CUnion _ ->
        ()
-    | TFunction (_, _, name, _, _, _, body, _) ->
-       if ends_in_return body then
-         ()
-       else
-         err ("Function "
-              ^ (ident_string name)
-              ^ " in module "
-              ^ (mod_name_string mn)
-              ^ " doesn't end in a return statement.")
-    | TForeignFunction _ ->
+    | CFunction (_, name, _, _, _, body, _, pragmas) ->
+       (match pragmas with
+        | [] ->
+           (* No pragmas: regular function. *)
+           if ends_in_return body then
+             ()
+           else
+             let _ = print_endline "BODY: " in
+             err ("Function "
+                  ^ (ident_string name)
+                  ^ " in module "
+                  ^ (mod_name_string mn)
+                  ^ " doesn't end in a return statement.")
+        | _ ->
+           (* Yes pragmas: foreign function, ignore the body. *)
+           ())
+    | CTypeclass _ ->
        ()
-    | TTypeClass _ ->
-       ()
-    | TInstance (_, _, _, _, _, methods, _) ->
+    | CInstance (_, _, _, _, methods, _) ->
        let _ = List.map check_method_ends_in_return methods in
        ()
   in

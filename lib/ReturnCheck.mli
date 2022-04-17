@@ -1,5 +1,5 @@
 (** This module implements a check over the TAST that a function ends with
     either a return statement or a call to `Abort`. *)
-open Tast
+open Combined
 
-val check_ends_in_return : typed_module -> unit
+val check_ends_in_return : combined_module -> unit
