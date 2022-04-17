@@ -19,7 +19,19 @@ let rec abs_stmt im stmt =
   | CAssign (span, lvalue, value) ->
      AAssign (span, abs_lvalue im lvalue, abs_expr im value)
   | CIf (span, c, t, f) ->
-     AIf (span, abs_expr im c, abs_stmt im t, abs_stmt im f)
+     let c = abs_expr im c
+     and t = abs_stmt im t
+     and f = abs_stmt im f
+     in
+     (match f with
+      | ASkip _ ->
+         (* If the else branch is just a skip statement, we rewrite this into a
+            `when` (i.e. an `if` without an `else`). This is because in the pass
+            where we check all functions have a return value we need else-less
+            whens. *)
+         AWhen (span, c, t)
+      | _ ->
+         AIf (span, c, t, f))
   | CCase (span, e, cases) ->
      ACase (span, abs_expr im e, List.map (abs_when im) cases)
   | CWhile (span, c, b) ->
@@ -123,7 +135,10 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
          in
          ADestructure (span, bs', e', b)
       | s ->
-         ABlock (empty_span, abs_stmt im s, let_reshape im rest))
+         (if rest = [] then
+            abs_stmt im s
+          else
+            ABlock (empty_span, abs_stmt im s, let_reshape im rest)))
   | [] ->
      ASkip empty_span
 

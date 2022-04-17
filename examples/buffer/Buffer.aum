@@ -30,9 +30,7 @@ module body Example.Buffer is
     function Allocate_Or_Die(size: Natural_64): Pointer[T] is
         let arr: Pointer[T] := Allocate(size);
         let null: Pointer[T] := Null_Pointer();
-        if arr = null then
-            skip;
-        else
+        if arr /= null then
             return arr;
         end if;
     end;
