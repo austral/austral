@@ -824,6 +824,14 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            TIf (span, c', augment_stmt ctx t, augment_stmt ctx f)
          else
            err "The type of the condition in an if statement must be a boolean.")
+  | AWhen (span, c, t) ->
+     adorn_error_with_span span
+       (fun _ ->
+         let c = augment_expr module_name env rm typarams lexenv None c in
+         if is_boolean (get_type c) then
+           TIf (span, c, augment_stmt ctx t, TSkip span)
+         else
+           err "The type of the condition in an if statement must be a boolean.")
   | ACase (span, expr, whens) ->
      (* Type checking a case statement:
 

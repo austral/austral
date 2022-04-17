@@ -12,6 +12,7 @@ type astmt =
   | ADestructure of span * (identifier * qtypespec) list * aexpr * astmt
   | AAssign of span * lvalue * aexpr
   | AIf of span * aexpr * astmt * astmt
+  | AWhen of span * aexpr * astmt
   | ACase of span * aexpr * abstract_when list
   | AWhile of span * aexpr * astmt
   | AFor of {
