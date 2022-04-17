@@ -123,7 +123,10 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
          in
          ADestructure (span, bs', e', b)
       | s ->
-         ABlock (empty_span, abs_stmt im s, let_reshape im rest))
+         (if rest = [] then
+            abs_stmt im s
+          else
+            ABlock (empty_span, abs_stmt im s, let_reshape im rest)))
   | [] ->
      ASkip empty_span
 
