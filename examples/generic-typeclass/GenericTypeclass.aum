@@ -17,10 +17,7 @@ module body Example.GenericTypeclass is
     function Pointer_To_Integer(): Integer_32 is
         let ptr: Pointer[Integer_32] := Allocate(sizeof(Integer_32));
         let null: Pointer[Integer_32] := Null_Pointer();
-        if ptr = null then
-            -- Do nothing.
-            skip;
-        else
+        if ptr /= null then
             let X: Integer_32 := To_Integer(ptr);
             return X;
         end if;
