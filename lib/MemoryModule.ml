@@ -10,6 +10,9 @@ module Austral.Memory is
     function Null_Pointer(): Pointer[T];
 
     generic [T: Type]
+    function Allocate(size: Natural_64): Pointer[T];
+
+    generic [T: Type]
     function Load(pointer: Pointer[T]): T;
 
     generic [T: Type]
@@ -23,9 +26,6 @@ module Austral.Memory is
 
     generic [T: Type, R: Region]
     function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R];
-
-    generic [T: Type]
-    function Allocate(size: Natural_64): Pointer[T];
 
     generic [T: Type]
     function Resize_Array(array: Pointer[T], size: Natural_64): Pointer[T];
