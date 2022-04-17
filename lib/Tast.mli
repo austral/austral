@@ -6,25 +6,7 @@ open Linked
 open Id
 open Span
 
-type typed_module = TypedModule of module_name * typed_decl list
-
-and typed_decl =
-  | TConstant of decl_id * vis * identifier * ty * texpr * docstring
-  | TTypeAlias of decl_id * type_vis * identifier * type_parameter list * universe * ty * docstring
-  | TRecord of decl_id * type_vis * identifier * type_parameter list * universe * typed_slot list * docstring
-  | TUnion of decl_id * type_vis * identifier * type_parameter list * universe * linked_case list * docstring
-  | TFunction of decl_id * vis * identifier * type_parameter list * value_parameter list * ty * tstmt * docstring
-  | TForeignFunction of decl_id * vis * identifier * value_parameter list * ty * string * docstring
-  | TTypeClass of decl_id * vis * identifier * type_parameter * typed_method_decl list * docstring
-  | TInstance of decl_id * vis * qident * type_parameter list * ty * typed_method_def list * docstring
-
-and typed_method_decl =
-  TypedMethodDecl of decl_id * identifier * value_parameter list * ty
-
-and typed_method_def =
-  TypedMethodDef of ins_meth_id * identifier * value_parameter list * ty * tstmt
-
-and tstmt =
+type tstmt =
   | TSkip of span
   | TLet of span * identifier * ty * texpr * tstmt
   | TDestructure of span * (identifier * ty) list * texpr * tstmt
@@ -46,6 +28,7 @@ and tstmt =
   | TBlock of span * tstmt * tstmt
   | TDiscarding of span * texpr
   | TReturn of span * texpr
+[@@deriving show]
 
 and texpr =
   | TNilConstant
@@ -74,21 +57,44 @@ and texpr =
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
+[@@deriving show]
 
 and typed_when =
   TypedWhen of identifier * value_parameter list * tstmt
+[@@deriving show]
 
 and typed_path_elem =
   | TSlotAccessor of identifier * ty
   | TPointerSlotAccessor of identifier * ty
   | TArrayIndex of texpr * ty
+[@@deriving show]
 
 and typed_lvalue =
   TypedLValue of identifier * typed_path_elem list
+[@@deriving show]
 
-type typed_arglist =
+and typed_arglist =
   | TPositionalArglist of texpr list
   | TNamedArglist of (identifier * texpr) list
+[@@deriving show]
+
+type typed_method_decl =
+  TypedMethodDecl of decl_id * identifier * value_parameter list * ty
+
+type typed_method_def =
+  TypedMethodDef of ins_meth_id * identifier * value_parameter list * ty * tstmt
+
+type typed_decl =
+  | TConstant of decl_id * vis * identifier * ty * texpr * docstring
+  | TTypeAlias of decl_id * type_vis * identifier * type_parameter list * universe * ty * docstring
+  | TRecord of decl_id * type_vis * identifier * type_parameter list * universe * typed_slot list * docstring
+  | TUnion of decl_id * type_vis * identifier * type_parameter list * universe * linked_case list * docstring
+  | TFunction of decl_id * vis * identifier * type_parameter list * value_parameter list * ty * tstmt * docstring
+  | TForeignFunction of decl_id * vis * identifier * value_parameter list * ty * string * docstring
+  | TTypeClass of decl_id * vis * identifier * type_parameter * typed_method_decl list * docstring
+  | TInstance of decl_id * vis * qident * type_parameter list * ty * typed_method_def list * docstring
+
+type typed_module = TypedModule of module_name * typed_decl list
 
 val arglist_size : typed_arglist -> int
 

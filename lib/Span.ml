@@ -4,6 +4,7 @@ type position = Position of {
       line: int;
       column: int;
     }
+[@@deriving show]
 
 let pos_line (Position { line; _}) =
   line
@@ -13,6 +14,7 @@ type span = Span of {
       startp: position;
       endp: position;
     }
+[@@deriving show]
 
 let from_lexbuf (lexbuf: lexbuf): span =
   let start_pos = lexbuf.lex_start_p

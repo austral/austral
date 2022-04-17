@@ -3,6 +3,7 @@ type arithmetic_operator =
   | Subtract
   | Multiply
   | Divide
+[@@deriving show]
 
 type comparison_operator =
   | Equal
@@ -11,6 +12,7 @@ type comparison_operator =
   | LessThanOrEqual
   | GreaterThan
   | GreaterThanOrEqual
+[@@deriving show]
 
 type docstring = Docstring of string
 
@@ -21,6 +23,7 @@ type pragma =
 type borrowing_mode =
   | ReadBorrow
   | WriteBorrow
+[@@deriving show]
 
 (** Whether a module is safe or unsafe. *)
 type module_kind =
