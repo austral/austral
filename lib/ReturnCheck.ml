@@ -72,7 +72,6 @@ let check_ends_in_return (CombinedModule { name=mn; decls; _ }): unit =
            if ends_in_return body then
              ()
            else
-             let _ = print_endline "BODY: " in
              err ("Function "
                   ^ (ident_string name)
                   ^ " in module "
