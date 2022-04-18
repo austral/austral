@@ -47,14 +47,14 @@ module Austral.Pervasive is
     constant Minimum_Integer_64: Integer_64;
     constant Maximum_Integer_64: Integer_64;
 
-    interface Trapping_Arithmetic(T: Type) is
+    typeclass Trapping_Arithmetic(T: Type) is
         method Trapping_Add(lhs: T, rhs: T): T;
         method Trapping_Subtract(lhs: T, rhs: T): T;
         method Trapping_Multiply(lhs: T, rhs: T): T;
         method Trapping_Divide(lhs: T, rhs: T): T;
     end;
 
-    interface Modular_Arithmetic(T: Type) is
+    typeclass Modular_Arithmetic(T: Type) is
         method Modular_Add(lhs: T, rhs: T): T;
         method Modular_Subtract(lhs: T, rhs: T): T;
         method Modular_Multiply(lhs: T, rhs: T): T;
