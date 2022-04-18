@@ -674,35 +674,18 @@ and make_substs (bindings: type_bindings) (typarams: type_parameter list): (iden
   List.filter_map f typarams
 
 and handle_return_type_polymorphism (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
-  let _ = print_endline "---BEGIN---" in
-  print_endline ("Function " ^ (ident_string name));
-  (*print_endline "---BEGIN---";
-  print_endline (ident_string name);
-  print_endline (String.concat ", " (List.map show_type_parameter typarams));
-  print_endline (show_ty rt);
-  print_endline (show_bindings bindings);*)
-  let retval =
-    if is_return_type_polymorphic params rt then
-      let _ = print_endline ("BOOL: is polymorphic on the return type") in
-      match asserted_ty with
-      | (Some asserted_ty') ->
-         let bindings' = match_type rt asserted_ty' in
-         let bindings'' = merge_bindings bindings bindings' in
-         (bindings'', replace_variables bindings'' rt)
-      | None ->
-         err ("Callable '"
-              ^ (ident_string name)
-              ^ "' is polymorphic in the return type but has no asserted type.")
-    else
-      let _ = print_endline ("BOOL: is not polymorphic") in
-      print_endline "Bindings:";
-      print_endline (show_bindings bindings);
-      print_endline ("RT Before:\n" ^ (show_ty rt));
-      print_endline ("RT After:\n" ^ (show_ty (replace_variables bindings rt)));
-      (empty_bindings, replace_variables bindings rt)
-  in
-  print_endline "---END---";
-  retval
+  if is_return_type_polymorphic params rt then
+    match asserted_ty with
+    | (Some asserted_ty') ->
+       let bindings' = match_type rt asserted_ty' in
+       let bindings'' = merge_bindings bindings bindings' in
+       (bindings'', replace_variables bindings'' rt)
+    | None ->
+       err ("Callable '"
+            ^ (ident_string name)
+            ^ "' is polymorphic in the return type but has no asserted type.")
+  else
+    (empty_bindings, replace_variables bindings rt)
 
 (* Given a function's parameter list and return type, check if the return type
    of a function is polymorphic. *)
