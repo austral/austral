@@ -117,7 +117,7 @@ module body Austral.Pervasive is
     --- Trapping Arithmetic
     ---
 
-    implementation Trapping_Arithmetic(Natural_8) is
+    instance Trapping_Arithmetic(Natural_8) is
         method Trapping_Add(lhs: Natural_8, rhs: Natural_8): Natural_8 is
             let result: Natural_8 := 0;
             let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
@@ -153,7 +153,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Trapping_Arithmetic(Integer_8) is
+    instance Trapping_Arithmetic(Integer_8) is
         method Trapping_Add(lhs: Integer_8, rhs: Integer_8): Integer_8 is
             let result: Integer_8 := 0;
             let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
@@ -192,7 +192,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Trapping_Arithmetic(Natural_16) is
+    instance Trapping_Arithmetic(Natural_16) is
         method Trapping_Add(lhs: Natural_16, rhs: Natural_16): Natural_16 is
             let result: Natural_16 := 0;
             let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
@@ -228,7 +228,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Trapping_Arithmetic(Integer_16) is
+    instance Trapping_Arithmetic(Integer_16) is
         method Trapping_Add(lhs: Integer_16, rhs: Integer_16): Integer_16 is
             let result: Integer_16 := 0;
             let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
@@ -267,7 +267,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Trapping_Arithmetic(Natural_32) is
+    instance Trapping_Arithmetic(Natural_32) is
         method Trapping_Add(lhs: Natural_32, rhs: Natural_32): Natural_32 is
             let result: Natural_32 := 0;
             let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
@@ -303,7 +303,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Trapping_Arithmetic(Integer_32) is
+    instance Trapping_Arithmetic(Integer_32) is
         method Trapping_Add(lhs: Integer_32, rhs: Integer_32): Integer_32 is
             let result: Integer_32 := 0;
             let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
@@ -342,7 +342,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Trapping_Arithmetic(Natural_64) is
+    instance Trapping_Arithmetic(Natural_64) is
         method Trapping_Add(lhs: Natural_64, rhs: Natural_64): Natural_64 is
             let result: Natural_64 := 0;
             let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
@@ -378,7 +378,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Trapping_Arithmetic(Integer_64) is
+    instance Trapping_Arithmetic(Integer_64) is
         method Trapping_Add(lhs: Integer_64, rhs: Integer_64): Integer_64 is
             let result: Integer_64 := 0;
             let did_overflow: Boolean := @embed(Boolean, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
@@ -417,7 +417,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Trapping_Arithmetic(Double_Float) is
+    instance Trapping_Arithmetic(Double_Float) is
         method Trapping_Add(lhs: Double_Float, rhs: Double_Float): Double_Float is
             return @embed(Double_Float, "$1 + $2", lhs, rhs);
         end;
@@ -443,7 +443,7 @@ module body Austral.Pervasive is
     --- Modular Arithmetic
     ---
 
-    implementation Modular_Arithmetic(Natural_8) is
+    instance Modular_Arithmetic(Natural_8) is
         method Modular_Add(lhs: Natural_8, rhs: Natural_8): Natural_8 is
             return @embed(Natural_8, "$1 + $2", lhs, rhs);
         end;
@@ -464,7 +464,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Modular_Arithmetic(Integer_8) is
+    instance Modular_Arithmetic(Integer_8) is
         method Modular_Add(lhs: Integer_8, rhs: Integer_8): Integer_8 is
             return @embed(Integer_8, "$1 + $2", lhs, rhs);
         end;
@@ -485,7 +485,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Modular_Arithmetic(Natural_16) is
+    instance Modular_Arithmetic(Natural_16) is
         method Modular_Add(lhs: Natural_16, rhs: Natural_16): Natural_16 is
             return @embed(Natural_16, "$1 + $2", lhs, rhs);
         end;
@@ -506,7 +506,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Modular_Arithmetic(Integer_16) is
+    instance Modular_Arithmetic(Integer_16) is
         method Modular_Add(lhs: Integer_16, rhs: Integer_16): Integer_16 is
             return @embed(Integer_16, "$1 + $2", lhs, rhs);
         end;
@@ -527,7 +527,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Modular_Arithmetic(Natural_32) is
+    instance Modular_Arithmetic(Natural_32) is
         method Modular_Add(lhs: Natural_32, rhs: Natural_32): Natural_32 is
             return @embed(Natural_32, "$1 + $2", lhs, rhs);
         end;
@@ -548,7 +548,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Modular_Arithmetic(Integer_32) is
+    instance Modular_Arithmetic(Integer_32) is
         method Modular_Add(lhs: Integer_32, rhs: Integer_32): Integer_32 is
             return @embed(Integer_32, "$1 + $2", lhs, rhs);
         end;
@@ -569,7 +569,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Modular_Arithmetic(Natural_64) is
+    instance Modular_Arithmetic(Natural_64) is
         method Modular_Add(lhs: Natural_64, rhs: Natural_64): Natural_64 is
             return @embed(Natural_64, "$1 + $2", lhs, rhs);
         end;
@@ -590,7 +590,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    implementation Modular_Arithmetic(Integer_64) is
+    instance Modular_Arithmetic(Integer_64) is
         method Modular_Add(lhs: Integer_64, rhs: Integer_64): Integer_64 is
             return @embed(Integer_64, "$1 + $2", lhs, rhs);
         end;

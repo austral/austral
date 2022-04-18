@@ -91,7 +91,7 @@ rule token = parse
   | "of" { OF }
   | "when" { WHEN }
   | "typeclass" { TYPECLASS }
-  | "implementation" { INSTANCE }
+  | "instance" { INSTANCE }
   | "method" { METHOD }
   | "if" { IF }
   | "then" { THEN }

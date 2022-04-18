@@ -8,7 +8,7 @@ module body Example.GenericTypeclass is
     end;
 
     generic [T: Free]
-    implementation Numerical(Pointer[T]) is
+    instance Numerical(Pointer[T]) is
         method To_Integer(x: Pointer[T]): Integer_32 is
             return 0;
         end;
