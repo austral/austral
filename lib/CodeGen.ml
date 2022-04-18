@@ -281,7 +281,10 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   | MWhile (c, b) ->
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
-     CFor (gen_sident mn v, ge i, ge f, gs b)
+     CExplicitBlock [
+         CLet (gen_sident mn v, CNamedType "size_t", ge i);
+         CFor (gen_sident mn v, ge f, gs b)
+       ]
   | MBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
        (match orig_type with

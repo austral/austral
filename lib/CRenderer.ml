@@ -99,15 +99,11 @@ and render_stmt (i: indentation) (stmt: c_stmt): line list =
          render_stmt (indent i) b;
          [Line (i, "}")]
        ]
-  | CFor (v, initial, f, b) ->
-     let s = "size_t "
-             ^ v
-             ^ " = "
-             ^ (e initial)
-             ^ "; "
+  | CFor (v, final, b) ->
+     let s = "; "
              ^ v
              ^ " < "
-             ^ (e f)
+             ^ (e final)
              ^ "; "
              ^ v
              ^ "++"

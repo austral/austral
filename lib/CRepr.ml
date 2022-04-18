@@ -47,7 +47,7 @@ type c_stmt =
   | CIf of c_expr * c_stmt * c_stmt
   | CSwitch of c_expr * c_switch_case list
   | CWhile of c_expr * c_stmt
-  | CFor of string * c_expr * c_expr * c_stmt
+  | CFor of string * c_expr * c_stmt
   | CReturn of c_expr
   | CBlock of c_stmt list
   | CExplicitBlock of c_stmt list
