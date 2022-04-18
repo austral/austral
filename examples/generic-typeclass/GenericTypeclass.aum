@@ -3,12 +3,12 @@ import Austral.Memory (Pointer, Allocate, Null_Pointer);
 module body Example.GenericTypeclass is
     pragma Unsafe_Module;
 
-    interface Numerical(T: Free) is
+    typeclass Numerical(T: Free) is
         method To_Integer(x: T): Integer_32;
     end;
 
     generic [T: Free]
-    implementation Numerical(Pointer[T]) is
+    instance Numerical(Pointer[T]) is
         method To_Integer(x: Pointer[T]): Integer_32 is
             return 0;
         end;
