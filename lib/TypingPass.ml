@@ -256,8 +256,8 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
        (match ty with
         | Integer (signedness, width) ->
            let s = (match signedness with
-                    | Unsigned -> "u"
-                    | Signed -> "")
+                    | Unsigned -> "nat"
+                    | Signed -> "int")
            and w = (match width with
                     | Width8 -> "8"
                     | Width16 -> "16"
@@ -266,9 +266,9 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
            in
            s ^ "int" ^ w
         | SingleFloat ->
-           "f"
+           "float"
         | DoubleFloat ->
-           "d"
+           "double"
         | _ ->
            err "Invalid type for numeric conversion.")
      in
