@@ -60,6 +60,25 @@ module Austral.Pervasive is
         method Modular_Multiply(lhs: T, rhs: T): T;
         method Modular_Divide(lhs: T, rhs: T): T;
     end;
+
+    instance Trapping_Arithmetic(Natural_8);
+    instance Trapping_Arithmetic(Integer_8);
+    instance Trapping_Arithmetic(Natural_16);
+    instance Trapping_Arithmetic(Integer_16);
+    instance Trapping_Arithmetic(Natural_32);
+    instance Trapping_Arithmetic(Integer_32);
+    instance Trapping_Arithmetic(Natural_64);
+    instance Trapping_Arithmetic(Integer_64);
+    instance Trapping_Arithmetic(Double_Float);
+
+    instance Modular_Arithmetic(Natural_8);
+    instance Modular_Arithmetic(Integer_8);
+    instance Modular_Arithmetic(Natural_16);
+    instance Modular_Arithmetic(Integer_16);
+    instance Modular_Arithmetic(Natural_32);
+    instance Modular_Arithmetic(Integer_32);
+    instance Modular_Arithmetic(Natural_64);
+    instance Modular_Arithmetic(Integer_64);
 end module.
 
 |code}
