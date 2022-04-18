@@ -26,7 +26,7 @@ type type_parameter = TypeParameter of identifier * universe * qident
 [@@deriving show]
 
 type type_var = TypeVariable of identifier * universe * qident
-[@@deriving eq, show]
+[@@deriving (eq, show)]
 
 type ty =
   | Unit
