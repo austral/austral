@@ -53,8 +53,7 @@ module body Example.Box is
     function Read_Free(boxref: Reference[Box[T], R]): T is
         let ptrref: Reference[Pointer[T], R] := boxref->pointer;
         let ptr: Pointer[T] := !ptrref;
-        let value: T := Load(ptr);
-        return value;
+        return Load(ptr);
     end;
 
     generic [T: Free, R: Region]
