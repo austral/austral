@@ -42,6 +42,7 @@ type ty =
   | WriteRef of ty * ty
   | TyVar of type_var
   | Address of ty
+  | Pointer of ty
   | MonoTy of mono_id
 [@@deriving show]
 
@@ -84,7 +85,9 @@ let rec type_string = function
   | TyVar (TypeVariable (n, u, from)) ->
      (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ " : " ^ (universe_string u)
   | Address ty ->
-    address_name ^ "[" ^ (type_string ty) ^ "]"
+     address_name ^ "[" ^ (type_string ty) ^ "]"
+  | Pointer ty ->
+     pointer_name ^ "[" ^ (type_string ty) ^ "]"
   | MonoTy _ ->
     err "Not applicable"
 
@@ -181,6 +184,12 @@ let rec equal_ty a b =
   | Address ty ->
      (match b with
       | Address ty' ->
+         equal_ty ty ty'
+      | _ ->
+        false)
+  | Pointer ty ->
+     (match b with
+      | Pointer ty' ->
          equal_ty ty ty'
       | _ ->
         false)

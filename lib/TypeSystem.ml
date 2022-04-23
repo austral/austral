@@ -16,6 +16,7 @@ let type_universe = function
   | WriteRef _ -> FreeUniverse
   | TyVar (TypeVariable (_, u, _)) -> u
   | Address _ -> FreeUniverse
+  | Pointer _ -> FreeUniverse
   | MonoTy _ -> err "Not applicable"
 
 let is_numeric = function
@@ -31,6 +32,7 @@ let is_numeric = function
   | WriteRef _ -> false
   | TyVar _ -> false
   | Address _ -> false
+  | Pointer -> false
   | MonoTy _ -> err "Not applicable"
 
 let is_comparable = function
@@ -46,6 +48,7 @@ let is_comparable = function
   | WriteRef _ -> false
   | TyVar _ -> false
   | Address _ -> true
+  | Pointer _ -> true
   | MonoTy _ -> err "Not applicable"
 
 let rec type_variables = function
@@ -73,6 +76,8 @@ let rec type_variables = function
      TypeVarSet.singleton v
   | Address ty ->
      type_variables ty
+  | Pointer ty ->
+     type_variables ty
   | MonoTy _ ->
     TypeVarSet.empty
 
@@ -98,6 +103,8 @@ let rec is_concrete = function
      (* Individual type variables need not be instantiated. *)
      true
   | Address _ ->
-    true
+     true
+  | Pointer _ ->
+     true
   | MonoTy _ ->
     true
