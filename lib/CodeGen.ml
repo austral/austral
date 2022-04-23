@@ -269,12 +269,12 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   | MSkip ->
      CBlock []
   | MLet (n, t, v, b) ->
-     let l = CLet (gen_sident mn n, gen_type t, ge v) in
+     let l = CLet (gen_ident n, gen_type t, ge v) in
      CBlock [l; gs b]
   | MDestructure (bs, e, b) ->
      let tmp = new_variable () in
      let vardecl = CLet (tmp, gen_type (get_type e), ge e)
-     and bs' = List.map (fun (n, t) -> CLet (gen_sident mn n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
+     and bs' = List.map (fun (n, t) -> CLet (gen_ident n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
      and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
@@ -288,8 +288,8 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
      CExplicitBlock [
-         CLet (gen_sident mn v, CNamedType "size_t", ge i);
-         CFor (gen_sident mn v, ge f, gs b)
+         CLet (gen_ident v, CNamedType "size_t", ge i);
+         CFor (gen_ident v, ge f, gs b)
        ]
   | MBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
@@ -300,10 +300,10 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
            false)
      in
      if is_pointer then
-       let l = CLet (gen_sident mn rename, gen_type orig_type, CVar (gen_sident mn original)) in
+       let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
        CBlock [l; gs body]
      else
-       let l = CLet (gen_sident mn rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_sident mn original))) in
+       let l = CLet (gen_ident rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
        CBlock [l; gs body]
   | MBlock (a, b) ->
      CBlock [gs a; gs b]
@@ -313,7 +313,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CReturn (ge e)
 
 and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
-  gen_path mn (CVar (gen_sident mn name)) elems
+  gen_path mn (CVar (gen_ident name)) elems
 
 and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
@@ -336,14 +336,15 @@ and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, b
   let get_binding binding_name =
     CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
   in
-  let bindings' = List.map (fun (MValueParameter (n, t)) -> CLet (gen_sident mn n, gen_type t, get_binding n)) bindings in
+  let bindings' = List.map (fun (MValueParameter (n, t)) -> CLet (gen_ident n, gen_type t, get_binding n)) bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 
 (* Declarations *)
 
 let gen_params mn params =
-  List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_sident mn n, gen_type t)) params
+  let _ = mn in
+  List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_ident n, gen_type t)) params
 
 let gen_slots (slots: mono_slot list) =
   List.map (fun (MonoSlot (n, t)) -> CSlot (gen_ident n, gen_type t)) slots
@@ -468,15 +469,15 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
        | _ ->
           param_type_to_c_type t
      in
-     let ff_params = List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_sident mn n, param_type_to_c_type t)) params
+     let ff_params = List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_ident n, param_type_to_c_type t)) params
      and ff_rt = return_type_to_c_type rt in
      let ff_decl = CFunctionDeclaration (underlying, ff_params, ff_rt, LinkageExternal) in
      let make_param (n: identifier) (t: mono_ty) =
        if (gen_type t) = (CNamedType "au_array_t") then
          (* Extract the pointer from the Array struct *)
-         CStructAccessor (CVar (gen_sident mn n), "data")
+         CStructAccessor (CVar (gen_ident n), "data")
        else
-         CVar (gen_sident mn n)
+         CVar (gen_ident n)
      in
      let args = List.map (fun (MValueParameter (n, t)) -> make_param n t) params in
      let funcall = CFuncall (underlying, args) in
