@@ -65,6 +65,7 @@ type c_decl =
   | CEnumDefinition of string * string list
   | CFunctionDeclaration of string * c_param list * c_ty * c_function_linkage
   | CFunctionDefinition of string * c_param list * c_ty * c_stmt
+  | CDeclComment of string
 
 and c_param = CValueParam of string * c_ty
 

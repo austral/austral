@@ -373,7 +373,9 @@ let get_original_module_name (env: env) (id: mono_id): module_name =
 let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   match decl with
   | MConstant (_, n, ty, e) ->
-     [CConstantDefinition (gen_sident mn n, gen_type ty, gen_exp mn e)]
+     [
+       CConstantDefinition (gen_sident mn n, gen_type ty, gen_exp mn e)
+     ]
   | MTypeAlias (_, n, ty) ->
      [
        CStructDefinition (
@@ -431,12 +433,16 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      [enum_def; union_def]
   | MFunction (id, _, params, rt, body) ->
-     [CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
+     [
+       CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
+     ]
   | MFunctionMonomorph (id, params, rt, body) ->
      (* Load-bearing hack: prefix parameters not with the current module name,
         but with the name of the module the monomorph's declaration is from. *)
      let mn': module_name = get_original_module_name env id in
-     [CFunctionDefinition (gen_mono_id id, gen_params mn' params, gen_type rt, gen_stmt mn body)]
+     [
+       CFunctionDefinition (gen_mono_id id, gen_params mn' params, gen_type rt, gen_stmt mn body)
+     ]
   | MForeignFunction (id, _, params, rt, underlying) ->
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
@@ -487,7 +493,9 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   | MConcreteInstance (_, _, _, methods) ->
      List.map (gen_method mn) methods
   | MMethodMonomorph (id, params, rt, body) ->
-     [CFunctionDefinition (gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
+     [
+       CFunctionDefinition (gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
+     ]
 
 (* Extract types into forward type declarations *)
 
