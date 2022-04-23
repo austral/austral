@@ -107,4 +107,4 @@ let rec is_concrete = function
   | Pointer _ ->
      true
   | MonoTy _ ->
-    true
+     true
