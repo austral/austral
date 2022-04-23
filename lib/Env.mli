@@ -430,7 +430,7 @@ val get_callable : env -> module_name -> sident -> callable option
 
 (** Get the type of a variable, trying first the lexenv and then the env for
     constants. *)
-val get_variable : env -> lexenv -> qident -> ty option
+val get_variable : env -> lexenv -> qident -> (ty * var_source) option
 
 (** Return all typeclass instances visible from a module. These are not only the
     instances that are defined in the module itself, but the instances imported
