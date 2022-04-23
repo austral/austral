@@ -124,7 +124,7 @@ let rec gen_type (ty: mono_ty): c_ty =
      CPointer (gen_type t)
   | MonoWriteRef (t, _) ->
      CPointer (gen_type t)
-  | MonoRawPointer t ->
+  | MonoAddress t ->
      CPointer (gen_type t)
   | MonoRegionTyVar _ ->
      err "internal"
@@ -288,7 +288,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   | MBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
        (match orig_type with
-        | MonoRawPointer _ ->
+        | MonoAddress _ ->
            true
         | _ ->
            false)
@@ -448,7 +448,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
              c_string_type
            else
              err "Not allowed"
-        | MonoRawPointer _ ->
+        | MonoAddress _ ->
            gen_type t
         | MonoNamedType _ ->
            err "Not implemented"

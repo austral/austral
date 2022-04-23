@@ -1,5 +1,5 @@
 import Austral.Memory (
-    Pointer,
+    Address,
     Null_Pointer,
     Allocate,
     Deallocate,
@@ -25,14 +25,14 @@ module body Example.Array is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let arr: Pointer[Boolean] := Allocate(3);
-        let null: Pointer[Boolean] := Null_Pointer();
+        let arr: Address[Boolean] := Allocate(3);
+        let null: Address[Boolean] := Null_Pointer();
         if arr = null then
             skip;
         else
-            let firstp: Pointer[Boolean] := arr;
-            let secondp: Pointer[Boolean] := Positive_Offset(arr, 1);
-            let thirdp: Pointer[Boolean] := Positive_Offset(arr, 2);
+            let firstp: Address[Boolean] := arr;
+            let secondp: Address[Boolean] := Positive_Offset(arr, 1);
+            let thirdp: Address[Boolean] := Positive_Offset(arr, 2);
             Store(firstp, true);
             Store(secondp, false);
             Store(thirdp, true);

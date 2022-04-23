@@ -1,8 +1,4 @@
-import Austral.Memory (Pointer);
-
 module body Example.ConcreteTypeclass is
-    pragma Unsafe_Module;
-
     typeclass Numerical(T: Free) is
         method To_Integer(x: T): Integer_32;
     end;

@@ -1,5 +1,5 @@
 import Austral.Memory (
-    Pointer,
+    Address,
     Allocate,
     Load,
     Store,
@@ -11,8 +11,8 @@ module body Example.Memory is
     pragma Unsafe_Module;
 
     function Main(root: Root_Capability): Root_Capability is
-        let ptr: Pointer[Integer_32] := Allocate(sizeof(Integer_32));
-        let null: Pointer[Integer_32] := Null_Pointer();
+        let ptr: Address[Integer_32] := Allocate(sizeof(Integer_32));
+        let null: Address[Integer_32] := Null_Pointer();
         if ptr /= null then
             Deallocate(ptr);
         end if;

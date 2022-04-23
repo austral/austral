@@ -40,11 +40,3 @@ let pervasive_imports =
 (* Austral.Memory *)
 
 let memory_module_name = make_mod_name "Austral.Memory"
-
-let pointer_type_name = make_ident "Pointer"
-
-let is_pointer_type (name: qident): bool =
-  let s = source_module_name name
-  and o = original_name name
-  in
-  (equal_module_name s memory_module_name) && (equal_identifier o pointer_type_name)

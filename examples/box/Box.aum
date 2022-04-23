@@ -1,5 +1,5 @@
 import Austral.Memory (
-    Pointer,
+    Address,
     Null_Pointer,
     Allocate,
     Load,
@@ -13,13 +13,13 @@ module body Example.Box is
     pragma Unsafe_Module;
 
     record Box[T: Type]: Linear is
-        pointer: Pointer[T];
+        pointer: Address[T];
     end;
 
     generic [T: Type]
     function Make(val: T): Either[Box[T], T] is
-        let ptr: Pointer[T] := Allocate(sizeof(T));
-        let null: Pointer[T] := Null_Pointer();
+        let ptr: Address[T] := Allocate(sizeof(T));
+        let null: Address[T] := Null_Pointer();
         if ptr = null then
             -- Allocation failed, return the object we tried to box.
             let right: Either[Box[T], T] := Right(right => val);
@@ -34,7 +34,7 @@ module body Example.Box is
 
     generic [T: Type]
     function Unbox(box: Box[T]): T is
-        let { pointer: Pointer[T] } := box;
+        let { pointer: Address[T] } := box;
         let value: T := Load(pointer);
         Deallocate(pointer);
         return value;
@@ -42,7 +42,7 @@ module body Example.Box is
 
     generic [X: Free]
     function Swap_Free(box: Box[X], new: X): Box[X] is
-        let { pointer: Pointer[X] } := box;
+        let { pointer: Address[X] } := box;
         let old: X := Load(pointer);
         Store(pointer, new);
         let newbox: Box[X] := Box(pointer => pointer);
@@ -51,29 +51,29 @@ module body Example.Box is
 
     generic [T: Free, R: Region]
     function Read_Free(boxref: Reference[Box[T], R]): T is
-        let ptrref: Reference[Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := !ptrref;
+        let ptrref: Reference[Address[T], R] := boxref->pointer;
+        let ptr: Address[T] := !ptrref;
         return Load(ptr);
     end;
 
     generic [T: Free, R: Region]
     function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit is
-        let ptrref: WriteReference[Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := !(ptrref);
+        let ptrref: WriteReference[Address[T], R] := boxref->pointer;
+        let ptr: Address[T] := !(ptrref);
         Store(ptr, value);
         return nil;
     end;
 
     generic [T: Type, R: Region]
     function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R] is
-        let ptrref: Reference[Pointer[T], R] := boxref->pointer;
+        let ptrref: Reference[Address[T], R] := boxref->pointer;
         let ref: Reference[T, R] := Load_Read_Reference(ptrref);
         return ref;
     end;
 
     generic [T: Free, R: Region]
     function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
-        let ptr: Pointer[T] := !(boxref->pointer);
+        let ptr: Address[T] := !(boxref->pointer);
         let old_value: T := Load(ptr);
         Store(ptr, value);
         return old_value;

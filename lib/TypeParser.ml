@@ -1,10 +1,10 @@
 open Identifier
+open Names
 open Type
 open TypeSystem
 open Region
 open Ast
 open Env
-open BuiltIn
 open Error
 
 let decl_type_signature (decl: decl): type_signature option =
@@ -28,13 +28,22 @@ let decl_type_signature (decl: decl): type_signature option =
   | Instance _ ->
      None
 
+let memory_module_name = make_mod_name "Austral.Memory"
+
+let is_address_type (name: qident): bool =
+  let s = source_module_name name
+  and o = original_name name
+  in
+  (equal_module_name s memory_module_name)
+  && (equal_identifier o (make_ident address_name))
+
 let parse_built_in_type (name: qident) (args: ty list): ty option =
-  if is_pointer_type name then
+  if is_address_type name then
     match args with
     | [ty] ->
-       Some (RawPointer ty)
+       Some (Address ty)
     | _ ->
-       err "Invalid Pointer type specifier."
+       err "Invalid Address type specifier."
   else
     let name_str: string = ident_string (original_name name) in
     match name_str with

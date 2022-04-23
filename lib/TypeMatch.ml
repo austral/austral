@@ -109,9 +109,9 @@ let rec match_type a b =
          type_mismatch "Expected a write reference, but got another type." a b)
   | TyVar tyvar ->
      match_type_var tyvar b
-  | RawPointer t ->
+  | Address t ->
      (match b with
-      | RawPointer t' ->
+      | Address t' ->
          match_type t t'
       | TyVar tyvar ->
          match_type_var tyvar a

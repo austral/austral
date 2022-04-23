@@ -29,17 +29,17 @@ let test_successful_matches _ =
   let param = fnt "Option" [Unit]
   and arg = fnt "Option" [t] in
   meq param arg [("T", Unit)];
-  let param = RawPointer t
-  and arg = RawPointer Unit in
+  let param = Address t
+  and arg = Address Unit in
   meq param arg [("T", Unit)];
-  let param = RawPointer (RawPointer t)
-  and arg = RawPointer (RawPointer Unit) in
+  let param = Address (Address t)
+  and arg = Address (Address Unit) in
   meq param arg [("T", Unit)];
-  let param = fnt "A" [RawPointer t]
-  and arg = fnt "A" [RawPointer Unit] in
+  let param = fnt "A" [Address t]
+  and arg = fnt "A" [Address Unit] in
   meq param arg [("T", Unit)];
-  let param = fnt "A" [fnt "B" [RawPointer t]]
-  and arg = fnt "A" [fnt "B" [RawPointer Unit]] in
+  let param = fnt "A" [fnt "B" [Address t]]
+  and arg = fnt "A" [fnt "B" [Address Unit]] in
   meq param arg [("T", Unit)]
 
 let suite =

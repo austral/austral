@@ -1,5 +1,5 @@
 import Austral.Memory (
-    Pointer,
+    Address,
     Allocate,
     Resize_Array,
     Deallocate,
@@ -27,9 +27,9 @@ module body Example.Buffer is
 
     -- Allocate an array, and abort if allocation fails.
     generic [T: Type]
-    function Allocate_Or_Die(size: Natural_64): Pointer[T] is
-        let arr: Pointer[T] := Allocate(size);
-        let null: Pointer[T] := Null_Pointer();
+    function Allocate_Or_Die(size: Natural_64): Address[T] is
+        let arr: Address[T] := Allocate(size);
+        let null: Address[T] := Null_Pointer();
         if arr /= null then
             return arr;
         end if;
@@ -47,7 +47,7 @@ module body Example.Buffer is
         -- The number of elements actually stored in the array.
         size: Natural_64;
         -- The underlying heap array.
-        array: Pointer[T];
+        array: Address[T];
 
         -- Invariants:
         --
@@ -72,9 +72,9 @@ module body Example.Buffer is
 
     generic [T: Free]
     function Initialize(size: Natural_64, elem: T): Buffer[T] is
-        let array: Pointer[T] := Allocate_Or_Die(size);
+        let array: Address[T] := Allocate_Or_Die(size);
         for i from 0 to size - 1 do
-            let nth: Pointer[T] := Positive_Offset(array, i);
+            let nth: Address[T] := Positive_Offset(array, i);
             Store(nth, elem);
         end for;
         let buf: Buffer[T] := Buffer(
@@ -87,7 +87,7 @@ module body Example.Buffer is
 
     generic [T: Type]
     function Destroy_Buffer(buffer: Buffer[T]): Unit is
-        let { capacity: Natural_64, size: Natural_64, array: Pointer[T] } := buffer;
+        let { capacity: Natural_64, size: Natural_64, array: Address[T] } := buffer;
         Deallocate(array);
         return nil;
     end;
@@ -103,8 +103,8 @@ module body Example.Buffer is
 
     generic [T: Free, R: Region]
     function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T is
-        let arr: Pointer[T] := !(buffer->array);
-        let nth_ptr: Pointer[T] := Positive_Offset(arr, index);
+        let arr: Address[T] := !(buffer->array);
+        let nth_ptr: Address[T] := Positive_Offset(arr, index);
         let val: T := Load(nth_ptr);
         return val;
     end;

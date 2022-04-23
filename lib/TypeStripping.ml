@@ -15,7 +15,7 @@ type stripped_ty =
   | SRegionTy of region
   | SReadRef of stripped_ty * stripped_ty
   | SWriteRef of stripped_ty * stripped_ty
-  | SRawPointer of stripped_ty
+  | SAddress of stripped_ty
   | SMonoTy of mono_id
   | SRegionTyVar of identifier * qident
 
@@ -78,10 +78,10 @@ and strip_type' (ty: ty): stripped_ty option =
           search-and-replace step should *also* have signalled an error if a
           type variable has no replacement. *)
        err ("strip_type': Variable not replaced: '" ^ (ident_string name) ^ "'")
-  | RawPointer ty ->
+  | Address ty ->
     (match (strip_type' ty) with
      | Some ty ->
-       Some (SRawPointer ty)
+       Some (SAddress ty)
      | None ->
        err "Internal: raw pointer type instantiated with a region type.")
   | MonoTy id ->

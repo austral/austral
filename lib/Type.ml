@@ -1,6 +1,7 @@
 open Id
 open Identifier
 open Region
+open Names
 open Error
 
 type universe =
@@ -40,7 +41,7 @@ type ty =
   | ReadRef of ty * ty
   | WriteRef of ty * ty
   | TyVar of type_var
-  | RawPointer of ty
+  | Address of ty
   | MonoTy of mono_id
 [@@deriving show]
 
@@ -61,15 +62,15 @@ let universe_string = function
 
 let rec type_string = function
   | Unit ->
-     "Unit"
+     unit_name
   | Boolean ->
-     "Boolean"
+     bool_name
   | Integer (s, w) ->
-     (signedness_string s) ^ "_" ^ (width_string w)
+     (signedness_string s) ^ (width_string w)
   | SingleFloat ->
-     "SingleFloat"
+     single_float_name
   | DoubleFloat ->
-     "DoubleFloat"
+     double_float_name
   | NamedType (n, args, u) ->
      (ident_string (local_name n)) ^ args_string args ^ " : " ^ (universe_string u)
   | Array (t, r) ->
@@ -77,19 +78,19 @@ let rec type_string = function
   | RegionTy r ->
      ident_string (region_name r) ^ "(" ^ (string_of_int (region_id r)) ^ ")"
   | ReadRef (t, r) ->
-     "Reference[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Free"
+     read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Free"
   | WriteRef (t, r) ->
-     "WriteReference[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Linear"
+     write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Linear"
   | TyVar (TypeVariable (n, u, from)) ->
      (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ " : " ^ (universe_string u)
-  | RawPointer ty ->
-    "Pointer[" ^ (type_string ty) ^ "]"
+  | Address ty ->
+    address_name ^ "[" ^ (type_string ty) ^ "]"
   | MonoTy _ ->
     err "Not applicable"
 
 and signedness_string = function
-  | Unsigned -> "Natural"
-  | Signed -> "Integer"
+  | Unsigned -> nat_prefix
+  | Signed -> int_prefix
 
 and width_int = function
   | Width8 -> 8
@@ -177,9 +178,9 @@ let rec equal_ty a b =
          equal_type_var v v'
       | _ ->
          false)
-  | RawPointer ty ->
+  | Address ty ->
      (match b with
-      | RawPointer ty' ->
+      | Address ty' ->
          equal_ty ty ty'
       | _ ->
         false)
