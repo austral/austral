@@ -15,10 +15,7 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
   | TStringConstant s ->
      TStringConstant s
   | TVariable (name, ty) ->
-     (*print_endline ("Bindings: " ^ (show_bindings bindings));*)
-     (*print_endline ("Type before: " ^ (show_ty ty));*)
      let ty = replace_variables bindings ty in
-     (*print_endline ("Type after: " ^ (show_ty ty));*)
      TVariable (name, ty)
   | TArithmetic (oper, lhs, rhs) ->
      let lhs = replace_tyvars_expr bindings lhs
