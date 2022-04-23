@@ -99,8 +99,6 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   | TStringConstant s ->
      (MStringConstant s, env)
   | TVariable (name, ty) ->
-     (*print_endline (qident_debug_name name);*)
-     (*print_endline ("Type: " ^ (show_ty ty));*)
      let (ty, env) = strip_and_mono env ty in
      (MVariable (name, ty), env)
   | TArithmetic (oper, lhs, rhs) ->
