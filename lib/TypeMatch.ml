@@ -116,7 +116,7 @@ let rec match_type a b =
       | TyVar tyvar ->
          match_type_var tyvar a
       | _ ->
-        type_mismatch "Expected a Pointer, but got another type." a b)
+        type_mismatch "Expected an Address, but got another type." a b)
   | MonoTy _ ->
     err "Not applicable"
 
