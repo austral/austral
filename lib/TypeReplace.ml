@@ -14,9 +14,15 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      TFloatConstant f
   | TStringConstant s ->
      TStringConstant s
-  | TVariable (name, ty) ->
+  | TConstVar (name, ty) ->
      let ty = replace_variables bindings ty in
-     TVariable (name, ty)
+     TConstVar (name, ty)
+  | TParamVar (name, ty) ->
+     let ty = replace_variables bindings ty in
+     TParamVar (name, ty)
+  | TLocalVar (name, ty) ->
+     let ty = replace_variables bindings ty in
+     TLocalVar (name, ty)
   | TArithmetic (oper, lhs, rhs) ->
      let lhs = replace_tyvars_expr bindings lhs
      and rhs = replace_tyvars_expr bindings rhs in

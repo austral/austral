@@ -36,7 +36,9 @@ and texpr =
   | TIntConstant of string
   | TFloatConstant of string
   | TStringConstant of escaped_string
-  | TVariable of qident * ty
+  | TConstVar of qident * ty
+  | TParamVar of identifier * ty
+  | TLocalVar of identifier * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of decl_id * qident * texpr list * ty * (identifier * ty) list
   | TMethodCall of ins_meth_id * qident * type_parameter list * texpr list * ty * (identifier * ty) list

@@ -98,9 +98,15 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      (MFloatConstant f, env)
   | TStringConstant s ->
      (MStringConstant s, env)
-  | TVariable (name, ty) ->
+  | TConstVar (name, ty) ->
      let (ty, env) = strip_and_mono env ty in
-     (MVariable (name, ty), env)
+     (MConstVar (name, ty), env)
+  | TParamVar (name, ty) ->
+     let (ty, env) = strip_and_mono env ty in
+     (MParamVar (name, ty), env)
+  | TLocalVar (name, ty) ->
+     let (ty, env) = strip_and_mono env ty in
+     (MLocalVar (name, ty), env)
   | TArithmetic (oper, lhs, rhs) ->
      let (lhs, env) = monomorphize_expr env lhs in
      let (rhs, env) = monomorphize_expr env rhs in

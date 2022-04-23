@@ -109,8 +109,14 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
      TStringConstant s
   | Variable name ->
      (match get_variable env lexenv name with
-      | Some ty ->
-         TVariable (name, ty)
+      | Some (ty, src) ->
+         (match src with
+          | VarConstant ->
+             TConstVar (name, ty)
+          | VarParam ->
+             TParamVar ((original_name name), ty)
+          | VarLocal ->
+             TLocalVar ((original_name name), ty))
       | None ->
          err ("I can't find the variable named " ^ (ident_string (original_name name))))
   | FunctionCall (name, args) ->
@@ -767,7 +773,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
          let bindings = match_type_with_value expected_ty value' in
          let ty = replace_variables bindings expected_ty in
-         let lexenv' = push_var lexenv name ty in
+         let lexenv' = push_var lexenv name ty VarLocal in
          let body' = augment_stmt (update_lexenv ctx lexenv') body in
          TLet (span, name, ty, value', body'))
   | ADestructure (span, bindings, value, body) ->
@@ -795,7 +801,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual)) bindings' in
                  let newvars = List.map (fun (n, ty, actual) ->
                                    let _ = match_type ty actual in
-                                   (n, ty))
+                                   (n, ty, VarLocal))
                                  bindings'' in
                  let lexenv' = push_vars lexenv newvars in
                  let body' = augment_stmt (update_lexenv ctx lexenv') body in
@@ -815,7 +821,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      adorn_error_with_span span
        (fun _ ->
          (match get_var lexenv var with
-          | Some var_ty ->
+          | Some (var_ty, _) ->
              let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
              let value = augment_expr module_name env rm typarams lexenv None value in
              let path = TPath {
@@ -885,7 +891,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          and f' = augment_expr module_name env rm typarams lexenv None final in
          if is_compatible_with_size_type i' then
            if is_compatible_with_size_type f' then
-             let lexenv' = push_var lexenv name size_type in
+             let lexenv' = push_var lexenv name size_type VarLocal in
              let b' = augment_stmt (update_lexenv ctx lexenv') body in
              TFor (span, name, i', f', b')
            else
@@ -896,7 +902,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
      adorn_error_with_span span
        (fun _ ->
          (match get_var lexenv original with
-          | (Some orig_ty) ->
+          | (Some (orig_ty, _)) ->
              let u = type_universe orig_ty in
              if ((u = LinearUniverse) || (u = TypeUniverse)) then
                let region_obj = fresh_region region in
@@ -907,7 +913,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                   | WriteBorrow ->
                      WriteRef (orig_ty, RegionTy region_obj))
                in
-               let lexenv' = push_var lexenv rename refty in
+               let lexenv' = push_var lexenv rename refty VarLocal in
                let rm' = add_region rm region region_obj in
                let ctx' = update_lexenv ctx lexenv' in
                let ctx''= update_rm ctx' rm' in
@@ -1030,7 +1036,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
     let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
     let newvars = List.map (fun (n, ty, actual) ->
                       if equal_ty ty actual then
-                        (n, ty)
+                        (n, ty, VarLocal)
                       else
                         err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
                     bindings'' in
@@ -1057,8 +1063,12 @@ and is_constant = function
      true
   | TStringConstant _ ->
      true
-  | TVariable _ ->
+  | TConstVar _ ->
      true
+  | TParamVar _ ->
+     false
+  | TLocalVar _ ->
+     false
   | TArithmetic (_, lhs, rhs) ->
      (is_constant lhs) && (is_constant rhs)
   | TFuncall _ ->
@@ -1142,7 +1152,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
 and lexenv_from_params (params: value_parameter list): lexenv =
   match params with
   | (ValueParameter (n, t))::rest ->
-     push_var (lexenv_from_params rest) n t
+     push_var (lexenv_from_params rest) n t VarParam
   | [] ->
      empty_lexenv
 

@@ -30,9 +30,16 @@ let rec count_appearances (name: identifier) (expr: texpr) =
      0
   | TStringConstant _ ->
      0
-  | TVariable (n, _) ->
-     (* TODO: is using original_name here correct? *)
-     if equal_identifier name (original_name n) then
+  | TConstVar _ ->
+     (* Constants are never linear, don't worry about it. *)
+     0
+  | TParamVar (n, _) ->
+     if equal_identifier name n then
+       1
+     else
+       0
+  | TLocalVar (n, _) ->
+     if equal_identifier name n then
        1
      else
        0
@@ -75,7 +82,11 @@ let rec count_appearances (name: identifier) (expr: texpr) =
           unless the expression is just a bare variable. So `f(x).y` will count
           but not `x.y`. *)
        (match head with
-        | TVariable _ ->
+        | TConstVar _ ->
+           0
+        | TParamVar _ ->
+           0
+        | TLocalVar _ ->
            0
         | _ ->
            ca head)

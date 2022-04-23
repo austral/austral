@@ -177,8 +177,12 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
            CInt (string_of_int (String.length (escaped_to_string s)))
          ]
        )
-  | MVariable (n, _) ->
+  | MConstVar (n, _) ->
      CVar (gen_qident n)
+  | MParamVar (n, _) ->
+     CVar (gen_ident n)
+  | MLocalVar (n, _) ->
+     CVar (gen_ident n)
   | MConcreteFuncall (id, _, args, _) ->
      CFuncall (gen_decl_id id, List.map g args)
   | MGenericFuncall (id, args, _) ->
