@@ -18,8 +18,9 @@ type stripped_ty =
   | SArray of stripped_ty * region
   | SRegionTy of region
   | SReadRef of stripped_ty * stripped_ty
-  | SWriteRef of stripped_ty * stripped_ty
+  | SWriteRef of stripped_ty *
   | SAddress of stripped_ty
+  | SPointer of stripped_ty
   | SMonoTy of mono_id
   | SRegionTyVar of identifier * qident
 

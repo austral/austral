@@ -32,7 +32,7 @@ let is_numeric = function
   | WriteRef _ -> false
   | TyVar _ -> false
   | Address _ -> false
-  | Pointer -> false
+  | Pointer _ -> false
   | MonoTy _ -> err "Not applicable"
 
 let is_comparable = function

@@ -127,6 +127,8 @@ let rec replace_variables bindings ty =
      WriteRef (replace_variables bindings ty, replace_variables bindings region)
   | Address ty ->
      Address (replace_variables bindings ty)
+  | Pointer ty ->
+     Pointer (replace_variables bindings ty)
   | MonoTy id ->
      MonoTy id
 
