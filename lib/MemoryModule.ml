@@ -63,8 +63,8 @@ module body Austral.Memory is
 
     generic [T: Type]
     function Null_Check(address: Address[T]): Option[Pointer[T]] is
-        let null: Address[T] := Null_Pointer();
-        if address /= null then
+        let n: Address[T] := Null_Pointer();
+        if address /= n then
             let ptr: Pointer[T] := @embed(Pointer[T], "$1", address);
             return Some(value => ptr);
         else
