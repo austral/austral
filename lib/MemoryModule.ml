@@ -5,9 +5,13 @@ let memory_interface_source = {code|
 
 module Austral.Memory is
     type Address[T: Type]: Free;
+    type Pointer[T: Type]: Free;
 
     generic [T: Type]
     function Null_Pointer(): Address[T];
+
+    generic [T: Type]
+    function Null_Check(address: Address[T]): Option[Pointer[T]];
 
     generic [T: Type]
     function Allocate(size: Natural_64): Address[T];
@@ -50,10 +54,22 @@ let memory_body_source = {code|
 
 module body Austral.Memory is
     type Address[T: Type]: Free is Unit;
+    type Pointer[T: Type]: Free is Unit;
 
     generic [T: Type]
     function Null_Pointer(): Address[T] is
         return @embed(Address[T], "NULL");
+    end;
+
+    generic [T: Type]
+    function Null_Check(address: Address[T]): Option[Pointer[T]] is
+        let n: Address[T] := Null_Pointer();
+        if address /= null then
+            let ptr: Pointer[T] := @embed(Pointer[T], "$1", address);
+            return Some(ptr);
+        else
+            return None();
+        end if;
     end;
 
     generic [T: Type]
