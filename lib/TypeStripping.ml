@@ -23,9 +23,9 @@ type stripped_ty =
 let rec strip_type (ty: ty): stripped_ty =
   match strip_type' ty with
   | Some ty ->
-    ty
+     ty
   | None ->
-    err "strip_type called with a region type as its argument"
+     err "strip_type called with a region type as its argument"
 
 and strip_type' (ty: ty): stripped_ty option =
   match ty with
@@ -84,6 +84,12 @@ and strip_type' (ty: ty): stripped_ty option =
       | Some ty ->
          Some (SAddress ty)
       | None ->
-         err "Internal: raw pointer type instantiated with a region type.")
+         err "Internal: Address type instantiated with a region type.")
+  | Pointer ty ->
+     (match (strip_type' ty) with
+      | Some ty ->
+         Some (SPointer ty)
+      | None ->
+         err "Internal: Pointer type instantiated with a region type.")
   | MonoTy id ->
      Some (SMonoTy id)
