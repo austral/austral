@@ -24,6 +24,7 @@ module body Example.GenericTypeclass is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
+        Pointer_To_Integer();
         return root;
     end;
 end module body.
