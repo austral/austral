@@ -126,6 +126,8 @@ let rec gen_type (ty: mono_ty): c_ty =
      CPointer (gen_type t)
   | MonoAddress t ->
      CPointer (gen_type t)
+  | MonoPointer t ->
+     CPointer (gen_type t)
   | MonoRegionTyVar _ ->
      err "internal"
 

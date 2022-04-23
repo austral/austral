@@ -41,6 +41,9 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
   | SAddress ty ->
      let (ty, env) = monomorphize_ty env ty in
      (MonoAddress ty, env)
+  | SPointer ty ->
+     let (ty, env) = monomorphize_ty env ty in
+     (MonoPointer ty, env)
   | SNamedType (name, args) ->
      let (args, env) = monomorphize_ty_list env args in
      (match get_decl_by_name env (qident_to_sident name) with
@@ -767,5 +770,7 @@ and mono_to_ty (ty: mono_ty): ty =
      WriteRef (r ty, r region)
   | MonoAddress ty ->
      Address (r ty)
+  | MonoPointer ty ->
+     Pointer (r ty)
   | MonoRegionTyVar (name, source) ->
      TyVar (TypeVariable (name, RegionUniverse, source))
