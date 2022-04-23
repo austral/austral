@@ -15,6 +15,9 @@ type line = Line of indentation * string
 let render_line (Line (Indentation i, s)) =
   (String.make i ' ') ^ s
 
+let desc_text (Desc text): string =
+  "/*\n" ^ text ^ "*/"
+
 let rec render_unit (CUnit (name, decls)): string =
   let rd d =
     String.concat "\n" (List.map render_line (render_decl zero_indent d))
@@ -25,23 +28,39 @@ let rec render_unit (CUnit (name, decls)): string =
 
 and render_decl i d =
   match d with
-  | CConstantDefinition (name, ty, value) ->
-     [Line (i, (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";")]
-  | CStructForwardDeclaration (name) ->
-     [Line (i, "typedef struct " ^ name ^ " " ^ name ^ ";")]
-  | CTypeDefinition (name, def) ->
-     [Line (i, "typedef " ^ (render_type def) ^ " " ^ name ^ ";")]
-  | CStructDefinition (record) ->
-     [Line (i, (render_struct record) ^ ";")]
-  | CNamedStructDefinition (name, slots) ->
-     [Line (i, "typedef struct {" ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots)) ^ "} " ^ name ^ ";")]
-  | CEnumDefinition (name, cases) ->
+  | CConstantDefinition (desc, name, ty, value) ->
+     [
+       Line (i, desc_text desc);
+       Line (i, (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";")
+     ]
+  | CStructForwardDeclaration (desc, name) ->
+     [
+       Line (i, desc_text desc);
+       Line (i, "typedef struct " ^ name ^ " " ^ name ^ ";")
+     ]
+  | CTypeDefinition (desc, name, def) ->
+     [
+       Line (i, desc_text desc);
+       Line (i, "typedef " ^ (render_type def) ^ " " ^ name ^ ";")
+     ]
+  | CStructDefinition (desc, record) ->
+     [
+       Line (i, desc_text desc);
+       Line (i, (render_struct record) ^ ";")
+     ]
+  | CNamedStructDefinition (desc, name, slots) ->
+     [
+       Line (i, desc_text desc);
+       Line (i, "typedef struct {" ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots)) ^ "} " ^ name ^ ";")
+     ]
+  | CEnumDefinition (desc, name, cases) ->
      List.concat [
+         [Line (i, desc_text desc)];
          [Line (i, "typedef enum {")];
          [Line (indent i, comma_sep (List.map (fun case -> case) cases))];
          [Line (i, "} " ^ name ^ ";")];
        ]
-  | CFunctionDeclaration (name, params, rt, linkage) ->
+  | CFunctionDeclaration (desc, name, params, rt, linkage) ->
      let s = (render_linkage linkage)
              ^ (render_type rt)
              ^ " "
@@ -50,8 +69,11 @@ and render_decl i d =
              ^ (comma_sep (List.map (fun (CValueParam (n, t)) -> (render_type t) ^ " " ^ n) params))
              ^ ");"
      in
-     [Line (i, s)]
-  | CFunctionDefinition (name, params, rt, body) ->
+     [
+       Line (i, desc_text desc);
+       Line (i, s)
+     ]
+  | CFunctionDefinition (desc, name, params, rt, body) ->
      let s = (render_type rt)
              ^ " "
              ^ name
@@ -60,6 +82,7 @@ and render_decl i d =
              ^ ") {"
      in
      List.concat [
+         [Line (i, desc_text desc)];
          [Line (i, s)];
          render_stmt (indent i) body;
          [Line (i, "}")];
