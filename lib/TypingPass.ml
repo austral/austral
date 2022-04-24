@@ -960,9 +960,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
               | None ->
                  err "No variable with this name."))
       | ABlock (span, f, r) ->
-         TBlock (span,
-                 augment_stmt ctx f,
-                 augment_stmt ctx r)
+         let a = augment_stmt ctx f in
+         let b = augment_stmt ctx r in
+         TBlock (span, a, b)
       | ADiscarding (span, e) ->
          adorn_error_with_span span
            (fun _ ->
@@ -976,6 +976,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          adorn_error_with_span span
            (fun _ ->
              let e' = augment_expr module_name env rm typarams lexenv None e in
+             pt ("Type", get_type e');
              let _ = match_type_with_value rt e' in
              TReturn (span, e')))
 
@@ -1067,6 +1068,9 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
         let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
         let newvars = List.map (fun (n, ty, actual) ->
                           if equal_ty ty actual then
+                            let _ = pi ("Binding name", n)
+                            in
+                            pt ("Binding type",  ty);
                             (n, ty, VarLocal)
                           else
                             err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
