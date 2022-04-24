@@ -5,15 +5,13 @@ open Cst
 
 let pervasive_module_name = make_mod_name "Austral.Pervasive"
 
-let option_type_name = make_ident "Option"
-
 let root_cap_type_name = make_ident "Root_Capability"
 
 let pervasive_imports =
   ConcreteImportList (
       pervasive_module_name,
       [
-        ConcreteImport (option_type_name, None);
+        ConcreteImport (make_ident "Option", None);
         ConcreteImport (make_ident "Some", None);
         ConcreteImport (make_ident "None", None);
         ConcreteImport (make_ident "Either", None);
