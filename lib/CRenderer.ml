@@ -16,7 +16,7 @@ let render_line (Line (Indentation i, s)) =
   (String.make i ' ') ^ s
 
 let desc_text (Desc text): string =
-  "/*\n" ^ text ^ "*/"
+  "/*\n  " ^ text ^ "\n*/"
 
 let rec render_unit (CUnit (name, decls)): string =
   let rd d =
