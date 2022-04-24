@@ -555,46 +555,42 @@ and augment_record_constructor (name: qident) (typarams: type_parameter list) (u
       err "Universe mismatch"
 
 and augment_union_constructor (type_name: qident) (typarams: type_parameter list) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
-  let args' = (match args with
-               | TPositionalArglist l ->
-                  if l = [] then
-                    []
-                  else
-                    err "Arguments to a union constructor must be named"
-               | TNamedArglist a ->
-                  a) in
-  (* Check: the set of slots matches the set of param names *)
-  let (TypedCase (case_name, slots)) = case in
-  let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
-  let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
-  if not (ident_set_eq slot_names argument_names) then
-    err "Slot names don't match argument names"
-  else
-    (* Convert args to positional *)
-    let arguments = arglist_to_positional (args, slot_names) in
-    (* Check the list of params against the list of arguments *)
-    let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
-    let bindings = check_argument_list params arguments in
-    (* Use the bindings to get the effective return type *)
-    let rt = NamedType (type_name,
-                        List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams,
-                        universe)
-    in
-    let rt' = replace_variables bindings rt in
-    let (bindings', rt'') = handle_return_type_polymorphism case_name params rt' asserted_ty bindings in
-    (* Check: the set of bindings equals the set of type parameters *)
-    check_bindings typarams (merge_bindings bindings bindings');
-    (* Check the resulting type is in the correct universe *)
-    if universe_compatible universe (type_universe rt'') then
-      let _ =  print_endline "-------------" in
-      print_endline ("rt: " ^ (type_string rt));
-      print_endline ("rt': " ^ (type_string rt'));
-      print_endline ("rt'': " ^ (type_string rt''));
-      print_endline ("Tyargs: " ^ (String.concat ", " (List.map (fun (_, t) -> show_ty (get_type t)) args')));
-      print_endline "-------------";
-      TUnionConstructor (rt'', case_name, List.map2 (fun a b -> (a, b)) slot_names arguments)
-    else
-      err "Universe mismatch"
+  with_frame "Augment union constructor"
+    (fun _ ->
+      let args' = (match args with
+                   | TPositionalArglist l ->
+                      if l = [] then
+                        []
+                      else
+                        err "Arguments to a union constructor must be named"
+                   | TNamedArglist a ->
+                      a) in
+      (* Check: the set of slots matches the set of param names *)
+      let (TypedCase (case_name, slots)) = case in
+      let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
+      let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
+      if not (ident_set_eq slot_names argument_names) then
+        err "Slot names don't match argument names"
+      else
+        (* Convert args to positional *)
+        let arguments = arglist_to_positional (args, slot_names) in
+        (* Check the list of params against the list of arguments *)
+        let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
+        let bindings = check_argument_list params arguments in
+        (* Use the bindings to get the effective return type *)
+        let rt = NamedType (type_name,
+                            List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams,
+                            universe)
+        in
+        let rt' = replace_variables bindings rt in
+        let (bindings', rt'') = handle_return_type_polymorphism case_name params rt' asserted_ty bindings in
+        (* Check: the set of bindings equals the set of type parameters *)
+        check_bindings typarams (merge_bindings bindings bindings');
+        (* Check the resulting type is in the correct universe *)
+        if universe_compatible universe (type_universe rt'') then
+          TUnionConstructor (rt'', case_name, List.map2 (fun a b -> (a, b)) slot_names arguments)
+        else
+          err "Universe mismatch")
 
 and augment_method_call (env: env) (source_module_name: module_name) (typeclass_id: decl_id) (typaram: type_parameter) (callable_name: qident) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
   (* At this point, we know the method's name and the typeclass it belongs
