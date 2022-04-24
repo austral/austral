@@ -1057,6 +1057,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
       let (_, menv, rm, typarams, lexenv, _) = ctx in
       let (AbstractWhen (name, bindings, body)) = w
       and (TypedCase (_, slots)) = c in
+      pi ("Case name", name);
       (* Check the set of binding names is the same as the set of slots *)
       let binding_names = List.map (fun (n, _) -> n) bindings
       and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
