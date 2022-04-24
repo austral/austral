@@ -7,6 +7,7 @@ open Cst
 open Combined
 open Env
 open ImportResolution
+open Reporter
 open Error
 
 let parse_slots (imports: import_map) (slots: concrete_slot list): qslot list =
@@ -201,30 +202,33 @@ let private_def module_name im def =
                 docstring)
 
 let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
-  let (ConcreteModuleInterface (mn, interface_docstring, interface_imports, decls)) = cmi
-  and (ConcreteModuleBody (mn', kind, body_docstring, body_imports, defs)) = cmb
-  in
-  if mn <> mn' then
-    err ("Interface and body have mismatching names: "
-         ^ (mod_name_string mn)
-         ^ " and "
-         ^ (mod_name_string mn'))
-  else
-    let im = resolve mn kind env interface_imports
-    and bm = resolve mn kind env body_imports
-    in
-    let public_decls = List.map (parse_decl mn im bm cmb) decls
-    and private_decls = parse_defs mn cmi bm defs
-    in
-    CombinedModule {
-        name = mn;
-        kind = kind;
-        interface_docstring = interface_docstring;
-        interface_imports = im;
-        body_docstring = body_docstring;
-        body_imports = bm;
-        decls = List.concat [public_decls; private_decls];
-      }
+  with_frame "Module combining pass"
+    (fun _ ->
+      let (ConcreteModuleInterface (mn, interface_docstring, interface_imports, decls)) = cmi
+      and (ConcreteModuleBody (mn', kind, body_docstring, body_imports, defs)) = cmb
+      in
+      ps ("Module name", (mod_name_string mn));
+      if mn <> mn' then
+        err ("Interface and body have mismatching names: "
+             ^ (mod_name_string mn)
+             ^ " and "
+             ^ (mod_name_string mn'))
+      else
+        let im = resolve mn kind env interface_imports
+        and bm = resolve mn kind env body_imports
+        in
+        let public_decls = List.map (parse_decl mn im bm cmb) decls
+        and private_decls = parse_defs mn cmi bm defs
+        in
+        CombinedModule {
+            name = mn;
+            kind = kind;
+            interface_docstring = interface_docstring;
+            interface_imports = im;
+            body_docstring = body_docstring;
+            body_imports = bm;
+            decls = List.concat [public_decls; private_decls];
+    })
 
 and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb: concrete_module_body) (decl: concrete_decl): combined_definition =
   let make_qname n =

@@ -142,30 +142,32 @@ let fake_mod_source (is: string) (bs: string): module_source =
   ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
 
 let empty_compiler: compiler =
-  (* We have to compile the Austral.Pervasive module, followed by
-     Austral.Memory, since the latter uses declarations from the former. *)
-  let env: env = empty_env in
-  (* Start with the C++ prelude. *)
-  let c = Compiler (env, prelude_source) in
-  let c =
-    (* Handle errors during the compilation of the Austral,Pervasive
-       module. Otherwise, a typo in the source code of this module will cause a
-       fatal error due to an exception stack overflow (unsure why this
-       happens). *)
-    try
-      compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
-    with Austral_error error ->
-      Printf.eprintf "%s" (render_error error None);
-      exit (-1)
-  in
-  let c =
-    try
-      compile_mod c (fake_mod_source memory_interface_source memory_body_source)
-    with Austral_error error ->
-      Printf.eprintf "%s" (render_error error None);
-      exit (-1)
-  in
-  c
+  with_frame "Compile built-in modules"
+    (fun _ ->
+      (* We have to compile the Austral.Pervasive module, followed by
+         Austral.Memory, since the latter uses declarations from the former. *)
+      let env: env = empty_env in
+      (* Start with the C++ prelude. *)
+      let c = Compiler (env, prelude_source) in
+      let c =
+        (* Handle errors during the compilation of the Austral,Pervasive
+           module. Otherwise, a typo in the source code of this module will cause a
+           fatal error due to an exception stack overflow (unsure why this
+           happens). *)
+        try
+          compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
+        with Austral_error error ->
+          Printf.eprintf "%s" (render_error error None);
+          exit (-1)
+      in
+      let c =
+        try
+          compile_mod c (fake_mod_source memory_interface_source memory_body_source)
+        with Austral_error error ->
+          Printf.eprintf "%s" (render_error error None);
+          exit (-1)
+      in
+      c)
 
 let compile_and_run (modules: (string * string) list) (entrypoint: string): (int * string) =
   let compiler = compile_multiple empty_compiler (List.map (fun (i, b) -> fake_mod_source i b) modules) in
