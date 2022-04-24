@@ -1052,27 +1052,29 @@ and group_bindings_slots (bindings: (identifier * qtypespec) list) (slots: typed
   List.map (fun (n, t) -> (n, t, let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> n = n') slots in ty')) bindings
 
 and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case): typed_when =
-  let (_, menv, rm, typarams, lexenv, _) = ctx in
-  let (AbstractWhen (name, bindings, body)) = w
-  and (TypedCase (_, slots)) = c in
-  (* Check the set of binding names is the same as the set of slots *)
-  let binding_names = List.map (fun (n, _) -> n) bindings
-  and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
-  if ident_set_eq binding_names slot_names then
-    (* Check the type of each binding matches the type of the slot *)
-    let bindings' = group_bindings_slots bindings slots in
-    let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
-    let newvars = List.map (fun (n, ty, actual) ->
-                      if equal_ty ty actual then
-                        (n, ty, VarLocal)
-                      else
-                        err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
-                    bindings'' in
-    let lexenv' = push_vars lexenv newvars in
-    let body' = augment_stmt (update_lexenv ctx lexenv') body in
-    TypedWhen (name, List.map (fun (n, t, _) -> ValueParameter (n, t)) bindings'', body')
-  else
-    err "The set of slots in the case statement doesn't match the set of slots in the union definition."
+  with_frame "Augment when"
+    (fun _ ->
+      let (_, menv, rm, typarams, lexenv, _) = ctx in
+      let (AbstractWhen (name, bindings, body)) = w
+      and (TypedCase (_, slots)) = c in
+      (* Check the set of binding names is the same as the set of slots *)
+      let binding_names = List.map (fun (n, _) -> n) bindings
+      and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
+      if ident_set_eq binding_names slot_names then
+        (* Check the type of each binding matches the type of the slot *)
+        let bindings' = group_bindings_slots bindings slots in
+        let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
+        let newvars = List.map (fun (n, ty, actual) ->
+                          if equal_ty ty actual then
+                            (n, ty, VarLocal)
+                          else
+                            err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
+                        bindings'' in
+        let lexenv' = push_vars lexenv newvars in
+        let body' = augment_stmt (update_lexenv ctx lexenv') body in
+        TypedWhen (name, List.map (fun (n, t, _) -> ValueParameter (n, t)) bindings'', body')
+      else
+        err "The set of slots in the case statement doesn't match the set of slots in the union definition.")
 
 let rec validate_constant_expression (expr: texpr): unit =
   if is_constant expr then
