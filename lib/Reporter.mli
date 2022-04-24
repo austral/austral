@@ -18,5 +18,8 @@ val ps : (label * string) -> unit
 (** Push an identifier property to the current frame. *)
 val pi: (label * identifier) -> unit
 
+(** Push a qualified identifier property to the current frame. *)
+val pqi: (label * qident) -> unit
+
 (** Push a type expression property to the current frame. *)
 val pt: (label * ty) -> unit

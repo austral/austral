@@ -89,5 +89,8 @@ let ps ((label, value): (label * string)): unit =
 let pi ((label, value): (label * identifier)): unit =
   push_event (PrintValue (label, ident_string value))
 
+let pqi ((label, value): (label * qident)): unit =
+  push_event (PrintValue (label, qident_debug_name value))
+
 let pt ((label, value): (label * ty)): unit =
   push_event (PrintValue (label, type_string value))
