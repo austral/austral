@@ -557,6 +557,7 @@ and augment_record_constructor (name: qident) (typarams: type_parameter list) (u
 and augment_union_constructor (type_name: qident) (typarams: type_parameter list) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
   with_frame "Augment union constructor"
     (fun _ ->
+      pqi ("Type name", type_name);
       let args' = (match args with
                    | TPositionalArglist l ->
                       if l = [] then
@@ -567,6 +568,7 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
                       a) in
       (* Check: the set of slots matches the set of param names *)
       let (TypedCase (case_name, slots)) = case in
+      pi ("Case name", case_name);
       let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
       let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
       if not (ident_set_eq slot_names argument_names) then
@@ -582,12 +584,16 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
                             List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams,
                             universe)
         in
+        pt ("Type", rt);
         let rt' = replace_variables bindings rt in
+        pt ("Type'", rt');
         let (bindings', rt'') = handle_return_type_polymorphism case_name params rt' asserted_ty bindings in
         (* Check: the set of bindings equals the set of type parameters *)
         check_bindings typarams (merge_bindings bindings bindings');
         (* Check the resulting type is in the correct universe *)
         if universe_compatible universe (type_universe rt'') then
+          let _ = pt ("Type''", rt'')
+          in
           TUnionConstructor (rt'', case_name, List.map2 (fun a b -> (a, b)) slot_names arguments)
         else
           err "Universe mismatch")
