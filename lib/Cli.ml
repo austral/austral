@@ -157,6 +157,7 @@ let main (args: string list): unit =
   try
     Printexc.record_backtrace true;
     main' args;
+    Reporter.dump ();
     exit 0
   with Austral_error error ->
     Printf.eprintf "%s" (render_error error None);
