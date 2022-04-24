@@ -768,195 +768,216 @@ let update_lexenv (mn, menv, rm, typarams, _, rt) lexenv =
 let update_rm (mn, menv, _, typarams, lexenv, rt) rm =
   (mn, menv, rm, typarams, lexenv, rt)
 
-let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
-  let (module_name, env, rm, typarams, lexenv, rt) = ctx in
+let stmt_kind (stmt: astmt): string =
   match stmt with
-  | ASkip span ->
-     TSkip span
-  | ALet (span, name, ty, value, body) ->
-     adorn_error_with_span span
-       (fun _ ->
-         let expected_ty = parse_typespec env rm typarams ty in
-         let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
-         let bindings = match_type_with_value expected_ty value' in
-         let ty = replace_variables bindings expected_ty in
-         let lexenv' = push_var lexenv name ty VarLocal in
-         let body' = augment_stmt (update_lexenv ctx lexenv') body in
-         TLet (span, name, ty, value', body'))
-  | ADestructure (span, bindings, value, body) ->
-     adorn_error_with_span span
-       (fun _ ->
-         let value' = augment_expr module_name env rm typarams lexenv None value in
-         (* Check: the value must be a public record type *)
-         let rec_ty = get_type value' in
-         (match rec_ty with
-          | (NamedType (name, _, u)) ->
-             let (source_module, vis, record_typarams, slots) = get_record_definition env name in
-             let orig_type = NamedType (
-                                 make_qident (source_module, original_name name, original_name name),
-                                 List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) record_typarams,
-                                 u
-                               )
-             in
-             let typebindings = match_type orig_type rec_ty in
-             if (vis = TypeVisPublic) || (module_name = source_module) then
-               (* Find the set of slot names and the set of binding names, and compare them *)
-               let binding_names = List.map (fun (n, _) -> n) bindings
-               and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
-               if ident_set_eq binding_names slot_names then
-                 let bindings' = group_bindings_slots bindings slots in
-                 let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual)) bindings' in
-                 let newvars = List.map (fun (n, ty, actual) ->
-                                   let _ = match_type ty actual in
-                                   (n, ty, VarLocal))
-                                 bindings'' in
-                 let lexenv' = push_vars lexenv newvars in
-                 let body' = augment_stmt (update_lexenv ctx lexenv') body in
-                 TDestructure (
-                     span,
-                     List.map (fun (n, _, t) -> (n, t)) bindings'',
-                     value',
-                     body'
-                   )
-               else
-                 err "Destructuring a record: not the same set of bindings and slots"
-             else
-               err "Not a public record"
-          | _ ->
-             err "Not a record type"))
-  | AAssign (span, LValue (var, elems), value) ->
-     adorn_error_with_span span
-       (fun _ ->
-         (match get_var lexenv var with
-          | Some (var_ty, _) ->
-             let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
-             let value = augment_expr module_name env rm typarams lexenv None value in
-             let path = TPath {
-                            head = value;
-                            elems = elems;
-                            ty = get_path_ty_from_elems elems
-                          }
-             in
-             let universe = type_universe (get_type path) in
-             if universe = FreeUniverse then
-               TAssign (span, TypedLValue (var, elems), value)
-             else
-               err "Paths must end in the free universe"
-          | None ->
-             err "No var with this name."))
-  | AIf (span, c, t, f) ->
-     adorn_error_with_span span
-       (fun _ ->
-         let c' = augment_expr module_name env rm typarams lexenv None c in
-         if is_boolean (get_type c') then
-           TIf (span, c', augment_stmt ctx t, augment_stmt ctx f)
-         else
-           err "The type of the condition in an if statement must be a boolean.")
-  | AWhen (span, c, t) ->
-     adorn_error_with_span span
-       (fun _ ->
-         let c = augment_expr module_name env rm typarams lexenv None c in
-         if is_boolean (get_type c) then
-           TIf (span, c, augment_stmt ctx t, TSkip span)
-         else
-           err "The type of the condition in an if statement must be a boolean.")
-  | ACase (span, expr, whens) ->
-     (* Type checking a case statement:
+  | ASkip _ -> "skip"
+  | ALet _ -> "let"
+  | ADestructure _ -> "let (destructure)"
+  | AAssign _ -> "assign"
+  | AIf _ -> "if"
+  | AWhen _ -> "if (no else)"
+  | ACase _ -> "case"
+  | AWhile _ -> "while"
+  | AFor _ -> "for"
+  | ABorrow _ -> "borrow"
+  | ABlock _ -> "block"
+  | ADiscarding _ -> "discard"
+  | AReturn _ -> "return"
 
-        1. Ensure the value is of a union type.
-        2. Ensure the union type is public or it is defined in this module.
-        3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
-        4. Iterate over the cases, and ensure the bindings are correct.
-      *)
-     adorn_error_with_span span
-       (fun _ ->
-         let expr' = augment_expr module_name env rm typarams lexenv None expr in
-         let ty = get_type expr' in
-         let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
-         let typebindings = match_type union_ty ty in
-         let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
-         let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
-         if ident_set_eq case_names when_names then
-           (* Group the cases and whens *)
-           let whens' = group_cases_whens cases whens in
-           let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
-           TCase (span, expr', whens'')
-         else
-           err "Non-exhaustive case statement.")
-  | AWhile (span, c, body) ->
-     adorn_error_with_span span
-       (fun _ ->
-         let c' = augment_expr module_name env rm typarams lexenv None c in
-         if is_boolean (get_type c') then
-           TWhile (span, c', augment_stmt ctx body)
-         else
-           err "The type of the condition in a while loop must be a boolean")
-  | AFor { span; name; initial; final; body; } ->
-     adorn_error_with_span span
-       (fun _ ->
-         let i' = augment_expr module_name env rm typarams lexenv None initial
-         and f' = augment_expr module_name env rm typarams lexenv None final in
-         if is_compatible_with_size_type i' then
-           if is_compatible_with_size_type f' then
-             let lexenv' = push_var lexenv name size_type VarLocal in
-             let b' = augment_stmt (update_lexenv ctx lexenv') body in
-             TFor (span, name, i', f', b')
-           else
-             err "The type of the final value in a for loop must be an integer type."
-         else
-           err "The type of the initial value in a for loop must be an integer type.")
-  | ABorrow { span; original; rename; region; body; mode; } ->
-     adorn_error_with_span span
-       (fun _ ->
-         (match get_var lexenv original with
-          | (Some (orig_ty, _)) ->
-             let u = type_universe orig_ty in
-             if ((u = LinearUniverse) || (u = TypeUniverse)) then
-               let region_obj = fresh_region region in
-               let refty =
-                 (match mode with
-                  | ReadBorrow ->
-                     ReadRef (orig_ty, RegionTy region_obj)
-                  | WriteBorrow ->
-                     WriteRef (orig_ty, RegionTy region_obj))
-               in
-               let lexenv' = push_var lexenv rename refty VarLocal in
-               let rm' = add_region rm region region_obj in
-               let ctx' = update_lexenv ctx lexenv' in
-               let ctx''= update_rm ctx' rm' in
-               TBorrow {
-                   span=span;
-                   original=original;
-                   rename=rename;
-                   region=region;
-                   orig_type=orig_ty;
-                   ref_type=refty;
-                   body=augment_stmt ctx'' body;
-                   mode=mode
-                 }
+let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
+  with_frame ("Augment statement: " ^ (stmt_kind stmt))
+    (fun _ ->
+      let (module_name, env, rm, typarams, lexenv, rt) = ctx in
+      match stmt with
+      | ASkip span ->
+         TSkip span
+      | ALet (span, name, ty, value, body) ->
+         pi ("Name", name);
+         adorn_error_with_span span
+           (fun _ ->
+             let expected_ty = parse_typespec env rm typarams ty in
+             let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
+             let bindings = match_type_with_value expected_ty value' in
+             let ty = replace_variables bindings expected_ty in
+             pt ("Type", ty);
+             let lexenv' = push_var lexenv name ty VarLocal in
+             let body' = augment_stmt (update_lexenv ctx lexenv') body in
+             TLet (span, name, ty, value', body'))
+      | ADestructure (span, bindings, value, body) ->
+         adorn_error_with_span span
+           (fun _ ->
+             let value' = augment_expr module_name env rm typarams lexenv None value in
+             (* Check: the value must be a public record type *)
+             let rec_ty = get_type value' in
+             (match rec_ty with
+              | (NamedType (name, _, u)) ->
+                 let (source_module, vis, record_typarams, slots) = get_record_definition env name in
+                 let orig_type = NamedType (
+                                     make_qident (source_module, original_name name, original_name name),
+                                     List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) record_typarams,
+                                     u
+                                   )
+                 in
+                 let typebindings = match_type orig_type rec_ty in
+                 if (vis = TypeVisPublic) || (module_name = source_module) then
+                   (* Find the set of slot names and the set of binding names, and compare them *)
+                   let binding_names = List.map (fun (n, _) -> n) bindings
+                   and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
+                   if ident_set_eq binding_names slot_names then
+                     let bindings' = group_bindings_slots bindings slots in
+                     let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual)) bindings' in
+                     let newvars = List.map (fun (n, ty, actual) ->
+                                       let _ = match_type ty actual in
+                                       (n, ty, VarLocal))
+                                     bindings'' in
+                     let lexenv' = push_vars lexenv newvars in
+                     let body' = augment_stmt (update_lexenv ctx lexenv') body in
+                     TDestructure (
+                         span,
+                         List.map (fun (n, _, t) -> (n, t)) bindings'',
+                         value',
+                         body'
+                       )
+                   else
+                     err "Destructuring a record: not the same set of bindings and slots"
+                 else
+                   err "Not a public record"
+              | _ ->
+                 err "Not a record type"))
+      | AAssign (span, LValue (var, elems), value) ->
+         adorn_error_with_span span
+           (fun _ ->
+             (match get_var lexenv var with
+              | Some (var_ty, _) ->
+                 let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
+                 let value = augment_expr module_name env rm typarams lexenv None value in
+                 let path = TPath {
+                                head = value;
+                                elems = elems;
+                                ty = get_path_ty_from_elems elems
+                              }
+                 in
+                 let universe = type_universe (get_type path) in
+                 if universe = FreeUniverse then
+                   TAssign (span, TypedLValue (var, elems), value)
+                 else
+                   err "Paths must end in the free universe"
+              | None ->
+                 err "No var with this name."))
+      | AIf (span, c, t, f) ->
+         adorn_error_with_span span
+           (fun _ ->
+             let c' = augment_expr module_name env rm typarams lexenv None c in
+             if is_boolean (get_type c') then
+               TIf (span, c', augment_stmt ctx t, augment_stmt ctx f)
              else
-               err "Cannot borrow a non-linear type."
-          | None ->
-             err "No variable with this name."))
-  | ABlock (span, f, r) ->
-     TBlock (span,
-             augment_stmt ctx f,
-             augment_stmt ctx r)
-  | ADiscarding (span, e) ->
-     adorn_error_with_span span
-       (fun _ ->
-         let e' = augment_expr module_name env rm typarams lexenv None e in
-         let u = type_universe (get_type e') in
-         if ((u = LinearUniverse) || (u = TypeUniverse)) then
-           err "Discarding a linear value"
-         else
-           TDiscarding (span, e'))
-  | AReturn (span, e) ->
-     adorn_error_with_span span
-       (fun _ ->
-         let e' = augment_expr module_name env rm typarams lexenv None e in
-         let _ = match_type_with_value rt e' in
-         TReturn (span, e'))
+               err "The type of the condition in an if statement must be a boolean.")
+      | AWhen (span, c, t) ->
+         adorn_error_with_span span
+           (fun _ ->
+             let c = augment_expr module_name env rm typarams lexenv None c in
+             if is_boolean (get_type c) then
+               TIf (span, c, augment_stmt ctx t, TSkip span)
+             else
+               err "The type of the condition in an if statement must be a boolean.")
+      | ACase (span, expr, whens) ->
+         (* Type checking a case statement:
+
+            1. Ensure the value is of a union type.
+            2. Ensure the union type is public or it is defined in this module.
+            3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
+            4. Iterate over the cases, and ensure the bindings are correct.
+          *)
+         adorn_error_with_span span
+           (fun _ ->
+             let expr' = augment_expr module_name env rm typarams lexenv None expr in
+             let ty = get_type expr' in
+             pt ("Case type", ty);
+             let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
+             let typebindings = match_type union_ty ty in
+             let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
+             let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
+             if ident_set_eq case_names when_names then
+               (* Group the cases and whens *)
+               let whens' = group_cases_whens cases whens in
+               let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
+               TCase (span, expr', whens'')
+             else
+               err "Non-exhaustive case statement.")
+      | AWhile (span, c, body) ->
+         adorn_error_with_span span
+           (fun _ ->
+             let c' = augment_expr module_name env rm typarams lexenv None c in
+             if is_boolean (get_type c') then
+               TWhile (span, c', augment_stmt ctx body)
+             else
+               err "The type of the condition in a while loop must be a boolean")
+      | AFor { span; name; initial; final; body; } ->
+         adorn_error_with_span span
+           (fun _ ->
+             let i' = augment_expr module_name env rm typarams lexenv None initial
+             and f' = augment_expr module_name env rm typarams lexenv None final in
+             if is_compatible_with_size_type i' then
+               if is_compatible_with_size_type f' then
+                 let lexenv' = push_var lexenv name size_type VarLocal in
+                 let b' = augment_stmt (update_lexenv ctx lexenv') body in
+                 TFor (span, name, i', f', b')
+               else
+                 err "The type of the final value in a for loop must be an integer type."
+             else
+               err "The type of the initial value in a for loop must be an integer type.")
+      | ABorrow { span; original; rename; region; body; mode; } ->
+         adorn_error_with_span span
+           (fun _ ->
+             (match get_var lexenv original with
+              | (Some (orig_ty, _)) ->
+                 let u = type_universe orig_ty in
+                 if ((u = LinearUniverse) || (u = TypeUniverse)) then
+                   let region_obj = fresh_region region in
+                   let refty =
+                     (match mode with
+                      | ReadBorrow ->
+                         ReadRef (orig_ty, RegionTy region_obj)
+                      | WriteBorrow ->
+                         WriteRef (orig_ty, RegionTy region_obj))
+                   in
+                   let lexenv' = push_var lexenv rename refty VarLocal in
+                   let rm' = add_region rm region region_obj in
+                   let ctx' = update_lexenv ctx lexenv' in
+                   let ctx''= update_rm ctx' rm' in
+                   TBorrow {
+                       span=span;
+                       original=original;
+                       rename=rename;
+                       region=region;
+                       orig_type=orig_ty;
+                       ref_type=refty;
+                       body=augment_stmt ctx'' body;
+                       mode=mode
+                     }
+                 else
+                   err "Cannot borrow a non-linear type."
+              | None ->
+                 err "No variable with this name."))
+      | ABlock (span, f, r) ->
+         TBlock (span,
+                 augment_stmt ctx f,
+                 augment_stmt ctx r)
+      | ADiscarding (span, e) ->
+         adorn_error_with_span span
+           (fun _ ->
+             let e' = augment_expr module_name env rm typarams lexenv None e in
+             let u = type_universe (get_type e') in
+             if ((u = LinearUniverse) || (u = TypeUniverse)) then
+               err "Discarding a linear value"
+             else
+               TDiscarding (span, e'))
+      | AReturn (span, e) ->
+         adorn_error_with_span span
+           (fun _ ->
+             let e' = augment_expr module_name env rm typarams lexenv None e in
+             let _ = match_type_with_value rt e' in
+             TReturn (span, e')))
 
 and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
