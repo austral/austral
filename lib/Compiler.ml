@@ -22,6 +22,7 @@ open Linked
 open Mtast
 open Monomorphize
 open ReturnCheck
+open Reporter
 open Filename
 
 let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import_list): concrete_module_interface =
@@ -53,23 +54,25 @@ type module_source = ModuleSource of {
     }
 
 let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; body_code }) =
-  let env: env = cenv c in
-  let (env, int_file_id) = add_file env { path = int_filename; contents = int_code } in
-  let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
-  let ci: concrete_module_interface = parse_module_int int_code int_filename
-  and cb: concrete_module_body = parse_module_body body_code body_filename
-  in
-  let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
-  and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
-  let combined: combined_module = combine env ci cb in
-  let _ = check_ends_in_return combined in
-  let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
-  let typed: typed_module = augment_module env linked in
-  let env: env = extract_bodies env typed in
-  let (env, mono): (env * mono_module) = monomorphize env typed in
-  let unit = gen_module env mono in
-  let c_code: string = render_unit unit in
-  Compiler (env, (compiler_code c) ^ "\n" ^ c_code)
+  with_frame "Compile module"
+    (fun _ ->
+      let env: env = cenv c in
+      let (env, int_file_id) = add_file env { path = int_filename; contents = int_code } in
+      let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
+      let ci: concrete_module_interface = parse_module_int int_code int_filename
+      and cb: concrete_module_body = parse_module_body body_code body_filename
+      in
+      let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
+      and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
+      let combined: combined_module = combine env ci cb in
+      let _ = check_ends_in_return combined in
+      let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
+      let typed: typed_module = augment_module env linked in
+      let env: env = extract_bodies env typed in
+      let (env, mono): (env * mono_module) = monomorphize env typed in
+      let unit = gen_module env mono in
+      let c_code: string = render_unit unit in
+      Compiler (env, (compiler_code c) ^ "\n" ^ c_code))
 
 let rec compile_multiple c modules =
   match modules with
