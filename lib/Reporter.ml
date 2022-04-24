@@ -13,9 +13,24 @@ let events: event list ref = ref []
 let push_event (event: event): unit =
   events := (event :: !events)
 
+let prefix: string = "<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Austral Compiler Call Tree</title>
+  </head>
+  <body>
+<h1>Compiler Call Tree</h1>\n"
+
+let suffix: string = "
+  </body>
+</html>"
+
 (** Render the event list to HTML. *)
 let rec render _ : string =
-  String.concat "" (List.map render_event !events)
+  prefix
+ ^ (String.concat "" (List.map render_event !events))
+ ^ suffix
 
 and render_event (event: event): string =
   match event with
