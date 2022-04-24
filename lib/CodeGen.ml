@@ -353,7 +353,7 @@ let gen_cases (cases: mono_case list) =
   List.map (fun (MonoCase (n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
 
 let gen_method (mn: module_name) (MConcreteMethod (id, _, params, rt, body)) =
-  let d = Desc "" in
+  let d = Desc "Method" in
   CFunctionDefinition (d, gen_ins_meth_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
 
 let get_original_module_name (env: env) (id: mono_id): module_name =
@@ -370,6 +370,46 @@ let get_original_module_name (env: env) (id: mono_id): module_name =
          err "internal")
   | _ ->
      err "internal"
+
+let rec mono_desc (env: env) (id: mono_id): string =
+  let mono = get_mono_or_die env id in
+  match mono with
+  | MonoTypeAliasDefinition { type_id; tyargs; _ } ->
+     render_mono env type_id tyargs
+  | MonoRecordDefinition { type_id; tyargs; _ } ->
+     render_mono env type_id tyargs
+  | MonoUnionDefinition { type_id; tyargs; _ } ->
+     render_mono env type_id tyargs
+  | MonoFunction { function_id; tyargs; _ } ->
+     render_mono env function_id tyargs
+  | MonoInstanceMethod _ ->
+     ""
+
+and get_mono_or_die (env: env) (id: mono_id): monomorph =
+  match get_monomorph env id with
+  | Some mono ->
+     mono
+  | None ->
+     err "internal"
+
+and get_decl_name_or_die (env: env) (id: decl_id): string =
+  match get_decl_by_id env id with
+  | Some decl ->
+     (match (decl_name decl) with
+      | Some name ->
+         (ident_string name)
+      | None ->
+         err "decl has no name")
+  | None ->
+     err "internal"
+
+and tyargs_string (args: mono_ty list): string =
+  "["
+  ^ (String.concat ", " (List.map show_mono_ty args))
+  ^ "]"
+
+and render_mono (env: env) (id: decl_id) (tyargs: mono_ty list): string =
+  (get_decl_name_or_die env id) ^ (tyargs_string tyargs)
 
 let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   match decl with
@@ -392,7 +432,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
          )
      ]
   | MTypeAliasMonomorph (id, ty) ->
-     let d = Desc "Type alias monomorph" in
+     let d = Desc ("Type alias monomorph: " ^ (mono_desc env id)) in
      [
        CNamedStructDefinition (
            d,
@@ -408,7 +448,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
        CNamedStructDefinition (d, gen_decl_id id, gen_slots slots)
      ]
   | MRecordMonomorph (id, slots) ->
-     let d = Desc "Record monomorph" in
+     let d = Desc ("Record monomorph: " ^ (mono_desc env id)) in
      [
        CNamedStructDefinition (d, gen_mono_id id, gen_slots slots)
      ]
@@ -431,8 +471,8 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      [enum_def; union_def]
   | MUnionMonomorph (id, cases) ->
-     let enum_d = Desc "Union monomorph tag enum" in
-     let union_d = Desc "Union monomorph" in
+     let enum_d = Desc ("Union monomorph tag enum: " ^ (mono_desc env id)) in
+     let union_d = Desc ("Union monomorph: " ^ (mono_desc env id)) in
      let enum_def = CEnumDefinition (
                         enum_d,
                         local_union_tag_enum_name_from_id id,
@@ -457,7 +497,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      (* Load-bearing hack: prefix parameters not with the current module name,
         but with the name of the module the monomorph's declaration is from. *)
      let mn': module_name = get_original_module_name env id in
-     let d = Desc "Function monomorph" in
+     let d = Desc ("Function monomorph: " ^ (mono_desc env id)) in
      [
        CFunctionDefinition (d, gen_mono_id id, gen_params mn' params, gen_type rt, gen_stmt mn body)
      ]
@@ -513,7 +553,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   | MConcreteInstance (_, _, _, methods) ->
      List.map (gen_method mn) methods
   | MMethodMonomorph (id, params, rt, body) ->
-     let d = Desc "Method monomorph" in
+     let d = Desc ("Method monomorph: " ^ (mono_desc env id)) in
      [
        CFunctionDefinition (d, gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
      ]

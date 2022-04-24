@@ -466,6 +466,9 @@ val get_monomorph : env -> mono_id -> monomorph option
 (** Return the ID of a declaration. *)
 val decl_id : decl -> decl_id
 
+(** Return the name of a declaration. *)
+val decl_name : decl -> identifier option
+
 (** Return whether a declaration is importable by a foreign module. *)
 val is_importable: decl -> bool
 

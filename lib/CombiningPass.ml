@@ -230,7 +230,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
   let make_qname n =
     make_qident (module_name, n, n)
   in
-  match decl_name decl with
+  match concrete_decl_name decl with
   | (Some name) ->
      (match decl with
       (* Some declarations don't need to have a matching body *)

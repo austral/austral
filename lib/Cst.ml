@@ -146,7 +146,7 @@ let make_module_body (name: module_name) (imports: concrete_import_list list) (p
   in
   ConcreteModuleBody (name, kind, docstring, imports, defs)
 
-let decl_name = function
+let concrete_decl_name = function
   | ConcreteConstantDecl (n, _, _) -> Some n
   | ConcreteOpaqueTypeDecl (n, _, _, _) -> Some n
   | ConcreteTypeAliasDecl (ConcreteTypeAlias (n, _, _, _, _)) -> Some n
@@ -167,7 +167,7 @@ let def_name = function
 
 let get_concrete_decl (ConcreteModuleInterface (_, _, _, decls)) name =
   let pred decl =
-    match decl_name decl with
+    match concrete_decl_name decl with
     | (Some name') ->
        name = name'
     | None ->
