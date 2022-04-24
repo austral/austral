@@ -1,4 +1,5 @@
 open Identifier
+open Type
 open Util
 
 (** An event: either entering a frame, printing a value, or leaving a frame. *)
@@ -87,3 +88,6 @@ let ps ((label, value): (label * string)): unit =
 
 let pi ((label, value): (label * identifier)): unit =
   push_event (PrintValue (label, ident_string value))
+
+let pt ((label, value): (label * ty)): unit =
+  push_event (PrintValue (label, type_string value))

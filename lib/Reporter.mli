@@ -1,6 +1,7 @@
 (** The reporter keeps track of the compiler's call tree, and is useful for
     debugging crashes and bugs. *)
 open Identifier
+open Type
 
 (** Render the event list and dump it to a file. *)
 val dump : unit -> unit
@@ -16,3 +17,6 @@ val ps : (label * string) -> unit
 
 (** Push an identifier property to the current frame. *)
 val pi: (label * identifier) -> unit
+
+(** Push a type expression property to the current frame. *)
+val pt: (label * ty) -> unit
