@@ -96,216 +96,218 @@ let parse_typespec (env: env) (rm: region_map) (typarams: type_parameter list) (
   parse_type env [] rm typarams ty
 
 let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typarams: type_parameter list) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
-  let aug = augment_expr module_name env rm typarams lexenv None in
-  match expr with
-  | NilConstant ->
-     TNilConstant
-  | BoolConstant b ->
-     TBoolConstant b
-  | IntConstant i ->
-     TIntConstant i
-  | FloatConstant f ->
-     TFloatConstant f
-  | StringConstant s ->
-     TStringConstant s
-  | Variable name ->
-     (match get_variable env lexenv name with
-      | Some (ty, src) ->
-         (match src with
-          | VarConstant ->
-             TConstVar (name, ty)
-          | VarParam ->
-             TParamVar ((original_name name), ty)
-          | VarLocal ->
-             TLocalVar ((original_name name), ty))
-      | None ->
-         err ("I can't find the variable named " ^ (ident_string (original_name name))))
-  | FunctionCall (name, args) ->
-     augment_call module_name env asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
-  | ArithmeticExpression (op, lhs, rhs) ->
-     let lhs' = aug lhs
-     and rhs' = aug rhs in
-     if (get_type lhs') = (get_type rhs') then
-       (* If the types are the same type, check it is a numeric type. *)
-       if (is_numeric (get_type lhs')) then
-         TArithmetic (op, lhs', rhs')
-       else
-         err "Both operands to an arithmetic expression must be comparable types."
-     else
-       (* If the types are different, check if at least one operator is a constant.*)
-       let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
-       and are_float_constants = (is_float_constant lhs) || (is_float_constant rhs) in
-       if (are_int_constants || are_float_constants) then
-         (* If either operand is a constant, let it pass *)
-         TArithmetic (op, lhs', rhs')
-       else
-         err "Both operands to an arithmetic expression must be of the same type"
-  | Comparison (op, lhs, rhs) ->
-     let lhs' = aug lhs
-     and rhs' = aug rhs in
-     let _ = match_type_with_value (get_type lhs') rhs' in
-     TComparison (op, lhs', rhs')
-  | Conjunction (lhs, rhs) ->
-     let lhs' = aug lhs
-     and rhs' = aug rhs in
-     if ((is_bool lhs') && (is_bool rhs')) then
-       TConjunction (lhs', rhs')
-     else
-       err "Both operands to a logical expression must be boolean-typed expressions."
-  | Disjunction (lhs, rhs) ->
-     let lhs' = aug lhs
-     and rhs' = aug rhs in
-     if ((is_bool lhs') && (is_bool rhs')) then
-       TDisjunction (lhs', rhs')
-     else
-       err "Both operands to a logical expression must be boolean-typed expressions."
-  | Negation e ->
-     let e' = aug e in
-     if is_bool e' then
-       TNegation e'
-     else
-       err "The operand to the negation operator must be an expression of boolean type."
-  | IfExpression (c, t, f) ->
-     let c' = aug c
-     and t' = aug t
-     and f' = aug f in
-     if is_bool c' then
-       if (get_type t') = (get_type f') then
-         TIfExpression (c', t', f')
-       else
-         err "Both branches of an if expression must be the same type."
-     else
-       err "The type of the condition in an if expression must be a boolean."
-  | Path (e, elems) ->
-     (* Path rules:
-
-        1. Path that begins in a reference ends in a reference.
-        2. All paths end in a type in the free universe.
-     *)
-     let e' = aug e in
-     (* Is the initial expression of a path a read reference or write reference or no reference? *)
-     let (is_read, region): (bool * ty option) =
-       (match (get_type e') with
-        | ReadRef (_, r) ->
-           (true, Some r)
-        | WriteRef (_, r) ->
-           (false, Some r)
-        | _ ->
-           (false, None))
-     in
-     let elems' = augment_path env module_name rm typarams lexenv (get_type e') elems in
-     let path_ty: ty = get_path_ty_from_elems elems' in
-     let path_ty: ty =
-       (* If the path starts in a reference it should end in one. *)
-       (match region with
-        | Some reg ->
-           if is_read then
-             ReadRef (path_ty, reg)
+  with_frame ("Augment expression: " ^ (expr_kind expr))
+    (fun _ ->
+      let aug = augment_expr module_name env rm typarams lexenv None in
+      match expr with
+      | NilConstant ->
+         TNilConstant
+      | BoolConstant b ->
+         TBoolConstant b
+      | IntConstant i ->
+         TIntConstant i
+      | FloatConstant f ->
+         TFloatConstant f
+      | StringConstant s ->
+         TStringConstant s
+      | Variable name ->
+         (match get_variable env lexenv name with
+          | Some (ty, src) ->
+             (match src with
+              | VarConstant ->
+                 TConstVar (name, ty)
+              | VarParam ->
+                 TParamVar ((original_name name), ty)
+              | VarLocal ->
+                 TLocalVar ((original_name name), ty))
+          | None ->
+             err ("I can't find the variable named " ^ (ident_string (original_name name))))
+      | FunctionCall (name, args) ->
+         augment_call module_name env asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
+      | ArithmeticExpression (op, lhs, rhs) ->
+         let lhs' = aug lhs
+         and rhs' = aug rhs in
+         if (get_type lhs') = (get_type rhs') then
+           (* If the types are the same type, check it is a numeric type. *)
+           if (is_numeric (get_type lhs')) then
+             TArithmetic (op, lhs', rhs')
            else
-             WriteRef (path_ty, reg)
-        | None ->
-           path_ty)
-     in
-     let universe = type_universe path_ty in
-     if universe = FreeUniverse then
-       TPath {
-           head = e';
-           elems = elems';
-           ty = path_ty
-         }
-     else
-       err ("Paths must end in the free universe: " ^ (show_ty path_ty))
-  | Embed (ty, expr, args) ->
-     TEmbed (
-         parse_typespec env rm typarams ty,
-         expr,
-         List.map aug args
-       )
-  | Deref expr ->
-     (* The type of the expression being dereferenced must be either a read-only
-        reference or a write reference. *)
-     let expr' = aug expr in
-     let ty = get_type expr' in
-     (match ty with
-      | ReadRef _ ->
-         TDeref expr'
-      | WriteRef _ ->
-         TDeref expr'
-      | _ ->
-         err "The dereference operator must be applied to an expression of a reference type.")
-  | Typecast (expr, ty) ->
-     (* The typecast operator has four uses:
+             err "Both operands to an arithmetic expression must be comparable types."
+         else
+           (* If the types are different, check if at least one operator is a constant.*)
+           let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
+           and are_float_constants = (is_float_constant lhs) || (is_float_constant rhs) in
+           if (are_int_constants || are_float_constants) then
+             (* If either operand is a constant, let it pass *)
+             TArithmetic (op, lhs', rhs')
+           else
+             err "Both operands to an arithmetic expression must be of the same type"
+      | Comparison (op, lhs, rhs) ->
+         let lhs' = aug lhs
+         and rhs' = aug rhs in
+         let _ = match_type_with_value (get_type lhs') rhs' in
+         TComparison (op, lhs', rhs')
+      | Conjunction (lhs, rhs) ->
+         let lhs' = aug lhs
+         and rhs' = aug rhs in
+         if ((is_bool lhs') && (is_bool rhs')) then
+           TConjunction (lhs', rhs')
+         else
+           err "Both operands to a logical expression must be boolean-typed expressions."
+      | Disjunction (lhs, rhs) ->
+         let lhs' = aug lhs
+         and rhs' = aug rhs in
+         if ((is_bool lhs') && (is_bool rhs')) then
+           TDisjunction (lhs', rhs')
+         else
+           err "Both operands to a logical expression must be boolean-typed expressions."
+      | Negation e ->
+         let e' = aug e in
+         if is_bool e' then
+           TNegation e'
+         else
+           err "The operand to the negation operator must be an expression of boolean type."
+      | IfExpression (c, t, f) ->
+         let c' = aug c
+         and t' = aug t
+         and f' = aug f in
+         if is_bool c' then
+           if (get_type t') = (get_type f') then
+             TIfExpression (c', t', f')
+           else
+             err "Both branches of an if expression must be the same type."
+         else
+           err "The type of the condition in an if expression must be a boolean."
+      | Path (e, elems) ->
+         (* Path rules:
 
-          1. Clarifying the type of integer and floating point constants.
-
-          2. Converting between different integer and floating point types
-             (otherwise, you get a combinatorial explosion of typeclasses).
-
-          3. Converting write references to read references.
-
-          4. Clarifying the type of return type polymorphic functions.
-
-      *)
-
-     let rec is_int_or_float_type = function
-       | Integer _ -> true
-       | SingleFloat -> true
-       | DoubleFloat -> true
-       | _ -> false
-
-     and augment_numeric_conversion (expr: texpr) (ty: ty): texpr =
-       let source_type_name = type_conversion_name (get_type expr)
-       and target_type_name = type_conversion_name ty in
-       let conversion_function_call = "Austral__Core::convert_" ^ source_type_name ^ "_to_" ^ target_type_name ^ "($1)" in
-       TEmbed (ty, conversion_function_call, [expr])
-
-     and type_conversion_name (ty: ty): string =
-       (match ty with
-        | Integer (signedness, width) ->
-           let s = (match signedness with
-                    | Unsigned -> "nat"
-                    | Signed -> "int")
-           and w = (match width with
-                    | Width8 -> "8"
-                    | Width16 -> "16"
-                    | Width32 -> "32"
-                    | Width64 -> "64")
-           in
-           s ^ "int" ^ w
-        | SingleFloat ->
-           "float"
-        | DoubleFloat ->
-           "double"
-        | _ ->
-           err "Invalid type for numeric conversion.")
-     in
-
-     let target_type = parse_typespec env rm typarams ty in
-     (* By passing target_type as the asserted type we're doing point 4. *)
-     let expr' = augment_expr module_name env rm typarams lexenv (Some target_type) expr in
-     (* For 1 and 2: if the expression has an int or float type, and the type is
-        an integer or float constant, do the conversion: *)
-     if (is_int_or_float_type (get_type expr')) && (is_int_or_float_type target_type) then
-       augment_numeric_conversion expr' target_type
-     else
-       (* Otherwise, if the expression has a mutable reference type and the
-          target type is a read reference, and they point to the same underlying
-          type and underlying region, just convert it to a read ref. This does
-          point 3. *)
-       (match (get_type expr') with
-        | WriteRef (underlying_ty, region) ->
-           (match target_type with
-            | ReadRef (underlying_ty', region') ->
-               if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
-                 TCast (expr', target_type)
-               else
-                 err "Cannot convert because the references have different underlying types or regions."
+            1. Path that begins in a reference ends in a reference.
+            2. All paths end in a type in the free universe.
+          *)
+         let e' = aug e in
+         (* Is the initial expression of a path a read reference or write reference or no reference? *)
+         let (is_read, region): (bool * ty option) =
+           (match (get_type e') with
+            | ReadRef (_, r) ->
+               (true, Some r)
+            | WriteRef (_, r) ->
+               (false, Some r)
             | _ ->
-               err "Bad conversion.")
-        | _ ->
-           err "Bad conversion")
-  | SizeOf ty ->
-     TSizeOf (parse_typespec env rm typarams ty)
+               (false, None))
+         in
+         let elems' = augment_path env module_name rm typarams lexenv (get_type e') elems in
+         let path_ty: ty = get_path_ty_from_elems elems' in
+         let path_ty: ty =
+           (* If the path starts in a reference it should end in one. *)
+           (match region with
+            | Some reg ->
+               if is_read then
+                 ReadRef (path_ty, reg)
+               else
+                 WriteRef (path_ty, reg)
+            | None ->
+               path_ty)
+         in
+         let universe = type_universe path_ty in
+         if universe = FreeUniverse then
+           TPath {
+               head = e';
+               elems = elems';
+               ty = path_ty
+             }
+         else
+           err ("Paths must end in the free universe: " ^ (show_ty path_ty))
+      | Embed (ty, expr, args) ->
+         TEmbed (
+             parse_typespec env rm typarams ty,
+             expr,
+             List.map aug args
+           )
+      | Deref expr ->
+         (* The type of the expression being dereferenced must be either a read-only
+            reference or a write reference. *)
+         let expr' = aug expr in
+         let ty = get_type expr' in
+         (match ty with
+          | ReadRef _ ->
+             TDeref expr'
+          | WriteRef _ ->
+             TDeref expr'
+          | _ ->
+             err "The dereference operator must be applied to an expression of a reference type.")
+      | Typecast (expr, ty) ->
+         (* The typecast operator has four uses:
+
+            1. Clarifying the type of integer and floating point constants.
+
+            2. Converting between different integer and floating point types
+            (otherwise, you get a combinatorial explosion of typeclasses).
+
+            3. Converting write references to read references.
+
+            4. Clarifying the type of return type polymorphic functions.
+
+          *)
+
+         let rec is_int_or_float_type = function
+           | Integer _ -> true
+           | SingleFloat -> true
+           | DoubleFloat -> true
+           | _ -> false
+
+         and augment_numeric_conversion (expr: texpr) (ty: ty): texpr =
+           let source_type_name = type_conversion_name (get_type expr)
+           and target_type_name = type_conversion_name ty in
+           let conversion_function_call = "Austral__Core::convert_" ^ source_type_name ^ "_to_" ^ target_type_name ^ "($1)" in
+           TEmbed (ty, conversion_function_call, [expr])
+
+         and type_conversion_name (ty: ty): string =
+           (match ty with
+            | Integer (signedness, width) ->
+               let s = (match signedness with
+                        | Unsigned -> "nat"
+                        | Signed -> "int")
+               and w = (match width with
+                        | Width8 -> "8"
+                        | Width16 -> "16"
+                        | Width32 -> "32"
+                        | Width64 -> "64")
+               in
+               s ^ "int" ^ w
+            | SingleFloat ->
+               "float"
+            | DoubleFloat ->
+               "double"
+            | _ ->
+               err "Invalid type for numeric conversion.")
+         in
+
+         let target_type = parse_typespec env rm typarams ty in
+         (* By passing target_type as the asserted type we're doing point 4. *)
+         let expr' = augment_expr module_name env rm typarams lexenv (Some target_type) expr in
+         (* For 1 and 2: if the expression has an int or float type, and the type is
+            an integer or float constant, do the conversion: *)
+         if (is_int_or_float_type (get_type expr')) && (is_int_or_float_type target_type) then
+           augment_numeric_conversion expr' target_type
+         else
+           (* Otherwise, if the expression has a mutable reference type and the
+              target type is a read reference, and they point to the same underlying
+              type and underlying region, just convert it to a read ref. This does
+              point 3. *)
+           (match (get_type expr') with
+            | WriteRef (underlying_ty, region) ->
+               (match target_type with
+                | ReadRef (underlying_ty', region') ->
+                   if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
+                     TCast (expr', target_type)
+                   else
+                     err "Cannot convert because the references have different underlying types or regions."
+                | _ ->
+                   err "Bad conversion.")
+            | _ ->
+               err "Bad conversion")
+      | SizeOf ty ->
+         TSizeOf (parse_typespec env rm typarams ty))
 
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
@@ -443,47 +445,54 @@ and augment_call (module_name: module_name) (env: env) (asserted_ty: ty option) 
      err ("No callable with this name: " ^ (qident_debug_name name))
 
 and augment_callable (module_name: module_name) (env: env) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
-  match callable with
-  | FunctionCallable (id, typarams, params, rt) ->
-     augment_function_call id name typarams params rt asserted_ty args
-  | TypeAliasCallable (_, typarams, universe, ty) ->
-     augment_typealias_callable name typarams universe asserted_ty ty args
-  | RecordConstructor (_, typarams, universe, slots) ->
-     augment_record_constructor name typarams universe slots asserted_ty args
-  | UnionConstructor { union_id; type_params; universe; case } ->
-     let type_name: qident = (match get_decl_by_id env union_id with
-                              | Some (Union { name; mod_id; _ }) ->
-                                 (* TODO: constructing a fake qident *)
-                                 make_qident (module_name_from_id env mod_id, name, name)
-                              | _ ->
-                                 err "Internal")
-     in
-     augment_union_constructor type_name type_params universe case asserted_ty args
-  | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
-     let param = (match get_decl_by_id env typeclass_id with
-                  | Some (TypeClass { param; _ }) ->
-                     param
-                  | _ ->
-                     err "Internal")
-     in
-     augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args
+  with_frame "Augment callable"
+    (fun _ ->
+      match callable with
+      | FunctionCallable (id, typarams, params, rt) ->
+         augment_function_call id name typarams params rt asserted_ty args
+      | TypeAliasCallable (_, typarams, universe, ty) ->
+         augment_typealias_callable name typarams universe asserted_ty ty args
+      | RecordConstructor (_, typarams, universe, slots) ->
+         augment_record_constructor name typarams universe slots asserted_ty args
+      | UnionConstructor { union_id; type_params; universe; case } ->
+         let type_name: qident = (match get_decl_by_id env union_id with
+                                  | Some (Union { name; mod_id; _ }) ->
+                                     (* TODO: constructing a fake qident *)
+                                     make_qident (module_name_from_id env mod_id, name, name)
+                                  | _ ->
+                                     err "Internal")
+         in
+         augment_union_constructor type_name type_params universe case asserted_ty args
+      | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
+         let param = (match get_decl_by_id env typeclass_id with
+                      | Some (TypeClass { param; _ }) ->
+                         param
+                      | _ ->
+                         err "Internal")
+         in
+         augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args)
 
 and augment_function_call (id: decl_id) name typarams params rt asserted_ty args =
-  (* For simplicity, and to reduce duplication of code, we convert the argument
-     list to a positional list. *)
-  let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-  let arguments = arglist_to_positional (args, param_names) in
-  (* Check the list of params against the list of arguments *)
-  let bindings = check_argument_list params arguments in
-  (* Use the bindings to get the effective return type *)
-  let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism (local_name name) params rt' asserted_ty bindings in
-  (* Check: the set of bindings equals the set of type parameters *)
-  let bindings'' = merge_bindings bindings bindings' in
-  check_bindings typarams bindings'';
-  let arguments' = cast_arguments bindings'' params arguments in
-  let substs = make_substs bindings'' typarams in
-  TFuncall (id, name, arguments', rt'', substs)
+  with_frame "Augment function call"
+    (fun _ ->
+      pqi ("Name", name);
+      (* For simplicity, and to reduce duplication of code, we convert the argument
+         list to a positional list. *)
+      let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
+      let arguments = arglist_to_positional (args, param_names) in
+      (* Check the list of params against the list of arguments *)
+      let bindings = check_argument_list params arguments in
+      (* Use the bindings to get the effective return type *)
+      let rt' = replace_variables bindings rt in
+      let (bindings', rt'') = handle_return_type_polymorphism (local_name name) params rt' asserted_ty bindings in
+      (* Check: the set of bindings equals the set of type parameters *)
+      let bindings'' = merge_bindings bindings bindings' in
+      check_bindings typarams bindings'';
+      let arguments' = cast_arguments bindings'' params arguments in
+      let substs = make_substs bindings'' typarams in
+      ps ("Bindings", show_bindings bindings'');
+      pt ("Return type", rt'');
+      TFuncall (id, name, arguments', rt'', substs))
 
 and augment_typealias_callable name typarams universe asserted_ty definition_ty args =
   (* Check: the argument list is a positional list with a single argument *)
@@ -546,7 +555,6 @@ and augment_record_constructor (name: qident) (typarams: type_parameter list) (u
       err "Universe mismatch"
 
 and augment_union_constructor (type_name: qident) (typarams: type_parameter list) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
-  (* Check: the argument list must be named *)
   let args' = (match args with
                | TPositionalArglist l ->
                   if l = [] then
