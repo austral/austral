@@ -66,7 +66,8 @@ module body Austral.Memory is
         let n: Address[T] := Null_Pointer();
         if address /= n then
             let ptr: Pointer[T] := @embed(Pointer[T], "$1", address);
-            return Some(value => ptr);
+            let opt: Option[Pointer[T]] := Some(value => ptr);
+            return opt;
         else
             let res: Option[Pointer[T]] := None();
             return res;
