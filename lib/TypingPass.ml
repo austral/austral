@@ -577,6 +577,12 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
     check_bindings typarams (merge_bindings bindings bindings');
     (* Check the resulting type is in the correct universe *)
     if universe_compatible universe (type_universe rt'') then
+      let _ =  print_endline "-------------" in
+      print_endline ("rt: " ^ (type_string rt));
+      print_endline ("rt': " ^ (type_string rt'));
+      print_endline ("rt'': " ^ (type_string rt''));
+      print_endline ("Tyargs: " ^ (String.concat ", " (List.map (fun (_, t) -> show_ty (get_type t)) args')));
+      print_endline "-------------";
       TUnionConstructor (rt'', case_name, List.map2 (fun a b -> (a, b)) slot_names arguments)
     else
       err "Universe mismatch"

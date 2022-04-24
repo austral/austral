@@ -2,7 +2,6 @@ open Id
 open Identifier
 open Region
 open Names
-open Error
 
 type universe =
   | FreeUniverse
@@ -73,23 +72,23 @@ let rec type_string = function
   | DoubleFloat ->
      double_float_name
   | NamedType (n, args, u) ->
-     (ident_string (local_name n)) ^ args_string args ^ " : " ^ (universe_string u)
+     (qident_debug_name n) ^ args_string args ^ ": " ^ (universe_string u)
   | Array (t, r) ->
-     "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "] : Free"
+     "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "]: Free"
   | RegionTy r ->
      ident_string (region_name r) ^ "(" ^ (string_of_int (region_id r)) ^ ")"
   | ReadRef (t, r) ->
-     read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Free"
+     read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Free"
   | WriteRef (t, r) ->
-     write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "] : Linear"
+     write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Linear"
   | TyVar (TypeVariable (n, u, from)) ->
-     (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ " : " ^ (universe_string u)
+     (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ ": " ^ (universe_string u)
   | Address ty ->
      address_name ^ "[" ^ (type_string ty) ^ "]"
   | Pointer ty ->
      pointer_name ^ "[" ^ (type_string ty) ^ "]"
   | MonoTy _ ->
-    err "Not applicable"
+    "MonoTy"
 
 and signedness_string = function
   | Unsigned -> nat_prefix
