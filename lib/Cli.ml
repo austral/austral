@@ -80,6 +80,11 @@ let parse_source_files (args: string list): (module_source list * string SourceM
   in
   (contents, source_map)
 
+let dump_and_die _: unit =
+  print_endline "Compiler call tree printed to calltree.html";
+  Reporter.dump ();
+  exit (-1)
+
 let compile_main (args: string list): unit =
   let (contents, source_map) = parse_source_files args in
   try
@@ -115,7 +120,7 @@ let compile_main (args: string list): unit =
     in
     Printf.eprintf "%s" (render_error error code);
     print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
-    exit (-1)
+    dump_and_die ()
 
 let typecheck_main (args: string list): unit =
   let (contents, source_map) = parse_source_files args in
@@ -133,7 +138,7 @@ let typecheck_main (args: string list): unit =
     in
     Printf.eprintf "%s" (render_error error code);
     print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
-    exit (-1)
+    dump_and_die ()
 
 let main' (args: string list): unit =
   match args with
@@ -156,4 +161,4 @@ let main (args: string list): unit =
   with Austral_error error ->
     Printf.eprintf "%s" (render_error error None);
     print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
-    exit (-1)
+    dump_and_die ()
