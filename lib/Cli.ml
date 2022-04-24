@@ -2,6 +2,7 @@ open Identifier
 open Compiler
 open Util
 open Error
+open Reporter
 
 (* Map of filenames to file contents. *)
 module SourceMap =
@@ -85,7 +86,13 @@ let dump_and_die _: unit =
   Reporter.dump ();
   exit (-1)
 
-let compile_main (args: string list): unit =
+let rec compile_main (args: string list): unit =
+  with_frame "Entrypoint"
+    (fun () ->
+      ps ("Arguments: ", String.concat " " args);
+      compile_main' args)
+
+and compile_main' (args: string list): unit =
   let (contents, source_map) = parse_source_files args in
   try
     let args' = List.map parse_arg args in
