@@ -20,16 +20,23 @@ let prefix: string = "<!DOCTYPE html>
     <title>Austral Compiler Call Tree</title>
   </head>
   <body>
-<h1>Compiler Call Tree</h1>\n"
+<h1>Compiler Call Tree</h1>
+<ul>\n"
 
-let suffix: string = "
+let suffix: string = "</ul>
+  <style>
+    .multi-line {
+      display: flex;
+      flex-direction: row;
+    }
+  </style>
   </body>
 </html>"
 
 (** Render the event list to HTML. *)
 let rec render _ : string =
   prefix
- ^ (String.concat "" (List.map render_event !events))
+ ^ (String.concat "" (List.map render_event (List.rev !events)))
  ^ suffix
 
 and render_event (event: event): string =
@@ -42,10 +49,24 @@ and render_event (event: event): string =
      "</ul>
 </li>\n"
   | PrintValue (label, value) ->
-     "<li class='value'>
+     (match String.index_opt value '\n' with
+      | Some _ ->
+         (* Has a newline. *)
+         ("<li class='prop'>
+<div class='multi-line'>
 <span class='label'>" ^ label ^ "</span>
-<pre><code>" ^ value ^ "</pre></code>
-</li>\n"
+<pre class='value'><code>" ^ value ^ "</pre></code>
+</div>
+</li>\n")
+      | None ->
+         (* No newline. *)
+         ("<li class='prop'>
+<div class='single-line'>
+<span class='label'>" ^ label ^ "</span>
+<code class='value'>" ^ value ^ "</code>
+</div>
+</li>\n"))
+
 
 let dump _: unit =
   write_string_to_file "calltree.html" (render ())
