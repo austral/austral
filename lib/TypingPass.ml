@@ -967,6 +967,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          adorn_error_with_span span
            (fun _ ->
              let e' = augment_expr module_name env rm typarams lexenv None e in
+             ps ("Expression", show_texpr e');
              let u = type_universe (get_type e') in
              if ((u = LinearUniverse) || (u = TypeUniverse)) then
                err "Discarding a linear value"
