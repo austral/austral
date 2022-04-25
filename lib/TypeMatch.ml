@@ -64,14 +64,10 @@ let rec match_type a b =
          match_type_var tyvar a
       | _ ->
          type_mismatch "Expected a named type, but got something else." a b)
-  | StaticArray (t, r) ->
+  | StaticArray t ->
      (match b with
-      | StaticArray (t', r') ->
-         let bindings = match_type t t' in
-         if r = r' then
-           bindings
-         else
-           type_mismatch "Array type mismatch" a b
+      | StaticArray t' ->
+         match_type t t'
       | TyVar tyvar ->
          match_type_var tyvar a
       | _ ->

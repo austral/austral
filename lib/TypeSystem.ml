@@ -10,7 +10,7 @@ let type_universe = function
   | SingleFloat -> FreeUniverse
   | DoubleFloat -> FreeUniverse
   | NamedType (_, _, u) -> u
-  | StaticArray (_, _) -> FreeUniverse
+  | StaticArray _ -> FreeUniverse
   | RegionTy _ -> RegionUniverse
   | ReadRef _ -> FreeUniverse
   | WriteRef _ -> FreeUniverse
@@ -64,7 +64,7 @@ let rec type_variables = function
      TypeVarSet.empty
   | NamedType (_, a, _) ->
      List.fold_left TypeVarSet.union TypeVarSet.empty (List.map type_variables a)
-  | StaticArray (ty, _) ->
+  | StaticArray ty ->
      type_variables ty
   | RegionTy _ ->
      TypeVarSet.empty
@@ -91,7 +91,7 @@ let rec is_concrete = function
   | SingleFloat -> true
   | DoubleFloat -> true
   | NamedType _ -> false
-  | StaticArray (ty, _) ->
+  | StaticArray ty ->
      is_concrete ty
   | RegionTy _ ->
      true

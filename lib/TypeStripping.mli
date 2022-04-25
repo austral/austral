@@ -15,7 +15,7 @@ type stripped_ty =
   | SSingleFloat
   | SDoubleFloat
   | SNamedType of qident * stripped_ty list
-  | SStaticArray of stripped_ty * region
+  | SStaticArray of stripped_ty
   | SRegionTy of region
   | SReadRef of stripped_ty * stripped_ty
   | SWriteRef of stripped_ty * stripped_ty

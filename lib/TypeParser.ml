@@ -92,7 +92,7 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
       | "Fixed_Array" ->
          (match args with
           | [ty] ->
-             Some (StaticArray (ty, static_region))
+             Some (StaticArray ty)
           | _ ->
              err "Invalid Fixed_Array type specifier.")
       | "Reference" ->

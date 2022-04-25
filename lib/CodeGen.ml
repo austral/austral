@@ -6,7 +6,6 @@ open MonoType
 open Mtast
 open CRepr
 open Util
-open Region
 open Escape
 open Error
 
@@ -125,7 +124,7 @@ let rec gen_type (ty: mono_ty): c_ty =
      CNamedType "double"
   | MonoNamedType id ->
      CNamedType (gen_mono_id id)
-  | MonoStaticArray (_, _) ->
+  | MonoStaticArray _ ->
      CNamedType "au_array_t"
   | MonoRegionTy _ ->
      err "TODO: Codegen for region types"
@@ -525,11 +524,8 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
            gen_type t
         | MonoDoubleFloat ->
            gen_type t
-        | MonoStaticArray (MonoInteger (Unsigned, Width8), r) ->
-           if r = static_region then
-             c_string_type
-           else
-             err "Not allowed"
+        | MonoStaticArray (MonoInteger (Unsigned, Width8)) ->
+           c_string_type
         | MonoAddress _ ->
            gen_type t
         | MonoNamedType _ ->
