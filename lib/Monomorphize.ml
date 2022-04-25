@@ -38,9 +38,12 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
      let (ty, env) = monomorphize_ty env ty in
      let (region, env) = monomorphize_ty env region in
      (MonoWriteRef (ty, region), env)
-  | SRawPointer ty ->
+  | SAddress ty ->
      let (ty, env) = monomorphize_ty env ty in
-     (MonoRawPointer ty, env)
+     (MonoAddress ty, env)
+  | SPointer ty ->
+     let (ty, env) = monomorphize_ty env ty in
+     (MonoPointer ty, env)
   | SNamedType (name, args) ->
      let (args, env) = monomorphize_ty_list env args in
      (match get_decl_by_name env (qident_to_sident name) with
@@ -95,11 +98,15 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      (MFloatConstant f, env)
   | TStringConstant s ->
      (MStringConstant s, env)
-  | TVariable (name, ty) ->
-     (*print_endline (qident_debug_name name);*)
-     (*print_endline ("Type: " ^ (show_ty ty));*)
+  | TConstVar (name, ty) ->
      let (ty, env) = strip_and_mono env ty in
-     (MVariable (name, ty), env)
+     (MConstVar (name, ty), env)
+  | TParamVar (name, ty) ->
+     let (ty, env) = strip_and_mono env ty in
+     (MParamVar (name, ty), env)
+  | TLocalVar (name, ty) ->
+     let (ty, env) = strip_and_mono env ty in
+     (MLocalVar (name, ty), env)
   | TArithmetic (oper, lhs, rhs) ->
      let (lhs, env) = monomorphize_expr env lhs in
      let (rhs, env) = monomorphize_expr env rhs in
@@ -765,7 +772,9 @@ and mono_to_ty (ty: mono_ty): ty =
      ReadRef (r ty, r region)
   | MonoWriteRef (ty, region) ->
      WriteRef (r ty, r region)
-  | MonoRawPointer ty ->
-     RawPointer (r ty)
+  | MonoAddress ty ->
+     Address (r ty)
+  | MonoPointer ty ->
+     Pointer (r ty)
   | MonoRegionTyVar (name, source) ->
      TyVar (TypeVariable (name, RegionUniverse, source))

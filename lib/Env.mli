@@ -430,7 +430,7 @@ val get_callable : env -> module_name -> sident -> callable option
 
 (** Get the type of a variable, trying first the lexenv and then the env for
     constants. *)
-val get_variable : env -> lexenv -> qident -> ty option
+val get_variable : env -> lexenv -> qident -> (ty * var_source) option
 
 (** Return all typeclass instances visible from a module. These are not only the
     instances that are defined in the module itself, but the instances imported
@@ -465,6 +465,9 @@ val get_monomorph : env -> mono_id -> monomorph option
 
 (** Return the ID of a declaration. *)
 val decl_id : decl -> decl_id
+
+(** Return the name of a declaration. *)
+val decl_name : decl -> identifier option
 
 (** Return whether a declaration is importable by a foreign module. *)
 val is_importable: decl -> bool

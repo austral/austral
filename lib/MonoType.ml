@@ -16,7 +16,8 @@ type mono_ty =
   | MonoRegionTy of region
   | MonoReadRef of mono_ty * mono_ty
   | MonoWriteRef of mono_ty * mono_ty
-  | MonoRawPointer of mono_ty
+  | MonoAddress of mono_ty
+  | MonoPointer of mono_ty
   | MonoRegionTyVar of identifier * qident
 [@@deriving (eq, show)]
 

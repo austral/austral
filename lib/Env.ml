@@ -611,16 +611,16 @@ let get_callable (env: env) (importing_module_name: module_name) (name: sident):
   | None ->
      None
 
-let get_variable (env: env) (lexenv: lexenv) (name: qident): ty option =
+let get_variable (env: env) (lexenv: lexenv) (name: qident): (ty * var_source) option =
   match get_var lexenv (original_name name) with
-  | Some ty ->
-     Some ty
+  | Some (ty, src) ->
+     Some (ty, src)
   | None ->
      (match get_decl_by_name env (qident_to_sident name) with
       | Some decl ->
          (match decl with
           | Constant { ty; _ } ->
-             Some ty
+             Some (ty, VarConstant)
           | _ ->
              None)
       | None ->

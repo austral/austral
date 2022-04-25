@@ -4,13 +4,17 @@
 let memory_interface_source = {code|
 
 module Austral.Memory is
+    type Address[T: Type]: Free;
     type Pointer[T: Type]: Free;
 
     generic [T: Type]
-    function Null_Pointer(): Pointer[T];
+    function Null_Pointer(): Address[T];
 
     generic [T: Type]
-    function Allocate(size: Natural_64): Pointer[T];
+    function Null_Check(address: Address[T]): Option[Pointer[T]];
+
+    generic [T: Type]
+    function Allocate(size: Natural_64): Address[T];
 
     generic [T: Type]
     function Load(pointer: Pointer[T]): T;
@@ -49,11 +53,30 @@ end module.
 let memory_body_source = {code|
 
 module body Austral.Memory is
+    type Address[T: Type]: Free is Unit;
     type Pointer[T: Type]: Free is Unit;
 
     generic [T: Type]
-    function Null_Pointer(): Pointer[T] is
-        return @embed(Pointer[T], "NULL");
+    function Null_Pointer(): Address[T] is
+        return @embed(Address[T], "NULL");
+    end;
+
+    generic [T: Type]
+    function Null_Check(address: Address[T]): Option[Pointer[T]] is
+        let n: Address[T] := Null_Pointer();
+        if address /= n then
+            let ptr: Pointer[T] := @embed(Pointer[T], "$1", address);
+            let opt: Option[Pointer[T]] := Some(value => ptr);
+            return opt;
+        else
+            let res: Option[Pointer[T]] := None();
+            return res;
+        end if;
+    end;
+
+    generic [T: Type]
+    function Allocate(size: Natural_64): Address[T] is
+        return @embed(Address[T], "au_calloc($1, $2)", sizeof(T), size);
     end;
 
     generic [T: Type]
@@ -81,11 +104,6 @@ module body Austral.Memory is
     generic [T: Type, R: Region]
     function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R] is
         return @embed(WriteReference[T, R], "*($1)", ref);
-    end;
-
-    generic [T: Type]
-    function Allocate(size: Natural_64): Pointer[T] is
-        return @embed(Pointer[T], "au_calloc($1, $2)", sizeof(T), size);
     end;
 
     generic [T: Type]

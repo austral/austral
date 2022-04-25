@@ -1,6 +1,7 @@
 import Austral.Memory (
+    Address,
     Pointer,
-    Null_Pointer,
+    Null_Check,
     Allocate,
     Load,
     Store,
@@ -18,18 +19,18 @@ module body Example.Box is
 
     generic [T: Type]
     function Make(val: T): Either[Box[T], T] is
-        let ptr: Pointer[T] := Allocate(sizeof(T));
-        let null: Pointer[T] := Null_Pointer();
-        if ptr = null then
-            -- Allocation failed, return the object we tried to box.
-            let right: Either[Box[T], T] := Right(right => val);
-            return right;
-        else
-            Store(ptr, val);
-            let box: Box[T] := Box(pointer => ptr);
-            let left: Either[Box[T], T] := Left(left => box);
-            return left;
-        end if;
+        let addr: Address[T] := Allocate(sizeof(T));
+        case Null_Check(addr) of
+            when Some(value: Pointer[T]) do
+                Store(value, val);
+                let box: Box[T] := Box(pointer => value);
+                let left: Either[Box[T], T] := Left(left => box);
+                return left;
+            when None do
+                -- Allocation failed, return the object we tried to box.
+                let right: Either[Box[T], T] := Right(right => val);
+                return right;
+        end case;
     end;
 
     generic [T: Type]

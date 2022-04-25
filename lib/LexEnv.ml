@@ -2,25 +2,30 @@ open Identifier
 open Type
 open Error
 
-type lexenv = (identifier * ty) list
+type var_source =
+  | VarConstant
+  | VarParam
+  | VarLocal
+
+type lexenv = (identifier * ty * var_source) list
 
 let empty_lexenv =
   []
 
-let get_var l name =
-  Option.map (fun (_, t) -> t) (List.find_opt (fun (n, _) -> n = name) l)
+let get_var (l: lexenv) (name: identifier): (ty * var_source) option =
+  Option.map (fun (_, t, s) -> (t, s)) (List.find_opt (fun (n, _, _) -> n = name) l)
 
-let push_var l name ty =
+let push_var l name ty source =
   match get_var l name with
   | (Some _) ->
      err "push_var: var with this name already exists"
   | None ->
-     (name, ty) :: l
+     (name, ty, source) :: l
 
 let rec push_vars env l =
   match l with
-  | (n,t)::rest ->
-     push_vars (push_var env n t) rest
+  | (n,t,s)::rest ->
+     push_vars (push_var env n t s) rest
   | [] ->
      env
 

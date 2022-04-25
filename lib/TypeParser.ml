@@ -1,10 +1,10 @@
 open Identifier
+open Names
 open Type
 open TypeSystem
 open Region
 open Ast
 open Env
-open BuiltIn
 open Error
 
 let decl_type_signature (decl: decl): type_signature option =
@@ -28,78 +28,102 @@ let decl_type_signature (decl: decl): type_signature option =
   | Instance _ ->
      None
 
+let memory_module_name = make_mod_name "Austral.Memory"
+
+let is_address_type (name: qident): bool =
+  let s = source_module_name name
+  and o = original_name name
+  in
+  (equal_module_name s memory_module_name)
+  && (equal_identifier o (make_ident address_name))
+
+let is_pointer_type (name: qident): bool =
+  let s = source_module_name name
+  and o = original_name name
+  in
+  (equal_module_name s memory_module_name)
+  && (equal_identifier o (make_ident pointer_name))
+
 let parse_built_in_type (name: qident) (args: ty list): ty option =
-  if is_pointer_type name then
+  if is_address_type name then
     match args with
     | [ty] ->
-       Some (RawPointer ty)
+       Some (Address ty)
     | _ ->
-       err "Invalid Pointer type specifier."
+       err "Invalid Address type specifier."
   else
-    let name_str: string = ident_string (original_name name) in
-    match name_str with
-    | "Unit" ->
-       Some Unit
-    | "Boolean" ->
-       Some Boolean
-    | "Natural_8" ->
-       Some (Integer (Unsigned, Width8))
-    | "Natural_16" ->
-       Some (Integer (Unsigned, Width16))
-    | "Natural_32" ->
-       Some (Integer (Unsigned, Width32))
-    | "Natural_64" ->
-       Some (Integer (Unsigned, Width64))
-    | "Integer_8" ->
-       Some (Integer (Signed, Width8))
-    | "Integer_16" ->
-       Some (Integer (Signed, Width16))
-    | "Integer_32" ->
-       Some (Integer (Signed, Width32))
-    | "Integer_64" ->
-       Some (Integer (Signed, Width64))
-    | "Single_Float" ->
-       Some SingleFloat
-    | "Double_Float" ->
-       Some DoubleFloat
-    | "Static" ->
-       Some (RegionTy static_region)
-    | "Fixed_Array" ->
-       (match args with
-        | [ty] ->
-           Some (Array (ty, static_region))
-        | _ ->
-           err "Invalid Fixed_Array type specifier.")
-    | "Reference" ->
-       (match args with
-        | [ty; ty'] ->
-           let u = type_universe ty' in
-           if (u = RegionUniverse) then
-             Some (ReadRef (ty, ty'))
-           else
-             err "Reference error: Not a region"
-        | _ ->
-           err "Invalid Reference type specifier.")
-    | "WriteReference" ->
-       (match args with
-        | [ty; ty'] ->
-           let u' = type_universe ty' in
-           if (u' = RegionUniverse) then
-             Some (WriteRef (ty, ty'))
-           else
-             err "WriteReference error: Not a region"
-        | _ ->
-           err "Invalid WriteReference type specifier.")
-    | _ ->
-       None
+    if is_pointer_type name then
+      match args with
+      | [ty] ->
+         Some (Pointer ty)
+      | _ ->
+         err "Invalid Pointer type specifier."
+    else
+      let name_str: string = ident_string (original_name name) in
+      match name_str with
+      | "Unit" ->
+         Some Unit
+      | "Boolean" ->
+         Some Boolean
+      | "Natural_8" ->
+         Some (Integer (Unsigned, Width8))
+      | "Natural_16" ->
+         Some (Integer (Unsigned, Width16))
+      | "Natural_32" ->
+         Some (Integer (Unsigned, Width32))
+      | "Natural_64" ->
+         Some (Integer (Unsigned, Width64))
+      | "Integer_8" ->
+         Some (Integer (Signed, Width8))
+      | "Integer_16" ->
+         Some (Integer (Signed, Width16))
+      | "Integer_32" ->
+         Some (Integer (Signed, Width32))
+      | "Integer_64" ->
+         Some (Integer (Signed, Width64))
+      | "Single_Float" ->
+         Some SingleFloat
+      | "Double_Float" ->
+         Some DoubleFloat
+      | "Static" ->
+         Some (RegionTy static_region)
+      | "Fixed_Array" ->
+         (match args with
+          | [ty] ->
+             Some (Array (ty, static_region))
+          | _ ->
+             err "Invalid Fixed_Array type specifier.")
+      | "Reference" ->
+         (match args with
+          | [ty; ty'] ->
+             let u = type_universe ty' in
+             if (u = RegionUniverse) then
+               Some (ReadRef (ty, ty'))
+             else
+               err "Reference error: Not a region"
+          | _ ->
+             err "Invalid Reference type specifier.")
+      | "WriteReference" ->
+         (match args with
+          | [ty; ty'] ->
+             let u' = type_universe ty' in
+             if (u' = RegionUniverse) then
+               Some (WriteRef (ty, ty'))
+             else
+               err "WriteReference error: Not a region"
+          | _ ->
+             err "Invalid WriteReference type specifier.")
+      | _ ->
+         None
 
 let rec effective_universe name typarams declared_universe args =
   (* Algorithm:
 
      1. If the declared universe is Free then none of the type parameters can be Linear or Type.
 
-         1.1 Unless it's `Pointer[T]`. But we don't have to take care of that here, since `Pointer`
-             is a built in type, and the `type_universe` function determines its universe.
+         1.1 Unless it's `Pointer[T]` or `Address[T]`. But we don't have to take
+         care of that here, since those are built in types, and the
+         `type_universe` function determines their universe.
 
      2. If the declared universe is Linear, then no type parameter can change this. Therefore, the effective
         universe is Linear.

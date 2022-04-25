@@ -1,6 +1,7 @@
 open Cst
 open Span
 open Error
+open Reporter
 
 let parse' f (code: string) (filename: string) =
   let lexbuf = Lexing.from_string code in
@@ -13,10 +14,16 @@ let parse' f (code: string) (filename: string) =
         raise (Austral_error error)
 
 let parse_module_int (s:string) (filename: string): concrete_module_interface  =
-  parse' Parser.module_int s filename
+  with_frame "Parse module interface"
+    (fun _ ->
+      ps ("Filename", filename);
+      parse' Parser.module_int s filename)
 
 let parse_module_body (s: string) (filename: string): concrete_module_body =
-  parse' Parser.module_body s filename
+    with_frame "Parse module body"
+      (fun _ ->
+        ps ("Filename", filename);
+        parse' Parser.module_body s filename)
 
 let parse_stmt s =
   parse' Parser.standalone_statement s ""

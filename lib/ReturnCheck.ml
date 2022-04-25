@@ -1,6 +1,7 @@
 open Identifier
 open Ast
 open Combined
+open Reporter
 open Error
 
 let is_abort (name: qident): bool =
@@ -45,47 +46,49 @@ let rec ends_in_return (stmt: astmt): bool =
      true
 
 let check_ends_in_return (CombinedModule { name=mn; decls; _ }): unit =
-  let check_method_ends_in_return (CMethodDef (name, _, _, _, body)): unit =
-    if ends_in_return body then
-      ()
-    else
-      err ("Method "
-           ^ (ident_string name)
-           ^ " in module "
-           ^ (mod_name_string mn)
-           ^ " doesn't end in a return statement.")
-  in
-  let check_decl_ends_in_return (decl: combined_definition): unit =
-    match decl with
-    | CConstant _ ->
-       ()
-    | CTypeAlias _ ->
-       ()
-    | CRecord _ ->
-       ()
-    | CUnion _ ->
-       ()
-    | CFunction (_, name, _, _, _, body, _, pragmas) ->
-       (match pragmas with
-        | [] ->
-           (* No pragmas: regular function. *)
-           if ends_in_return body then
-             ()
-           else
-             err ("Function "
-                  ^ (ident_string name)
-                  ^ " in module "
-                  ^ (mod_name_string mn)
-                  ^ " doesn't end in a return statement.")
-        | _ ->
-           (* Yes pragmas: foreign function, ignore the body. *)
-           ())
-    | CTypeclass _ ->
-       ()
-    | CInstance (_, _, _, _, methods, _) ->
-       let _ = List.map check_method_ends_in_return methods in
-       ()
-  in
-  let _ = List.map check_decl_ends_in_return decls
-  in
-  ()
+  with_frame "Return check"
+    (fun _ ->
+      let check_method_ends_in_return (CMethodDef (name, _, _, _, body)): unit =
+        if ends_in_return body then
+          ()
+        else
+          err ("Method "
+               ^ (ident_string name)
+               ^ " in module "
+               ^ (mod_name_string mn)
+               ^ " doesn't end in a return statement.")
+      in
+      let check_decl_ends_in_return (decl: combined_definition): unit =
+        match decl with
+        | CConstant _ ->
+           ()
+        | CTypeAlias _ ->
+           ()
+        | CRecord _ ->
+           ()
+        | CUnion _ ->
+           ()
+        | CFunction (_, name, _, _, _, body, _, pragmas) ->
+           (match pragmas with
+            | [] ->
+               (* No pragmas: regular function. *)
+               if ends_in_return body then
+                 ()
+               else
+                 err ("Function "
+                      ^ (ident_string name)
+                      ^ " in module "
+                      ^ (mod_name_string mn)
+                      ^ " doesn't end in a return statement.")
+            | _ ->
+               (* Yes pragmas: foreign function, ignore the body. *)
+               ())
+        | CTypeclass _ ->
+           ()
+        | CInstance (_, _, _, _, methods, _) ->
+           let _ = List.map check_method_ends_in_return methods in
+           ()
+      in
+      let _ = List.map check_decl_ends_in_return decls
+      in
+      ())

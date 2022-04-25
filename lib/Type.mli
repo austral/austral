@@ -39,7 +39,8 @@ type ty =
   | ReadRef of ty * ty
   | WriteRef of ty * ty
   | TyVar of type_var
-  | RawPointer of ty
+  | Address of ty
+  | Pointer of ty
   | MonoTy of mono_id
   (** Special case, see the `mono_to_ty` function. We need this to be able to do
      monomorph instantiation, but this doesn't correspond to anything in the

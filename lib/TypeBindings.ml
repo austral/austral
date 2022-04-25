@@ -9,16 +9,14 @@ module BindingsMap =
         open Identifier
         type t = (identifier * qident)
         let compare (n, f) (n', f') =
-          let qs (qname: qident) =
+          (* Turn a qident into a string. *)
+          let qs (qname: qident): string =
             (mod_name_string (source_module_name qname))
             ^ (ident_string (original_name qname))
             ^ (ident_string (local_name qname))
           in
-          let _ = (qs, f, f') in
-          let a =
-            (ident_string n)
-          and b =
-            (ident_string n')
+          let a = (ident_string n) ^ (qs f)
+          and b = (ident_string n') ^ (qs f')
           in
           compare a b
       end
@@ -125,8 +123,10 @@ let rec replace_variables bindings ty =
      ReadRef (replace_variables bindings ty, replace_variables bindings region)
   | WriteRef (ty, region) ->
      WriteRef (replace_variables bindings ty, replace_variables bindings region)
-  | RawPointer ty ->
-     RawPointer (replace_variables bindings ty)
+  | Address ty ->
+     Address (replace_variables bindings ty)
+  | Pointer ty ->
+     Pointer (replace_variables bindings ty)
   | MonoTy id ->
      MonoTy id
 

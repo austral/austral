@@ -68,3 +68,42 @@ and path_elem =
 
 and lvalue =
   LValue of identifier * path_elem list
+
+let expr_kind (expr: aexpr): string =
+  match expr with
+  | NilConstant ->
+     "nil constant"
+  | BoolConstant _ ->
+     "bool constant"
+  | IntConstant _ ->
+     "int constant"
+  | FloatConstant _ ->
+     "float constant"
+  | StringConstant _ ->
+     "string constant"
+  | Variable _ ->
+     "variable"
+  | FunctionCall _ ->
+     "function call"
+  | ArithmeticExpression _ ->
+     "arithmetic"
+  | Comparison _ ->
+     "comparison"
+  | Conjunction _ ->
+     "conjunction"
+  | Disjunction _ ->
+     "disjunction"
+  | Negation _ ->
+     "negation"
+  | IfExpression _ ->
+     "if"
+  | Path _ ->
+     "path"
+  | Embed _ ->
+     "embed"
+  | Deref _ ->
+     "dereference"
+  | Typecast _ ->
+     "typecast"
+  | SizeOf _ ->
+     "sizeof"

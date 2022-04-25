@@ -38,7 +38,9 @@ and texpr =
   | TIntConstant of string
   | TFloatConstant of string
   | TStringConstant of escaped_string
-  | TVariable of qident * ty
+  | TConstVar of qident * ty
+  | TParamVar of identifier * ty
+  | TLocalVar of identifier * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of decl_id * qident * texpr list * ty * (identifier * ty) list
   | TMethodCall of ins_meth_id * qident * type_parameter list * texpr list * ty * (identifier * ty) list
@@ -135,7 +137,11 @@ let rec get_type = function
      DoubleFloat
   | TStringConstant _ ->
      string_type
-  | TVariable (_, ty) ->
+  | TConstVar (_, ty) ->
+     ty
+  | TParamVar (_, ty) ->
+     ty
+  | TLocalVar (_, ty) ->
      ty
   | TArithmetic (_, lhs, _) ->
      get_type lhs

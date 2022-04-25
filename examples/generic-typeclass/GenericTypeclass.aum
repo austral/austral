@@ -1,4 +1,4 @@
-import Austral.Memory (Pointer, Allocate, Null_Pointer);
+import Austral.Memory (Address, Allocate, Null_Pointer);
 
 module body Example.GenericTypeclass is
     pragma Unsafe_Module;
@@ -8,15 +8,15 @@ module body Example.GenericTypeclass is
     end;
 
     generic [T: Free]
-    instance Numerical(Pointer[T]) is
-        method To_Integer(x: Pointer[T]): Integer_32 is
+    instance Numerical(Address[T]) is
+        method To_Integer(x: Address[T]): Integer_32 is
             return 0;
         end;
     end;
 
     function Pointer_To_Integer(): Integer_32 is
-        let ptr: Pointer[Integer_32] := Allocate(sizeof(Integer_32));
-        let null: Pointer[Integer_32] := Null_Pointer();
+        let ptr: Address[Integer_32] := Allocate(sizeof(Integer_32));
+        let null: Address[Integer_32] := Null_Pointer();
         if ptr /= null then
             let X: Integer_32 := To_Integer(ptr);
             return X;
@@ -24,6 +24,7 @@ module body Example.GenericTypeclass is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
+        Pointer_To_Integer();
         return root;
     end;
 end module body.

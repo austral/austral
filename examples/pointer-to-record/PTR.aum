@@ -1,6 +1,7 @@
 import Austral.Memory (
+    Address,
     Pointer,
-    Null_Pointer,
+    Null_Check,
     Allocate,
     Load,
     Store,
@@ -20,16 +21,16 @@ module body Example.PTR is
 
     function Main(root: Root_Capability): Root_Capability is
         let r: R := R(X => 97);
-        let ptr: Pointer[R] := Allocate(sizeof(R));
-        let null: Pointer[R] := Null_Pointer();
-        if ptr = null then
-            -- Do nothing.
-            skip;
-        else
-            Store(ptr, r);
-            Put_Character(ptr->X);
-            Deallocate(ptr);
-        end if;
+        let addr: Address[R] := Allocate(sizeof(R));
+        case Null_Check(addr) of
+            when Some(value: Pointer[R]) do
+                Store(value, r);
+                Put_Character(value->X);
+                Deallocate(value);
+            when None do
+                -- Do nothing.
+                skip;
+        end case;
         return root;
     end;
 end module body.

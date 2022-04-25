@@ -12,8 +12,8 @@ module body Example.RTR is
     function Main(root: Root_Capability): Root_Capability is
         let r: R := R(X => 97);
         borrow r as r2 in rho do
-            let char: Integer_32 := !(r2->X);
-            Put_Character(char);
+            let c: Integer_32 := !(r2->X);
+            Put_Character(c);
         end;
         let { X: Integer_32 } := r;
         Put_Character(X);

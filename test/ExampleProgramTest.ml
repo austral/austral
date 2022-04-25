@@ -57,8 +57,8 @@ module body Example is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let char: Natural_8 := @embed(Natural_8, "$1 + $2", 90, 7);
-        Put_Character(char);
+        let c: Natural_8 := @embed(Natural_8, "$1 + $2", 90, 7);
+        Put_Character(c);
         return root;
     end;
 end module body.

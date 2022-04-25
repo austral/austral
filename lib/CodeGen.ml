@@ -124,7 +124,9 @@ let rec gen_type (ty: mono_ty): c_ty =
      CPointer (gen_type t)
   | MonoWriteRef (t, _) ->
      CPointer (gen_type t)
-  | MonoRawPointer t ->
+  | MonoAddress t ->
+     CPointer (gen_type t)
+  | MonoPointer t ->
      CPointer (gen_type t)
   | MonoRegionTyVar _ ->
      err "internal"
@@ -175,8 +177,12 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
            CInt (string_of_int (String.length (escaped_to_string s)))
          ]
        )
-  | MVariable (n, _) ->
+  | MConstVar (n, _) ->
      CVar (gen_qident n)
+  | MParamVar (n, _) ->
+     CVar (gen_ident n)
+  | MLocalVar (n, _) ->
+     CVar (gen_ident n)
   | MConcreteFuncall (id, _, args, _) ->
      CFuncall (gen_decl_id id, List.map g args)
   | MGenericFuncall (id, args, _) ->
@@ -263,12 +269,12 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   | MSkip ->
      CBlock []
   | MLet (n, t, v, b) ->
-     let l = CLet (gen_sident mn n, gen_type t, ge v) in
+     let l = CLet (gen_ident n, gen_type t, ge v) in
      CBlock [l; gs b]
   | MDestructure (bs, e, b) ->
      let tmp = new_variable () in
      let vardecl = CLet (tmp, gen_type (get_type e), ge e)
-     and bs' = List.map (fun (n, t) -> CLet (gen_sident mn n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
+     and bs' = List.map (fun (n, t) -> CLet (gen_ident n, gen_type t, CStructAccessor (CVar tmp, gen_ident n))) bs
      and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
@@ -282,22 +288,22 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
      CExplicitBlock [
-         CLet (gen_sident mn v, CNamedType "size_t", ge i);
-         CFor (gen_sident mn v, ge f, gs b)
+         CLet (gen_ident v, CNamedType "size_t", ge i);
+         CFor (gen_ident v, ge f, gs b)
        ]
   | MBorrow { original; rename; orig_type; body; _ } ->
      let is_pointer =
        (match orig_type with
-        | MonoRawPointer _ ->
+        | MonoAddress _ ->
            true
         | _ ->
            false)
      in
      if is_pointer then
-       let l = CLet (gen_sident mn rename, gen_type orig_type, CVar (gen_sident mn original)) in
+       let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
        CBlock [l; gs body]
      else
-       let l = CLet (gen_sident mn rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_sident mn original))) in
+       let l = CLet (gen_ident rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
        CBlock [l; gs body]
   | MBlock (a, b) ->
      CBlock [gs a; gs b]
@@ -307,7 +313,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CReturn (ge e)
 
 and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
-  gen_path mn (CVar (gen_sident mn name)) elems
+  gen_path mn (CVar (gen_ident name)) elems
 
 and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
@@ -330,14 +336,15 @@ and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, b
   let get_binding binding_name =
     CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
   in
-  let bindings' = List.map (fun (MValueParameter (n, t)) -> CLet (gen_sident mn n, gen_type t, get_binding n)) bindings in
+  let bindings' = List.map (fun (MValueParameter (n, t)) -> CLet (gen_ident n, gen_type t, get_binding n)) bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 
 (* Declarations *)
 
 let gen_params mn params =
-  List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_sident mn n, gen_type t)) params
+  let _ = mn in
+  List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_ident n, gen_type t)) params
 
 let gen_slots (slots: mono_slot list) =
   List.map (fun (MonoSlot (n, t)) -> CSlot (gen_ident n, gen_type t)) slots
@@ -346,7 +353,8 @@ let gen_cases (cases: mono_case list) =
   List.map (fun (MonoCase (n, ss)) -> CSlot (gen_ident n, CStructType (CStruct (None, gen_slots ss)))) cases
 
 let gen_method (mn: module_name) (MConcreteMethod (id, _, params, rt, body)) =
-  CFunctionDefinition (gen_ins_meth_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
+  let d = Desc "Method" in
+  CFunctionDefinition (d, gen_ins_meth_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
 
 let get_original_module_name (env: env) (id: mono_id): module_name =
   match get_monomorph env id with
@@ -363,13 +371,58 @@ let get_original_module_name (env: env) (id: mono_id): module_name =
   | _ ->
      err "internal"
 
+let rec mono_desc (env: env) (id: mono_id): string =
+  let mono = get_mono_or_die env id in
+  match mono with
+  | MonoTypeAliasDefinition { type_id; tyargs; _ } ->
+     render_mono env type_id tyargs
+  | MonoRecordDefinition { type_id; tyargs; _ } ->
+     render_mono env type_id tyargs
+  | MonoUnionDefinition { type_id; tyargs; _ } ->
+     render_mono env type_id tyargs
+  | MonoFunction { function_id; tyargs; _ } ->
+     render_mono env function_id tyargs
+  | MonoInstanceMethod _ ->
+     ""
+
+and get_mono_or_die (env: env) (id: mono_id): monomorph =
+  match get_monomorph env id with
+  | Some mono ->
+     mono
+  | None ->
+     err "internal"
+
+and get_decl_name_or_die (env: env) (id: decl_id): string =
+  match get_decl_by_id env id with
+  | Some decl ->
+     (match (decl_name decl) with
+      | Some name ->
+         (ident_string name)
+      | None ->
+         err "decl has no name")
+  | None ->
+     err "internal"
+
+and tyargs_string (args: mono_ty list): string =
+  "["
+  ^ (String.concat ", " (List.map show_mono_ty args))
+  ^ "]"
+
+and render_mono (env: env) (id: decl_id) (tyargs: mono_ty list): string =
+  (get_decl_name_or_die env id) ^ (tyargs_string tyargs)
+
 let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   match decl with
   | MConstant (_, n, ty, e) ->
-     [CConstantDefinition (gen_sident mn n, gen_type ty, gen_exp mn e)]
+     let d = Desc "Constant" in
+     [
+       CConstantDefinition (d, gen_sident mn n, gen_type ty, gen_exp mn e)
+     ]
   | MTypeAlias (_, n, ty) ->
+     let d = Desc "Type Alias" in
      [
        CStructDefinition (
+           d,
            CStruct (
                Some (gen_ident n),
                [
@@ -379,8 +432,10 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
          )
      ]
   | MTypeAliasMonomorph (id, ty) ->
+     let d = Desc ("Type alias monomorph: " ^ (mono_desc env id)) in
      [
        CNamedStructDefinition (
+           d,
            gen_mono_id id,
            [
              CSlot ("value", gen_type ty)
@@ -388,19 +443,25 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
          )
      ]
   | MRecord (id, _, slots) ->
+     let d = Desc "Record" in
      [
-       CNamedStructDefinition (gen_decl_id id, gen_slots slots)
+       CNamedStructDefinition (d, gen_decl_id id, gen_slots slots)
      ]
   | MRecordMonomorph (id, slots) ->
+     let d = Desc ("Record monomorph: " ^ (mono_desc env id)) in
      [
-       CNamedStructDefinition (gen_mono_id id, gen_slots slots)
+       CNamedStructDefinition (d, gen_mono_id id, gen_slots slots)
      ]
   | MUnion (_, n, cases) ->
+     let enum_d = Desc "Union tag enum" in
+     let union_d = Desc "Union" in
      let enum_def = CEnumDefinition (
+                        enum_d,
                         (gen_ident n) ^ "_tag",
                         List.map (fun (MonoCase (n', _)) -> (gen_ident n) ^ "_tag_" ^ (gen_ident n')) cases
                       )
      and union_def = CNamedStructDefinition (
+                         union_d,
                          gen_ident n,
                          [
                            CSlot ("tag", CNamedType (local_union_tag_enum_name n));
@@ -410,11 +471,15 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      [enum_def; union_def]
   | MUnionMonomorph (id, cases) ->
+     let enum_d = Desc ("Union monomorph tag enum: " ^ (mono_desc env id)) in
+     let union_d = Desc ("Union monomorph: " ^ (mono_desc env id)) in
      let enum_def = CEnumDefinition (
+                        enum_d,
                         local_union_tag_enum_name_from_id id,
                         List.map (fun (MonoCase (n', _)) -> (gen_mono_id id) ^ "_tag_" ^ (gen_ident n')) cases
                       )
      and union_def = CNamedStructDefinition (
+                         union_d,
                          gen_mono_id id,
                          [
                            CSlot ("tag", CNamedType (local_union_tag_enum_name_from_id id));
@@ -424,13 +489,21 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      [enum_def; union_def]
   | MFunction (id, _, params, rt, body) ->
-     [CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
+     let d = Desc "Function" in
+     [
+       CFunctionDefinition (d, gen_decl_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
+     ]
   | MFunctionMonomorph (id, params, rt, body) ->
      (* Load-bearing hack: prefix parameters not with the current module name,
         but with the name of the module the monomorph's declaration is from. *)
      let mn': module_name = get_original_module_name env id in
-     [CFunctionDefinition (gen_mono_id id, gen_params mn' params, gen_type rt, gen_stmt mn body)]
+     let d = Desc ("Function monomorph: " ^ (mono_desc env id)) in
+     [
+       CFunctionDefinition (d, gen_mono_id id, gen_params mn' params, gen_type rt, gen_stmt mn body)
+     ]
   | MForeignFunction (id, _, params, rt, underlying) ->
+     let decl_d = Desc "Foreign function decl" in
+     let def_d = Desc "Foreign function" in
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
         | MonoUnit ->
@@ -448,7 +521,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
              c_string_type
            else
              err "Not allowed"
-        | MonoRawPointer _ ->
+        | MonoAddress _ ->
            gen_type t
         | MonoNamedType _ ->
            err "Not implemented"
@@ -462,25 +535,28 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
        | _ ->
           param_type_to_c_type t
      in
-     let ff_params = List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_sident mn n, param_type_to_c_type t)) params
+     let ff_params = List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_ident n, param_type_to_c_type t)) params
      and ff_rt = return_type_to_c_type rt in
-     let ff_decl = CFunctionDeclaration (underlying, ff_params, ff_rt, LinkageExternal) in
+     let ff_decl = CFunctionDeclaration (decl_d, underlying, ff_params, ff_rt, LinkageExternal) in
      let make_param (n: identifier) (t: mono_ty) =
        if (gen_type t) = (CNamedType "au_array_t") then
          (* Extract the pointer from the Array struct *)
-         CStructAccessor (CVar (gen_sident mn n), "data")
+         CStructAccessor (CVar (gen_ident n), "data")
        else
-         CVar (gen_sident mn n)
+         CVar (gen_ident n)
      in
      let args = List.map (fun (MValueParameter (n, t)) -> make_param n t) params in
      let funcall = CFuncall (underlying, args) in
      let body = CReturn funcall in
-     let def = CFunctionDefinition (gen_decl_id id, gen_params mn params, gen_type rt, body) in
+     let def = CFunctionDefinition (def_d, gen_decl_id id, gen_params mn params, gen_type rt, body) in
      [ff_decl; def]
   | MConcreteInstance (_, _, _, methods) ->
      List.map (gen_method mn) methods
   | MMethodMonomorph (id, params, rt, body) ->
-     [CFunctionDefinition (gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)]
+     let d = Desc ("Method monomorph: " ^ (mono_desc env id)) in
+     [
+       CFunctionDefinition (d, gen_mono_id id, gen_params mn params, gen_type rt, gen_stmt mn body)
+     ]
 
 (* Extract types into forward type declarations *)
 
@@ -505,20 +581,25 @@ let rec gen_fun_decls mn decls =
 and gen_fun_decl mn decl =
   match decl with
   | MFunction (id, _, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
+     let d = Desc "Function forward declaratioon" in
+     Some [CFunctionDeclaration (d, gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | MFunctionMonomorph (id, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_mono_id id, gen_params mn p, gen_type rt, LinkageInternal)]
+     let d = Desc "Function monomorph forward declaration" in
+     Some [CFunctionDeclaration (d, gen_mono_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | MForeignFunction (id, _, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
+     let d = Desc "Foreign function forward declaration" in
+     Some [CFunctionDeclaration (d, gen_decl_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | MConcreteInstance (_, _, _, ms) ->
      Some (List.map (gen_method_decl mn) ms)
   | MMethodMonomorph (id, p, rt, _) ->
-     Some [CFunctionDeclaration (gen_mono_id id, gen_params mn p, gen_type rt, LinkageInternal)]
+     let d = Desc "Method monomorph forward declaration" in
+     Some [CFunctionDeclaration (d, gen_mono_id id, gen_params mn p, gen_type rt, LinkageInternal)]
   | _ ->
      None
 
 and gen_method_decl mn (MConcreteMethod (id, _, params, rt, _)) =
-  CFunctionDeclaration (gen_ins_meth_id id, gen_params mn params, gen_type rt, LinkageInternal)
+  let d = Desc "Method forward declaration" in
+  CFunctionDeclaration (d, gen_ins_meth_id id, gen_params mn params, gen_type rt, LinkageInternal)
 
 (* Codegen a module *)
 
