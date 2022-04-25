@@ -809,10 +809,13 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          adorn_error_with_span span
            (fun _ ->
              let expected_ty = parse_typespec env rm typarams ty in
+             pt ("Expected type", expected_ty);
              let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
              let bindings = match_type_with_value expected_ty value' in
+             ps ("Bindings", show_bindings bindings);
              let ty = replace_variables bindings expected_ty in
              pt ("Type", ty);
+             pt ("Value type", get_type value');
              let lexenv' = push_var lexenv name ty VarLocal in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
              TLet (span, name, ty, value', body'))
