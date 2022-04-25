@@ -2,8 +2,7 @@ open Identifier
 open Id
 open Env
 open BuiltIn
-open Pervasive
-open MemoryModule
+open BuiltInModules
 open CPrelude
 open ParserInterface
 open CombiningPass
