@@ -30,7 +30,7 @@ jobs:
         run: opam install dune ppx_deriving ounit2 menhir
 
       - name: Build
-        run: opam exec -- dune build && cp _build/default/bin/austral.exe austral
+        run: make
 
       - name: Install
         run: sudo make install
