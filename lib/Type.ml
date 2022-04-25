@@ -15,6 +15,7 @@ type integer_width =
   | Width16
   | Width32
   | Width64
+  | WidthIndex
 [@@deriving (eq, show)]
 
 type signedness =
