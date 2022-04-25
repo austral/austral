@@ -1,6 +1,7 @@
 import Austral.Memory (
     Address,
-    Null_Pointer,
+    Pointer,
+    Null_Check,
     Allocate,
     Deallocate,
     Positive_Offset,
@@ -25,25 +26,26 @@ module body Example.Array is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let arr: Address[Boolean] := Allocate(3);
-        let null: Address[Boolean] := Null_Pointer();
-        if arr = null then
-            skip;
-        else
-            let firstp: Address[Boolean] := arr;
-            let secondp: Address[Boolean] := Positive_Offset(arr, 1);
-            let thirdp: Address[Boolean] := Positive_Offset(arr, 2);
-            Store(firstp, true);
-            Store(secondp, false);
-            Store(thirdp, true);
-            let first: Boolean := Load(firstp);
-            let second: Boolean := Load(secondp);
-            let third: Boolean := Load(thirdp);
-            Show_Bool(first);
-            Show_Bool(second);
-            Show_Bool(third);
-            Deallocate(arr);
-        end if;
+        let addr: Address[Boolean] := Allocate(3);
+        case Null_Check(addr) of
+            when Some(value: Pointer[Boolean]) do
+                let arr: Pointer[Boolean] := value;
+                let firstp: Pointer[Boolean] := arr;
+                let secondp: Pointer[Boolean] := Positive_Offset(arr, 1);
+                let thirdp: Pointer[Boolean] := Positive_Offset(arr, 2);
+                Store(firstp, true);
+                Store(secondp, false);
+                Store(thirdp, true);
+                let first: Boolean := Load(firstp);
+                let second: Boolean := Load(secondp);
+                let third: Boolean := Load(thirdp);
+                Show_Bool(first);
+                Show_Bool(second);
+                Show_Bool(third);
+                Deallocate(arr);
+            when None do
+                skip;
+        end case;
         return root;
     end;
 end module body.
