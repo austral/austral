@@ -67,7 +67,17 @@ let rec type_string = function
   | Boolean ->
      bool_name
   | Integer (s, w) ->
-     (signedness_string s) ^ (width_string w)
+     let sgn: string =
+       match s with
+       | Unsigned -> "Natural_"
+       | Signed -> "Integer_"
+     in
+     (match w with
+      | Width8 -> sgn ^ "8"
+      | Width16 -> sgn ^ "16"
+      | Width32 -> sgn ^ "32"
+      | Width64 -> sgn ^ "64"
+      | WidthIndex -> "Index")
   | SingleFloat ->
      single_float_name
   | DoubleFloat ->
@@ -90,18 +100,6 @@ let rec type_string = function
      pointer_name ^ "[" ^ (type_string ty) ^ "]"
   | MonoTy _ ->
     "MonoTy"
-
-and signedness_string = function
-  | Unsigned -> nat_prefix
-  | Signed -> int_prefix
-
-and width_int = function
-  | Width8 -> 8
-  | Width16 -> 16
-  | Width32 -> 32
-  | Width64 -> 64
-
-and width_string w = string_of_int (width_int w)
 
 and args_string = function
   | (first::rest) -> "[" ^ (String.concat ", " (List.map type_string (first::rest))) ^ "]"

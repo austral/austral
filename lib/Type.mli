@@ -73,6 +73,4 @@ val size_type : ty
 
 val string_type : ty
 
-val width_int : integer_width -> int
-
 val equal_ty : ty -> ty -> bool

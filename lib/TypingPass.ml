@@ -271,7 +271,8 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                         | Width8 -> "8"
                         | Width16 -> "16"
                         | Width32 -> "32"
-                        | Width64 -> "64")
+                        | Width64 -> "64"
+                        | WidthIndex -> "index")
                in
                s ^ "int" ^ w
             | SingleFloat ->
