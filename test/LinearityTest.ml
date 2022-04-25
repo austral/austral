@@ -49,7 +49,7 @@ module body Example is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let r: R := R(x => 32);3
+        let r: R := R(x => 32);
         return root;
     end;
 end module body.
