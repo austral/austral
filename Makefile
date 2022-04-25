@@ -21,4 +21,4 @@ uninstall:
 	sudo rm /usr/local/bin/austral
 
 clean:
-	rm $(BIN); rm -rf _build
+	rm $(BIN); rm -rf _build; rm lib/BuiltInModules.ml
