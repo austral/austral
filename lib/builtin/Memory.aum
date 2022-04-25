@@ -1,57 +1,3 @@
-(** The Austral.Memory module. *)
-
-(** The source code of the Austral.Memory module interface file. *)
-let memory_interface_source = {code|
-
-module Austral.Memory is
-    type Address[T: Type]: Free;
-    type Pointer[T: Type]: Free;
-
-    generic [T: Type]
-    function Null_Pointer(): Address[T];
-
-    generic [T: Type]
-    function Null_Check(address: Address[T]): Option[Pointer[T]];
-
-    generic [T: Type]
-    function Allocate(size: Natural_64): Address[T];
-
-    generic [T: Type]
-    function Load(pointer: Pointer[T]): T;
-
-    generic [T: Type]
-    function Store(pointer: Pointer[T], value: T): Unit;
-
-    generic [T: Type]
-    function Deallocate(pointer: Pointer[T]): Unit;
-
-    generic [T: Type, R: Region]
-    function Load_Read_Reference(ref: Reference[Pointer[T], R]): Reference[T, R];
-
-    generic [T: Type, R: Region]
-    function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R];
-
-    generic [T: Type]
-    function Resize_Array(array: Pointer[T], size: Natural_64): Pointer[T];
-
-    generic [T: Type, U: Type]
-    function memmove(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit;
-
-    generic [T: Type, U: Type]
-    function memcpy(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit;
-
-    generic [T: Type]
-    function Positive_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T];
-
-    generic [T: Type]
-    function Negative_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T];
-end module.
-
-|code}
-
-(** The source code of the Austral.Memory module body file. *)
-let memory_body_source = {code|
-
 module body Austral.Memory is
     type Address[T: Type]: Free is Unit;
     type Pointer[T: Type]: Free is Unit;
@@ -134,5 +80,3 @@ module body Austral.Memory is
         return @embed(Pointer[T], "$1 - $2", pointer, offset);
     end;
 end module body.
-
-|code}

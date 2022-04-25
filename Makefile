@@ -1,7 +1,10 @@
 BIN := austral
-SRC := lib/*.ml lib/*.mli lib/*.mll lib/*.mly lib/dune bin/dune bin/austral.ml
+SRC := lib/*.ml lib/*.mli lib/*.mll lib/*.mly lib/dune bin/dune bin/austral.ml lib/BuiltInModules.ml
 
 all: $(BIN)
+
+lib/BuiltInModules.ml: lib/builtin/*.aui lib/builtin/*.aum
+	python3 concat_builtins.py
 
 $(BIN): $(SRC)
 	dune build
@@ -18,4 +21,4 @@ uninstall:
 	sudo rm /usr/local/bin/austral
 
 clean:
-	rm $(BIN); rm -rf _build
+	rm $(BIN); rm -rf _build; rm lib/BuiltInModules.ml
