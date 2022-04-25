@@ -21,7 +21,7 @@ jobs:
         run: opam init
 
       - name: Install dependencies
-        run: opam install dune ppx_deriving ounit2 menhir
+        run: opam install -y dune ppx_deriving ounit2 menhir
 
       - name: Build
         run: make
