@@ -19,16 +19,16 @@ module body Example.Buffer is
     ----------
 
     -- The size of empty buffers.
-    --constant Initial_Size: Natural_64 := 16;
+    --constant Initial_Size: Index := 16;
 
     -- The growth factor times the array's capacity tells us the next size of
     -- the array when resizing. Naively, we double the size of the array when
     -- hitting the capacity.
-    constant Growth_Factor: Natural_64 := 2;
+    constant Growth_Factor: Index := 2;
 
     -- Allocate an array, and abort if allocation fails.
     generic [T: Type]
-    function Allocate_Or_Die(size: Natural_64): Pointer[T] is
+    function Allocate_Or_Die(size: Index): Pointer[T] is
         let addr: Address[T] := Allocate(size);
         case Null_Check(addr) of
             when Some(value: Pointer[T]) do
@@ -46,9 +46,9 @@ module body Example.Buffer is
         -- The capacity is the true underlying size. It is different from the
         -- size since we allocate more space than we need in order to minimize
         -- frequent reallocation.
-        capacity: Natural_64;
+        capacity: Index;
         -- The number of elements actually stored in the array.
-        size: Natural_64;
+        size: Index;
         -- The underlying heap array.
         array: Pointer[T];
 
@@ -74,7 +74,7 @@ module body Example.Buffer is
     -- end;
 
     generic [T: Free]
-    function Initialize(size: Natural_64, elem: T): Buffer[T] is
+    function Initialize(size: Index, elem: T): Buffer[T] is
         let array: Pointer[T] := Allocate_Or_Die(size);
         for i from 0 to size - 1 do
             let nth: Pointer[T] := Positive_Offset(array, i);
@@ -90,7 +90,7 @@ module body Example.Buffer is
 
     generic [T: Type]
     function Destroy_Buffer(buffer: Buffer[T]): Unit is
-        let { capacity: Natural_64, size: Natural_64, array: Pointer[T] } := buffer;
+        let { capacity: Index, size: Index, array: Pointer[T] } := buffer;
         Deallocate(array);
         return nil;
     end;
@@ -98,14 +98,14 @@ module body Example.Buffer is
     -- Query
 
     generic [T: Free, R: Region]
-    function Buffer_Size(buffer: Reference[Buffer[T], R]): Natural_64 is
+    function Buffer_Size(buffer: Reference[Buffer[T], R]): Index is
         return !(buffer->size);
     end;
 
     -- Retrieval
 
     generic [T: Free, R: Region]
-    function Nth_Free(buffer: Reference[Buffer[T], R], index: Natural_64): T is
+    function Nth_Free(buffer: Reference[Buffer[T], R], index: Index): T is
         let arr: Pointer[T] := !(buffer->array);
         let nth_ptr: Pointer[T] := Positive_Offset(arr, index);
         let val: T := Load(nth_ptr);
@@ -113,7 +113,7 @@ module body Example.Buffer is
     end;
 
     ---generic [T: Type, R: Region]
-    -- function Nth_Ref(buffer: Reference[Buffer[T], R], index: Natural_64): Reference[T, R] is
+    -- function Nth_Ref(buffer: Reference[Buffer[T], R], index: Index): Reference[T, R] is
     --    return buffer->array[index];
     -- end;
 
@@ -125,7 +125,7 @@ module body Example.Buffer is
         -- Create a buffer of e's.
         let buf: Buffer[Integer_32] := Initialize(3, 101);
         borrow buf as bufref in rho do
-            let size: Natural_64 := Buffer_Size(bufref);
+            let size: Index := Buffer_Size(bufref);
             if size = 3 then
                 Put_Character(97);
             end if;
