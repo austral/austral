@@ -24,7 +24,7 @@ jobs:
       - name: Set up OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v2
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-compiler: ${{ matrix.ocaml-version }}
 
       - name: Install dependencies
         run: opam install dune ppx_deriving ounit2 menhir
