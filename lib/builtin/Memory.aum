@@ -21,7 +21,7 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function Allocate(size: Natural_64): Address[T] is
+    function Allocate(size: Index): Address[T] is
         return @embed(Address[T], "au_calloc($1, $2)", sizeof(T), size);
     end;
 
