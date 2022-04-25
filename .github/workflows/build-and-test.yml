@@ -20,6 +20,9 @@ jobs:
       - name: Initialize opam
         run: opam init
 
+      - name: Use version 4.12.0 of OCaml
+        run: opam switch create 4.12.0
+
       - name: Install dependencies
         run: opam install -y dune ppx_deriving ounit2 menhir
 
