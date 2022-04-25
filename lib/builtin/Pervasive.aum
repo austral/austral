@@ -44,6 +44,9 @@ module body Austral.Pervasive is
     constant Minimum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MIN");
     constant Maximum_Integer_64: Integer_64 := @embed(Integer_64, "INT64_MAX");
 
+    constant Minimum_Index: Index := 0;
+    constant Maximum_Index: Index := @embed(Index, "SIZE_MAX");
+
     ---
     --- Trapping Arithmetic
     ---
