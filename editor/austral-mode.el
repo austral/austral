@@ -22,8 +22,8 @@
 
 (defconst austral-keywords
   '("and" "or" "not" "module" "is" "body" "import" "as" "end" "constant" "type"
-    "function" "generic" "record" "union" "case" "of" "when" "interface"
-    "implementation" "method" "if" "then" "else" "let" "while" "for" "do" "from"
+    "function" "generic" "record" "union" "case" "of" "when" "typeclass"
+    "instance" "method" "if" "then" "else" "let" "while" "for" "do" "from"
     "to" "borrow" "borrow!" "in" "return" "skip" "Free" "Linear" "Type" "Region"
     "pragma" "nil" "true" "false"))
 
