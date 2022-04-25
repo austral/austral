@@ -18,6 +18,17 @@ open Util
 open Reporter
 open Error
 
+let get_decl_name_or_die (env: env) (id: decl_id): string =
+  match get_decl_by_id env id with
+  | Some decl ->
+     (match (decl_name decl) with
+      | Some name ->
+         (ident_string name)
+      | None ->
+         err "decl has no name")
+  | None ->
+     err "internal"
+
 let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): decl =
   let _ = source_module_name in
   (* This comment describes the process of finding an instance of the typeclass
@@ -88,7 +99,12 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
     | _::_ ->
        err "Overlapping typeclasses"
     | [] ->
-       err "Typeclass resolution failed"
+       err (
+           "Typeclass resolution failed. Typeclass: "
+           ^ (get_decl_name_or_die env typeclass)
+           ^ ". Dispatch type: "
+           ^ (type_string dispatch_ty)
+         )
 
 (* Since the extraction pass has already happened, we can simplify the call to
    `parse_type` by passing an empty list of local type signatures. *)
