@@ -359,7 +359,7 @@ and augment_path_elem (env: env) (module_name: module_name) (rm: region_map) (ty
          err "Not a record type")
   | PointerSlotAccessor slot_name ->
      (match head_ty with
-      | Address pointed_to ->
+      | Pointer pointed_to ->
          (* TODO: Addresses should not be indexable. *)
          augment_pointer_slot_accessor_elem env module_name slot_name pointed_to
       | ReadRef (ty, _) ->
@@ -1018,7 +1018,7 @@ and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_m
          err "Not a record type")
   | PointerSlotAccessor slot_name ->
      (match head_ty with
-      | Address pointed_to ->
+      | Pointer pointed_to ->
          (* TODO: addresses should not be indexable *)
          augment_pointer_slot_accessor_elem env module_name slot_name pointed_to
       | WriteRef (ty, _) ->
