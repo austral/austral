@@ -35,7 +35,7 @@ type ty =
   | SingleFloat
   | DoubleFloat
   | NamedType of qident * ty list * universe
-  | Array of ty * region
+  | StaticArray of ty * region
   | RegionTy of region
   | ReadRef of ty * ty
   | WriteRef of ty * ty

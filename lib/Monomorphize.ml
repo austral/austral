@@ -27,9 +27,9 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
      (MonoDoubleFloat, env)
   | SRegionTy r ->
      (MonoRegionTy r, env)
-  | SArray (elem_ty, region) ->
+  | SStaticArray (elem_ty, region) ->
      let (elem_ty, env) = monomorphize_ty env elem_ty in
-     (MonoArray (elem_ty, region), env)
+     (MonoStaticArray (elem_ty, region), env)
   | SReadRef (ty, region) ->
      let (ty, env) = monomorphize_ty env ty in
      let (region, env) = monomorphize_ty env region in
@@ -764,8 +764,8 @@ and mono_to_ty (ty: mono_ty): ty =
   | MonoNamedType mono_id ->
      (* SPECIAL CASE *)
      MonoTy mono_id
-  | MonoArray (elem_ty, region) ->
-     Array (r elem_ty, region)
+  | MonoStaticArray (elem_ty, region) ->
+     StaticArray (r elem_ty, region)
   | MonoRegionTy r ->
      RegionTy r
   | MonoReadRef (ty, region) ->

@@ -125,7 +125,7 @@ let rec gen_type (ty: mono_ty): c_ty =
      CNamedType "double"
   | MonoNamedType id ->
      CNamedType (gen_mono_id id)
-  | MonoArray (_, _) ->
+  | MonoStaticArray (_, _) ->
      CNamedType "au_array_t"
   | MonoRegionTy _ ->
      err "TODO: Codegen for region types"
@@ -525,7 +525,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
            gen_type t
         | MonoDoubleFloat ->
            gen_type t
-        | MonoArray (MonoInteger (Unsigned, Width8), r) ->
+        | MonoStaticArray (MonoInteger (Unsigned, Width8), r) ->
            if r = static_region then
              c_string_type
            else
@@ -539,7 +539,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      let return_type_to_c_type t =
        match t with
-       | MonoArray _ ->
+       | MonoStaticArray _ ->
           err "Foreign functions cannot return arrays."
        | _ ->
           param_type_to_c_type t
