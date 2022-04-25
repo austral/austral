@@ -105,7 +105,7 @@ and args_string = function
   | (first::rest) -> "[" ^ (String.concat ", " (List.map type_string (first::rest))) ^ "]"
   | [] -> ""
 
-let size_type = Integer (Unsigned, Width64)
+let size_type = Integer (Unsigned, WidthIndex)
 
 let string_type = Array (Integer (Unsigned, Width8), static_region)
 
