@@ -10,8 +10,8 @@ module body Austral.Pervasive is
     end;
 
     generic [T: Type]
-    function Fixed_Array_Size(arr: Fixed_Array[T]): Natural_64 is
-        return @embed(Natural_64, "$1.size", arr);
+    function Fixed_Array_Size(arr: Fixed_Array[T]): Index is
+        return @embed(Index, "$1.size", arr);
     end;
 
     function Abort(message: Fixed_Array[Natural_8]): Unit is

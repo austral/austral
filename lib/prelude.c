@@ -30,7 +30,7 @@ typedef size_t         au_index_t;
 
 typedef struct {
     void*  data;
-    size_t size;
+    au_index_t size;
 } au_array_t;
 
 au_array_t au_make_array_from_string(const char* data, size_t size) {
