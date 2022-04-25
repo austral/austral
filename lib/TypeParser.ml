@@ -82,7 +82,7 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
       | "Integer_64" ->
          Some (Integer (Signed, Width64))
       | "Index" ->
-         Some (Integer (Signed, WidthIndex))
+         Some (Integer (Unsigned, WidthIndex))
       | "Single_Float" ->
          Some SingleFloat
       | "Double_Float" ->
