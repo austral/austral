@@ -7,12 +7,12 @@ lib/BuiltInModules.ml: lib/builtin/*.aui lib/builtin/*.aum
 	python3 concat_builtins.py
 
 $(BIN): $(SRC)
-	dune build
+	opam exec -- dune build
 	cp _build/default/bin/austral.exe $(BIN)
 
 .PHONY: test
 test: $(BIN)
-	dune runtest
+	opam exec -- dune runtest
 
 install: $(BIN)
 	install -m 755 austral /usr/local/bin/austral
