@@ -59,24 +59,24 @@ module body Austral.Memory is
     end;
 
     generic [T: Type, U: Type]
-    function memmove(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit is
+    function memmove(source: Pointer[T], destination: Pointer[U], count: Index): Unit is
         @embed(Pointer[T], "au_memmove($1, $2, $3)", destination, source, count);
         return nil;
     end;
 
     generic [T: Type, U: Type]
-    function memcpy(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit is
+    function memcpy(source: Pointer[T], destination: Pointer[U], count: Index): Unit is
         @embed(Pointer[T], "au_memcpy($1, $2, $3)", destination, source, count);
         return nil;
     end;
 
     generic [T: Type]
-    function Positive_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T] is
+    function Positive_Offset(pointer: Pointer[T], offset: Index): Pointer[T] is
         return @embed(Pointer[T], "$1 + $2", pointer, offset);
     end;
 
     generic [T: Type]
-    function Negative_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T] is
+    function Negative_Offset(pointer: Pointer[T], offset: Index): Pointer[T] is
         return @embed(Pointer[T], "$1 - $2", pointer, offset);
     end;
 end module body.
