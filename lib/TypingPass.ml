@@ -578,6 +578,8 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
         let arguments = arglist_to_positional (args, slot_names) in
         (* Check the list of params against the list of arguments *)
         let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
+        ps ("Params", String.concat "\n" (List.map (fun (ValueParameter (n, t)) -> (ident_string n) ^ ": " ^ (type_string t)) params));
+        ps ("Arguments", String.concat "\n" (List.map show_texpr arguments));
         let bindings = check_argument_list params arguments in
         (* Use the bindings to get the effective return type *)
         let rt = NamedType (type_name,
@@ -585,6 +587,7 @@ and augment_union_constructor (type_name: qident) (typarams: type_parameter list
                             universe)
         in
         pt ("Type", rt);
+        ps ("Bindings", show_bindings bindings);
         let rt' = replace_variables bindings rt in
         pt ("Type'", rt');
         let (bindings', rt'') = handle_return_type_polymorphism case_name params rt' asserted_ty bindings in
