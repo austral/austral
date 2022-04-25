@@ -1,6 +1,7 @@
 import Austral.Memory (
     Address,
-    Null_Pointer,
+    Pointer,
+    Null_Check,
     Allocate,
     Load,
     Store,
@@ -13,28 +14,28 @@ module body Example.Box is
     pragma Unsafe_Module;
 
     record Box[T: Type]: Linear is
-        pointer: Address[T];
+        pointer: Pointer[T];
     end;
 
     generic [T: Type]
     function Make(val: T): Either[Box[T], T] is
-        let ptr: Address[T] := Allocate(sizeof(T));
-        let null: Address[T] := Null_Pointer();
-        if ptr = null then
-            -- Allocation failed, return the object we tried to box.
-            let right: Either[Box[T], T] := Right(right => val);
-            return right;
-        else
-            Store(ptr, val);
-            let box: Box[T] := Box(pointer => ptr);
-            let left: Either[Box[T], T] := Left(left => box);
-            return left;
-        end if;
+        let addr: Address[T] := Allocate(sizeof(T));
+        case Null_Check(addr) of
+            when Some(value: Pointer[T]) do
+                Store(value, val);
+                let box: Box[T] := Box(pointer => value);
+                let left: Either[Box[T], T] := Left(left => box);
+                return left;
+            when None do
+                -- Allocation failed, return the object we tried to box.
+                let right: Either[Box[T], T] := Right(right => val);
+                return right;
+        end case;
     end;
 
     generic [T: Type]
     function Unbox(box: Box[T]): T is
-        let { pointer: Address[T] } := box;
+        let { pointer: Pointer[T] } := box;
         let value: T := Load(pointer);
         Deallocate(pointer);
         return value;
@@ -42,7 +43,7 @@ module body Example.Box is
 
     generic [X: Free]
     function Swap_Free(box: Box[X], new: X): Box[X] is
-        let { pointer: Address[X] } := box;
+        let { pointer: Pointer[X] } := box;
         let old: X := Load(pointer);
         Store(pointer, new);
         let newbox: Box[X] := Box(pointer => pointer);
@@ -51,29 +52,29 @@ module body Example.Box is
 
     generic [T: Free, R: Region]
     function Read_Free(boxref: Reference[Box[T], R]): T is
-        let ptrref: Reference[Address[T], R] := boxref->pointer;
-        let ptr: Address[T] := !ptrref;
+        let ptrref: Reference[Pointer[T], R] := boxref->pointer;
+        let ptr: Pointer[T] := !ptrref;
         return Load(ptr);
     end;
 
     generic [T: Free, R: Region]
     function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit is
-        let ptrref: WriteReference[Address[T], R] := boxref->pointer;
-        let ptr: Address[T] := !(ptrref);
+        let ptrref: WriteReference[Pointer[T], R] := boxref->pointer;
+        let ptr: Pointer[T] := !(ptrref);
         Store(ptr, value);
         return nil;
     end;
 
     generic [T: Type, R: Region]
     function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R] is
-        let ptrref: Reference[Address[T], R] := boxref->pointer;
+        let ptrref: Reference[Pointer[T], R] := boxref->pointer;
         let ref: Reference[T, R] := Load_Read_Reference(ptrref);
         return ref;
     end;
 
     generic [T: Free, R: Region]
     function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
-        let ptr: Address[T] := !(boxref->pointer);
+        let ptr: Pointer[T] := !(boxref->pointer);
         let old_value: T := Load(ptr);
         Store(ptr, value);
         return old_value;
