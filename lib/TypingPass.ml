@@ -111,8 +111,7 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
              "Typeclass resolution failed. Typeclass: "
              ^ (get_decl_name_or_die env typeclass)
              ^ ". Dispatch type: "
-             ^ (type_string dispatch_ty)
-    ))
+             ^ (type_string dispatch_ty)))
 
 (* Since the extraction pass has already happened, we can simplify the call to
    `parse_type` by passing an empty list of local type signatures. *)
