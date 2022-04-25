@@ -14,6 +14,7 @@ type integer_width =
   | Width16
   | Width32
   | Width64
+  | WidthIndex
 [@@deriving (eq, show)]
 
 type signedness =
@@ -71,7 +72,5 @@ val type_string : ty -> string
 val size_type : ty
 
 val string_type : ty
-
-val width_int : integer_width -> int
 
 val equal_ty : ty -> ty -> bool

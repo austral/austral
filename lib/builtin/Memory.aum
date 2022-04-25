@@ -21,7 +21,7 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function Allocate(size: Natural_64): Address[T] is
+    function Allocate(size: Index): Address[T] is
         return @embed(Address[T], "au_calloc($1, $2)", sizeof(T), size);
     end;
 
@@ -53,30 +53,30 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function Resize_Array(array: Pointer[T], size: Natural_64): Pointer[T] is
-        let total: Natural_64 := (sizeof(T)) * size;
+    function Resize_Array(array: Pointer[T], size: Index): Pointer[T] is
+        let total: Index := (sizeof(T)) * size;
         return @embed(Pointer[T], "au_realloc($1, $2)", array, total);
     end;
 
     generic [T: Type, U: Type]
-    function memmove(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit is
+    function memmove(source: Pointer[T], destination: Pointer[U], count: Index): Unit is
         @embed(Pointer[T], "au_memmove($1, $2, $3)", destination, source, count);
         return nil;
     end;
 
     generic [T: Type, U: Type]
-    function memcpy(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit is
+    function memcpy(source: Pointer[T], destination: Pointer[U], count: Index): Unit is
         @embed(Pointer[T], "au_memcpy($1, $2, $3)", destination, source, count);
         return nil;
     end;
 
     generic [T: Type]
-    function Positive_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T] is
+    function Positive_Offset(pointer: Pointer[T], offset: Index): Pointer[T] is
         return @embed(Pointer[T], "$1 + $2", pointer, offset);
     end;
 
     generic [T: Type]
-    function Negative_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T] is
+    function Negative_Offset(pointer: Pointer[T], offset: Index): Pointer[T] is
         return @embed(Pointer[T], "$1 - $2", pointer, offset);
     end;
 end module body.

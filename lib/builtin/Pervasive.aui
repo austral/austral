@@ -19,7 +19,7 @@ module Austral.Pervasive is
     function Deref_Write(ref: WriteReference[T, R]): T;
 
     generic [T: Type]
-    function Fixed_Array_Size(arr: Fixed_Array[T]): Natural_64;
+    function Fixed_Array_Size(arr: Fixed_Array[T]): Index;
 
     function Abort(message: Fixed_Array[Natural_8]): Unit;
 
@@ -41,6 +41,9 @@ module Austral.Pervasive is
 
     constant Minimum_Integer_64: Integer_64;
     constant Maximum_Integer_64: Integer_64;
+
+    constant Minimum_Index: Index;
+    constant Maximum_Index: Index;
 
     typeclass Trapping_Arithmetic(T: Type) is
         method Trapping_Add(lhs: T, rhs: T): T;
@@ -64,6 +67,7 @@ module Austral.Pervasive is
     instance Trapping_Arithmetic(Integer_32);
     instance Trapping_Arithmetic(Natural_64);
     instance Trapping_Arithmetic(Integer_64);
+    instance Trapping_Arithmetic(Index);
     instance Trapping_Arithmetic(Double_Float);
 
     instance Modular_Arithmetic(Natural_8);
@@ -74,4 +78,5 @@ module Austral.Pervasive is
     instance Modular_Arithmetic(Integer_32);
     instance Modular_Arithmetic(Natural_64);
     instance Modular_Arithmetic(Integer_64);
+    instance Modular_Arithmetic(Index);
 end module.

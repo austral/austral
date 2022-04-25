@@ -105,11 +105,20 @@ let rec gen_type (ty: mono_ty): c_ty =
   | MonoBoolean ->
      CNamedType "au_bool_t"
   | MonoInteger (s, w) ->
-     let s' = (match s with
-               | Unsigned -> "nat"
-               | Signed -> "int")
-     and w' = string_of_int (width_int w) in
-     CNamedType ("au_" ^ s' ^ w' ^ "_t")
+     let sgn: string =
+       match s with
+       | Unsigned -> "au_nat"
+       | Signed -> "au_int"
+     in
+     let name: string =
+       match w with
+       | Width8 -> sgn ^ "8_t"
+       | Width16 -> sgn ^ "16_t"
+       | Width32 -> sgn ^ "32_t"
+       | Width64 -> sgn ^ "64_t"
+       | WidthIndex -> "au_index_t"
+     in
+     CNamedType name
   | MonoSingleFloat ->
      CNamedType "float"
   | MonoDoubleFloat ->

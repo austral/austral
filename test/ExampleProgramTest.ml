@@ -140,7 +140,7 @@ module body Example is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let size: Natural_64 := sizeof(Natural_8);
+        let size: Index := sizeof(Natural_8);
         if size /= 1 then
             Put_Character('f');
         end if;

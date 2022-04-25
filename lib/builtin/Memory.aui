@@ -9,7 +9,7 @@ module Austral.Memory is
     function Null_Check(address: Address[T]): Option[Pointer[T]];
 
     generic [T: Type]
-    function Allocate(size: Natural_64): Address[T];
+    function Allocate(size: Index): Address[T];
 
     generic [T: Type]
     function Load(pointer: Pointer[T]): T;
@@ -27,17 +27,17 @@ module Austral.Memory is
     function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R];
 
     generic [T: Type]
-    function Resize_Array(array: Pointer[T], size: Natural_64): Pointer[T];
+    function Resize_Array(array: Pointer[T], size: Index): Pointer[T];
 
     generic [T: Type, U: Type]
-    function memmove(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit;
+    function memmove(source: Pointer[T], destination: Pointer[U], count: Index): Unit;
 
     generic [T: Type, U: Type]
-    function memcpy(source: Pointer[T], destination: Pointer[U], count: Natural_64): Unit;
+    function memcpy(source: Pointer[T], destination: Pointer[U], count: Index): Unit;
 
     generic [T: Type]
-    function Positive_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T];
+    function Positive_Offset(pointer: Pointer[T], offset: Index): Pointer[T];
 
     generic [T: Type]
-    function Negative_Offset(pointer: Pointer[T], offset: Natural_64): Pointer[T];
+    function Negative_Offset(pointer: Pointer[T], offset: Index): Pointer[T];
 end module.
