@@ -67,6 +67,7 @@ module Austral.Pervasive is
     instance Trapping_Arithmetic(Integer_32);
     instance Trapping_Arithmetic(Natural_64);
     instance Trapping_Arithmetic(Integer_64);
+    instance Trapping_Arithmetic(Index);
     instance Trapping_Arithmetic(Double_Float);
 
     instance Modular_Arithmetic(Natural_8);
@@ -77,4 +78,5 @@ module Austral.Pervasive is
     instance Modular_Arithmetic(Integer_32);
     instance Modular_Arithmetic(Natural_64);
     instance Modular_Arithmetic(Integer_64);
+    instance Modular_Arithmetic(Index);
 end module.
