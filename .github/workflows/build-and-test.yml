@@ -17,6 +17,9 @@ jobs:
       - name: Install opam
         run: sudo apt-get install -y opam
 
+      - name: Initialize opam
+        run: opam init
+
       - name: Install dependencies
         run: opam install dune ppx_deriving ounit2 menhir
 
