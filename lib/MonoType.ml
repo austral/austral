@@ -12,7 +12,7 @@ type mono_ty =
   | MonoSingleFloat
   | MonoDoubleFloat
   | MonoNamedType of mono_id
-  | MonoArray of mono_ty * region
+  | MonoStaticArray of mono_ty
   | MonoRegionTy of region
   | MonoReadRef of mono_ty * mono_ty
   | MonoWriteRef of mono_ty * mono_ty

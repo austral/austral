@@ -36,7 +36,7 @@ type ty =
   | SingleFloat
   | DoubleFloat
   | NamedType of qident * ty list * universe
-  | Array of ty * region
+  | StaticArray of ty
   | RegionTy of region
   | ReadRef of ty * ty
   | WriteRef of ty * ty
@@ -84,8 +84,8 @@ let rec type_string = function
      double_float_name
   | NamedType (n, args, u) ->
      (qident_debug_name n) ^ args_string args ^ ": " ^ (universe_string u)
-  | Array (t, r) ->
-     "Array[" ^ (type_string t) ^ ", " ^ (ident_string (region_name r)) ^ "]: Free"
+  | StaticArray t ->
+     "Static_Array[" ^ (type_string t) ^ "]: Free"
   | RegionTy r ->
      ident_string (region_name r) ^ "(" ^ (string_of_int (region_id r)) ^ ")"
   | ReadRef (t, r) ->
@@ -107,7 +107,7 @@ and args_string = function
 
 let size_type = Integer (Unsigned, WidthIndex)
 
-let string_type = Array (Integer (Unsigned, Width8), static_region)
+let string_type = StaticArray (Integer (Unsigned, Width8))
 
 let rec equal_ty a b =
   match a with
@@ -149,10 +149,10 @@ let rec equal_ty a b =
          && (equal_universe u u')
       | _ ->
          false)
-  | Array (t, r) ->
+  | StaticArray t ->
      (match b with
-      | Array (t', r') ->
-         (equal_ty t t') && (equal_region r r')
+      | StaticArray t' ->
+         equal_ty t t'
       | _ ->
          false)
   | RegionTy r ->

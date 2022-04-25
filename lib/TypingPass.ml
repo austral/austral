@@ -403,7 +403,7 @@ and augment_path_elem (env: env) (module_name: module_name) (rm: region_map) (ty
   | ArrayIndex ie ->
      let ie' = augment_expr module_name env rm typarams lexenv None ie in
      (match head_ty with
-      | Array (elem_ty, _) ->
+      | StaticArray elem_ty ->
          TArrayIndex (ie', elem_ty)
       | _ ->
          err "Array index operator doesn't work for this type.")
