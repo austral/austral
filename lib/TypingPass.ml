@@ -1016,7 +1016,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       | AReturn (span, e) ->
          adorn_error_with_span span
            (fun _ ->
-             let e' = augment_expr module_name env rm typarams lexenv None e in
+             let e' = augment_expr module_name env rm typarams lexenv (Some rt) e in
              pt ("Type", get_type e');
              let _ = match_type_with_value rt e' in
              TReturn (span, e')))
