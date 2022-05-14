@@ -1,5 +1,6 @@
 open Type
 open TypeVarSet
+open TypeParameters
 open Region
 
 (* Get the universe this type belongs to *)
@@ -14,6 +15,6 @@ val is_comparable : ty -> bool
 (* Return the set of type variables in a type expression, *)
 val type_variables : ty -> TypeVarSet.t
 
-val region_map_from_typarams : type_parameter list -> region_map
+val region_map_from_typarams : typarams -> region_map
 
 val is_concrete : ty -> bool

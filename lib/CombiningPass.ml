@@ -2,6 +2,7 @@ open Identifier
 open Imports
 open Qualifier
 open Type
+open TypeParameters
 open AbstractionPass
 open Cst
 open Combined
@@ -47,8 +48,11 @@ let parse_method_defs (imports: import_map) (methods: concrete_method_def list):
                   abs_stmt imports body))
     methods
 
-let name_typarams (typarams: concrete_type_param list) (name: qident): type_parameter list =
-  List.map (fun (ConcreteTypeParam (n, u)) -> TypeParameter (n, u, name)) typarams
+let name_typarams (params: concrete_type_param list) (name: qident): typarams =
+  let lst: type_parameter list =
+    List.map (fun (ConcreteTypeParam (n, u)) -> TypeParameter (n, u, name)) params
+  in
+  typarams_from_list lst
 
 let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: concrete_def): combined_definition =
   let make_qname n =
@@ -185,7 +189,11 @@ let private_def module_name im def =
      let qname = make_qname name in
      CTypeclass (VisPrivate,
                  name,
-                 List.nth (name_typarams [typaram] qname) 0,
+                 (match (typarams_as_list (name_typarams [typaram] qname)) with
+                  | [tp] ->
+                     tp
+                  | _ ->
+                     err "typeclass has more than one parameter"),
                  parse_method_decls im methods,
                  docstring)
   | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
@@ -261,7 +269,11 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
          let qname = make_qname name in
          CTypeclass (VisPublic,
                      name,
-                     List.nth (name_typarams [typaram] qname) 0,
+                 (match (typarams_as_list (name_typarams [typaram] qname)) with
+                  | [tp] ->
+                     tp
+                  | _ ->
+                     err "typeclass has more than one parameter"),
                      parse_method_decls im methods,
                      docstring)
       | _ ->

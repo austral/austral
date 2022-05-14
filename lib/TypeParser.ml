@@ -1,6 +1,8 @@
 open Identifier
 open Names
 open Type
+open TypeSignature
+open TypeParameters
 open TypeSystem
 open Region
 open Ast
@@ -118,7 +120,7 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
       | _ ->
          None
 
-let rec effective_universe name typarams declared_universe args =
+let rec effective_universe name (typarams: typarams) declared_universe args =
   (* Algorithm:
 
      1. If the declared universe is Free then none of the type parameters can be Linear or Type.
@@ -154,7 +156,7 @@ let rec effective_universe name typarams declared_universe args =
   | RegionUniverse ->
      err "effective_universe called with a region type"
   | TypeUniverse ->
-     assert ((List.length typarams) > 0);
+     assert ((typarams_size typarams) > 0);
      if any_arg_is_linear args then
        LinearUniverse
      else
@@ -215,7 +217,7 @@ let get_type_signature (env: env) (sigs: type_signature list) (name: qident) =
 
 (* Parsing *)
 
-let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
+let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: typarams) (QTypeSpecifier (name, args)) =
   let args' = List.map (parse_type env sigs rm typarams) args in
   match parse_built_in_type name args' with
   | Some ty ->
@@ -233,10 +235,9 @@ let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typa
 
 (* Is the given name a type parameter in the list of type paramters? If so,
    return it as a type variable. *)
-and is_param (typarams: type_parameter list) (name: qident): ty option =
-  let name' = original_name name
-  in
-  match List.find_opt (fun (TypeParameter (n, _, _)) -> equal_identifier n name') typarams with
+and is_param (typarams: typarams) (name: qident): ty option =
+  let name' = original_name name in
+  match get_typaram typarams name' with
   | Some (TypeParameter (_, u, from)) ->
      Some (TyVar (TypeVariable (name', u, from)))
   | None ->
@@ -268,11 +269,11 @@ and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list)
   let universe = effective_universe name ts_params declared_universe args in
   NamedType (name, args, universe)
 
-and check_param_arity_matches (params: type_parameter list) (args: ty list): unit =
-  assert ((List.length params) = (List.length args))
+and check_param_arity_matches (params: typarams) (args: ty list): unit =
+  assert ((typarams_size params) = (List.length args))
 
-and check_universes_match (params: type_parameter list) (args: ty list): unit =
-  let _ = List.map2 check_universes_match' params args in ()
+and check_universes_match (params: typarams) (args: ty list): unit =
+  let _ = List.map2 check_universes_match' (typarams_as_list params) args in ()
 
 and check_universes_match' (TypeParameter (_, param_u, _)) (arg: ty): unit =
   let arg_u = type_universe arg in

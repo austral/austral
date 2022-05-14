@@ -1,5 +1,6 @@
 open Type
 open TypeVarSet
+open TypeParameters
 open Region
 open Error
 
@@ -81,7 +82,9 @@ let rec type_variables = function
   | MonoTy _ ->
     TypeVarSet.empty
 
-let region_map_from_typarams _ =
+let region_map_from_typarams (typarams: typarams): region_map =
+  (* TODO: what the fuck *)
+  let _ = typarams in
   empty_region_map
 
 let rec is_concrete = function

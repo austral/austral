@@ -8,6 +8,8 @@ open Ast
 open Id
 open Env
 open TypeParser
+open TypeSignature
+open TypeParameters
 open Util
 open Error
 
@@ -86,17 +88,17 @@ and extract_definitions (env: env) (mod_id: mod_id) (local_types: type_signature
     the environment, and return a linked definition. *)
 and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature list) (def: combined_definition): (env * linked_definition)  =
   let parse' = parse_type env local_types in
-  let rec parse_slot (typarams: type_parameter list) (QualifiedSlot (n, ts)): typed_slot =
+  let rec parse_slot (typarams: typarams) (QualifiedSlot (n, ts)): typed_slot =
     let rm = region_map_from_typarams typarams in
     TypedSlot (n, parse' rm typarams ts)
-  and parse_param (typarams: type_parameter list) (QualifiedParameter (n, ts)): value_parameter =
+  and parse_param (typarams: typarams) (QualifiedParameter (n, ts)): value_parameter =
     let rm = region_map_from_typarams typarams in
     ValueParameter (n, parse' rm typarams ts)
   in
   match def with
   | CConstant (vis, name, typespec, def, docstring) ->
-     let rm = region_map_from_typarams [] in
-     let ty = parse' rm [] typespec in
+     let rm = region_map_from_typarams empty_typarams in
+     let ty = parse' rm empty_typarams typespec in
      let (env, decl_id) = add_constant env { mod_id; vis; name; ty; docstring } in
      let decl = LConstant (decl_id, vis, name, ty, def, docstring) in
      (env, decl)
@@ -169,7 +171,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      (* Add the typeclass itself to the env *)
      let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
      (* Convert the list of methods into a list of type_class_method records *)
-     let typarams = [typaram] in
+     let typarams = typarams_from_list [typaram] in
      let method_map (CMethodDecl (name, params, rt, docstring)): type_class_method_input =
        let rm = region_map_from_typarams typarams in
        let value_params = List.map (parse_param typarams) params

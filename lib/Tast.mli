@@ -2,6 +2,7 @@ open Identifier
 open Common
 open Escape
 open Type
+open TypeParameters
 open Linked
 open Id
 open Span
@@ -41,7 +42,7 @@ and texpr =
   | TLocalVar of identifier * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of decl_id * qident * texpr list * ty * (identifier * ty) list
-  | TMethodCall of ins_meth_id * qident * type_parameter list * texpr list * ty * (identifier * ty) list
+  | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * (identifier * ty) list
   | TCast of texpr * ty
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr
@@ -88,13 +89,13 @@ type typed_method_def =
 
 type typed_decl =
   | TConstant of decl_id * vis * identifier * ty * texpr * docstring
-  | TTypeAlias of decl_id * type_vis * identifier * type_parameter list * universe * ty * docstring
-  | TRecord of decl_id * type_vis * identifier * type_parameter list * universe * typed_slot list * docstring
-  | TUnion of decl_id * type_vis * identifier * type_parameter list * universe * linked_case list * docstring
-  | TFunction of decl_id * vis * identifier * type_parameter list * value_parameter list * ty * tstmt * docstring
+  | TTypeAlias of decl_id * type_vis * identifier * typarams * universe * ty * docstring
+  | TRecord of decl_id * type_vis * identifier * typarams * universe * typed_slot list * docstring
+  | TUnion of decl_id * type_vis * identifier * typarams * universe * linked_case list * docstring
+  | TFunction of decl_id * vis * identifier * typarams * value_parameter list * ty * tstmt * docstring
   | TForeignFunction of decl_id * vis * identifier * value_parameter list * ty * string * docstring
   | TTypeClass of decl_id * vis * identifier * type_parameter * typed_method_decl list * docstring
-  | TInstance of decl_id * vis * qident * type_parameter list * ty * typed_method_def list * docstring
+  | TInstance of decl_id * vis * qident * typarams * ty * typed_method_def list * docstring
 
 type typed_module = TypedModule of module_name * typed_decl list
 

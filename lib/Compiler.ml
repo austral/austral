@@ -14,6 +14,7 @@ open CRenderer
 open Cst
 open Tast
 open Type
+open TypeParameters
 open Error
 open Util
 open Combined
@@ -84,7 +85,7 @@ let rec check_entrypoint_validity (env: env) (qi: qident): decl_id =
      (match decl with
       | Function { id; vis; typarams; value_params; rt; _ } ->
          if vis = VisPublic then
-           if typarams = [] then
+           if (typarams_size typarams) = 0 then
              match value_params with
              | [ValueParameter (_, pt)] ->
                 if is_root_cap_type pt then

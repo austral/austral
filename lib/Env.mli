@@ -1,6 +1,7 @@
 open Identifier
 open Common
 open Type
+open TypeParameters
 open MonoType
 open Tast
 open Mtast
@@ -8,9 +9,6 @@ open Id
 open LexEnv
 
 (** {1 Types} *)
-
-(** A set of type parameters. *)
-type typarams = type_parameter list
 
 (** The global compiler environment. *)
 type env
@@ -262,12 +260,12 @@ type ins_meth_rec = InsMethRec of {
 
 (** Callable things. *)
 type callable =
-  | FunctionCallable of decl_id * type_parameter list * value_parameter list * ty
-  | TypeAliasCallable of decl_id * type_parameter list * universe * ty
-  | RecordConstructor of decl_id * type_parameter list * universe * typed_slot list
+  | FunctionCallable of decl_id * typarams * value_parameter list * ty
+  | TypeAliasCallable of decl_id * typarams * universe * ty
+  | RecordConstructor of decl_id * typarams * universe * typed_slot list
   | UnionConstructor of {
       union_id: decl_id;
-      type_params: type_parameter list;
+      type_params: typarams;
       universe: universe;
       case: typed_case;
     }
