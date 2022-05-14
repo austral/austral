@@ -50,7 +50,7 @@ let char_constant = '\'' (ascii_char | '\\' ['n' 'r' 't' '\\']) '\''
 
 rule token = parse
   (* Comments *)
-  | comment { token lexbuf }
+  | comment { advance_line lexbuf; token lexbuf }
   (* Brackets *)
   | "(" { LPAREN }
   | ")" { RPAREN }
