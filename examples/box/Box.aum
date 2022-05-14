@@ -13,10 +13,12 @@ import Austral.Memory (
 module body Example.Box is
     pragma Unsafe_Module;
 
+    -- A linear pointer.
     record Box[T: Type]: Linear is
         pointer: Pointer[T];
     end;
 
+    -- Construct a box from a value. If allocation fails, return the value.
     generic [T: Type]
     function Make(val: T): Either[Box[T], T] is
         let addr: Address[T] := Allocate(sizeof(T));
@@ -33,6 +35,7 @@ module body Example.Box is
         end case;
     end;
 
+    -- Unbox and deallocate.
     generic [T: Type]
     function Unbox(box: Box[T]): T is
         let { pointer: Pointer[T] } := box;
@@ -41,6 +44,7 @@ module body Example.Box is
         return value;
     end;
 
+    -- If the box contains a free value, swap it and discard the contents.
     generic [X: Free]
     function Swap_Free(box: Box[X], new: X): Box[X] is
         let { pointer: Pointer[X] } := box;
@@ -90,7 +94,7 @@ module body Example.Box is
         case b of
             when Left(left: Box[Integer_32]) do
                 let newbox: Box[Integer_32] := Swap_Free(left, 'a');
-                let contents: Integer_32 := Unbox(newbox);
+                let contents: Single_Float := Unbox(newbox);
                 Put_Character(contents);
             when Right(right: Integer_32) do
                 Abort("Unexpected.");
