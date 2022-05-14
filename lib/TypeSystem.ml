@@ -83,9 +83,18 @@ let rec type_variables = function
     TypeVarSet.empty
 
 let region_map_from_typarams (typarams: typarams): region_map =
-  (* TODO: what the fuck *)
   let _ = typarams in
   empty_region_map
+(* TODO: why does this not work?
+  let folder (rm: region_map) (typaram: type_parameter): region_map =
+    let (TypeParameter (name, u, _)) = typaram in
+    if u = RegionUniverse then
+      add_region rm name (fresh_region name)
+    else
+      rm
+  in
+  List.fold_left folder empty_region_map (typarams_as_list typarams) *)
+
 
 let rec is_concrete = function
   | Unit -> true
