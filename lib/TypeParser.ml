@@ -217,7 +217,7 @@ let get_type_signature (env: env) (sigs: type_signature list) (name: qident) =
 
 (* Parsing *)
 
-let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: type_parameter list) (QTypeSpecifier (name, args)) =
+let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: typarams) (QTypeSpecifier (name, args)) =
   let args' = List.map (parse_type env sigs rm typarams) args in
   match parse_built_in_type name args' with
   | Some ty ->
@@ -235,10 +235,9 @@ let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typa
 
 (* Is the given name a type parameter in the list of type paramters? If so,
    return it as a type variable. *)
-and is_param (typarams: type_parameter list) (name: qident): ty option =
-  let name' = original_name name
-  in
-  match List.find_opt (fun (TypeParameter (n, _, _)) -> equal_identifier n name') typarams with
+and is_param (typarams: typarams) (name: qident): ty option =
+  let name' = original_name name in
+  match get_typaram typarams name' with
   | Some (TypeParameter (_, u, from)) ->
      Some (TyVar (TypeVariable (name', u, from)))
   | None ->

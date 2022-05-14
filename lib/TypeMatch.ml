@@ -1,6 +1,7 @@
 open Identifier
 open Type
 open TypeBindings
+open TypeParameters
 open Tast
 open Error
 
@@ -151,8 +152,8 @@ and match_type_list tys tys' =
   let bs = List.map2 match_type tys tys' in
   List.fold_left merge_bindings empty_bindings bs
 
-let match_typarams typarams args =
-  let typarams' = List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) typarams in
+let match_typarams (typarams: typarams) (args: ty list): type_bindings =
+  let typarams' = List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) (typarams_as_list typarams) in
   match_type_list typarams' args
 
 let match_type_with_value (ty: ty) (expr: texpr): type_bindings =

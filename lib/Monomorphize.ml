@@ -343,74 +343,69 @@ and monomorphize_named_ty_list (env: env) (tys: (identifier * stripped_ty) list)
 let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
   match decl with
   | TConstant (id, _, name, ty, value, _) ->
-    (* Constant are intrinsically monomorphic, and can be monomorphized
-       painlessly. *)
-    let (ty, env) = strip_and_mono env ty in
-    let (value, env) = monomorphize_expr env value in
-    let decl = MConstant (id, name, ty, value) in
-    (Some decl, env)
+     (* Constant are intrinsically monomorphic, and can be monomorphized
+        painlessly. *)
+     let (ty, env) = strip_and_mono env ty in
+     let (value, env) = monomorphize_expr env value in
+     let decl = MConstant (id, name, ty, value) in
+     (Some decl, env)
   | TTypeAlias (id, _, name, typarams, _, ty, _) ->
-    (* Concrete (i.e., no type parameters) type aliases can be monomorphized
-       immediately. Generic ones are monomorphized on demand. *)
-    (match typarams with
-     | [] ->
+     (* Concrete (i.e., no type parameters) type aliases can be monomorphized
+        immediately. Generic ones are monomorphized on demand. *)
+     if (typarams_size typarams) = 0 then
        let (ty, env) = strip_and_mono env ty in
        let decl = MTypeAlias (id, name, ty) in
        (Some decl, env)
-     | _ ->
-       (None, env))
+     else
+       (None, env)
   | TRecord (id, _, name, typarams, _, slots, _) ->
-    (* Concrete records are monomorphized immediately. Generic records are
-       monomorphized on demand. *)
-    (match typarams with
-     | [] ->
+     (* Concrete records are monomorphized immediately. Generic records are
+        monomorphized on demand. *)
+     if (typarams_size typarams) = 0 then
        let (env, slots) = monomorphize_slots env slots in
        let decl = MRecord (id, name, slots) in
        (Some decl, env)
-     | _ ->
-       (None, env))
+     else
+       (None, env)
   | TUnion (id, _, name, typarams, _, cases, _) ->
-    (* Concrete unions are monomorphized immediately. Generic unions are
-       monomorphized on demand. *)
-    (match typarams with
-     | [] ->
+     (* Concrete unions are monomorphized immediately. Generic unions are
+        monomorphized on demand. *)
+     if (typarams_size typarams) = 0 then
        let (env, cases) = Util.map_with_context (fun (e, c) -> monomorphize_case e c) env cases in
        let decl = MUnion (id, name, cases) in
        (Some decl, env)
-     | _ ->
-       (None, env))
+     else
+       (None, env)
   | TFunction (id, _, name, typarams, value_params, rt, body, _) ->
-    (* Concrete functions are monomorphized immediately. Generic functions are
-       monomorphized on demand. *)
-    (match typarams with
-     | [] ->
+     (* Concrete functions are monomorphized immediately. Generic functions are
+        monomorphized on demand. *)
+     if (typarams_size typarams) = 0 then
        let (env, params) = monomorphize_params env value_params in
        let (rt, env) = strip_and_mono env rt in
        let (body, env) = monomorphize_stmt env body in
        let decl = MFunction (id, name, params, rt, body) in
        (Some decl, env)
-     | _ ->
-       (None, env))
+     else
+       (None, env)
   | TForeignFunction (id, _, name, params, rt, underlying, _) ->
-    (* Foreign functions are intrinsically monomorphic. *)
-    let (env, params) = monomorphize_params env params in
-    let (rt, env) = strip_and_mono env rt in
-    let decl = MForeignFunction (id, name, params, rt, underlying) in
-    (Some decl, env)
+     (* Foreign functions are intrinsically monomorphic. *)
+     let (env, params) = monomorphize_params env params in
+     let (rt, env) = strip_and_mono env rt in
+     let decl = MForeignFunction (id, name, params, rt, underlying) in
+     (Some decl, env)
   | TTypeClass _ ->
-    (* Type classes are purely "informative" declarations: they have no physical
-       existence in the code. *)
-    (None, env)
+     (* Type classes are purely "informative" declarations: they have no physical
+        existence in the code. *)
+     (None, env)
   | TInstance (decl_id, _, name, typarams, argument, methods, _) ->
-    (* Concrete instances can be monomorphized immediately. *)
-    (match typarams with
-     | [] ->
+     (* Concrete instances can be monomorphized immediately. *)
+     if (typarams_size typarams) = 0 then
        let (argument, env) = strip_and_mono env argument in
        let (env, methods) = monomorphize_methods env methods in
        let decl = MConcreteInstance (decl_id, name, argument, methods) in
        (Some decl, env)
-     | _ ->
-       (None, env))
+     else
+       (None, env)
 
 and monomorphize_slot (env: env) (slot: typed_slot): (env * mono_slot) =
   let (TypedSlot (name, ty)) = slot in
@@ -650,21 +645,21 @@ and get_mono_qname (env: env) (mono: monomorph): qident =
       | _ ->
          err "internal")
 
-and get_type_alias_definition (env: env) (id: decl_id): (type_parameter list * ty) =
+and get_type_alias_definition (env: env) (id: decl_id): (typarams * ty) =
   match get_decl_by_id env id with
   | Some (TypeAlias { typarams; def; _ }) ->
      (typarams, def)
   | _ ->
      err "internal"
 
-and get_record_definition (env: env) (id: decl_id): (type_parameter list * typed_slot list) =
+and get_record_definition (env: env) (id: decl_id): (typarams * typed_slot list) =
   match get_decl_by_id env id with
   | Some (Record { typarams; slots; _ }) ->
      (typarams, slots)
   | _ ->
      err "internal"
 
-and get_union_typarams (env: env) (id: decl_id): type_parameter list =
+and get_union_typarams (env: env) (id: decl_id): typarams =
   match get_decl_by_id env id with
   | Some (Union { typarams; _ }) ->
      typarams
@@ -682,7 +677,7 @@ and get_union_typed_cases (env: env) (union_id: decl_id): typed_case list =
   in
   List.map mapper cases
 
-and get_function_definition (env: env) (id: decl_id): (type_parameter list * value_parameter list * ty * tstmt) =
+and get_function_definition (env: env) (id: decl_id): (typarams * value_parameter list * ty * tstmt) =
   match get_decl_by_id env id with
   | Some (Function { typarams; value_params; rt; body; _ }) ->
      (match body with
@@ -693,7 +688,7 @@ and get_function_definition (env: env) (id: decl_id): (type_parameter list * val
   | _ ->
      err "internal"
 
-and get_method_definition (env: env) (id: ins_meth_id): (type_parameter list * value_parameter list * ty * tstmt) =
+and get_method_definition (env: env) (id: ins_meth_id): (typarams * value_parameter list * ty * tstmt) =
   match get_instance_method env id with
   | Some (InsMethRec { instance_id; value_params; rt; body; _ }) ->
      (match get_decl_by_id env instance_id with
@@ -722,11 +717,11 @@ and monomorphize_case_list (env: env) (cases: typed_case list): (env * mono_case
     env
     cases
 
-and replace_type_variables (typarams: type_parameter list) (source: qident) (args: mono_ty list) (ty: ty): ty =
+and replace_type_variables (typarams: typarams) (source: qident) (args: mono_ty list) (ty: ty): ty =
   let bindings: type_bindings = make_bindings typarams source args in
   replace_variables bindings ty
 
-and make_bindings (typarams: type_parameter list) (source: qident) (args: mono_ty list): type_bindings =
+and make_bindings (typarams: typarams) (source: qident) (args: mono_ty list): type_bindings =
   (* Given a list of type parameters, a list of monomorphic type arguments (of
      qthe same length), return a type bindings object (implicitly converting the
      `mono_ty` into a `ty`).
@@ -737,7 +732,7 @@ and make_bindings (typarams: type_parameter list) (source: qident) (args: mono_t
   let is_not_region (TypeParameter (_, u, _)): bool =
     u <> RegionUniverse
   in
-  let typarams = List.filter is_not_region typarams in
+  let typarams = List.filter is_not_region (typarams_as_list typarams) in
   if (List.length typarams) = (List.length args) then
     let triples: (identifier * qident * ty) list =
       List.map2
