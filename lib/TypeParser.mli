@@ -1,5 +1,7 @@
 open Identifier
 open Type
+open TypeSignature
+open TypeParameters
 open Region
 open Ast
 open Env
@@ -8,7 +10,7 @@ open Env
    supplied type arguments, evaluate the effective universe the type belongs to.
 
    Preconditions: the lists have the same length. *)
-val effective_universe : qident -> type_parameter list -> universe -> ty list -> universe
+val effective_universe : qident -> typarams -> universe -> ty list -> universe
 
 val any_arg_is_linear : ty list -> bool
 

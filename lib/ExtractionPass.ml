@@ -8,6 +8,7 @@ open Ast
 open Id
 open Env
 open TypeParser
+open TypeSignature
 open Util
 open Error
 

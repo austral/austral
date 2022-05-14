@@ -1,6 +1,8 @@
 open Identifier
 open Names
 open Type
+open TypeSignature
+open TypeParameters
 open TypeSystem
 open Region
 open Ast
@@ -118,7 +120,7 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
       | _ ->
          None
 
-let rec effective_universe name typarams declared_universe args =
+let rec effective_universe name (typarams: typarams) declared_universe args =
   (* Algorithm:
 
      1. If the declared universe is Free then none of the type parameters can be Linear or Type.
@@ -154,7 +156,7 @@ let rec effective_universe name typarams declared_universe args =
   | RegionUniverse ->
      err "effective_universe called with a region type"
   | TypeUniverse ->
-     assert ((List.length typarams) > 0);
+     assert ((typarams_size typarams) > 0);
      if any_arg_is_linear args then
        LinearUniverse
      else
@@ -268,11 +270,11 @@ and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list)
   let universe = effective_universe name ts_params declared_universe args in
   NamedType (name, args, universe)
 
-and check_param_arity_matches (params: type_parameter list) (args: ty list): unit =
-  assert ((List.length params) = (List.length args))
+and check_param_arity_matches (params: typarams) (args: ty list): unit =
+  assert ((typarams_size params) = (List.length args))
 
-and check_universes_match (params: type_parameter list) (args: ty list): unit =
-  let _ = List.map2 check_universes_match' params args in ()
+and check_universes_match (params: typarams) (args: ty list): unit =
+  let _ = List.map2 check_universes_match' (typarams_as_list params) args in ()
 
 and check_universes_match' (TypeParameter (_, param_u, _)) (arg: ty): unit =
   let arg_u = type_universe arg in

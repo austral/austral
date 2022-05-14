@@ -1,4 +1,4 @@
-open Type
+open TypeSignature
 open Combined
 open Linked
 open Env
