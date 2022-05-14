@@ -53,8 +53,6 @@ type typed_case = TypedCase of identifier * typed_slot list
 type value_parameter = ValueParameter of identifier * ty
 [@@deriving show]
 
-type type_signature = TypeSignature of identifier * type_parameter list * universe
-
 let universe_string = function
   | FreeUniverse -> "Free"
   | LinearUniverse -> "Linear"
