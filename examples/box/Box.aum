@@ -94,7 +94,7 @@ module body Example.Box is
         case b of
             when Left(left: Box[Integer_32]) do
                 let newbox: Box[Integer_32] := Swap_Free(left, 'a');
-                let contents: Single_Float := Unbox(newbox);
+                let contents: Integer_32 := Unbox(newbox);
                 Put_Character(contents);
             when Right(right: Integer_32) do
                 Abort("Unexpected.");
