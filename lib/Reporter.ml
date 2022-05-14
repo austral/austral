@@ -26,14 +26,46 @@ let prefix: string = "<!DOCTYPE html>
 <ul>\n"
 
 let suffix: string = "</ul>
-  <style>
-    .multi-line {
-      display: flex;
-      flex-direction: row;
-    }
-  </style>
+    <style>
+      .multi-line {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .frame-contents {
+        display: none;
+      }
+
+      .frame-contents.show {
+        display: block;
+      }
+    </style>
+    <script>
+      const triggers = Array.from(document.querySelectorAll('[data-toggle]'));
+
+      window.addEventListener('click', (ev) => {
+        const elm = ev.target;
+        if (triggers.includes(elm)) {
+          const frameId = elm.getAttribute('data-toggle');
+          collapse(frameId);
+        }
+      }, false);
+
+      const collapse = (frameId) => {
+        const target = document.querySelector('#' + frameId);
+        target.classList.toggle('show');
+      }
+    </script>
   </body>
 </html>"
+
+(** Used to match frame titles with frame contents for toggling. *)
+let toggle_id = ref 0
+
+let fresh_toggle_id _: int =
+  let id = !toggle_id in
+  toggle_id := id + 1;
+  id
 
 (** Render the event list to HTML. *)
 let rec render _ : string =
@@ -44,9 +76,10 @@ let rec render _ : string =
 and render_event (event: event): string =
   match event with
   | EnterFrame name ->
+     let id: string = string_of_int (fresh_toggle_id ()) in
      "<li class='frame'>
-<div class='frame-title'>" ^ name ^ "</div>
-<ul class='frame-contents'>\n"
+<div class='frame-title' data-toggle='frame-" ^ id ^ "'>" ^ name ^ "</div>
+<ul class='frame-contents' id='frame-" ^ id ^ "'>\n"
   | LeaveFrame ->
      "</ul>
 </li>\n"
