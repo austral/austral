@@ -5,6 +5,7 @@ open TypeStripping
 open MonoType
 open TypeBindings
 open TypeReplace
+open TypeParameters
 open Tast
 open Mtast
 open Linked
@@ -133,7 +134,7 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      (* Monomorphize the arglist *)
      let (args, env) = monomorphize_expr_list env args in
      (* Does the funcall have a list of type params? *)
-     if List.length typarams > 0 then
+     if typarams_size typarams > 0 then
        (* The instance is generic. *)
        (* Monomorphize the tyargs *)
        let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
