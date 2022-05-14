@@ -85,7 +85,9 @@ let rec type_variables = function
 let region_map_from_typarams (typarams: typarams): region_map =
   let _ = typarams in
   empty_region_map
-(* TODO: why does this not work?
+
+(* TODO: why does this not work? *)
+(*let region_map_from_typarams (typarams: typarams): region_map =
   let folder (rm: region_map) (typaram: type_parameter): region_map =
     let (TypeParameter (name, u, _)) = typaram in
     if u = RegionUniverse then
@@ -93,9 +95,8 @@ let region_map_from_typarams (typarams: typarams): region_map =
     else
       rm
   in
-  List.fold_left folder empty_region_map (typarams_as_list typarams) *)
-
-
+  List.fold_left folder empty_region_map (typarams_as_list typarams)
+ *)
 let rec is_concrete = function
   | Unit -> true
   | Boolean -> true
