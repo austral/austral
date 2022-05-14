@@ -5,9 +5,13 @@ open Type
 
 (** An ordered set of type parameters keyed by the parameter's name. *)
 type typarams
+[@@deriving show]
 
 (** An empty type parameter set. *)
 val empty_typarams : typarams
+
+(** The number of type parameters in the set. *)
+val typarams_size : typarams -> int
 
 (** Find a type parameter by name. *)
 val get_typaram : typarams -> identifier -> type_parameter option

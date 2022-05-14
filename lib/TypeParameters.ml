@@ -3,8 +3,13 @@ open Type
 open Error
 
 type typarams = TyParams of type_parameter list
+[@@deriving show]
 
 let empty_typarams: typarams = TyParams []
+
+let typarams_size (typarams: typarams): int =
+  let (TyParams lst) = typarams in
+  List.length lst
 
 let typaram_name (typaram: type_parameter): identifier =
   let (TypeParameter (name, _, _)) = typaram in
