@@ -17,6 +17,8 @@ let rec ends_in_return (stmt: astmt): bool =
      false
   | ALet (_, _, _, _, body) ->
      ends_in_return body
+  | ALetBorrow { body; _ } ->
+     ends_in_return body
   | ADestructure (_, _, _, body) ->
      ends_in_return body
   | AAssign _ ->
