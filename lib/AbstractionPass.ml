@@ -129,7 +129,7 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
   | first::rest ->
      (match first with
       | CLet (span, n, t, v) ->
-         ALet (span, n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
+         parse_let im span n t v rest
       | CDestructure (span, bs, e) ->
          let bs' = List.map (fun (n, ts) -> (n, qualify_typespec im ts)) bs
          and e' = abs_expr im e
@@ -146,3 +146,7 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
 
 and abs_lvalue im (ConcreteLValue (head, elems)) =
   LValue (head, List.map (abs_path_elem im) elems)
+
+and parse_let (im: import_map) (span: span) (name: identifier) (ty: typespec) (value: cexpr) (rest: cstmt list): astmt =
+  (* Check if it is a let borrow. *)
+  ALet (span, name, qualify_typespec im ty, abs_expr im value, let_reshape im rest)
