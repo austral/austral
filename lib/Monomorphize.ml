@@ -253,6 +253,11 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
      let (value, env) = monomorphize_expr env value in
      let (body, env) = monomorphize_stmt env body in
      (MLet (name, ty, value, body), env)
+  | TLetBorrow { span; name; ty; region_name; region; var_name; mode; body } ->
+     let _ = span in
+     let (ty, env) = strip_and_mono env ty in
+     let (body, env) = monomorphize_stmt env body in
+     (MLetBorrow { name; ty; region_name; region; var_name; mode; body }, env)
   | TDestructure (_, bindings, value, body) ->
      let (bindings, env) = monomorphize_named_ty_list env (List.map (fun (n, t) -> (n, strip_type t)) bindings) in
      let (value, env) = monomorphize_expr env value in
