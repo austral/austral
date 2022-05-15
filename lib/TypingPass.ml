@@ -342,12 +342,12 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                  err "Constants cannot be borrowed"
               | VarParam ->
                  let name: identifier = original_name name
-                 and reg: region = fresh_region (original_name name)
+                 and reg: region = fresh_region ()
                  in
                  TBorrowExpr (mode, name, reg, ty)
               | VarLocal ->
                  let name: identifier = original_name name
-                 and reg: region = fresh_region (original_name name)
+                 and reg: region = fresh_region ()
                  in
                  TBorrowExpr (mode, name, reg, ty))
           | None ->
@@ -992,7 +992,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
               | (Some (orig_ty, _)) ->
                  let u = type_universe orig_ty in
                  if ((u = LinearUniverse) || (u = TypeUniverse)) then
-                   let region_obj = fresh_region region in
+                   let region_obj = fresh_region () in
                    let refty =
                      (match mode with
                       | ReadBorrow ->

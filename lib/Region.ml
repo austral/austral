@@ -2,23 +2,21 @@ open Identifier
 open IdentifierMap
 open Error
 
-type region = Region of identifier * int
+type region = Region of int
 [@@deriving eq, show]
 
-let region_name (Region (n, _)) = n
-
-let region_id (Region (_, i)) = i
+let region_id (Region i) = i
 
 let static_region_name = make_ident "Static"
 
-let static_region = Region (static_region_name, 0)
+let static_region = Region (0)
 
 let region_counter: int ref = ref 1
 
-let fresh_region n =
+let fresh_region _ =
   let i = !region_counter in
   region_counter := i + 1;
-  Region (n, i)
+  Region i
 
 type region_map = region IdentifierMap.t
 
