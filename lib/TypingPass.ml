@@ -828,6 +828,7 @@ let stmt_kind (stmt: astmt): string =
   match stmt with
   | ASkip _ -> "skip"
   | ALet _ -> "let"
+  | ALetBorrow _ -> "let (borrow)"
   | ADestructure _ -> "let (destructure)"
   | AAssign _ -> "assign"
   | AIf _ -> "if"
