@@ -6,6 +6,7 @@ open TypeParameters
 open Linked
 open Id
 open Span
+open Region
 
 type tstmt =
   | TSkip of span
@@ -60,6 +61,8 @@ and texpr =
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
+  | TBorrowExpr of borrowing_mode * identifier * region * ty
+  (** ty is the type the reference points to *)
 [@@deriving show]
 
 and typed_when =

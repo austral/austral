@@ -7,6 +7,7 @@ open TypeParameters
 open Span
 open Linked
 open Id
+open Region
 open Error
 
 type tstmt =
@@ -62,6 +63,7 @@ and texpr =
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
+  | TBorrowExpr of borrowing_mode * identifier * region * ty
 [@@deriving show]
 
 and typed_when =
