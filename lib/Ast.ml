@@ -9,6 +9,16 @@ type qtypespec = QTypeSpecifier of qident * qtypespec list
 type astmt =
   | ASkip of span
   | ALet of span * identifier * qtypespec * aexpr * astmt
+  | ALetBorrow of {
+      span: span;
+      name: identifier;
+      ty: qtypespec;
+      (** The type the reference points to, that is, in `let x: Read[T, R]` this is `T`. *)
+      region_name: identifier;
+      var_name: qident;
+      (** The name of the borrowed variable. *)
+      body: astmt;
+    }
   | ADestructure of span * (identifier * qtypespec) list * aexpr * astmt
   | AAssign of span * lvalue * aexpr
   | AIf of span * aexpr * astmt * astmt
