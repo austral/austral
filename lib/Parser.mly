@@ -30,6 +30,9 @@ open Span
 %token AND
 %token OR
 %token NOT
+/* Borrowing */
+%token BORROW_WRITE
+%token BORROW_READ
 /* Keywords */
 %token MODULE
 %token IS
