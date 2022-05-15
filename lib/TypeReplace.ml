@@ -114,6 +114,10 @@ let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
      and value = replace_tyvars_expr bindings value
      and body = replace_tyvars_stmt bindings body in
      TLet (span, name, ty, value, body)
+  | TLetBorrow { span; name; ty; region_name; region; var_name; mode; body } ->
+     let ty = replace_variables bindings ty
+     and body = replace_tyvars_stmt bindings body in
+     TLetBorrow { span; name; ty; region_name; region; var_name; mode; body }
   | TDestructure (span, params, value, body) ->
      let params = List.map (fun (n, ty) -> (n, replace_variables bindings ty)) params
      and value = replace_tyvars_expr bindings value
