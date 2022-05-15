@@ -17,6 +17,7 @@ type astmt =
       region_name: identifier;
       var_name: qident;
       (** The name of the borrowed variable. *)
+      mode: borrowing_mode;
       body: astmt;
     }
   | ADestructure of span * (identifier * qtypespec) list * aexpr * astmt
