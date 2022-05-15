@@ -98,7 +98,7 @@ and abs_expr im expr =
   | CSizeOf (_, ty) ->
      SizeOf (qualify_typespec im ty)
   | CBorrowExpr (_, mode, var) ->
-     BorrowExpr (mode, var)
+     BorrowExpr (mode, qualify_identifier im var)
 
 and abs_when im (ConcreteWhen (name, params, body)) =
   AbstractWhen (name,
