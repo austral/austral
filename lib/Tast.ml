@@ -184,6 +184,12 @@ let rec get_type = function
          err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
   | TSizeOf _ ->
      Integer (Unsigned, WidthIndex)
+  | TBorrowExpr (mode, _, region, ty) ->
+     (match mode with
+      | ReadBorrow ->
+         ReadRef (ty, RegionTy region)
+      | WriteBorrow ->
+         WriteRef (ty, RegionTy region))
 
 and path_elem_type = function
   | TSlotAccessor (_, t) ->
