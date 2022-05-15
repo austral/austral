@@ -166,6 +166,8 @@ and check_consistency' (name: identifier) (is_write_ref: bool) (stmt: tstmt) (st
   | TLet (_, _, _, e, b) ->
      let state' = new_state name e state in
      check_consistency' name is_write_ref b state'
+  | TLetBorrow { body; _ } ->
+     check_consistency' name is_write_ref body state
   | TDestructure (_, _, e, b) ->
     let state' = new_state name e state in
     check_consistency' name is_write_ref b state'
@@ -257,6 +259,8 @@ let rec check_linearity (stmt: tstmt): unit =
   match stmt with
   | TSkip _ ->
      ()
+  | TLetBorrow { body; _ } ->
+     check_linearity body
   | TLet (_, n, t, _, b) ->
      let u = type_universe t in
      (* Check this var in the body *)
