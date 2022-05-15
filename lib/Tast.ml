@@ -19,7 +19,7 @@ type tstmt =
       ty: ty;
       region_name: identifier;
       region: region;
-      var_name: qident;
+      var_name: identifier;
       mode: borrowing_mode;
       body: tstmt;
     }

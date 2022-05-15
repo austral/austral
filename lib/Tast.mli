@@ -18,7 +18,7 @@ type tstmt =
       (** The type the reference points to, that is, in `let x: Read[T, R]` this is `T`. *)
       region_name: identifier;
       region: region;
-      var_name: qident;
+      var_name: identifier;
       (** The name of the borrowed variable. *)
       mode: borrowing_mode;
       body: tstmt;
