@@ -281,6 +281,9 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   | MLet (n, t, v, b) ->
      let l = CLet (gen_ident n, gen_type t, ge v) in
      CBlock [l; gs b]
+  | MLetBorrow { name; ty; var_name; body; _ } ->
+     let l = CLet (gen_ident name, CPointer (gen_type ty), CAddressOf (CVar (gen_ident var_name))) in
+     CBlock [l; gs body]
   | MDestructure (bs, e, b) ->
      let tmp = new_variable () in
      let vardecl = CLet (tmp, gen_type (get_type e), ge e)
