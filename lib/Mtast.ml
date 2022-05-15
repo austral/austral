@@ -28,6 +28,15 @@ and concrete_method =
 and mstmt =
   | MSkip
   | MLet of identifier * mono_ty * mexpr * mstmt
+  | MLetBorrow of {
+      name: identifier;
+      ty: mono_ty;
+      region_name: identifier;
+      region: region;
+      var_name: identifier;
+      mode: borrowing_mode;
+      body: mstmt;
+    }
   | MDestructure of (identifier * mono_ty) list * mexpr * mstmt
   | MAssign of mtyped_lvalue * mexpr
   | MIf of mexpr * mstmt * mstmt
