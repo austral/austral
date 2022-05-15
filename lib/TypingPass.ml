@@ -863,6 +863,52 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let lexenv' = push_var lexenv name ty VarLocal in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
              TLet (span, name, ty, value', body'))
+      | ALetBorrow { span; name; ty; region_name; var_name; mode; body; } ->
+         (* Parse the type specifier. *)
+         let ty: ty = parse_typespec env rm typarams ty in
+         (* Find the variable. *)
+         let borrowed_var_ty: ty =
+           (match get_variable env lexenv var_name with
+            | Some (ty, src) ->
+               (match src with
+                | VarConstant ->
+                   err "Constants can't be borrowed."
+                | VarParam ->
+                   ty
+                | VarLocal ->
+                   ty)
+            | None ->
+               err ("I can't find the variable named " ^ (ident_string (original_name var_name))))
+         in
+         (* Check that `ty` (the T in e.g. Read[T, R]) is the same as the type
+            of the borrowed variable. *)
+         let bindings: type_bindings = match_type ty borrowed_var_ty in
+         (* Create a fresh region, and add it to the region map. *)
+         let region: region = fresh_region () in
+         let rm: region_map = add_region rm region_name region in
+         let ctx = update_rm ctx rm in
+         (* Update the lexenv. *)
+         let ref_ty: ty =
+           (match mode with
+            | ReadBorrow ->
+               ReadRef (replace_variables bindings ty, RegionTy region)
+            | WriteBorrow ->
+               WriteRef (replace_variables bindings ty, RegionTy region))
+         in
+         let lexenv: lexenv = push_var lexenv name ref_ty VarLocal in
+         let ctx = update_lexenv ctx lexenv in
+         (* Augment the body. *)
+         let body = augment_stmt (update_lexenv ctx lexenv) body in
+         TLetBorrow {
+             span;
+             name;
+             ty;
+             region_name;
+             region;
+             var_name=original_name var_name;
+             mode;
+             body
+           }
       | ADestructure (span, bindings, value, body) ->
          adorn_error_with_span span
            (fun _ ->
