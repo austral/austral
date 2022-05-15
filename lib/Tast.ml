@@ -13,6 +13,16 @@ open Error
 type tstmt =
   | TSkip of span
   | TLet of span * identifier * ty * texpr * tstmt
+  | TLetBorrow of {
+      span: span;
+      name: identifier;
+      ty: ty;
+      region_name: identifier;
+      region: region;
+      var_name: qident;
+      mode: borrowing_mode;
+      body: tstmt;
+    }
   | TDestructure of span * (identifier * ty) list * texpr * tstmt
   | TAssign of span * typed_lvalue * texpr
   | TIf of span * texpr * tstmt * tstmt

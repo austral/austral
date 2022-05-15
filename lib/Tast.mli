@@ -11,6 +11,18 @@ open Region
 type tstmt =
   | TSkip of span
   | TLet of span * identifier * ty * texpr * tstmt
+  | TLetBorrow of {
+      span: span;
+      name: identifier;
+      ty: ty;
+      (** The type the reference points to, that is, in `let x: Read[T, R]` this is `T`. *)
+      region_name: identifier;
+      region: region;
+      var_name: qident;
+      (** The name of the borrowed variable. *)
+      mode: borrowing_mode;
+      body: tstmt;
+    }
   | TDestructure of span * (identifier * ty) list * texpr * tstmt
   | TAssign of span * typed_lvalue * texpr
   | TIf of span * texpr * tstmt * tstmt
