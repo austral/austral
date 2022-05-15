@@ -6,6 +6,8 @@ open Ast
 open Escape
 open Qualifier
 open Span
+open Common
+open Names
 open Error
 
 let rec abs_stmt im stmt =
@@ -149,4 +151,60 @@ and abs_lvalue im (ConcreteLValue (head, elems)) =
 
 and parse_let (im: import_map) (span: span) (name: identifier) (ty: typespec) (value: cexpr) (rest: cstmt list): astmt =
   (* Check if it is a let borrow. *)
-  ALet (span, name, qualify_typespec im ty, abs_expr im value, let_reshape im rest)
+  match value with
+  | CBorrowExpr (_, mode, borrowed_var) ->
+    (* If it is a let borrow, check that the type specifier has the form
+       `Reference[T, R]` or `WriteReference[T, R]`. *)
+     (match parse_ref_type ty with
+      | Some (mode', pointed_ty, reg_name) ->
+         if equal_borrowing_mode mode mode' then
+           ALetBorrow {
+               span;
+               name;
+               ty=qualify_typespec im pointed_ty;
+               region_name=reg_name;
+               var_name=qualify_identifier im borrowed_var;
+               mode;
+               body=let_reshape im rest;
+             }
+         else
+           err "bad letborrow"
+      | None ->
+         err "bad letborrow")
+  | _ ->
+     (* It isn't a let borrow. Use a regular let. *)
+     ALet (span, name, qualify_typespec im ty, abs_expr im value, let_reshape im rest)
+
+(* Given a type specifier, if it is of the form `Reference[T, R]` or
+   `WriteReference[T, R]`, returns a triple (mode, T, R), where mode is
+   `ReadBorrow` in the `Reference` case and `WriteBorrow` in the
+   `WriteReference` case. Otherwise returns None. *)
+and parse_ref_type (ty: typespec): (borrowing_mode * typespec * identifier) option =
+  let (TypeSpecifier (name, args)) = ty in
+  if (equal_identifier name (make_ident read_ref_name)) then
+    (match (parse_ref_type_args args) with
+     | Some (pointed_ty, reg_name) ->
+        Some (ReadBorrow, pointed_ty, reg_name)
+     | None ->
+        None)
+  else
+    if (equal_identifier name (make_ident write_ref_name)) then
+    (match (parse_ref_type_args args) with
+     | Some (pointed_ty, reg_name) ->
+        Some (WriteBorrow, pointed_ty, reg_name)
+     | None ->
+        None)
+    else
+      None
+
+and parse_ref_type_args (args: typespec list): (typespec * identifier) option =
+  match args with
+  | [tyarg; regarg] ->
+     let (TypeSpecifier (reg_name, reg_args)) = regarg in
+     (match reg_args with
+      | [] ->
+         Some (tyarg, reg_name)
+      | _ ->
+         None)
+  | _ ->
+     None
