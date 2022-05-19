@@ -2,8 +2,9 @@
 open Identifier
 open Ptast
 
-(** The table of appearances maps linear variables to the list of places where
-    they appear, and the loop context where the variable was defined. *)
+(** The table of appearances maps linear variables to the position where they
+    were defined, the list of places where they appear, and the loop context
+    where the variable was defined. *)
 type appear_tbl
 
 (** A loop is either a while loop or a for loop. *)
@@ -33,10 +34,10 @@ type appear_kind = AppearConsume | AppearPath | AppearBorrow
 (** The empty table. *)
 val empty_appearances : appear_tbl
 
-(** Given a variable's name and the loop context where it is defined, add a row
-    to the table of appearances. Errors if a variable with that name already
-    exists. *)
-val register_var : appear_tbl -> identifier -> loop_context -> appear_tbl
+(** Given a variable's name, the position where it was defined, and the loop
+    context where it is defined, add a row to the table of appearances. Errors
+    if a variable with that name already exists. *)
+val register_var : appear_tbl -> identifier -> pos -> loop_context -> appear_tbl
 
 (** Given a variable's name, register an appearance with a position, type, and
     the loop context where the variable appeared. *)
