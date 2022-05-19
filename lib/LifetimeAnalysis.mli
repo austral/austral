@@ -1,7 +1,7 @@
 (** This module implements Austral's lifetime analysis pass. *)
 open Identifier
 open Type
-open Appearances
+open LifetimeTables
 open Tast
 open Ptast
 

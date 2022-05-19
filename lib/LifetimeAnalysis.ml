@@ -1,7 +1,7 @@
 open Identifier
 open Type
 open TypeSystem
-open Appearances
+open LifetimeTables
 open Tast
 open Ptast
 open Error
