@@ -2,6 +2,7 @@
     pass. *)
 open Identifier
 open Ptast
+open Region
 
 (** The table of appearances maps linear variables to the position where they
     were defined, the list of places where they appear, and the loop context
@@ -46,3 +47,15 @@ val register_appear : appear_tbl -> identifier -> pos -> appear_kind -> loop_con
 
 (** Return whether the given name exists in the table. *)
 val tbl_has_name : appear_tbl -> identifier -> bool
+
+(** The table of lifetimes maps regions to their start and end positions. *)
+type lifetime_tbl
+
+(** Register a region and its start position in the table. If the region exists,
+    throws an error. *)
+val register_region : lifetime_tbl -> region -> pos -> lifetime_tbl
+
+(** Given a region and an end position, update it if it is higher than the
+    recorded end position. Throws an error if there's no region with this
+    name. *)
+val update_region_end : lifetime_tbl -> region -> pos -> lifetime_tbl
