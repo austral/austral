@@ -1,4 +1,5 @@
-(** The table of appearances is used by the lifetime analysis pass. *)
+(** This module implements the tables used by Austral's lifetime analysis
+    pass. *)
 open Identifier
 open Ptast
 
