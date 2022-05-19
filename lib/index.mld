@@ -54,7 +54,8 @@ The compiler's middle end.
 - {!Austral_core.TypingPass}
 - {!Austral_core.BuiltIn}
 - {!Austral_core.Linearity}
-- {!Austral_core.Appearances}
+- {!Austral_core.LifetimeTables}
+- {!Austral_core.LifetimeAnalysis}
 - {!Austral_core.TypeStripping}
 - {!Austral_core.MonoType}
 - {!Austral_core.Mtast}
