@@ -42,3 +42,6 @@ val register_var : appear_tbl -> identifier -> pos -> loop_context -> appear_tbl
 (** Given a variable's name, register an appearance with a position, type, and
     the loop context where the variable appeared. *)
 val register_appear : appear_tbl -> identifier -> pos -> appear_kind -> loop_context -> appear_tbl
+
+(** Return whether the given name exists in the table. *)
+val tbl_has_name : appear_tbl -> identifier -> bool

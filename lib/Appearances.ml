@@ -41,3 +41,6 @@ let register_appear (tbl: appear_tbl) (name: identifier) (pos: pos) (kind: appea
      (Row (name, init_pos, init_ctx, Appear (pos, kind, ctx) :: appearances)) :: tbl
   | None ->
      err "No variable with that name."
+
+let tbl_has_name (tbl: appear_tbl) (name: identifier): bool =
+  Option.is_some (get_var tbl name)
