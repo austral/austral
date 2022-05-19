@@ -144,6 +144,64 @@ and extract_path_variables (tbl: appear_tbl) (elem: typed_path_elem): (identifie
 let register_appears (tbl: appear_tbl) (pos: pos) (loop_ctx: loop_context) (lst: (identifier * appear_kind) list): appear_tbl =
   List.fold_left (fun tbl (name, kind) -> register_appear tbl name pos kind loop_ctx) tbl lst
 
+let rec register_variables (tbl: appear_tbl) (stmt: pstmt): appear_tbl =
+  register_variables' tbl [] stmt
+
+and register_variables' (tbl: appear_tbl) (loop_ctx: loop_context) (stmt: pstmt): appear_tbl =
+  match stmt with
+  | PSkip _ ->
+     tbl
+  | PLet (pos, _, name, ty, _, body) ->
+     (* If the variable is linear-ish, register it. *)
+     let tbl =
+       if universe_linear_ish (type_universe ty) then
+         register_var tbl name pos loop_ctx
+       else
+         tbl
+     in
+     register_variables' tbl loop_ctx body
+  | PLetBorrow _ ->
+     (* We don't have to do anything here, since borrows are not linear. *)
+     tbl
+  | PDestructure (pos, _, bindings, _, body) ->
+     (* Register the variables which are linear. *)
+     let tbl = register_bindings tbl pos bindings in
+     register_variables' tbl loop_ctx body
+  | PAssign _ ->
+     tbl
+  | PIf (_, _, _, tb, fb) ->
+     let tbl = register_variables' tbl loop_ctx tb in
+     let tbl = register_variables' tbl loop_ctx fb in
+     tbl
+  | PCase _ ->
+     err "Not implemented yet"
+  | PWhile (_, _, _, body) ->
+     register_variables' tbl (CtxWhile :: loop_ctx) body
+  | PFor (_, _, _, _, _, _, body) ->
+     register_variables' tbl (CtxFor :: loop_ctx) body
+  | PBorrow _ ->
+     tbl
+  | PBlock (_, a, b) ->
+     let tbl = register_variables' tbl loop_ctx a in
+     let tbl = register_variables' tbl loop_ctx b in
+     tbl
+  | PDiscarding _ ->
+     tbl
+  | PReturn _ ->
+     tbl
+
+and register_bindings (tbl: appear_tbl) (pos: pos) (bindings: (identifier * ty) list): appear_tbl =
+  let folder (tbl: appear_tbl) (binding: (identifier * ty)): appear_tbl =
+    let (name, ty) = binding in
+    (* If the binding has a linear type, add it to the table. *)
+    if universe_linear_ish (type_universe ty) then
+      register_var tbl name pos []
+    else
+      (* If it's not linear skip to the next binding. *)
+      tbl
+  in
+  List.fold_left folder tbl bindings
+
 let rec record_appearances (tbl: appear_tbl) (stmt: pstmt): appear_tbl =
   record_appearances' tbl [] stmt
 
@@ -151,13 +209,16 @@ and record_appearances' (tbl: appear_tbl) (loop_ctx: loop_context) (stmt: pstmt)
   match stmt with
   | PSkip _ ->
      tbl
-  | PLet (pos, _, name, _, value, body) ->
+  | PLet (pos, _, name, ty, value, body) ->
      (* Register appearances in the right side. *)
      let tbl = register_appears tbl pos loop_ctx (extract_variables tbl value) in
-     (* Register the variable. *)
-     let tbl = register_var tbl name pos loop_ctx in
-     record_appearances' tbl loop_ctx body
-  | PLetBorrow { body; _ } ->
+     (* If the variable is linear-ish, register it. *)
+     let tbl =
+       if universe_linear_ish (type_universe ty) then
+         register_var tbl name pos loop_ctx
+       else
+         tbl
+     in
      record_appearances' tbl loop_ctx body
   | _ ->
      err "Not implemented"

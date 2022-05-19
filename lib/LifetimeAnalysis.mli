@@ -14,5 +14,8 @@ val appearances_from_params : value_parameter list -> appear_tbl
     they have. *)
 val extract_variables : appear_tbl -> texpr -> (identifier * appear_kind) list
 
+(** Given a statement, do a depth-first pass and record all variable definitions. *)
+val register_variables : appear_tbl -> pstmt -> appear_tbl
+
 (** Given a statement, do a depth-first pass and record variable appearances in the table. *)
 val record_appearances : appear_tbl -> pstmt -> appear_tbl
