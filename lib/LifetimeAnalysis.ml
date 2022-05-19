@@ -140,6 +140,10 @@ and extract_path_variables (tbl: appear_tbl) (elem: typed_path_elem): (identifie
   | TArrayIndex (e, _) ->
      extract_variables tbl e
 
+(** Given a table and statement's position and loop context, register a list of appearances. *)
+let register_appears (tbl: appear_tbl) (pos: pos) (loop_ctx: loop_context) (lst: (identifier * appear_kind) list): appear_tbl =
+  List.fold_left (fun tbl (name, kind) -> register_appear tbl name pos kind loop_ctx) tbl lst
+
 let rec record_appearances (tbl: appear_tbl) (stmt: pstmt): appear_tbl =
   record_appearances' tbl [] stmt
 
@@ -147,7 +151,10 @@ and record_appearances' (tbl: appear_tbl) (loop_ctx: loop_context) (stmt: pstmt)
   match stmt with
   | PSkip _ ->
      tbl
-  | PLet (pos, _, name, _ ,_ , body) ->
+  | PLet (pos, _, name, _, value, body) ->
+     (* Register appearances in the right side. *)
+     let tbl = register_appears tbl pos loop_ctx (extract_variables tbl value) in
+     (* Register the variable. *)
      let tbl = register_var tbl name pos loop_ctx in
      record_appearances' tbl loop_ctx body
   | PLetBorrow { body; _ } ->
