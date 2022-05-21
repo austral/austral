@@ -4,6 +4,7 @@ open TypeSystem
 open LifetimeTables
 open Tast
 open Ptast
+open RegionSet
 open Error
 
 (* True when a universe is Linear or Type. *)
@@ -229,3 +230,30 @@ and record_appearances' (tbl: appear_tbl) (loop_ctx: loop_context) (stmt: pstmt)
      record_appearances' tbl loop_ctx body
   | _ ->
      err "Not implemented"
+
+let rec type_regions (ty: ty): RegionSet.t =
+  let e = RegionSet.empty in
+  match ty with
+  | Unit -> e
+  | Boolean -> e
+  | Integer _ -> e
+  | SingleFloat -> e
+  | DoubleFloat -> e
+  | NamedType (_, args, _) ->
+     List.fold_left RegionSet.union e (List.map type_regions args)
+  | StaticArray ty ->
+     type_regions ty
+  | RegionTy r ->
+     RegionSet.singleton r
+  | ReadRef (ty, r) ->
+     RegionSet.union (type_regions ty) (type_regions r)
+  | WriteRef (ty, r) ->
+     RegionSet.union (type_regions ty) (type_regions r)
+  | TyVar _ ->
+     e
+  | Address ty ->
+     type_regions ty
+  | Pointer ty ->
+     type_regions ty
+  | MonoTy _ ->
+     e

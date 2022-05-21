@@ -31,11 +31,3 @@ let add_region m n r =
      err "Region map already has a region with this name"
   | None ->
      IdentifierMap.add n r m
-
-module RegionSet =
-  Set.Make(
-      struct
-        type t = region
-        let compare a b = compare (region_id a) (region_id b)
-      end
-    )
