@@ -5,7 +5,6 @@ open LifetimeTables
 open Tast
 open Ptast
 open RegionSet
-open Error
 
 (* True when a universe is Linear or Type. *)
 let universe_linear_ish = function
@@ -116,9 +115,9 @@ let rec extract_variables (tbl: appear_tbl) (expr: texpr): (identifier * appear_
         | _ ->
            (* Otherwise, just extract the variables inside. *)
            extract_variables tbl head)
-     and elems' = List.map (extract_path_variables tbl) elems
+     and elem_vars' = extract_all_path_variables tbl elems
      in
-     head' @ (List.concat elems')
+     head' @ elem_vars'
   | TEmbed (_, _, args) ->
      let args' = List.map (extract_variables tbl) args in
      List.concat args'
@@ -131,6 +130,9 @@ let rec extract_variables (tbl: appear_tbl) (expr: texpr): (identifier * appear_
        [(name, AppearBorrow)]
      else
        []
+
+and extract_all_path_variables (tbl:appear_tbl) (elems: typed_path_elem list): (identifier * appear_kind) list =
+  List.concat (List.map (extract_path_variables tbl) elems)
 
 and extract_path_variables (tbl: appear_tbl) (elem: typed_path_elem): (identifier * appear_kind) list =
   match elem with
@@ -217,19 +219,55 @@ and record_appearances' (tbl: appear_tbl) (loop_ctx: loop_context) (stmt: pstmt)
   match stmt with
   | PSkip _ ->
      tbl
-  | PLet (pos, _, name, ty, value, body) ->
+  | PLet (pos, _, _, _, value, body) ->
      (* Register appearances in the right side. *)
      let tbl = register_appears tbl pos loop_ctx (extract_variables tbl value) in
-     (* If the variable is linear-ish, register it. *)
-     let tbl =
-       if universe_linear_ish (type_universe ty) then
-         register_var tbl name pos loop_ctx
-       else
-         tbl
-     in
      record_appearances' tbl loop_ctx body
-  | _ ->
-     err "Not implemented"
+  | PLetBorrow { name; pos; body; _ } ->
+     (* Register the borrow *)
+     let tbl = register_appear tbl name pos AppearBorrow loop_ctx in
+     record_appearances' tbl loop_ctx body
+  | PDestructure (pos, _, _, expr, body) ->
+     let tbl = register_appears tbl pos loop_ctx (extract_variables tbl expr) in
+     record_appearances' tbl loop_ctx body
+  | PAssign (_, pos, lvalue, pos', expr) ->
+     let (TypedLValue (_, elems)) = lvalue in
+     let tbl = register_appears tbl pos loop_ctx (extract_all_path_variables tbl elems) in
+     let tbl = register_appears tbl pos' loop_ctx (extract_variables tbl expr) in
+     tbl
+  | PIf (pos, _, expr, tb, fb) ->
+     let tbl = register_appears tbl pos loop_ctx (extract_variables tbl expr) in
+     let tbl = record_appearances' tbl loop_ctx tb in
+     let tbl = record_appearances' tbl loop_ctx fb in
+     tbl
+  | PCase (pos, _, expr, whens) ->
+     let tbl = register_appears tbl pos loop_ctx (extract_variables tbl expr) in
+     let folder (tbl: appear_tbl) (pwhen: pwhen): appear_tbl =
+       let (PWhen (_, _, _, body)) = pwhen in
+       let tbl = record_appearances' tbl loop_ctx body in
+       tbl
+     in
+     List.fold_left folder tbl whens
+  | PWhile (pos, _, expr, body) ->
+     let tbl = register_appears tbl pos loop_ctx (extract_variables tbl expr) in
+     record_appearances' tbl (CtxWhile :: loop_ctx) body
+  | PFor (_, _, pos, init, pos', final, body) ->
+     let tbl = register_appears tbl pos loop_ctx (extract_variables tbl init) in
+     let tbl = register_appears tbl pos' loop_ctx (extract_variables tbl final) in
+     record_appearances' tbl (CtxFor :: loop_ctx) body
+  | PBorrow _ ->
+     (* TODO *)
+     tbl
+  | PBlock (_, a, b) ->
+     let tbl = record_appearances' tbl loop_ctx a in
+     let tbl = record_appearances' tbl loop_ctx b in
+     tbl
+  | PDiscarding (pos, _, expr) ->
+     let tbl = register_appears tbl pos loop_ctx (extract_variables tbl expr) in
+     tbl
+  | PReturn (pos, _, expr) ->
+     let tbl = register_appears tbl pos loop_ctx (extract_variables tbl expr) in
+     tbl
 
 let rec type_regions (ty: ty): RegionSet.t =
   let e = RegionSet.empty in
