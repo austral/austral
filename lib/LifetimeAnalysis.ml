@@ -269,6 +269,9 @@ and record_appearances' (tbl: appear_tbl) (loop_ctx: loop_context) (stmt: pstmt)
      let tbl = register_appears tbl pos loop_ctx (extract_variables tbl expr) in
      tbl
 
+let region_set_union_all (sets: RegionSet.t list): RegionSet.t =
+  List.fold_left RegionSet.union RegionSet.empty sets
+
 let rec type_regions (ty: ty): RegionSet.t =
   let e = RegionSet.empty in
   match ty with
@@ -278,7 +281,7 @@ let rec type_regions (ty: ty): RegionSet.t =
   | SingleFloat -> e
   | DoubleFloat -> e
   | NamedType (_, args, _) ->
-     List.fold_left RegionSet.union e (List.map type_regions args)
+     region_set_union_all (List.map type_regions args)
   | StaticArray ty ->
      type_regions ty
   | RegionTy r ->
@@ -295,3 +298,106 @@ let rec type_regions (ty: ty): RegionSet.t =
      type_regions ty
   | MonoTy _ ->
      e
+
+let rec expr_regions (expr: texpr): RegionSet.t =
+  let e = RegionSet.empty in
+  match expr with
+  | TNilConstant ->
+     e
+  | TBoolConstant _ ->
+     e
+  | TIntConstant _ ->
+     e
+  | TFloatConstant _ ->
+     e
+  | TStringConstant _ ->
+     e
+  | TConstVar (_, ty) ->
+     type_regions ty
+  | TParamVar (_, ty) ->
+     type_regions ty
+  | TLocalVar (_, ty) ->
+     type_regions ty
+  | TArithmetic (_, lhs, rhs) ->
+     RegionSet.union (expr_regions lhs) (expr_regions rhs)
+  | TFuncall (_, _, args, rt, bindings) ->
+     let a: RegionSet.t list = List.map expr_regions args
+     and b: RegionSet.t = type_regions rt
+     and c: RegionSet.t list = List.map (fun (_, t) -> type_regions t) bindings
+     in
+     region_set_union_all (b :: (a @ c))
+  | TMethodCall (_, _, _, args, rt, bindings) ->
+     let a: RegionSet.t list = List.map expr_regions args
+     and b: RegionSet.t = type_regions rt
+     and c: RegionSet.t list = List.map (fun (_, t) -> type_regions t) bindings
+     in
+     region_set_union_all (b :: (a @ c))
+  | TCast (expr, ty) ->
+     let a = expr_regions expr
+     and b = type_regions ty
+     in
+     RegionSet.union a b
+  | TComparison (_, lhs, rhs) ->
+     RegionSet.union (expr_regions lhs) (expr_regions rhs)
+  | TConjunction (lhs, rhs) ->
+     RegionSet.union (expr_regions lhs) (expr_regions rhs)
+  | TDisjunction (lhs, rhs) ->
+     RegionSet.union (expr_regions lhs) (expr_regions rhs)
+  | TNegation expr ->
+     expr_regions expr
+  | TIfExpression (cond, te, fe) ->
+     let a = expr_regions cond
+     and b = expr_regions te
+     and c = expr_regions fe
+     in
+     RegionSet.union a (RegionSet.union b c)
+  | TRecordConstructor (ty, args) ->
+     let a: RegionSet.t = type_regions ty
+     and b: RegionSet.t list = List.map (fun (_, expr) -> expr_regions expr) args
+     in
+     RegionSet.union a (region_set_union_all b)
+  | TUnionConstructor (ty, _, args) ->
+     let a: RegionSet.t = type_regions ty
+     and b: RegionSet.t list = List.map (fun (_, expr) -> expr_regions expr) args
+     in
+     RegionSet.union a (region_set_union_all b)
+  | TTypeAliasConstructor (ty, expr) ->
+     let a: RegionSet.t = type_regions ty
+     and b: RegionSet.t = expr_regions expr
+     in
+     RegionSet.union a b
+  | TPath { head; elems; ty } ->
+     let head': RegionSet.t = expr_regions head
+     and elems': RegionSet.t = path_regions elems
+     and ty': RegionSet.t = type_regions ty
+     in
+     RegionSet.union head' (RegionSet.union elems' ty')
+  | TEmbed (ty, _, args) ->
+     let a: RegionSet.t = type_regions ty
+     and b: RegionSet.t list = List.map expr_regions args
+     in
+     RegionSet.union a (region_set_union_all b)
+  | TDeref expr ->
+     expr_regions expr
+  | TSizeOf ty ->
+     type_regions ty
+  | TBorrowExpr (_, _, r, ty) ->
+     let a = RegionSet.singleton r
+     and b = type_regions ty
+     in
+     RegionSet.union a b
+
+and path_regions (elems: typed_path_elem list): RegionSet.t =
+  List.fold_left RegionSet.union RegionSet.empty (List.map path_elem_regions elems)
+
+and path_elem_regions (elem: typed_path_elem): RegionSet.t =
+  match elem with
+  | TSlotAccessor (_, ty) ->
+     type_regions ty
+  | TPointerSlotAccessor (_, ty) ->
+     type_regions ty
+  | TArrayIndex (expr, ty) ->
+     let ty': RegionSet.t = type_regions ty
+     and expr': RegionSet.t =  expr_regions expr
+     in
+     RegionSet.union ty' expr'
