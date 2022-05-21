@@ -173,8 +173,15 @@ and register_variables' (tbl: appear_tbl) (loop_ctx: loop_context) (stmt: pstmt)
      let tbl = register_variables' tbl loop_ctx tb in
      let tbl = register_variables' tbl loop_ctx fb in
      tbl
-  | PCase _ ->
-     err "Not implemented yet"
+  | PCase (_, _, _, whens) ->
+     let folder (tbl: appear_tbl) (pwhen: pwhen): appear_tbl =
+       let (PWhen (pos, _, bindings, body)) = pwhen in
+       (* Register any linear bindings. *)
+       let tbl = register_bindings tbl pos (List.map (fun (ValueParameter (n, t)) -> (n, t)) bindings) in
+       let tbl = register_variables' tbl loop_ctx body in
+       tbl
+     in
+     List.fold_left folder tbl whens
   | PWhile (_, _, _, body) ->
      register_variables' tbl (CtxWhile :: loop_ctx) body
   | PFor (_, _, _, _, _, _, body) ->

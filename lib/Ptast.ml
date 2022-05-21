@@ -44,7 +44,7 @@ type pstmt =
   | PReturn of pos * span * texpr
 
 and pwhen =
-  PWhen of identifier * value_parameter list * pstmt
+  PWhen of pos * identifier * value_parameter list * pstmt
 
 let current_pos = ref 0
 
@@ -101,7 +101,8 @@ let rec add_pos (stmt: tstmt): pstmt =
 
 and add_pos_when (twhen: typed_when): pwhen =
   let (TypedWhen (name, bindings, body)) = twhen in
-    PWhen (name, bindings, add_pos body)
+  let pos = fresh_pos () in
+  PWhen (pos, name, bindings, add_pos body)
 
 (** Add positions to a typed statement. *)
 let track_positions (stmt: tstmt): pstmt =
