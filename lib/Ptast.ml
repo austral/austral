@@ -26,7 +26,7 @@ type pstmt =
   | PDestructure of pos * span * (identifier * ty) list * texpr * pstmt
   | PAssign of span * pos * typed_lvalue * pos * texpr
   | PIf of pos * span * texpr * pstmt * pstmt
-  | PCase of pos * span * texpr * typed_when list
+  | PCase of pos * span * texpr * pwhen list
   | PWhile of pos * span * texpr * pstmt
   | PFor of span * identifier * pos * texpr * pos * texpr * pstmt
   | PBorrow of {
@@ -42,6 +42,9 @@ type pstmt =
   | PBlock of span * pstmt * pstmt
   | PDiscarding of pos * span * texpr
   | PReturn of pos * span * texpr
+
+and pwhen =
+  PWhen of identifier * value_parameter list * pstmt
 
 let current_pos = ref 0
 
@@ -77,7 +80,7 @@ let rec add_pos (stmt: tstmt): pstmt =
     PIf (pos, span, test, tb, fb)
   | TCase (span, value, whens) ->
      let pos = fresh_pos () in
-     PCase (pos, span, value, whens)
+     PCase (pos, span, value, List.map add_pos_when whens)
   | TWhile (span, test, body) ->
      let pos = fresh_pos () in
      PWhile (pos, span, test, add_pos body)
@@ -95,6 +98,10 @@ let rec add_pos (stmt: tstmt): pstmt =
      PDiscarding (fresh_pos (), span, value)
   | TReturn (span, value) ->
      PReturn (fresh_pos (), span, value)
+
+and add_pos_when (twhen: typed_when): pwhen =
+  let (TypedWhen (name, bindings, body)) = twhen in
+    PWhen (name, bindings, add_pos body)
 
 (** Add positions to a typed statement. *)
 let track_positions (stmt: tstmt): pstmt =
