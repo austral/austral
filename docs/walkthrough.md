@@ -41,7 +41,11 @@ the untyped AST is converted into a **TAST** (typed abstract syntax tree).
 
 # Lifetime Analysis
 
-[TODO]
+In the lifetime analysis pass, we:
+
+1. Ensure linear values are used once and exactly once.
+
+2. Ensure references to linear values are used within the lifetime of that value.
 
 # Body Extraction Pass
 
