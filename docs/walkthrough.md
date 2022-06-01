@@ -145,6 +145,65 @@ The rules are straightforward:
 4. Write reference lifetimes cannot overlap with each other or with other read
    references to the same variable.
 
+## Positions
+
+A lifetime is a span of code. A span has a beginning and an end. Therefore, we
+need a way to represent positions in code, such that we can compare whether two
+intervals overlap, or one contains the other, etc. This turns out to be
+surprisingly simple to do: a depth first pass is all it takes.
+
+Consider this code:
+
+```
+function Foo(x: T): Y is
+    let y: U := f(x);
+    while cond() do
+        foo();
+    end while;
+    if g(x) then
+        foo();
+    else if h(x) then
+        bar();
+    else
+        baz();
+    end if;
+    y := x;
+    return x;
+end;
+```
+
+After annotating positions:
+
+```
+function Foo(x: T): Y is  -- 0
+    let y: U := f(x);     -- 1
+    while cond() do       -- 2
+        foo();            -- 3
+    end while;
+    if g(x) then          -- 4
+        foo();            -- 5
+    else if h(x) then     -- 6
+        bar();            -- 7
+    else
+        baz();            -- 8
+    end if;
+    y := x;               -- 9, 10
+    return x;             -- 11
+end;
+```
+
+The "resolution" of our positions doesn't have to be too exact (we don't care
+about the position of expressions and subexpressions), each position represents,
+not exactly a statement, but rather the _expression-bearing_ part of a
+statement, so an assignment statement does not have one position but two: one
+for the l-value and one for the right hand side.
+
+Given two positions `a` and `b`, if `a < b` then `a` happened before `b`
+(assuming all branches are taken).
+
+Note that the position 0 is reserved for function parameters, so if we have a
+linear value as a parameter the lifetime of that variable begins at 0.
+
 ## Data Structures
 
 Two data structures are built up in the lifetime analysis pass: the table of
@@ -229,7 +288,7 @@ The table of appearances would look like this:
 
 | Name | Position | Loop Ctx | Appearances |
 | ---- | -------- | -------- | ----------- |
-| `x`  | 1        | []       | `[(2, Path, []), (3, ReadBorrow, []), (5, WriteBorrow, [While]), (5, Consume, [])` |
+| `x`  | 1        | `[]`     | `[(2, Path, []), (3, ReadBorrow, []), (5, WriteBorrow, [While]), (5, Consume, [])` |
 
 ### Table of Lifetimes
 
