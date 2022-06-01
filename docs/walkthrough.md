@@ -336,6 +336,18 @@ function Foo(x: T): U is
 end;
 ```
 
+After annotating positions:
+
+```
+function Foo(x: T): U is     -- 0
+    let y: U := f(x);        -- 1
+    while cond() do          -- 2
+        let z: U = copy(&y); -- 3
+    end while;
+    return y;                -- 4
+end;
+```
+
 Would result in this:
 
 | Name | Position | Loop Ctx  | Appearances |
@@ -347,6 +359,16 @@ Would result in this:
 ## Variable Appearances Pass
 
 We traverse the code depth-first and register all variable appearances.
+
+After this pass, the table of appearances is completed.
+
+In the above example, the full table looks like this:
+
+| Name | Position | Loop Ctx  | Appearances                                    |
+| ---- | -------- | --------- | ---------------------------------------------- |
+| `x`  | 0        | `[]`      | `[(1, Consume, [])]`                           |
+| `y`  | 1        | `[]`      | `[(3, ReadBorrow, [While]), (4, Consume, [])]` |
+| `z`  | 3        | `[While]` | `[]`                                           |
 
 ## Region Lifetimes Pass
 
