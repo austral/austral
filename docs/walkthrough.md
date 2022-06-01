@@ -147,7 +147,86 @@ The rules are straightforward:
 
 ## Data Structures
 
-[TODO]
+Two data structures are built up in the lifetime analysis pass: the table of
+appearances and the table of lifetimes.
+
+The table of appearances maps the names of linear variables to:
+
+1. The position where they are defined.
+
+2. The loop context where they are defined.
+
+3. The list of appearances, where each appearance is a triple `(pos, kind, ctx)`, where:
+
+    1. `pos` is the position where the appearance, well, appears,
+
+    2. `kind` is the type of appearance, one of `{Consume, Path, ReadBorrow,
+       WriteBorrow}`, where `Consume` means a consumption appearance
+       (e.g. `f(x)`), `Path` means the variable appears as the head of a path
+       (e.g. `x.foo.bar`), `ReadBorrow` means the variable is borrowed read-only
+       (e.g. `&x`) and `WriteBorrow` means the variable is borrowed
+       read-and-write.
+
+    3. `ctx` is the loop context of the appearance.
+
+The concept of a loop context is best explained with an example:
+
+```
+let x: T := Make_T();
+while ... do
+    let y: U := Make_U();
+    for i from 0 to n do
+        while ... do
+            consume_y(y);
+        end while;
+    end for;
+end while;
+consume_t(x);
+```
+
+Here, the loop context where `x` is defined is the empty list `[]`, and the loop
+context where `x` is consumed is also the empty list `[]`. The loop context
+where `y` is defined is `[While]`, since it is defined inside a while loop, and
+the loop context where it is consumed is `[While, For, While]`, because it is
+consumed inside a while loop that's inside a for loop that's inside a while
+loop.
+
+Basically the loop context is: how many levels of loop are you in. This is used
+to verify that linear variables defined outside a loop are not consumed in the
+body of an inner loop. If a variable `x` has the same loop context where it is
+defined and where it is consumed, it's all good. If a linear variable has a loop
+context `[l_0, ..., l_n]` with `n >= 0` but it is consumed in a loop context
+`[l_0, ..., l_n, ..., l_m]` with `m > n`, that's an error. The above example
+does not pass linearity checking: `y` is consumed potentially many times.
+
+Given the following code:
+
+```
+let x: T := Make();
+f(x.foo);
+g(&x);
+while cond() do
+    h(&!x);
+end while;
+consume(x);
+```
+
+After annotating with position information:
+
+```
+let x: T := Make(); -- 1
+f(x.foo);           -- 2
+g(&x);              -- 3
+while cond() do     -- 4
+    h(&!x);         -- 5
+end while;
+consume(x);         -- 6
+```
+
+The table of appearances would look like this:
+
+| Name | Position | Loop Ctx | Appearances |
+| `x`  | 1        | []       | `[(2, Path, []), (3, ReadBorrow, []), (5, WriteBorrow, [While]), (5, Consume, [])` |
 
 ## Variable Registration Pass
 
