@@ -319,7 +319,7 @@ Would result in this:
 
 ## Variable Appearances Pass
 
-[TODO]
+We traverse the code depth-first and register all variable appearances.
 
 ## Region Lifetimes Pass
 
