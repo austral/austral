@@ -7,6 +7,8 @@ compiler's pipeline, from source to target.
 
 The overall pipeline looks like this:
 
+![Compiler pipeline](pipeline.png)
+
 # Parsing
 
 Every Austral module is divided into two files: the module interface file and
