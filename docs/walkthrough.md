@@ -292,7 +292,34 @@ The table of appearances would look like this:
 
 ### Table of Lifetimes
 
-[TODO]
+The table of lifetimes maps regions to their start and end positions.
+
+For example, in the following code:
+
+```
+let x: T := Make();
+foo(&x);
+let r: Reference[T, R] := &x;
+bar(&ref);
+consume(x);
+```
+
+Annotated with positions:
+
+```
+let x: T := Make();           -- 0
+foo(&x);                      -- 1
+let r: Reference[T, R] := &x; -- 2
+bar(&ref);                    -- 3
+consume(x);                   -- 4
+```
+
+The table would look like this:
+
+| Region             | Start | End |
+| ------------------ | ----- | --- |
+| _Unnamed region 1_ | 1     | 1   |
+| `R`                | 2     | 3   |
 
 ## Variable Registration Pass
 
