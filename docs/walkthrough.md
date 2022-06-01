@@ -147,6 +147,14 @@ The rules are straightforward:
 
 ## Data Structures
 
+[TODO]
+
+## Variable Registration Pass
+
+## Variable Appearances Pass
+
+## Region Lifetimes Pass
+
 # Body Extraction Pass
 
 In the body extraction pass, the bodies of functions and instance methods are
