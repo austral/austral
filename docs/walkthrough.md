@@ -325,6 +325,13 @@ We traverse the code depth-first and register all variable appearances.
 
 [TODO]
 
+## Rules Checking
+
+When all the lifetime analysis passes are complete and the tables are filled in,
+we can check the rules.
+
+[TODO]
+
 # Body Extraction Pass
 
 In the body extraction pass, the bodies of functions and instance methods are
