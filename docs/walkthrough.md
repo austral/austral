@@ -350,7 +350,22 @@ We traverse the code depth-first and register all variable appearances.
 
 ## Region Lifetimes Pass
 
-[TODO]
+We traverse the code depth-first, and fill the table of lifetimes.
+
+When we encounter an anonymous borrow at position `p`, we add an entry `(Unnamed
+region #N, p, p)` to the table of lifetimes.
+
+When we encounter a named borrow at position `p` with region name `R`, we add an
+entry `(R, p, ?)` to the table of lifetimes.
+
+At each expression at position `p` we encounter, we extract the set of types
+used, and from them we extract the set of regions used. For each of those
+regions, if the region's end position in the table is unknown, we replace it
+with `p`. If the region's end position is less than `p`, we update it with
+`p`. Essentially this means that, for named borrows, we keep updating the end
+position of the region as we keep finding usages of the region. After the last
+time the region is used, its end position is never updated, that's how we
+determine where the region's lifetime ends.
 
 ## Rules Checking
 
