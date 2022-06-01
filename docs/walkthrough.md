@@ -150,6 +150,8 @@ The rules are straightforward:
 Two data structures are built up in the lifetime analysis pass: the table of
 appearances and the table of lifetimes.
 
+### Table of Appearances
+
 The table of appearances maps the names of linear variables to:
 
 1. The position where they are defined.
@@ -226,7 +228,12 @@ consume(x);         -- 6
 The table of appearances would look like this:
 
 | Name | Position | Loop Ctx | Appearances |
+| ---- | -------- | -------- | ----------- |
 | `x`  | 1        | []       | `[(2, Path, []), (3, ReadBorrow, []), (5, WriteBorrow, [While]), (5, Consume, [])` |
+
+### Table of Lifetimes
+
+[TODO]
 
 ## Variable Registration Pass
 
