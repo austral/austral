@@ -41,11 +41,99 @@ the untyped AST is converted into a **TAST** (typed abstract syntax tree).
 
 # Lifetime Analysis
 
+This section describes the lifetime analysis pass.
+
+## Linearity Rules
+
 In the lifetime analysis pass, we:
 
 1. Ensure linear values are used once and exactly once.
 
 2. Ensure references to linear values are used within the lifetime of that value.
+
+The lifetime of linear intermediates is unimportant: e.g., `f(g(h(x)))`, if `g`
+returns a linear type, then that's a linear value that's immediately created and
+consumed. We just ensure that linear intermediates are not discarded, e.g. a
+statement like `g(x);` is not valid because the linear value is returned and
+discarded, that is, used zero times.
+
+What we care about -- what can be borrowed -- are linear variables.
+
+The lifetime of a linear variable begins where it is defined and ends where it
+is consumed:
+
+```
+let x: T := f(); -- begins
+...
+consume(x);      -- ends
+```
+
+If variables are consumed zero times, or more than once, that's an error we have
+to check.
+
+## Borrowing Rules
+
+There are two kinds of borrows:
+
+1. *Anonymous borrows* where the reference region has no name.
+
+2. *Named borrows* where the reference region has a name and can appear in type
+   specifiers.
+
+Anonymous borrows are used where we have to pass a reference to a function, but
+the reference (or, more accurately, the reference's region) is not part of the
+function's return type. For example, in a function like:
+
+```
+generic [T: Type, R: Region]
+function Length(list: Reference[List[T, R]]): Size;
+```
+
+Essentially we're giving a query function read permission on the data structure,
+and we only care about the result, and not some transformation that can be
+performed on the reference.
+
+But suppose we have:
+
+```
+generic [T: Type, R: Region]
+function Nth_Ref(list: Reference[List[T, R]], index: Size): Reference[T, R];
+```
+
+That is, given a reference to the list, we get a reference to the _n_-th element.
+
+We can't do this:
+
+```
+let nr: Reference[T, ???] := Nth_Ref(&ref, idx);
+```
+
+because we don't have the name of the region `&ref`. To do this, we have to use
+a named borrow.
+
+A named borrow is a special form of the `let` statement:
+
+```
+let <V>: Reference[<T>, <R>] := &<L>;
+```
+
+where `V` is the name of the reference variable, `T` is the referenced type, `R`
+is the region name, and `L` is the name of a linear variable being
+borrowed. This is special because `R` is not known from anywhere else: it is
+introduced here.
+
+Here, we can do:
+
+```
+let listref: Reference[List[T], R] := &list;
+let nthref: Reference[T, R] := Nth_Ref(listref, idx);
+```
+
+Because the region name `R` was introduced by the named borrow.
+
+## Data Structures
+
+##
 
 # Body Extraction Pass
 
