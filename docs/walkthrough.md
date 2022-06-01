@@ -151,9 +151,15 @@ The rules are straightforward:
 
 ## Variable Registration Pass
 
+[TODO]
+
 ## Variable Appearances Pass
 
+[TODO]
+
 ## Region Lifetimes Pass
+
+[TODO]
 
 # Body Extraction Pass
 
