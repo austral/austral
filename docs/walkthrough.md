@@ -41,6 +41,8 @@ the untyped AST is converted into a **TAST** (typed abstract syntax tree).
 
 # Lifetime Analysis
 
+[TODO]
+
 # Body Extraction Pass
 
 In the body extraction pass, the bodies of functions and instance methods are
@@ -50,6 +52,15 @@ monomorphization pass.
 
 # Monomorphization Pass
 
+In the monomorphization pass, generic types and functions are instantiated into
+concrete types.
+
 # Code Generation
 
+In the code generation pass, a monomorphized module is converted into a C
+translation unit.
+
 # Rendering
+
+In the rendering pass, implemented in the `CRender` module, the C code AST is
+rendered into C code which is dumped to a file for GCC/Clang to compile.
