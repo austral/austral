@@ -133,8 +133,6 @@ Because the region name `R` was introduced by the named borrow.
 
 ## Data Structures
 
-##
-
 # Body Extraction Pass
 
 In the body extraction pass, the bodies of functions and instance methods are
