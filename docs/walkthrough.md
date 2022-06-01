@@ -131,6 +131,20 @@ let nthref: Reference[T, R] := Nth_Ref(listref, idx);
 
 Because the region name `R` was introduced by the named borrow.
 
+The rules are straightforward:
+
+1. Anonymous borrows of a linear variable must happen within the lifetime of the
+   linear variable.
+
+2. Named borrows have a lifetime: from the `let` borrow to the last statement
+   where the region introduced appears. This lifetime must be within the
+   lifetime the region borrows.
+
+3. Read reference lifetimes can overlap.
+
+4. Write reference lifetimes cannot overlap with each other or with other read
+   references to the same variable.
+
 ## Data Structures
 
 # Body Extraction Pass
