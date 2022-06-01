@@ -296,7 +296,26 @@ The table of appearances would look like this:
 
 ## Variable Registration Pass
 
-[TODO]
+We traverse the code depth-first and register all variables with a linear type. into the table of
+appearances. For example:
+
+```
+function Foo(x: T): U is
+    let y: U := f(x);
+    while cond() do
+        let z: U = copy(&y);
+    end while;
+    return y;
+end;
+```
+
+Would result in this:
+
+| Name | Position | Loop Ctx  | Appearances |
+| ---- | -------- | --------- | ----------- |
+| `x`  | 0        | `[]`      | `[]`        |
+| `y`  | 1        | `[]`      | `[]`        |
+| `z`  | 3        | `[While]` | `[]`        |
 
 ## Variable Appearances Pass
 
