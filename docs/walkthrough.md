@@ -107,17 +107,17 @@ This is how it works:
            state table.
 
     4. When encountering an `if` statement, traverse the true and false branches
-       separately, the common rows (those with the name variable name) in the
-       resulting tables must have the same state. This is to enforce that if a
-       variable is consumed in one branch it is consumed in all others. Continue
-       with the intersection of the two tables.
+       separately. The two resulting tables must have the same set of variable
+       names. For each variable, check the state is the same in both
+       tables. This is to enforce that if a variable is consumed in one branch
+       it is consumed in all others. Continue with either table.
 
-    5. Analogously with `case` statements. Continue with the intersection of all
-       the resulting tables.
+    5. Analogously with `case` statements.
 
     6. When encountering a `borrow` statement for a variable `x`, check that `x`
        is `Unconsumed`. Mark `x` as `BorrowedRead` or `BorrowedWrite` for the
-       duration of the statement's body.
+       duration of the statement's body, when the body ends, mark `x` as
+       `Unconsumed`.
 
     7. When encountering a `return` statement, ensure that all variables in the
        state table are consumed. Otherwise, signal an error.
@@ -157,6 +157,9 @@ This is how it works:
 
                3. If `W = 0`, either `R` and `P` can be non-zero (i.e., we can
                   read freely) iff `x` is `Unconsumed`.
+
+    9. When leaving the body of a `let` statement or `case` clause, remove the
+       linear variables they introduced from the table.
 
 # Body Extraction Pass
 
