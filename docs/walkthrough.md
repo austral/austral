@@ -97,9 +97,9 @@ This is how it works:
 
 3. Traverse the code in depth-first order:
 
-    1. When entering a `for` or `while` loop body, increase the loop depth by one.
+    1. When entering a `for` or `while` loop body, increase `loopDepth` by one.
 
-    2. Dually, when leaving a loop body, decrease the loop depth by one.
+    2. Dually, when leaving a loop body, decrease `loopDepth` by one.
 
     3. When encounter a `let` statement defining a variable `x` of a linear type:
 
@@ -126,8 +126,9 @@ This is how it works:
 
            2. If `C = 1`, check in the table that `x` is `Unconsumed`, and that
               `R`, `W`, and `P` are zero (i.e.: we're not reading or borrowing
-              in the same expression where we're consuming). Mark `x` as
-              consumed and move on.
+              in the same expression where we're consuming), and that the loop
+              depth where `x` was defined is the same as the current value of
+              `loopDepth`. Mark `x` as consumed and move on.
 
            3. If `C = 0`:
 
