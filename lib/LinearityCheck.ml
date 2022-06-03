@@ -35,7 +35,7 @@ let get_entry_or_fail (tbl: state_tbl) (name: identifier): (loop_depth * var_sta
   | None ->
      err ("Internal: variable `"
           ^ (ident_string name)
-          ^ "` not in state table. State stable: \n\n"
+          ^ "` not in state table. Table contents: \n\n"
           ^ (show_state_tbl tbl))
 
 let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl =
@@ -48,11 +48,33 @@ let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl
 let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl =
   match get_entry tbl name with
   | None ->
-     err "No variable in the state table with this name."
+     err ("Tried to update the state of the variable `"
+          ^ (ident_string name)
+          ^ "`, but no such variable exists in the state table. Table contents: \n\n"
+          ^ (show_state_tbl tbl))
   | Some (depth, _) ->
      let other_entries = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
      in
      (name, depth, state) :: other_entries
+
+let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
+  match get_entry tbl name with
+  | None ->
+     err ("Tried to update the state of the variable `"
+          ^ (ident_string name)
+          ^ "`, but no such variable exists in the state table. Table contents: \n\n"
+          ^ (show_state_tbl tbl))
+  | Some _ ->
+     let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
+     in
+     others
+
+let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
+  match names with
+  | first::rest ->
+     remove_entries (remove_entry tbl first) rest
+  | [] ->
+     tbl
 
 let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
   tbl
@@ -233,18 +255,27 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      (* First, check the expression. *)
      let tbl: state_tbl = check_expr tbl depth expr in
      (* If the type is linear, add an entry to the table. *)
-     let tbl: state_tbl =
-       if universe_linear_ish (type_universe ty) then
-         add_entry tbl name depth
-       else
-         tbl
-     in
-     check_stmt tbl depth body
+     if universe_linear_ish (type_universe ty) then
+       let tbl: state_tbl = add_entry tbl name depth in
+       let tbl: state_tbl = check_stmt tbl depth body in
+       (* Once we leave the scope, remove the variable we added. *)
+       let tbl: state_tbl = remove_entry tbl name in
+       tbl
+     else
+       check_stmt tbl depth body
   | TDestructure (_, bindings, expr, body) ->
      (* First, check the expression. *)
      let tbl: state_tbl = check_expr tbl depth expr in
      (* Iterate over the bidings, for each that is linear, add an entry to the
-        table. *)
+        table. Also, keep track of the names of the linear variables. *)
+     let linear_names: identifier list =
+       List.filter_map (fun (name, ty) ->
+           if universe_linear_ish (type_universe ty) then
+             Some name
+           else
+             None)
+         bindings
+     in
      let tbl: state_tbl =
        Util.iter_with_context
          (fun tbl (name, ty) -> if universe_linear_ish (type_universe ty) then
@@ -254,7 +285,10 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
          tbl
          bindings
      in
-     check_stmt tbl depth body
+     let tbl: state_tbl = check_stmt tbl depth body in
+     (* Once we leave the scope, remove the linear variables we added. *)
+     let tbl: state_tbl = remove_entries tbl linear_names in
+     tbl
   | TAssign (_, lvalue, expr) ->
      let tbl: state_tbl = check_lvalue tbl depth lvalue in
      let tbl: state_tbl = check_expr tbl depth expr in
@@ -285,7 +319,7 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      let tbl: state_tbl = check_stmt tbl (depth + 1) body in
      tbl
   | TBorrow { original; mode; body; _ } ->
-     (* Ensure the variable is unconsumed to be borrowed. *)
+     (* Ensure the original variable is unconsumed to be borrowed. *)
      if is_unconsumed tbl original then
        let tbl: state_tbl =
          match mode with
@@ -294,7 +328,11 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
          | WriteBorrow ->
             update_tbl tbl original BorrowedWrite
        in
-       check_stmt tbl depth body
+       (* Traverse the body. *)
+       let tbl: state_tbl = check_stmt tbl depth body in
+       (* After the body, unborrow the variable. *)
+       let tbl: state_tbl = update_tbl tbl original Unconsumed in
+       tbl
      else
        err "Cannot borrow."
   | TBlock (_, a, b) ->
@@ -323,7 +361,15 @@ and check_whens (tbl: state_tbl) (depth: loop_depth) (whens: typed_when list): s
 and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl =
   let TypedWhen (_, bindings, body) = whn in
   (* Iterate over the bidings, for each that is linear, add an entry to the
-     table. *)
+     table. Keep track of the names of the linear variables we added. *)
+  let linear_names: identifier list =
+    List.filter_map (fun (ValueParameter (name, ty)) ->
+        if universe_linear_ish (type_universe ty) then
+          Some name
+        else
+          None)
+      bindings
+  in
   let tbl: state_tbl =
     Util.iter_with_context
       (fun tbl (ValueParameter (name, ty)) ->
@@ -336,6 +382,8 @@ and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl
   in
   (* Check the body. *)
   let tbl: state_tbl = check_stmt tbl depth body in
+  (* Once we leave the scope, remove the linear variables we added. *)
+  let tbl: state_tbl = remove_entries tbl linear_names in
   tbl
 
 and check_lvalue (tbl: state_tbl) (depth: loop_depth) (lvalue: typed_lvalue): state_tbl =
@@ -344,21 +392,33 @@ and check_lvalue (tbl: state_tbl) (depth: loop_depth) (lvalue: typed_lvalue): st
   tbl
 
 and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
-  (* Find common rows, take the state from A and B. *)
-  let common: (identifier * var_state * var_state) list =
-    List.filter_map (fun (name, _, state_a) ->
-        match get_entry b name with
-        | Some (_, state_b) ->
-           Some (name, state_a, state_b)
-        | None ->
-           None)
-      (tbl_to_list a)
+  (* Tables should have the same set of variable names. *)
+  let names_a: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list a)
+  and names_b: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list b)
   in
-  List.iter (fun (_, state_a, state_b) ->
-      if state_a <> state_b then
-        err "Variable used inconsistently."
-      else
-        ()) common
+  if List.equal equal_identifier names_a names_b then
+    (* Make a list of triples with the variable name, its state in A, and its
+       state in B. *)
+    let common: (identifier * var_state * var_state) list =
+      List.filter_map (fun (name, _, state_a) ->
+          match get_entry b name with
+          | Some (_, state_b) ->
+             Some (name, state_a, state_b)
+          | None ->
+             None)
+        (tbl_to_list a)
+    in
+    (* Ensure the states are the same. *)
+    List.iter (fun (_, state_a, state_b) ->
+        if state_a <> state_b then
+          err "Variable used inconsistently."
+        else
+          ()) common
+  else
+    err ("Tables are inconsistent:\n\n"
+         ^ (show_state_tbl a)
+         ^ "\n\n"
+         ^ (show_state_tbl b))
 
 and table_list_is_consistent (lst: state_tbl list): unit =
   match lst with
