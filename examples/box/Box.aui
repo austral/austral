@@ -11,13 +11,13 @@ module Example.Box is
     function Swap_Free(box: Box[X], new: X): Box[X];
 
     generic [T: Free, R: Region]
-    function Read_Free(boxref: Reference[Box[T], R]): T;
+    function Read_Free(boxref: &[Box[T], R]): T;
 
     generic [T: Free, R: Region]
-    function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit;
+    function Store_Free(boxref: &![Box[T], R], value: T): Unit;
 
     generic [T: Free, R: Region]
-    function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T;
+    function Swap_Mut(boxref: &![Box[T], R], value: T): T;
 
     function Main(root: Root_Capability): Root_Capability;
 end module.
