@@ -106,14 +106,23 @@ This is how it works:
         1. Add an entry `(name = x, depth = depth, state = Unconsumed)` to the
            state table.
 
-    4. When encountering a `borrow` statement for a variable `x`, check that `x`
+    4. When encountering an `if` statement, traverse the true and false branches
+       separately, the common rows (those with the name variable name) in the
+       resulting tables must have the same state. This is to enforce that if a
+       variable is consumed in one branch it is consumed in all others. Continue
+       with the intersection of the two tables.
+
+    5. Analogously with `case` statements. Continue with the intersection of all
+       the resulting tables.
+
+    6. When encountering a `borrow` statement for a variable `x`, check that `x`
        is `Unconsumed`. Mark `x` as `BorrowedRead` or `BorrowedWrite` for the
        duration of the statement's body.
 
-    5. When encountering a `return` statement, ensure that all variables in the
+    7. When encountering a `return` statement, ensure that all variables in the
        state table are consumed. Otherwise, signal an error.
 
-    6. When encountering an expression, for each variable `x` in the state
+    8. When encountering an expression, for each variable `x` in the state
        table:
 
        1. Count the number of times `x` is consumed in the expression and call
