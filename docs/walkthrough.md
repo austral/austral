@@ -106,7 +106,14 @@ This is how it works:
         1. Add an entry `(name = x, depth = depth, state = Unconsumed)` to the
            state table.
 
-    4. When encountering an expression, for each variable `x` in the state
+    4. When encountering a `borrow` statement for a variable `x`, check that `x`
+       is `Unconsumed`. Mark `x` as `BorrowedRead` or `BorrowedWrite` for the
+       duration of the statement's body.
+
+    5. When encountering a `return` statement, ensure that all variables in the
+       state table are consumed. Otherwise, signal an error.
+
+    6. When encountering an expression, for each variable `x` in the state
        table:
 
        1. Count the number of times `x` is consumed in the expression and call
@@ -141,13 +148,6 @@ This is how it works:
 
                3. If `W = 0`, either `R` and `P` can be non-zero (i.e., we can
                   read freely) iff `x` is `Unconsumed`.
-
-    5. When encountering a `borrow` statement for a variable `x`, check that `x`
-       is `Unconsumed`. Mark `x` as `BorrowedRead` or `BorrowedWrite` for the
-       duration of the statement's body.
-
-    6. When encountering a `return` statement, ensure that all variables in the
-       state table are consumed. Otherwise, signal an error.
 
 # Body Extraction Pass
 
