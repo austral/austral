@@ -220,6 +220,30 @@ and init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
   in
   Util.iter_with_context f tbl params
 
+and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
+  match stmt with
+  | TSkip _ ->
+     tbl
+  | TBlock (_, a, b) ->
+     let tbl: state_tbl = check_stmt tbl depth a in
+     let tbl: state_tbl = check_stmt tbl depth b in
+     tbl
+  | TDiscarding (_, expr) ->
+     let tbl: state_tbl = check_expr tbl depth expr in
+     tbl
+  | TReturn (_, expr) ->
+     let tbl: state_tbl = check_expr tbl depth expr in
+     (* Ensure that all variables are Consumed. *)
+     let states = List.map (fun (_, _, state) -> state) (tbl_to_list tbl) in
+     let unconsumed = List.filter (fun s -> s = Unconsumed) states in
+     if (List.length states) = (List.length unconsumed) then
+       (* All variables are consumed. *)
+       tbl
+     else
+       err "Cannot return: not all variables are consumed."
+  | _ ->
+     err "Not implemented yet."
+
 and check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
      the expression. *)
