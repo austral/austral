@@ -113,9 +113,9 @@ This is how it works:
           it `W` (e.g., for `f(x, g(x))` it's twice).
 
        2. Count the number of times `x` appears in a read-only anonymous borrow
-          and a read-write anonymous borrow and call them `R` and `W`,
-          respectively (e.g., in `f(&x, &x, &!x)` then `R` is two and `W` is
-          one).
+          (`&`) and a read-write anonymous borrow (`&!`) and call them `R` and
+          `W`, respectively (e.g., in `f(&x, &x, &!x)` then `R` is two and `W`
+          is one).
 
        3. Count the number of times `x` appears at the head of a path and call it
          `P` (e.g., `x.foo` counts as once).
