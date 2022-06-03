@@ -3,7 +3,10 @@ open Common
 open Span
 open Escape
 
-type qtypespec = QTypeSpecifier of qident * qtypespec list
+type qtypespec =
+  | QTypeSpecifier of qident * qtypespec list
+  | QReadRef of qtypespec * qtypespec
+  | QWriteRef of qtypespec * qtypespec
 [@@deriving show]
 
 type astmt =

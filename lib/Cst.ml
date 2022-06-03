@@ -63,7 +63,9 @@ and concrete_method_def =
   ConcreteMethodDef of identifier * concrete_param list * typespec * cstmt * docstring
 
 and typespec =
-  TypeSpecifier of identifier * typespec list
+  | TypeSpecifier of identifier * typespec list
+  | ConcreteReadRef of typespec * typespec
+  | ConcreteWriteRef of typespec * typespec
 
 and cexpr =
   | CNilConstant of span

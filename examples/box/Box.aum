@@ -55,29 +55,29 @@ module body Example.Box is
     end;
 
     generic [T: Free, R: Region]
-    function Read_Free(boxref: Reference[Box[T], R]): T is
-        let ptrref: Reference[Pointer[T], R] := boxref->pointer;
+    function Read_Free(boxref: &[Box[T], R]): T is
+        let ptrref: &[Pointer[T], R] := boxref->pointer;
         let ptr: Pointer[T] := !ptrref;
         return Load(ptr);
     end;
 
     generic [T: Free, R: Region]
-    function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit is
-        let ptrref: WriteReference[Pointer[T], R] := boxref->pointer;
+    function Store_Free(boxref: &![Box[T], R], value: T): Unit is
+        let ptrref: &![Pointer[T], R] := boxref->pointer;
         let ptr: Pointer[T] := !(ptrref);
         Store(ptr, value);
         return nil;
     end;
 
     generic [T: Type, R: Region]
-    function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R] is
-        let ptrref: Reference[Pointer[T], R] := boxref->pointer;
-        let ref: Reference[T, R] := Load_Read_Reference(ptrref);
+    function Get_Value_Ref(boxref: &[Box[T], R]): &[T, R] is
+        let ptrref: &[Pointer[T], R] := boxref->pointer;
+        let ref: &[T, R] := Load_Read_Reference(ptrref);
         return ref;
     end;
 
     generic [T: Free, R: Region]
-    function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
+    function Swap_Mut(boxref: &![Box[T], R], value: T): T is
         let ptr: Pointer[T] := !(boxref->pointer);
         let old_value: T := Load(ptr);
         Store(ptr, value);
@@ -128,7 +128,7 @@ module body Example.Box is
         case b4 of
             when Left(left: Box[Integer_32]) do
                 borrow left as boxref in rho do
-                    let valueref: Reference[Integer_32, rho] := Get_Value_Ref(boxref);
+                    let valueref: &[Integer_32, rho] := Get_Value_Ref(boxref);
                     let contents: Integer_32 := !(valueref);
                     Put_Character(contents);
                 end;
