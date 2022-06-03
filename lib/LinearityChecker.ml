@@ -227,6 +227,21 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
          tbl
      in
      check_stmt tbl depth body
+  | TDestructure (_, bindings, expr, body) ->
+     (* First, check the expression. *)
+     let tbl: state_tbl = check_expr tbl depth expr in
+     (* Iterate over the bidings, for each that is linear, add an entry to the
+        table. *)
+     let tbl: state_tbl =
+       Util.iter_with_context
+         (fun tbl (name, ty) -> if universe_linear_ish (type_universe ty) then
+                                  add_entry tbl name depth
+                                else
+                                  tbl)
+         tbl
+         bindings
+     in
+     check_stmt tbl depth body
   | TBlock (_, a, b) ->
      let tbl: state_tbl = check_stmt tbl depth a in
      let tbl: state_tbl = check_stmt tbl depth b in
