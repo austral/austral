@@ -30,3 +30,6 @@ val update_state : state_tbl -> identifier -> var_state -> state_tbl
 
 (** Return all entries as a list. *)
 val tbl_to_list : state_tbl -> (identifier * loop_depth * var_state) list
+
+(** Represents the number of times a given variable appears in an expression in different ways. *)
+type appearances

@@ -101,7 +101,7 @@ This is how it works:
 
     2. Dually, when leaving a loop body, decrease `loopDepth` by one.
 
-    3. When encounter a `let` statement defining a variable `x` of a linear type:
+    3. When encountering a `let` statement defining a variable `x` of a linear type:
 
         1. Add an entry `(name = x, depth = depth, state = Unconsumed)` to the
            state table.

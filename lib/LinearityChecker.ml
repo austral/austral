@@ -38,3 +38,10 @@ let update_state (tbl: state_tbl) (name: identifier) (state: var_state): state_t
 
 let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
   tbl
+
+type appearances = {
+    consumed: int;
+    read: int;
+    write: int;
+    path: int;
+  }
