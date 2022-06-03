@@ -132,7 +132,7 @@ This is how it works:
 
            3. If `C = 0`:
 
-               1. If `W > 0`: signal an error (we can't borrow mutably multiple
+               1. If `W > 1`: signal an error (we can't borrow mutably multiple
                   times in the same expression).
 
                2. If `W = 1`, check in the table that `x` is `Unconsumed`, and

@@ -288,13 +288,15 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
   | TReturn (_, expr) ->
      let tbl: state_tbl = check_expr tbl depth expr in
      (* Ensure that all variables are Consumed. *)
-     let states = List.map (fun (_, _, state) -> state) (tbl_to_list tbl) in
-     let unconsumed = List.filter (fun s -> s = Unconsumed) states in
-     if (List.length states) = (List.length unconsumed) then
-       (* All variables are consumed. *)
-       tbl
-     else
-       err "Cannot return: not all variables are consumed."
+     let _ =
+       List.map (fun (name, _, state) ->
+           if state = Consumed then
+             ()
+           else
+             err ("Variable `" ^ (ident_string name) ^ "` not consumed at return statement."))
+         (tbl_to_list tbl)
+     in
+     tbl
 
 and check_whens (tbl: state_tbl) (depth: loop_depth) (whens: typed_when list): state_tbl =
   Util.iter_with_context (fun tbl whn -> check_when tbl depth whn) tbl whens
@@ -355,7 +357,8 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
        if ((read = 0) && (path = 0)) then
          if depth = (get_loop_depth tbl name) then
            (* Everything checks out. Mark the variable as consumed. *)
-           update_tbl tbl name Consumed
+           let tbl = update_tbl tbl name Consumed in
+           tbl
          else
            err "Loop depth mismatch."
        else
