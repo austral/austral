@@ -35,3 +35,6 @@ let update_state (tbl: state_tbl) (name: identifier) (state: var_state): state_t
      let other_entries = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
      in
      (name, depth, state) :: other_entries
+
+let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
+  tbl

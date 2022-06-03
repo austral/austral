@@ -27,3 +27,6 @@ val add_entry : state_tbl -> identifier -> loop_depth -> state_tbl
 
 (** Update the state of a variable in the table. Throws an error if there is no entry with this name. *)
 val update_state : state_tbl -> identifier -> var_state -> state_tbl
+
+(** Return all entries as a list. *)
+val tbl_to_list : state_tbl -> (identifier * loop_depth * var_state) list
