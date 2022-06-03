@@ -30,6 +30,9 @@ open Span
 %token AND
 %token OR
 %token NOT
+/* Borrowing */
+%token BORROW_WRITE
+%token BORROW_READ
 /* Keywords */
 %token MODULE
 %token IS
@@ -517,6 +520,8 @@ module_name_inner:
 typespec:
   | identifier LBRACKET separated_list(COMMA, typespec) RBRACKET { TypeSpecifier ($1, $3) }
   | identifier { TypeSpecifier ($1, []) }
+  | BORROW_READ LBRACKET typespec COMMA typespec RBRACKET { ConcreteReadRef ($3, $5) }
+  | BORROW_WRITE LBRACKET typespec COMMA typespec RBRACKET { ConcreteWriteRef ($3, $5) }
   ;
 
 universe:

@@ -74,6 +74,9 @@ rule token = parse
   | "and" { AND }
   | "or" { OR }
   | "not" { NOT }
+  (* Borrowing *)
+  | "&!" { BORROW_WRITE }
+  | "&" { BORROW_READ }
   (* Keywords *)
   | "module" { MODULE }
   | "is" { IS }
