@@ -26,6 +26,14 @@ let get_entry (tbl: state_tbl) (name: identifier): (loop_depth * var_state) opti
   | None ->
      None
 
+let get_entry_or_fail (tbl: state_tbl) (name: identifier): (loop_depth * var_state) =
+  match get_entry tbl name with
+  | Some p -> p
+  | None ->
+     err ("Internal: variable "
+          ^ (ident_string name)
+          ^ " not in state table.")
+
 let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl =
   match get_entry tbl name with
   | None ->
@@ -335,11 +343,8 @@ and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
   (* Find common rows, take the state from A and B. *)
   let common: (identifier * var_state * var_state) list =
     List.map (fun (name, _, state_a) ->
-        match get_entry b name with
-        | Some (_, state_b) ->
-           (name, state_a, state_b)
-        | None ->
-           err "Not in table")
+        let (_, state_b) = get_entry_or_fail b name in
+        (name, state_a, state_b))
       (tbl_to_list a)
   in
   List.iter (fun (_, state_a, state_b) ->
@@ -418,7 +423,7 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
            else
              (* Signal an error: cannot borrow mutably while also borrowing
                 immutably or reading through a path. *)
-             err ""
+             err "Cannot borrow mutably while also borrowing immutably or reading."
          else
            err "Variable already consumed."
       | Zero ->
@@ -445,20 +450,14 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              tbl)
 
 and get_loop_depth (tbl: state_tbl) (name: identifier): loop_depth =
-  match get_entry tbl name with
-  | Some (depth, _) ->
-     depth
-  | _ ->
-     err "Not in table"
+  let (depth, _) = get_entry_or_fail tbl name in
+  depth
 
 and is_unconsumed (tbl: state_tbl) (name: identifier): bool =
-  match get_entry tbl name with
-  | Some (_, state) ->
-     (match state with
-      | Unconsumed -> true
-      | _ -> false)
-  | _ ->
-     err "Not in table"
+  let (_, state) = get_entry_or_fail tbl name in
+  match state with
+  | Unconsumed -> true
+  | _ -> false
 
 and universe_linear_ish = function
   | LinearUniverse -> true
