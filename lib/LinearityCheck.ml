@@ -255,8 +255,14 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      true_tbl
   | TCase (_, expr, whens) ->
      let tbl: state_tbl = check_expr tbl depth expr in
-     let tbl: state_tbl = check_whens tbl depth whens in
-     tbl
+     let tbls: state_tbl list = check_whens tbl depth whens in
+     let _ = table_list_is_consistent tbls in
+     (match tbls with
+      | first::rest ->
+         let _ = rest in
+         first
+      | [] ->
+         tbl)
   | TWhile (_, cond, body) ->
      let tbl: state_tbl = check_expr tbl depth cond in
      let tbl: state_tbl = check_stmt tbl (depth + 1) body in
@@ -299,8 +305,8 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      in
      tbl
 
-and check_whens (tbl: state_tbl) (depth: loop_depth) (whens: typed_when list): state_tbl =
-  Util.iter_with_context (fun tbl whn -> check_when tbl depth whn) tbl whens
+and check_whens (tbl: state_tbl) (depth: loop_depth) (whens: typed_when list): state_tbl list =
+  List.map (check_when tbl depth) whens
 
 and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl =
   let TypedWhen (_, bindings, body) = whn in
@@ -341,6 +347,17 @@ and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
         err "Variable used inconsistently."
       else
         ()) common
+
+and table_list_is_consistent (lst: state_tbl list): unit =
+  match lst with
+  | a::b::rest ->
+     let _ = tables_are_consistent a b in
+     table_list_is_consistent rest
+  | [a] ->
+     let _ = a in
+     ()
+  | [] ->
+     ()
 
 and check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
