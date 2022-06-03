@@ -199,16 +199,8 @@ let rec linearity_check (params: value_parameter list) (body: tstmt): unit =
   (* Populate the table with the linear parameters. *)
   tbl := init_tbl !tbl params;
   (* Traverse the code in execution order. *)
-  let rec check (stmt: tstmt): unit =
-    match stmt with
-    | TSkip _ ->
-       ()
-    | TDiscarding (_, expr) ->
-       tbl := check_expr !tbl !depth expr;
-    | _ ->
-       err "Not implemented yet"
-  in
-  check body;
+  let _ = check_stmt !tbl !depth body in
+  ()
 
 and init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
   let f (tbl: state_tbl) (ValueParameter (name, ty)): state_tbl =
