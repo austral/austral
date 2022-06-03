@@ -224,6 +224,17 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
   match stmt with
   | TSkip _ ->
      tbl
+  | TLet (_, name, ty, expr, body) ->
+     (* First, check the expression. *)
+     let tbl: state_tbl = check_expr tbl depth expr in
+     (* If the type is linear, add an entry to the table. *)
+     let tbl: state_tbl =
+       if universe_linear_ish (type_universe ty) then
+         add_entry tbl name depth
+       else
+         tbl
+     in
+     check_stmt tbl depth body
   | TBlock (_, a, b) ->
      let tbl: state_tbl = check_stmt tbl depth a in
      let tbl: state_tbl = check_stmt tbl depth b in
