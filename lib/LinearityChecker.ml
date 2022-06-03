@@ -242,6 +242,41 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
          bindings
      in
      check_stmt tbl depth body
+  | TAssign (_, lvalue, expr) ->
+     let tbl: state_tbl = check_lvalue tbl depth lvalue in
+     let tbl: state_tbl = check_expr tbl depth expr in
+     tbl
+  | TIf (_, cond, tb, fb) ->
+     let tbl: state_tbl = check_expr tbl depth cond in
+     let tbl: state_tbl = check_stmt tbl depth tb in
+     let tbl: state_tbl = check_stmt tbl depth fb in
+     tbl
+  | TCase (_, expr, whens) ->
+     let tbl: state_tbl = check_expr tbl depth expr in
+     let tbl: state_tbl = check_whens tbl depth whens in
+     tbl
+  | TWhile (_, cond, body) ->
+     let tbl: state_tbl = check_expr tbl depth cond in
+     let tbl: state_tbl = check_stmt tbl (depth + 1) body in
+     tbl
+  | TFor (_, _, start, final, body) ->
+     let tbl: state_tbl = check_expr tbl depth start in
+     let tbl: state_tbl = check_expr tbl depth final in
+     let tbl: state_tbl = check_stmt tbl (depth + 1) body in
+     tbl
+  | TBorrow { original; mode; body; _ } ->
+     (* Ensure the variable is unconsumed to be borrowed. *)
+     if is_unconsumed tbl original then
+       let tbl: state_tbl =
+         match mode with
+         | ReadBorrow ->
+            update_tbl tbl original BorrowedRead
+         | WriteBorrow ->
+            update_tbl tbl original BorrowedWrite
+       in
+       check_stmt tbl depth body
+     else
+       err "Cannot borrow."
   | TBlock (_, a, b) ->
      let tbl: state_tbl = check_stmt tbl depth a in
      let tbl: state_tbl = check_stmt tbl depth b in
@@ -259,8 +294,32 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
        tbl
      else
        err "Cannot return: not all variables are consumed."
-  | _ ->
-     err "Not implemented yet."
+
+and check_whens (tbl: state_tbl) (depth: loop_depth) (whens: typed_when list): state_tbl =
+  Util.iter_with_context (fun tbl whn -> check_when tbl depth whn) tbl whens
+
+and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl =
+  let TypedWhen (_, bindings, body) = whn in
+  (* Iterate over the bidings, for each that is linear, add an entry to the
+     table. *)
+  let tbl: state_tbl =
+    Util.iter_with_context
+      (fun tbl (ValueParameter (name, ty)) ->
+        if universe_linear_ish (type_universe ty) then
+          add_entry tbl name depth
+        else
+          tbl)
+      tbl
+      bindings
+  in
+  (* Check the body. *)
+  let tbl: state_tbl = check_stmt tbl depth body in
+  tbl
+
+and check_lvalue (tbl: state_tbl) (depth: loop_depth) (lvalue: typed_lvalue): state_tbl =
+  (* TODO: lvalue semantics should be better defined. *)
+  let _ = (depth, lvalue) in
+  tbl
 
 and check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
