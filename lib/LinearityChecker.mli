@@ -1,6 +1,7 @@
 (** The linearity checker. *)
 open Identifier
 open Tast
+open Type
 
 (** The loop depth represents, for a particular piece of code, how many loops
     into the function that piece of code is. *)
@@ -27,7 +28,7 @@ val get_entry : state_tbl -> identifier -> (loop_depth * var_state) option
 val add_entry : state_tbl -> identifier -> loop_depth -> state_tbl
 
 (** Update the state of a variable in the table. Throws an error if there is no entry with this name. *)
-val update_state : state_tbl -> identifier -> var_state -> state_tbl
+val update_tbl : state_tbl -> identifier -> var_state -> state_tbl
 
 (** Return all entries as a list. *)
 val tbl_to_list : state_tbl -> (identifier * loop_depth * var_state) list
@@ -37,3 +38,5 @@ type appearances
 
 (** Count the appearances of a given variable in the expression. *)
 val count : identifier -> texpr -> appearances
+
+val linearity_check: value_parameter list -> tstmt -> unit
