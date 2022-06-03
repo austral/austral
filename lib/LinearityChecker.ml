@@ -425,3 +425,22 @@ and universe_linear_ish = function
   | LinearUniverse -> true
   | TypeUniverse -> true
   | _ -> false
+
+(* Linearity checking of whole modules *)
+
+let rec check_module_linearity (TypedModule (_, decls)): unit =
+  let _ = List.map check_decl_linearity decls in
+  ()
+
+and check_decl_linearity (decl: typed_decl): unit =
+  match decl with
+  | TFunction (_, _, _, _, params, _, b, _) ->
+     linearity_check params b
+  | TInstance (_, _, _, _, _, methods, _) ->
+     let _ = List.map check_method_linearity methods in
+     ()
+  | _ ->
+     ()
+
+and check_method_linearity (TypedMethodDef (_, _, params, _, b)) =
+  linearity_check params b

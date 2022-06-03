@@ -39,4 +39,9 @@ type appearances
 (** Count the appearances of a given variable in the expression. *)
 val count : identifier -> texpr -> appearances
 
+(** Run the linearity checking algorithm given a function or method's value
+    parameter list and body. *)
 val linearity_check: value_parameter list -> tstmt -> unit
+
+(** Check the linearity of all functions and methods in a module. *)
+val check_module_linearity : typed_module -> unit
