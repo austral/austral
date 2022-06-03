@@ -39,127 +39,114 @@ into the environment. The bodies of functions and methods are ignored.
 The typing pass is the largest pass by volume: type checking happens here, and
 the untyped AST is converted into a **TAST** (typed abstract syntax tree).
 
-# Lifetime Analysis
+# Linearity Checking
 
-This section describes the lifetime analysis pass.
+This section describes Austral's **linearity checker**. The linearity checker
+works a lot like abstract interpretation: we traverse the code in execution
+order, keeping track of different things in a state table to implement the
+linearity and borrowing rules.
 
-## Linearity Rules
+The linearity checker starts with a function or method to check. Then it
+traverses the code in depth-first order, essentially the order of control
+flow. Throughout the traversal we keep track of two things:
 
-In the lifetime analysis pass, we:
+1. The **loop depth**.
 
-1. Ensure linear values are used once and exactly once.
+2. The **state table**.
 
-2. Ensure references to linear values are used within the lifetime of that value.
+The loop depth is: at this point in the code, how many loops are we in? This is
+used to enforce the rule that a linear variable cannot be consumed inside a
+loop, when said variable was defined outside that loop (because the variable
+could be consumed multiple times).
 
-The lifetime of linear intermediates is unimportant: e.g., `f(g(h(x)))`, if `g`
-returns a linear type, then that's a linear value that's immediately created and
-consumed. We just ensure that linear intermediates are not discarded, e.g. a
-statement like `g(x);` is not valid because the linear value is returned and
-discarded, that is, used zero times.
-
-What we care about -- what can be borrowed -- are linear variables.
-
-The lifetime of a linear variable begins where it is defined and ends where it
-is consumed:
-
-```
-let x: T := f(); -- begins
-...
-consume(x);      -- ends
-```
-
-If variables are consumed zero times, or more than once, that's an error we have
-to check.
-
-## Borrowing Rules
-
-There are two kinds of borrows:
-
-1. *Anonymous borrows* where the reference region has no name.
-
-2. *Named borrows* where the reference region has a name and can appear in type
-   specifiers.
-
-Anonymous borrows are used where we have to pass a reference to a function, but
-the reference (or, more accurately, the reference's region) is not part of the
-function's return type. For example, in a function like:
+For example:
 
 ```
-generic [T: Type, R: Region]
-function Length(list: Reference[List[T, R]]): Size;
+let x: T := Make_T();
+while ... do
+    let y: U := Make_U();
+    for i from 0 to n do
+        while ... do
+            consume_y(y);
+        end while;
+    end for;
+end while;
+consume_t(x);
 ```
 
-Essentially we're giving a query function read permission on the data structure,
-and we only care about the result, and not some transformation that can be
-performed on the reference.
+Here, `x` is defined and consumed at a loop deoth of 0, `y` is defined at a loop
+depth of 1 and consumed at a loop depth of 3.
 
-But suppose we have:
+The state table associates linear variables to two things:
 
-```
-generic [T: Type, R: Region]
-function Nth_Ref(list: Reference[List[T, R]], index: Size): Reference[T, R];
-```
+1. The loop depth where that variable is defined.
 
-That is, given a reference to the list, we get a reference to the _n_-th element.
+2. The current **consumption state** of the variable, which is one of
+   `{Unconsumed, BorrowedRead, BorrowedWrite, Consumed}`.
 
-We can't do this:
+This is how it works:
 
-```
-let nr: Reference[T, ???] := Nth_Ref(&ref, idx);
-```
+**The Linearity Checking Algorithm:** Given a function or method definition:
 
-because we don't have the name of the region `&ref`. To do this, we have to use
-a named borrow.
+1. Initialize `loopDepth` to 0 and `state` to the empty state table.
 
-A named borrow is a special form of the `let` statement:
+2. Iterate over every parameter `p` of a linear type:
 
-```
-let <V>: Reference[<T>, <R>] := &<L>;
-```
+    1. Add an entry `(name = p, depth = 0, state = Unconsumed)` to the state
+       table.
 
-where `V` is the name of the reference variable, `T` is the referenced type, `R`
-is the region name, and `L` is the name of a linear variable being
-borrowed. This is special because `R` is not known from anywhere else: it is
-introduced here.
+3. Traverse the code in depth-first order:
 
-Here, we can do:
+    1. When entering a `for` or `while` loop body, increase the loop depth by one.
 
-```
-let listref: Reference[List[T], R] := &list;
-let nthref: Reference[T, R] := Nth_Ref(listref, idx);
-```
+    2. Dually, when leaving a loop body, decrease the loop depth by one.
 
-Because the region name `R` was introduced by the named borrow.
+    3. When encounter a `let` statement defining a variable `x` of a linear type:
 
-The rules are straightforward:
+        1. Add an entry `(name = x, depth = depth, state = Unconsumed)` to the
+           state table.
 
-1. Anonymous borrows of a linear variable must happen within the lifetime of the
-   linear variable.
+    4. When encountering an expression, for each variable `x` in the state
+       table:
 
-2. Named borrows have a lifetime: from the `let` borrow to the last statement
-   where the region introduced appears. This lifetime must be within the
-   lifetime the region borrows.
+       1. Count the number of times `x` is consumed in the expression and call
+          it `W` (e.g., for `f(x, g(x))` it's twice).
 
-3. Read reference lifetimes can overlap.
+       2. Count the number of times `x` appears in a read-only anonymous borrow
+          and a read-write anonymous borrow and call them `R` and `W`,
+          respectively (e.g., in `f(&x, &x, &!x)` then `R` is two and `W` is
+          one).
 
-4. Write reference lifetimes cannot overlap with each other or with other read
-   references to the same variable.
+      3. Count the number of times `x` appears at the head of a path and call it
+         `P` (e.g., `x.foo` counts as once).
 
-## Data Structures
+      4. Then:
 
-[TODO]
+          1. If `C > 1`, signal an error, because `x` is being consumed more than once.
 
-## Variable Registration Pass
+          2. If `C = 1`, check in the table that `x` is `Unconsumed`, and that
+             `R`, `W`, and `P` are zero (i.e.: we're not reading or borrowing in
+             the same expression where we're consuming). Mark `x` as consumed
+             and move on.
 
-[TODO]
+          3. If `C = 0`:
 
-## Variable Appearances Pass
+              1. If `W > 0`: signal an error (we can't borrow mutably multiple
+                 times in the same expression).
 
-[TODO]
+              2. If `W = 1`, check in the table that `x` is `Unconsumed`, and
+                 check that `R` and `P` are zero (i.e., we can't borrow mutably
+                 and also read within the same expression).
 
-## Region Lifetimes Pass
+              3. If `W = 0`, either `R` and `P` can be non-zero (i.e., we can
+                 read freely) iff `x` is `Unconsumed`.
 
-[TODO]
+    5. When encountering a `borrow` statement for a variable `x`, check that `x`
+       is `Unconsumed`. Mark `x` as `BorrowedRead` or `BorrowedWrite` for the
+       duration of the statement's body.
+
+    6. When encountering a `return` statement, ensure that all variables in the
+       state table are consumed. Otherwise, signal an error.
 
 # Body Extraction Pass
 
