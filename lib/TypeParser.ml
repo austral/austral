@@ -217,21 +217,34 @@ let get_type_signature (env: env) (sigs: type_signature list) (name: qident) =
 
 (* Parsing *)
 
-let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: typarams) (QTypeSpecifier (name, args)) =
-  let args' = List.map (parse_type env sigs rm typarams) args in
-  match parse_built_in_type name args' with
-  | Some ty ->
-     ty
-  | None ->
-     (match is_region rm name with
+let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: typarams) (ts: qtypespec): ty =
+  match ts with
+  | QTypeSpecifier (name, args) ->
+     let args' = List.map (parse_type env sigs rm typarams) args in
+     (match parse_built_in_type name args' with
       | Some ty ->
          ty
       | None ->
-         (match is_param typarams name with
+         (match is_region rm name with
           | Some ty ->
              ty
           | None ->
-             parse_user_defined_type env sigs name args'))
+             (match is_param typarams name with
+              | Some ty ->
+                 ty
+              | None ->
+                 parse_user_defined_type env sigs name args')))
+  | QReadRef (ty, r) ->
+     let ty' = parse_type env sigs rm typarams ty
+     and r' = parse_type env sigs rm typarams r
+     in
+     ReadRef (ty', r')
+  | QWriteRef (ty, r) ->
+     let ty' = parse_type env sigs rm typarams ty
+     and r' = parse_type env sigs rm typarams r
+     in
+     WriteRef (ty', r')
+
 
 (* Is the given name a type parameter in the list of type paramters? If so,
    return it as a type variable. *)
