@@ -22,7 +22,7 @@ open Linked
 open Mtast
 open Monomorphize
 open ReturnCheck
-open LinearityChecker
+open LinearityCheck
 open Reporter
 open Filename
 
