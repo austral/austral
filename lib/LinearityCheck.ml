@@ -249,9 +249,10 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      tbl
   | TIf (_, cond, tb, fb) ->
      let tbl: state_tbl = check_expr tbl depth cond in
-     let tbl: state_tbl = check_stmt tbl depth tb in
-     let tbl: state_tbl = check_stmt tbl depth fb in
-     tbl
+     let true_tbl: state_tbl = check_stmt tbl depth tb in
+     let false_tbl: state_tbl = check_stmt tbl depth fb in
+     let _ = tables_are_consistent true_tbl false_tbl in
+     true_tbl
   | TCase (_, expr, whens) ->
      let tbl: state_tbl = check_expr tbl depth expr in
      let tbl: state_tbl = check_whens tbl depth whens in
@@ -323,6 +324,23 @@ and check_lvalue (tbl: state_tbl) (depth: loop_depth) (lvalue: typed_lvalue): st
   (* TODO: lvalue semantics should be better defined. *)
   let _ = (depth, lvalue) in
   tbl
+
+and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
+  (* Find common rows, take the state from A and B. *)
+  let common: (identifier * var_state * var_state) list =
+    List.map (fun (name, _, state_a) ->
+        match get_entry b name with
+        | Some (_, state_b) ->
+           (name, state_a, state_b)
+        | None ->
+           err "Not in table")
+      (tbl_to_list a)
+  in
+  List.iter (fun (_, state_a, state_b) ->
+      if state_a <> state_b then
+        err "Variable used inconsistently."
+      else
+        ()) common
 
 and check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
