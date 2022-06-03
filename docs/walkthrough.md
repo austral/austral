@@ -117,29 +117,29 @@ This is how it works:
           respectively (e.g., in `f(&x, &x, &!x)` then `R` is two and `W` is
           one).
 
-      3. Count the number of times `x` appears at the head of a path and call it
+       3. Count the number of times `x` appears at the head of a path and call it
          `P` (e.g., `x.foo` counts as once).
 
-      4. Then:
+       4. Then:
 
-          1. If `C > 1`, signal an error, because `x` is being consumed more than once.
+           1. If `C > 1`, signal an error, because `x` is being consumed more than once.
 
-          2. If `C = 1`, check in the table that `x` is `Unconsumed`, and that
-             `R`, `W`, and `P` are zero (i.e.: we're not reading or borrowing in
-             the same expression where we're consuming). Mark `x` as consumed
-             and move on.
+           2. If `C = 1`, check in the table that `x` is `Unconsumed`, and that
+              `R`, `W`, and `P` are zero (i.e.: we're not reading or borrowing
+              in the same expression where we're consuming). Mark `x` as
+              consumed and move on.
 
-          3. If `C = 0`:
+           3. If `C = 0`:
 
-              1. If `W > 0`: signal an error (we can't borrow mutably multiple
-                 times in the same expression).
+               1. If `W > 0`: signal an error (we can't borrow mutably multiple
+                  times in the same expression).
 
-              2. If `W = 1`, check in the table that `x` is `Unconsumed`, and
-                 check that `R` and `P` are zero (i.e., we can't borrow mutably
-                 and also read within the same expression).
+               2. If `W = 1`, check in the table that `x` is `Unconsumed`, and
+                  check that `R` and `P` are zero (i.e., we can't borrow mutably
+                  and also read within the same expression).
 
-              3. If `W = 0`, either `R` and `P` can be non-zero (i.e., we can
-                 read freely) iff `x` is `Unconsumed`.
+               3. If `W = 0`, either `R` and `P` can be non-zero (i.e., we can
+                  read freely) iff `x` is `Unconsumed`.
 
     5. When encountering a `borrow` statement for a variable `x`, check that `x`
        is `Unconsumed`. Mark `x` as `BorrowedRead` or `BorrowedWrite` for the
