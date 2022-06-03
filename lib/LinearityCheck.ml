@@ -8,14 +8,17 @@ open Error
 (* Data structures *)
 
 type loop_depth = int
+[@@deriving show]
 
 type var_state =
   | Unconsumed
   | BorrowedRead
   | BorrowedWrite
   | Consumed
+[@@deriving show]
 
 type state_tbl = (identifier * loop_depth * var_state) list
+[@@deriving show]
 
 let empty_tbl: state_tbl = []
 
@@ -30,9 +33,10 @@ let get_entry_or_fail (tbl: state_tbl) (name: identifier): (loop_depth * var_sta
   match get_entry tbl name with
   | Some p -> p
   | None ->
-     err ("Internal: variable "
+     err ("Internal: variable `"
           ^ (ident_string name)
-          ^ " not in state table.")
+          ^ "` not in state table. State stable: \n\n"
+          ^ (show_state_tbl tbl))
 
 let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl =
   match get_entry tbl name with
@@ -342,9 +346,12 @@ and check_lvalue (tbl: state_tbl) (depth: loop_depth) (lvalue: typed_lvalue): st
 and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
   (* Find common rows, take the state from A and B. *)
   let common: (identifier * var_state * var_state) list =
-    List.map (fun (name, _, state_a) ->
-        let (_, state_b) = get_entry_or_fail b name in
-        (name, state_a, state_b))
+    List.filter_map (fun (name, _, state_a) ->
+        match get_entry b name with
+        | Some (_, state_b) ->
+           Some (name, state_a, state_b)
+        | None ->
+           None)
       (tbl_to_list a)
   in
   List.iter (fun (_, state_a, state_b) ->
@@ -404,7 +411,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
        else
          err "Cannot consume a variable in the same expression as it is borrowed or accessed through a path."
      else
-       err "Variable already consumed."
+       err ("Trying to consume the variable `"
+            ^ (ident_string name)
+            ^ "`, which is "
+            ^ (humanize_state (get_state tbl name))
+            ^ ".")
   | Zero ->
      (* The variable is not consumed. *)
      (match partition write with
@@ -449,12 +460,16 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              (* The variable is not used in this expression. *)
              tbl)
 
+and get_state (tbl: state_tbl) (name: identifier): var_state =
+  let (_, state) = get_entry_or_fail tbl name in
+  state
+
 and get_loop_depth (tbl: state_tbl) (name: identifier): loop_depth =
   let (depth, _) = get_entry_or_fail tbl name in
   depth
 
 and is_unconsumed (tbl: state_tbl) (name: identifier): bool =
-  let (_, state) = get_entry_or_fail tbl name in
+  let state = get_state tbl name in
   match state with
   | Unconsumed -> true
   | _ -> false
@@ -463,6 +478,13 @@ and universe_linear_ish = function
   | LinearUniverse -> true
   | TypeUniverse -> true
   | _ -> false
+
+and humanize_state (state: var_state): string =
+  match state with
+  | Unconsumed -> "not yet consumed"
+  | BorrowedRead -> "borrowed (read-only)"
+  | BorrowedWrite -> "borrowed (read-write)"
+  | Consumed -> "consumed"
 
 (* Linearity checking of whole modules *)
 
