@@ -1,4 +1,5 @@
 open Identifier
+open Tast
 open Error
 
 type loop_depth = int
@@ -45,3 +46,122 @@ type appearances = {
     write: int;
     path: int;
   }
+
+let zero_appearances: appearances = {
+    consumed = 0;
+    read = 0;
+    write = 0;
+    path = 0;
+  }
+
+let consumed_once: appearances = {
+    consumed = 1;
+    read = 0;
+    write = 0;
+    path = 0;
+  }
+
+let path_once: appearances = {
+    consumed = 0;
+    read = 0;
+    write = 0;
+    path = 1;
+  }
+
+let merge (a: appearances) (b: appearances): appearances =
+  {
+    consumed = a.consumed + b.consumed;
+    read = a.read + b.read;
+    write = a.write + b.write;
+    path = a.path + b.path;
+  }
+
+let merge_list (l: appearances list): appearances =
+  List.fold_left merge zero_appearances l
+
+let rec count (name: identifier) (expr: texpr): appearances =
+  let c = count name in
+  match expr with
+  | TNilConstant ->
+     zero_appearances
+  | TBoolConstant _ ->
+     zero_appearances
+  | TIntConstant _ ->
+     zero_appearances
+  | TFloatConstant _ ->
+     zero_appearances
+  | TStringConstant _ ->
+     zero_appearances
+  | TConstVar _ ->
+     (* Constants variables can't be linear. *)
+     zero_appearances
+  | TParamVar (name', _) ->
+     if equal_identifier name name' then
+       consumed_once
+     else
+       zero_appearances
+  | TLocalVar (name', _) ->
+     if equal_identifier name name' then
+       consumed_once
+     else
+       zero_appearances
+  | TArithmetic (_, lhs, rhs) ->
+     merge (c lhs) (c rhs)
+  | TFuncall (_, _, args, _, _) ->
+     merge_list (List.map c args)
+  | TMethodCall (_, _, _, args, _, _) ->
+     merge_list (List.map c args)
+  | TCast (e, _) ->
+     c e
+  | TComparison (_, lhs, rhs) ->
+     merge (c lhs) (c rhs)
+  | TConjunction (lhs, rhs) ->
+     merge (c lhs) (c rhs)
+  | TDisjunction (lhs, rhs) ->
+     merge (c lhs) (c rhs)
+  | TNegation e ->
+     c e
+  | TIfExpression (e, t, f) ->
+     merge (c e) (merge (c t) (c f))
+  | TRecordConstructor (_, args) ->
+     merge_list (List.map (fun (_, e) -> c e) args)
+  | TUnionConstructor (_, _, args) ->
+     merge_list (List.map (fun (_, e) -> c e) args)
+  | TTypeAliasConstructor (_, e) ->
+     c e
+  | TPath { head; elems; _ } ->
+     let head_apps: appearances =
+       (* If the head of the path is a variable, check if it is the one we are
+          looking for. If it is, count that as a path appearance. *)
+       (match head with
+        | TParamVar (name', _) ->
+           if equal_identifier name name' then
+             path_once
+           else
+             zero_appearances
+        | TLocalVar (name', _) ->
+           if equal_identifier name name' then
+             path_once
+           else
+             zero_appearances
+        | _ ->
+           (* Otherwise, just count the appearances inside the expression. *)
+           c head)
+     and path_apps: appearances = merge_list (List.map (count_path_elem name) elems)
+     in
+     merge head_apps path_apps
+  | TEmbed (_, _, args) ->
+     merge_list (List.map c args)
+  | TDeref e ->
+     c e
+  | TSizeOf _ ->
+     zero_appearances
+
+and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
+  match elem with
+  | TSlotAccessor _ ->
+     zero_appearances
+  | TPointerSlotAccessor _ ->
+     zero_appearances
+  | TArrayIndex (e, _) ->
+     count name e

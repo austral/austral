@@ -1,5 +1,6 @@
 (** The linearity checker. *)
 open Identifier
+open Tast
 
 (** The loop depth represents, for a particular piece of code, how many loops
     into the function that piece of code is. *)
@@ -33,3 +34,6 @@ val tbl_to_list : state_tbl -> (identifier * loop_depth * var_state) list
 
 (** Represents the number of times a given variable appears in an expression in different ways. *)
 type appearances
+
+(** Count the appearances of a given variable in the expression. *)
+val count : identifier -> texpr -> appearances
