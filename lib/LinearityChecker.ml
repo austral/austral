@@ -193,13 +193,13 @@ let partition (n: int): partitions =
 
 let rec linearity_check (params: value_parameter list) (body: tstmt): unit =
   (* Initialize the loop depth to zero, *)
-  let depth: int ref = ref 0 in
+  let depth: int = 0 in
   (* Initialize the state table to the empty table. *)
-  let tbl: state_tbl ref = ref empty_tbl in
+  let tbl: state_tbl = empty_tbl in
   (* Populate the table with the linear parameters. *)
-  tbl := init_tbl !tbl params;
+  let tbl: state_tbl = init_tbl tbl params in
   (* Traverse the code in execution order. *)
-  let _ = check_stmt !tbl !depth body in
+  let _ = check_stmt tbl depth body in
   ()
 
 and init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
