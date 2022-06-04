@@ -51,8 +51,8 @@ The compiler's middle end.
 - {!Austral_core.TypeReplace}
 - {!Austral_core.LexEnv}
 - {!Austral_core.TypingPass}
-- {!Austral_core.Pervasive}
 - {!Austral_core.BuiltIn}
+- {!Austral_core.BuiltInModules}
 - {!Austral_core.Linearity}
 - {!Austral_core.TypeStripping}
 - {!Austral_core.MonoType}
@@ -65,9 +65,6 @@ The compiler's middle end.
 The compiler backend.
 
 - {!Austral_core.CodeGen}
-- {!Austral_core.Cpp}
-- {!Austral_core.CppPrelude}
-- {!Austral_core.CppRenderer}
 - {!Austral_core.CRepr}
 - {!Austral_core.CRenderer}
 
