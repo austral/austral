@@ -1,0 +1,1 @@
+A trivial test of union functionality.
