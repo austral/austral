@@ -105,7 +105,7 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
       | [a] ->
          a
       | _::_ ->
-         err "Overlapping typeclasses"
+         err "Multiple instances satisfy this call."
       | [] ->
          err (
              "Typeclass resolution failed. Typeclass: "
