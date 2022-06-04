@@ -125,6 +125,11 @@ type type_class_method_input = {
     rt: ty;
   }
 
+(** The argument to a typeclass is either a concrete type applied to zero
+    arguments, or a generic type applied to a number of type variables. *)
+type instance_argument =
+  InstanceArgument of decl_id * identifier list
+
 (** Input to the {!add_instance} function. *)
 type instance_input = {
     mod_id: mod_id;
@@ -132,7 +137,7 @@ type instance_input = {
     typeclass_id: decl_id;
     docstring: docstring;
     typarams: typarams;
-    argument: ty;
+    argument: instance_argument;
   }
 
 (** Input to the {!add_instance_method} function. *)
