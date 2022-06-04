@@ -467,7 +467,7 @@ val get_monomorph : env -> mono_id -> monomorph option
 
 (** Get a type signature by name. If there is no declaration with this name, or
     if the declaration is not a type, throws an error. *)
-val get_type_signature : env -> sident -> type_signature
+val get_type_signature_by_name : env -> sident -> type_signature
 
 (** {2 Other Functions} *)
 

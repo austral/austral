@@ -182,7 +182,7 @@ let get_type_signature (env: env) (sigs: type_signature list) (name: qident) =
     List.find_opt (fun (TypeSignature (n, _, _)) -> n = (local_name name)) sigs
 
   and get_foreign_type_signature (env: env) (name: qident): type_signature option =
-    Some (get_type_signature env (qident_to_sident name))
+    Some (get_type_signature_by_name env (qident_to_sident name))
   in
   match get_local_type_signature sigs name with
   | (Some ts) ->

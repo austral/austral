@@ -942,7 +942,7 @@ let decl_type_signature (decl: decl): type_signature option =
   | Instance _ ->
      None
 
-let get_type_signature (env: env) (name: sident): type_signature =
+let get_type_signature_by_name (env: env) (name: sident): type_signature =
   match get_decl_by_name env name with
   | Some decl ->
      (match decl_type_signature decl with
