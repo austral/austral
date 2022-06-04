@@ -331,8 +331,26 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
             | _ ->
                err "Bad conversion")
       | SizeOf ty ->
-         TSizeOf (parse_typespec env rm typarams ty))
-
+         TSizeOf (parse_typespec env rm typarams ty)
+      | BorrowExpr (mode, name) ->
+         (match get_variable env lexenv name with
+          | Some (ty, src) ->
+             (* TODO: check if `ty` is linear? *)
+             (match src with
+              | VarConstant ->
+                 err "Constants cannot be borrowed"
+              | VarParam ->
+                 let name: identifier = original_name name
+                 and reg: region = fresh_region ()
+                 in
+                 TBorrowExpr (mode, name, reg, ty)
+              | VarLocal ->
+                 let name: identifier = original_name name
+                 and reg: region = fresh_region ()
+                 in
+                 TBorrowExpr (mode, name, reg, ty))
+          | None ->
+             err ("I can't find the variable named " ^ (ident_string (original_name name)))))
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
