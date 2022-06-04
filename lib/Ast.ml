@@ -56,6 +56,7 @@ and aexpr =
   | Deref of aexpr
   | Typecast of aexpr * qtypespec
   | SizeOf of qtypespec
+  | BorrowExpr of borrowing_mode * qident
 
 and abstract_when =
   | AbstractWhen of identifier * (identifier * qtypespec) list * astmt
@@ -110,3 +111,5 @@ let expr_kind (expr: aexpr): string =
      "typecast"
   | SizeOf _ ->
      "sizeof"
+  | BorrowExpr _ ->
+     "borrow"
