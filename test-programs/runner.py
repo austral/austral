@@ -38,7 +38,7 @@ def run_all_tests():
             elif os.path.isfile(os.path.join(test_dir, "output.txt")):
                 # If so, the program should compile, run successfully, produce stdout that matches the contents of the file.
                 with open(os.path.join(test_dir, "output.txt"), "r") as stream:
-                    expected_output: str = stream.read().strip()
+                    expected_output: str = stream.read()
                     if not expected_output:
                         print("\nERROR: `output.txt` is empty")
                         exit(-1)
@@ -104,7 +104,7 @@ def compile_successfully(suite_name: str, test_name: str, expected_output):
                         print("\t--- BEGIN STDOUT ---")
                         print(indent(stdout))
                         print("\t--- END STDOUT ---")
-                        print("Expected output:\n")
+                        print("\nExpected output:\n")
                         print("\t--- BEGIN EXPECTED ---")
                         print(indent(expected_output))
                         print("\t--- END EXPECTED ---")
