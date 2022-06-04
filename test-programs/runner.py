@@ -12,7 +12,7 @@ def run_all_tests():
     """
     Find and run all the tests.
     """
-    # Find the `suites/`` directory.
+    # Find the `suites/` directory.
     suites_dir: str = os.path.join(DIR, "suites")
     # Find the test suites.
     suite_names: list[str] = sorted(os.listdir(suites_dir))
