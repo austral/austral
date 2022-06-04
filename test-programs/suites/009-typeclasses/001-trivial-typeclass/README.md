@@ -1,0 +1,1 @@
+Test a simple `Print` typeclass.
