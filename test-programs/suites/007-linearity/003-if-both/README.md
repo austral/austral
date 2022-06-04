@@ -1,0 +1,1 @@
+Test that consuming a linear variable in both branches of an `if` statement works.
