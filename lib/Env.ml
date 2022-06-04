@@ -2,6 +2,7 @@ open Identifier
 open Common
 open Type
 open TypeParameters
+open TypeSignature
 open MonoType
 open Tast
 open Mtast
@@ -919,3 +920,34 @@ let get_monomorph (env: env) (id: mono_id): monomorph option =
     equal_mono_id id (monomorph_id mono)
   in
   List.find_opt pred monos
+
+let decl_type_signature (decl: decl): type_signature option =
+  match decl with
+  | Constant _ ->
+     None
+  | TypeAlias { name; typarams; universe; _ } ->
+     Some (TypeSignature (name, typarams, universe))
+  | Record { name; typarams; universe; _ } ->
+     Some (TypeSignature (name, typarams, universe))
+  | Union { name; typarams; universe; _ } ->
+     Some (TypeSignature (name, typarams, universe))
+  | UnionCase _ ->
+     None
+  | Function _ ->
+     None
+  | TypeClass _ ->
+     None
+  | TypeClassMethod _ ->
+     None
+  | Instance _ ->
+     None
+
+let get_type_signature (env: env) (name: sident): type_signature =
+  match get_decl_by_name env name with
+  | Some decl ->
+     (match decl_type_signature decl with
+      | Some s -> s
+      | None ->
+         err "Not a type")
+  | None ->
+     err "Internal: no decl"

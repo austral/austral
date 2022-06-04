@@ -9,27 +9,6 @@ open Ast
 open Env
 open Error
 
-let decl_type_signature (decl: decl): type_signature option =
-  match decl with
-  | Constant _ ->
-     None
-  | TypeAlias { name; typarams; universe; _ } ->
-     Some (TypeSignature (name, typarams, universe))
-  | Record { name; typarams; universe; _ } ->
-     Some (TypeSignature (name, typarams, universe))
-  | Union { name; typarams; universe; _ } ->
-     Some (TypeSignature (name, typarams, universe))
-  | UnionCase _ ->
-     None
-  | Function _ ->
-     None
-  | TypeClass _ ->
-     None
-  | TypeClassMethod _ ->
-     None
-  | Instance _ ->
-     None
-
 let memory_module_name = make_mod_name "Austral.Memory"
 
 let is_address_type (name: qident): bool =
@@ -203,11 +182,7 @@ let get_type_signature (env: env) (sigs: type_signature list) (name: qident) =
     List.find_opt (fun (TypeSignature (n, _, _)) -> n = (local_name name)) sigs
 
   and get_foreign_type_signature (env: env) (name: qident): type_signature option =
-    match get_decl_by_name env (qident_to_sident name) with
-    | (Some decl) ->
-       decl_type_signature decl
-    | None ->
-       None
+    Some (get_type_signature env (qident_to_sident name))
   in
   match get_local_type_signature sigs name with
   | (Some ts) ->

@@ -2,6 +2,7 @@ open Identifier
 open Common
 open Type
 open TypeParameters
+open TypeSignature
 open MonoType
 open Tast
 open Mtast
@@ -463,6 +464,10 @@ val get_uninstantiated_monomorphs : env -> monomorph list
 
 (** Get a monomorph by ID. *)
 val get_monomorph : env -> mono_id -> monomorph option
+
+(** Get a type signature by name. If there is no declaration with this name, or
+    if the declaration is not a type, throws an error. *)
+val get_type_signature : env -> sident -> type_signature
 
 (** {2 Other Functions} *)
 
