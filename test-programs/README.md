@@ -12,14 +12,14 @@ test-programs/
                 Test.aui   # Module interface
                 Test.aum   # Module body
                 output.txt # Expected program output, if the program is meant to compile.
-                errors.txt # Expected compiler output, if the program is meant to compile.
+                error.txt  # Expected compiler output, if the program is meant to compile.
 ```
 
 The `suites` directory has numbered subdirectories, each representing a test suite: a collection of tests covering specific compiler features.
 
 Each test directory contains some Austral source files (in the simplest cases, `Test.aui` and `Test.aum`).
 
-If the compilation is expected to fail, there should be a file called `errors.txt` containing the compiler's expected output.
+If the compilation is expected to fail, there should be a file called `error.txt` containing the compiler's expected output.
 
 If compilation is expected to succeed and the program is expected to produce text output, there should be a file called `output.txt` containing the program's expected output.
 

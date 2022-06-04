@@ -26,14 +26,15 @@ def run_all_tests():
         for test_name in test_names:
             print(f"\t{test_name.ljust(30)}", end="")
             test_dir: str = os.path.join(suite_dir, test_name)
-            # Is there an `errors.txt` file?
-            if os.path.isfile(os.path.join(test_dir, "errors.txt")):
+            # Is there an `error.txt` file?
+            if os.path.isfile(os.path.join(test_dir, "error.txt")):
                 # If so, the test should fail to compile, and the compiler output must match the contents of the file.
-                expected_errors: str = stream.read().strip()
-                if not expected_errors:
-                    print("\nERROR: `errors.txt` is empty")
-                    exit(-1)
-                compile_failed(suite_name, test_name, expected_errors)
+                with open(os.path.join(test_dir, "error.txt"), "r") as stream:
+                    expected_errors: str = stream.read().strip()
+                    if not expected_errors:
+                        print("\nERROR: `error.txt` is empty")
+                        exit(-1)
+                    compile_failed(suite_name, test_name, expected_errors)
             # Is there an `output.txt` file?
             elif os.path.isfile(os.path.join(test_dir, "output.txt")):
                 # If so, the program should compile, run successfully, produce stdout that matches the contents of the file.
@@ -43,7 +44,7 @@ def run_all_tests():
                         print("\nERROR: `output.txt` is empty")
                         exit(-1)
                     compile_successfully(suite_name, test_name, expected_output)
-            # There is neither an `errors.txt` nor an `output.txt `file.
+            # There is neither an `error.txt` nor an `output.txt `file.
             else:
                 # The program should compile and run successfully and produce no stdout.
                 compile_successfully(suite_name, test_name, None)
@@ -231,7 +232,7 @@ def compile_failed(suite_name: str, test_name: str, expected_errors: str):
         exit(-1)
     else:
         # Compilation failed. Does the actual stderr match expected?
-        stderr: str = result.stderr.decode("utf-8")
+        stderr: str = result.stderr.decode("utf-8").strip()
         if stderr == expected_errors:
             print("PASS")
         else:
@@ -245,10 +246,10 @@ def compile_failed(suite_name: str, test_name: str, expected_errors: str):
             print("\t--- BEGIN EXPECTED ---")
             print(indent(expected_errors))
             print("\t--- END EXPECTED ---")
-            print("Actual stderr: \n")
+            print("\nActual stderr: \n")
             print("\t--- BEGIN STDERR ---")
             print(indent(stderr))
-            print("\t--- END STDERR ---")
+            print("\t--- END STDERR ---\n")
             print("--- END ERROR ---")
             exit(-1)
 
