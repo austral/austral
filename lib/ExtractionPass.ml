@@ -192,10 +192,9 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      (* Construct the decl *)
      let decl = LTypeclass (typeclass_id, vis, name, typaram, linked_methods, docstring) in
      (env, decl)
-  | CInstance (vis, name, typarams, argument, methods, docstring) ->
+  | CInstance (vis, name, typarams, CombinedInstanceArg (arg_name, arg_args), methods, docstring) ->
      (* Add the instance itself to the env *)
      let rm = region_map_from_typarams typarams in
-     let argument = parse' rm typarams argument in
      let typeclass_id: decl_id =
        match get_decl_by_name env (qident_to_sident name) with
        | Some decl ->
@@ -207,6 +206,10 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
        | None ->
           err "Type class with this name does not exist."
      in
+     (* Check that the set of type variables applied to the arguments is identical to the set of type parameters. *)
+     (* Find the argument type. *)
+     (* Check that the argument type's parameter list fits ours. *)
+     (* Check the universes match *)
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
