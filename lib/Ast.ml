@@ -73,6 +73,8 @@ and path_elem =
 and lvalue =
   LValue of identifier * path_elem list
 
+(** Used for debugging: tells us what kind of expression this is, as a
+    human-readable string. *)
 let expr_kind (expr: aexpr): string =
   match expr with
   | NilConstant ->
