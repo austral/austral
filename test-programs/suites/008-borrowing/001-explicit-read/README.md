@@ -1,0 +1,1 @@
+Acquire a named read reference.
