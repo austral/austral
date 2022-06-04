@@ -8,7 +8,7 @@ module body Test is
         let foo: Foo := Foo(bar => 'a');
         -- Consume the record by destructuring.
         let { bar: Natural_8 } := foo;
-        -- Try to borrow it it.
+        -- Try to borrow it.
         borrow foo as fooref in rho do
             skip;
         end;
