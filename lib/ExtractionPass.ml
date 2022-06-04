@@ -1,4 +1,5 @@
 open Identifier
+open IdentifierSet
 open Common
 open Type
 open TypeSystem
@@ -193,8 +194,8 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let decl = LTypeclass (typeclass_id, vis, name, typaram, linked_methods, docstring) in
      (env, decl)
   | CInstance (vis, name, typarams, CombinedInstanceArg (arg_name, arg_args), methods, docstring) ->
-     (* Add the instance itself to the env *)
-     let rm = region_map_from_typarams typarams in
+     (* First we add the typeclass, then we add the methods. *)
+     (* Find the ID of the typeclass. *)
      let typeclass_id: decl_id =
        match get_decl_by_name env (qident_to_sident name) with
        | Some decl ->
@@ -206,8 +207,28 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
        | None ->
           err "Type class with this name does not exist."
      in
-     (* Check that the set of type variables applied to the arguments is identical to the set of type parameters. *)
-     (* Find the argument type. *)
+     (* Check that the set of type variables applied to the arguments is
+        identical to the set of type parameters.
+
+        When we have a generic instance, the shape of the argument is T[A_0,
+        ..., A_n], and the typaram set must likewise be [A_0, ..., A_n].  *)
+     let _ =
+       (* Convert typarams to an identifier set. *)
+       let typaram_names: identifier list =
+         List.map (fun (TypeParameter (name, _, _)) -> name) (typarams_as_list typarams)
+       in
+       let typarams_set: IdentifierSet.t = IdentifierSet.of_list typaram_names
+         (* Convert args to an identifier set *)
+       and arg_set: IdentifierSet.t = IdentifierSet.of_list arg_args
+       in
+       (* Compare sets for equality *)
+       if IdentifierSet.equal typarams_set arg_set then
+         ()
+       else
+         err "When defining a generic typeclass instance, the set of type parameters must be the same as the set of type arguments."
+     in
+     (* Find the argument's type signature. *)
+     let signature: type_signature = get_type_signature_by_name env (qident_to_sident arg_name) in
      (* Check that the argument type's parameter list fits ours. *)
      (* Check the universes match *)
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
