@@ -288,7 +288,7 @@ pragma:
 
 instance_def:
   | doc=docstringopt typarams=generic_segment
-    INSTANCE name=identifier LPAREN arg=typespec RPAREN IS
+    INSTANCE name=identifier LPAREN arg=concrete_instance_arg RPAREN IS
     methods=method_def*
     END SEMI
     { ConcreteInstanceDef (ConcreteInstance (name, typarams, arg, methods, doc)) }
