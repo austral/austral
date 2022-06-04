@@ -1,0 +1,1 @@
+Test that forgetting to consume a linear variable throws an error.

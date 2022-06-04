@@ -1,0 +1,1 @@
+Test that multi line strings are trimmed correctly.

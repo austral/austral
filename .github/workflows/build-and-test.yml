@@ -49,8 +49,12 @@ jobs:
         run: opam exec -- dune runtest
         if: runner.os == 'Linux'
 
-      - name: Run test script
+      - name: Run example programs
         run: ./run-tests.sh
+        if: runner.os == 'Linux'
+
+      - name: Run test script
+        run: python3 test-programs/runner.py
         if: runner.os == 'Linux'
 
       - name: Upload compiler binary

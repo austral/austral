@@ -1,0 +1,1 @@
+Tests of Austral's constant functionality.

@@ -1,0 +1,53 @@
+import Austral.Memory (
+    Pointer,
+    Address,
+    Null_Check,
+    Allocate,
+    Load,
+    Store,
+    Deallocate
+);
+
+module body Test is
+    pragma Unsafe_Module;
+
+    record Box[T: Type]: Linear is
+        pointer: Pointer[T];
+    end;
+
+    generic [T: Type]
+    function Make(val: T): Either[Box[T], T] is
+        let addr: Address[T] := Allocate(sizeof(T));
+        case Null_Check(addr) of
+            when Some(value: Pointer[T]) do
+                Store(value, val);
+                let box: Box[T] := Box(pointer => value);
+                let left: Either[Box[T], T] := Left(left => box);
+                return left;
+            when None do
+                -- Allocation failed, return the object we tried to box.
+                let right: Either[Box[T], T] := Right(right => val);
+                return right;
+        end case;
+    end;
+
+    generic [T: Type]
+    function Unbox(box: Box[T]): T is
+        let { pointer: Pointer[T] } := box;
+        let value: T := Load(pointer);
+        Deallocate(pointer);
+        return value;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        let e: Either[Box[Integer_32], Integer_32] := Make('e');
+        case e of
+            when Left(left: Box[Integer_32]) do
+                Unbox(left);
+                Unbox(left);
+            when Right(right: Integer_32) do
+                skip;
+        end case;
+        return root;
+    end;
+end module body.

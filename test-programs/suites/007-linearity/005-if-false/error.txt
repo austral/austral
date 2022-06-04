@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    Variable used inconsistently.
+  Code:
+    [no span available]

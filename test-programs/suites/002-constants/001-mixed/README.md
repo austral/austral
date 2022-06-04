@@ -1,0 +1,1 @@
+Multiple public and private constants.

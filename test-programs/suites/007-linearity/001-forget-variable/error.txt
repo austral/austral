@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    Variable `r` not consumed at return statement.
+  Code:
+    [no span available]

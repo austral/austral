@@ -1,0 +1,1 @@
+Consuming by calling a function twice fails.

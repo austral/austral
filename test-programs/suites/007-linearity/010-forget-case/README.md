@@ -1,0 +1,1 @@
+Test that forgetting to consume a linear value bound in a `case` statement's `when` clause fails.

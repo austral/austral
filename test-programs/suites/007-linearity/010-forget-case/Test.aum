@@ -1,0 +1,17 @@
+module body Test is
+    record R : Linear is
+        x: Integer_32;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        let r: R := R(x => 32);
+        let ropt: Option[R] := Some(value => r);
+        case ropt of
+            when Some(value: R) do
+                skip;
+            when None do
+                skip;
+        end case;
+        return root;
+    end;
+end module body.

@@ -1,0 +1,1 @@
+Test that you can't consume a linear value twice in a case statement.
