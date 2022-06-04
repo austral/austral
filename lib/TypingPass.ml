@@ -991,7 +991,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
               | (Some (orig_ty, _)) ->
                  let u = type_universe orig_ty in
                  if ((u = LinearUniverse) || (u = TypeUniverse)) then
-                   let region_obj = fresh_region region in
+                   let region_obj = fresh_region () in
                    let refty =
                      (match mode with
                       | ReadBorrow ->
