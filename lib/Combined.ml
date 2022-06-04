@@ -22,7 +22,7 @@ and combined_definition =
   | CUnion of type_vis * identifier * typarams * universe * qcase list * docstring
   | CFunction of vis * identifier * typarams * qparam list * qtypespec * astmt * docstring * pragma list
   | CTypeclass of vis * identifier * type_parameter * combined_method_decl list * docstring
-  | CInstance of vis * qident * typarams * qtypespec * combined_method_def list * docstring
+  | CInstance of vis * qident * typarams * combined_instance_arg * combined_method_def list * docstring
 
 and qslot = QualifiedSlot of identifier * qtypespec
 
@@ -33,3 +33,5 @@ and qparam = QualifiedParameter of identifier * qtypespec
 and combined_method_decl = CMethodDecl of identifier * qparam list * qtypespec * docstring
 
 and combined_method_def = CMethodDef of identifier * qparam list * qtypespec * docstring * astmt
+
+and combined_instance_arg = CombinedInstanceArg of qident * identifier list

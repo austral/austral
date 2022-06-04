@@ -117,20 +117,24 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
            err "Function declaration does not match definition"
       | _ ->
          err "Not a function")
-  | ConcreteInstanceDecl (name, typarams, argument, docstring) ->
+  | ConcreteInstanceDecl (typeclass_name, typarams, ConcreteInstanceArg (arg_name, arg_args), docstring) ->
      (match def with
-      | ConcreteInstanceDef (ConcreteInstance (name', typarams', argument', methods, _)) ->
-         if (name = name') && (typarams = typarams') && (argument = argument') then
+      | ConcreteInstanceDef (ConcreteInstance (typeclass_name', typarams', ConcreteInstanceArg (arg_name', arg_args'), methods, _)) ->
+         if (equal_identifier typeclass_name typeclass_name')
+            && (typarams = typarams')
+            && (arg_name = arg_name')
+            && (arg_args = arg_args')
+         then
            (* Instance names might refer to an imported typeclass, so we have to
               qualify them. Since we're parsing a public declaration, which
               means the instance (and thus the name of the typeclass) appears in
               the interface file, we use the interface imports for
               qualification. *)
-           let qname = qualify_identifier ii name in
+           let qname = qualify_identifier ii typeclass_name in
            CInstance (VisPublic,
                       qname,
                       name_typarams typarams qname,
-                      qualify_typespec ii argument,
+                      CombinedInstanceArg (qualify_identifier ii arg_name, arg_args),
                       parse_method_defs bi methods,
                       docstring)
          else
@@ -196,7 +200,7 @@ let private_def module_name im def =
                      err "typeclass has more than one parameter"),
                  parse_method_decls im methods,
                  docstring)
-  | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
+  | ConcreteInstanceDef (ConcreteInstance (name, typarams, ConcreteInstanceArg (arg_name, arg_args), methods, docstring)) ->
      (* Instance names might refer to an imported typeclass, so we have to
         qualify them. Since we're parsing a private declaration, which means the
         instance (and thus the name of the typeclass) appears in the body file,
@@ -205,7 +209,7 @@ let private_def module_name im def =
      CInstance (VisPrivate,
                 qname,
                 name_typarams typarams qname,
-                qualify_typespec im argument,
+                CombinedInstanceArg (qualify_identifier im arg_name, arg_args),
                 parse_method_defs im methods,
                 docstring)
 
@@ -285,9 +289,9 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
              err "Interface declaration has no corresponding body declaration"))
   | None ->
      (match decl with
-      | ConcreteInstanceDecl (name, typarams, argument, _) ->
+      | ConcreteInstanceDecl (tc_name, _, ConcreteInstanceArg (arg_name, _), _) ->
          (* It's an instance declaration. Find the corresponding instance in the body. *)
-         (match get_instance_def cmb name typarams argument with
+         (match get_instance_def cmb tc_name arg_name with
           | (Some def) ->
              match_decls module_name im bm decl (ConcreteInstanceDef def)
           | None ->
