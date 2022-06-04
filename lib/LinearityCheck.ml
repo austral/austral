@@ -103,6 +103,20 @@ let consumed_once: appearances = {
     path = 0;
   }
 
+let read_once: appearances = {
+    consumed = 0;
+    read = 1;
+    write = 0;
+    path = 0;
+  }
+
+let write_once: appearances = {
+    consumed = 0;
+    read = 0;
+    write = 1;
+    path = 0;
+  }
+
 let path_once: appearances = {
     consumed = 0;
     read = 0;
@@ -200,6 +214,15 @@ let rec count (name: identifier) (expr: texpr): appearances =
      c e
   | TSizeOf _ ->
      zero_appearances
+  | TBorrowExpr (mode, name', _, _) ->
+     if equal_identifier name name' then
+       (match mode with
+        | ReadBorrow ->
+           read_once
+        | WriteBorrow ->
+           write_once)
+     else
+       zero_appearances
 
 and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
   match elem with
