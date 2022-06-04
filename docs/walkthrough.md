@@ -126,7 +126,7 @@ This is how it works:
        table:
 
        1. Count the number of times `x` is consumed in the expression and call
-          it `W` (e.g., for `f(x, g(x))` it's twice).
+          it `C` (e.g., for `f(x, g(x))` it's twice).
 
        2. Count the number of times `x` appears in a read-only anonymous borrow
           (`&`) and a read-write anonymous borrow (`&!`) and call them `R` and
