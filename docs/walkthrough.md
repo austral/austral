@@ -34,6 +34,8 @@ in the module interface.
 The extraction pass goes through a combined module and extracts its declarations
 into the environment. The bodies of functions and methods are ignored.
 
+This is where the correctness of declarations is checked.
+
 # Typing Pass
 
 The typing pass is the largest pass by volume: type checking happens here, and
