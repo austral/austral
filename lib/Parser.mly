@@ -248,8 +248,13 @@ method_decl:
 
 instance_decl:
   | doc=docstringopt typarams=generic_segment
-    INSTANCE name=identifier LPAREN arg=typespec RPAREN SEMI
+    INSTANCE name=identifier LPAREN arg=instance_arg RPAREN SEMI
     { ConcreteInstanceDecl (name, typarams, arg, doc) }
+  ;
+
+instance_arg:
+  | identifier { ConcreteInstanceArg ($1, []) }
+  | identifier LBRACKET separated_list(COMMA, identifier) RBRACKET { ConcreteInstanceArg ($1, $3) }
   ;
 
 body_decl:

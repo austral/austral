@@ -23,7 +23,7 @@ and concrete_decl =
   | ConcreteUnionDecl of concrete_union
   | ConcreteFunctionDecl of identifier * concrete_type_param list * concrete_param list * typespec * docstring
   | ConcreteTypeClassDecl of concrete_typeclass
-  | ConcreteInstanceDecl of identifier * concrete_type_param list * typespec * docstring
+  | ConcreteInstanceDecl of identifier * concrete_type_param list * concrete_instance_arg * docstring
 
 and concrete_def =
   | ConcreteConstantDef of identifier * typespec * cexpr * docstring
@@ -53,13 +53,16 @@ and concrete_typeclass =
   ConcreteTypeClass of identifier * concrete_type_param * concrete_method_decl list * docstring
 
 and concrete_instance =
-  ConcreteInstance of identifier * concrete_type_param list * typespec * concrete_method_def list * docstring
+  ConcreteInstance of identifier * concrete_type_param list * concrete_instance_arg * concrete_method_def list * docstring
 
 and concrete_method_decl =
   ConcreteMethodDecl of identifier * concrete_param list * typespec * docstring
 
 and concrete_method_def =
   ConcreteMethodDef of identifier * concrete_param list * typespec * cstmt * docstring
+
+and concrete_instance_arg =
+  ConcreteInstanceArg of identifier * identifier list
 
 and typespec =
   | TypeSpecifier of identifier * typespec list
