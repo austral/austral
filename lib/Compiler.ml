@@ -22,6 +22,7 @@ open Linked
 open Mtast
 open Monomorphize
 open ReturnCheck
+open LinearityCheck
 open Reporter
 open Filename
 
@@ -68,6 +69,7 @@ let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; bod
       let _ = check_ends_in_return combined in
       let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
       let typed: typed_module = augment_module env linked in
+      let _ = check_module_linearity typed in
       let env: env = extract_bodies env typed in
       let (env, mono): (env * mono_module) = monomorphize env typed in
       let unit = gen_module env mono in

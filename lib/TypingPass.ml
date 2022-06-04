@@ -14,7 +14,6 @@ open Env
 open Ast
 open Tast
 open Linked
-open Linearity
 open Util
 open Reporter
 open Error
@@ -1255,5 +1254,4 @@ let augment_module menv (LinkedModule { name; decls; kind; _ }) =
   with_frame "Typing pass"
     (fun _ ->
       let decls' = List.map (augment_decl name kind menv) decls in
-      let _ = List.map check_decl_linearity decls' in
       TypedModule (name, decls'))
