@@ -1195,6 +1195,8 @@ and is_constant = function
      false
   | TSizeOf _ ->
      true
+  | TBorrowExpr _ ->
+     false
 
 and is_path_elem_constant = function
   | TSlotAccessor _ ->
