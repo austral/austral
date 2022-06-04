@@ -1,0 +1,1 @@
+Test that we can't anonymously borrow a linear variable after it has been consumed.
