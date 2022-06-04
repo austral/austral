@@ -1,7 +1,7 @@
 Error:
   Title: Generic Error
   Location:
-    Filename: '/home/eudoxia/files/code/austral/austral-main/./test-programs/suites/007-linearity/003-destructure-twice/Test.aum'
+    Filename: 'test-programs/suites/007-linearity/003-destructure-twice/Test.aum'
     From: line 9, column 8
     To: line 9, column 35
   Description:

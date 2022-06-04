@@ -6,7 +6,7 @@ import os
 import subprocess
 
 # The `test-programs/` directory.
-DIR: str = os.path.dirname(__file__)
+DIR: str = "test-programs/"
 
 def run_all_tests():
     """
