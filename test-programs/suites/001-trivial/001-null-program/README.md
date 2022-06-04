@@ -1,0 +1,1 @@
+A module with a single declaration, the entrypoint function, which does nothing.
