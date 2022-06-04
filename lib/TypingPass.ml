@@ -281,7 +281,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
          and augment_numeric_conversion (expr: texpr) (ty: ty): texpr =
            let source_type_name = type_conversion_name (get_type expr)
            and target_type_name = type_conversion_name ty in
-           let conversion_function_call = "Austral__Core::convert_" ^ source_type_name ^ "_to_" ^ target_type_name ^ "($1)" in
+           let conversion_function_call = "convert_" ^ source_type_name ^ "_to_" ^ target_type_name ^ "($1)" in
            TEmbed (ty, conversion_function_call, [expr])
 
          and type_conversion_name (ty: ty): string =
@@ -297,7 +297,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                         | Width64 -> "64"
                         | WidthIndex -> "index")
                in
-               s ^ "int" ^ w
+               s ^ w
             | SingleFloat ->
                "float"
             | DoubleFloat ->
