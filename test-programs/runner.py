@@ -24,7 +24,7 @@ def run_all_tests():
         test_names: list[str] = sorted([name for name in os.listdir(suite_dir) if name != "README.md"])
         # Iterate over each test.
         for test_name in test_names:
-            print(f"\t{test_name.ljust(30)}", end="")
+            print(f"\t{test_name.ljust(45)}", end="")
             test_dir: str = os.path.join(suite_dir, test_name)
             # Is there an `error.txt` file?
             if os.path.isfile(os.path.join(test_dir, "error.txt")):

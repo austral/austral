@@ -2,6 +2,7 @@ open Identifier
 open Common
 open Escape
 open Type
+open Region
 open TypeParameters
 open Linked
 open Id
@@ -60,6 +61,7 @@ and texpr =
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
+  | TBorrowExpr of borrowing_mode * identifier * region * ty
 [@@deriving show]
 
 and typed_when =

@@ -85,7 +85,7 @@ let rec type_string = function
   | StaticArray t ->
      "Static_Array[" ^ (type_string t) ^ "]: Free"
   | RegionTy r ->
-     ident_string (region_name r) ^ "(" ^ (string_of_int (region_id r)) ^ ")"
+     "Region<" ^ (string_of_int (region_id r)) ^ ">"
   | ReadRef (t, r) ->
      read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Free"
   | WriteRef (t, r) ->

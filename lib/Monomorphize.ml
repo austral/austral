@@ -195,6 +195,9 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   | TSizeOf ty ->
      let (ty, env) = strip_and_mono env ty in
      (MSizeOf ty, env)
+  | TBorrowExpr (mode, name, region, ty) ->
+     let (ty, env) = strip_and_mono env ty in
+     (MBorrowExpr (mode, name, region, ty), env)
 
 and monomorphize_expr_list (env: env) (exprs: texpr list): (mexpr list * env) =
   match exprs with

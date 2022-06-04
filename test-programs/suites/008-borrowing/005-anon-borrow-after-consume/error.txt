@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    Cannot borrow a variable: state mismatch.
+  Code:
+    [no span available]

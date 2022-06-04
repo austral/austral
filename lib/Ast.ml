@@ -56,6 +56,7 @@ and aexpr =
   | Deref of aexpr
   | Typecast of aexpr * qtypespec
   | SizeOf of qtypespec
+  | BorrowExpr of borrowing_mode * qident
 
 and abstract_when =
   | AbstractWhen of identifier * (identifier * qtypespec) list * astmt
@@ -72,6 +73,8 @@ and path_elem =
 and lvalue =
   LValue of identifier * path_elem list
 
+(** Used for debugging: tells us what kind of expression this is, as a
+    human-readable string. *)
 let expr_kind (expr: aexpr): string =
   match expr with
   | NilConstant ->
@@ -110,3 +113,5 @@ let expr_kind (expr: aexpr): string =
      "typecast"
   | SizeOf _ ->
      "sizeof"
+  | BorrowExpr _ ->
+     "borrow"

@@ -382,6 +382,8 @@ atomic_expression:
   | parenthesized_expr { $1 }
   | intrinsic { $1 }
   | SIZEOF LPAREN typespec RPAREN { CSizeOf (from_loc $loc, $3) }
+  | BORROW_READ identifier { CBorrowExpr (from_loc $loc, ReadBorrow, $2) }
+  | BORROW_WRITE identifier { CBorrowExpr (from_loc $loc, WriteBorrow, $2) }
   ;
 
 int_constant:
