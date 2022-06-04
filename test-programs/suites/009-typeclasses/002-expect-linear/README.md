@@ -1,0 +1,1 @@
+Define a typeclass that expects arguments of a linear type, passing a free argument should fail.

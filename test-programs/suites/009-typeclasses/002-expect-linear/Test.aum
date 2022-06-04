@@ -1,0 +1,15 @@
+module body Test is
+    typeclass AcceptsLinear(T: Linear) is
+        method Accept(x: T): Unit;
+    end;
+
+    instance AcceptsLinear(Natural_8) is
+        method Accept(x: Natural_8): Unit is
+            return nil;
+        end;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.
