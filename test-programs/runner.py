@@ -48,7 +48,7 @@ def run_all_tests():
                 # The program should compile and run successfully and produce no stdout.
                 compile_successfully(suite_name, test_name, None)
 
-def compile_successfully(suite_name: str, test_name: str, expected_output: str | None):
+def compile_successfully(suite_name: str, test_name: str, expected_output):
     """
     Given the name of a suite and a test, compile the code, check that compilation succeeds, and run the program, checking that it terminates successfully and the expected output matches.
     """
