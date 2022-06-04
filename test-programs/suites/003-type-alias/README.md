@@ -1,0 +1,1 @@
+Tests of type alias functionality.
