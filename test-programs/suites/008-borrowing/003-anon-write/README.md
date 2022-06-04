@@ -1,0 +1,1 @@
+Acquire an anonymous write reference.
