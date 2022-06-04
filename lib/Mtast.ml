@@ -3,6 +3,7 @@ open Identifier
 open Common
 open Escape
 open MonoType
+open Region
 open Error
 
 type mono_module = MonoModule of module_name * mdecl list
@@ -82,6 +83,7 @@ and mexpr =
   | MDeref of mexpr
   | MTypecast of mexpr * mono_ty
   | MSizeOf of mono_ty
+  | MBorrowExpr of borrowing_mode * identifier * region * mono_ty
 
 and mtyped_when =
   MTypedWhen of identifier * mvalue_parameter list * mstmt
