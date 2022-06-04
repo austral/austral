@@ -118,7 +118,7 @@ def compile_successfully(suite_name: str, test_name: str, expected_output: str |
                     print("Description: program produced stdout, but we expected none.")
                     print("Program output:\n")
                     print("\t--- BEGIN STDOUT ---")
-                    print(ident(stdout))
+                    print(indent(stdout))
                     print("\t--- END STDOUT ---")
                     print("--- END ERROR ---")
                     exit(-1)
