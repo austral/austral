@@ -1,0 +1,1 @@
+A linear value created in a loop can be used inside that loop.
