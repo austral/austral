@@ -1,0 +1,1 @@
+Create a record and consume it by destructuring.
