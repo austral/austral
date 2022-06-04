@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    Forgot to consume a linear variable.
+  Code:
+    [no span available]
