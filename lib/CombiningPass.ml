@@ -309,11 +309,11 @@ and parse_def (module_name: module_name) (cmi: concrete_module_interface) (im: i
          Some (private_def module_name im def))
   | None ->
      (match def with
-      | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, _, _)) ->
+      | ConcreteInstanceDef (ConcreteInstance (typeclass_name, _, ConcreteInstanceArg (arg_name, _), _, _)) ->
       (* It's an instance declaration. If the interface file declares it, ignore
          it: it's already been processed. Otherwise, process it as a private
          instance declaration. *)
-         if has_instance_decl cmi name typarams argument then
+         if has_instance_decl cmi typeclass_name arg_name then
            None
          else
            Some (private_def module_name im def)

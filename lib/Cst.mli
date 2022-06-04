@@ -146,8 +146,8 @@ val get_concrete_decl : concrete_module_interface -> identifier -> concrete_decl
 
 val get_concrete_def : concrete_module_body -> identifier -> concrete_def option
 
-val has_instance_decl : concrete_module_interface -> identifier -> concrete_type_param list -> typespec -> bool
+val has_instance_decl : concrete_module_interface -> identifier -> identifier -> bool
 
-val get_instance_def : concrete_module_body -> identifier -> concrete_type_param list -> typespec -> concrete_instance option
+val get_instance_def : concrete_module_body -> identifier -> identifier -> concrete_instance option
 
 val make_pragma : identifier -> concrete_arglist -> pragma

@@ -191,21 +191,23 @@ let get_concrete_def (ConcreteModuleBody (_, _, _, _, defs)) name =
   in
   List.find_opt pred defs
 
-let has_instance_decl (ConcreteModuleInterface (_, _, _, decls)) (name: identifier) (typarams: concrete_type_param list) (ty: typespec): bool =
+let has_instance_decl (ConcreteModuleInterface (_, _, _, decls)) (typeclass_name: identifier) (arg_name: identifier): bool =
   let pred = function
-    | ConcreteInstanceDecl (name', typarams', ty', _) ->
-       (name = name') && (typarams = typarams') && (ty = ty')
+    | ConcreteInstanceDecl (typeclass_name', _, ConcreteInstanceArg (arg_name', _), _) ->
+       (equal_identifier typeclass_name typeclass_name')
+       && (equal_identifier arg_name arg_name')
     | _ ->
        false
   in
   List.exists pred decls
 
-let get_instance_def (ConcreteModuleBody (_, _, _, _, defs)) (name: identifier) (typarams: concrete_type_param list) (ty: typespec): concrete_instance option =
+let get_instance_def (ConcreteModuleBody (_, _, _, _, defs)) (typeclass_name: identifier) (arg_name: identifier): concrete_instance option =
   let filter = function
     | ConcreteInstanceDef ci -> Some ci
     | _ -> None
-  and pred (ConcreteInstance (name', typarams', ty', _, _)) =
-    (name = name') && (typarams = typarams') && (ty = ty')
+  and pred (ConcreteInstance (typeclass_name', _, ConcreteInstanceArg (arg_name', _), _, _)) =
+    (equal_identifier typeclass_name typeclass_name')
+    && (equal_identifier arg_name arg_name')
   in
   List.find_opt pred (List.filter_map filter defs)
 
