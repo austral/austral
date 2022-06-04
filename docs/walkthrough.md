@@ -158,8 +158,9 @@ This is how it works:
                3. If `W = 0`, either `R` and `P` can be non-zero (i.e., we can
                   read freely) iff `x` is `Unconsumed`.
 
-    9. When leaving the body of a `let` statement or `case` clause, remove the
-       linear variables they introduced from the table.
+    9. When leaving the body of a `let` statement or `case` clause, ensure the
+       linear variable(s) introduced is `Consumed`, and then remove it from the
+       table.
 
 # Body Extraction Pass
 

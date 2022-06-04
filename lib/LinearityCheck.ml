@@ -64,10 +64,13 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
           ^ (ident_string name)
           ^ "`, but no such variable exists in the state table. Table contents: \n\n"
           ^ (show_state_tbl tbl))
-  | Some _ ->
-     let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
-     in
-     others
+  | Some (_, state) ->
+     if state = Consumed then
+       let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
+       in
+       others
+     else
+       err "Forgot to consume a linear variable."
 
 let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   match names with
