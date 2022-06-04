@@ -98,14 +98,14 @@ module body Example.Buffer is
     -- Query
 
     generic [T: Free, R: Region]
-    function Buffer_Size(buffer: Reference[Buffer[T], R]): Index is
+    function Buffer_Size(buffer: &[Buffer[T], R]): Index is
         return !(buffer->size);
     end;
 
     -- Retrieval
 
     generic [T: Free, R: Region]
-    function Nth_Free(buffer: Reference[Buffer[T], R], index: Index): T is
+    function Nth_Free(buffer: &[Buffer[T], R], index: Index): T is
         let arr: Pointer[T] := !(buffer->array);
         let nth_ptr: Pointer[T] := Positive_Offset(arr, index);
         let val: T := Load(nth_ptr);
@@ -113,7 +113,7 @@ module body Example.Buffer is
     end;
 
     ---generic [T: Type, R: Region]
-    -- function Nth_Ref(buffer: Reference[Buffer[T], R], index: Index): Reference[T, R] is
+    -- function Nth_Ref(buffer: &[Buffer[T], R], index: Index): &[T, R] is
     --    return buffer->array[index];
     -- end;
 

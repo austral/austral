@@ -43,13 +43,13 @@ module body Austral.Memory is
     end;
 
     generic [T: Type, R: Region]
-    function Load_Read_Reference(ref: Reference[Pointer[T], R]): Reference[T, R] is
-        return @embed(Reference[T, R], "*($1)", ref);
+    function Load_Read_Reference(ref: &[Pointer[T], R]): &[T, R] is
+        return @embed(&[T, R], "*($1)", ref);
     end;
 
     generic [T: Type, R: Region]
-    function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R] is
-        return @embed(WriteReference[T, R], "*($1)", ref);
+    function Load_Write_Reference(ref: &![Pointer[T], R]): &![T, R] is
+        return @embed(&![T, R], "*($1)", ref);
     end;
 
     generic [T: Type]

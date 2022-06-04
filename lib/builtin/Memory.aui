@@ -21,10 +21,10 @@ module Austral.Memory is
     function Deallocate(pointer: Pointer[T]): Unit;
 
     generic [T: Type, R: Region]
-    function Load_Read_Reference(ref: Reference[Pointer[T], R]): Reference[T, R];
+    function Load_Read_Reference(ref: &[Pointer[T], R]): &[T, R];
 
     generic [T: Type, R: Region]
-    function Load_Write_Reference(ref: WriteReference[Pointer[T], R]): WriteReference[T, R];
+    function Load_Write_Reference(ref: &![Pointer[T], R]): &![T, R];
 
     generic [T: Type]
     function Resize_Array(array: Pointer[T], size: Index): Pointer[T];

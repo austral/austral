@@ -15,22 +15,22 @@ module Example.Buffer is
     -- Query
 
     generic [T: Free, R: Region]
-    function Buffer_Size(buffer: Reference[Buffer[T], R]): Index;
+    function Buffer_Size(buffer: &[Buffer[T], R]): Index;
 
     -- Retrieval
 
     -- generic [T: Type, R: Region]
-    -- function Nth_Ref(buffer: Reference[Buffer[T], R], index: Index): Reference[T, R];
+    -- function Nth_Ref(buffer: &[Buffer[T], R], index: Index): &[T, R];
 
     -- Insertion
 
     --generic [T: Type, R: Region]
-    --function Insert_After(buffer: WriteReference[Buffer[T], R], elem: T): Unit;
+    --function Insert_After(buffer: &![Buffer[T], R], elem: T): Unit;
 
     -- Removal
 
     --generic [T: Type, R: Region]
-    --function Remove_Nth(buffer: WriteReference[Buffer[T], R], index: Index): T;
+    --function Remove_Nth(buffer: &![Buffer[T], R], index: Index): T;
 
     function Main(root: Root_Capability): Root_Capability;
 end module.
