@@ -2,44 +2,6 @@ open OUnit2
 open Austral_core.Compiler
 open Austral_core.Error
 
-(* Consume a linear record twice through a function call. This fails. *)
-let test_funcall_twice _ =
-  let i = {code|
-
-module Example is
-    function Main(root: Root_Capability): Root_Capability;
-end module.
-
-|code}
-  and b = {code|
-
-module body Example is
-    record R : Linear is
-        x: Integer_32;
-    end;
-
-    function Consume(r: R): Unit is
-        let r: R := R(x => 32);
-        return nil;
-    end;
-
-    function Main(root: Root_Capability): Root_Capability is
-        let r: R := R(x => 32);
-        Consume(r);
-        Consume(r);
-        return root;
-    end;
-end module body.
-
-|code}
-  in
-  try
-    let _ = compile_and_run [(i, b)] "Example:Main" in
-    assert_failure "This should have failed."
-  with
-    Austral_error _ ->
-    assert_bool "Passed" true
-
 (* Test that forgetting to consume a linear value bound in a `case` statement
    fails. *)
 let test_forget_case_binding _ =
@@ -195,7 +157,6 @@ end module body.
 
 let suite =
   "Linearity checker tests" >::: [
-      "Consume by calling a function twice" >:: test_funcall_twice;
       "Forget a case binding" >:: test_forget_case_binding;
       "Consume a case binding twice" >:: test_consume_case_binding_twice;
       "Unbox a box twice" >:: test_unbox_twice;
