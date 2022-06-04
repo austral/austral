@@ -21,6 +21,9 @@ type mod_rec = ModRec of {
       kind: module_kind
     }
 
+type instance_argument =
+  InstanceArgument of decl_id * identifier list
+
 type decl =
   | Constant of {
       id: decl_id;
@@ -107,7 +110,7 @@ type decl =
       typeclass_id: decl_id;
       docstring: docstring;
       typarams: typarams;
-      argument: ty;
+      argument: instance_argument;
     }
 
 type ins_meth_rec = InsMethRec of {
@@ -386,11 +389,6 @@ let add_type_class_method (env: env) (input: type_class_method_input): (env * de
   let decl = make_type_class_method_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
-
-(** The argument to a typeclass is either a concrete type applied to zero
-    arguments, or a generic type applied to a number of type variables. *)
-type instance_argument =
-  InstanceArgument of decl_id * identifier list
 
 type instance_input = {
     mod_id: mod_id;

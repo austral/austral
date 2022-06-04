@@ -248,7 +248,7 @@ type decl =
       typeclass_id: decl_id;
       docstring: docstring;
       typarams: typarams;
-      argument: ty;
+      argument: instance_argument;
     }
 
 (** Represents an instance method. *)
