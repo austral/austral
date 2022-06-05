@@ -41,15 +41,15 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
          Suppose we have a typeclass:
 
          interface Printable(T: Free) is
-         method Print(t: T): Unit;
+             method Print(t: T): Unit;
          end;
 
          And an instance:
 
          implementation Printable(Integer_32) is
-         method Print(t: Integer_32) is
-         ...
-         end;
+             method Print(t: Integer_32) is
+                 ...
+             end;
          end;
 
          Then, if we have a call like `Print(30)`, we know which typeclass it's
@@ -70,9 +70,9 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
 
          generic (U: Free)
          implementation Printable(List[U]) is
-         method Print(t: List[U]) is
-         ...
-         end;
+             method Print(t: List[U]) is
+                 ...
+             end;
          end;
 
          Here, a call like `print(listOfInts)` will yield a binding map that maps
