@@ -1,0 +1,20 @@
+module body Test is
+    typeclass TC(T: Free) is
+        method Accept(x: T): Unit;
+    end;
+
+    record Holder[A: Free]: Free is
+        a: A;
+    end;
+
+    generic [A: Free, B: Free]
+    instance TC(Holder[A]) is
+        method Accept(x: Holder[A]): Unit is
+            return nil;
+        end;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.

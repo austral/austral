@@ -1,0 +1,1 @@
+Define a typeclass instance where the argument has the form T[A, A]. All type variables must be distinct, so this should fail.

@@ -1,0 +1,21 @@
+module body Test is
+    typeclass TC(T: Free) is
+        method Accept(x: T): Unit;
+    end;
+
+    record Pair[A: Free, B: Free]: Free is
+        a: A;
+        b: B;
+    end;
+
+    generic [T: Free]
+    instance TC(Pair[T, T]) is
+        method Accept(x: Pair[T, T]): Unit is
+            return nil;
+        end;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.

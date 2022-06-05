@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    All tyvars must be distinct
+  Code:
+    [no span available]

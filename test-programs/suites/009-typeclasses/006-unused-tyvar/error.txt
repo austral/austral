@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    The number of type parameters in the instance declaration must be the same as the number of type variables applied to the argument.
+  Code:
+    [no span available]
