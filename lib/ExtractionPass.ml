@@ -60,7 +60,7 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) 
      specifiers without reference to the environment. *)
   let sigs: type_signature list = extract_type_signatures cmodule in
   (* Extract all declarations from the module into the environment. *)
-  let (env, linked_defs): (env * linked_definition list) = extract_definitions env mod_id sigs decls in
+  let (env, linked_defs): (env * linked_definition list) = extract_definitions name env mod_id sigs decls in
   (* Construct the linked module *)
   let lmod = LinkedModule {
                  mod_id = mod_id;
@@ -78,16 +78,16 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) 
 (** Given the environment, the ID of the module we're extracting, the list of
     local type signatures, and a list of combined definitions, add all relevant
     decls to the environment, and return all corresponding linked decls. *)
-and extract_definitions (env: env) (mod_id: mod_id) (local_types: type_signature list) (defs: combined_definition list): (env * (linked_definition list)) =
+and extract_definitions (mn: module_name) (env: env) (mod_id: mod_id) (local_types: type_signature list) (defs: combined_definition list): (env * (linked_definition list)) =
   let f ((env, comb_def): (env * combined_definition)): (env * linked_definition) =
-    extract_definition env mod_id local_types comb_def
+    extract_definition mn env mod_id local_types comb_def
   in
   map_with_context f env defs
 
 (** Given the environment, the ID of the module we're extracting, the list of
     local type signatures, and a combined definition, add all relevant decls to
     the environment, and return a linked definition. *)
-and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature list) (def: combined_definition): (env * linked_definition)  =
+and extract_definition (mn: module_name) (env: env) (mod_id: mod_id) (local_types: type_signature list) (def: combined_definition): (env * linked_definition)  =
   let parse' = parse_type env local_types in
   let rec parse_slot (typarams: typarams) (QualifiedSlot (n, ts)): typed_slot =
     let rm = region_map_from_typarams typarams in
@@ -169,6 +169,16 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let decl = LFunction (decl_id, vis, name, typarams, value_params, rt, body, docstring, pragmas) in
      (env, decl)
   | CTypeclass (vis, name, typaram, methods, docstring) ->
+     (* Check: the universe is one of {Type, Linear, Free} *)
+     let _ =
+       let TypeParameter (_, universe, _) = typaram in
+       match universe with
+       | TypeUniverse -> ()
+       | LinearUniverse -> ()
+       | FreeUniverse -> ()
+       | RegionUniverse ->
+          err "The type class parameter must have a universe in {Type, Linear, Free}."
+     in
      (* Add the typeclass itself to the env *)
      let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
      (* Convert the list of methods into a list of type_class_method records *)
@@ -195,13 +205,14 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      (env, decl)
   | CInstance (vis, name, typarams, CombinedInstanceArg (arg_name, arg_args), methods, docstring) ->
      (* First we add the typeclass, then we add the methods. *)
-     (* Find the ID of the typeclass. *)
-     let typeclass_id: decl_id =
+     (* Find the ID of the typeclass, and the expected universe. *)
+     let (typeclass_id, tc_universe): decl_id * universe =
        match get_decl_by_name env (qident_to_sident name) with
        | Some decl ->
           (match decl with
-           | TypeClass { id; _ } ->
-              id
+           | TypeClass { id; param; _ } ->
+              let TypeParameter (_, universe, _) = param in
+              (id, universe)
            | _ ->
               err "Type class name refers to something that is not a type class.")
        | None ->
@@ -244,7 +255,15 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
        type_universe arg_ty
      in
      (* Check the universes match *)
-     let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
+     let _ =
+       if universe_compatible tc_universe uni then
+         ()
+       else
+         err "Universe mismatch."
+     in
+     (* Extract the argument type's ID. No error checking, since it definitely exists. *)
+     let arg_type_id: decl_id = decl_id (Option.get (get_decl_by_name env (qident_to_sident arg_name))) in
+     let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument = InstanceArgument (arg_type_id, arg_args) } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
      let method_map (CMethodDef (name, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
