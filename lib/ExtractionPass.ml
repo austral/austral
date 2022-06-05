@@ -13,6 +13,12 @@ open TypeParameters
 open Util
 open Error
 
+let check_instance_argument_has_right_universe (universe: universe) (arg: ty): unit =
+  if universe_compatible universe (type_universe arg) then
+    ()
+  else
+    err "While trying to define this instance, the instance's argument belongs to a universe that is not compatible with the typeclass's universe."
+
 let rec extract_type_signatures (CombinedModule { decls; _ }): type_signature list =
   List.filter_map extract_type_signatures' decls
 
@@ -206,17 +212,22 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      (* Add the instance itself to the env *)
      let rm = region_map_from_typarams typarams in
      let argument = parse' rm typarams argument in
-     let typeclass_id: decl_id =
+     (* Find typeclass info. *)
+     let (typeclass_id, universe): decl_id * universe =
        match get_decl_by_name env (qident_to_sident name) with
        | Some decl ->
           (match decl with
-           | TypeClass { id; _ } ->
-              id
+           | TypeClass { id; param; _ } ->
+              let TypeParameter (_, universe, _) = param in
+              (id, universe)
            | _ ->
               err "Type class name refers to something that is not a type class.")
        | None ->
           err "Type class with this name does not exist."
      in
+     (* Check the argument has the right shape. *)
+     let _ = check_instance_argument_has_right_universe universe argument in
+     (* Add the TC to the env *)
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)

@@ -1,0 +1,19 @@
+module body Test is
+    typeclass AcceptsFree(T: Free) is
+        method Accept(x: T): Unit;
+    end;
+
+    record Foo: Linear is
+    end;
+
+    instance AcceptsFree(Foo) is
+        method Accept(x: Foo): Unit is
+            let {} := x;
+            return nil;
+        end;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.

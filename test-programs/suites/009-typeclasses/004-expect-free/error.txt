@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    While trying to define this instance, the instance's argument belongs to a universe that is not compatible with the typeclass's universe.
+  Code:
+    [no span available]
