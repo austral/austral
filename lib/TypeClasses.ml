@@ -4,6 +4,7 @@ open Type
 open TypeParameters
 open TypeParser
 open TypeSystem
+open Env
 open Error
 
 let check_instance_argument_has_right_universe (universe: universe) (arg: ty): unit =
@@ -127,3 +128,16 @@ let overlapping_instances (a: ty) (b: ty): bool =
       | _ -> true)
   | MonoTy _ ->
      err "Not allowed"
+
+let check_instance_locally_unique (instances: decl list) (argument: ty): unit =
+  let pred (decl: decl): bool =
+    match decl with
+    | Instance { argument=argument'; _ } ->
+       overlapping_instances argument argument'
+    | _ ->
+       false
+  in
+  if List.exists pred instances then
+    err "Instance overlaps."
+  else
+    ()
