@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    The type class parameter must have a universe in {Type, Linear, Free}.
+  Code:
+    [no span available]

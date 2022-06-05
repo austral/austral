@@ -1,0 +1,1 @@
+Cannot define a typeclass that accepts types in the region universe.

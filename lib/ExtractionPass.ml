@@ -168,6 +168,16 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let decl = LFunction (decl_id, vis, name, typarams, value_params, rt, body, docstring, pragmas) in
      (env, decl)
   | CTypeclass (vis, name, typaram, methods, docstring) ->
+     (* Check: the universe is one of {Type, Linear, Free} *)
+     let _ =
+       let TypeParameter (_, universe, _) = typaram in
+       match universe with
+       | TypeUniverse -> ()
+       | LinearUniverse -> ()
+       | FreeUniverse -> ()
+       | RegionUniverse ->
+          err "The type class parameter must have a universe in {Type, Linear, Free}."
+     in
      (* Add the typeclass itself to the env *)
      let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
      (* Convert the list of methods into a list of type_class_method records *)
