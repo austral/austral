@@ -229,7 +229,20 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      in
      (* Find the argument's type signature. *)
      let signature: type_signature = get_type_signature_by_name env (qident_to_sident arg_name) in
-     (* Check that the argument type's parameter list fits ours. *)
+     let TypeSignature (_, arg_typarams, _) = signature in
+     (* Convert the argument into a type specifier, and parse it. If parsing
+        succeeds, it means the argument type's type parameter list matches the
+        arguments applied in the instance.
+
+        The result we're interested in is the type's universe, to match it with
+        the typeclass's expected universe. *)
+     let uni: universe =
+       let rm = region_map_from_typarams typarams in
+       let ts_args: qtypespec list = List.map (fun name -> QTypeSpecifier (make_qident (mn, name, name), [])) arg_args in
+       let arg_typespec: qtypespec = QTypeSpecifier (arg_name, ts_args) in
+       let arg_ty: ty = parse_type env local_types rm arg_typarams arg_typespec in
+       type_universe arg_ty
+     in
      (* Check the universes match *)
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
