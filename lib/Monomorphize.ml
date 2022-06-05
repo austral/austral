@@ -10,6 +10,7 @@ open Tast
 open Mtast
 open Linked
 open Id
+open TypingPass
 open Error
 
 (* Monomorphize type specifiers *)
@@ -403,7 +404,7 @@ let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
   | TInstance (decl_id, _, name, typarams, argument, methods, _) ->
      (* Concrete instances can be monomorphized immediately. *)
      if (typarams_size typarams) = 0 then
-       let (argument, env) = strip_and_mono env argument in
+       let (argument, env) = strip_and_mono env (instance_arg_as_type env argument typarams) in
        let (env, methods) = monomorphize_methods env methods in
        let decl = MConcreteInstance (decl_id, name, argument, methods) in
        (Some decl, env)
