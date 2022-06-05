@@ -1,0 +1,27 @@
+module body Test is
+    typeclass Foo(T: Type) is
+        method Accept(x: T): Unit;
+    end;
+
+    record Bar[T: Type]: Type is
+    end;
+
+    generic [T: Linear]
+    instance Foo(Bar[T]) is
+        method Accept(x: Bar[T]): Unit is
+            let {} := x;
+            return nil;
+        end;
+    end;
+
+    generic [T: Free]
+    instance Foo(Bar[T]) is
+        method Accept(x: Bar[T]): Unit is
+            return nil;
+        end;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.
