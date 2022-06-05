@@ -22,7 +22,6 @@ let get_typaram (typarams: typarams) (name: identifier): type_parameter option =
   in
   List.find_opt pred lst
 
-
 let add_typaram (typarams: typarams) (typaram: type_parameter): typarams =
   match get_typaram typarams (typaram_name typaram) with
   | Some _ ->
