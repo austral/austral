@@ -459,18 +459,20 @@ let rec monomorphize (env: env) (m: typed_module): (env * mono_module) =
       (env, MonoModule (module_name, decls @ decls')))
 
 and instantiate_monomorphs_until_exhausted (env: env): (env * mdecl list) =
-  (* Get uninstantiated monomorphs from the environment. *)
-  let monos: monomorph list = get_uninstantiated_monomorphs env in
-  match monos with
-  | first::rest ->
-     (* If there are uninstantiated monomorphs, instantite them, and repeat the
-        process. *)
-     let (env, decls): (env * mdecl list) = instantiate_monomorphs env (first::rest) in
-     let (env, decls') : (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
-     (env, decls @ decls')
-  | [] ->
-     (* If there are no uninstantiated monomorphs, we're done. *)
-     (env, [])
+  with_frame "Instantiating monomorphs until exhausted"
+    (fun _ ->
+      (* Get uninstantiated monomorphs from the environment. *)
+      let monos: monomorph list = get_uninstantiated_monomorphs env in
+      match monos with
+      | first::rest ->
+         (* If there are uninstantiated monomorphs, instantite them, and repeat the
+            process. *)
+         let (env, decls): (env * mdecl list) = instantiate_monomorphs env (first::rest) in
+         let (env, decls') : (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+         (env, decls @ decls')
+      | [] ->
+         (* If there are no uninstantiated monomorphs, we're done. *)
+         (env, []))
 
 and instantiate_monomorphs (env: env) (monos: monomorph list): (env * mdecl list) =
   (* Instantiate a list of monomorphs. *)
@@ -495,26 +497,29 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      (* Return the new environment and the declaration. *)
      (env, decl)
   | MonoRecordDefinition { id; type_id; tyargs; _ } ->
-     (* Find the record definition and extract the type parameters and the slot
-        list. *)
-     let (typarams, slots) = get_record_definition env type_id in
-     (* Search/replace the type variables in the slot list with the type
-        arguments from this monomorph. *)
-     let slots: typed_slot list =
-       List.map
-         (fun (TypedSlot (name, ty)) ->
-           (* TODO: extract decl name, make it a qname, pass that here *)
-           TypedSlot (name, replace_type_variables typarams qname tyargs ty))
-         slots
-     in
-     (* Strip and monomorphize the slot list. *)
-     let (env, slots): (env * mono_slot list) = monomorphize_slot_list env slots in
-     (* Store the monomorphic slot list in the environment. *)
-     let env = store_record_monomorph_definition env id slots in
-     (* Construct a monomorphic record decl. *)
-     let decl: mdecl = MRecordMonomorph (id, slots) in
-     (* Return the new environment and the declaration. *)
-     (env, decl)
+     with_frame "Instantiating record monomorph"
+       (fun _ ->
+         ps ("Monomorph ID", show_mono_id id);
+         (* Find the record definition and extract the type parameters and the slot
+            list. *)
+         let (typarams, slots) = get_record_definition env type_id in
+         (* Search/replace the type variables in the slot list with the type
+            arguments from this monomorph. *)
+         let slots: typed_slot list =
+           List.map
+             (fun (TypedSlot (name, ty)) ->
+               (* TODO: extract decl name, make it a qname, pass that here *)
+               TypedSlot (name, replace_type_variables typarams qname tyargs ty))
+             slots
+         in
+         (* Strip and monomorphize the slot list. *)
+         let (env, slots): (env * mono_slot list) = monomorphize_slot_list env slots in
+         (* Store the monomorphic slot list in the environment. *)
+         let env = store_record_monomorph_definition env id slots in
+         (* Construct a monomorphic record decl. *)
+         let decl: mdecl = MRecordMonomorph (id, slots) in
+         (* Return the new environment and the declaration. *)
+         (env, decl))
   | MonoUnionDefinition { id; type_id; tyargs; _ } ->
      (* Find the list of type parameters from the union definition. *)
      let typarams = get_union_typarams env type_id in
