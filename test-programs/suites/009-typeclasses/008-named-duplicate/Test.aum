@@ -1,0 +1,24 @@
+module body Test is
+    typeclass Foo(T: Free) is
+        method Accept(x: T): Unit;
+    end;
+
+    record Bar: Free is
+    end;
+
+    instance Foo(Bar) is
+        method Accept(x: Bar): Unit is
+            return nil;
+        end;
+    end;
+
+    instance Foo(Bar) is
+        method Accept(x: Bar): Unit is
+            return nil;
+        end;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.

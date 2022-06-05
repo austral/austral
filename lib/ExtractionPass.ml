@@ -232,6 +232,18 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let _ = check_instance_argument_has_right_universe universe argument in
      (* Check the argument has the right shape. *)
      let _ = check_instance_argument_has_right_shape typarams argument in
+     (* Local uniqueness: does this instance collide with other instances in this module? *)
+     let _ =
+       let other_instances: decl list =
+         List.filter (fun decl ->
+             match decl with
+             | Instance { typeclass_id=typeclass_id'; _ } ->
+                equal_decl_id typeclass_id typeclass_id'
+             | _ -> false)
+           (module_instances env mod_id)
+       in
+       check_instance_locally_unique other_instances argument
+     in
      (* Add the instance to the env *)
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in

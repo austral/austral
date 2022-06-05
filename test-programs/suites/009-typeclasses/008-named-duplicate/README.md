@@ -1,0 +1,1 @@
+Test that local typeclass uniqueness is enforced: case where both instances have the same concrete user-defined named type.
