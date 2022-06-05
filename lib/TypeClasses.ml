@@ -68,4 +68,62 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = no_leftovers 1 in
      ()
   | MonoTy _ ->
-     ()
+     err "Not allowed"
+
+let overlapping_instances (a: ty) (b: ty): bool =
+  match a with
+  | Unit ->
+     (match b with
+      | Unit -> true
+      | _ -> false)
+  | Boolean ->
+     (match b with
+      | Boolean -> true
+      | _ -> false)
+  | Integer (s, w) ->
+     (match b with
+      | Integer (s', w') ->
+         (equal_signedness s s')
+         && (equal_integer_width w w')
+      | _ ->
+         false)
+  | SingleFloat ->
+     (match b with
+      | SingleFloat -> true
+      | _ -> false)
+  | DoubleFloat ->
+     (match b with
+      | DoubleFloat -> true
+      | _ -> false)
+  | NamedType (name, _, _) ->
+     (match b with
+      | NamedType (name', _, _) ->
+         equal_qident name name'
+      | _ ->
+         false)
+  | StaticArray _ ->
+     (match b with
+      | StaticArray _ -> true
+      | _ -> false)
+  | RegionTy _ ->
+     err "Not allowed"
+  | ReadRef _ ->
+     (match b with
+      | ReadRef _ -> true
+      | _ -> false)
+  | WriteRef _ ->
+     (match b with
+      | WriteRef _ -> true
+      | _ -> false)
+  | TyVar _ ->
+     err "Not allowed"
+  | Address _ ->
+     (match b with
+      | Address _ -> true
+      | _ -> false)
+  | Pointer _ ->
+     (match b with
+      | Pointer _ -> true
+      | _ -> true)
+  | MonoTy _ ->
+     err "Not allowed"
