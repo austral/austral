@@ -7,7 +7,9 @@ open Combined
 open Linked
 open Ast
 open Id
+open DeclIdSet
 open Env
+open Imports
 open TypeParser
 open TypeSignature
 open TypeParameters
@@ -110,13 +112,19 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) 
            _
       }) = cmodule in
   (* Add the module to the environment. *)
+  let imported_instances: DeclIdSet.t =
+    DeclIdSet.union
+      (DeclIdSet.of_list (imported_instances interface_imports))
+      (DeclIdSet.of_list (imported_instances body_imports))
+  in
   let input: mod_input = {
       name;
       interface_file;
       interface_docstring;
       body_file;
       body_docstring;
-      kind
+      kind;
+      imported_instances;
     }
   in
   let (env, mod_id) = add_module env input in

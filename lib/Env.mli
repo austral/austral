@@ -6,6 +6,7 @@ open MonoType
 open Tast
 open Mtast
 open Id
+open DeclIdSet
 open LexEnv
 
 (** {1 Types} *)
@@ -26,7 +27,8 @@ type mod_input = {
     interface_docstring: docstring;
     body_file: file_id;
     body_docstring: docstring;
-    kind: module_kind
+    kind: module_kind;
+    imported_instances: DeclIdSet.t;
   }
 
 (** A module record contains a module's name, docstring, and pointers to the
@@ -38,7 +40,8 @@ type mod_rec = ModRec of {
       interface_docstring: docstring;
       body_file: file_id;
       body_docstring: docstring;
-      kind: module_kind
+      kind: module_kind;
+      imported_instances: DeclIdSet.t;
     }
 
 (** Input to the {!add_constant} function. *)
