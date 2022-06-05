@@ -30,6 +30,28 @@ let get_decl_name_or_die (env: env) (id: decl_id): string =
   | None ->
      err "internal"
 
+(** Given an instance argument, and the instance's type parameter set, convert
+    the instance to a type. *)
+let instance_arg_as_type (env: env) (arg: instance_argument) (instance_typarams: typarams): ty =
+  let InstanceArgument (type_id, instance_args) = arg in
+  (* Find the name of the type. *)
+  let name: qident =
+    let decl: decl = get_decl_by_id env id in
+    let name: identifier = decl_name decl in
+
+  (* Convert the type parameter set into type variables. *)
+  let tyvars: type_var list =
+    List.map (fun (TypeParameter (n, u, from)) -> TypeVariable (n, u, from)) (typarams_as_list instance_typarams)
+  in
+  (* Convert the instance argument list into a list of type variables. *)
+  let args: ty list =
+    let find_arg (name: identifier): type_var =
+      List.find (fun (TypeVariable (name', _, _)) -> equal_identifier name name') tyvars
+    in
+    List.map (fun name -> TyVar (find_arg name)) instance_args
+  in
+  NamedType (name, args, universe)
+
 let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): decl =
   with_frame "Typeclass Resolution"
     (fun _ ->
