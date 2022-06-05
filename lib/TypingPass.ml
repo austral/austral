@@ -34,11 +34,18 @@ let get_decl_name_or_die (env: env) (id: decl_id): string =
     the instance to a type. *)
 let instance_arg_as_type (env: env) (arg: instance_argument) (instance_typarams: typarams): ty =
   let InstanceArgument (type_id, instance_args) = arg in
-  (* Find the name of the type. *)
-  let name: qident =
-    let decl: decl = get_decl_by_id env id in
-    let name: identifier = decl_name decl in
-
+  (* Find type information. *)
+  let decl: decl = Option.get (get_decl_by_id env type_id) in
+  let (name, mod_id, type_typarams, universe) =
+    match decl with
+    | TypeAlias { name; mod_id; universe; typarams; _ } -> (name, mod_id, typarams, universe)
+    | Record { name; mod_id; universe; typarams; _ } -> (name, mod_id, typarams, universe)
+    | Union { name; mod_id; universe; typarams; _ } -> (name, mod_id, typarams, universe)
+    | _ -> err "internal"
+  in
+  (* Construct the type name *)
+  let mod_name: module_name = module_name_from_id env mod_id in
+  let name: qident = make_qident (mod_name, name, name) in
   (* Convert the type parameter set into type variables. *)
   let tyvars: type_var list =
     List.map (fun (TypeParameter (n, u, from)) -> TypeVariable (n, u, from)) (typarams_as_list instance_typarams)
@@ -50,7 +57,9 @@ let instance_arg_as_type (env: env) (arg: instance_argument) (instance_typarams:
     in
     List.map (fun name -> TyVar (find_arg name)) instance_args
   in
-  NamedType (name, args, universe)
+  (* Find the universe of this type. *)
+  let eff_universe: universe = effective_universe name type_typarams universe args in
+  NamedType (name, args, eff_universe)
 
 let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): decl =
   with_frame "Typeclass Resolution"
@@ -105,15 +114,12 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
 
          We use this second binding map to replace the variables in the dispatch
          type: in our case, `List[U]` becomes `List[Integer_32]`. *)
-      let instance_arg_as_type (arg: instance_argument): ty =
-        let _ = arg in
-        err "TODO: NOT IMPLEMENTED YET"
-      in
       let pred = function
-        | Instance { typeclass_id; argument; _ } ->
+        | Instance { typeclass_id; typarams; argument; _ } ->
            if equal_decl_id typeclass_id typeclass then
              try
-               let _ = match_type (instance_arg_as_type argument) dispatch_ty in
+               let ty: ty = instance_arg_as_type env argument typarams in
+               let _ = match_type ty dispatch_ty in
                (* TODO: the rest of the process described above. *)
                true
              with
