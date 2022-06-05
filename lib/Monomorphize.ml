@@ -738,7 +738,7 @@ and replace_type_variables (typarams: typarams) (source: qident) (args: mono_ty 
   with_frame "Replacing type variables"
     (fun _ ->
       ps ("Type parameters", String.concat ", " (List.map show_type_parameter (typarams_as_list typarams)));
-      ps ("Type arguments", String.concat ", " (List.map show_mono_ty args));
+      ps ("Type arguments", "[" ^ (String.concat ", " (List.map show_mono_ty args)) ^ "]");
       ps ("Type", show_ty ty);
       let bindings: type_bindings = make_bindings typarams source args in
       replace_variables bindings ty)
