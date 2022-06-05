@@ -212,7 +212,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let decl = LTypeclass (typeclass_id, vis, name, typaram, linked_methods, docstring) in
      (env, decl)
   | CInstance (vis, name, typarams, argument, methods, docstring) ->
-     (* Add the instance itself to the env *)
+     (* First add the instance to the env, then the methods. *)
      let rm = region_map_from_typarams typarams in
      let argument = parse' rm typarams argument in
      (* Find typeclass info. *)
@@ -232,7 +232,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let _ = check_instance_argument_has_right_universe universe argument in
      (* Check the argument has the right shape. *)
      let _ = check_instance_argument_has_right_shape typarams argument in
-     (* Add the TC to the env *)
+     (* Add the instance to the env *)
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
