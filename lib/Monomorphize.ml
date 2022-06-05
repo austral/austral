@@ -383,14 +383,16 @@ let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
   | TFunction (id, _, name, typarams, value_params, rt, body, _) ->
      (* Concrete functions are monomorphized immediately. Generic functions are
         monomorphized on demand. *)
-     if (typarams_size typarams) = 0 then
-       let (env, params) = monomorphize_params env value_params in
-       let (rt, env) = strip_and_mono env rt in
-       let (body, env) = monomorphize_stmt env body in
-       let decl = MFunction (id, name, params, rt, body) in
-       (Some decl, env)
-     else
-       (None, env)
+     with_frame ("Monomorphizing function: " ^ (ident_string name))
+       (fun _ ->
+         if (typarams_size typarams) = 0 then
+           let (env, params) = monomorphize_params env value_params in
+           let (rt, env) = strip_and_mono env rt in
+           let (body, env) = monomorphize_stmt env body in
+           let decl = MFunction (id, name, params, rt, body) in
+           (Some decl, env)
+         else
+           (None, env))
   | TForeignFunction (id, _, name, params, rt, underlying, _) ->
      (* Foreign functions are intrinsically monomorphic. *)
      let (env, params) = monomorphize_params env params in
