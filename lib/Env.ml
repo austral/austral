@@ -948,4 +948,4 @@ let get_type_signature_by_name (env: env) (name: sident): type_signature =
       | None ->
          err "Not a type")
   | None ->
-     err "Internal: no decl"
+     err ("Internal: no decl with name " ^ (ident_string (sident_name name)))
