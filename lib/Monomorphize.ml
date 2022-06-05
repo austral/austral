@@ -130,21 +130,25 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
        (* The function is concrete. *)
        (MConcreteFuncall (decl_id, name, args, rt), env)
   | TMethodCall (ins_meth_id, name, typarams, args, rt, substs) ->
-     (* Monomorphize the return type. *)
-     let (rt, env) = strip_and_mono env rt in
-     (* Monomorphize the arglist *)
-     let (args, env) = monomorphize_expr_list env args in
-     (* Does the funcall have a list of type params? *)
-     if typarams_size typarams > 0 then
-       (* The instance is generic. *)
-       (* Monomorphize the tyargs *)
-       let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
-       let (tyargs, env) = monomorphize_ty_list env tyargs in
-       let (env, mono_id) = add_or_get_instance_method_monomorph env ins_meth_id tyargs in
-       (MGenericMethodCall (ins_meth_id, mono_id, args, rt), env)
-     else
-       (* The instance is concrete. *)
-       (MConcreteMethodCall (ins_meth_id, name, args, rt), env)
+     with_frame "Monomorphizing method call"
+       (fun _ ->
+         (* Monomorphize the return type. *)
+         let (rt, env) = strip_and_mono env rt in
+         (* Monomorphize the arglist *)
+         let (args, env) = monomorphize_expr_list env args in
+         (* Does the funcall have a list of type params? *)
+         if typarams_size typarams > 0 then
+           (* The instance is generic. *)
+           (* Monomorphize the tyargs *)
+           let _ = ps ("Substitutions", "[" ^ (String.concat ", " (List.map (fun (n, t) -> (ident_string n) ^ " : " ^ (type_string t)) substs)) ^ "]") in
+           let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
+           let (tyargs, env) = monomorphize_ty_list env tyargs in
+           ps ("Type arguments", String.concat ", " (List.map show_mono_ty tyargs));
+           let (env, mono_id) = add_or_get_instance_method_monomorph env ins_meth_id tyargs in
+           (MGenericMethodCall (ins_meth_id, mono_id, args, rt), env)
+         else
+           (* The instance is concrete. *)
+           (MConcreteMethodCall (ins_meth_id, name, args, rt), env))
   | TCast (expr, ty) ->
      let (ty, env) = strip_and_mono env ty in
      let (expr, env) = monomorphize_expr env expr in
