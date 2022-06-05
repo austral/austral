@@ -1,0 +1,30 @@
+module body Test is
+    pragma Unsafe_Module;
+
+    function Put_String(str: Fixed_Array[Natural_8]): Integer_32 is
+        pragma Foreign_Import(External_Name => "puts");
+    end;
+
+    typeclass Foo(T: Free) is
+        method Accept(x: T): Unit;
+    end;
+
+    record Pair[A: Free, B: Free]: Free is
+        a: A;
+        b: B;
+    end;
+
+    generic [A: Free, B: Free]
+    instance Foo(Pair[A, B]) is
+        method Accept(x: Pair[A, B]): Unit is
+            Put_String("Accept");
+            return nil;
+        end;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        let p: Pair[Boolean, Boolean] := Pair(a => true, b => false);
+        Accept(p);
+        return root;
+    end;
+end module body.
