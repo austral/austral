@@ -6,6 +6,8 @@ open Ast
 open Linked
 open Tast
 open Type
+open TypeClasses
+open TypeParameters
 
 (** Find an instance of the given typeclass given the dispatch type.
 
@@ -20,3 +22,5 @@ val augment_stmt: stmt_ctx -> astmt -> tstmt
 val augment_decl : module_name -> module_kind -> env -> linked_definition -> typed_decl
 
 val augment_module : env -> linked_module -> typed_module
+
+val instance_arg_as_type : env -> instance_argument -> typarams -> ty
