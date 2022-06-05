@@ -10,6 +10,7 @@ open Tast
 open Mtast
 open Linked
 open Id
+open Reporter
 open Error
 
 (* Monomorphize type specifiers *)
@@ -444,14 +445,16 @@ and monomorphize_method (env: env) (meth: typed_method_def): (env * concrete_met
 (* Monomorphize modules *)
 
 let rec monomorphize (env: env) (m: typed_module): (env * mono_module) =
-  (* Monomorphize what we can: concrete definitions. *)
-  let (TypedModule (module_name, decls)) = m in
-  let (env, declopts) =
-    Util.map_with_context (fun (e, d) -> let (d, e) = monomorphize_decl e d in (e, d)) env decls in
-  let decls: mdecl list = List.filter_map (fun x -> x) declopts in
-  (* Recursively collect and instantiate monomorphs until everything's instantiated. *)
-  let (env, decls'): (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
-  (env, MonoModule (module_name, decls @ decls'))
+  with_frame "Monomorphizing module"
+    (fun _ ->
+      (* Monomorphize what we can: concrete definitions. *)
+      let (TypedModule (module_name, decls)) = m in
+      let (env, declopts) =
+        Util.map_with_context (fun (e, d) -> let (d, e) = monomorphize_decl e d in (e, d)) env decls in
+      let decls: mdecl list = List.filter_map (fun x -> x) declopts in
+      (* Recursively collect and instantiate monomorphs until everything's instantiated. *)
+      let (env, decls'): (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+      (env, MonoModule (module_name, decls @ decls')))
 
 and instantiate_monomorphs_until_exhausted (env: env): (env * mdecl list) =
   (* Get uninstantiated monomorphs from the environment. *)
