@@ -263,7 +263,8 @@ and extract_definition (mn: module_name) (env: env) (mod_id: mod_id) (local_type
      in
      (* Extract the argument type's ID. No error checking, since it definitely exists. *)
      let arg_type_id: decl_id = decl_id (Option.get (get_decl_by_name env (qident_to_sident arg_name))) in
-     let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument = InstanceArgument (arg_type_id, arg_args) } in
+     let instance_arg: instance_argument = InstanceArgument (arg_type_id, arg_args) in
+     let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument = instance_arg } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
      let method_map (CMethodDef (name, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
@@ -292,7 +293,7 @@ and extract_definition (mn: module_name) (env: env) (mod_id: mod_id) (local_type
      (* Add the methods to the env *)
      let (env, linked_methods) = add_instance_methods env methods in
      (* Construct the decl *)
-     let decl = LInstance (instance_id, vis, name, typarams, argument, linked_methods, docstring) in
+     let decl = LInstance (instance_id, vis, name, typarams, instance_arg, linked_methods, docstring) in
      (env, decl)
 
 (** Utility functions to add lists of things to the environment. *)

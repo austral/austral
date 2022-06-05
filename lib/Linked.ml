@@ -28,7 +28,7 @@ and linked_definition =
   | LUnion of decl_id * type_vis * identifier * typarams * universe * linked_case list * docstring
   | LFunction of decl_id * vis * identifier * typarams * value_parameter list * ty * astmt * docstring * pragma list
   | LTypeclass of decl_id * vis * identifier * type_parameter * linked_method_decl list * docstring
-  | LInstance of decl_id * vis * qident * typarams * ty * linked_method_def list * docstring
+  | LInstance of decl_id * vis * qident * typarams * instance_argument * linked_method_def list * docstring
 
 and linked_case = LCase of decl_id * identifier * typed_slot list
 
