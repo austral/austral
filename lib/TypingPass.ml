@@ -16,6 +16,7 @@ open Tast
 open Linked
 open Util
 open Reporter
+open TypeClasses
 open Error
 
 let get_decl_name_or_die (env: env) (id: decl_id): string =
@@ -82,12 +83,15 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
 
          We use this second binding map to replace the variables in the dispatch
          type: in our case, `List[U]` becomes `List[Integer_32]`. *)
+      let instance_arg_as_type (arg: instance_argument): ty =
+        let _ = arg in
+        err "TODO: NOT IMPLEMENTED YET"
+      in
       let pred = function
         | Instance { typeclass_id; argument; _ } ->
            if equal_decl_id typeclass_id typeclass then
-             let _ = pt ("Trying instance with argument", argument) in
              try
-               let _ = match_type argument dispatch_ty in
+               let _ = match_type (instance_arg_as_type argument) dispatch_ty in
                (* TODO: the rest of the process described above. *)
                true
              with

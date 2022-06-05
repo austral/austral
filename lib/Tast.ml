@@ -8,6 +8,7 @@ open TypeParameters
 open Span
 open Linked
 open Id
+open TypeClasses
 open Error
 
 type tstmt =
@@ -99,7 +100,7 @@ type typed_decl =
   | TFunction of decl_id * vis * identifier * typarams * value_parameter list * ty * tstmt * docstring
   | TForeignFunction of decl_id * vis * identifier * value_parameter list * ty * string * docstring
   | TTypeClass of decl_id * vis * identifier * type_parameter * typed_method_decl list * docstring
-  | TInstance of decl_id * vis * qident * typarams * ty * typed_method_def list * docstring
+  | TInstance of decl_id * vis * qident * typarams * instance_argument * typed_method_def list * docstring
 
 type typed_module = TypedModule of module_name * typed_decl list
 
