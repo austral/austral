@@ -8,6 +8,7 @@ open Tast
 open Mtast
 open Id
 open LexEnv
+open TypeClasses
 open Error
 
 type file_rec = FileRec of { id: file_id; path: string; contents: string }
@@ -21,9 +22,6 @@ type mod_rec = ModRec of {
       body_docstring: docstring;
       kind: module_kind
     }
-
-type instance_argument =
-  InstanceArgument of decl_id * identifier list
 
 type decl =
   | Constant of {

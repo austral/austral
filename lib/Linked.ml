@@ -5,6 +5,7 @@ open Ast
 open Type
 open TypeParameters
 open Id
+open TypeClasses
 
 (** The linked representation is essentially the same as the combined
     representation, but declarations are linked to their corresponding entry in

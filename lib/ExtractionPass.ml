@@ -11,6 +11,7 @@ open Env
 open TypeParser
 open TypeSignature
 open TypeParameters
+open TypeClasses
 open Util
 open Error
 

@@ -8,6 +8,7 @@ open Tast
 open Mtast
 open Id
 open LexEnv
+open TypeClasses
 
 (** {1 Types} *)
 
@@ -125,11 +126,6 @@ type type_class_method_input = {
     value_params: value_parameter list;
     rt: ty;
   }
-
-(** The argument to a typeclass is either a concrete type applied to zero
-    arguments, or a generic type applied to a number of type variables. *)
-type instance_argument =
-  InstanceArgument of decl_id * identifier list
 
 (** Input to the {!add_instance} function. *)
 type instance_input = {
