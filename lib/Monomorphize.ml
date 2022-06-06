@@ -10,6 +10,7 @@ open Tast
 open Mtast
 open Linked
 open Id
+open Reporter
 open Error
 
 (* Monomorphize type specifiers *)
@@ -129,21 +130,25 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
        (* The function is concrete. *)
        (MConcreteFuncall (decl_id, name, args, rt), env)
   | TMethodCall (ins_meth_id, name, typarams, args, rt, substs) ->
-     (* Monomorphize the return type. *)
-     let (rt, env) = strip_and_mono env rt in
-     (* Monomorphize the arglist *)
-     let (args, env) = monomorphize_expr_list env args in
-     (* Does the funcall have a list of type params? *)
-     if typarams_size typarams > 0 then
-       (* The instance is generic. *)
-       (* Monomorphize the tyargs *)
-       let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
-       let (tyargs, env) = monomorphize_ty_list env tyargs in
-       let (env, mono_id) = add_or_get_instance_method_monomorph env ins_meth_id tyargs in
-       (MGenericMethodCall (ins_meth_id, mono_id, args, rt), env)
-     else
-       (* The instance is concrete. *)
-       (MConcreteMethodCall (ins_meth_id, name, args, rt), env)
+     with_frame "Monomorphizing method call"
+       (fun _ ->
+         (* Monomorphize the return type. *)
+         let (rt, env) = strip_and_mono env rt in
+         (* Monomorphize the arglist *)
+         let (args, env) = monomorphize_expr_list env args in
+         (* Does the funcall have a list of type params? *)
+         if typarams_size typarams > 0 then
+           (* The instance is generic. *)
+           (* Monomorphize the tyargs *)
+           let _ = ps ("Substitutions", "[" ^ (String.concat ", " (List.map (fun (n, t) -> (ident_string n) ^ " : " ^ (type_string t)) substs)) ^ "]") in
+           let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
+           let (tyargs, env) = monomorphize_ty_list env tyargs in
+           ps ("Type arguments", String.concat ", " (List.map show_mono_ty tyargs));
+           let (env, mono_id) = add_or_get_instance_method_monomorph env ins_meth_id tyargs in
+           (MGenericMethodCall (ins_meth_id, mono_id, args, rt), env)
+         else
+           (* The instance is concrete. *)
+           (MConcreteMethodCall (ins_meth_id, name, args, rt), env))
   | TCast (expr, ty) ->
      let (ty, env) = strip_and_mono env ty in
      let (expr, env) = monomorphize_expr env expr in
@@ -382,14 +387,16 @@ let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
   | TFunction (id, _, name, typarams, value_params, rt, body, _) ->
      (* Concrete functions are monomorphized immediately. Generic functions are
         monomorphized on demand. *)
-     if (typarams_size typarams) = 0 then
-       let (env, params) = monomorphize_params env value_params in
-       let (rt, env) = strip_and_mono env rt in
-       let (body, env) = monomorphize_stmt env body in
-       let decl = MFunction (id, name, params, rt, body) in
-       (Some decl, env)
-     else
-       (None, env)
+     with_frame ("Monomorphizing function: " ^ (ident_string name))
+       (fun _ ->
+         if (typarams_size typarams) = 0 then
+           let (env, params) = monomorphize_params env value_params in
+           let (rt, env) = strip_and_mono env rt in
+           let (body, env) = monomorphize_stmt env body in
+           let decl = MFunction (id, name, params, rt, body) in
+           (Some decl, env)
+         else
+           (None, env))
   | TForeignFunction (id, _, name, params, rt, underlying, _) ->
      (* Foreign functions are intrinsically monomorphic. *)
      let (env, params) = monomorphize_params env params in
@@ -444,28 +451,32 @@ and monomorphize_method (env: env) (meth: typed_method_def): (env * concrete_met
 (* Monomorphize modules *)
 
 let rec monomorphize (env: env) (m: typed_module): (env * mono_module) =
-  (* Monomorphize what we can: concrete definitions. *)
-  let (TypedModule (module_name, decls)) = m in
-  let (env, declopts) =
-    Util.map_with_context (fun (e, d) -> let (d, e) = monomorphize_decl e d in (e, d)) env decls in
-  let decls: mdecl list = List.filter_map (fun x -> x) declopts in
-  (* Recursively collect and instantiate monomorphs until everything's instantiated. *)
-  let (env, decls'): (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
-  (env, MonoModule (module_name, decls @ decls'))
+  with_frame "Monomorphizing module"
+    (fun _ ->
+      (* Monomorphize what we can: concrete definitions. *)
+      let (TypedModule (module_name, decls)) = m in
+      let (env, declopts) =
+        Util.map_with_context (fun (e, d) -> let (d, e) = monomorphize_decl e d in (e, d)) env decls in
+      let decls: mdecl list = List.filter_map (fun x -> x) declopts in
+      (* Recursively collect and instantiate monomorphs until everything's instantiated. *)
+      let (env, decls'): (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+      (env, MonoModule (module_name, decls @ decls')))
 
 and instantiate_monomorphs_until_exhausted (env: env): (env * mdecl list) =
-  (* Get uninstantiated monomorphs from the environment. *)
-  let monos: monomorph list = get_uninstantiated_monomorphs env in
-  match monos with
-  | first::rest ->
-     (* If there are uninstantiated monomorphs, instantite them, and repeat the
-        process. *)
-     let (env, decls): (env * mdecl list) = instantiate_monomorphs env (first::rest) in
-     let (env, decls') : (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
-     (env, decls @ decls')
-  | [] ->
-     (* If there are no uninstantiated monomorphs, we're done. *)
-     (env, [])
+  with_frame "Instantiating monomorphs until exhausted"
+    (fun _ ->
+      (* Get uninstantiated monomorphs from the environment. *)
+      let monos: monomorph list = get_uninstantiated_monomorphs env in
+      match monos with
+      | first::rest ->
+         (* If there are uninstantiated monomorphs, instantite them, and repeat the
+            process. *)
+         let (env, decls): (env * mdecl list) = instantiate_monomorphs env (first::rest) in
+         let (env, decls') : (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+         (env, decls @ decls')
+      | [] ->
+         (* If there are no uninstantiated monomorphs, we're done. *)
+         (env, []))
 
 and instantiate_monomorphs (env: env) (monos: monomorph list): (env * mdecl list) =
   (* Instantiate a list of monomorphs. *)
@@ -490,26 +501,31 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      (* Return the new environment and the declaration. *)
      (env, decl)
   | MonoRecordDefinition { id; type_id; tyargs; _ } ->
-     (* Find the record definition and extract the type parameters and the slot
-        list. *)
-     let (typarams, slots) = get_record_definition env type_id in
-     (* Search/replace the type variables in the slot list with the type
-        arguments from this monomorph. *)
-     let slots: typed_slot list =
-       List.map
-         (fun (TypedSlot (name, ty)) ->
-           (* TODO: extract decl name, make it a qname, pass that here *)
-           TypedSlot (name, replace_type_variables typarams qname tyargs ty))
-         slots
-     in
-     (* Strip and monomorphize the slot list. *)
-     let (env, slots): (env * mono_slot list) = monomorphize_slot_list env slots in
-     (* Store the monomorphic slot list in the environment. *)
-     let env = store_record_monomorph_definition env id slots in
-     (* Construct a monomorphic record decl. *)
-     let decl: mdecl = MRecordMonomorph (id, slots) in
-     (* Return the new environment and the declaration. *)
-     (env, decl)
+     with_frame "Instantiating record monomorph"
+       (fun _ ->
+         ps ("Monomorph ID", show_mono_id id);
+         ps ("Type arguments", String.concat ", " (List.map show_mono_ty tyargs));
+         (* Find the record definition and extract the type parameters and the slot
+            list. *)
+         let (typarams, slots) = get_record_definition env type_id in
+         ps ("Type parameters", String.concat ", " (List.map show_type_parameter (typarams_as_list typarams)));
+         (* Search/replace the type variables in the slot list with the type
+            arguments from this monomorph. *)
+         let slots: typed_slot list =
+           List.map
+             (fun (TypedSlot (name, ty)) ->
+               (* TODO: extract decl name, make it a qname, pass that here *)
+               TypedSlot (name, replace_type_variables typarams qname tyargs ty))
+             slots
+         in
+         (* Strip and monomorphize the slot list. *)
+         let (env, slots): (env * mono_slot list) = monomorphize_slot_list env slots in
+         (* Store the monomorphic slot list in the environment. *)
+         let env = store_record_monomorph_definition env id slots in
+         (* Construct a monomorphic record decl. *)
+         let decl: mdecl = MRecordMonomorph (id, slots) in
+         (* Return the new environment and the declaration. *)
+         (env, decl))
   | MonoUnionDefinition { id; type_id; tyargs; _ } ->
      (* Find the list of type parameters from the union definition. *)
      let typarams = get_union_typarams env type_id in
@@ -568,35 +584,37 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      (* Return the new environment and the declaration. *)
      (env, decl)
   | MonoInstanceMethod { id; method_id; tyargs; _ } ->
-     (* Find the methods's type parameters, value parameters, return type, and
-        body. *)
-     let (typarams, params, rt, body) = get_method_definition env method_id in
-     (* Search/replace the type variables in the parameter list with the type
-        arguments. *)
-     let params: value_parameter list =
-       List.map
-         (fun (ValueParameter (name, ty)) ->
-           ValueParameter (name, replace_type_variables typarams qname tyargs ty))
-         params
-     in
-     (* Monomorphize the parameter list. *)
-     let (env, params) = monomorphize_params env params in
-     (* Search/replace the type variables in the return type. *)
-     let rt = replace_type_variables typarams qname tyargs rt in
-     (* Monomorphize the return type. *)
-     let (rt, env) = strip_and_mono env rt in
-     (* Search/replace the type variables in the body with the type
-        arguments. *)
-     let bindings = make_bindings typarams qname tyargs in
-     let body = replace_tyvars_stmt bindings body in
-     (* Monomorphize the body *)
-     let (body, env) = monomorphize_stmt env body in
-     (* Store the monomorphic body in the environment. *)
-     let env = store_instance_method_monomorph_definition env id body in
-     (* Construct a monomorphic record decl. *)
-     let decl: mdecl = MMethodMonomorph (id, params, rt, body) in
-     (* Return the new environment and the declaration. *)
-     (env, decl)
+     with_frame "Instantiating instance method monomorph"
+       (fun _ ->
+         (* Find the methods's type parameters, value parameters, return type, and
+            body. *)
+         let (typarams, params, rt, body) = get_method_definition env method_id in
+         (* Search/replace the type variables in the parameter list with the type
+            arguments. *)
+         let params: value_parameter list =
+           List.map
+             (fun (ValueParameter (name, ty)) ->
+               ValueParameter (name, replace_type_variables typarams qname tyargs ty))
+             params
+         in
+         (* Monomorphize the parameter list. *)
+         let (env, params) = monomorphize_params env params in
+         (* Search/replace the type variables in the return type. *)
+         let rt = replace_type_variables typarams qname tyargs rt in
+         (* Monomorphize the return type. *)
+         let (rt, env) = strip_and_mono env rt in
+         (* Search/replace the type variables in the body with the type
+            arguments. *)
+         let bindings = make_bindings typarams qname tyargs in
+         let body = replace_tyvars_stmt bindings body in
+         (* Monomorphize the body *)
+         let (body, env) = monomorphize_stmt env body in
+         (* Store the monomorphic body in the environment. *)
+         let env = store_instance_method_monomorph_definition env id body in
+         (* Construct a monomorphic record decl. *)
+         let decl: mdecl = MMethodMonomorph (id, params, rt, body) in
+         (* Return the new environment and the declaration. *)
+         (env, decl))
 
 (* Utils *)
 
@@ -721,36 +739,46 @@ and monomorphize_case_list (env: env) (cases: typed_case list): (env * mono_case
     cases
 
 and replace_type_variables (typarams: typarams) (source: qident) (args: mono_ty list) (ty: ty): ty =
-  let bindings: type_bindings = make_bindings typarams source args in
-  replace_variables bindings ty
+  with_frame "Replacing type variables"
+    (fun _ ->
+      ps ("Type parameters", String.concat ", " (List.map show_type_parameter (typarams_as_list typarams)));
+      ps ("Type arguments", "[" ^ (String.concat ", " (List.map show_mono_ty args)) ^ "]");
+      ps ("Type", show_ty ty);
+      let bindings: type_bindings = make_bindings typarams source args in
+      replace_variables bindings ty)
 
 and make_bindings (typarams: typarams) (source: qident) (args: mono_ty list): type_bindings =
-  (* Given a list of type parameters, a list of monomorphic type arguments (of
-     qthe same length), return a type bindings object (implicitly converting the
-     `mono_ty` into a `ty`).
+  with_frame "Make bindings"
+    (fun _ ->
+      (* Given a list of type parameters, a list of monomorphic type arguments (of
+         qthe same length), return a type bindings object (implicitly converting the
+         `mono_ty` into a `ty`).
 
-     Ideally we shouldn't need to bring the type parameters, rather, monomorphs
-     should be stored in the environment with an `(identifier, mono_ty)` map
-     rather than as a bare list of monomorphic type arguments. *)
-  let is_not_region (TypeParameter (_, u, _)): bool =
-    u <> RegionUniverse
-  in
-  let typarams = List.filter is_not_region (typarams_as_list typarams) in
-  if (List.length typarams) = (List.length args) then
-    let triples: (identifier * qident * ty) list =
-      List.map2
-        (fun typaram mty ->
-          let (TypeParameter (name, _, _)) = typaram in
-          (name, source, mono_to_ty mty))
-        typarams
-        args
-    in
-    bindings_from_list triples
-  else
-    err ("Parameter list and argument list don't have the same length:\n\nparameters:\n"
-         ^ (String.concat ", " (List.map show_type_parameter typarams))
-         ^ "\narguments:\n"
-         ^ (String.concat ", " (List.map show_mono_ty args)))
+         Ideally we shouldn't need to bring the type parameters, rather, monomorphs
+         should be stored in the environment with an `(identifier, mono_ty)` map
+         rather than as a bare list of monomorphic type arguments. *)
+      let is_not_region (TypeParameter (_, u, _)): bool =
+        u <> RegionUniverse
+      in
+      let typarams = List.filter is_not_region (typarams_as_list typarams) in
+      if (List.length typarams) = (List.length args) then
+        let triples: (identifier * qident * ty) list =
+          List.map2
+            (fun typaram mty ->
+              let (TypeParameter (name, _, _)) = typaram in
+              (name, source, mono_to_ty mty))
+            typarams
+            args
+        in
+        let _ = ps ("Triples", String.concat ", " (List.map (fun (n, q, t) -> "(" ^ (ident_string n) ^ ", " ^ (qident_debug_name q) ^ ", " ^ (show_ty t) ^ ")") triples)) in
+        let b = bindings_from_list triples in
+        ps ("Bindings", show_bindings b);
+        b
+      else
+        err ("Parameter list and argument list don't have the same length:\n\nparameters:\n"
+             ^ (String.concat ", " (List.map show_type_parameter typarams))
+             ^ "\narguments:\n"
+             ^ (String.concat ", " (List.map show_mono_ty args))))
 
 and mono_to_ty (ty: mono_ty): ty =
   let r = mono_to_ty in
