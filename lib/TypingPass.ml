@@ -29,7 +29,7 @@ let get_decl_name_or_die (env: env) (id: decl_id): string =
   | None ->
      err "internal"
 
-let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): decl =
+let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): decl * type_bindings =
   with_frame "Typeclass Resolution"
     (fun _ ->
       ps ("In module", (mod_name_string source_module_name));
@@ -41,15 +41,15 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
          Suppose we have a typeclass:
 
          interface Printable(T: Free) is
-         method Print(t: T): Unit;
+             method Print(t: T): Unit;
          end;
 
          And an instance:
 
          implementation Printable(Integer_32) is
-         method Print(t: Integer_32) is
-         ...
-         end;
+             method Print(t: Integer_32) is
+                 ...
+             end;
          end;
 
          Then, if we have a call like `Print(30)`, we know which typeclass it's
@@ -70,9 +70,9 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
 
          generic (U: Free)
          implementation Printable(List[U]) is
-         method Print(t: List[U]) is
-         ...
-         end;
+             method Print(t: List[U]) is
+                 ...
+             end;
          end;
 
          Here, a call like `print(listOfInts)` will yield a binding map that maps
@@ -82,24 +82,27 @@ let get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
 
          We use this second binding map to replace the variables in the dispatch
          type: in our case, `List[U]` becomes `List[Integer_32]`. *)
-      let pred = function
+      let pred (decl: decl): (decl * type_bindings) option =
+        match decl with
         | Instance { typeclass_id; argument; _ } ->
            if equal_decl_id typeclass_id typeclass then
              let _ = pt ("Trying instance with argument", argument) in
              try
-               let _ = match_type argument dispatch_ty in
+               let bindings = match_type argument dispatch_ty in
                (* TODO: the rest of the process described above. *)
-               true
+               Some (decl, bindings)
              with
                Austral_error _ ->
                (* Does not match, just skip to the next instance, *)
-               false
+               None
            else
-             false
-        | _ -> false
+             None
+        | _ ->
+           None
       in
-      let filtered =
-        with_frame "Filtering instances" (fun _ -> List.filter pred (visible_instances env))
+      let filtered: (decl * type_bindings) list =
+        with_frame "Filtering instances"
+          (fun _ -> List.filter_map pred (visible_instances env))
       in
       match filtered with
       | [a] ->
@@ -644,41 +647,47 @@ and augment_union_constructor (type_name: qident) (typarams: typarams) (universe
           err "Universe mismatch")
 
 and augment_method_call (env: env) (source_module_name: module_name) (typeclass_id: decl_id) (typaram: type_parameter) (callable_name: qident) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
-  (* At this point, we know the method's name and the typeclass it belongs
-     to. We pull the parameter list from the typeclass, and compare that against
-     the argument list. *)
-  (* For simplicity, and to reduce duplication of code, we convert the argument
-     list to a positional list. *)
-  let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-  let arguments = arglist_to_positional (args, param_names) in
-  (* Check the list of params against the list of arguments *)
-  let bindings = check_argument_list params arguments in
-  (* Use the bindings to get the effective return type *)
-  let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism (local_name callable_name) params rt' asserted_ty bindings in
-  let bindings'' = merge_bindings bindings bindings' in
-  (* Check: the set of bindings equals the set of type parameters *)
-  check_bindings (typarams_from_list [typaram]) bindings'';
-  let (TypeParameter (type_parameter_name, _, from)) = typaram in
-  match get_binding bindings'' type_parameter_name from with
-  | (Some dispatch_ty) ->
-     let instance: decl = get_instance env source_module_name dispatch_ty typeclass_id in
-     let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables bindings'' t)) params in
-     let arguments' = cast_arguments bindings'' params' arguments in
-     let typarams = (match instance with
-                     | Instance { typarams; _ } -> typarams
-                     | _ -> err "Internal")
-     in
-     let instance_id: decl_id = decl_id instance in
-     let meth_id: ins_meth_id =
-       (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
-        | Some (InsMethRec { id; _ }) -> id
-        | None -> err "Internal")
-     in
-     let substs = make_substs bindings'' typarams in
-     TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs)
-  | None ->
-     err "Internal: couldn't extract dispatch type."
+  with_frame "Augmenting method call"
+    (fun _ ->
+      (* At this point, we know the method's name and the typeclass it belongs
+         to. We pull the parameter list from the typeclass, and compare that against
+         the argument list. *)
+      (* For simplicity, and to reduce duplication of code, we convert the argument
+         list to a positional list. *)
+      let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
+      let arguments = arglist_to_positional (args, param_names) in
+      (* Check the list of params against the list of arguments *)
+      let bindings = check_argument_list params arguments in
+      (* Use the bindings to get the effective return type *)
+      let rt' = replace_variables bindings rt in
+      let (bindings', rt'') = handle_return_type_polymorphism (local_name callable_name) params rt' asserted_ty bindings in
+      let bindings'' = merge_bindings bindings bindings' in
+      (* Check: the set of bindings equals the set of type parameters *)
+      check_bindings (typarams_from_list [typaram]) bindings'';
+      let (TypeParameter (type_parameter_name, _, from)) = typaram in
+      match get_binding bindings'' type_parameter_name from with
+      | (Some dispatch_ty) ->
+         pt ("Dispatch Type", dispatch_ty);
+         let (instance, instance_bindings): decl * type_bindings =
+           get_instance env source_module_name dispatch_ty typeclass_id in
+         ps ("Instance bindings", show_bindings instance_bindings);
+         let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
+         let arguments' = cast_arguments instance_bindings params' arguments in
+         let typarams = (match instance with
+                         | Instance { typarams; _ } -> typarams
+                         | _ -> err "Internal")
+         in
+         let instance_id: decl_id = decl_id instance in
+         let meth_id: ins_meth_id =
+           (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
+            | Some (InsMethRec { id; _ }) -> id
+            | None -> err "Internal")
+         in
+         ps ("Bindings", show_bindings bindings'');
+         let substs = make_substs instance_bindings typarams in
+         TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs)
+      | None ->
+         err "Internal: couldn't extract dispatch type.")
 
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
