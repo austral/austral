@@ -7,6 +7,7 @@ open Tast
 open Mtast
 open Id
 open DeclIdSet
+open ModIdSet
 open LexEnv
 
 (** {1 Types} *)
@@ -29,6 +30,7 @@ type mod_input = {
     body_docstring: docstring;
     kind: module_kind;
     imported_instances: DeclIdSet.t;
+    imports_from: ModIdSet.t;
   }
 
 (** A module record contains a module's name, docstring, and pointers to the
@@ -42,6 +44,7 @@ type mod_rec = ModRec of {
       body_docstring: docstring;
       kind: module_kind;
       imported_instances: DeclIdSet.t;
+      imports_from: ModIdSet.t;
     }
 
 (** Input to the {!add_constant} function. *)

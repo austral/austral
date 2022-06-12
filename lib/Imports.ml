@@ -1,5 +1,6 @@
 open Identifier
 open IdentifierMap
+open ModuleNameSet
 open Id
 open Error
 
@@ -48,3 +49,9 @@ let importing_module (im: import_map): module_name =
 let imported_instances (im: import_map): decl_id list =
   let (ImportMap { instances; _ }) = im in
   instances
+
+let modules_imported_from (im: import_map): ModuleNameSet.t =
+  let ImportMap { symbols; _ } = im in
+  let names: qident list = List.map (fun (_, q) -> q) (List.of_seq (IdentifierMap.to_seq symbols)) in
+  let modnames: module_name list = List.map source_module_name names in
+  ModuleNameSet.of_list modnames

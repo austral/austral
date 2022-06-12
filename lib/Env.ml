@@ -7,6 +7,7 @@ open Tast
 open Mtast
 open Id
 open DeclIdSet
+open ModIdSet
 open LexEnv
 open Error
 
@@ -21,6 +22,7 @@ type mod_rec = ModRec of {
       body_docstring: docstring;
       kind: module_kind;
       imported_instances: DeclIdSet.t;
+      imports_from: ModIdSet.t;
     }
 
 type decl =
@@ -199,10 +201,11 @@ type mod_input = {
     body_docstring: docstring;
     kind: module_kind;
     imported_instances: DeclIdSet.t;
+    imports_from: ModIdSet.t;
   }
 
 let add_module (env: env) (input: mod_input): (env * mod_id) =
-  let { name; interface_file; interface_docstring; body_file; body_docstring; kind; imported_instances } = input in
+  let { name; interface_file; interface_docstring; body_file; body_docstring; kind; imported_instances; imports_from } = input in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mod_id () in
   let md = ModRec {
@@ -214,6 +217,7 @@ let add_module (env: env) (input: mod_input): (env * mod_id) =
                body_docstring;
                kind;
                imported_instances;
+               imports_from;
              }
   in
   let env = Env { files; mods = md :: mods; methods; decls; monos } in
