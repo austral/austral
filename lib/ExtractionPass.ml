@@ -1,4 +1,5 @@
 open Identifier
+open ModuleNameSet
 open Common
 open Type
 open TypeSystem
@@ -7,6 +8,7 @@ open Linked
 open Ast
 open Id
 open DeclIdSet
+open ModIdSet
 open Env
 open Imports
 open TypeParser
@@ -47,6 +49,20 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) 
            decls;
            _
       }) = cmodule in
+  (* Find the set of modules we're importing from. *)
+  let imports_from: ModIdSet.t =
+    let module_names: ModuleNameSet.t =
+      ModuleNameSet.union
+        (modules_imported_from interface_imports)
+        (modules_imported_from body_imports)
+    in
+    ModIdSet.of_list
+      (List.map (fun mn ->
+           match get_module_by_name env mn with
+           | Some (ModRec { id; _ }) -> id
+           | None -> err "Internal")
+         (List.of_seq (ModuleNameSet.to_seq module_names)))
+  in
   (* Add the module to the environment. *)
   let imported_instances: DeclIdSet.t =
     DeclIdSet.union
@@ -61,6 +77,7 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) 
       body_docstring;
       kind;
       imported_instances;
+      imports_from;
     }
   in
   let (env, mod_id) = add_module env input in
