@@ -6,8 +6,8 @@
  (name austral_core)
  (public_name austral.austral_core)
  (synopsis "The bootstrapping compiler for Austral.")
- (libraries unix str)
- (preprocess (pps ppx_deriving.eq ppx_deriving.show))
+ (libraries unix str yojson ppx_deriving_yojson.runtime)
+ (preprocess (pps ppx_deriving.eq ppx_deriving.show ppx_deriving_yojson))
  (flags
   ;menhir generates instances of the "unused rec flag"
   ; warning
