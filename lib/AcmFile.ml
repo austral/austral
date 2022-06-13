@@ -10,16 +10,9 @@ open Tast
 type acm_type_vis =
   | AcmTypeVisPublic
   | AcmTypeVisOpaque
+[@@deriving sexp]
 
-(** Represents the contents of an ACM file. *)
-type compiled_module =
-  CompiledModule of {
-      name: module_name;
-      imports_from: ModIdSet.t;
-      decls: compiled_decl list;
-    }
-
-and compiled_decl =
+type compiled_decl =
   | CompiledConstant of {
       name: identifier;
       ty: ty;
@@ -86,4 +79,13 @@ and compiled_method_def =
       value_params: value_parameter list;
       rt: ty;
       body: tstmt;
+    }
+[@@deriving sexp]
+
+(** Represents the contents of an ACM file. *)
+type compiled_module =
+  CompiledModule of {
+      name: module_name;
+      imports_from: ModIdSet.t;
+      decls: compiled_decl list;
     }

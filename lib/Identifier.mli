@@ -1,6 +1,6 @@
 (** The type of Austral identifiers. *)
 type identifier
-[@@deriving eq, show]
+[@@deriving (eq, show, sexp)]
 
 (** Create an identifier from a string.
 
@@ -12,7 +12,7 @@ val ident_string : identifier -> string
 
 (** The type of Austral module names. *)
 type module_name
-[@@deriving eq, show]
+[@@deriving (eq, show, sexp)]
 
 (** Create a module name from a string.
 
@@ -45,7 +45,7 @@ val sident_name : sident -> identifier
     3. The identifier's local import nickname.
 *)
 type qident
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 (** Make a qualified identifier from the module name, original name, and
     nickname. *)

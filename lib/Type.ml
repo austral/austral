@@ -2,13 +2,15 @@ open Id
 open Identifier
 open Region
 open Names
+open Sexplib
+open Std
 
 type universe =
   | FreeUniverse
   | LinearUniverse
   | TypeUniverse
   | RegionUniverse
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type integer_width =
   | Width8
@@ -16,12 +18,12 @@ type integer_width =
   | Width32
   | Width64
   | WidthIndex
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type signedness =
   | Unsigned
   | Signed
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type type_parameter = TypeParameter of identifier * universe * qident
 [@@deriving show]
@@ -44,7 +46,7 @@ type ty =
   | Address of ty
   | Pointer of ty
   | MonoTy of mono_id
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 type typed_slot = TypedSlot of identifier * ty
 

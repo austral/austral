@@ -1,14 +1,17 @@
-type identifier = string
-[@@deriving eq, show]
+open Sexplib
+open Std (* load-bearing import *)
 
-let make_ident i = i
-let ident_string i = i
+type identifier = Identifier of string
+[@@deriving (eq, show, sexp)]
 
-type module_name = string
-[@@deriving eq, show]
+let make_ident i = Identifier i
+let ident_string (Identifier i) = i
 
-let make_mod_name n = n
-let mod_name_string n = n
+type module_name = ModuleName of string
+[@@deriving (eq, show, sexp)]
+
+let make_mod_name n = ModuleName n
+let mod_name_string (ModuleName n) = n
 
 type sident = module_name * identifier
 
@@ -23,7 +26,7 @@ type qident = {
     original: identifier;
     local: identifier
   }
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 let make_qident (m, o, n) =
   { source = m; original = o; local = n }
