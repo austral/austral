@@ -1,9 +1,11 @@
 open Identifier
 open IdentifierMap
 open Error
+open Sexplib
+open Std
 
 type region = Region of int
-[@@deriving eq, show]
+[@@deriving (eq, show, sexp)]
 
 let region_id (Region i) = i
 

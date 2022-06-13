@@ -7,7 +7,7 @@ type universe =
   | LinearUniverse
   | TypeUniverse
   | RegionUniverse
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type integer_width =
   | Width8
@@ -15,18 +15,18 @@ type integer_width =
   | Width32
   | Width64
   | WidthIndex
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type signedness =
   | Unsigned
   | Signed
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type type_parameter = TypeParameter of identifier * universe * qident
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 type type_var = TypeVariable of identifier * universe * qident
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type ty =
   | Unit
@@ -46,14 +46,16 @@ type ty =
   (** Special case, see the `mono_to_ty` function. We need this to be able to do
      monomorph instantiation, but this doesn't correspond to anything in the
      code. *)
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 type typed_slot = TypedSlot of identifier * ty
+[@@deriving sexp]
 
 type typed_case = TypedCase of identifier * typed_slot list
+[@@deriving sexp]
 
 type value_parameter = ValueParameter of identifier * ty
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 val universe_string : universe -> string
 

@@ -7,7 +7,7 @@
  (public_name austral.austral_core)
  (synopsis "The bootstrapping compiler for Austral.")
  (libraries unix str sexplib)
- (preprocess (pps ppx_deriving.eq ppx_deriving.show))
+ (preprocess (pps ppx_deriving.eq ppx_deriving.show ppx_sexp_conv))
  (flags
   ;menhir generates instances of the "unused rec flag"
   ; warning

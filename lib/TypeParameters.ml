@@ -1,9 +1,11 @@
 open Identifier
 open Type
 open Error
+open Sexplib
+open Std
 
 type typarams = TyParams of type_parameter list
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 let empty_typarams: typarams = TyParams []
 

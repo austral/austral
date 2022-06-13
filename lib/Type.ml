@@ -2,13 +2,15 @@ open Id
 open Identifier
 open Region
 open Names
+open Sexplib
+open Std
 
 type universe =
   | FreeUniverse
   | LinearUniverse
   | TypeUniverse
   | RegionUniverse
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type integer_width =
   | Width8
@@ -16,18 +18,18 @@ type integer_width =
   | Width32
   | Width64
   | WidthIndex
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type signedness =
   | Unsigned
   | Signed
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type type_parameter = TypeParameter of identifier * universe * qident
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 type type_var = TypeVariable of identifier * universe * qident
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type ty =
   | Unit
@@ -44,14 +46,16 @@ type ty =
   | Address of ty
   | Pointer of ty
   | MonoTy of mono_id
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 type typed_slot = TypedSlot of identifier * ty
+[@@deriving sexp]
 
 type typed_case = TypedCase of identifier * typed_slot list
+[@@deriving sexp]
 
 type value_parameter = ValueParameter of identifier * ty
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 let universe_string = function
   | FreeUniverse -> "Free"
