@@ -1,5 +1,5 @@
 open Sexplib
-open CompiledModule
+open AcmFile
 open Error
 
 type sexp = Sexp.t

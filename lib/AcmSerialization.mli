@@ -1,6 +1,6 @@
 (** Serializing and deserializing ACM files. *)
 open Sexplib
-open CompiledModule
+open AcmFile
 
 type sexp = Sexp.t
 
