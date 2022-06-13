@@ -19,15 +19,15 @@ type acm_type_vis =
 
 (** The serialized form of a statement. *)
 type ser_stmt =
-  | TSkip of span
-  | TLet of span * identifier * ty * ser_expr * ser_stmt
-  | TDestructure of span * (identifier * ty) list * ser_expr * ser_stmt
-  | TAssign of span * ser_lvalue * ser_expr
-  | TIf of span * ser_expr * ser_stmt * ser_stmt
-  | TCase of span * ser_expr * ser_when list
-  | TWhile of span * ser_expr * ser_stmt
-  | TFor of span * identifier * ser_expr * ser_expr * ser_stmt
-  | TBorrow of {
+  | SSkip of span
+  | SLet of span * identifier * ty * ser_expr * ser_stmt
+  | SDestructure of span * (identifier * ty) list * ser_expr * ser_stmt
+  | SAssign of span * ser_lvalue * ser_expr
+  | SIf of span * ser_expr * ser_stmt * ser_stmt
+  | SCase of span * ser_expr * ser_when list
+  | SWhile of span * ser_expr * ser_stmt
+  | SFor of span * identifier * ser_expr * ser_expr * ser_stmt
+  | SBorrow of {
       span: span;
       original: identifier;
       rename: identifier;
@@ -37,9 +37,9 @@ type ser_stmt =
       body: ser_stmt;
       mode: borrowing_mode
     }
-  | TBlock of span * ser_stmt * ser_stmt
-  | TDiscarding of span * ser_expr
-  | TReturn of span * ser_expr
+  | SBlock of span * ser_stmt * ser_stmt
+  | SDiscarding of span * ser_expr
+  | SReturn of span * ser_expr
 [@@deriving sexp]
 
 (** A reference to an instance. *)
@@ -58,54 +58,54 @@ and ins_meth_ref =
 
 (** The serialized form of an expression. *)
 and ser_expr =
-  | TNilConstant
-  | TBoolConstant of bool
-  | TIntConstant of string
-  | TFloatConstant of string
-  | TStringConstant of escaped_string
-  | TConstVar of qident * ty
-  | TParamVar of identifier * ty
-  | TLocalVar of identifier * ty
-  | TArithmetic of arithmetic_operator * ser_expr * ser_expr
-  | TFuncall of qident * ser_expr list * ty * (identifier * ty) list
-  | TMethodCall of ins_meth_ref * qident * typarams * ser_expr list * ty * (identifier * ty) list
-  | TCast of ser_expr * ty
-  | TComparison of comparison_operator * ser_expr * ser_expr
-  | TConjunction of ser_expr * ser_expr
-  | TDisjunction of ser_expr * ser_expr
-  | TNegation of ser_expr
-  | TIfExpression of ser_expr * ser_expr * ser_expr
-  | TRecordConstructor of ty * (identifier * ser_expr) list
-  | TUnionConstructor of ty * identifier * (identifier * ser_expr) list
-  | TTypeAliasConstructor of ty * ser_expr
-  | TPath of {
+  | SNilConstant
+  | SBoolConstant of bool
+  | SIntConstant of string
+  | SFloatConstant of string
+  | SStringConstant of escaped_string
+  | SConstVar of qident * ty
+  | SParamVar of identifier * ty
+  | SLocalVar of identifier * ty
+  | SArithmetic of arithmetic_operator * ser_expr * ser_expr
+  | SFuncall of qident * ser_expr list * ty * (identifier * ty) list
+  | SMethodCall of ins_meth_ref * qident * typarams * ser_expr list * ty * (identifier * ty) list
+  | SCast of ser_expr * ty
+  | SComparison of comparison_operator * ser_expr * ser_expr
+  | SConjunction of ser_expr * ser_expr
+  | SDisjunction of ser_expr * ser_expr
+  | SNegation of ser_expr
+  | SIfExpression of ser_expr * ser_expr * ser_expr
+  | SRecordConstructor of ty * (identifier * ser_expr) list
+  | SUnionConstructor of ty * identifier * (identifier * ser_expr) list
+  | STypeAliasConstructor of ty * ser_expr
+  | SPath of {
       head: ser_expr;
       elems: ser_path_elem list;
       ty: ty
     }
-  | TEmbed of ty * string * ser_expr list
-  | TDeref of ser_expr
-  | TSizeOf of ty
-  | TBorrowExpr of borrowing_mode * identifier * region * ty
+  | SEmbed of ty * string * ser_expr list
+  | SDeref of ser_expr
+  | SSizeOf of ty
+  | SBorrowExpr of borrowing_mode * identifier * region * ty
 [@@deriving sexp]
 
 and ser_when =
-  TypedWhen of identifier * value_parameter list * ser_stmt
+  SerWhen of identifier * value_parameter list * ser_stmt
 [@@deriving sexp]
 
 and ser_path_elem =
-  | TSlotAccessor of identifier * ty
-  | TPointerSlotAccessor of identifier * ty
-  | TArrayIndex of ser_expr * ty
+  | SerSlotAccessor of identifier * ty
+  | SerPointerSlotAccessor of identifier * ty
+  | SerArrayIndex of ser_expr * ty
 [@@deriving sexp]
 
 and ser_lvalue =
-  TypedLValue of identifier * ser_path_elem list
+  | SerLValue of identifier * ser_path_elem list
 [@@deriving sexp]
 
 and ser_arglist =
-  | TPositionalArglist of ser_expr list
-  | TNamedArglist of (identifier * ser_expr) list
+  | SerPositionalArglist of ser_expr list
+  | SerNamedArglist of (identifier * ser_expr) list
 [@@deriving sexp]
 
 type compiled_decl =
