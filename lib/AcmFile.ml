@@ -1,7 +1,6 @@
 (** Types for representing Austral Compiled Module (.acm) files. *)
 open Identifier
 open Id
-open ModIdSet
 open Type
 open TypeParameters
 open Sexplib
@@ -9,6 +8,7 @@ open Std
 open Span
 open Common
 open Escape
+open ModuleNameSet
 open Region
 
 (** Types in ACM files are always either public or opaque. *)
@@ -182,6 +182,6 @@ and compiled_method_def =
 type compiled_module =
   CompiledModule of {
       name: module_name;
-      imports_from: ModIdSet.t;
+      imports_from: ModuleNameSet.t;
       decls: compiled_decl list;
     }

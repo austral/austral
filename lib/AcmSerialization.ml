@@ -1,45 +1,45 @@
-open Type
 open Sexplib
 open AcmFile
 open Identifier
-open Id
-open ModIdSet
-open Env
+open ModuleNameSet
 open Error
 
 type sexp = Sexp.t
 
-(* mod_id *)
-
-let ser_mod_id (env: env) (id: mod_id): sexp =
-  match get_module_by_id env id with
-  | Some (ModRec { name; _ }) ->
-     sexp_of_module_name name
-  | None ->
-     err "internal"
-
 (* ModIdSet.t *)
 
-let ser_mod_id_set (env: env) (set: ModIdSet.t): sexp =
-  List (List.map (ser_mod_id env) (List.of_seq (ModIdSet.to_seq set)))
+let ser_mod_id_set (set: ModuleNameSet.t): sexp =
+  List (List.map sexp_of_module_name (List.of_seq (ModuleNameSet.to_seq set)))
 
-(* compiled_decl *)
-
-let ser_compiled_decl (env: env) (decl: compiled_decl): sexp =
-  let _ = env in
-  match decl with
-  | CompiledConstant { name; ty; } ->
-     List [Atom "CompiledConstant"; List [sexp_of_identifier name; sexp_of_ty ty]]
+let par_mod_id_set (sexp: sexp): ModuleNameSet.t =
+  match sexp with
+  | List atoms ->
+     ModuleNameSet.of_list (List.map module_name_of_sexp atoms)
   | _ ->
-     err "Not implemented yet"
+     err "internal: bad parse"
 
 (* compiled_module *)
 
-let ser_compiled_module (env: env) (cm: compiled_module): sexp =
+let ser_compiled_module (cm: compiled_module): sexp =
   let CompiledModule { name; imports_from; decls; } = cm in
   List [
       Atom "CompiledModule";
       sexp_of_module_name name;
-      ser_mod_id_set env imports_from;
-      List (List.map (ser_compiled_decl env) decls)
+      ser_mod_id_set imports_from;
+      List (List.map sexp_of_compiled_decl decls)
     ]
+
+let par_compiled_module (sexp: sexp): compiled_module =
+  match sexp with
+  | List [Atom "CompiledModule"; name; imports; decls] ->
+     CompiledModule {
+         name = module_name_of_sexp name;
+         imports_from = par_mod_id_set imports;
+         decls = (match decls with
+                  | List decls ->
+                     List.map compiled_decl_of_sexp decls
+                  | _ ->
+                    err "internal: bad parse");
+       }
+  | _ ->
+     err "internal: bad acm parse"
