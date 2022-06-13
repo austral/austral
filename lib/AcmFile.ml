@@ -4,7 +4,6 @@ open Id
 open ModIdSet
 open Type
 open TypeParameters
-open Tast
 open Sexplib
 open Std
 
@@ -49,7 +48,7 @@ type compiled_decl =
       external_name: string option;
       (** If this function is foreign, this is the name of the underlying function
           that will be called. *)
-      body: tstmt option;
+      (*body: tstmt option;*)
       (** If the function is generic, it should have a body. *)
     }
   (** Functions in ACM files are always public. *)
@@ -80,7 +79,7 @@ and compiled_method_def =
       name: identifier;
       value_params: value_parameter list;
       rt: ty;
-      body: tstmt;
+      (*body: tstmt;*)
     }
 [@@deriving sexp]
 

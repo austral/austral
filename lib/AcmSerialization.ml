@@ -4,12 +4,22 @@ open Identifier
 open Id
 open ModIdSet
 open Env
+open Type
 open Error
 
 type sexp = Sexp.t
 
 let fail (msg: string) =
   err ("ACM file parsing failed: " ^ msg)
+
+(* mod_id *)
+
+let ser_mod_id (env: env) (id: mod_id): sexp =
+  match get_module_by_id env id with
+  | Some (ModRec { name; _ }) ->
+     sexp_of_module_name name
+  | None ->
+     err "internal"
 
 (* ModIdSet.t *)
 
@@ -22,7 +32,7 @@ let ser_compiled_decl (env: env) (decl: compiled_decl): sexp =
   let _ = env in
   match decl with
   | CompiledConstant { name; ty; } ->
-     List [Atom "CompiledConstant"; List [ser_identifier name; ser_ty ty]]
+     List [Atom "CompiledConstant"; List [sexp_of_identifier name; sexp_of_ty ty]]
   | _ ->
      err "Not implemented yet"
 
