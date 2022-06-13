@@ -25,8 +25,4 @@ val position_to_string : position -> string
 
 val span_to_string : span -> string
 
-(* Given a string containing a code file, and a span, return the relevant lines
-   plus some context. *)
-val span_text : string -> span -> string
-
 val empty_span : span

@@ -1,4 +1,5 @@
 open Span
+open SourceContext
 
 let indent_text (text: string) (indent: int): string =
   let lines = String.split_on_char '\n' text in
@@ -77,7 +78,7 @@ let render_error (error: error) (code: string option): string =
        (match code with
         | Some code ->
            "  Code:\n"
-           ^ (indent_text (span_text code span) 4)
+           ^ (indent_text (source_ctx_to_plain_text (get_source_ctx code span)) 4)
         | None ->
            "  Code: [not available]\n")
     | None ->
