@@ -1,16 +1,13 @@
+open Type
 open Sexplib
 open AcmFile
 open Identifier
 open Id
 open ModIdSet
 open Env
-open Type
 open Error
 
 type sexp = Sexp.t
-
-let fail (msg: string) =
-  err ("ACM file parsing failed: " ^ msg)
 
 (* mod_id *)
 
@@ -42,7 +39,7 @@ let ser_compiled_module (env: env) (cm: compiled_module): sexp =
   let CompiledModule { name; imports_from; decls; } = cm in
   List [
       Atom "CompiledModule";
-      ser_module_name name;
+      sexp_of_module_name name;
       ser_mod_id_set env imports_from;
       List (List.map (ser_compiled_decl env) decls)
     ]
