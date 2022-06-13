@@ -6,7 +6,13 @@ open Tast
 open Error
 
 let type_mismatch _ a b =
-  raise_type_mismatch_error (type_string a) (type_string b)
+  austral_raise "Type Mismatch"
+    [
+      Text "Expected a value of type";
+      Code (type_string a);
+      Text ", but got a value of type";
+      Code (type_string b);
+    ]
 
 let rec match_type a b =
   match a with

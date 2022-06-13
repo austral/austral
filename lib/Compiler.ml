@@ -164,14 +164,14 @@ let empty_compiler: compiler =
         try
           compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
         with Austral_error error ->
-          Printf.eprintf "%s" (render_error error None);
+          Printf.eprintf "%s" (render_error_to_plain error);
           dump_and_die ()
       in
       let c =
         try
           compile_mod c (fake_mod_source memory_interface_source memory_body_source)
         with Austral_error error ->
-          Printf.eprintf "%s" (render_error error None);
+          Printf.eprintf "%s" (render_error_to_plain error);
           dump_and_die ()
       in
       c)

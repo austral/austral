@@ -1,7 +1,11 @@
 open Cst
 open Span
 open Error
+open ErrorText
 open Reporter
+
+let raise_parse_error (span: span): 'a =
+  adorn_error_with_span span (fun _ -> austral_raise "Parse Error" [Text "Error during parse."])
 
 let parse' f (code: string) (filename: string) =
   let lexbuf = Lexing.from_string code in

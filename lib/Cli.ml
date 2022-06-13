@@ -2,6 +2,7 @@ open Identifier
 open Compiler
 open Util
 open Error
+open SourceContext
 open Reporter
 
 (* Map of filenames to file contents. *)
@@ -86,6 +87,25 @@ let dump_and_die _: unit =
   Reporter.dump ();
   exit (-1)
 
+(** Try adding a source context to the error if it doesn't have one. *)
+let try_adding_source_ctx (error: austral_error) (source_map: string SourceMap.t): austral_error =
+  let (AustralError { span; source_ctx; _ }) = error in
+  match source_ctx with
+  | Some _ ->
+     (* Already have a context. *)
+     error
+  | None ->
+     (match span with
+      | Some span ->
+         let (Span { filename; _ }) = span in
+         (match (SourceMap.find_opt filename source_map) with
+          | Some code ->
+             add_source_ctx error (get_source_ctx code span)
+          | None ->
+             error)
+      | None ->
+         error)
+
 let rec compile_main (args: string list): unit =
   with_frame "Entrypoint"
     (fun () ->
@@ -117,15 +137,8 @@ and compile_main' (args: string list): unit =
     | _ ->
        err "Multiple --output flags."
   with Austral_error error ->
-    let filename = error_filename error in
-    let code: string option =
-      match filename with
-      | Some filename ->
-         (SourceMap.find_opt filename source_map)
-      | None ->
-         None
-    in
-    Printf.eprintf "%s" (render_error error code);
+    let error: austral_error = try_adding_source_ctx error source_map in
+    Printf.eprintf "%s" (render_error_to_plain error);
     print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     dump_and_die ()
 
@@ -135,15 +148,8 @@ let typecheck_main (args: string list): unit =
     let _ = compile_multiple empty_compiler contents in
     ()
   with Austral_error error ->
-    let filename = error_filename error in
-    let code: string option =
-      match filename with
-      | Some filename ->
-         (SourceMap.find_opt filename source_map)
-      | None ->
-         None
-    in
-    Printf.eprintf "%s" (render_error error code);
+    let error: austral_error = try_adding_source_ctx error source_map in
+    Printf.eprintf "%s" (render_error_to_plain error);
     print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     dump_and_die ()
 
@@ -167,6 +173,6 @@ let main (args: string list): unit =
     Reporter.dump ();
     exit 0
   with Austral_error error ->
-    Printf.eprintf "%s" (render_error error None);
+    Printf.eprintf "%s" (render_error_to_plain error);
     print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     dump_and_die ()

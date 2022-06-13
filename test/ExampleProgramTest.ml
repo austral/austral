@@ -8,7 +8,7 @@ let print_and_reraise_error (f: unit -> 'a): 'a =
     f ()
   with
     Austral_error error ->
-     Printf.eprintf "%s" (render_error error None);
+     Printf.eprintf "%s" (render_error_to_plain error);
      raise (Austral_error error)
 
 let car sources entrypoint =
