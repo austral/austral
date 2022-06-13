@@ -1,8 +1,8 @@
 (** Serializing and deserializing ACM files. *)
 open Sexplib
 open AcmFile
+open Env
 
 type sexp = Sexp.t
 
-val ser_acm_type_vis : acm_type_vis -> sexp
-val par_acm_type_vis : sexp -> acm_type_vis
+val ser_compiled_module : env -> compiled_module -> sexp
