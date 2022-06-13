@@ -1,7 +1,7 @@
 open Identifier
 
 type region
-[@@deriving eq, show]
+[@@deriving (eq, show, sexp)]
 
 val region_id: region -> int
 

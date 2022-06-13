@@ -5,6 +5,8 @@ open ModIdSet
 open Type
 open TypeParameters
 open Tast
+open Sexplib
+open Std
 
 (** Types in ACM files are always either public or opaque. *)
 type acm_type_vis =

@@ -23,10 +23,10 @@ type signedness =
 [@@deriving (eq, show, sexp)]
 
 type type_parameter = TypeParameter of identifier * universe * qident
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 type type_var = TypeVariable of identifier * universe * qident
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type ty =
   | Unit
@@ -49,11 +49,13 @@ type ty =
 [@@deriving (show, sexp)]
 
 type typed_slot = TypedSlot of identifier * ty
+[@@deriving sexp]
 
 type typed_case = TypedCase of identifier * typed_slot list
+[@@deriving sexp]
 
 type value_parameter = ValueParameter of identifier * ty
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 val universe_string : universe -> string
 

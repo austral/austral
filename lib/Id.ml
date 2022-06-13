@@ -1,8 +1,11 @@
+open Sexplib
+open Std
+
 type file_id = FileId of int
 [@@deriving eq]
 
 type mod_id = ModId of int
-[@@deriving eq]
+[@@deriving (eq, sexp)]
 
 type decl_id = DeclId of int
 [@@deriving (eq, show)]
@@ -11,7 +14,7 @@ type ins_meth_id = InsMethId of int
 [@@deriving (eq, show)]
 
 type mono_id = MonoId of int
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 (* ID utilities *)
 
