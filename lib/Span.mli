@@ -6,14 +6,14 @@ type position = Position of {
       (* Columns range from 0 to infinity. *)
       column: int;
     }
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 type span = Span of {
       filename: string;
       startp: position;
       endp: position;
     }
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 val from_lexbuf : lexbuf -> span
 

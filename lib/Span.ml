@@ -1,10 +1,12 @@
 open Lexing
+open Sexplib
+open Std
 
 type position = Position of {
       line: int;
       column: int;
     }
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 let pos_line (Position { line; _}) =
   line
@@ -14,7 +16,7 @@ type span = Span of {
       startp: position;
       endp: position;
     }
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 let from_lexbuf (lexbuf: lexbuf): span =
   let start_pos = lexbuf.lex_start_p

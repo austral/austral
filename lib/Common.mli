@@ -23,7 +23,7 @@ type pragma =
 type borrowing_mode =
   | ReadBorrow
   | WriteBorrow
-[@@deriving show]
+[@@deriving (show, sexp)]
 
 type module_kind =
   | SafeModule
