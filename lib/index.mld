@@ -8,6 +8,8 @@ Code used throughout the compiler.
 - {!Austral_core.IdentifierMap}
 - {!Austral_core.Common}
 - {!Austral_core.Span}
+- {!Austral_core.SourceContext}
+- {!Austral_core.ErrorText}
 - {!Austral_core.Error}
 - {!Austral_core.Util}
 - {!Austral_core.StringSet}
