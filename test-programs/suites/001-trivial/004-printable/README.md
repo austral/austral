@@ -1,0 +1,1 @@
+Test of the `Printable` typeclass in `Austral.Pervasive`.

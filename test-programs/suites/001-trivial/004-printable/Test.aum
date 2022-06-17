@@ -1,0 +1,41 @@
+module body Test is
+    pragma Unsafe_Module;
+
+    function Put_Character(character: Natural_8): Integer_32 is
+        pragma Foreign_Import(External_Name => "putchar");
+end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        Print(nil);
+        Put_Character(10);
+        Print(Maximum_Natural_8);
+        Put_Character(10);
+        Print(Maximum_Natural_16);
+        Put_Character(10);
+        Print(Maximum_Natural_32);
+        Put_Character(10);
+        Print(Maximum_Natural_64);
+        Put_Character(10);
+        Print(Minimum_Integer_8);
+        Put_Character(10);
+        Print(Minimum_Integer_16);
+        Put_Character(10);
+        Print(Minimum_Integer_32);
+        Put_Character(10);
+        Print(Minimum_Integer_64);
+        Put_Character(10);
+        Print(Maximum_Integer_8);
+        Put_Character(10);
+        Print(Maximum_Integer_16);
+        Put_Character(10);
+        Print(Maximum_Integer_32);
+        Put_Character(10);
+        Print(Maximum_Integer_64);
+        Put_Character(10);
+        Print(3.14 : Single_Float);
+        Put_Character(10);
+        Print(3.14 : Double_Float);
+        Put_Character(10);
+        return root;
+    end;
+end module body.
