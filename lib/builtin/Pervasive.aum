@@ -601,4 +601,92 @@ module body Austral.Pervasive is
             return @embed(Index, "$1 / $2", lhs, rhs);
         end;
     end;
+
+    ---
+    --- Printable
+    ---
+
+    instance Printable(Unit) is
+        method Print(value: Unit): Unit is
+            return @embed(Unit, "printf(\"nil\")");
+            return value;
+        end;
+    end;
+
+    instance Printable(Natural_8) is
+        method Print(value: Natural_8): Unit is
+            return @embed(Unit, "printf(\"%i\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Natural_16) is
+        method Print(value: Natural_16): Unit is
+            return @embed(Unit, "printf(\"%i\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Natural_32) is
+        method Print(value: Natural_32): Unit is
+            return @embed(Unit, "printf(\"%zu\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Natural_64) is
+        method Print(value: Natural_64): Unit is
+            return @embed(Unit, "printf(\"%zu\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Integer_8) is
+        method Print(value: Integer_8): Unit is
+            return @embed(Unit, "printf(\"%i\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Integer_16) is
+        method Print(value: Integer_16): Unit is
+            return @embed(Unit, "printf(\"%i\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Integer_32) is
+        method Print(value: Integer_32): Unit is
+            return @embed(Unit, "printf(\"%i\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Integer_64) is
+        method Print(value: Integer_64): Unit is
+            return @embed(Unit, "printf(\"%lli\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Index) is
+        method Print(value: Index): Unit is
+            return @embed(Unit, "printf(\"%z\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Single_Float) is
+        method Print(value: Single_Float): Unit is
+            return @embed(Unit, "printf(\"%f\", $1)", value);
+            return nil;
+        end;
+    end;
+
+    instance Printable(Double_Float) is
+        method Print(value: Double_Float): Unit is
+            return @embed(Unit, "printf(\"%f\", $1)", value);
+            return nil;
+        end;
+    end;
 end module body.
