@@ -1,1 +1,1 @@
-Add a test that a type parameter without constraints can't call a method of a typeclass.
+Test that a value whose type is an unconstrained type parameter can't be passed to a method of a typeclass.
