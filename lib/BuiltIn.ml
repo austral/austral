@@ -22,6 +22,18 @@ let pervasive_imports =
         ConcreteImport (make_ident "Fixed_Array_Size", None);
         ConcreteImport (make_ident "Abort", None);
         ConcreteImport (make_ident "Root_Capability", None);
+        ConcreteImport (make_ident "Maximum_Natural_8", None);
+        ConcreteImport (make_ident "Maximum_Natural_16", None);
+        ConcreteImport (make_ident "Maximum_Natural_32", None);
+        ConcreteImport (make_ident "Maximum_Natural_64", None);
+        ConcreteImport (make_ident "Minimum_Integer_8", None);
+        ConcreteImport (make_ident "Minimum_Integer_16", None);
+        ConcreteImport (make_ident "Minimum_Integer_32", None);
+        ConcreteImport (make_ident "Minimum_Integer_64", None);
+        ConcreteImport (make_ident "Maximum_Integer_8", None);
+        ConcreteImport (make_ident "Maximum_Integer_16", None);
+        ConcreteImport (make_ident "Maximum_Integer_32", None);
+        ConcreteImport (make_ident "Maximum_Integer_64", None);
         ConcreteImport (make_ident "Trapping_Arithmetic", None);
         ConcreteImport (make_ident "Trapping_Add", None);
         ConcreteImport (make_ident "Trapping_Subtract", None);
@@ -31,7 +43,9 @@ let pervasive_imports =
         ConcreteImport (make_ident "Modular_Add", None);
         ConcreteImport (make_ident "Modular_Subtract", None);
         ConcreteImport (make_ident "Modular_Multiply", None);
-        ConcreteImport (make_ident "Modular_Divide", None)
+        ConcreteImport (make_ident "Modular_Divide", None);
+        ConcreteImport (make_ident "Printable", None);
+        ConcreteImport (make_ident "Print", None);
       ]
     )
 
