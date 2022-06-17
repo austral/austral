@@ -1,0 +1,1 @@
+Add a test that a type parameter without constraints can't call a method of a typeclass.

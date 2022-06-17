@@ -1,0 +1,22 @@
+module body Test is
+    typeclass Class(T: Free) is
+        method Accept(value: T): Unit;
+    end;
+
+    instance Class(Integer_32) is
+        method Accept(value: Integer_32): Unit is
+            return nil;
+        end;
+    end;
+
+    generic [T: Free]
+    function Foo(value: T): Unit is
+        Accept(value);
+        return nil;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        Foo(nil);
+        return root;
+    end;
+end module body.
