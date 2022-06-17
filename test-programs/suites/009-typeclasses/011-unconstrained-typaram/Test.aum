@@ -1,9 +1,9 @@
 module body Test is
-    typeclass Class(T: Free) is
+    typeclass Acceptable(T: Free) is
         method Accept(value: T): Unit;
     end;
 
-    instance Class(Integer_32) is
+    instance Acceptable(Integer_32) is
         method Accept(value: Integer_32): Unit is
             return nil;
         end;
