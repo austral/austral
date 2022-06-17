@@ -20,16 +20,12 @@ let rec match_type a b =
      (match b with
       | Unit ->
          empty_bindings
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected Unit, but got another type." a b)
   | Boolean ->
      (match b with
       | Boolean ->
          empty_bindings
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected Boolean, but got another type." a b)
   | Integer (s, w) ->
@@ -39,24 +35,18 @@ let rec match_type a b =
            empty_bindings
          else
            type_mismatch "Integer types don't match" a b
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected an integer, but got another type." a b)
   | SingleFloat ->
      (match b with
       | SingleFloat ->
          empty_bindings
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected SingleFloat, but got another type." a b)
   | DoubleFloat ->
      (match b with
       | DoubleFloat ->
          empty_bindings
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected DoubleFloat, but got another type." a b)
   | NamedType (n, args, _) ->
@@ -67,16 +57,12 @@ let rec match_type a b =
            match_type_list args args'
          else
            type_mismatch "Type mismatch" a b
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected a named type, but got something else." a b)
   | StaticArray t ->
      (match b with
       | StaticArray t' ->
          match_type t t'
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected an array, but got another type." a b)
   | RegionTy r ->
@@ -86,8 +72,6 @@ let rec match_type a b =
            empty_bindings
          else
            type_mismatch "Region type mismatch" a b
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected a region, but got another type." a b)
   | ReadRef (t, r) ->
@@ -96,8 +80,6 @@ let rec match_type a b =
          let bindings = match_type t t' in
          let bindings' = match_type r r' in
          merge_bindings bindings bindings'
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected a read reference, but got another type." a b)
   | WriteRef (t, r) ->
@@ -106,8 +88,6 @@ let rec match_type a b =
          let bindings = match_type t t' in
          let bindings' = match_type r r' in
          merge_bindings bindings bindings'
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
          type_mismatch "Expected a write reference, but got another type." a b)
   | TyVar tyvar ->
@@ -116,16 +96,12 @@ let rec match_type a b =
      (match b with
       | Address t' ->
          match_type t t'
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
         type_mismatch "Expected an Address, but got another type." a b)
   | Pointer t ->
      (match b with
       | Pointer t' ->
          match_type t t'
-      | TyVar tyvar ->
-         match_type_var tyvar a
       | _ ->
         type_mismatch "Expected a Pointer, but got another type." a b)
   | MonoTy _ ->

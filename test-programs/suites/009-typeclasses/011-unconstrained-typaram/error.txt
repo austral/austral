@@ -1,0 +1,14 @@
+Error:
+  Title: Generic Error
+  Location:
+    Filename: 'test-programs/suites/009-typeclasses/011-unconstrained-typaram/Test.aum'
+    From: line 14, column 8
+    To: line 14, column 22
+  Description:
+    Typeclass resolution failed. Typeclass: Acceptable. Dispatch type: T(Test::Foo): Free
+  Code:
+    12 |     generic [T: Free]
+    13 |     function Foo(value: T): Unit is
+    14 |         Accept(value);
+    15 |         return nil;
+    16 |     end;

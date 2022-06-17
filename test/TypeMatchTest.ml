@@ -26,17 +26,8 @@ let test_successful_matches _ =
   let param = fnt "Option" [t]
   and arg = fnt "Option" [Unit] in
   meq param arg [("T", Unit)];
-  let param = fnt "Option" [Unit]
-  and arg = fnt "Option" [t] in
-  meq param arg [("T", Unit)];
   let param = Address t
   and arg = Address Unit in
-  meq param arg [("T", Unit)];
-  let param = Address (Address t)
-  and arg = Address (Address Unit) in
-  meq param arg [("T", Unit)];
-  let param = fnt "A" [Address t]
-  and arg = fnt "A" [Address Unit] in
   meq param arg [("T", Unit)];
   let param = fnt "A" [fnt "B" [Address t]]
   and arg = fnt "A" [fnt "B" [Address Unit]] in
