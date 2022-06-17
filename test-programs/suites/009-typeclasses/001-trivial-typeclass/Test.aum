@@ -6,25 +6,25 @@ module body Test is
     end;
 
     typeclass PrintFree(T: Free) is
-        method Print(x: T): Unit;
+        method PrintF(x: T): Unit;
     end;
 
     instance PrintFree(Natural_8) is
-        method Print(x: Natural_8): Unit is
+        method PrintF(x: Natural_8): Unit is
             Put_String("Nat8");
             return nil;
         end;
     end;
 
     instance PrintFree(Natural_16) is
-        method Print(x: Natural_16): Unit is
+        method PrintF(x: Natural_16): Unit is
             Put_String("Nat16");
             return nil;
         end;
     end;
 
     instance PrintFree(Double_Float) is
-        method Print(x: Double_Float): Unit is
+        method PrintF(x: Double_Float): Unit is
             Put_String("Float64");
             return nil;
         end;
@@ -32,7 +32,7 @@ module body Test is
 
     generic [T: Type, R: Region]
     instance PrintFree(&[T, R]) is
-        method Print(x: &[T, R]): Unit is
+        method PrintF(x: &[T, R]): Unit is
             Put_String("REF");
             return nil;
         end;
@@ -43,14 +43,14 @@ module body Test is
 
     function Main(root: Root_Capability): Root_Capability is
         let n8: Natural_8 := 'a';
-        Print(n8);
-        Print('a' : Natural_16);
-        Print(3.14);
+        PrintF(n8);
+        PrintF('a' : Natural_16);
+        PrintF(3.14);
         let foo: Foo := Foo();
         borrow foo as fooref in rho do
-            Print(fooref);
+            PrintF(fooref);
         end;
-        Print(&foo);
+        PrintF(&foo);
         let {} := foo;
         return root;
     end;

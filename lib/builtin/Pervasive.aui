@@ -79,4 +79,21 @@ module Austral.Pervasive is
     instance Modular_Arithmetic(Natural_64);
     instance Modular_Arithmetic(Integer_64);
     instance Modular_Arithmetic(Index);
+
+    typeclass Printable(A: Free) is
+        method Print(value: A): Unit;
+    end;
+
+    instance Printable(Unit);
+    instance Printable(Natural_8);
+    instance Printable(Integer_8);
+    instance Printable(Natural_16);
+    instance Printable(Integer_16);
+    instance Printable(Natural_32);
+    instance Printable(Integer_32);
+    instance Printable(Natural_64);
+    instance Printable(Integer_64);
+    instance Printable(Index);
+    instance Printable(Single_Float);
+    instance Printable(Double_Float);
 end module.
