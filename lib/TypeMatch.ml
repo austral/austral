@@ -191,10 +191,12 @@ and get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
              let _ = pt ("Trying instance with argument", argument) in
              try
                let bindings = match_type (env, source_module_name) argument dispatch_ty in
+               ps ("Resolution", "Success");
                Some (decl, bindings)
              with
                Austral_error _ ->
                (* Does not match, just skip to the next instance, *)
+               ps ("Resolution", "Failure");
                None
            else
              None
