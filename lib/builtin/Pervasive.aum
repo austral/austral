@@ -629,7 +629,7 @@ module body Austral.Pervasive is
 
     instance Printable(Natural_32) is
         method Print(value: Natural_32): Unit is
-            return @embed(Unit, "printf(\"%zu\", $1)", value);
+            return @embed(Unit, "printf(\"%u\", $1)", value);
             return nil;
         end;
     end;
@@ -664,14 +664,14 @@ module body Austral.Pervasive is
 
     instance Printable(Integer_64) is
         method Print(value: Integer_64): Unit is
-            return @embed(Unit, "printf(\"%lli\", $1)", value);
+            return @embed(Unit, "printf(\"%li\", $1)", value);
             return nil;
         end;
     end;
 
     instance Printable(Index) is
         method Print(value: Index): Unit is
-            return @embed(Unit, "printf(\"%z\", $1)", value);
+            return @embed(Unit, "printf(\"%zu\", $1)", value);
             return nil;
         end;
     end;
