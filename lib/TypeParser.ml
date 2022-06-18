@@ -252,8 +252,8 @@ let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typa
 and is_param (typarams: typarams) (name: qident): ty option =
   let name' = original_name name in
   match get_typaram typarams name' with
-  | Some (TypeParameter (_, u, from)) ->
-     Some (TyVar (TypeVariable (name', u, from)))
+  | Some tp ->
+     Some (TyVar (typaram_to_tyvar tp))
   | None ->
      None
 
@@ -289,7 +289,7 @@ and check_param_arity_matches (params: typarams) (args: ty list): unit =
 and check_universes_match (params: typarams) (args: ty list): unit =
   let _ = List.map2 check_universes_match' (typarams_as_list params) args in ()
 
-and check_universes_match' (TypeParameter (_, param_u, _)) (arg: ty): unit =
+and check_universes_match' (TypeParameter (_, param_u, _, _)) (arg: ty): unit =
   let arg_u = type_universe arg in
   if universe_compatible param_u arg_u then
     ()

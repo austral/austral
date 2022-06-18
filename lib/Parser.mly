@@ -550,7 +550,8 @@ type_parameter_list_inner:
   ;
 
 type_parameter:
-  | identifier COLON universe { ConcreteTypeParam ($1, $3) }
+  | identifier COLON universe { ConcreteTypeParam ($1, $3, []) }
+  | identifier COLON universe LPAREN separated_list(COMMA, identifier) RPAREN { ConcreteTypeParam ($1, $3, $5) }
   ;
 
 docstring:

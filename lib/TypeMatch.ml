@@ -135,7 +135,7 @@ and match_type_list tys tys' =
   List.fold_left merge_bindings empty_bindings bs
 
 let match_typarams (typarams: typarams) (args: ty list): type_bindings =
-  let typarams' = List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) (typarams_as_list typarams) in
+  let typarams' = List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams) in
   match_type_list typarams' args
 
 let match_type_with_value (ty: ty) (expr: texpr): type_bindings =

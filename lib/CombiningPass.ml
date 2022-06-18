@@ -50,7 +50,7 @@ let parse_method_defs (imports: import_map) (methods: concrete_method_def list):
 
 let name_typarams (params: concrete_type_param list) (name: qident): typarams =
   let lst: type_parameter list =
-    List.map (fun (ConcreteTypeParam (n, u)) -> TypeParameter (n, u, name)) params
+    List.map (fun (ConcreteTypeParam (n, u, cs)) -> TypeParameter (n, u, name, cs)) params
   in
   typarams_from_list lst
 

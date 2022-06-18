@@ -122,7 +122,7 @@ and concrete_param =
   ConcreteParam of identifier * typespec
 
 and concrete_type_param =
-  ConcreteTypeParam of identifier * universe
+  ConcreteTypeParam of identifier * universe * identifier list
 
 and concrete_path_elem =
   | CSlotAccessor of identifier

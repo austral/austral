@@ -555,7 +555,7 @@ and augment_typealias_callable name typarams universe asserted_ty definition_ty 
   (* Use the bindings to get the effective return type *)
   let rt = NamedType (
                name,
-               List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) (typarams_as_list typarams),
+               List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
                universe
              )
   in
@@ -588,7 +588,7 @@ and augment_record_constructor (name: qident) (typarams: typarams) (universe: un
     let bindings = check_argument_list params arguments in
     (* Use the bindings to get the effective return type *)
     let rt = NamedType (name,
-                        List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) (typarams_as_list typarams),
+                        List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
                         universe)
     in
     let rt' = replace_variables bindings rt in
@@ -630,7 +630,7 @@ and augment_union_constructor (type_name: qident) (typarams: typarams) (universe
         let bindings = check_argument_list params arguments in
         (* Use the bindings to get the effective return type *)
         let rt = NamedType (type_name,
-                            List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) (typarams_as_list typarams),
+                            List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
                             universe)
         in
         pt ("Type", rt);
@@ -666,7 +666,7 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       let bindings'' = merge_bindings bindings bindings' in
       (* Check: the set of bindings equals the set of type parameters *)
       check_bindings (typarams_from_list [typaram]) bindings'';
-      let (TypeParameter (type_parameter_name, _, from)) = typaram in
+      let (TypeParameter (type_parameter_name, _, from, _)) = typaram in
       match get_binding bindings'' type_parameter_name from with
       | (Some dispatch_ty) ->
          pt ("Dispatch Type", dispatch_ty);
@@ -741,7 +741,7 @@ and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arg
   List.map2 f params arguments
 
 and make_substs (bindings: type_bindings) (typarams: typarams): (identifier * ty) list =
-  let f (TypeParameter (n, u, from)) =
+  let f (TypeParameter (n, u, from, _)) =
     if u = RegionUniverse then
       None
     else
@@ -793,7 +793,7 @@ and is_return_type_polymorphic (params: value_parameter list) (rt: ty): bool =
    every type parameter is satisfied. *)
 and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
   if (typarams_size typarams) = (binding_count bindings) then
-    let check (TypeParameter (n, u, from)): unit =
+    let check (TypeParameter (n, u, from, _)): unit =
       (match get_binding bindings n from with
        | Some ty ->
           if universe_compatible u (type_universe ty) then
@@ -883,7 +883,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let (source_module, vis, record_typarams, slots) = get_record_definition env name in
                  let orig_type = NamedType (
                                      make_qident (source_module, original_name name, original_name name),
-                                     List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) (typarams_as_list record_typarams),
+                                     List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list record_typarams),
                                      u
                                    )
                  in
@@ -1105,7 +1105,7 @@ and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty
      let module_name = module_name_from_id env mod_id in
      if (vis = TypeVisPublic) || (importing_module = module_name) then
        let n = make_qident (module_name, name, name)
-       and args = List.map (fun (TypeParameter (n, u, from)) -> TyVar (TypeVariable (n, u, from))) (typarams_as_list typarams)
+       and args = List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams)
        in
        let ty = NamedType (n, args, universe)
        and cases = get_union_cases env id in

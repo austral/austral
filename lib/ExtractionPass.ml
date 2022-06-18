@@ -197,7 +197,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
   | CTypeclass (vis, name, typaram, methods, docstring) ->
      (* Check: the universe is one of {Type, Linear, Free} *)
      let _ =
-       let TypeParameter (_, universe, _) = typaram in
+       let TypeParameter (_, universe, _, _) = typaram in
        match universe with
        | TypeUniverse -> ()
        | LinearUniverse -> ()
@@ -239,7 +239,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
        | Some decl ->
           (match decl with
            | TypeClass { id; param; _ } ->
-              let TypeParameter (_, universe, _) = param in
+              let TypeParameter (_, universe, _, _) = param in
               (id, universe)
            | _ ->
               err "Type class name refers to something that is not a type class.")
