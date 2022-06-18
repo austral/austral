@@ -3,7 +3,9 @@ open IdentifierSet
 open Type
 open TypeBindings
 open TypeParameters
+open TypeClasses
 open Tast
+open Env
 open Error
 
 let type_mismatch _ a b =
@@ -15,7 +17,13 @@ let type_mismatch _ a b =
       Code (type_string b);
     ]
 
-let rec match_type a b =
+type ctx = env * module_name
+
+let ctx_env (env, _) = env
+
+let ctx_mn (_, mn) = mn
+
+let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
   match a with
   | Unit ->
      (match b with
@@ -55,7 +63,7 @@ let rec match_type a b =
       | NamedType (n', args', _) ->
          (* We ignore the universe, since the type system is nominal. *)
          if n = n' then
-           match_type_list args args'
+           match_type_list ctx args args'
          else
            type_mismatch "Type mismatch" a b
       | _ ->
@@ -63,7 +71,7 @@ let rec match_type a b =
   | StaticArray t ->
      (match b with
       | StaticArray t' ->
-         match_type t t'
+         match_type ctx t t'
       | _ ->
          type_mismatch "Expected an array, but got another type." a b)
   | RegionTy r ->
@@ -78,37 +86,37 @@ let rec match_type a b =
   | ReadRef (t, r) ->
      (match b with
       | ReadRef (t', r') ->
-         let bindings = match_type t t' in
-         let bindings' = match_type r r' in
+         let bindings = match_type ctx t t' in
+         let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
          type_mismatch "Expected a read reference, but got another type." a b)
   | WriteRef (t, r) ->
      (match b with
       | WriteRef (t', r') ->
-         let bindings = match_type t t' in
-         let bindings' = match_type r r' in
+         let bindings = match_type ctx t t' in
+         let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
          type_mismatch "Expected a write reference, but got another type." a b)
   | TyVar tyvar ->
-     match_type_var tyvar b
+     match_type_var ctx tyvar b
   | Address t ->
      (match b with
       | Address t' ->
-         match_type t t'
+         match_type ctx t t'
       | _ ->
          type_mismatch "Expected an Address, but got another type." a b)
   | Pointer t ->
      (match b with
       | Pointer t' ->
-         match_type t t'
+         match_type ctx t t'
       | _ ->
          type_mismatch "Expected a Pointer, but got another type." a b)
   | MonoTy _ ->
      err "Not applicable"
 
-and match_type_var (TypeVariable (name, universe, from, constraints)) ty =
+and match_type_var (ctx: ctx) (TypeVariable (name, universe, from, constraints)) ty =
   (* Check if the argument type is a variable. *)
   match ty with
   | (TyVar (TypeVariable (i', u', from', constraints'))) ->
@@ -128,7 +136,7 @@ and match_type_var (TypeVariable (name, universe, from, constraints)) ty =
        add_binding empty_bindings name from ty
   | _ ->
      (* Check that the type implements the type variable's constraints, if any. *)
-     check_type_implements_constraints ty constraints;
+     check_type_implements_constraints ctx ty constraints;
      (* If the constraints are satisfied, add a straightforward binding. *)
      add_binding empty_bindings name from ty
 
@@ -138,7 +146,7 @@ and constraints_match (a: sident list) (b: sident list): bool =
   in
   SIdentSet.equal a b
 
-and check_type_implements_constraints (ty: ty) (constraints: sident list): unit =
+and check_type_implements_constraints (ctx: ctx) (ty: ty) (constraints: sident list): unit =
   (* If there are no constraints, do nothing. *)
   if constraints = [] then
     ()
@@ -146,23 +154,78 @@ and check_type_implements_constraints (ty: ty) (constraints: sident list): unit 
     (* If there are constraints, make them into a set. *)
     let constraints: SIdentSet.t = SIdentSet.of_list constraints in
     (* Try to find an instance for this type for each of the constraints. *)
-    List.iter (try_constraint ty) (List.of_seq (SIdentSet.to_seq constraints))
+    List.iter (try_constraint ctx ty) (List.of_seq (SIdentSet.to_seq constraints))
 
-and try_constraint (ty: ty) (typeclass_name: sident): unit =
-  (* Try to find an instance for the given typeclass name that implements this type. *)
-  let _ = (ty, typeclass_name) in
-  (* TODO *)
-  ()
+and try_constraint (ctx: ctx) (ty: ty) (typeclass_name: sident): unit =
+  (* Find the typeclass. *)
+  match get_decl_by_name (ctx_env ctx) typeclass_name with
+  | Some (TypeClass { id; _ }) ->
+     (* Try to find an instance for the given typeclass name that implements this type. *)
+     (match get_instance (ctx_env ctx) (ctx_mn ctx) ty id with
+      | Some (_, _) ->
+         (* Found a typeclass for this type. *)
+         ()
+      | None ->
+         (* No typeclass. *)
+         err "The type does not implement the given typeclass.")
+  | Some _ ->
+     internal_err "Type parameter constraint refers to a declaration which is not a typeclass."
+  | None ->
+     internal_err "No typeclass with the given name. This should have been validated in the extraction pass."
+
+and get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): decl * type_bindings =
+  with_frame "Typeclass Resolution"
+    (fun _ ->
+      ps ("In module", (mod_name_string source_module_name));
+      ps ("Typeclass", (get_decl_name_or_die env typeclass));
+      pt ("Dispatch type", dispatch_ty);
+      let mod_id: mod_id =
+        let (ModRec { id; _ }) = Option.get (get_module_by_name env source_module_name) in
+        id
+      in
+      let pred (decl: decl): (decl * type_bindings) option =
+        match decl with
+        | Instance { typeclass_id; argument; _ } ->
+           if equal_decl_id typeclass_id typeclass then
+             let _ = pt ("Trying instance with argument", argument) in
+             try
+               let bindings = match_type argument dispatch_ty in
+               Some (decl, bindings)
+             with
+               Austral_error _ ->
+               (* Does not match, just skip to the next instance, *)
+               None
+           else
+             None
+        | _ ->
+           None
+      in
+      let filtered: (decl * type_bindings) list =
+        with_frame "Filtering instances"
+          (fun _ -> List.filter_map pred (visible_instances env mod_id))
+      in
+      match filtered with
+      | [a] ->
+         a
+      | _::_ ->
+         err "Multiple instances satisfy this call."
+      | [] ->
+         err (
+             "Typeclass resolution failed. Typeclass: "
+             ^ (get_decl_name_or_die env typeclass)
+             ^ ". Dispatch type: "
+             ^ (type_string dispatch_ty)))
+
 
 and match_type_list tys tys' =
   let bs = List.map2 match_type tys tys' in
   List.fold_left merge_bindings empty_bindings bs
 
-let match_typarams (typarams: typarams) (args: ty list): type_bindings =
+let match_typarams (ctx: ctx) (typarams: typarams) (args: ty list): type_bindings =
   let typarams' = List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams) in
-  match_type_list typarams' args
+  match_type_list ctx typarams' args
 
-let match_type_with_value (ty: ty) (expr: texpr): type_bindings =
+let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
   (* Like type_match, but gentler with integer constants. *)
   match ty with
   | Integer _ ->
@@ -172,6 +235,6 @@ let match_type_with_value (ty: ty) (expr: texpr): type_bindings =
          (* TODO: check value against width *)
          empty_bindings
       | _ ->
-         match_type ty (get_type expr))
+         match_type ctx ty (get_type expr))
   | _ ->
-     match_type ty (get_type expr)
+     match_type ctx ty (get_type expr)
