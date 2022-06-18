@@ -28,7 +28,7 @@ type signedness =
 type type_parameter = TypeParameter of identifier * universe * qident * identifier list
 [@@deriving (show, sexp)]
 
-type type_var = TypeVariable of identifier * universe * qident
+type type_var = TypeVariable of identifier * universe * qident * identifier list
 [@@deriving (eq, show, sexp)]
 
 type ty =
@@ -94,7 +94,7 @@ let rec type_string = function
      read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Free"
   | WriteRef (t, r) ->
      write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Linear"
-  | TyVar (TypeVariable (n, u, from)) ->
+  | TyVar (TypeVariable (n, u, from, _)) ->
      (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ ": " ^ (universe_string u)
   | Address ty ->
      address_name ^ "[" ^ (type_string ty) ^ "]"
@@ -201,5 +201,5 @@ let rec equal_ty a b =
        false)
 
 let typaram_to_tyvar (typaram: type_parameter): type_var =
-  let (TypeParameter (n, u, f, _)) = typaram in
-  TypeVariable (n, u ,f)
+  let (TypeParameter (n, u, f, cs)) = typaram in
+  TypeVariable (n, u, f, cs)

@@ -25,7 +25,7 @@ type signedness =
 type type_parameter = TypeParameter of identifier * universe * qident * identifier list
 [@@deriving (show, sexp)]
 
-type type_var = TypeVariable of identifier * universe * qident
+type type_var = TypeVariable of identifier * universe * qident * identifier list
 [@@deriving (eq, show, sexp)]
 
 type ty =
