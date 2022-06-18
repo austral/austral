@@ -16,7 +16,6 @@ module body Test is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        Foo(0 : Integer_32);
         return root;
     end;
 end module body.

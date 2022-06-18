@@ -94,8 +94,16 @@ let rec type_string = function
      read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Free"
   | WriteRef (t, r) ->
      write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Linear"
-  | TyVar (TypeVariable (n, u, from, _)) ->
-     (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ ": " ^ (universe_string u)
+  | TyVar (TypeVariable (n, u, from, constraints)) ->
+     let sident_string si =
+       (mod_name_string (sident_module_name si)) ^ "::" ^ (ident_string (sident_name si))
+     in
+     (ident_string n)
+     ^ "("
+     ^ (qident_debug_name from)
+     ^ "): "
+     ^ (universe_string u)
+     ^ (if constraints = [] then "" else ("(" ^ (String.concat ", " (List.map sident_string constraints)) ^ ")"))
   | Address ty ->
      address_name ^ "[" ^ (type_string ty) ^ "]"
   | Pointer ty ->
