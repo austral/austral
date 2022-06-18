@@ -15,7 +15,7 @@ let type_universe = function
   | RegionTy _ -> RegionUniverse
   | ReadRef _ -> FreeUniverse
   | WriteRef _ -> FreeUniverse
-  | TyVar (TypeVariable (_, u, _)) -> u
+  | TyVar (TypeVariable (_, u, _, _)) -> u
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
   | MonoTy _ -> err "Not applicable"
