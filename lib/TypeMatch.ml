@@ -127,6 +127,7 @@ and match_type_var (TypeVariable (name, universe, from, constraints)) ty =
           type is `U`, so we create a binding `T -> U`.  *)
        add_binding empty_bindings name from ty
   | _ ->
+     (* todo: check that `ty` implements the typeclasses. *)
      (* The argument type is not a type variable. Add a straightforward
         binding. *)
      add_binding empty_bindings name from ty
