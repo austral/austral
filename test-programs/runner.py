@@ -55,13 +55,12 @@ def compile_successfully(suite_name: str, test_name: str, expected_output):
     """
     # Find the source files.
     test_dir: str = os.path.join(DIR, "suites", suite_name, test_name)
-    interface_path: str = os.path.join(test_dir, "Test.aui")
     body_path: str = os.path.join(test_dir, "Test.aum")
     # Construct the compiler command.
     compile_cmd: list[str] = [
         "./_build/default/bin/austral.exe",
         "compile",
-        f"--module={interface_path},{body_path}",
+        f"--public-module={body_path}",
         "--entrypoint=Test:Main",
         "--output=test-programs/output.c",
     ]
@@ -203,13 +202,12 @@ def compile_failed(suite_name: str, test_name: str, expected_errors: str):
     """
     # Find the source files.
     test_dir: str = os.path.join(DIR, "suites", suite_name, test_name)
-    interface_path: str = os.path.join(test_dir, "Test.aui")
     body_path: str = os.path.join(test_dir, "Test.aum")
     # Construct the compiler command.
     compile_cmd: list[str] = [
         "./_build/default/bin/austral.exe",
         "compile",
-        f"--module={interface_path},{body_path}",
+        f"--public-module={body_path}",
         "--entrypoint=Test:Main",
         "--output=test-programs/output.c",
     ]

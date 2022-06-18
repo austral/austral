@@ -210,7 +210,7 @@ let private_def module_name im def =
                 docstring)
 
 let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
-  with_frame "Module combining pass"
+  with_frame "Module combining pass: combining .aui and .aum files"
     (fun _ ->
       let (ConcreteModuleInterface (mn, interface_docstring, interface_imports, decls)) = cmi
       and (ConcreteModuleBody (mn', kind, body_docstring, body_imports, defs)) = cmb
@@ -319,3 +319,41 @@ and parse_def (module_name: module_name) (cmi: concrete_module_interface) (im: i
            Some (private_def module_name im def)
       | _ ->
          err "Internal")
+
+let as_public (def: combined_definition): combined_definition =
+  match def with
+  | CConstant (_, name, ty, value, docstring) ->
+     CConstant (VisPublic, name, ty, value, docstring)
+  | CTypeAlias (_, name, typarams, universe, def, docstring) ->
+     CTypeAlias (TypeVisPublic, name, typarams, universe, def, docstring)
+  | CRecord (_, name, typarams, universe, slots, docstring) ->
+     CRecord (TypeVisPublic, name, typarams, universe, slots, docstring)
+  | CUnion (_, name, typarams, universe, cases, docstring) ->
+     CUnion (TypeVisPublic, name, typarams, universe, cases, docstring)
+  | CFunction (_, name, typarams, params, rt, body, docstring, pragmas) ->
+     CFunction (VisPublic, name, typarams, params, rt, body, docstring, pragmas)
+  | CTypeclass (_, name, typaram, methods, docstring) ->
+     CTypeclass (VisPublic, name, typaram, methods, docstring)
+  | CInstance (_, name, typarams, argument, methods, docstring) ->
+     CInstance (VisPublic, name, typarams, argument, methods, docstring)
+
+let body_as_combined (env: env) (body: concrete_module_body): combined_module =
+  with_frame "Module combining pass: module body without interface"
+    (fun _ ->
+      let (ConcreteModuleBody (mn, kind, body_docstring, body_imports, defs)) = body in
+      ps ("Module name", (mod_name_string mn));
+      (* We fake an empty module interface. *)
+      let cmi: concrete_module_interface = ConcreteModuleInterface (mn, Docstring "", [], []) in
+      let imports = resolve mn kind env body_imports in
+      let decls = parse_defs mn cmi imports defs in
+      (* Go through the declarations and make them public. *)
+      let decls = List.map as_public decls in
+      CombinedModule {
+          name = mn;
+          kind = kind;
+          interface_docstring = Docstring "";
+          interface_imports = empty_map mn;
+          body_docstring = body_docstring;
+          body_imports = imports;
+          decls = decls;
+    })

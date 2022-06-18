@@ -1,4 +1,17 @@
 module body Test is
+    union Color: Free is
+        case Red;
+        case Green;
+        case Blue;
+    end;
+
+    union Number: Free is
+        case Integer is
+            value: Integer_32;
+        case Float is
+            value: Double_Float;
+    end;
+
     function Main(root: Root_Capability): Root_Capability is
         let C : Color := Red();
         case C of

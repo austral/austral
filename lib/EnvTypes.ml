@@ -20,7 +20,7 @@ type file_input = { path: string; contents: string }
 type mod_rec = ModRec of {
       id: mod_id;
       name: module_name;
-      interface_file: file_id;
+      interface_file: file_id option;
       interface_docstring: docstring;
       body_file: file_id;
       body_docstring: docstring;
@@ -31,7 +31,7 @@ type mod_rec = ModRec of {
 
 type mod_input = {
     name: module_name;
-    interface_file: file_id;
+    interface_file: file_id option;
     interface_docstring: docstring;
     body_file: file_id;
     body_docstring: docstring;
