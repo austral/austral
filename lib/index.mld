@@ -33,7 +33,6 @@ The compiler frontend.
 - {!Austral_core.ImportResolution}
 - {!Austral_core.Qualifier}
 
-
 {1 Middle}
 
 The compiler's middle end.
