@@ -145,6 +145,12 @@ $ austral typecheck \
     --module=src/C
 ```
 
+The generated code should be compiled with:
+
+```
+gcc -fwrapv lib/prelude.c generated.c -lm
+```
+
 ## Status
 
 1. The bootstrapping compiler, written in OCaml, is implemented. The main
