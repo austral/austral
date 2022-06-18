@@ -7,7 +7,6 @@ open TypeMatch
 open TypeVarSet
 open TypeParser
 open TypeParameters
-open TypeClasses
 open Region
 open Id
 open LexEnv
@@ -767,7 +766,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let expected_ty = parse_typespec env rm typarams ty in
              pt ("Expected type", expected_ty);
              let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
-             let bindings = match_type_with_value expected_ty value' in
+             let bindings = match_type_with_value (env, module_name) expected_ty value' in
              ps ("Bindings", show_bindings bindings);
              let ty = replace_variables bindings expected_ty in
              pt ("Type", ty);
@@ -790,7 +789,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                                      u
                                    )
                  in
-                 let typebindings = match_type orig_type rec_ty in
+                 let typebindings = match_type (env, module_name) orig_type rec_ty in
                  if (vis = TypeVisPublic) || (module_name = source_module) then
                    (* Find the set of slot names and the set of binding names, and compare them *)
                    let binding_names = List.map (fun (n, _) -> n) bindings
@@ -799,7 +798,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      let bindings' = group_bindings_slots bindings slots in
                      let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual)) bindings' in
                      let newvars = List.map (fun (n, ty, actual) ->
-                                       let _ = match_type ty actual in
+                                       let _ = match_type (env, module_name) ty actual in
                                        (n, ty, VarLocal))
                                      bindings'' in
                      let lexenv' = push_vars lexenv newvars in
@@ -866,7 +865,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let ty = get_type expr' in
              pt ("Case type", ty);
              let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
-             let typebindings = match_type union_ty ty in
+             let typebindings = match_type (env, module_name) union_ty ty in
              let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
              let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
              if ident_set_eq case_names when_names then
@@ -950,7 +949,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            (fun _ ->
              let e' = augment_expr module_name env rm typarams lexenv (Some rt) e in
              pt ("Type", get_type e');
-             let _ = match_type_with_value rt e' in
+             let _ = match_type_with_value (env, module_name) rt e' in
              TReturn (span, e')))
 
 and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
@@ -1127,7 +1126,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
       | LConstant (decl_id, vis, name, ty, expr, doc) ->
          ps ("Kind", "Constant");
          let expr' = augment_expr module_name env empty_region_map empty_typarams empty_lexenv (Some ty) expr in
-         let _ = match_type_with_value ty expr' in
+         let _ = match_type_with_value (env, module_name) ty expr' in
          let _ = validate_constant_expression expr' in
          TConstant (decl_id, vis, name, ty, expr', doc)
       | LTypeAlias (decl_id, vis, name, typarams, universe, ty, doc) ->
