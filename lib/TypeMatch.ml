@@ -1,4 +1,5 @@
 open Identifier
+open IdentifierSet
 open Type
 open TypeBindings
 open TypeParameters
@@ -97,23 +98,23 @@ let rec match_type a b =
       | Address t' ->
          match_type t t'
       | _ ->
-        type_mismatch "Expected an Address, but got another type." a b)
+         type_mismatch "Expected an Address, but got another type." a b)
   | Pointer t ->
      (match b with
       | Pointer t' ->
          match_type t t'
       | _ ->
-        type_mismatch "Expected a Pointer, but got another type." a b)
+         type_mismatch "Expected a Pointer, but got another type." a b)
   | MonoTy _ ->
-    err "Not applicable"
+     err "Not applicable"
 
-and match_type_var (TypeVariable (name, universe, from)) ty =
+and match_type_var (TypeVariable (name, universe, from, constraints)) ty =
   (* Check if the argument type is a variable. *)
   match ty with
-  | (TyVar (TypeVariable (i', u', from'))) ->
+  | (TyVar (TypeVariable (i', u', from', constraints'))) ->
      (* When the argument type is a type variable, check if the variables have
         the same name and provenance. *)
-     if (equal_identifier name i') && (universe = u') && (equal_qident from from') then
+     if (equal_identifier name i') && (universe = u') && (equal_qident from from') && (constraints_match constraints constraints') then
        (* If so, do nothing: we don't want circular bindings *)
        empty_bindings
      else
@@ -129,6 +130,12 @@ and match_type_var (TypeVariable (name, universe, from)) ty =
      (* The argument type is not a type variable. Add a straightforward
         binding. *)
      add_binding empty_bindings name from ty
+
+and constraints_match (a: identifier list) (b: identifier list): bool =
+  let a: IdentifierSet.t = IdentifierSet.of_list a
+  and b: IdentifierSet.t = IdentifierSet.of_list b
+  in
+  IdentifierSet.equal a b
 
 and match_type_list tys tys' =
   let bs = List.map2 match_type tys tys' in
