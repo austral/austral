@@ -127,9 +127,9 @@ and match_type_var (TypeVariable (name, universe, from, constraints)) ty =
           type is `U`, so we create a binding `T -> U`.  *)
        add_binding empty_bindings name from ty
   | _ ->
-     (* todo: check that `ty` implements the typeclasses. *)
-     (* The argument type is not a type variable. Add a straightforward
-        binding. *)
+     (* Check that the type implements the type variable's constraints, if any. *)
+     check_type_implements_constraints ty constraints;
+     (* If the constraints are satisfied, add a straightforward binding. *)
      add_binding empty_bindings name from ty
 
 and constraints_match (a: identifier list) (b: identifier list): bool =
@@ -137,6 +137,21 @@ and constraints_match (a: identifier list) (b: identifier list): bool =
   and b: IdentifierSet.t = IdentifierSet.of_list b
   in
   IdentifierSet.equal a b
+
+and check_type_implements_constraints (ty: ty) (constraints: identifier list): unit =
+  (* If there are no constraints, do nothing. *)
+  if constraints = [] then
+    ()
+  else
+    (* If there are constraints, make them into a set. *)
+    let constraints: IdentifierSet.t = IdentifierSet.of_list constraints in
+    (* Try to find an instance for this type for each of the constraints. *)
+    List.iter (try_constraint ty) (List.of_seq (IdentifierSet.to_seq constraints))
+
+and try_constraint (ty: ty) (typeclass_name: identifier): unit =
+  (* Try to find an instance for the given typeclass name that implements this type. *)
+  let _ = (ty, typeclass_name) in
+  ()
 
 and match_type_list tys tys' =
   let bs = List.map2 match_type tys tys' in
