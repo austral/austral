@@ -399,11 +399,11 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
     (fun _ ->
       match callable with
       | FunctionCallable (id, typarams, params, rt) ->
-         augment_function_call id name typarams params rt asserted_ty args
+         augment_function_call env module_name id name typarams params rt asserted_ty args
       | TypeAliasCallable (_, typarams, universe, ty) ->
-         augment_typealias_callable name typarams universe asserted_ty ty args
+         augment_typealias_callable env module_name name typarams universe asserted_ty ty args
       | RecordConstructor (_, typarams, universe, slots) ->
-         augment_record_constructor name typarams universe slots asserted_ty args
+         augment_record_constructor env module_name name typarams universe slots asserted_ty args
       | UnionConstructor { union_id; type_params; universe; case } ->
          let type_name: qident = (match get_decl_by_id env union_id with
                                   | Some (Union { name; mod_id; _ }) ->
@@ -412,7 +412,7 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
                                   | _ ->
                                      err "Internal")
          in
-         augment_union_constructor type_name type_params universe case asserted_ty args
+         augment_union_constructor env module_name type_name type_params universe case asserted_ty args
       | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
          let param = (match get_decl_by_id env typeclass_id with
                       | Some (TypeClass { param; _ }) ->
@@ -422,7 +422,7 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
          in
          augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args)
 
-and augment_function_call (id: decl_id) name typarams params rt asserted_ty args =
+and augment_function_call (env: env) (module_name: module_name) (id: decl_id) name typarams params rt asserted_ty args =
   with_frame "Augment function call"
     (fun _ ->
       pqi ("Name", name);
@@ -431,10 +431,10 @@ and augment_function_call (id: decl_id) name typarams params rt asserted_ty args
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
       let arguments = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
-      let bindings = check_argument_list params arguments in
+      let bindings = check_argument_list env module_name params arguments in
       (* Use the bindings to get the effective return type *)
       let rt' = replace_variables bindings rt in
-      let (bindings', rt'') = handle_return_type_polymorphism (local_name name) params rt' asserted_ty bindings in
+      let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
       (* Check: the set of bindings equals the set of type parameters *)
       let bindings'' = merge_bindings bindings bindings' in
       check_bindings typarams bindings'';
@@ -444,7 +444,7 @@ and augment_function_call (id: decl_id) name typarams params rt asserted_ty args
       pt ("Return type", rt'');
       TFuncall (id, name, arguments', rt'', substs))
 
-and augment_typealias_callable name typarams universe asserted_ty definition_ty args =
+and augment_typealias_callable (env: env) (module_name: module_name) name typarams universe asserted_ty definition_ty args =
   (* Check: the argument list is a positional list with a single argument *)
   let arg = (match args with
              | TPositionalArglist [a] ->
@@ -454,7 +454,7 @@ and augment_typealias_callable name typarams universe asserted_ty definition_ty 
   in
   (* Check a synthetic list of params against the list of arguments *)
   let params = [ValueParameter (make_ident "synthetic", definition_ty)] in
-  let bindings = check_argument_list params [arg] in
+  let bindings = check_argument_list env module_name params [arg] in
   (* Use the bindings to get the effective return type *)
   let rt = NamedType (
                name,
@@ -463,12 +463,12 @@ and augment_typealias_callable name typarams universe asserted_ty definition_ty 
              )
   in
   let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism (local_name name) params rt' asserted_ty bindings in
+  let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings typarams (merge_bindings bindings bindings');
   TTypeAliasConstructor (rt'', arg)
 
-and augment_record_constructor (name: qident) (typarams: typarams) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
+and augment_record_constructor (env: env) (module_name: module_name) (name: qident) (typarams: typarams) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
   (* Check: the argument list must be named *)
   let args' = (match args with
                | TPositionalArglist l ->
@@ -488,14 +488,14 @@ and augment_record_constructor (name: qident) (typarams: typarams) (universe: un
     let arguments = arglist_to_positional (args, slot_names) in
     (* Check the list of params against the list of arguments *)
     let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
-    let bindings = check_argument_list params arguments in
+    let bindings = check_argument_list env module_name params arguments in
     (* Use the bindings to get the effective return type *)
     let rt = NamedType (name,
                         List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
                         universe)
     in
     let rt' = replace_variables bindings rt in
-    let (bindings', rt'') = handle_return_type_polymorphism (local_name name) params rt' asserted_ty bindings in
+    let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
     (* Check: the set of bindings equals the set of type parameters *)
     check_bindings typarams (merge_bindings bindings bindings');
     (* Check the resulting type is in the correct universe *)
@@ -504,7 +504,7 @@ and augment_record_constructor (name: qident) (typarams: typarams) (universe: un
     else
       err "Universe mismatch"
 
-and augment_union_constructor (type_name: qident) (typarams: typarams) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
+and augment_union_constructor (env: env) (module_name: module_name) (type_name: qident) (typarams: typarams) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
   with_frame "Augment union constructor"
     (fun _ ->
       pqi ("Type name", type_name);
@@ -530,7 +530,7 @@ and augment_union_constructor (type_name: qident) (typarams: typarams) (universe
         let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
         ps ("Params", String.concat "\n" (List.map (fun (ValueParameter (n, t)) -> (ident_string n) ^ ": " ^ (type_string t)) params));
         ps ("Arguments", String.concat "\n" (List.map show_texpr arguments));
-        let bindings = check_argument_list params arguments in
+        let bindings = check_argument_list env module_name params arguments in
         (* Use the bindings to get the effective return type *)
         let rt = NamedType (type_name,
                             List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
@@ -540,7 +540,7 @@ and augment_union_constructor (type_name: qident) (typarams: typarams) (universe
         ps ("Bindings", show_bindings bindings);
         let rt' = replace_variables bindings rt in
         pt ("Type'", rt');
-        let (bindings', rt'') = handle_return_type_polymorphism case_name params rt' asserted_ty bindings in
+        let (bindings', rt'') = handle_return_type_polymorphism env module_name case_name params rt' asserted_ty bindings in
         (* Check: the set of bindings equals the set of type parameters *)
         check_bindings typarams (merge_bindings bindings bindings');
         (* Check the resulting type is in the correct universe *)
@@ -562,10 +562,10 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
       let arguments = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
-      let bindings = check_argument_list params arguments in
+      let bindings = check_argument_list env source_module_name params arguments in
       (* Use the bindings to get the effective return type *)
       let rt' = replace_variables bindings rt in
-      let (bindings', rt'') = handle_return_type_polymorphism (local_name callable_name) params rt' asserted_ty bindings in
+      let (bindings', rt'') = handle_return_type_polymorphism env source_module_name (local_name callable_name) params rt' asserted_ty bindings in
       let bindings'' = merge_bindings bindings bindings' in
       (* Check: the set of bindings equals the set of type parameters *)
       check_bindings (typarams_from_list [typaram]) bindings'';
@@ -597,12 +597,12 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
    parameter. Return the resulting set of type bindings. *)
-and check_argument_list (params: value_parameter list) (args: texpr list): type_bindings =
+and check_argument_list (env: env) (module_name: module_name) (params: value_parameter list) (args: texpr list): type_bindings =
   (* Check that the number of parameters is the same as the number of
      arguments. *)
   check_arity params args;
   (* Check arguments against parameters *)
-  check_argument_list' empty_bindings params args
+  check_argument_list' env module_name empty_bindings params args
 
 and check_arity (params: value_parameter list) (args: texpr list): unit =
   let nparams = List.length params
@@ -617,19 +617,19 @@ and check_arity (params: value_parameter list) (args: texpr list): unit =
          ^ ".")
 
 (* Precondition: both lists have the same length. *)
-and check_argument_list' (bindings: type_bindings) (params: value_parameter list) (args: texpr list): type_bindings =
+and check_argument_list' (env: env) (module_name: module_name) (bindings: type_bindings) (params: value_parameter list) (args: texpr list): type_bindings =
   match (params, args) with
   | ((first_param::rest_params), (first_arg::rest_args)) ->
-     let bindings' = merge_bindings bindings (match_parameter first_param first_arg) in
-     check_argument_list' bindings' rest_params rest_args
+     let bindings' = merge_bindings bindings (match_parameter env module_name first_param first_arg) in
+     check_argument_list' env module_name bindings' rest_params rest_args
   | ([], []) ->
      bindings
   | _ ->
      err "Internal"
 
-and match_parameter (param: value_parameter) (arg: texpr): type_bindings =
+and match_parameter (env: env) (module_name: module_name) (param: value_parameter) (arg: texpr): type_bindings =
   let (ValueParameter (_, ty)) = param in
-  match_type_with_value ty arg
+  match_type_with_value (env, module_name) ty arg
 
 and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arguments: texpr list): texpr list =
   let f (ValueParameter (_, expected)) value =
@@ -656,11 +656,11 @@ and make_substs (bindings: type_bindings) (typarams: typarams): (identifier * ty
   in
   List.filter_map f (typarams_as_list typarams)
 
-and handle_return_type_polymorphism (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
+and handle_return_type_polymorphism (env: env) (module_name: module_name) (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
   if is_return_type_polymorphic params rt then
     match asserted_ty with
     | (Some asserted_ty') ->
-       let bindings' = match_type rt asserted_ty' in
+       let bindings' = match_type (env, module_name) rt asserted_ty' in
        let bindings'' = merge_bindings bindings bindings' in
        (bindings'', replace_variables bindings'' rt)
     | None ->
