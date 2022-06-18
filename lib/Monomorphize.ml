@@ -805,4 +805,4 @@ and mono_to_ty (ty: mono_ty): ty =
   | MonoPointer ty ->
      Pointer (r ty)
   | MonoRegionTyVar (name, source) ->
-     TyVar (TypeVariable (name, RegionUniverse, source))
+     TyVar (TypeVariable (name, RegionUniverse, source, []))
