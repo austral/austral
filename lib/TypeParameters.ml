@@ -14,7 +14,7 @@ let typarams_size (typarams: typarams): int =
   List.length lst
 
 let typaram_name (typaram: type_parameter): identifier =
-  let (TypeParameter (name, _, _)) = typaram in
+  let (TypeParameter (name, _, _, _)) = typaram in
   name
 
 let get_typaram (typarams: typarams) (name: identifier): type_parameter option =
