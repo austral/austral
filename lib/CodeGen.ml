@@ -1,6 +1,7 @@
 open Id
 open Identifier
 open Type
+open EnvTypes
 open Env
 open MonoType
 open Mtast

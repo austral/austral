@@ -2,6 +2,7 @@ open Identifier
 open Common
 open Id
 open Env
+open EnvTypes
 open Ast
 open Linked
 open Tast

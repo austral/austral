@@ -1,7 +1,7 @@
 (** This module implements the checking of various typeclass rules. *)
 open Type
 open TypeParameters
-open Env
+open EnvTypes
 
 (** Given the universe a typeclass accepts types from, and the argument to an
     instance of that typeclass, check the argument's universe is acceptable. *)

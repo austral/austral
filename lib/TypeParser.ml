@@ -7,6 +7,7 @@ open TypeSystem
 open Region
 open Ast
 open Env
+open EnvTypes
 open Error
 
 let decl_type_signature (decl: decl): type_signature option =

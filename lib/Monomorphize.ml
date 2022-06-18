@@ -1,5 +1,6 @@
 open Identifier
 open Env
+open EnvTypes
 open Type
 open TypeStripping
 open MonoType

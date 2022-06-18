@@ -10,6 +10,7 @@ open Id
 open DeclIdSet
 open ModIdSet
 open Env
+open EnvTypes
 open Imports
 open TypeParser
 open TypeSignature

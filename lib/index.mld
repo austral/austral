@@ -39,6 +39,7 @@ The compiler frontend.
 The compiler's middle end.
 
 - {!Austral_core.Id}
+- {!Austral_core.EnvTypes}
 - {!Austral_core.Env}
 - {!Austral_core.Region}
 - {!Austral_core.Tast}

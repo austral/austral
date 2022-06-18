@@ -11,6 +11,7 @@ open Region
 open Id
 open LexEnv
 open Env
+open EnvTypes
 open Ast
 open Tast
 open Linked

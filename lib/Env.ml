@@ -1,161 +1,13 @@
 open Identifier
 open Common
 open Type
-open TypeParameters
 open MonoType
 open Tast
 open Mtast
 open Id
-open DeclIdSet
-open ModIdSet
 open LexEnv
+open EnvTypes
 open Error
-
-type file_rec = FileRec of { id: file_id; path: string; contents: string }
-
-type mod_rec = ModRec of {
-      id: mod_id;
-      name: module_name;
-      interface_file: file_id;
-      interface_docstring: docstring;
-      body_file: file_id;
-      body_docstring: docstring;
-      kind: module_kind;
-      imported_instances: DeclIdSet.t;
-      imports_from: ModIdSet.t;
-    }
-
-type decl =
-  | Constant of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: vis;
-      name: identifier;
-      ty: ty;
-      docstring: docstring;
-    }
-  | TypeAlias of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: type_vis;
-      name: identifier;
-      docstring: docstring;
-      typarams: typarams;
-      universe: universe;
-      def: ty;
-    }
-  | Record of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: type_vis;
-      name: identifier;
-      docstring: docstring;
-      typarams: typarams;
-      universe: universe;
-      slots: typed_slot list;
-    }
-  | Union of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: type_vis;
-      name: identifier;
-      docstring: docstring;
-      typarams: typarams;
-      universe: universe;
-    }
-  | UnionCase of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: vis;
-      union_id: decl_id;
-      name: identifier;
-      docstring: docstring;
-      slots: typed_slot list;
-    }
-  | Function of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: vis;
-      name: identifier;
-      docstring: docstring;
-      typarams: typarams;
-      value_params: value_parameter list;
-      rt: ty;
-      external_name: string option;
-      (** If this function is foreign, this is the name of the underlying function
-          that will be called. *)
-      body: tstmt option;
-    }
-  | TypeClass of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: vis;
-      name: identifier;
-      docstring: docstring;
-      param: type_parameter;
-    }
-  | TypeClassMethod of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: vis;
-      typeclass_id: decl_id;
-      name: identifier;
-      docstring: docstring;
-      value_params: value_parameter list;
-      rt: ty;
-    }
-  | Instance of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: vis;
-      typeclass_id: decl_id;
-      docstring: docstring;
-      typarams: typarams;
-      argument: ty;
-    }
-
-type ins_meth_rec = InsMethRec of {
-      id: ins_meth_id;
-      instance_id: decl_id;
-      method_id: decl_id;
-      docstring: docstring;
-      name: identifier;
-      value_params: value_parameter list;
-      rt: ty;
-      body: tstmt option;
-    }
-
-type monomorph =
-  | MonoTypeAliasDefinition of {
-      id: mono_id;
-      type_id: decl_id;
-      tyargs: mono_ty list;
-      def: mono_ty option;
-    }
-  | MonoRecordDefinition of {
-      id: mono_id;
-      type_id: decl_id;
-      tyargs: mono_ty list;
-      slots: (mono_slot list) option;
-    }
-  | MonoUnionDefinition of {
-      id: mono_id;
-      type_id: decl_id;
-      tyargs: mono_ty list;
-      cases: (mono_case list) option;
-    }
-  | MonoFunction of {
-      id: mono_id;
-      function_id: decl_id;
-      tyargs: mono_ty list;
-      body: mstmt option;
-    }
-  | MonoInstanceMethod of {
-      id: mono_id;
-      method_id: ins_meth_id;
-      tyargs: mono_ty list;
-      body: mstmt option;
-    }
 
 (** The file environment stores the contents of files for error reporting. *)
 type file_env = file_rec list
@@ -183,8 +35,6 @@ type env = Env of {
 let empty_env: env =
   Env { files = []; mods = []; methods = []; decls = []; monos = []; }
 
-type file_input = { path: string; contents: string }
-
 let add_file (env: env) (input: file_input): (env * file_id) =
   let { path; contents } = input in
   let (Env { files; mods; methods; decls; monos }) = env in
@@ -192,17 +42,6 @@ let add_file (env: env) (input: file_input): (env * file_id) =
   let file = FileRec { id = id; path = path; contents = contents } in
   let env = Env { files = file :: files; mods; methods; decls; monos} in
   (env, id)
-
-type mod_input = {
-    name: module_name;
-    interface_file: file_id;
-    interface_docstring: docstring;
-    body_file: file_id;
-    body_docstring: docstring;
-    kind: module_kind;
-    imported_instances: DeclIdSet.t;
-    imports_from: ModIdSet.t;
-  }
 
 let add_module (env: env) (input: mod_input): (env * mod_id) =
   let { name; interface_file; interface_docstring; body_file; body_docstring; kind; imported_instances; imports_from } = input in
@@ -231,14 +70,6 @@ let get_module_by_name (env: env) (mod_name: module_name): mod_rec option =
   let (Env { mods; _ }) = env in
   List.find_opt (fun (ModRec { name; _ }) -> equal_module_name mod_name name) mods
 
-type const_input = {
-    mod_id: mod_id;
-    vis: vis;
-    name: identifier;
-    ty: ty;
-    docstring: docstring;
-  }
-
 let make_const_decl (id: decl_id) (input: const_input): decl =
   let { mod_id; vis; name; ty; docstring } = input in
   Constant { id; mod_id; vis; name; ty; docstring }
@@ -249,16 +80,6 @@ let add_constant (env: env) (input: const_input): (env * decl_id) =
   let decl = make_const_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
-
-type type_alias_input = {
-    mod_id: mod_id;
-    vis: type_vis;
-    name: identifier;
-    docstring: docstring;
-    typarams: typarams;
-    universe: universe;
-    def: ty;
-  }
 
 let make_type_alias_decl (id: decl_id) (input: type_alias_input): decl =
   let { mod_id; vis; name; docstring; typarams; universe; def } = input in
@@ -271,16 +92,6 @@ let add_type_alias (env: env) (input: type_alias_input): (env * decl_id) =
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
-type record_input = {
-    mod_id: mod_id;
-    vis: type_vis;
-    name: identifier;
-    docstring: docstring;
-    typarams: typarams;
-    universe: universe;
-    slots: typed_slot list;
-  }
-
 let make_record_decl (id: decl_id) (input: record_input): decl =
   let { mod_id; vis; name; docstring; typarams; universe; slots } = input in
   Record { id; mod_id; vis; name; docstring; typarams; universe; slots }
@@ -291,15 +102,6 @@ let add_record (env: env) (input: record_input): (env * decl_id) =
   let decl = make_record_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
-
-type union_input = {
-    mod_id: mod_id;
-    vis: type_vis;
-    name: identifier;
-    docstring: docstring;
-    typarams: typarams;
-    universe: universe;
-  }
 
 let make_union_decl (id: decl_id) (input: union_input): decl =
   let { mod_id; vis; name; docstring; typarams; universe } = input in
@@ -312,15 +114,6 @@ let add_union (env: env) (input: union_input): (env * decl_id) =
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
-type union_case_input = {
-    mod_id: mod_id;
-    vis: vis;
-    union_id: decl_id;
-    name: identifier;
-    docstring: docstring;
-    slots: typed_slot list;
-  }
-
 let make_union_case_decl (id: decl_id) (input: union_case_input): decl =
   let { mod_id; vis; union_id; name; docstring; slots } = input in
   UnionCase { id; vis; mod_id; union_id; name; docstring; slots }
@@ -331,18 +124,6 @@ let add_union_case (env: env) (input: union_case_input): (env * decl_id) =
   let decl = make_union_case_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
-
-type function_input = {
-    mod_id: mod_id;
-    vis: vis;
-    name: identifier;
-    docstring: docstring;
-    typarams: typarams;
-    value_params: value_parameter list;
-    rt: ty;
-    external_name: string option;
-    body: tstmt option;
-  }
 
 let make_function_decl (id: decl_id) (input: function_input): decl =
   let { mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } = input in
@@ -355,14 +136,6 @@ let add_function (env: env) (input: function_input): (env * decl_id) =
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
-type type_class_input = {
-    mod_id: mod_id;
-    vis: vis;
-    name: identifier;
-    docstring: docstring;
-    param: type_parameter;
-  }
-
 let make_type_class_decl (id: decl_id) (input: type_class_input): decl =
   let { mod_id; vis; name; docstring; param } = input in
   TypeClass { id; mod_id; vis; name; docstring; param }
@@ -373,16 +146,6 @@ let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
   let decl = make_type_class_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
-
-type type_class_method_input = {
-    mod_id: mod_id;
-    vis: vis;
-    typeclass_id: decl_id;
-    name: identifier;
-    docstring: docstring;
-    value_params: value_parameter list;
-    rt: ty;
-  }
 
 let make_type_class_method_decl (id: decl_id) (input: type_class_method_input): decl =
   let { mod_id; vis; typeclass_id; name; docstring; value_params; rt } = input in
@@ -395,15 +158,6 @@ let add_type_class_method (env: env) (input: type_class_method_input): (env * de
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
-type instance_input = {
-    mod_id: mod_id;
-    vis: vis;
-    typeclass_id: decl_id;
-    docstring: docstring;
-    typarams: typarams;
-    argument: ty;
-  }
-
 let make_instance_decl (id: decl_id) (input: instance_input): decl =
   let { mod_id; vis; typeclass_id; docstring; typarams; argument } = input in
   Instance { id; mod_id; vis; typeclass_id; docstring; typarams; argument }
@@ -414,16 +168,6 @@ let add_instance (env: env) (input: instance_input): (env * decl_id) =
   let decl = make_instance_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
-
-type instance_method_input = {
-    instance_id: decl_id;
-    method_id: decl_id;
-    docstring: docstring;
-    name: identifier;
-    value_params: value_parameter list;
-    rt: ty;
-    body: tstmt option;
-  }
 
 let make_ins_meth (id: ins_meth_id) (input: instance_method_input): ins_meth_rec =
   let { instance_id; method_id; docstring; name; value_params; rt; body } = input in
@@ -564,22 +308,6 @@ let union_case_to_typed_case (decl: decl): typed_case =
      TypedCase (name, slots)
   | _ ->
      err "Internal: not a union case"
-
-type callable =
-  | FunctionCallable of decl_id * typarams * value_parameter list * ty
-  | TypeAliasCallable of decl_id * typarams * universe * ty
-  | RecordConstructor of decl_id * typarams * universe * typed_slot list
-  | UnionConstructor of {
-      union_id: decl_id;
-      type_params: typarams;
-      universe: universe;
-      case: typed_case;
-    }
-  | MethodCallable of {
-      typeclass_id: decl_id;
-      value_parameters: value_parameter list;
-      return_type: ty
-    }
 
 let get_callable (env: env) (importing_module_name: module_name) (name: sident): callable option =
   let _ = importing_module_name in

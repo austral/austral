@@ -4,7 +4,7 @@ open Type
 open TypeParameters
 open TypeParser
 open TypeSystem
-open Env
+open EnvTypes
 open Error
 
 let check_instance_argument_has_right_universe (universe: universe) (arg: ty): unit =
