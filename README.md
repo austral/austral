@@ -120,7 +120,7 @@ $ austral compile \
     --module=src/B \
     --module=src/C \
     --entrypoint=C:Main \
-    --output=program.cpp
+    --output=program.c
 ```
 
 The order in which `--module` options appear is the order in which they are
