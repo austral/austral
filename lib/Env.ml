@@ -291,7 +291,7 @@ let module_name_from_id (env: env) (mod_id: mod_id): module_name =
   | Some (ModRec { name; _ }) ->
      name
   | _ ->
-     err "Internal error: no module with ID"
+     internal_err "No module with this ID"
 
 let get_union_cases (env: env) (id: decl_id): decl list =
   let (Env { decls; _ }) = env
@@ -307,7 +307,7 @@ let union_case_to_typed_case (decl: decl): typed_case =
   | UnionCase { name; slots; _ } ->
      TypedCase (name, slots)
   | _ ->
-     err "Internal: not a union case"
+     internal_err "Declaration is not a union case"
 
 let get_callable (env: env) (importing_module_name: module_name) (name: sident): callable option =
   let _ = importing_module_name in
