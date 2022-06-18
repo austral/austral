@@ -4,6 +4,7 @@ open MonoType
 open Tast
 open Mtast
 open Id
+open DeclIdSet
 open LexEnv
 open EnvTypes
 open EnvUtils
@@ -298,14 +299,23 @@ let get_variable (env: env) (lexenv: lexenv) (name: qident): (ty * var_source) o
       | None ->
          None)
 
-let visible_instances (env: env): decl list =
-  (* TODO: filter correctly using the source module ID *)
-  let (Env { decls; _ }) = env
-  and pred = function
-      | Instance _ -> true
+let visible_instances (env: env) (id: mod_id): decl list =
+  let instances_defined_in_module: decl list =
+    let (Env { decls; _ }) = env
+    and pred = function
+      | Instance { mod_id; _ } ->
+         equal_mod_id id mod_id
       | _ -> false
+    in
+    List.filter pred decls
+  and instances_imported_by_module: decl list =
+    match get_module_by_id env id with
+    | Some (ModRec { imported_instances; _ }) ->
+       List.map (fun id -> Option.get (get_decl_by_id env id)) (List.of_seq (DeclIdSet.to_seq imported_instances))
+    | None ->
+       internal_err "No module with ID."
   in
-  List.filter pred decls
+  instances_defined_in_module @ instances_imported_by_module
 
 let rec store_function_body (env: env) (fn_id: decl_id) (body: tstmt): env =
   let (Env { files; mods; methods; decls; monos }) = env in
