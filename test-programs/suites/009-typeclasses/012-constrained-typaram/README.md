@@ -1,0 +1,1 @@
+We have a generic function with a type parameter constrained to a given typeclass, test that it can be called by a value whose type implements that typeclass.
