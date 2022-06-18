@@ -1,19 +1,9 @@
 open Identifier
 open Common
-open Id
 open Env
-open EnvTypes
 open Ast
 open Linked
 open Tast
-open Type
-open TypeBindings
-
-(** Find an instance of the given typeclass given the dispatch type.
-
-Parameters are: environment, source module name, dispatch type, and ID of the
-typeclass. *)
-val get_instance : env -> module_name -> ty -> decl_id -> decl * type_bindings
 
 type stmt_ctx
 
