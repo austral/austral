@@ -76,7 +76,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
       | Comparison (op, lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
-         let _ = match_type_with_value (get_type lhs') rhs' in
+         let _ = match_type_with_value (env, module_name) (get_type lhs') rhs' in
          TComparison (op, lhs', rhs')
       | Conjunction (lhs, rhs) ->
          let lhs' = aug lhs
