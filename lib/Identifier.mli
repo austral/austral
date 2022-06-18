@@ -25,7 +25,7 @@ val mod_name_string : module_name -> string
 (** A sourced identifier is a module name plus an identifier from that
     module. *)
 type sident
-[@@deriving (show, sexp)]
+[@@deriving (eq, show, sexp)]
 
 (** Make a sourced identifier. *)
 val make_sident : module_name -> identifier -> sident

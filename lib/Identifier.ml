@@ -14,7 +14,7 @@ let make_mod_name n = ModuleName n
 let mod_name_string (ModuleName n) = n
 
 type sident = module_name * identifier
-[@@deriving (show, sexp)]
+[@@deriving (eq, show, sexp)]
 
 let make_sident mn n =
   (mn, n)
