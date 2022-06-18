@@ -6,7 +6,7 @@ open Tast
 open Error
 
 let type_mismatch _ a b =
-  austral_raise "Type Mismatch"
+  austral_raise TypeError
     [
       Text "Expected a value of type";
       Code (type_string a);

@@ -5,9 +5,15 @@ open ErrorText
 
 (* Types *)
 
+type error_kind =
+  | GenericError
+  | ParseError
+  | TypeError
+  | InternalError
+
 type austral_error = AustralError of {
       module_name: module_name option;
-      title: string;
+      kind: error_kind;
       text: err_text;
       span: span option;
       source_ctx: source_ctx option;
@@ -17,11 +23,11 @@ exception Austral_error of austral_error
 
 (* Raising *)
 
-let austral_raise (title: string) (text: err_text): 'a =
+let austral_raise (kind: error_kind) (text: err_text): 'a =
   let error: austral_error =
     AustralError {
         module_name = None;
-        title = title;
+        kind = kind;
         text = text;
         span = None;
         source_ctx = None;
@@ -32,28 +38,35 @@ let austral_raise (title: string) (text: err_text): 'a =
 (* Error context-augmenting functions *)
 
 let add_source_ctx (error: austral_error) (ctx: source_ctx): austral_error =
-  let (AustralError { module_name; title; text; span; source_ctx }) = error in
+  let (AustralError { module_name; kind; text; span; source_ctx }) = error in
   match source_ctx with
   | Some _ ->
      error
   | None ->
-     AustralError { module_name; title; text; span; source_ctx = Some ctx; }
+     AustralError { module_name; kind; text; span; source_ctx = Some ctx; }
 
 let adorn_error_with_span (new_span: span) (f: unit -> 'a): 'a =
   try
     f ()
   with Austral_error error ->
-    let (AustralError { module_name; title; text; span; source_ctx }) = error in
+    let (AustralError { module_name; kind; text; span; source_ctx }) = error in
     match span with
     | Some _ ->
        (* The error already has a span, do nothing. *)
        raise (Austral_error error)
     | None ->
        (* Add the span *)
-       let new_err = AustralError { module_name; title; text; span = Some new_span; source_ctx } in
+       let new_err = AustralError { module_name; kind; text; span = Some new_span; source_ctx } in
        raise (Austral_error new_err)
 
 (* Error rendering to plain text *)
+
+let error_title (kind: error_kind): string =
+  match kind with
+  | GenericError -> "Generic Error"
+  | ParseError -> "Parse Error"
+  | TypeError -> "Type Error"
+  | InternalError -> "Internal Error"
 
 let indent_text (text: string) (indent: int): string =
   let lines = String.split_on_char '\n' text in
@@ -68,7 +81,8 @@ let indent_text (text: string) (indent: int): string =
   String.concat "\n" lines
 
 let render_error_to_plain (error: austral_error): string =
-  let (AustralError { span; title; text; source_ctx; _ }) = error in
+  let (AustralError { span; kind; text; source_ctx; _ }) = error in
+  let title: string = error_title kind in
   let span_text =
     match span with
     | Some (Span { filename; startp; endp }) ->
@@ -102,7 +116,7 @@ let err (message: string) =
   let e: austral_error =
     AustralError {
         module_name = None;
-        title = "Generic Error";
+        kind = GenericError;
         text = [Text message];
         span = None;
         source_ctx = None;
@@ -114,7 +128,7 @@ let internal_err (message: string) =
   let e: austral_error =
     AustralError {
         module_name = None;
-        title = "Internal Error";
+        kind = InternalError;
         text = [Text "Internal compiler error:"; Text message];
         span = None;
         source_ctx = None;
