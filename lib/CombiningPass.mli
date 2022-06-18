@@ -1,3 +1,5 @@
+(** The combining pass takes the concrete representation of module interfaces
+    and module bodies, and combines them into a single object for simplicity. *)
 open Identifier
 open Imports
 open Cst
