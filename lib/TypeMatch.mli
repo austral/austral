@@ -7,6 +7,10 @@ open Tast
 open Env
 open EnvTypes
 
+(** We need the environment and the module name to find instances of typeclasses
+    in the module where the typechecking happens. This is used to check that,
+    when matching a constrained type variable to a type, that the type
+    implements the constraints.*)
 type ctx = env * module_name
 
 val match_type_with_value : ctx -> ty -> texpr -> type_bindings
