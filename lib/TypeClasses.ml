@@ -27,7 +27,7 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
     | _ ->
        err "Not a tyvar"
   and all_distinct (tyvars: type_var list): unit =
-    let names: identifier list = List.map (fun (TypeVariable (name, _, _)) -> name) tyvars in
+    let names: identifier list = List.map (fun (TypeVariable (name, _, _, _)) -> name) tyvars in
     let set: IdentifierSet.t = IdentifierSet.of_list names in
     if List.length tyvars = IdentifierSet.cardinal set then
       ()
