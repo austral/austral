@@ -1,6 +1,5 @@
 open Id
 open Identifier
-open IdentifierSet
 open Region
 
 type universe =
@@ -23,7 +22,7 @@ type signedness =
   | Signed
 [@@deriving (eq, show, sexp)]
 
-type type_parameter = TypeParameter of identifier * universe * qident * IdentifierSet.t
+type type_parameter = TypeParameter of identifier * universe * qident * identifier list
 [@@deriving (show, sexp)]
 
 type type_var = TypeVariable of identifier * universe * qident
