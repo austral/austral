@@ -1,11 +1,14 @@
+open Id
 open Identifier
 open IdentifierSet
 open Type
 open TypeBindings
 open TypeParameters
-open TypeClasses
 open Tast
 open Env
+open EnvTypes
+open EnvExtras
+open Reporter
 open Error
 
 let type_mismatch _ a b =
@@ -161,13 +164,8 @@ and try_constraint (ctx: ctx) (ty: ty) (typeclass_name: sident): unit =
   match get_decl_by_name (ctx_env ctx) typeclass_name with
   | Some (TypeClass { id; _ }) ->
      (* Try to find an instance for the given typeclass name that implements this type. *)
-     (match get_instance (ctx_env ctx) (ctx_mn ctx) ty id with
-      | Some (_, _) ->
-         (* Found a typeclass for this type. *)
-         ()
-      | None ->
-         (* No typeclass. *)
-         err "The type does not implement the given typeclass.")
+     let _ = get_instance (ctx_env ctx) (ctx_mn ctx) ty id in
+     ()
   | Some _ ->
      internal_err "Type parameter constraint refers to a declaration which is not a typeclass."
   | None ->
@@ -189,7 +187,7 @@ and get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
            if equal_decl_id typeclass_id typeclass then
              let _ = pt ("Trying instance with argument", argument) in
              try
-               let bindings = match_type argument dispatch_ty in
+               let bindings = match_type (env, source_module_name) argument dispatch_ty in
                Some (decl, bindings)
              with
                Austral_error _ ->
@@ -217,8 +215,8 @@ and get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
              ^ (type_string dispatch_ty)))
 
 
-and match_type_list tys tys' =
-  let bs = List.map2 match_type tys tys' in
+and match_type_list ctx tys tys' =
+  let bs = List.map2 (match_type ctx) tys tys' in
   List.fold_left merge_bindings empty_bindings bs
 
 let match_typarams (ctx: ctx) (typarams: typarams) (args: ty list): type_bindings =
