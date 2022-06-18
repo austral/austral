@@ -124,7 +124,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
 and match_type_var (ctx: ctx) (TypeVariable (name, universe, from, constraints)) ty =
   (* Check if the argument type is a variable. *)
   match ty with
-  | (TyVar (TypeVariable (i', u', from', _))) ->
+  | (TyVar (TypeVariable (i', u', from', constraints'))) ->
      (* When the argument type is a type variable, check if the variables have
         the same name and provenance. *)
      if (equal_identifier name i') && (universe = u') && (equal_qident from from') then
@@ -132,7 +132,7 @@ and match_type_var (ctx: ctx) (TypeVariable (name, universe, from, constraints))
        empty_bindings
      else
        (* Check that the tyvar implements the type variable's constraints, if any. *)
-       let _ = check_type_implements_constraints ctx ty constraints in
+       let _ = check_tyvar_implements_constraints constraints constraints' in
        (* Otherwise, add a new binding.
 
           The idea here is: suppose we have a function `f` that accepts an
@@ -146,6 +146,13 @@ and match_type_var (ctx: ctx) (TypeVariable (name, universe, from, constraints))
      check_type_implements_constraints ctx ty constraints;
      (* If the constraints are satisfied, add a straightforward binding. *)
      add_binding empty_bindings name from ty
+
+and check_tyvar_implements_constraints (param: sident list) (arg: sident list): bool =
+  (* Check that the param is a subset of the param. *)
+  let param: SIdentSet.t = SIdentSet.of_list param
+  and arg: SIdentSet.t = SIdentSet.of_list arg
+  in
+  SIdentSet.subset param arg
 
 and check_type_implements_constraints (ctx: ctx) (ty: ty) (constraints: sident list): unit =
   with_frame "Check type implements constraints"
