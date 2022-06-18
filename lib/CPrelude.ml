@@ -45,6 +45,8 @@ extern au_array_t au_make_array_from_string(const char* data, size_t size);
 
 extern au_unit_t au_abort(au_array_t message);
 
+extern au_unit_t au_printf(const char* format, ...);
+
 /*
  * Memory functions
  */

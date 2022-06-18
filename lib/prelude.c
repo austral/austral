@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 /*
  * Austral types
@@ -49,6 +50,14 @@ au_unit_t au_abort(au_array_t message) {
     fflush(stderr);
     _Exit(-1);
     return nil;
+}
+
+au_unit_t au_printf(const char* format, ...) {
+  va_list args;
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+  return nil;
 }
 
 /*
