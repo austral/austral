@@ -573,7 +573,12 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       | (Some dispatch_ty) ->
          pt ("Dispatch Type", dispatch_ty);
          let (instance, instance_bindings): decl * type_bindings =
-           get_instance env source_module_name dispatch_ty typeclass_id in
+           (match get_instance env source_module_name dispatch_ty typeclass_id with
+            | Some (i, b) -> (i, b)
+            | None ->
+               err ("Typeclass resolution failed. Dispatch type: "
+                    ^ (type_string dispatch_ty)))
+         in
          ps ("Instance bindings", show_bindings instance_bindings);
          let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
          let arguments' = cast_arguments instance_bindings params' arguments in
