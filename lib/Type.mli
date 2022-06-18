@@ -68,3 +68,5 @@ val size_type : ty
 val string_type : ty
 
 val equal_ty : ty -> ty -> bool
+
+val typaram_to_tyvar : type_parameter -> type_var
