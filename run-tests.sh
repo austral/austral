@@ -8,5 +8,5 @@ make
 make test
 # Run the examples.
 ./run-examples.sh
-# Run the test suite.
+# Run the end-to-end tests.
 ./test-programs/runner.py
