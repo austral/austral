@@ -340,7 +340,7 @@ and augment_slot_accessor_elem (env: env) (module_name: module_name) (slot_name:
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-    let bindings = match_typarams typarams type_args in
+    let bindings = match_typarams (env, module_name) typarams type_args in
     let slot_ty' = replace_variables bindings slot_ty in
     TSlotAccessor (slot_name, slot_ty')
   else
@@ -354,7 +354,7 @@ and augment_pointer_slot_accessor_elem (env: env) (module_name: module_name) (sl
      if (vis = TypeVisPublic) || (module_name = source_module) then
        (* Check: the given slot name must exist in this record type. *)
        let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-       let bindings = match_typarams typarams type_args in
+       let bindings = match_typarams (env, module_name) typarams type_args in
        let slot_ty' = replace_variables bindings slot_ty in
        TPointerSlotAccessor (slot_name, slot_ty')
      else
@@ -368,7 +368,7 @@ and augment_reference_slot_accessor_elem (env: env) (module_name: module_name) (
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-    let bindings = match_typarams typarams type_args in
+    let bindings = match_typarams (env, module_name) typarams type_args in
     let slot_ty' = replace_variables bindings slot_ty in
     TPointerSlotAccessor (slot_name, slot_ty')
   else
