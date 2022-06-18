@@ -7,6 +7,7 @@ open Error
 open Id
 open Env
 open EnvTypes
+open EnvUtils
 
 (** Represents an Austral import declaration, that is, in some code like:
 

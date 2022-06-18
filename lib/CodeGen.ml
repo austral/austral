@@ -3,6 +3,7 @@ open Identifier
 open Type
 open EnvTypes
 open Env
+open EnvUtils
 open MonoType
 open Mtast
 open CRepr

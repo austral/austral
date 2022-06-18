@@ -1,5 +1,4 @@
 open Identifier
-open Common
 open Type
 open MonoType
 open Tast
@@ -7,6 +6,7 @@ open Mtast
 open Id
 open LexEnv
 open EnvTypes
+open EnvUtils
 open Error
 
 (** The file environment stores the contents of files for error reporting. *)
@@ -180,42 +180,6 @@ let add_instance_method (env: env) (input: instance_method_input): (env * ins_me
   let env = Env { files; mods; methods = meth :: methods; decls; monos } in
   (env, id)
 
-let decl_id (decl: decl): decl_id =
-  match decl with
-  | Constant { id; _ } -> id
-  | TypeAlias { id; _ } -> id
-  | Record { id; _ } -> id
-  | Union { id; _ } -> id
-  | UnionCase { id; _ } -> id
-  | Function { id; _ } -> id
-  | TypeClass { id; _ } -> id
-  | TypeClassMethod { id; _ } -> id
-  | Instance { id; _ } -> id
-
-let decl_mod_id (decl: decl): mod_id =
-  match decl with
-  | Constant { mod_id; _ } -> mod_id
-  | TypeAlias { mod_id; _ } -> mod_id
-  | Record { mod_id; _ } -> mod_id
-  | Union { mod_id; _ } -> mod_id
-  | UnionCase { mod_id; _ } -> mod_id
-  | Function { mod_id; _ } -> mod_id
-  | TypeClass { mod_id; _ } -> mod_id
-  | TypeClassMethod { mod_id; _ } -> mod_id
-  | Instance { mod_id; _ } -> mod_id
-
-let decl_name (decl: decl): identifier option =
-  match decl with
-  | Constant { name; _ } -> Some name
-  | TypeAlias { name; _ } -> Some name
-  | Record { name; _ } -> Some name
-  | Union { name; _ } -> Some name
-  | UnionCase { name; _ } -> Some name
-  | Function { name; _ } -> Some name
-  | TypeClass { name; _ } -> Some name
-  | TypeClassMethod { name; _ } -> Some name
-  | Instance _ -> None
-
 let get_decl_by_id (env: env) (id: decl_id): decl option =
   let (Env { decls; _ }) = env in
   List.find_opt (fun d -> equal_decl_id id (decl_id d)) decls
@@ -257,26 +221,6 @@ let get_method_from_typeclass_id_and_name (env: env) (typeclass_id: decl_id) (na
   in
   List.find_opt pred decls
 
-let is_importable (decl: decl): bool =
-  let importable_vis = function
-    | VisPublic -> true
-    | VisPrivate -> false
-  and importable_type = function
-    | TypeVisPublic -> true
-    | TypeVisOpaque -> true
-    | TypeVisPrivate -> false
-  in
-  match decl with
-  | Constant { vis; _ } -> importable_vis vis
-  | TypeAlias { vis; _ } -> importable_type vis
-  | Record { vis; _ } -> importable_type vis
-  | Union { vis; _ } -> importable_type vis
-  | UnionCase { vis; _ } -> importable_vis vis
-  | Function { vis; _ } -> importable_vis vis
-  | TypeClass { vis; _ } -> importable_vis vis
-  | TypeClassMethod { vis; _ } -> importable_vis vis
-  | Instance _ -> true
-
 let module_instances (env: env) (id: mod_id): decl list =
   let (Env { decls; _ }) = env
   and pred = function
@@ -301,13 +245,6 @@ let get_union_cases (env: env) (id: decl_id): decl list =
     | _ -> false
   in
   List.filter pred decls
-
-let union_case_to_typed_case (decl: decl): typed_case =
-  match decl with
-  | UnionCase { name; slots; _ } ->
-     TypedCase (name, slots)
-  | _ ->
-     internal_err "Declaration is not a union case"
 
 let get_callable (env: env) (importing_module_name: module_name) (name: sident): callable option =
   let _ = importing_module_name in

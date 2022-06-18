@@ -168,16 +168,3 @@ val get_variable : env -> lexenv -> qident -> (ty * var_source) option
     instances that are defined in the module itself, but the instances imported
     by the module. *)
 val visible_instances : env -> decl list
-
-(** {1 Other Functions} *)
-
-(** Return the ID of a declaration. *)
-val decl_id : decl -> decl_id
-
-(** Return the name of a declaration. *)
-val decl_name : decl -> identifier option
-
-(** Return whether a declaration is importable by a foreign module. *)
-val is_importable: decl -> bool
-
-val union_case_to_typed_case : decl -> typed_case
