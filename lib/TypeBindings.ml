@@ -111,10 +111,10 @@ let rec replace_variables bindings ty =
        NamedType (n, a', u')
      else
        NamedType (n, a', u)
-  | TyVar (TypeVariable (n, u, from)) ->
+  | TyVar (TypeVariable (n, u, from, constraints)) ->
      (match get_binding bindings n from with
       | Some ty -> ty
-      | None -> TyVar (TypeVariable (n, u, from)))
+      | None -> TyVar (TypeVariable (n, u, from, constraints)))
   | StaticArray ty ->
      StaticArray (replace_variables bindings ty)
   | RegionTy r ->
