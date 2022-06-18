@@ -13,7 +13,7 @@ let meq (ty: ty) (ty': ty) (bindlist: (string * ty) list) =
   eq list'' bindlist
 
 let v n u =
-  TyVar (TypeVariable (make_ident n, u, make_qident (make_mod_name "", make_ident "", make_ident "")))
+  TyVar (TypeVariable (make_ident n, u, make_qident (make_mod_name "", make_ident "", make_ident ""), []))
 
 let i = make_ident
 
