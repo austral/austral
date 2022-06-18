@@ -109,3 +109,15 @@ let err (message: string) =
       }
   in
   raise (Austral_error e)
+
+let internal_err (message: string) =
+  let e: austral_error =
+    AustralError {
+        module_name = None;
+        title = "Internal Error";
+        text = [Text "Internal compiler error:"; Text message];
+        span = None;
+        source_ctx = None;
+      }
+  in
+  raise (Austral_error e)

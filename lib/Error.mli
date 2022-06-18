@@ -38,3 +38,6 @@ val render_error_to_plain : austral_error -> string
 
 (** Utility: raise a generic error. *)
 val err : string -> 'a
+
+(** Utility: raise an internal error. *)
+val internal_err : string -> 'a
