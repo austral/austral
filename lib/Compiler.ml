@@ -47,25 +47,42 @@ let cenv (Compiler (m, _)): env = m
 
 let compiler_code (Compiler (_, c)): string = c
 
-type module_source = ModuleSource of {
+type module_source =
+  | TwoFileModuleSource of {
       int_filename: string;
       int_code: string;
       body_filename: string;
       body_code: string
     }
+  | BodyModuleSource of {
+      body_filename: string;
+      body_code: string
+    }
 
-let rec compile_mod c (ModuleSource { int_filename; int_code; body_filename; body_code }) =
+let parse_and_combine (env: env) (source: module_source): (env * combined_module * file_id option * file_id) =
+  match source with
+  | TwoFileModuleSource { int_filename; int_code; body_filename; body_code } ->
+     let (env, int_file_id) = add_file env { path = int_filename; contents = int_code } in
+     let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
+     let ci: concrete_module_interface = parse_module_int int_code int_filename
+     and cb: concrete_module_body = parse_module_body body_code body_filename
+     in
+     let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
+     and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
+     let combined: combined_module = combine env ci cb in
+     (env, combined, Some int_file_id, body_file_id)
+  | BodyModuleSource { body_filename; body_code } ->
+     let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
+     let cb: concrete_module_body = parse_module_body body_code body_filename in
+     let cb: concrete_module_body = append_import_to_body cb pervasive_imports in
+     let combined: combined_module = body_as_combined env cb in
+     (env, combined, None, body_file_id)
+
+let rec compile_mod (c: compiler) (source: module_source): compiler =
   with_frame "Compile module"
     (fun _ ->
       let env: env = cenv c in
-      let (env, int_file_id) = add_file env { path = int_filename; contents = int_code } in
-      let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
-      let ci: concrete_module_interface = parse_module_int int_code int_filename
-      and cb: concrete_module_body = parse_module_body body_code body_filename
-      in
-      let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
-      and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
-      let combined: combined_module = combine env ci cb in
+      let (env, combined, int_file_id, body_file_id) = parse_and_combine env source in
       let _ = check_ends_in_return combined in
       let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
       let typed: typed_module = augment_module env linked in
@@ -141,7 +158,7 @@ let compile_entrypoint c mn i =
   Compiler (m, code ^ "\n" ^ (entrypoint_code (get_root_capability_monomorph (cenv c)) entrypoint_id))
 
 let fake_mod_source (is: string) (bs: string): module_source =
-  ModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
+  TwoFileModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
 
 let dump_and_die _: 'a =
   print_endline "Compiler call tree printed to calltree.html";

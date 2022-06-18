@@ -6,9 +6,14 @@ val empty_compiler : compiler
 
 val compiler_code : compiler -> string
 
-type module_source = ModuleSource of {
+type module_source =
+  | TwoFileModuleSource of {
       int_filename: string;
       int_code: string;
+      body_filename: string;
+      body_code: string
+    }
+  | BodyModuleSource of {
       body_filename: string;
       body_code: string
     }

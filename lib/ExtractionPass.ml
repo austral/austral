@@ -39,7 +39,7 @@ and extract_type_signatures' (def: combined_definition): type_signature option =
   | CInstance _ ->
      None
 
-let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id) (body_file: file_id): (env * linked_module) =
+let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id option) (body_file: file_id): (env * linked_module) =
   let (CombinedModule {
            name;
            kind;

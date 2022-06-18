@@ -10,4 +10,4 @@ val extract_type_signatures : combined_module -> type_signature list
 
 (** Extract a combined module's declarations and put them in the environment,
     and returned a linked module. *)
-val extract : env -> combined_module -> file_id -> file_id -> (env * linked_module)
+val extract : env -> combined_module -> file_id option -> file_id -> (env * linked_module)
