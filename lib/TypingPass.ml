@@ -583,7 +583,13 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
                   proceed differently. Essentially we can't go on with instance
                   resolution, because we don't have a type to resolve an
                   instance for. So we have to freeze the process. *)
-               TNilConstant
+               TVarMethodCall {
+                   method_id = method_id;
+                   method_name = callable_name;
+                   args = arguments;
+                   dispatch_ty = dispatch_ty;
+                   rt = rt'';
+                 }
              else
                (* If it doesn't, that's an error *)
                err "Type parameter does not implement typeclass."
