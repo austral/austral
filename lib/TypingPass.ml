@@ -1111,6 +1111,8 @@ and is_constant = function
      false
   | TMethodCall _ ->
      false
+  | TVarMethodCall _ ->
+     false
   | TCast _ ->
      true
   | TComparison (_, lhs, rhs) ->
