@@ -164,7 +164,8 @@ def run_test(test: Test):
 
 def _test_cmd(test: Test) -> list[str]:
     if test.cli:
-        return test.cli.split(" ")
+        cli: str = test.cli.replace("$DIR", test.directory)
+        return cli.split(" ")
     else:
         body_path: str = os.path.join(test.directory, "Test.aum")
         return [
