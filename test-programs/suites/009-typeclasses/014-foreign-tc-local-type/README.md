@@ -1,0 +1,1 @@
+Test of the orphan rules with a foreign typeclass and a local type.
