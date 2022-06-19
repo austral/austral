@@ -3,7 +3,7 @@ import Test_Type (Foo);
 
 module body Test is
     instance Acceptable(Foo) is
-        method accept(value: Foo): Unit is
+        method Accept(value: Foo): Unit is
             return nil;
         end;
     end;
