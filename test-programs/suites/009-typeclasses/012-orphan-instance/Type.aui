@@ -1,4 +1,0 @@
-module Test_Type is
-    record Foo: Free is
-    end;
-end module.
