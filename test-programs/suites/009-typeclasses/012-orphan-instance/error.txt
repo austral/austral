@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    Orphan rule broken: typeclass and type are both foreign.
+  Code:
+    [no span available]

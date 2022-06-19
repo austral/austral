@@ -1,0 +1,5 @@
+module Test_TC is
+    typeclass Acceptable(T: Free) is
+        method Accept(value: T): Unit;
+    end;
+end module.

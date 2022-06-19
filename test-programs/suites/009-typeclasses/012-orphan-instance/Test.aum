@@ -1,0 +1,14 @@
+import Test_TC (Acceptable);
+import Test_Type (Foo);
+
+module body Test is
+    instance Acceptable(Foo) is
+        method accept(value: Foo): Unit is
+            return nil;
+        end;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.
