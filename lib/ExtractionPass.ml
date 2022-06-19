@@ -234,13 +234,13 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let rm = region_map_from_typarams typarams in
      let argument = parse' rm typarams argument in
      (* Find typeclass info. *)
-     let (typeclass_id, universe): decl_id * universe =
+     let (typeclass_id, typeclass_mod_id, universe): decl_id * mod_id * universe =
        match get_decl_by_name env (qident_to_sident name) with
        | Some decl ->
           (match decl with
-           | TypeClass { id; param; _ } ->
+           | TypeClass { id; mod_id; param; _ } ->
               let TypeParameter (_, universe, _, _) = param in
-              (id, universe)
+              (id, mod_id, universe)
            | _ ->
               err "Type class name refers to something that is not a type class.")
        | None ->
@@ -262,6 +262,8 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
        in
        check_instance_locally_unique other_instances argument
      in
+     (* Global uniqueness: check orphan rules. *)
+     let _ = check_instance_orphan_rules env mod_id typeclass_mod_id argument in
      (* Add the instance to the env *)
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
