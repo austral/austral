@@ -246,7 +246,7 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
        | None ->
           err "Type class with this name does not exist."
      in
-     (* Check the argument has the right shape. *)
+     (* Check the argument has the right universe for the typeclass. *)
      let _ = check_instance_argument_has_right_universe universe argument in
      (* Check the argument has the right shape. *)
      let _ = check_instance_argument_has_right_shape typarams argument in
