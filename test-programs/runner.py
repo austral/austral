@@ -70,28 +70,28 @@ class Suite(object):
 # Collection
 #
 
-def collect_suites() -> list[Suite]:
+def collect_suites() -> list:
     """
     Get the list of all test suites.
     """
     # Result aggregator.
-    suites: list[Suite] = []
+    suites: list = []
     # Find the `suites/`` directory.
     suites_dir: str = os.path.join(DIR, "suites")
     # Find the test suites.
-    suite_names: list[str] = sorted(os.listdir(suites_dir))
+    suite_names: list = sorted(os.listdir(suites_dir))
     # Iterate over each test suite.
     for suite_name in suite_names:
         # Find the tests in this suite.
         suite_dir: str = os.path.join(suites_dir, suite_name)
-        test_names: list[str] = sorted([name for name in os.listdir(suite_dir) if name != "README.md"])
-        tests: list[Test] = []
+        test_names: list = sorted([name for name in os.listdir(suite_dir) if name != "README.md"])
+        tests: list = []
         # Iterate over each test.
         for test_name in test_names:
             test_dir: str = os.path.join(suite_dir, test_name)
-            expected_error: str | None = _get_file_contents(test_dir, "error.txt")
-            expected_output: str | None = _get_file_contents(test_dir, "output.txt")
-            cli: str | None = _get_file_contents(test_dir, "cli.txt")
+            expected_error = _get_file_contents(test_dir, "error.txt")
+            expected_output = _get_file_contents(test_dir, "output.txt")
+            cli = _get_file_contents(test_dir, "cli.txt")
             if (expected_error is not None) and (expected_output is not None):
                 die("Can't have both `error.txt` and `output.txt` in the same test.")
             elif (expected_error is not None) and (expected_output is None):
@@ -162,7 +162,7 @@ def run_test(test: Test):
     else:
         die("Unknown test type.")
 
-def _test_cmd(test: Test) -> list[str]:
+def _test_cmd(test: Test) -> list:
     if test.cli:
         cli: str = test.cli.replace("$DIR", test.directory)
         return cli.split(" ")
@@ -184,13 +184,13 @@ def _run_success_test(test: Test):
     suite_name: str = test.suite_name
     test_name: str = test.name
     # Construct the compiler command.
-    compile_cmd: list[str] = _test_cmd(test)
+    compile_cmd: list = _test_cmd(test)
     # Call the compiler.
     result: subprocess.CompletedProcess = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     code: int = result.returncode
     if code == 0:
         # The compiler executed successfully. Compile the program with GCC.
-        gcc_cmd: list[str] = [
+        gcc_cmd: list = [
             "gcc",
             "-fwrapv", # Modular arithmetic semantics
             "-Wno-builtin-declaration-mismatch",
@@ -310,7 +310,7 @@ def _run_failure_test(test: TestFailure):
     test_dir: str = test.directory
     body_path: str = os.path.join(test_dir, "Test.aum")
     # Construct the compiler command.
-    compile_cmd: list[str] = _test_cmd(test)
+    compile_cmd: list = _test_cmd(test)
     # Call the compiler.
     result: subprocess.CompletedProcess = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     code: int = result.returncode
@@ -351,7 +351,7 @@ def _run_failure_test(test: TestFailure):
 # Test Runner
 #
 
-def run_all_tests(suites: list[Suite]):
+def run_all_tests(suites: list):
     """
     Run the given suites.
     """
