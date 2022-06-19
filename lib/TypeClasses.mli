@@ -1,6 +1,8 @@
 (** This module implements the checking of various typeclass rules. *)
+open Id
 open Type
 open TypeParameters
+open Env
 open EnvTypes
 
 (** Given the universe a typeclass accepts types from, and the argument to an
