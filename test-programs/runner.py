@@ -102,6 +102,7 @@ def collect_suites() -> list[Suite]:
                         name=test_name,
                         suite_name=suite_name,
                         directory=test_dir,
+                        cli=cli,
                         expected_compiler_error=expected_error,
                     )
                 )
@@ -113,6 +114,7 @@ def collect_suites() -> list[Suite]:
                         name=test_name,
                         suite_name=suite_name,
                         directory=test_dir,
+                        cli=cli,
                         expected_output=expected_output,
                     )
                 )
@@ -125,6 +127,7 @@ def collect_suites() -> list[Suite]:
                         name=test_name,
                         suite_name=suite_name,
                         directory=test_dir,
+                        cli=cli,
                         expected_output=None,
                     )
                 )
@@ -159,6 +162,16 @@ def run_test(test: Test):
     else:
         die("Unknown test type.")
 
+def _test_cmd(test: Test) -> list[str]:
+    body_path: str = os.path.join(test.directory, "Test.aum")
+    return [
+        "./_build/default/bin/austral.exe",
+        "compile",
+        f"--public-module={body_path}",
+        "--entrypoint=Test:Main",
+        "--output=test-programs/output.c",
+    ]
+
 def _run_success_test(test: Test):
     # Find the source files.
     test_dir: str = test.directory
@@ -167,13 +180,7 @@ def _run_success_test(test: Test):
     suite_name: str = test.suite_name
     test_name: str = test.name
     # Construct the compiler command.
-    compile_cmd: list[str] = [
-        "./_build/default/bin/austral.exe",
-        "compile",
-        f"--public-module={body_path}",
-        "--entrypoint=Test:Main",
-        "--output=test-programs/output.c",
-    ]
+    compile_cmd: list[str] = _test_cmd(test)
     # Call the compiler.
     result: subprocess.CompletedProcess = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     code: int = result.returncode
@@ -299,13 +306,7 @@ def _run_failure_test(test: TestFailure):
     test_dir: str = test.directory
     body_path: str = os.path.join(test_dir, "Test.aum")
     # Construct the compiler command.
-    compile_cmd: list[str] = [
-        "./_build/default/bin/austral.exe",
-        "compile",
-        f"--public-module={body_path}",
-        "--entrypoint=Test:Main",
-        "--output=test-programs/output.c",
-    ]
+    compile_cmd: list[str] = _test_cmd(test)
     # Call the compiler.
     result: subprocess.CompletedProcess = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     code: int = result.returncode
