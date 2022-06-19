@@ -13,6 +13,7 @@ open LexEnv
 open Env
 open EnvTypes
 open EnvUtils
+open EnvExtras
 open Ast
 open Tast
 open Linked
@@ -572,29 +573,45 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       match get_binding bindings'' type_parameter_name from with
       | (Some dispatch_ty) ->
          pt ("Dispatch Type", dispatch_ty);
-         let (instance, instance_bindings): decl * type_bindings =
-           (match get_instance env source_module_name dispatch_ty typeclass_id with
-            | Some (i, b) -> (i, b)
-            | None ->
-               err ("Typeclass resolution failed. Dispatch type: "
-                    ^ (type_string dispatch_ty)))
-         in
-         ps ("Instance bindings", show_bindings instance_bindings);
-         let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
-         let arguments' = cast_arguments instance_bindings params' arguments in
-         let typarams = (match instance with
-                         | Instance { typarams; _ } -> typarams
-                         | _ -> err "Internal")
-         in
-         let instance_id: decl_id = decl_id instance in
-         let meth_id: ins_meth_id =
-           (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
-            | Some (InsMethRec { id; _ }) -> id
-            | None -> err "Internal")
-         in
-         ps ("Bindings", show_bindings bindings'');
-         let substs = make_substs instance_bindings typarams in
-         TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs)
+         (* Is the dispatch type a type variable? *)
+         (match dispatch_ty with
+          | TyVar (TypeVariable (_, _, _, constraints)) ->
+             (* If so, check if the constraints say that it implements the typeclass. *)
+             let tc_name: sident = get_decl_sident_or_die env typeclass_id in
+             if List.exists (fun c -> equal_sident tc_name c) constraints then
+               (* If it's a tyvar that implements the typeclass, we have to
+                  proceed differently. Essentially we can't go on with instance
+                  resolution, because we don't have a type to resolve an
+                  instance for. So we have to freeze the process. *)
+               TNilConstant
+             else
+               (* If it doesn't, that's an error *)
+               err "Type parameter does not implement typeclass."
+          | _ ->
+             (* If it's not a type variable, continue normal instance resolution. *)
+             let (instance, instance_bindings): decl * type_bindings =
+               (match get_instance env source_module_name dispatch_ty typeclass_id with
+                | Some (i, b) -> (i, b)
+                | None ->
+                   err ("Typeclass resolution failed. Dispatch type: "
+                        ^ (type_string dispatch_ty)))
+             in
+             ps ("Instance bindings", show_bindings instance_bindings);
+             let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
+             let arguments' = cast_arguments instance_bindings params' arguments in
+             let typarams = (match instance with
+                             | Instance { typarams; _ } -> typarams
+                             | _ -> err "Internal")
+             in
+             let instance_id: decl_id = decl_id instance in
+             let meth_id: ins_meth_id =
+               (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
+                | Some (InsMethRec { id; _ }) -> id
+                | None -> err "Internal")
+             in
+             ps ("Bindings", show_bindings bindings'');
+             let substs = make_substs instance_bindings typarams in
+             TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs))
       | None ->
          err "Internal: couldn't extract dispatch type.")
 
@@ -718,9 +735,9 @@ and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
   else
     (* I think this should not be an error *)
     (*err ("Not the same number of bindings and parameters. Bindings: "
-         ^ (show_bindings bindings)
-         ^ ". Parameters: "
-         ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))*)
+      ^ (show_bindings bindings)
+      ^ ". Parameters: "
+      ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))*)
     ()
 
 let is_boolean = function
