@@ -140,7 +140,7 @@ def collect_suites() -> list:
         )
     return suites
 
-def _get_file_contents(test_dir: str, filename: str) -> str | None:
+def _get_file_contents(test_dir: str, filename: str):
     if os.path.isfile(os.path.join(test_dir, filename)):
         with open(os.path.join(test_dir, filename), "r") as stream:
             data: str = stream.read().strip()
@@ -180,7 +180,7 @@ def _run_success_test(test: Test):
     # Find the source files.
     test_dir: str = test.directory
     body_path: str = os.path.join(test_dir, "Test.aum")
-    expected_output: str | None = test.expected_output
+    expected_output = test.expected_output
     suite_name: str = test.suite_name
     test_name: str = test.name
     # Construct the compiler command.
