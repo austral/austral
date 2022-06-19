@@ -9,4 +9,4 @@ make test
 # Run the examples.
 ./run-examples.sh
 # Run the end-to-end tests.
-./test-programs/runner.py
+python3 test-programs/runner.py
