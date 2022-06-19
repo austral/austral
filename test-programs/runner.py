@@ -4,7 +4,6 @@ This script runs the end-to-end tests of the compiler.
 """
 import os
 import subprocess
-from dataclasses import dataclass
 
 #
 # Constants
@@ -43,28 +42,29 @@ def report(properties, outputs):
 # Classes
 #
 
-@dataclass(frozen=True)
-class TestSuccess:
-    name: str
-    suite_name: str
-    directory: str
-    cli: str | None
-    expected_output: str | None
+class Test(object):
+    pass
 
-@dataclass(frozen=True)
-class TestFailure:
-    name: str
-    suite_name: str
-    directory: str
-    cli: str | None
-    expected_compiler_error: str
+class TestSuccess(Test):
+    def __init__(self, name, suite_name, directory, cli, expected_output):
+        self.name = name
+        self.suite_name = suite_name
+        self.directory = directory
+        self.cli = cli
+        self.expected_output = expected_output
 
-Test = TestSuccess | TestFailure
+class TestFailure(Test):
+    def __init__(self, name, suite_name, directory, cli, expected_compiler_error):
+        self.name = name
+        self.suite_name = suite_name
+        self.directory = directory
+        self.cli = cli
+        self.expected_compiler_error = expected_compiler_error
 
-@dataclass(frozen=True)
-class Suite:
-    name: str
-    tests: list[Test]
+class Suite(object):
+    def __init__(self, name, tests):
+        self.name = name
+        self.tests = tests
 
 #
 # Collection
