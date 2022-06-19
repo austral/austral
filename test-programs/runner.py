@@ -163,14 +163,17 @@ def run_test(test: Test):
         die("Unknown test type.")
 
 def _test_cmd(test: Test) -> list[str]:
-    body_path: str = os.path.join(test.directory, "Test.aum")
-    return [
-        "./_build/default/bin/austral.exe",
-        "compile",
-        f"--public-module={body_path}",
-        "--entrypoint=Test:Main",
-        "--output=test-programs/output.c",
-    ]
+    if test.cli:
+        return test.cli.split(" ")
+    else:
+        body_path: str = os.path.join(test.directory, "Test.aum")
+        return [
+            "./_build/default/bin/austral.exe",
+            "compile",
+            f"--public-module={body_path}",
+            "--entrypoint=Test:Main",
+            "--output=test-programs/output.c",
+        ]
 
 def _run_success_test(test: Test):
     # Find the source files.
