@@ -5,71 +5,192 @@ This script runs the end-to-end tests of the compiler.
 import os
 import subprocess
 
+#
+# Constants
+#
+
 # The `test-programs/` directory.
 DIR: str = "test-programs/"
 
-def run_all_tests():
+#
+# Utilities
+#
+
+def indent(text: str) -> str:
+    return "\n".join(["\t" + line for line in text.split("\n")])
+
+#
+# Error Reporting
+#
+
+def die(message: str):
+    print(message)
+    exit(-1)
+
+def report(properties, outputs):
+    print("\n\n--- BEGIN ERROR ---")
+    for (name, value) in properties:
+        print(f"{name}: {value}")
+    for (name, value) in outputs:
+        print(f"\t--- BEGIN {name} ---")
+        print(indent(value))
+        print(f"\t--- END {name} ---\n")
+    print("--- END ERROR ---")
+    exit(-1)
+
+#
+# Classes
+#
+
+class Test(object):
+    pass
+
+class TestSuccess(Test):
+    def __init__(self, name, suite_name, directory, cli, expected_output):
+        self.name = name
+        self.suite_name = suite_name
+        self.directory = directory
+        self.cli = cli
+        self.expected_output = expected_output
+
+class TestFailure(Test):
+    def __init__(self, name, suite_name, directory, cli, expected_compiler_error):
+        self.name = name
+        self.suite_name = suite_name
+        self.directory = directory
+        self.cli = cli
+        self.expected_compiler_error = expected_compiler_error
+
+class Suite(object):
+    def __init__(self, name, tests):
+        self.name = name
+        self.tests = tests
+
+#
+# Collection
+#
+
+def collect_suites() -> list:
     """
-    Find and run all the tests.
+    Get the list of all test suites.
     """
+    # Result aggregator.
+    suites: list = []
     # Find the `suites/`` directory.
     suites_dir: str = os.path.join(DIR, "suites")
     # Find the test suites.
-    suite_names: list[str] = sorted(os.listdir(suites_dir))
+    suite_names: list = sorted(os.listdir(suites_dir))
     # Iterate over each test suite.
     for suite_name in suite_names:
-        print(f"{suite_name}")
         # Find the tests in this suite.
         suite_dir: str = os.path.join(suites_dir, suite_name)
-        test_names: list[str] = sorted([name for name in os.listdir(suite_dir) if name != "README.md"])
+        test_names: list = sorted([name for name in os.listdir(suite_dir) if name != "README.md"])
+        tests: list = []
         # Iterate over each test.
         for test_name in test_names:
-            print(f"\t{test_name.ljust(45)}", end="")
             test_dir: str = os.path.join(suite_dir, test_name)
-            # Is there an `error.txt` file?
-            if os.path.isfile(os.path.join(test_dir, "error.txt")):
-                # If so, the test should fail to compile, and the compiler output must match the contents of the file.
-                with open(os.path.join(test_dir, "error.txt"), "r") as stream:
-                    expected_errors: str = stream.read().strip()
-                    if not expected_errors:
-                        print("\nERROR: `error.txt` is empty")
-                        exit(-1)
-                    compile_failed(suite_name, test_name, expected_errors)
-            # Is there an `output.txt` file?
-            elif os.path.isfile(os.path.join(test_dir, "output.txt")):
-                # If so, the program should compile, run successfully, produce stdout that matches the contents of the file.
-                with open(os.path.join(test_dir, "output.txt"), "r") as stream:
-                    expected_output: str = stream.read()
-                    if not expected_output:
-                        print("\nERROR: `output.txt` is empty")
-                        exit(-1)
-                    compile_successfully(suite_name, test_name, expected_output)
+            expected_error = _get_file_contents(test_dir, "error.txt")
+            expected_output = _get_file_contents(test_dir, "output.txt")
+            cli = _get_file_contents(test_dir, "cli.txt")
+            if (expected_error is not None) and (expected_output is not None):
+                die("Can't have both `error.txt` and `output.txt` in the same test.")
+            elif (expected_error is not None) and (expected_output is None):
+                # The test should fail to compile, and the compiler output must
+                # match the contents of the file.
+                tests.append(
+                    TestFailure(
+                        name=test_name,
+                        suite_name=suite_name,
+                        directory=test_dir,
+                        cli=cli,
+                        expected_compiler_error=expected_error,
+                    )
+                )
+            elif (expected_error is None) and (expected_output is not None):
+                # The program should compile, run successfully, produce stdout
+                # that matches the contents of the file.
+                tests.append(
+                    TestSuccess(
+                        name=test_name,
+                        suite_name=suite_name,
+                        directory=test_dir,
+                        cli=cli,
+                        expected_output=expected_output,
+                    )
+                )
             # There is neither an `error.txt` nor an `output.txt `file.
             else:
-                # The program should compile and run successfully and produce no stdout.
-                compile_successfully(suite_name, test_name, None)
+                # The program should compile and run successfully and produce no
+                # stdout.
+                tests.append(
+                    TestSuccess(
+                        name=test_name,
+                        suite_name=suite_name,
+                        directory=test_dir,
+                        cli=cli,
+                        expected_output=None,
+                    )
+                )
+        # Add the suite.
+        suites.append(
+            Suite(
+                name=suite_name,
+                tests=tests,
+            )
+        )
+    return suites
 
-def compile_successfully(suite_name: str, test_name: str, expected_output):
-    """
-    Given the name of a suite and a test, compile the code, check that compilation succeeds, and run the program, checking that it terminates successfully and the expected output matches.
-    """
+def _get_file_contents(test_dir: str, filename: str):
+    if os.path.isfile(os.path.join(test_dir, filename)):
+        with open(os.path.join(test_dir, filename), "r") as stream:
+            data: str = stream.read().strip()
+            if not data:
+                die(f"`{filename}` exists, but it is empty.")
+            return data
+    else:
+        return None
+
+#
+# Test Execution
+#
+
+def run_test(test: Test):
+    if isinstance(test, TestSuccess):
+        _run_success_test(test)
+    elif isinstance(test, TestFailure):
+        _run_failure_test(test)
+    else:
+        die("Unknown test type.")
+
+def _test_cmd(test: Test) -> list:
+    if test.cli:
+        cli: str = test.cli.replace("$DIR", test.directory)
+        return cli.split(" ")
+    else:
+        body_path: str = os.path.join(test.directory, "Test.aum")
+        return [
+            "./austral",
+            "compile",
+            f"--public-module={body_path}",
+            "--entrypoint=Test:Main",
+            "--output=test-programs/output.c",
+        ]
+
+def _run_success_test(test: Test):
     # Find the source files.
-    test_dir: str = os.path.join(DIR, "suites", suite_name, test_name)
+    test_dir: str = test.directory
     body_path: str = os.path.join(test_dir, "Test.aum")
+    expected_output = test.expected_output
+    suite_name: str = test.suite_name
+    test_name: str = test.name
     # Construct the compiler command.
-    compile_cmd: list[str] = [
-        "./_build/default/bin/austral.exe",
-        "compile",
-        f"--public-module={body_path}",
-        "--entrypoint=Test:Main",
-        "--output=test-programs/output.c",
-    ]
+    compile_cmd: list = _test_cmd(test)
     # Call the compiler.
     result: subprocess.CompletedProcess = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     code: int = result.returncode
     if code == 0:
         # The compiler executed successfully. Compile the program with GCC.
-        gcc_cmd: list[str] = [
+        gcc_cmd: list = [
             "gcc",
             "-fwrapv", # Modular arithmetic semantics
             "-Wno-builtin-declaration-mismatch",
@@ -88,7 +209,7 @@ def compile_successfully(suite_name: str, test_name: str, expected_output):
             code: int = result.returncode
             if code == 0:
                 # Program ran successfully. Did it produce output?
-                stdout: str = result.stdout.decode("utf-8")
+                stdout: str = result.stdout.decode("utf-8").strip()
                 if stdout and expected_output:
                     # Have output, expected output. Check they match.
                     if stdout == expected_output:
@@ -96,165 +217,153 @@ def compile_successfully(suite_name: str, test_name: str, expected_output):
                         print("PASS")
                     else:
                         # Output mismatch. Error.
-                        print("\n\n--- BEGIN ERROR ---")
-                        print(f"Suite: {suite_name}")
-                        print(f"Test: {test_name}")
-                        print("Description: program produced stdout, but it was not what we expected.")
-                        print("Program output:\n")
-                        print("\t--- BEGIN STDOUT ---")
-                        print(indent(stdout))
-                        print("\t--- END STDOUT ---")
-                        print("\nExpected output:\n")
-                        print("\t--- BEGIN EXPECTED ---")
-                        print(indent(expected_output))
-                        print("\t--- END EXPECTED ---")
-                        print("--- END ERROR ---")
-                        exit(-1)
+                        report(
+                            properties=[
+                                ("Suite", suite_name),
+                                ("Test", test_name),
+                                ("Description", "program produced stdout, but it was not what we expected."),
+                            ],
+                            outputs=[
+                                ("ACTUAL STDOUT", stdout),
+                                ("EXPECTED STDOUT", expected_output),
+                            ],
+                        )
                 elif stdout and (not expected_output):
                     # Have output, did not expect it. Error.
-                    print("\n\n--- BEGIN ERROR ---")
-                    print(f"Suite: {suite_name}")
-                    print(f"Test: {test_name}")
-                    print("Description: program produced stdout, but we expected none.")
-                    print("Program output:\n")
-                    print("\t--- BEGIN STDOUT ---")
-                    print(indent(stdout))
-                    print("\t--- END STDOUT ---")
-                    print("--- END ERROR ---")
-                    exit(-1)
+                    report(
+                        properties=[
+                            ("Suite", suite_name),
+                            ("Test", test_name),
+                            ("Description", "program produced stdout, but we expected none."),
+                        ],
+                        outputs=[
+                            ("STDOUT", stdout),
+                        ],
+                    )
                 elif (not stdout) and expected_output:
                     # Don't have output, expected it. Error.
-                    print("\n\n--- BEGIN ERROR ---")
-                    print(f"Suite: {suite_name}")
-                    print(f"Test: {test_name}")
-                    print("Description: program did not produce stdout, but we expected output.")
-                    print("Expected output:\n")
-                    print("\t--- BEGIN EXPECTED ---")
-                    print(indent(expected_output))
-                    print("\t--- END EXPECTED ---")
-                    print("--- END ERROR ---")
-                    exit(-1)
+                    report(
+                        properties=[
+                            ("Suite", suite_name),
+                            ("Test", test_name),
+                            ("Description", "did not produce stdout, but we expected output."),
+                        ],
+                        outputs=[
+                            ("EXPECTED OUTPUT", expected_output),
+                        ],
+                    )
                 else:
                     # Don't have output, didn't expect it. Pass.
                     print("PASS")
             else:
                 # Program did not terminate successfully.
-                print("\n\n--- BEGIN ERROR ---")
-                print(f"Suite: {suite_name}")
-                print(f"Test: {test_name}")
-                print("Description: program terminated abnormally.")
-                print("Command:", " ".join(["./test-programs/testbin"]))
-                print("Return code:", code)
-                print("Program stdout: \n")
-                print("\t--- BEGIN STDOUT ---")
-                print(indent(result.stdout.decode("utf-8")))
-                print("\t--- END STDOUT ---")
-                print("\Program stderr:\n")
-                print("\t--- BEGIN STDERR ---")
-                print(indent(result.stderr.decode("utf-8")))
-                print("\t--- END STDERR ---")
-                print("--- END ERROR ---")
-                exit(-1)
+                report(
+                    properties=[
+                        ("Suite", suite_name),
+                        ("Test", test_name),
+                        ("Description", "program terminated abnormally."),
+                        ("Command", " ".join(["./test-programs/testbin"])),
+                        ("Return code", code),
+                    ],
+                    outputs=[
+                        ("STDOUT", result.stdout.decode("utf-8")),
+                        ("STDERR", result.stderr.decode("utf-8")),
+                    ],
+                )
         else:
             # GCC compilation failed.
-            print("\n\n--- BEGIN ERROR ---")
-            print(f"Suite: {suite_name}")
-            print(f"Test: {test_name}")
-            print("Description: GCC compiler failed.")
-            print("Command:", " ".join(gcc_cmd))
-            print("Generated code in: test-programs/output.c")
-            print("Return code:", code)
-            print("Compiler stdout: \n")
-            print("\t--- BEGIN STDOUT ---")
-            print(indent(result.stdout.decode("utf-8")))
-            print("\t--- END STDOUT ---")
-            print("\nCompiler stderr:\n")
-            print("\t--- BEGIN STDERR ---")
-            print(indent(result.stderr.decode("utf-8")))
-            print("\t--- END STDERR ---")
-            print("--- END ERROR ---")
-            exit(-1)
+            report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                ("Description", "GCC compiler failed."),
+                ("Command", " ".join(gcc_cmd)),
+                ("Return code", code),
+            ],
+                outputs=[
+                    ("GCC STDOUT", result.stdout.decode("utf-8")),
+                    ("GCC STDERR", result.stderr.decode("utf-8")),
+                ],
+            )
     else:
         # Compilation failed: print the output.
-        print("\n\n--- BEGIN ERROR ---")
-        print(f"Suite: {suite_name}")
-        print(f"Test: {test_name}")
-        print("Description: Austral compiler failed.")
-        print("Command:", " ".join(compile_cmd))
-        print("Return code:", code)
-        print("Compiler stdout: \n")
-        print("\t--- BEGIN STDOUT ---")
-        print(indent(result.stdout.decode("utf-8")))
-        print("\t--- END STDOUT ---")
-        print("\nCompiler stderr:\n")
-        print("\t--- BEGIN STDERR ---")
-        print(indent(result.stderr.decode("utf-8")))
-        print("\t--- END STDERR ---")
-        print("--- END ERROR ---")
-        exit(-1)
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                ("Description", "Austral compiler failed."),
+                ("Command", " ".join(compile_cmd)),
+                ("Return code", code),
+            ],
+            outputs=[
+                ("COMPILER STDOUT", result.stdout.decode("utf-8")),
+                ("STDERR", result.stderr.decode("utf-8")),
+            ],
+        )
     # At this point, the test has passed. Delete the C code and the test binary.
     os.remove("test-programs/output.c")
     os.remove("test-programs/testbin")
 
-def compile_failed(suite_name: str, test_name: str, expected_errors: str):
-    """
-    Given the name of a suite and a test, compile the code, check that compilation fails and the compiler produces the expected stderr text.
-    """
+
+def _run_failure_test(test: TestFailure):
     # Find the source files.
-    test_dir: str = os.path.join(DIR, "suites", suite_name, test_name)
+    test_dir: str = test.directory
     body_path: str = os.path.join(test_dir, "Test.aum")
     # Construct the compiler command.
-    compile_cmd: list[str] = [
-        "./_build/default/bin/austral.exe",
-        "compile",
-        f"--public-module={body_path}",
-        "--entrypoint=Test:Main",
-        "--output=test-programs/output.c",
-    ]
+    compile_cmd: list = _test_cmd(test)
     # Call the compiler.
     result: subprocess.CompletedProcess = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     code: int = result.returncode
     if code == 0:
         # Compilation succeeded.
-        print("\n\n--- BEGIN ERROR ---")
-        print(f"Suite: {suite_name}")
-        print(f"Test: {test_name}")
-        print("Description: Austral compiler succeeded, but was expected to fail.")
-        print("Command:", " ".join(compile_cmd))
-        print("Return code:", code)
-        print("Expected stderr: \n")
-        print("\t--- BEGIN EXPECTED ---")
-        print(indent(expected_errors))
-        print("\t--- END EXPECTED ---")
-        print("--- END ERROR ---")
-        exit(-1)
-    else:
-        # Compilation failed. Does the actual stderr match expected?
-        stderr: str = result.stderr.decode("utf-8").strip()
-        if stderr == expected_errors:
-            print("PASS")
-        else:
-            print("\n\n--- BEGIN ERROR ---")
-            print(f"Suite: {suite_name}")
-            print(f"Test: {test_name}")
-            print("Description: Austral compiler failed, but compiler output does not match what we expected.")
-            print("Command:", " ".join(compile_cmd))
-            print("Return code:", code)
-            print("Expected stderr: \n")
-            print("\t--- BEGIN EXPECTED ---")
-            print(indent(expected_errors))
-            print("\t--- END EXPECTED ---")
-            print("\nActual stderr: \n")
-            print("\t--- BEGIN STDERR ---")
-            print(indent(stderr))
-            print("\t--- END STDERR ---\n")
-            print("--- END ERROR ---")
-            exit(-1)
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                ("Description", "Austral compiler succeeded, but was expected to fail."),
+                ("Command", " ".join(compile_cmd)),
+                ("Return code", code),
+            ],
+            outputs=[
+                ("EXPECTED STDERR", test.expected_compiler_error),
+            ],
+        )
+    # Compilation failed. Does the actual stderr match expected?
+    stderr: str = result.stderr.decode("utf-8").strip()
+    if stderr != test.expected_compiler_error:
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                ("Description", "Austral compiler failed, but compiler output does not match what we expected."),
+                ("Command", " ".join(compile_cmd)),
+                ("Return code", code),
+            ],
+            outputs=[
+                ("EXPECTED STDERR", test.expected_compiler_error),
+                ("ACTUAL STDERR", stderr),
+            ],
+        )
+    # Compilation failed and output matches.
+    print("PASS")
 
-# Utilities
+#
+# Test Runner
+#
 
-def indent(text: str) -> str:
-    return "\n".join(["\t" + line for line in text.split("\n")])
+def run_all_tests(suites: list):
+    """
+    Run the given suites.
+    """
+    for suite in suites:
+        print(suite.name)
+        for test in suite.tests:
+            print(f"\t{test.name.ljust(45)}", end="")
+            run_test(test)
+
+#
+# Entrypoint
+#
 
 if __name__ == "__main__":
-    run_all_tests()
+    run_all_tests(collect_suites())

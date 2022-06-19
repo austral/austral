@@ -5,6 +5,10 @@ open TypeParameters
 open TypeParser
 open TypeSystem
 open EnvTypes
+open EnvExtras
+open EnvUtils
+open TypeMatch
+open Reporter
 open Error
 
 let check_instance_argument_has_right_universe (universe: universe) (arg: ty): unit =
@@ -141,3 +145,47 @@ let check_instance_locally_unique (instances: decl list) (argument: ty): unit =
     err "Instance overlaps."
   else
     ()
+
+let rec check_instance_orphan_rules (env: env) (mod_id: mod_id) (typeclass_mod_id: mod_id) (ty: ty): unit =
+  let tc_local: bool = equal_mod_id mod_id typeclass_mod_id
+  and ty_local: bool = is_type_local env mod_id ty
+  in
+  if (not tc_local) && (not ty_local) then
+    err "Orphan rule broken: typeclass and type are both foreign."
+  else
+    ()
+
+and is_type_local (env: env) (mod_id: mod_id) (ty: ty): bool =
+  match ty with
+  | Unit ->
+     true
+  | Boolean ->
+     true
+  | Integer _ ->
+     true
+  | SingleFloat ->
+     true
+  | DoubleFloat ->
+     true
+  | NamedType (name, _, _) ->
+     let type_mod_id: mod_id = decl_mod_id (get_decl_by_name_or_die env (qident_to_sident name)) in
+     equal_mod_id mod_id type_mod_id
+  | StaticArray _ ->
+     true
+  | RegionTy _ ->
+     (* Not applicable. *)
+     false
+  | ReadRef _ ->
+     true
+  | WriteRef _ ->
+     true
+  | TyVar _ ->
+     (* Not applicable. *)
+     false
+  | Address _ ->
+     true
+  | Pointer _ ->
+     true
+  | MonoTy _ ->
+     (* Not applicable. *)
+     false
