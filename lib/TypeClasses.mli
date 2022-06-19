@@ -32,6 +32,23 @@ val overlapping_instances : ty -> ty -> bool
     any instance from the list. *)
 val check_instance_locally_unique : decl list -> ty -> unit
 
+(** Given the ID of the module an instance is defined in, the ID of the module
+    the typeclass being implemented is from, and the argument type, check the
+    orphan rules.
+
+    A typeclass is local if it is defined in this module, and foreign
+    otherwise. A type is local if it is defined in this module, or if it is a
+    builtin type, and is foreign otherwise.
+
+    The orphan rules are:
+
+        1. Local typeclass and local type = ok
+        2. Local typeclass and foreign type = ok
+        3. Foreign typeclass and local type = ok
+        4. Foreign typeclass and foreign type = bad
+*)
+val check_instance_orphan_rules : env -> mod_id -> mod_id -> ty -> unit
+
 (** Find an instance of the given typeclass given the dispatch type.
 
 Parameters are: environment, source module name, dispatch type, and ID of the

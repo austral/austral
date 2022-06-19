@@ -1,0 +1,1 @@
+./austral compile --public-module=$DIR/TC.aum --public-module=$DIR/Type.aum --public-module=$DIR/Test.aum --entrypoint=Test:Main --output=test-programs/output.c

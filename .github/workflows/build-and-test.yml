@@ -45,16 +45,8 @@ jobs:
         run: sudo make install
         if: runner.os == 'Linux'
 
-      - name: Run OCaml tests
-        run: opam exec -- dune runtest
-        if: runner.os == 'Linux'
-
-      - name: Run example programs
+      - name: Run tests
         run: ./run-tests.sh
-        if: runner.os == 'Linux'
-
-      - name: Run test script
-        run: python3 test-programs/runner.py
         if: runner.os == 'Linux'
 
       - name: Upload compiler binary
