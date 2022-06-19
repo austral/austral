@@ -69,6 +69,12 @@ and ser_expr =
   | SArithmetic of arithmetic_operator * ser_expr * ser_expr
   | SFuncall of qident * ser_expr list * ty * (identifier * ty) list
   | SMethodCall of ins_meth_ref * typarams * ser_expr list * ty * (identifier * ty) list
+  | SVarMethodCall of {
+      method_name: sident;
+      args: ser_expr list;
+      dispatch_ty: ty;
+      rt: ty;
+    }
   | SCast of ser_expr * ty
   | SComparison of comparison_operator * ser_expr * ser_expr
   | SConjunction of ser_expr * ser_expr
