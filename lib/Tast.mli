@@ -44,6 +44,13 @@ and texpr =
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of decl_id * qident * texpr list * ty * (identifier * ty) list
   | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * (identifier * ty) list
+  | TVarMethodCall of {
+      method_id: decl_id;
+      method_name: qident;
+      args: texpr list;
+      dispatch_ty: ty;
+      rt: ty;
+    }
   | TCast of texpr * ty
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr
