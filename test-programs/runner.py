@@ -28,7 +28,7 @@ def die(message: str):
     print(message)
     exit(-1)
 
-def report(properties: list[tuple[str, str]], outputs: list[tuple[str, str]]):
+def report(properties, outputs):
     print("\n\n--- BEGIN ERROR ---")
     for (name, value) in properties:
         print(f"{name}: {value}")
