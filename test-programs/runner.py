@@ -169,7 +169,7 @@ def _test_cmd(test: Test) -> list[str]:
     else:
         body_path: str = os.path.join(test.directory, "Test.aum")
         return [
-            "./_build/default/bin/austral.exe",
+            "./austral",
             "compile",
             f"--public-module={body_path}",
             "--entrypoint=Test:Main",
