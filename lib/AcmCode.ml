@@ -1,5 +1,6 @@
 (** Transform typed statements to serialized statements. *)
 open Id
+open Identifier
 open Tast
 open AcmFile
 open Env
@@ -54,6 +55,13 @@ let rec ser_expr (env: env) (expr: texpr): ser_expr =
   | TMethodCall (ins_meth_id, _, typarams, args, ty, bindings) ->
      let meth_ref = get_method_ref env ins_meth_id in
      SMethodCall (meth_ref, typarams, List.map se args, ty, bindings)
+  | TVarMethodCall { method_name; args; dispatch_ty; rt; _ } ->
+     SVarMethodCall {
+         method_name = qident_to_sident method_name;
+         args = List.map se args;
+         dispatch_ty = dispatch_ty;
+         rt = rt;
+       }
   | TCast (e, ty) ->
      SCast (se e, ty)
   | TComparison (op, lhs, rhs) ->
