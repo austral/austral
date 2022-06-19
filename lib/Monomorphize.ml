@@ -150,6 +150,9 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
          else
            (* The instance is concrete. *)
            (MConcreteMethodCall (ins_meth_id, name, args, rt), env))
+  | TVarMethodCall _ ->
+     (* TODO *)
+     internal_err "Not implemented yet"
   | TCast (expr, ty) ->
      let (ty, env) = strip_and_mono env ty in
      let (expr, env) = monomorphize_expr env expr in
