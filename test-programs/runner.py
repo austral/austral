@@ -48,6 +48,7 @@ class TestSuccess:
     name: str
     suite_name: str
     directory: str
+    cli: str | None
     expected_output: str | None
 
 @dataclass(frozen=True)
@@ -55,6 +56,7 @@ class TestFailure:
     name: str
     suite_name: str
     directory: str
+    cli: str | None
     expected_compiler_error: str
 
 Test = TestSuccess | TestFailure
@@ -87,8 +89,9 @@ def collect_suites() -> list[Suite]:
         # Iterate over each test.
         for test_name in test_names:
             test_dir: str = os.path.join(suite_dir, test_name)
-            expected_error: str | None = _get_error_txt(test_dir)
-            expected_output: str | None = _get_output_txt(test_dir)
+            expected_error: str | None = _get_file_contents(test_dir, "error.txt")
+            expected_output: str | None = _get_file_contents(test_dir, "output.txt")
+            cli: str | None = _get_file_contents(test_dir, "cli.txt")
             if (expected_error is not None) and (expected_output is not None):
                 die("Can't have both `error.txt` and `output.txt` in the same test.")
             elif (expected_error is not None) and (expected_output is None):
@@ -133,18 +136,6 @@ def collect_suites() -> list[Suite]:
             )
         )
     return suites
-
-def _get_error_txt(test_dir: str) -> str | None:
-    """
-    Get the contents of `error.txt` if it exists, or `None` if it doesn't.
-    """
-    return _get_file_contents(test_dir, "error.txt")
-
-def _get_output_txt(test_dir: str) -> str | None:
-    """
-    Get the contents of `output.txt` if it exists, or `None` if it doesn't.
-    """
-    return _get_file_contents(test_dir, "output.txt")
 
 def _get_file_contents(test_dir: str, filename: str) -> str | None:
     if os.path.isfile(os.path.join(test_dir, filename)):
