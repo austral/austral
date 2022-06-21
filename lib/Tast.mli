@@ -4,6 +4,7 @@ open Escape
 open Type
 open Region
 open TypeParameters
+open TypeBindings
 open Linked
 open Id
 open Span
@@ -45,11 +46,14 @@ and texpr =
   | TFuncall of decl_id * qident * texpr list * ty * (identifier * ty) list
   | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * (identifier * ty) list
   | TVarMethodCall of {
-      method_id: decl_id;
+      source_module_name: module_name;
+      typeclass_id: decl_id;
+      params: value_parameter list;
       method_name: qident;
       args: texpr list;
       dispatch_ty: ty;
       rt: ty;
+      bindings: type_bindings;
     }
   | TCast of texpr * ty
   | TComparison of comparison_operator * texpr * texpr

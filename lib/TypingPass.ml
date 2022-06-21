@@ -593,6 +593,7 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
                    args = arguments;
                    dispatch_ty = dispatch_ty;
                    rt = rt'';
+                   bindings = bindings'';
                  }
              else
                (* If it doesn't, that's an error *)
