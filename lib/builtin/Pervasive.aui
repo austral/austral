@@ -100,4 +100,7 @@ module Austral.Pervasive is
     instance Printable(Double_Float);
     generic [B: Free(Printable)]
     instance Printable(Fixed_Array[B]);
+
+    generic [T: Free(Printable)]
+    function PrintLn(value: T): Unit;
 end module.
