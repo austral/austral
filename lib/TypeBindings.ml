@@ -66,6 +66,7 @@ let add_binding (TypeBindings m) name from ty =
      if equal_ty ty ty' then
        TypeBindings m
      else
+       (* FIXME: Should we fail here? *)
        (* let _ = print_endline (show_bindings (TypeBindings m)) in
        binding_conflict name from ty ty' *)
        (* Power through it. *)
