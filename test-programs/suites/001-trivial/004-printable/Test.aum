@@ -36,6 +36,8 @@ end;
         Put_Character(10);
         Print(3.14 : Double_Float);
         Put_Character(10);
+        Print("Hello, world!");
+        Put_Character(10);
         return root;
     end;
 end module body.
