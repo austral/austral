@@ -64,7 +64,6 @@ let add_binding (TypeBindings m) name from ty =
   match BindingsMap.find_opt (name, from) m with
   | Some ty' ->
      if equal_ty ty ty' then
-       (* let _ = print_endline ("Adding binding: " ^ (ident_string name) ^ " from " ^ (qident_debug_name from) ^ " => " ^ (type_string ty)) in *)
        TypeBindings m
      else
        (* let _ = print_endline (show_bindings (TypeBindings m)) in
@@ -72,7 +71,6 @@ let add_binding (TypeBindings m) name from ty =
        (* Power through it. *)
        TypeBindings (BindingsMap.add (name, from) ty' m)
   | None ->
-     (* let _ = print_endline ("Adding binding: " ^ (ident_string name) ^ " from " ^ (qident_debug_name from) ^ " => " ^ (type_string ty)) in *)
      TypeBindings (BindingsMap.add (name, from) ty m)
 
 (* Add multiple bindings to a bindings map. *)
