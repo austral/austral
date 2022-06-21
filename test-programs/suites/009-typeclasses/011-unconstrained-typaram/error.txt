@@ -5,7 +5,7 @@ Error:
     From: line 14, column 8
     To: line 14, column 22
   Description:
-    Typeclass resolution failed. Dispatch type: T(Test::Foo): Free
+    Type parameter does not implement typeclass.
   Code:
     12 |     generic [T: Free]
     13 |     function Foo(value: T): Unit is
