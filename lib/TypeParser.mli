@@ -12,10 +12,6 @@ open Env
    Preconditions: the lists have the same length. *)
 val effective_universe : qident -> typarams -> universe -> ty list -> universe
 
-val any_arg_is_linear : ty list -> bool
-
-val any_arg_is_type : ty list -> bool
-
 (* Find the type signature of the type with the given name, if any
    exists. Searches the local type signature list first. *)
 val get_type_signature : env -> type_signature list -> qident -> type_signature option

@@ -1,7 +1,6 @@
 open Identifier
 open Type
-open TypeParser
-(*open Error*)
+open TypeSystem
 
 module BindingsMap =
   Map.Make(
@@ -21,7 +20,6 @@ module BindingsMap =
           compare a b
       end
     )
-
 
 type type_bindings = TypeBindings of ty BindingsMap.t
 

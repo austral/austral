@@ -179,24 +179,6 @@ and all_arguments_are_free (args: ty list): bool =
   in
   List.for_all is_compatible_with_free (List.map type_universe args)
 
-(** Given a list of types, return whether any of them are in the Linear
-    universe. *)
-and any_arg_is_linear (args: ty list) =
-  let is_linear = function
-    | LinearUniverse -> true
-    | _ -> false
-  in
-  List.exists is_linear (List.map type_universe args)
-
-(** Given a list of types, return whether any of them are in the Type
-    universe. *)
-and any_arg_is_type (args: ty list) =
-  let is_type = function
-    | TypeUniverse -> true
-    | _ -> false
-  in
-  List.exists is_type (List.map type_universe args)
-
 (* Type signature retrieval *)
 
 let get_type_signature (env: env) (sigs: type_signature list) (name: qident) =
