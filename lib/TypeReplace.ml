@@ -38,6 +38,7 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      and substs = List.map (fun (n, t) -> (n, replace_variables bindings t)) substs in
      TMethodCall (meth_id, name, instance, args, rt, substs)
   | TVarMethodCall { source_module_name; typeclass_id; params; method_name; args; dispatch_ty; rt; bindings; } ->
+     (* FIXME: Do we have to replace the params and the bindings? *)
      let args = List.map (replace_tyvars_expr bindings) args
      and dispatch_ty = replace_variables bindings dispatch_ty
      and rt = replace_variables bindings rt
