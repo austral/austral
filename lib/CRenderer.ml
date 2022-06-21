@@ -125,7 +125,7 @@ and render_stmt (i: indentation) (stmt: c_stmt): line list =
   | CFor (v, final, b) ->
      let s = "; "
              ^ v
-             ^ " < "
+             ^ " <= "
              ^ (e final)
              ^ "; "
              ^ v
