@@ -624,11 +624,9 @@ module body Austral.Pervasive is
         end;
 
         method Print_Fixed_Array(array: Fixed_Array[Natural_8]): Unit is
-            Print('"');
-            for i from 0 to Fixed_Array_Size(array) do
+            for i from 0 to Fixed_Array_Size(array) - 1 do
                 @embed(Unit, "au_printf(\"%c\", $1)", array[i]);
             end for;
-            Print('"');
             return nil;
         end;
     end;
