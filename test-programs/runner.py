@@ -62,7 +62,9 @@ class TestSuccess(Test):
 
 
 class TestFailure(Test):
-    def __init__(self, name, suite_name, directory, cli, expected_compiler_error):
+    def __init__(
+        self, name, suite_name, directory, cli, expected_compiler_error
+    ):
         self.name = name
         self.suite_name = suite_name
         self.directory = directory
@@ -196,8 +198,6 @@ def _test_cmd(test: Test) -> list:
 
 def _run_success_test(test: Test):
     # Find the source files.
-    test_dir: str = test.directory
-    body_path: str = os.path.join(test_dir, "Test.aum")
     expected_output = test.expected_output
     suite_name: str = test.suite_name
     test_name: str = test.name
@@ -249,7 +249,8 @@ def _run_success_test(test: Test):
                                 ("Test", test_name),
                                 (
                                     "Description",
-                                    "program produced stdout, but it was not what we expected.",
+                                    "program produced stdout, but it was not "
+                                    "what we expected.",
                                 ),
                             ],
                             outputs=[
@@ -265,7 +266,8 @@ def _run_success_test(test: Test):
                             ("Test", test_name),
                             (
                                 "Description",
-                                "program produced stdout, but we expected none.",
+                                "program produced stdout, but we expected "
+                                "none.",
                             ),
                         ],
                         outputs=[
@@ -341,9 +343,8 @@ def _run_success_test(test: Test):
 
 
 def _run_failure_test(test: TestFailure):
-    # Find the source files.
-    test_dir: str = test.directory
-    body_path: str = os.path.join(test_dir, "Test.aum")
+    suite_name: str = test.suite_name
+    test_name: str = test.name
     # Construct the compiler command.
     compile_cmd: list = _test_cmd(test)
     # Call the compiler.
@@ -377,7 +378,8 @@ def _run_failure_test(test: TestFailure):
                 ("Test", test_name),
                 (
                     "Description",
-                    "Austral compiler failed, but compiler output does not match what we expected.",
+                    "Austral compiler failed, but compiler output does not "
+                    "match what we expected.",
                 ),
                 ("Command", " ".join(compile_cmd)),
                 ("Return code", code),
