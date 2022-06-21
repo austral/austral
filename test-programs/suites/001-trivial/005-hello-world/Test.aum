@@ -5,8 +5,11 @@ module body Test is
 
     function Main(root: Root_Capability): Root_Capability is
         let arr: Fixed_Array[Natural_8] := "Hello, world!";
-        let n: Index := Fixed_Array_Size(arr);
+        let n: Index := Fixed_Array_Size(arr) - 1;
         @embed(Unit, "au_printf(\"Length: %i\n\", $1)", n);
+        for i from 0 to n do
+            @embed(Unit, "au_printf(\"%i = '%c'\n\", $1, $2)", i, arr[i]);
+        end for;
         Print_Char('"');
         for i from 0 to n do
             Print_Char(arr[i]);
