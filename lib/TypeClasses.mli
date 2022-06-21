@@ -1,11 +1,9 @@
 (** This module implements the checking of various typeclass rules. *)
-open Identifier
 open Id
 open Type
 open TypeParameters
-open TypeBindings
-open EnvTypes
 open Env
+open EnvTypes
 
 (** Given the universe a typeclass accepts types from, and the argument to an
     instance of that typeclass, check the argument's universe is acceptable. *)
@@ -48,9 +46,3 @@ val check_instance_locally_unique : decl list -> ty -> unit
         4. Foreign typeclass and foreign type = bad
 *)
 val check_instance_orphan_rules : env -> mod_id -> mod_id -> ty -> unit
-
-(** Find an instance of the given typeclass given the dispatch type.
-
-Parameters are: environment, source module name, dispatch type, and ID of the
-typeclass. *)
-val get_instance : env -> module_name -> ty -> decl_id -> decl * type_bindings

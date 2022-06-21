@@ -16,16 +16,20 @@ DIR: str = "test-programs/"
 # Utilities
 #
 
+
 def indent(text: str) -> str:
     return "\n".join(["\t" + line for line in text.split("\n")])
+
 
 #
 # Error Reporting
 #
 
+
 def die(message: str):
     print(message)
     exit(-1)
+
 
 def report(properties, outputs):
     print("\n\n--- BEGIN ERROR ---")
@@ -38,12 +42,15 @@ def report(properties, outputs):
     print("--- END ERROR ---")
     exit(-1)
 
+
 #
 # Classes
 #
 
+
 class Test(object):
     pass
+
 
 class TestSuccess(Test):
     def __init__(self, name, suite_name, directory, cli, expected_output):
@@ -53,22 +60,28 @@ class TestSuccess(Test):
         self.cli = cli
         self.expected_output = expected_output
 
+
 class TestFailure(Test):
-    def __init__(self, name, suite_name, directory, cli, expected_compiler_error):
+    def __init__(
+        self, name, suite_name, directory, cli, expected_compiler_error
+    ):
         self.name = name
         self.suite_name = suite_name
         self.directory = directory
         self.cli = cli
         self.expected_compiler_error = expected_compiler_error
 
+
 class Suite(object):
     def __init__(self, name, tests):
         self.name = name
         self.tests = tests
 
+
 #
 # Collection
 #
+
 
 def collect_suites() -> list:
     """
@@ -84,7 +97,9 @@ def collect_suites() -> list:
     for suite_name in suite_names:
         # Find the tests in this suite.
         suite_dir: str = os.path.join(suites_dir, suite_name)
-        test_names: list = sorted([name for name in os.listdir(suite_dir) if name != "README.md"])
+        test_names: list = sorted(
+            [name for name in os.listdir(suite_dir) if name != "README.md"]
+        )
         tests: list = []
         # Iterate over each test.
         for test_name in test_names:
@@ -140,6 +155,7 @@ def collect_suites() -> list:
         )
     return suites
 
+
 def _get_file_contents(test_dir: str, filename: str):
     if os.path.isfile(os.path.join(test_dir, filename)):
         with open(os.path.join(test_dir, filename), "r") as stream:
@@ -150,9 +166,11 @@ def _get_file_contents(test_dir: str, filename: str):
     else:
         return None
 
+
 #
 # Test Execution
 #
+
 
 def run_test(test: Test):
     if isinstance(test, TestSuccess):
@@ -161,6 +179,7 @@ def run_test(test: Test):
         _run_failure_test(test)
     else:
         die("Unknown test type.")
+
 
 def _test_cmd(test: Test) -> list:
     if test.cli:
@@ -176,36 +195,43 @@ def _test_cmd(test: Test) -> list:
             "--output=test-programs/output.c",
         ]
 
+
 def _run_success_test(test: Test):
     # Find the source files.
-    test_dir: str = test.directory
-    body_path: str = os.path.join(test_dir, "Test.aum")
     expected_output = test.expected_output
     suite_name: str = test.suite_name
     test_name: str = test.name
     # Construct the compiler command.
     compile_cmd: list = _test_cmd(test)
     # Call the compiler.
-    result: subprocess.CompletedProcess = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result: subprocess.CompletedProcess = subprocess.run(
+        compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     code: int = result.returncode
     if code == 0:
         # The compiler executed successfully. Compile the program with GCC.
         gcc_cmd: list = [
             "gcc",
-            "-fwrapv", # Modular arithmetic semantics
+            "-fwrapv",  # Modular arithmetic semantics
             "-Wno-builtin-declaration-mismatch",
             "lib/prelude.c",
             "test-programs/output.c",
-            "-lm", # Math stdlib,
+            "-lm",  # Math stdlib,
             "-o",
             "test-programs/testbin",
         ]
         # Call GCC.
-        result: subprocess.CompletedProcess = subprocess.run(gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result: subprocess.CompletedProcess = subprocess.run(
+            gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         code: int = result.returncode
         if code == 0:
             # GCC compilation succeeded. Run the program.
-            result: subprocess.CompletedProcess = subprocess.run(["./test-programs/testbin"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result: subprocess.CompletedProcess = subprocess.run(
+                ["./test-programs/testbin"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
             code: int = result.returncode
             if code == 0:
                 # Program ran successfully. Did it produce output?
@@ -221,7 +247,11 @@ def _run_success_test(test: Test):
                             properties=[
                                 ("Suite", suite_name),
                                 ("Test", test_name),
-                                ("Description", "program produced stdout, but it was not what we expected."),
+                                (
+                                    "Description",
+                                    "program produced stdout, but it was not "
+                                    "what we expected.",
+                                ),
                             ],
                             outputs=[
                                 ("ACTUAL STDOUT", stdout),
@@ -234,7 +264,11 @@ def _run_success_test(test: Test):
                         properties=[
                             ("Suite", suite_name),
                             ("Test", test_name),
-                            ("Description", "program produced stdout, but we expected none."),
+                            (
+                                "Description",
+                                "program produced stdout, but we expected "
+                                "none.",
+                            ),
                         ],
                         outputs=[
                             ("STDOUT", stdout),
@@ -246,7 +280,10 @@ def _run_success_test(test: Test):
                         properties=[
                             ("Suite", suite_name),
                             ("Test", test_name),
-                            ("Description", "did not produce stdout, but we expected output."),
+                            (
+                                "Description",
+                                "did not produce stdout, but we expected output.",
+                            ),
                         ],
                         outputs=[
                             ("EXPECTED OUTPUT", expected_output),
@@ -273,13 +310,13 @@ def _run_success_test(test: Test):
         else:
             # GCC compilation failed.
             report(
-            properties=[
-                ("Suite", suite_name),
-                ("Test", test_name),
-                ("Description", "GCC compiler failed."),
-                ("Command", " ".join(gcc_cmd)),
-                ("Return code", code),
-            ],
+                properties=[
+                    ("Suite", suite_name),
+                    ("Test", test_name),
+                    ("Description", "GCC compiler failed."),
+                    ("Command", " ".join(gcc_cmd)),
+                    ("Return code", code),
+                ],
                 outputs=[
                     ("GCC STDOUT", result.stdout.decode("utf-8")),
                     ("GCC STDERR", result.stderr.decode("utf-8")),
@@ -306,13 +343,14 @@ def _run_success_test(test: Test):
 
 
 def _run_failure_test(test: TestFailure):
-    # Find the source files.
-    test_dir: str = test.directory
-    body_path: str = os.path.join(test_dir, "Test.aum")
+    suite_name: str = test.suite_name
+    test_name: str = test.name
     # Construct the compiler command.
     compile_cmd: list = _test_cmd(test)
     # Call the compiler.
-    result: subprocess.CompletedProcess = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result: subprocess.CompletedProcess = subprocess.run(
+        compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     code: int = result.returncode
     if code == 0:
         # Compilation succeeded.
@@ -320,7 +358,10 @@ def _run_failure_test(test: TestFailure):
             properties=[
                 ("Suite", suite_name),
                 ("Test", test_name),
-                ("Description", "Austral compiler succeeded, but was expected to fail."),
+                (
+                    "Description",
+                    "Austral compiler succeeded, but was expected to fail.",
+                ),
                 ("Command", " ".join(compile_cmd)),
                 ("Return code", code),
             ],
@@ -335,7 +376,11 @@ def _run_failure_test(test: TestFailure):
             properties=[
                 ("Suite", suite_name),
                 ("Test", test_name),
-                ("Description", "Austral compiler failed, but compiler output does not match what we expected."),
+                (
+                    "Description",
+                    "Austral compiler failed, but compiler output does not "
+                    "match what we expected.",
+                ),
                 ("Command", " ".join(compile_cmd)),
                 ("Return code", code),
             ],
@@ -347,9 +392,11 @@ def _run_failure_test(test: TestFailure):
     # Compilation failed and output matches.
     print("PASS")
 
+
 #
 # Test Runner
 #
+
 
 def run_all_tests(suites: list):
     """
@@ -360,6 +407,7 @@ def run_all_tests(suites: list):
         for test in suite.tests:
             print(f"\t{test.name.ljust(45)}", end="")
             run_test(test)
+
 
 #
 # Entrypoint

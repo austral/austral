@@ -25,10 +25,10 @@ type signedness =
   | Signed
 [@@deriving (eq, show, sexp)]
 
-type type_parameter = TypeParameter of identifier * universe * qident * identifier list
+type type_parameter = TypeParameter of identifier * universe * qident * sident list
 [@@deriving (show, sexp)]
 
-type type_var = TypeVariable of identifier * universe * qident
+type type_var = TypeVariable of identifier * universe * qident * sident list
 [@@deriving (eq, show, sexp)]
 
 type ty =
@@ -94,8 +94,16 @@ let rec type_string = function
      read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Free"
   | WriteRef (t, r) ->
      write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Linear"
-  | TyVar (TypeVariable (n, u, from)) ->
-     (ident_string n) ^ "(" ^ (qident_debug_name from) ^ ")" ^ ": " ^ (universe_string u)
+  | TyVar (TypeVariable (n, u, from, constraints)) ->
+     let sident_string si =
+       (mod_name_string (sident_module_name si)) ^ "::" ^ (ident_string (sident_name si))
+     in
+     (ident_string n)
+     ^ "("
+     ^ (qident_debug_name from)
+     ^ "): "
+     ^ (universe_string u)
+     ^ (if constraints = [] then "" else ("(" ^ (String.concat ", " (List.map sident_string constraints)) ^ ")"))
   | Address ty ->
      address_name ^ "[" ^ (type_string ty) ^ "]"
   | Pointer ty ->
@@ -201,5 +209,5 @@ let rec equal_ty a b =
        false)
 
 let typaram_to_tyvar (typaram: type_parameter): type_var =
-  let (TypeParameter (n, u, f, _)) = typaram in
-  TypeVariable (n, u ,f)
+  let (TypeParameter (n, u, f, cs)) = typaram in
+  TypeVariable (n, u, f, cs)

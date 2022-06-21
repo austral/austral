@@ -7,13 +7,13 @@ open TypeMatch
 open TypeVarSet
 open TypeParser
 open TypeParameters
-open TypeClasses
 open Region
 open Id
 open LexEnv
 open Env
 open EnvTypes
 open EnvUtils
+open EnvExtras
 open Ast
 open Tast
 open Linked
@@ -76,7 +76,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
       | Comparison (op, lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
-         let _ = match_type_with_value (get_type lhs') rhs' in
+         let _ = match_type_with_value (env, module_name) (get_type lhs') rhs' in
          TComparison (op, lhs', rhs')
       | Conjunction (lhs, rhs) ->
          let lhs' = aug lhs
@@ -340,7 +340,7 @@ and augment_slot_accessor_elem (env: env) (module_name: module_name) (slot_name:
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-    let bindings = match_typarams typarams type_args in
+    let bindings = match_typarams (env, module_name) typarams type_args in
     let slot_ty' = replace_variables bindings slot_ty in
     TSlotAccessor (slot_name, slot_ty')
   else
@@ -354,7 +354,7 @@ and augment_pointer_slot_accessor_elem (env: env) (module_name: module_name) (sl
      if (vis = TypeVisPublic) || (module_name = source_module) then
        (* Check: the given slot name must exist in this record type. *)
        let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-       let bindings = match_typarams typarams type_args in
+       let bindings = match_typarams (env, module_name) typarams type_args in
        let slot_ty' = replace_variables bindings slot_ty in
        TPointerSlotAccessor (slot_name, slot_ty')
      else
@@ -368,7 +368,7 @@ and augment_reference_slot_accessor_elem (env: env) (module_name: module_name) (
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-    let bindings = match_typarams typarams type_args in
+    let bindings = match_typarams (env, module_name) typarams type_args in
     let slot_ty' = replace_variables bindings slot_ty in
     TPointerSlotAccessor (slot_name, slot_ty')
   else
@@ -399,11 +399,11 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
     (fun _ ->
       match callable with
       | FunctionCallable (id, typarams, params, rt) ->
-         augment_function_call id name typarams params rt asserted_ty args
+         augment_function_call env module_name id name typarams params rt asserted_ty args
       | TypeAliasCallable (_, typarams, universe, ty) ->
-         augment_typealias_callable name typarams universe asserted_ty ty args
+         augment_typealias_callable env module_name name typarams universe asserted_ty ty args
       | RecordConstructor (_, typarams, universe, slots) ->
-         augment_record_constructor name typarams universe slots asserted_ty args
+         augment_record_constructor env module_name name typarams universe slots asserted_ty args
       | UnionConstructor { union_id; type_params; universe; case } ->
          let type_name: qident = (match get_decl_by_id env union_id with
                                   | Some (Union { name; mod_id; _ }) ->
@@ -412,7 +412,7 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
                                   | _ ->
                                      err "Internal")
          in
-         augment_union_constructor type_name type_params universe case asserted_ty args
+         augment_union_constructor env module_name type_name type_params universe case asserted_ty args
       | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
          let param = (match get_decl_by_id env typeclass_id with
                       | Some (TypeClass { param; _ }) ->
@@ -422,7 +422,7 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
          in
          augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args)
 
-and augment_function_call (id: decl_id) name typarams params rt asserted_ty args =
+and augment_function_call (env: env) (module_name: module_name) (id: decl_id) name typarams params rt asserted_ty args =
   with_frame "Augment function call"
     (fun _ ->
       pqi ("Name", name);
@@ -431,10 +431,10 @@ and augment_function_call (id: decl_id) name typarams params rt asserted_ty args
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
       let arguments = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
-      let bindings = check_argument_list params arguments in
+      let bindings = check_argument_list env module_name params arguments in
       (* Use the bindings to get the effective return type *)
       let rt' = replace_variables bindings rt in
-      let (bindings', rt'') = handle_return_type_polymorphism (local_name name) params rt' asserted_ty bindings in
+      let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
       (* Check: the set of bindings equals the set of type parameters *)
       let bindings'' = merge_bindings bindings bindings' in
       check_bindings typarams bindings'';
@@ -444,7 +444,7 @@ and augment_function_call (id: decl_id) name typarams params rt asserted_ty args
       pt ("Return type", rt'');
       TFuncall (id, name, arguments', rt'', substs))
 
-and augment_typealias_callable name typarams universe asserted_ty definition_ty args =
+and augment_typealias_callable (env: env) (module_name: module_name) name typarams universe asserted_ty definition_ty args =
   (* Check: the argument list is a positional list with a single argument *)
   let arg = (match args with
              | TPositionalArglist [a] ->
@@ -454,7 +454,7 @@ and augment_typealias_callable name typarams universe asserted_ty definition_ty 
   in
   (* Check a synthetic list of params against the list of arguments *)
   let params = [ValueParameter (make_ident "synthetic", definition_ty)] in
-  let bindings = check_argument_list params [arg] in
+  let bindings = check_argument_list env module_name params [arg] in
   (* Use the bindings to get the effective return type *)
   let rt = NamedType (
                name,
@@ -463,12 +463,12 @@ and augment_typealias_callable name typarams universe asserted_ty definition_ty 
              )
   in
   let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism (local_name name) params rt' asserted_ty bindings in
+  let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
   (* Check: the set of bindings equals the set of type parameters *)
   check_bindings typarams (merge_bindings bindings bindings');
   TTypeAliasConstructor (rt'', arg)
 
-and augment_record_constructor (name: qident) (typarams: typarams) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
+and augment_record_constructor (env: env) (module_name: module_name) (name: qident) (typarams: typarams) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
   (* Check: the argument list must be named *)
   let args' = (match args with
                | TPositionalArglist l ->
@@ -488,14 +488,14 @@ and augment_record_constructor (name: qident) (typarams: typarams) (universe: un
     let arguments = arglist_to_positional (args, slot_names) in
     (* Check the list of params against the list of arguments *)
     let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
-    let bindings = check_argument_list params arguments in
+    let bindings = check_argument_list env module_name params arguments in
     (* Use the bindings to get the effective return type *)
     let rt = NamedType (name,
                         List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
                         universe)
     in
     let rt' = replace_variables bindings rt in
-    let (bindings', rt'') = handle_return_type_polymorphism (local_name name) params rt' asserted_ty bindings in
+    let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
     (* Check: the set of bindings equals the set of type parameters *)
     check_bindings typarams (merge_bindings bindings bindings');
     (* Check the resulting type is in the correct universe *)
@@ -504,7 +504,7 @@ and augment_record_constructor (name: qident) (typarams: typarams) (universe: un
     else
       err "Universe mismatch"
 
-and augment_union_constructor (type_name: qident) (typarams: typarams) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
+and augment_union_constructor (env: env) (module_name: module_name) (type_name: qident) (typarams: typarams) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
   with_frame "Augment union constructor"
     (fun _ ->
       pqi ("Type name", type_name);
@@ -530,7 +530,7 @@ and augment_union_constructor (type_name: qident) (typarams: typarams) (universe
         let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
         ps ("Params", String.concat "\n" (List.map (fun (ValueParameter (n, t)) -> (ident_string n) ^ ": " ^ (type_string t)) params));
         ps ("Arguments", String.concat "\n" (List.map show_texpr arguments));
-        let bindings = check_argument_list params arguments in
+        let bindings = check_argument_list env module_name params arguments in
         (* Use the bindings to get the effective return type *)
         let rt = NamedType (type_name,
                             List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
@@ -540,7 +540,7 @@ and augment_union_constructor (type_name: qident) (typarams: typarams) (universe
         ps ("Bindings", show_bindings bindings);
         let rt' = replace_variables bindings rt in
         pt ("Type'", rt');
-        let (bindings', rt'') = handle_return_type_polymorphism case_name params rt' asserted_ty bindings in
+        let (bindings', rt'') = handle_return_type_polymorphism env module_name case_name params rt' asserted_ty bindings in
         (* Check: the set of bindings equals the set of type parameters *)
         check_bindings typarams (merge_bindings bindings bindings');
         (* Check the resulting type is in the correct universe *)
@@ -560,12 +560,12 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       (* For simplicity, and to reduce duplication of code, we convert the argument
          list to a positional list. *)
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-      let arguments = arglist_to_positional (args, param_names) in
+      let arguments: texpr list = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
-      let bindings = check_argument_list params arguments in
+      let bindings = check_argument_list env source_module_name params arguments in
       (* Use the bindings to get the effective return type *)
       let rt' = replace_variables bindings rt in
-      let (bindings', rt'') = handle_return_type_polymorphism (local_name callable_name) params rt' asserted_ty bindings in
+      let (bindings', rt'') = handle_return_type_polymorphism env source_module_name (local_name callable_name) params rt' asserted_ty bindings in
       let bindings'' = merge_bindings bindings bindings' in
       (* Check: the set of bindings equals the set of type parameters *)
       check_bindings (typarams_from_list [typaram]) bindings'';
@@ -573,36 +573,66 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       match get_binding bindings'' type_parameter_name from with
       | (Some dispatch_ty) ->
          pt ("Dispatch Type", dispatch_ty);
-         let (instance, instance_bindings): decl * type_bindings =
-           get_instance env source_module_name dispatch_ty typeclass_id in
-         ps ("Instance bindings", show_bindings instance_bindings);
-         let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
-         let arguments' = cast_arguments instance_bindings params' arguments in
-         let typarams = (match instance with
-                         | Instance { typarams; _ } -> typarams
-                         | _ -> err "Internal")
-         in
-         let instance_id: decl_id = decl_id instance in
-         let meth_id: ins_meth_id =
-           (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
-            | Some (InsMethRec { id; _ }) -> id
-            | None -> err "Internal")
-         in
-         ps ("Bindings", show_bindings bindings'');
-         let substs = make_substs instance_bindings typarams in
-         TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs)
+         (* Is the dispatch type a type variable? *)
+         (match dispatch_ty with
+          | TyVar (TypeVariable (_, _, _, constraints)) ->
+             (* If so, check if the constraints say that it implements the typeclass. *)
+             let tc_name: sident = get_decl_sident_or_die env typeclass_id in
+             if List.exists (fun c -> equal_sident tc_name c) constraints then
+               (* If it's a tyvar that implements the typeclass, we have to
+                  proceed differently. Essentially we can't go on with instance
+                  resolution, because we don't have a type to resolve an
+                  instance for. So we have to freeze the process. *)
+               TVarMethodCall {
+                   source_module_name = source_module_name;
+                   typeclass_id = typeclass_id;
+                   params = params;
+                   method_name = callable_name;
+                   args = arguments;
+                   dispatch_ty = dispatch_ty;
+                   rt = rt'';
+                   bindings = bindings'';
+                 }
+             else
+               (* If it doesn't, that's an error *)
+               err "Type parameter does not implement typeclass."
+          | _ ->
+             (* If it's not a type variable, continue normal instance resolution. *)
+             let (instance, instance_bindings): decl * type_bindings =
+               (match get_instance env source_module_name dispatch_ty typeclass_id with
+                | Some (i, b) -> (i, b)
+                | None ->
+                   err ("Typeclass resolution failed. Dispatch type: "
+                        ^ (type_string dispatch_ty)))
+             in
+             ps ("Instance bindings", show_bindings instance_bindings);
+             let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
+             let arguments' = cast_arguments instance_bindings params' arguments in
+             let typarams = (match instance with
+                             | Instance { typarams; _ } -> typarams
+                             | _ -> err "Internal")
+             in
+             let instance_id: decl_id = decl_id instance in
+             let meth_id: ins_meth_id =
+               (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
+                | Some (InsMethRec { id; _ }) -> id
+                | None -> err "Internal")
+             in
+             ps ("Bindings", show_bindings bindings'');
+             let substs = make_substs instance_bindings typarams in
+             TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs))
       | None ->
          err "Internal: couldn't extract dispatch type.")
 
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
    parameter. Return the resulting set of type bindings. *)
-and check_argument_list (params: value_parameter list) (args: texpr list): type_bindings =
+and check_argument_list (env: env) (module_name: module_name) (params: value_parameter list) (args: texpr list): type_bindings =
   (* Check that the number of parameters is the same as the number of
      arguments. *)
   check_arity params args;
   (* Check arguments against parameters *)
-  check_argument_list' empty_bindings params args
+  check_argument_list' env module_name empty_bindings params args
 
 and check_arity (params: value_parameter list) (args: texpr list): unit =
   let nparams = List.length params
@@ -617,19 +647,19 @@ and check_arity (params: value_parameter list) (args: texpr list): unit =
          ^ ".")
 
 (* Precondition: both lists have the same length. *)
-and check_argument_list' (bindings: type_bindings) (params: value_parameter list) (args: texpr list): type_bindings =
+and check_argument_list' (env: env) (module_name: module_name) (bindings: type_bindings) (params: value_parameter list) (args: texpr list): type_bindings =
   match (params, args) with
   | ((first_param::rest_params), (first_arg::rest_args)) ->
-     let bindings' = merge_bindings bindings (match_parameter first_param first_arg) in
-     check_argument_list' bindings' rest_params rest_args
+     let bindings' = merge_bindings bindings (match_parameter env module_name first_param first_arg) in
+     check_argument_list' env module_name bindings' rest_params rest_args
   | ([], []) ->
      bindings
   | _ ->
      err "Internal"
 
-and match_parameter (param: value_parameter) (arg: texpr): type_bindings =
+and match_parameter (env: env) (module_name: module_name) (param: value_parameter) (arg: texpr): type_bindings =
   let (ValueParameter (_, ty)) = param in
-  match_type_with_value ty arg
+  match_type_with_value (env, module_name) ty arg
 
 and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arguments: texpr list): texpr list =
   let f (ValueParameter (_, expected)) value =
@@ -656,11 +686,11 @@ and make_substs (bindings: type_bindings) (typarams: typarams): (identifier * ty
   in
   List.filter_map f (typarams_as_list typarams)
 
-and handle_return_type_polymorphism (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
+and handle_return_type_polymorphism (env: env) (module_name: module_name) (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
   if is_return_type_polymorphic params rt then
     match asserted_ty with
     | (Some asserted_ty') ->
-       let bindings' = match_type rt asserted_ty' in
+       let bindings' = match_type (env, module_name) rt asserted_ty' in
        let bindings'' = merge_bindings bindings bindings' in
        (bindings'', replace_variables bindings'' rt)
     | None ->
@@ -686,9 +716,9 @@ and is_return_type_polymorphic (params: value_parameter list) (rt: ty): bool =
     let param_ty_vars: type_var list = TypeVarSet.elements param_type_vars
     in
     let var_name_in_typarams (n: identifier): bool =
-      List.exists (fun (TypeVariable (n', _, _)) -> equal_identifier n n') param_ty_vars
+      List.exists (fun (TypeVariable (n', _, _, _)) -> equal_identifier n n') param_ty_vars
     in
-    TypeVarSet.of_list (List.filter (fun (TypeVariable (n, _, _)) -> not (var_name_in_typarams n)) (TypeVarSet.elements rt_type_vars))
+    TypeVarSet.of_list (List.filter (fun (TypeVariable (n, _, _, _)) -> not (var_name_in_typarams n)) (TypeVarSet.elements rt_type_vars))
   in
   (TypeVarSet.cardinal vars_not_params) > 0
 
@@ -714,9 +744,9 @@ and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
   else
     (* I think this should not be an error *)
     (*err ("Not the same number of bindings and parameters. Bindings: "
-         ^ (show_bindings bindings)
-         ^ ". Parameters: "
-         ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))*)
+      ^ (show_bindings bindings)
+      ^ ". Parameters: "
+      ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))*)
     ()
 
 let is_boolean = function
@@ -767,7 +797,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let expected_ty = parse_typespec env rm typarams ty in
              pt ("Expected type", expected_ty);
              let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
-             let bindings = match_type_with_value expected_ty value' in
+             let bindings = match_type_with_value (env, module_name) expected_ty value' in
              ps ("Bindings", show_bindings bindings);
              let ty = replace_variables bindings expected_ty in
              pt ("Type", ty);
@@ -790,7 +820,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                                      u
                                    )
                  in
-                 let typebindings = match_type orig_type rec_ty in
+                 let typebindings = match_type (env, module_name) orig_type rec_ty in
                  if (vis = TypeVisPublic) || (module_name = source_module) then
                    (* Find the set of slot names and the set of binding names, and compare them *)
                    let binding_names = List.map (fun (n, _) -> n) bindings
@@ -799,7 +829,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      let bindings' = group_bindings_slots bindings slots in
                      let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual)) bindings' in
                      let newvars = List.map (fun (n, ty, actual) ->
-                                       let _ = match_type ty actual in
+                                       let _ = match_type (env, module_name) ty actual in
                                        (n, ty, VarLocal))
                                      bindings'' in
                      let lexenv' = push_vars lexenv newvars in
@@ -866,7 +896,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let ty = get_type expr' in
              pt ("Case type", ty);
              let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
-             let typebindings = match_type union_ty ty in
+             let typebindings = match_type (env, module_name) union_ty ty in
              let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
              let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
              if ident_set_eq case_names when_names then
@@ -950,7 +980,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            (fun _ ->
              let e' = augment_expr module_name env rm typarams lexenv (Some rt) e in
              pt ("Type", get_type e');
-             let _ = match_type_with_value rt e' in
+             let _ = match_type_with_value (env, module_name) rt e' in
              TReturn (span, e')))
 
 and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
@@ -1083,6 +1113,8 @@ and is_constant = function
      false
   | TMethodCall _ ->
      false
+  | TVarMethodCall _ ->
+     false
   | TCast _ ->
      true
   | TComparison (_, lhs, rhs) ->
@@ -1127,7 +1159,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
       | LConstant (decl_id, vis, name, ty, expr, doc) ->
          ps ("Kind", "Constant");
          let expr' = augment_expr module_name env empty_region_map empty_typarams empty_lexenv (Some ty) expr in
-         let _ = match_type_with_value ty expr' in
+         let _ = match_type_with_value (env, module_name) ty expr' in
          let _ = validate_constant_expression expr' in
          TConstant (decl_id, vis, name, ty, expr', doc)
       | LTypeAlias (decl_id, vis, name, typarams, universe, ty, doc) ->

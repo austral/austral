@@ -5,6 +5,10 @@ open Type
    types. These are created as part of the type checking process. *)
 type type_bindings
 
+val pp_type_bindings : Format.formatter -> type_bindings -> unit
+
+val show_type_bindings : type_bindings -> string
+
 val binding_count : type_bindings -> int
 
 val bindings_list : type_bindings -> (identifier * qident * ty) list

@@ -5,6 +5,7 @@ open Escape
 open Type
 open Region
 open TypeParameters
+open TypeBindings
 open Span
 open Linked
 open Id
@@ -46,6 +47,16 @@ and texpr =
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of decl_id * qident * texpr list * ty * (identifier * ty) list
   | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * (identifier * ty) list
+  | TVarMethodCall of {
+      source_module_name: module_name;
+      typeclass_id: decl_id;
+      params: value_parameter list;
+      method_name: qident;
+      args: texpr list;
+      dispatch_ty: ty;
+      rt: ty;
+      bindings: type_bindings;
+    }
   | TCast of texpr * ty
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr
@@ -152,6 +163,8 @@ let rec get_type = function
      ty
   | TMethodCall (_, _, _, _, ty, _) ->
      ty
+  | TVarMethodCall { rt; _ } ->
+     rt
   | TCast (_, ty) ->
      ty
   | TComparison _ ->

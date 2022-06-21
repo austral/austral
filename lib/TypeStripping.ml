@@ -69,7 +69,7 @@ and strip_type' (ty: ty): stripped_ty option =
              err "internal")
       | None ->
          err "Internal: write ref instantiated with a region type.")
-  | TyVar (TypeVariable (name, u, source)) ->
+  | TyVar (TypeVariable (name, u, source, _)) ->
      if u = RegionUniverse then
        Some (SRegionTyVar (name, source))
      else

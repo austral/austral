@@ -48,9 +48,9 @@ let parse_method_defs (imports: import_map) (methods: concrete_method_def list):
                   abs_stmt imports body))
     methods
 
-let name_typarams (params: concrete_type_param list) (name: qident): typarams =
+let name_typarams (im: import_map) (params: concrete_type_param list) (name: qident): typarams =
   let lst: type_parameter list =
-    List.map (fun (ConcreteTypeParam (n, u, cs)) -> TypeParameter (n, u, name, cs)) params
+    List.map (fun (ConcreteTypeParam (n, u, cs)) -> TypeParameter (n, u, name, List.map (fun i -> qident_to_sident (qualify_identifier im i)) cs)) params
   in
   typarams_from_list lst
 
@@ -73,7 +73,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
       | ConcreteTypeAliasDef (ConcreteTypeAlias (name', typarams', universe', ty, _)) ->
          if (name = name') && (typarams = typarams') && (universe = universe') then
            let qname = make_qname name' in
-           CTypeAlias (TypeVisOpaque, name, name_typarams typarams qname, universe, qualify_typespec bi ty, docstring)
+           CTypeAlias (TypeVisOpaque, name, name_typarams bi typarams qname, universe, qualify_typespec bi ty, docstring)
          else
            err "Mismatch"
       | ConcreteRecordDef (ConcreteRecord (name', typarams', universe', slots, _)) ->
@@ -81,7 +81,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
            let qname = make_qname name' in
            CRecord (TypeVisOpaque,
                     name,
-                    name_typarams typarams qname,
+                    name_typarams bi typarams qname,
                     universe,
                     parse_slots bi slots,
                     docstring)
@@ -92,7 +92,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
            let qname = make_qname name' in
            CUnion (TypeVisOpaque,
                    name,
-                   name_typarams typarams qname,
+                   name_typarams bi typarams qname,
                    universe,
                    parse_cases bi cases,
                    docstring)
@@ -107,7 +107,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
            let qname = make_qname name' in
            CFunction (VisPublic,
                       name,
-                      name_typarams typarams qname,
+                      name_typarams bi typarams qname,
                       parse_params ii params,
                       qualify_typespec ii rt,
                       abs_stmt bi body,
@@ -129,7 +129,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
            let qname = qualify_identifier ii name in
            CInstance (VisPublic,
                       qname,
-                      name_typarams typarams qname,
+                      name_typarams bi typarams qname,
                       qualify_typespec ii argument,
                       parse_method_defs bi methods,
                       docstring)
@@ -155,7 +155,7 @@ let private_def module_name im def =
      let qname = make_qname name in
      CTypeAlias (TypeVisPrivate,
                  name,
-                 name_typarams typarams qname,
+                 name_typarams im typarams qname,
                  universe,
                  qualify_typespec im ty,
                  docstring)
@@ -163,7 +163,7 @@ let private_def module_name im def =
      let qname = make_qname name in
      CRecord (TypeVisPrivate,
               name,
-              name_typarams typarams qname,
+              name_typarams im typarams qname,
               universe,
               parse_slots im slots,
               docstring)
@@ -171,7 +171,7 @@ let private_def module_name im def =
      let qname = make_qname name in
      CUnion (TypeVisPrivate,
              name,
-             name_typarams typarams qname,
+             name_typarams im typarams qname,
              universe,
              parse_cases im cases,
              docstring)
@@ -179,7 +179,7 @@ let private_def module_name im def =
      let qname = make_qname name in
      CFunction (VisPrivate,
                 name,
-                name_typarams typarams qname,
+                name_typarams im typarams qname,
                 parse_params im params,
                 qualify_typespec im rt,
                 abs_stmt im body,
@@ -189,7 +189,7 @@ let private_def module_name im def =
      let qname = make_qname name in
      CTypeclass (VisPrivate,
                  name,
-                 (match (typarams_as_list (name_typarams [typaram] qname)) with
+                 (match (typarams_as_list (name_typarams im [typaram] qname)) with
                   | [tp] ->
                      tp
                   | _ ->
@@ -204,7 +204,7 @@ let private_def module_name im def =
      let qname = qualify_identifier im name in
      CInstance (VisPrivate,
                 qname,
-                name_typarams typarams qname,
+                name_typarams im typarams qname,
                 qualify_typespec im argument,
                 parse_method_defs im methods,
                 docstring)
@@ -248,12 +248,12 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
       (* Some declarations don't need to have a matching body *)
       | ConcreteTypeAliasDecl (ConcreteTypeAlias (name, typarams, universe, ty, docstring)) ->
          let qname = make_qname name in
-         CTypeAlias (TypeVisPublic, name, name_typarams typarams qname, universe, qualify_typespec im ty, docstring)
+         CTypeAlias (TypeVisPublic, name, name_typarams im typarams qname, universe, qualify_typespec im ty, docstring)
       | ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
          let qname = make_qname name in
          CRecord (TypeVisPublic,
                   name,
-                  name_typarams typarams qname,
+                  name_typarams im typarams qname,
                   universe,
                   parse_slots im slots,
                   docstring)
@@ -261,7 +261,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
          let qname = make_qname name in
          CUnion (TypeVisPublic,
                  name,
-                 name_typarams typarams qname,
+                 name_typarams im typarams qname,
                  universe,
                  parse_cases im cases,
                  docstring)
@@ -269,7 +269,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
          let qname = make_qname name in
          CTypeclass (VisPublic,
                      name,
-                 (match (typarams_as_list (name_typarams [typaram] qname)) with
+                 (match (typarams_as_list (name_typarams im [typaram] qname)) with
                   | [tp] ->
                      tp
                   | _ ->

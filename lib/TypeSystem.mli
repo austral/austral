@@ -18,3 +18,7 @@ val type_variables : ty -> TypeVarSet.t
 val region_map_from_typarams : typarams -> region_map
 
 val is_concrete : ty -> bool
+
+val any_arg_is_linear : ty list -> bool
+
+val any_arg_is_type : ty list -> bool

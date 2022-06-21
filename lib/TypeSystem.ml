@@ -15,7 +15,7 @@ let type_universe = function
   | RegionTy _ -> RegionUniverse
   | ReadRef _ -> FreeUniverse
   | WriteRef _ -> FreeUniverse
-  | TyVar (TypeVariable (_, u, _)) -> u
+  | TyVar (TypeVariable (_, u, _, _)) -> u
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
   | MonoTy _ -> err "Not applicable"
@@ -121,3 +121,21 @@ let rec is_concrete = function
      true
   | MonoTy _ ->
      true
+
+(** Given a list of types, return whether any of them are in the Linear
+    universe. *)
+and any_arg_is_linear (args: ty list) =
+  let is_linear = function
+    | LinearUniverse -> true
+    | _ -> false
+  in
+  List.exists is_linear (List.map type_universe args)
+
+(** Given a list of types, return whether any of them are in the Type
+    universe. *)
+and any_arg_is_type (args: ty list) =
+  let is_type = function
+    | TypeUniverse -> true
+    | _ -> false
+  in
+  List.exists is_type (List.map type_universe args)

@@ -1,7 +1,6 @@
 open Identifier
 open Type
-open TypeParser
-(*open Error*)
+open TypeSystem
 
 module BindingsMap =
   Map.Make(
@@ -21,7 +20,6 @@ module BindingsMap =
           compare a b
       end
     )
-
 
 type type_bindings = TypeBindings of ty BindingsMap.t
 
@@ -64,15 +62,14 @@ let add_binding (TypeBindings m) name from ty =
   match BindingsMap.find_opt (name, from) m with
   | Some ty' ->
      if equal_ty ty ty' then
-       (* let _ = print_endline ("Adding binding: " ^ (ident_string name) ^ " from " ^ (qident_debug_name from) ^ " => " ^ (type_string ty)) in *)
        TypeBindings m
      else
+       (* FIXME: Should we fail here? *)
        (* let _ = print_endline (show_bindings (TypeBindings m)) in
        binding_conflict name from ty ty' *)
        (* Power through it. *)
        TypeBindings (BindingsMap.add (name, from) ty' m)
   | None ->
-     (* let _ = print_endline ("Adding binding: " ^ (ident_string name) ^ " from " ^ (qident_debug_name from) ^ " => " ^ (type_string ty)) in *)
      TypeBindings (BindingsMap.add (name, from) ty m)
 
 (* Add multiple bindings to a bindings map. *)
@@ -111,10 +108,10 @@ let rec replace_variables bindings ty =
        NamedType (n, a', u')
      else
        NamedType (n, a', u)
-  | TyVar (TypeVariable (n, u, from)) ->
+  | TyVar (TypeVariable (n, u, from, constraints)) ->
      (match get_binding bindings n from with
       | Some ty -> ty
-      | None -> TyVar (TypeVariable (n, u, from)))
+      | None -> TyVar (TypeVariable (n, u, from, constraints)))
   | StaticArray ty ->
      StaticArray (replace_variables bindings ty)
   | RegionTy r ->
@@ -138,3 +135,7 @@ let rec bindings_from_list lst =
      merge_bindings bindings (bindings_from_list rest)
   | [] ->
    empty_bindings
+
+let pp_type_bindings _ _ = ()
+
+let show_type_bindings = show_bindings
