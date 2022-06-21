@@ -583,10 +583,8 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
                   proceed differently. Essentially we can't go on with instance
                   resolution, because we don't have a type to resolve an
                   instance for. So we have to freeze the process. *)
-               let method_id: decl_id = get_method_id_or_die env typeclass_id callable_name in
                TVarMethodCall {
                    source_module_name = source_module_name;
-                   method_id = method_id;
                    typeclass_id = typeclass_id;
                    params = params;
                    method_name = callable_name;

@@ -37,12 +37,12 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      and rt = replace_variables bindings rt
      and substs = List.map (fun (n, t) -> (n, replace_variables bindings t)) substs in
      TMethodCall (meth_id, name, instance, args, rt, substs)
-  | TVarMethodCall { method_id; method_name; args; dispatch_ty; rt; } ->
+  | TVarMethodCall { source_module_name; typeclass_id; params; method_name; args; dispatch_ty; rt; bindings; } ->
      let args = List.map (replace_tyvars_expr bindings) args
      and dispatch_ty = replace_variables bindings dispatch_ty
      and rt = replace_variables bindings rt
      in
-     TVarMethodCall { method_id; method_name; args; dispatch_ty; rt; }
+     TVarMethodCall { source_module_name; typeclass_id; params; method_name; args; dispatch_ty; rt; bindings; }
   | TCast (expr, ty) ->
      let expr = replace_tyvars_expr bindings expr
      and ty = replace_variables bindings ty in
