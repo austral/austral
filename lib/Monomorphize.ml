@@ -176,8 +176,8 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      in
      ps ("Bindings", show_bindings bindings);
      let substs = make_substs instance_bindings typarams in
-     let _ = TMethodCall (meth_id, method_name, typarams, arguments', rt, substs) in
-     internal_err "derp"
+     let mcall = TMethodCall (meth_id, method_name, typarams, arguments', rt, substs) in
+     monomorphize_expr env mcall
   | TCast (expr, ty) ->
      let (ty, env) = strip_and_mono env ty in
      let (expr, env) = monomorphize_expr env expr in
