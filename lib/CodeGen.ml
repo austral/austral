@@ -268,8 +268,8 @@ and gen_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_path_elem): c_e
      CStructAccessor (expr, gen_ident n)
   | MPointerSlotAccessor (n, _) ->
      CPointerStructAccessor (expr, gen_ident n)
-  | MArrayIndex (e, _) ->
-     CIndex (CCast (CStructAccessor (expr, "data"), CPointer (gen_type (get_type e))), gen_exp mn e)
+  | MArrayIndex (e, t) ->
+     CIndex (CCast (CStructAccessor (expr, "data"), CPointer (gen_type t)), gen_exp mn e)
 
 (* Statements *)
 
