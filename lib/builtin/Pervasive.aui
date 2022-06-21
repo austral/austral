@@ -98,6 +98,6 @@ module Austral.Pervasive is
     instance Printable(Index);
     instance Printable(Single_Float);
     instance Printable(Double_Float);
-    generic [A: Free(Printable)]
-    instance Printable(Fixed_Array[A]);
+    generic [B: Free(Printable)]
+    instance Printable(Fixed_Array[B]);
 end module.

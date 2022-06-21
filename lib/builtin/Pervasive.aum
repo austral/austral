@@ -738,13 +738,13 @@ module body Austral.Pervasive is
         end;
     end;
 
-    generic [A: Free(Printable)]
-    instance Printable(Fixed_Array[A]) is
-        method Print(value: Fixed_Array[A]): Unit is
+    generic [B: Free(Printable)]
+    instance Printable(Fixed_Array[B]) is
+        method Print(value: Fixed_Array[B]): Unit is
             return Print_Fixed_Array(value);
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Fixed_Array[A]]): Unit is
+        method Print_Fixed_Array(array: Fixed_Array[Fixed_Array[B]]): Unit is
             return nil;
         end;
     end;
