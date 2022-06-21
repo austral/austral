@@ -1,0 +1,48 @@
+module body Test is
+    pragma Unsafe_Module;
+
+    function Put(str: Fixed_Array[Natural_8]): Integer_32 is
+        pragma Foreign_Import(External_Name => "puts");
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        Put("Start");
+        for i from 0 to 10 do
+            if i = 0 then
+                Put("0");
+            end if;
+            if i = 1 then
+                Put("1");
+            end if;
+            if i = 2 then
+                Put("2");
+            end if;
+            if i = 3 then
+                Put("3");
+            end if;
+            if i = 4 then
+                Put("4");
+            end if;
+            if i = 5 then
+                Put("5");
+            end if;
+            if i = 6 then
+                Put("6");
+            end if;
+            if i = 7 then
+                Put("7");
+            end if;
+            if i = 8 then
+                Put("8");
+            end if;
+            if i = 9 then
+                Put("9");
+            end if;
+            if i = 10 then
+                Put("10");
+            end if;
+        end for;
+        Put("End");
+        return root;
+    end;
+end module body.
