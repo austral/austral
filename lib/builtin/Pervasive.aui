@@ -82,6 +82,8 @@ module Austral.Pervasive is
 
     typeclass Printable(A: Free) is
         method Print(value: A): Unit;
+
+        method Print_Fixed_Array(array: Fixed_Array[A]): Unit;
     end;
 
     instance Printable(Unit);
