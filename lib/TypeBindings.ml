@@ -138,3 +138,7 @@ let rec bindings_from_list lst =
      merge_bindings bindings (bindings_from_list rest)
   | [] ->
    empty_bindings
+
+let pp_type_bindings _ _ = ()
+
+let show_type_bindings = show_bindings
