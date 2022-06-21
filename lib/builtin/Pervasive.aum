@@ -737,4 +737,15 @@ module body Austral.Pervasive is
             return nil;
         end;
     end;
+
+    generic [A: Free(Printable)]
+    instance Printable(Fixed_Array[A]) is
+        method Print(value: Fixed_Array[A]): Unit is
+            return Print_Fixed_Array(value);
+        end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Fixed_Array[A]]): Unit is
+            return nil;
+        end;
+    end;
 end module body.
