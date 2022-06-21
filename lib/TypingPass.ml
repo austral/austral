@@ -560,7 +560,7 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       (* For simplicity, and to reduce duplication of code, we convert the argument
          list to a positional list. *)
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-      let arguments = arglist_to_positional (args, param_names) in
+      let arguments: texpr list = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
       let bindings = check_argument_list env source_module_name params arguments in
       (* Use the bindings to get the effective return type *)
@@ -585,7 +585,10 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
                   instance for. So we have to freeze the process. *)
                let method_id: decl_id = get_method_id_or_die env typeclass_id callable_name in
                TVarMethodCall {
+                   source_module_name = source_module_name;
                    method_id = method_id;
+                   typeclass_id = typeclass_id;
+                   params = params;
                    method_name = callable_name;
                    args = arguments;
                    dispatch_ty = dispatch_ty;
