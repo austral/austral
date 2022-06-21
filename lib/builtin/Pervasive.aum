@@ -611,11 +611,22 @@ module body Austral.Pervasive is
             return @embed(Unit, "au_printf(\"nil\")");
             return value;
         end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Unit]): Unit is
+            return nil;
+        end;
     end;
 
     instance Printable(Natural_8) is
         method Print(value: Natural_8): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
+            return nil;
+        end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Natural_8]): Unit is
+            for i from 0 to Fixed_Array_Size(array) - 1 do
+                @embed(Unit, "au_printf(\"%c\", $1)", array[i]);
+            end for;
             return nil;
         end;
     end;
@@ -625,11 +636,19 @@ module body Austral.Pervasive is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
             return nil;
         end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Natural_16]): Unit is
+            return nil;
+        end;
     end;
 
     instance Printable(Natural_32) is
         method Print(value: Natural_32): Unit is
             return @embed(Unit, "au_printf(\"%u\", $1)", value);
+            return nil;
+        end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Natural_32]): Unit is
             return nil;
         end;
     end;
@@ -639,11 +658,19 @@ module body Austral.Pervasive is
             return @embed(Unit, "au_printf(\"%zu\", $1)", value);
             return nil;
         end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Natural_64]): Unit is
+            return nil;
+        end;
     end;
 
     instance Printable(Integer_8) is
         method Print(value: Integer_8): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
+            return nil;
+        end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Integer_8]): Unit is
             return nil;
         end;
     end;
@@ -653,11 +680,19 @@ module body Austral.Pervasive is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
             return nil;
         end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Integer_16]): Unit is
+            return nil;
+        end;
     end;
 
     instance Printable(Integer_32) is
         method Print(value: Integer_32): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
+            return nil;
+        end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Integer_32]): Unit is
             return nil;
         end;
     end;
@@ -667,11 +702,19 @@ module body Austral.Pervasive is
             return @embed(Unit, "au_printf(\"%li\", $1)", value);
             return nil;
         end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Integer_64]): Unit is
+            return nil;
+        end;
     end;
 
     instance Printable(Index) is
         method Print(value: Index): Unit is
             return @embed(Unit, "au_printf(\"%zu\", $1)", value);
+            return nil;
+        end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Index]): Unit is
             return nil;
         end;
     end;
@@ -681,11 +724,30 @@ module body Austral.Pervasive is
             return @embed(Unit, "au_printf(\"%f\", $1)", value);
             return nil;
         end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Single_Float]): Unit is
+            return nil;
+        end;
     end;
 
     instance Printable(Double_Float) is
         method Print(value: Double_Float): Unit is
             return @embed(Unit, "au_printf(\"%f\", $1)", value);
+            return nil;
+        end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Double_Float]): Unit is
+            return nil;
+        end;
+    end;
+
+    generic [B: Free(Printable)]
+    instance Printable(Fixed_Array[B]) is
+        method Print(value: Fixed_Array[B]): Unit is
+            return Print_Fixed_Array(value);
+        end;
+
+        method Print_Fixed_Array(array: Fixed_Array[Fixed_Array[B]]): Unit is
             return nil;
         end;
     end;
