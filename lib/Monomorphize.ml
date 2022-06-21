@@ -1,13 +1,16 @@
 open Identifier
 open Env
 open EnvTypes
+open EnvUtils
 open Type
 open TypeStripping
 open MonoType
 open TypeBindings
 open TypeReplace
 open TypeParameters
+open TypeMatch
 open Tast
+open TypingPass
 open Mtast
 open Linked
 open Id
@@ -150,9 +153,31 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
          else
            (* The instance is concrete. *)
            (MConcreteMethodCall (ins_meth_id, name, args, rt), env))
-  | TVarMethodCall _ ->
-     (* TODO *)
-     internal_err "Not implemented yet"
+  | TVarMethodCall { dispatch_ty; typeclass_id; source_module_name; params; args; bindings; method_name; rt; } ->
+     (* Continue the instance resolution process we halted in the typing pass. *)
+     let (instance, instance_bindings): decl * type_bindings =
+       (match get_instance env source_module_name dispatch_ty typeclass_id with
+        | Some (i, b) -> (i, b)
+        | None ->
+           err ("Typeclass resolution failed. Dispatch type: "
+                ^ (type_string dispatch_ty)))
+     in
+     let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
+     let arguments' = cast_arguments instance_bindings params' args in
+     let typarams = (match instance with
+                     | Instance { typarams; _ } -> typarams
+                     | _ -> err "Internal")
+     in
+     let instance_id: decl_id = decl_id instance in
+     let meth_id: ins_meth_id =
+       (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name method_name) with
+        | Some (InsMethRec { id; _ }) -> id
+        | None -> err "Internal")
+     in
+     ps ("Bindings", show_bindings bindings);
+     let substs = make_substs instance_bindings typarams in
+     let _ = TMethodCall (meth_id, method_name, typarams, arguments', rt, substs) in
+     internal_err "derp"
   | TCast (expr, ty) ->
      let (ty, env) = strip_and_mono env ty in
      let (expr, env) = monomorphize_expr env expr in
