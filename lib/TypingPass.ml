@@ -554,6 +554,7 @@ and augment_union_constructor (env: env) (module_name: module_name) (type_name: 
 and augment_method_call (env: env) (source_module_name: module_name) (typeclass_id: decl_id) (typaram: type_parameter) (callable_name: qident) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
   with_frame "Augmenting method call"
     (fun _ ->
+      pqi ("Callable name", callable_name);
       (* At this point, we know the method's name and the typeclass it belongs
          to. We pull the parameter list from the typeclass, and compare that against
          the argument list. *)
@@ -567,6 +568,7 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       let rt' = replace_variables bindings rt in
       let (bindings', rt'') = handle_return_type_polymorphism env source_module_name (local_name callable_name) params rt' asserted_ty bindings in
       let bindings'' = merge_bindings bindings bindings' in
+      ps ("Bindings", show_bindings bindings'');
       (* Check: the set of bindings equals the set of type parameters *)
       check_bindings (typarams_from_list [typaram]) bindings'';
       let (TypeParameter (type_parameter_name, _, from, _)) = typaram in
