@@ -73,7 +73,7 @@ Then:
 ```bash
 $ git clone git@github.com:austral/austral.git
 $ cd austral
-$ opam install dune ppx_deriving ounit2 menhir
+$ ./install-ocaml-deps.sh
 $ make
 ```
 

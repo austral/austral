@@ -32,11 +32,8 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-version }}
 
-      - name: Install a specific version of ppxlib
-        run: opam install ppxlib.0.25.0
-
-      - name: Install dependencies
-        run: opam install dune ppx_deriving ounit2 menhir sexplib ppx_sexp_conv
+      - name: Install OCaml dependencies
+        run: ./install-ocaml-deps.sh
 
       - name: Build
         run: make
