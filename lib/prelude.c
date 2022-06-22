@@ -56,8 +56,12 @@ void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size) {
   if (index >= array.size) {
     au_abort_internal("Array index out of bounds.");
   }
+  au_index_t offset = 0;
+  if (__builtin_mul_overflow(index, elem_size, &offset)) {
+    au_abort_internal("Multiplication overflow in array indexing operation.");
+  }
   char* data = (char*) array.data;
-  char* ptr = data + (index * elem_size);
+  char* ptr = data + offset;
   return (void*)(ptr);
 }
 
