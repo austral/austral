@@ -34,12 +34,6 @@ typedef struct {
     au_index_t size;
 } au_array_t;
 
-void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size) {
-  char* data = (char*) array.data;
-  char* ptr = data + (index * elem_size);
-  return (void*)(ptr);
-}
-
 au_array_t au_make_array_from_string(const char* data, size_t size) {
     return (au_array_t){ .data = (void*) data, .size = size };
 }
@@ -56,6 +50,15 @@ au_unit_t au_abort(au_array_t message) {
     fflush(stderr);
     _Exit(-1);
     return nil;
+}
+
+void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size) {
+  if (index >= array.size) {
+    au_abort_internal("Array index out of bounds.");
+  }
+  char* data = (char*) array.data;
+  char* ptr = data + (index * elem_size);
+  return (void*)(ptr);
 }
 
 au_unit_t au_printf(const char* format, ...) {
