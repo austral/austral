@@ -1,0 +1,1 @@
+Test that defining a Free union with a Linear type parameter fails.

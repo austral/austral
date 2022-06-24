@@ -1,0 +1,8 @@
+module body Test is
+    union Foo[A: Type]: Free is
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.

@@ -16,6 +16,7 @@ open TypeParser
 open TypeSignature
 open TypeParameters
 open TypeClasses
+open BuiltIn
 open Util
 open Error
 
@@ -48,6 +49,20 @@ let check_cases_are_free (cases: typed_case list): unit =
     check_slots_are_free UnionKind slots
   in
   List.iter check_case_is_free cases
+
+let check_typarams_are_free (typarams: typarams): unit =
+  let check_universe (u: universe) =
+    match u with
+    | FreeUniverse ->
+       ()
+    | RegionUniverse ->
+       ()
+    | LinearUniverse ->
+       err "This type was declared to be in the Free universe, but it has a type parameter in the Linear universe."
+    | TypeUniverse ->
+       err "This type was declared to be in the Free universe, but it has a type parameter in the Type universe."
+  in
+  List.iter (fun (TypeParameter (_, u, _, _)) -> check_universe u) (typarams_as_list typarams)
 
 let rec extract_type_signatures (CombinedModule { decls; _ }): type_signature list =
   List.filter_map extract_type_signatures' decls
@@ -114,7 +129,7 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id o
      specifiers without reference to the environment. *)
   let sigs: type_signature list = extract_type_signatures cmodule in
   (* Extract all declarations from the module into the environment. *)
-  let (env, linked_defs): (env * linked_definition list) = extract_definitions env mod_id sigs decls in
+  let (env, linked_defs): (env * linked_definition list) = extract_definitions env mod_id name sigs decls in
   (* Construct the linked module *)
   let lmod = LinkedModule {
                  mod_id = mod_id;
@@ -132,16 +147,16 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id o
 (** Given the environment, the ID of the module we're extracting, the list of
     local type signatures, and a list of combined definitions, add all relevant
     decls to the environment, and return all corresponding linked decls. *)
-and extract_definitions (env: env) (mod_id: mod_id) (local_types: type_signature list) (defs: combined_definition list): (env * (linked_definition list)) =
+and extract_definitions (env: env) (mod_id: mod_id) (mn: module_name) (local_types: type_signature list) (defs: combined_definition list): (env * (linked_definition list)) =
   let f ((env, comb_def): (env * combined_definition)): (env * linked_definition) =
-    extract_definition env mod_id local_types comb_def
+    extract_definition env mod_id mn local_types comb_def
   in
   map_with_context f env defs
 
 (** Given the environment, the ID of the module we're extracting, the list of
     local type signatures, and a combined definition, add all relevant decls to
     the environment, and return a linked definition. *)
-and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature list) (def: combined_definition): (env * linked_definition)  =
+and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_types: type_signature list) (def: combined_definition): (env * linked_definition)  =
   let parse' = parse_type env local_types in
   let rec parse_slot (typarams: typarams) (QualifiedSlot (n, ts)): typed_slot =
     let rm = region_map_from_typarams typarams in
@@ -166,6 +181,19 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
        else
          ()
      in
+     (* If the universe is `Free`, check that there are no type parameters in
+        the `Linear` or `Type` universes. *)
+     let _ =
+       if universe = FreeUniverse then
+         (* Unless it is `Address` or `Pointer` *)
+         let name = make_qident (mn, name, name) in
+         if (is_address_type name) || (is_pointer_type name) then
+           ()
+         else
+           check_typarams_are_free typarams
+       else
+         ()
+     in
      let (env, decl_id) = add_record env { mod_id; vis; name; docstring; typarams; universe; slots } in
      let decl = LRecord (decl_id, vis, name, typarams, universe, slots, docstring) in
      (env, decl)
@@ -176,6 +204,14 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
          let cases = List.map (fun (QualifiedCase (n, slots)) -> TypedCase (n, List.map (parse_slot typarams) slots)) cases
          in
          check_cases_are_free cases
+       else
+         ()
+     in
+     (* If the universe is `Free`, check that there are no type parameters in
+        the `Linear` or `Type` universes. *)
+     let _ =
+       if universe = FreeUniverse then
+         check_typarams_are_free typarams
        else
          ()
      in

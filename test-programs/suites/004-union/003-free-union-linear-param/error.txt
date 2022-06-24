@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    This type was declared to be in the Free universe, but it has a type parameter in the Type universe.
+  Code:
+    [no span available]

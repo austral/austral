@@ -1,0 +1,1 @@
+Test that defining a Free record with a Linear type parameter fails.
