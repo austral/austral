@@ -392,8 +392,6 @@ let get_original_module_name (env: env) (id: mono_id): module_name =
 let rec mono_desc (env: env) (id: mono_id): string =
   let mono = get_mono_or_die env id in
   match mono with
-  | MonoTypeAliasDefinition { type_id; tyargs; _ } ->
-     render_mono env type_id tyargs
   | MonoRecordDefinition { type_id; tyargs; _ } ->
      render_mono env type_id tyargs
   | MonoUnionDefinition { type_id; tyargs; _ } ->
