@@ -1,8 +1,0 @@
-module body Test is
-    type Num: Free is Integer_32;
-
-    function Main(root: Root_Capability): Root_Capability is
-        let N: Num := Num(10);
-        return root;
-    end;
-end module body.
