@@ -171,7 +171,6 @@ imported_symbol:
 interface_decl:
   | constant_decl { $1 }
   | type_decl { $1 }
-  | type_alias { ConcreteTypeAliasDecl $1 }
   | record { ConcreteRecordDecl $1 }
   | union { ConcreteUnionDecl $1 }
   | function_decl { $1 }
@@ -254,7 +253,6 @@ instance_decl:
 
 body_decl:
   | constant_def { $1 }
-  | type_alias { ConcreteTypeAliasDef $1 }
   | record { ConcreteRecordDef $1 }
   | union { ConcreteUnionDef $1 }
   | function_def { $1 }
