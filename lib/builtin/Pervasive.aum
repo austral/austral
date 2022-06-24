@@ -18,7 +18,9 @@ module body Austral.Pervasive is
         return @embed(Unit, "au_abort($1)", message);
     end;
 
-    type Root_Capability : Linear is Unit;
+    record Root_Capability: Linear is
+        value: Unit;
+    end;
 
     constant Minimum_Natural_8: Integer_8 := 0;
     constant Maximum_Natural_8: Natural_8 := @embed(Natural_8, "UINT8_MAX");
