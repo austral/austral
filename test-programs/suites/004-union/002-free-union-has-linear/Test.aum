@@ -3,7 +3,7 @@ module body Test is
     end;
 
     union Bar: Free is
-        case B:
+        case B is
             foo: Foo;
     end;
 
