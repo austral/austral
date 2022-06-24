@@ -1164,9 +1164,6 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
          let _ = match_type_with_value (env, module_name) ty expr' in
          let _ = validate_constant_expression expr' in
          TConstant (decl_id, vis, name, ty, expr', doc)
-      | LTypeAlias (decl_id, vis, name, typarams, universe, ty, doc) ->
-         ps ("Kind", "Type Alias");
-         TTypeAlias (decl_id, vis, name, typarams, universe, ty, doc)
       | LRecord (decl_id, vis, name, typarams, universe, slots, doc) ->
          ps ("Kind", "Record");
          TRecord (decl_id, vis, name, typarams, universe, slots, doc)

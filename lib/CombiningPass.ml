@@ -307,8 +307,6 @@ let as_public (def: combined_definition): combined_definition =
   match def with
   | CConstant (_, name, ty, value, docstring) ->
      CConstant (VisPublic, name, ty, value, docstring)
-  | CTypeAlias (_, name, typarams, universe, def, docstring) ->
-     CTypeAlias (TypeVisPublic, name, typarams, universe, def, docstring)
   | CRecord (_, name, typarams, universe, slots, docstring) ->
      CRecord (TypeVisPublic, name, typarams, universe, slots, docstring)
   | CUnion (_, name, typarams, universe, cases, docstring) ->

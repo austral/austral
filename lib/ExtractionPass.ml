@@ -26,8 +26,6 @@ and extract_type_signatures' (def: combined_definition): type_signature option =
   match def with
   | CConstant _ ->
      None
-  | CTypeAlias (_, name, typarams, universe, _, _) ->
-     Some (TypeSignature (name, typarams, universe))
   | CRecord (_, name, typarams, universe, _, _) ->
      Some (TypeSignature (name, typarams, universe))
   | CUnion (_, name, typarams, universe, _, _) ->
@@ -128,12 +126,6 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      let ty = parse' rm empty_typarams typespec in
      let (env, decl_id) = add_constant env { mod_id; vis; name; ty; docstring } in
      let decl = LConstant (decl_id, vis, name, ty, def, docstring) in
-     (env, decl)
-  | CTypeAlias (vis, name, typarams, universe, typespec, docstring) ->
-     let rm = region_map_from_typarams typarams in
-     let def = parse' rm typarams typespec in
-     let (env, decl_id) = add_type_alias env { mod_id; vis; name; docstring; typarams; universe; def } in
-     let decl = LTypeAlias (decl_id, vis, name, typarams, universe, def, docstring) in
      (env, decl)
   | CRecord (vis, name, typarams, universe, slots, docstring) ->
      let slots = List.map (parse_slot typarams) slots in
