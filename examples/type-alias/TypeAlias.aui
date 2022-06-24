@@ -1,3 +1,0 @@
-module Example.TypeAlias is
-    function Main(root: Root_Capability): Root_Capability;
-end module.
