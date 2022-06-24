@@ -1,5 +1,6 @@
 open Identifier
 open Cst
+open Names
 
 (* Austral.Pervasive *)
 
@@ -53,3 +54,17 @@ let pervasive_imports =
 (* Austral.Memory *)
 
 let memory_module_name = make_mod_name "Austral.Memory"
+
+let is_address_type (name: qident): bool =
+  let s = source_module_name name
+  and o = original_name name
+  in
+  (equal_module_name s memory_module_name)
+  && (equal_identifier o (make_ident address_name))
+
+let is_pointer_type (name: qident): bool =
+  let s = source_module_name name
+  and o = original_name name
+  in
+  (equal_module_name s memory_module_name)
+  && (equal_identifier o (make_ident pointer_name))
