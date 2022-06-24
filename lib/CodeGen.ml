@@ -430,17 +430,6 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      [
        CConstantDefinition (d, gen_sident mn n, gen_type ty, gen_exp mn e)
      ]
-  | MTypeAliasMonomorph (id, ty) ->
-     let d = Desc ("Type alias monomorph: " ^ (mono_desc env id)) in
-     [
-       CNamedStructDefinition (
-           d,
-           gen_mono_id id,
-           [
-             CSlot ("value", gen_type ty)
-           ]
-         )
-     ]
   | MRecord (id, _, slots) ->
      let d = Desc "Record" in
      [

@@ -10,7 +10,6 @@ type mono_module = MonoModule of module_name * mdecl list
 
 and mdecl =
   | MConstant of decl_id * identifier * mono_ty * mexpr
-  | MTypeAliasMonomorph of mono_id * mono_ty
   | MRecord of decl_id * identifier * mono_slot list
   | MRecordMonomorph of mono_id * mono_slot list
   | MUnion of decl_id * identifier * mono_case list
