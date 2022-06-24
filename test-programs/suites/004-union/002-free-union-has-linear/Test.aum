@@ -1,0 +1,13 @@
+module body Test is
+    record Foo: Linear is
+    end;
+
+    union Bar: Free is
+        case B is
+            foo: Foo;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        return root;
+    end;
+end module body.

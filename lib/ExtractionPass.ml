@@ -19,6 +19,36 @@ open TypeClasses
 open Util
 open Error
 
+type type_kind = RecordKind | UnionKind
+
+let type_kind_string = function
+  | RecordKind -> "Record"
+  | UnionKind -> "Union"
+
+let check_slots_are_free (type_kind: type_kind) (slots: typed_slot list): unit =
+  let check_slot_is_free (slot: typed_slot): unit =
+    let (TypedSlot (_, ty)) = slot in
+    match type_universe ty with
+    | FreeUniverse ->
+       ()
+    | RegionUniverse ->
+       ()
+    | LinearUniverse ->
+       err ((type_kind_string type_kind)
+            ^ " was declared to belong to the Free universe, but it contains a type that beloings to the Linear universe.")
+    | TypeUniverse ->
+        err ((type_kind_string type_kind)
+             ^ " was declared to belong to the Free universe, but it contains a type that beloings to the Type universe.")
+  in
+  List.iter check_slot_is_free slots
+
+let check_cases_are_free (cases: typed_case list): unit =
+  let check_case_is_free (case: typed_case): unit =
+    let (TypedCase (_, slots)) = case in
+    check_slots_are_free UnionKind slots
+  in
+  List.iter check_case_is_free cases
+
 let rec extract_type_signatures (CombinedModule { decls; _ }): type_signature list =
   List.filter_map extract_type_signatures' decls
 
@@ -129,10 +159,26 @@ and extract_definition (env: env) (mod_id: mod_id) (local_types: type_signature 
      (env, decl)
   | CRecord (vis, name, typarams, universe, slots, docstring) ->
      let slots = List.map (parse_slot typarams) slots in
+     (* If the universe is `Free`, check that there are no slots with types in the `Type` or `Linear` universes. *)
+     let _ =
+       if universe = FreeUniverse then
+         check_slots_are_free RecordKind slots
+       else
+         ()
+     in
      let (env, decl_id) = add_record env { mod_id; vis; name; docstring; typarams; universe; slots } in
      let decl = LRecord (decl_id, vis, name, typarams, universe, slots, docstring) in
      (env, decl)
   | CUnion (vis, name, typarams, universe, cases, docstring) ->
+     (* If the universe is `Free`, check that there are no cases with slots with types in the `Type` or `Linear` universes. *)
+     let _ =
+       if universe = FreeUniverse then
+         let cases = List.map (fun (QualifiedCase (n, slots)) -> TypedCase (n, List.map (parse_slot typarams) slots)) cases
+         in
+         check_cases_are_free cases
+       else
+         ()
+     in
      (* Add the union itself to the env *)
      let (env, union_id) = add_union env { mod_id; vis; name; docstring; typarams; universe } in
      (* If the union is public, the cases are public, otherwise they are private. *)

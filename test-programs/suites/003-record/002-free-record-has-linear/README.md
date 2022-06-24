@@ -1,0 +1,1 @@
+Add a test that defining a Free record that contains a linear type fails.
