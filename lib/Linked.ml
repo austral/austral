@@ -23,7 +23,6 @@ type linked_module = LinkedModule of {
 
 and linked_definition =
   | LConstant of decl_id * vis * identifier * ty * aexpr * docstring
-  | LTypeAlias of decl_id * type_vis * identifier * typarams * universe * ty * docstring
   | LRecord of decl_id * type_vis * identifier * typarams * universe * typed_slot list * docstring
   | LUnion of decl_id * type_vis * identifier * typarams * universe * linked_case list * docstring
   | LFunction of decl_id * vis * identifier * typarams * value_parameter list * ty * astmt * docstring * pragma list
