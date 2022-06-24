@@ -1,7 +1,7 @@
 Error:
   Title: Generic Error
   Location:
-    Filename: 'test-programs/suites/009-typeclasses/011-unconstrained-typaram/Test.aum'
+    Filename: 'test-programs/suites/008-typeclasses/011-unconstrained-typaram/Test.aum'
     From: line 14, column 8
     To: line 14, column 22
   Description:

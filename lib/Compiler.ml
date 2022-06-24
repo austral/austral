@@ -142,7 +142,7 @@ let get_root_capability_monomorph (env: env): mono_id =
   and n: identifier = make_ident "Root_Capability" in
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with
-  | Some (TypeAlias { id; _ }) ->
+  | Some (Record { id; _ }) ->
      (match get_type_monomorph env id [] with
       | Some id ->
          id

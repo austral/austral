@@ -187,8 +187,6 @@ let rec count (name: identifier) (expr: texpr): appearances =
      merge_list (List.map (fun (_, e) -> c e) args)
   | TUnionConstructor (_, _, args) ->
      merge_list (List.map (fun (_, e) -> c e) args)
-  | TTypeAliasConstructor (_, e) ->
-     c e
   | TPath { head; elems; _ } ->
      let head_apps: appearances =
        (* If the head of the path is a variable, check if it is the one we are

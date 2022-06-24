@@ -1,1 +1,0 @@
-A number type alias.

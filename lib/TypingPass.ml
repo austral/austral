@@ -400,8 +400,6 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
       match callable with
       | FunctionCallable (id, typarams, params, rt) ->
          augment_function_call env module_name id name typarams params rt asserted_ty args
-      | TypeAliasCallable (_, typarams, universe, ty) ->
-         augment_typealias_callable env module_name name typarams universe asserted_ty ty args
       | RecordConstructor (_, typarams, universe, slots) ->
          augment_record_constructor env module_name name typarams universe slots asserted_ty args
       | UnionConstructor { union_id; type_params; universe; case } ->
@@ -443,30 +441,6 @@ and augment_function_call (env: env) (module_name: module_name) (id: decl_id) na
       ps ("Bindings", show_bindings bindings'');
       pt ("Return type", rt'');
       TFuncall (id, name, arguments', rt'', substs))
-
-and augment_typealias_callable (env: env) (module_name: module_name) name typarams universe asserted_ty definition_ty args =
-  (* Check: the argument list is a positional list with a single argument *)
-  let arg = (match args with
-             | TPositionalArglist [a] ->
-                a
-             | _ ->
-                err "The argument list to a type alias constructor call must be a single positional argument.")
-  in
-  (* Check a synthetic list of params against the list of arguments *)
-  let params = [ValueParameter (make_ident "synthetic", definition_ty)] in
-  let bindings = check_argument_list env module_name params [arg] in
-  (* Use the bindings to get the effective return type *)
-  let rt = NamedType (
-               name,
-               List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
-               universe
-             )
-  in
-  let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
-  (* Check: the set of bindings equals the set of type parameters *)
-  check_bindings typarams (merge_bindings bindings bindings');
-  TTypeAliasConstructor (rt'', arg)
 
 and augment_record_constructor (env: env) (module_name: module_name) (name: qident) (typarams: typarams) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
   (* Check: the argument list must be named *)
@@ -1133,8 +1107,6 @@ and is_constant = function
      List.for_all (fun (_, v) -> is_constant v) values
   | TUnionConstructor (_, _, values) ->
      List.for_all (fun (_, v) -> is_constant v) values
-  | TTypeAliasConstructor (_, e) ->
-     is_constant e
   | TPath { head; elems; _ } ->
      (is_constant head) && (List.for_all is_path_elem_constant elems)
   | TEmbed _ ->
@@ -1164,9 +1136,6 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
          let _ = match_type_with_value (env, module_name) ty expr' in
          let _ = validate_constant_expression expr' in
          TConstant (decl_id, vis, name, ty, expr', doc)
-      | LTypeAlias (decl_id, vis, name, typarams, universe, ty, doc) ->
-         ps ("Kind", "Type Alias");
-         TTypeAlias (decl_id, vis, name, typarams, universe, ty, doc)
       | LRecord (decl_id, vis, name, typarams, universe, slots, doc) ->
          ps ("Kind", "Record");
          TRecord (decl_id, vis, name, typarams, universe, slots, doc)

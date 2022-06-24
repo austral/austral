@@ -17,7 +17,6 @@ type combined_module = CombinedModule of {
 
 and combined_definition =
   | CConstant of vis * identifier * qtypespec * aexpr * docstring
-  | CTypeAlias of type_vis * identifier * typarams * universe * qtypespec * docstring
   | CRecord of type_vis * identifier * typarams * universe * qslot list * docstring
   | CUnion of type_vis * identifier * typarams * universe * qcase list * docstring
   | CFunction of vis * identifier * typarams * qparam list * qtypespec * astmt * docstring * pragma list

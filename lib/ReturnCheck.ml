@@ -62,8 +62,6 @@ let check_ends_in_return (CombinedModule { name=mn; decls; _ }): unit =
         match decl with
         | CConstant _ ->
            ()
-        | CTypeAlias _ ->
-           ()
         | CRecord _ ->
            ()
         | CUnion _ ->

@@ -19,7 +19,6 @@ and concrete_import =
 and concrete_decl =
   | ConcreteConstantDecl of identifier * typespec * docstring
   | ConcreteOpaqueTypeDecl of identifier * concrete_type_param list * universe * docstring
-  | ConcreteTypeAliasDecl of concrete_type_alias
   | ConcreteRecordDecl of concrete_record
   | ConcreteUnionDecl of concrete_union
   | ConcreteFunctionDecl of identifier * concrete_type_param list * concrete_param list * typespec * docstring
@@ -28,15 +27,11 @@ and concrete_decl =
 
 and concrete_def =
   | ConcreteConstantDef of identifier * typespec * cexpr * docstring
-  | ConcreteTypeAliasDef of concrete_type_alias
   | ConcreteRecordDef of concrete_record
   | ConcreteUnionDef of concrete_union
   | ConcreteFunctionDef of identifier * concrete_type_param list * concrete_param list * typespec * cstmt * docstring * pragma list
   | ConcreteTypeClassDef of concrete_typeclass
   | ConcreteInstanceDef of concrete_instance
-
-and concrete_type_alias =
-  ConcreteTypeAlias of identifier * concrete_type_param list * universe * typespec * docstring
 
 and concrete_record =
   ConcreteRecord of identifier * concrete_type_param list * universe * concrete_slot list * docstring
@@ -152,7 +147,6 @@ let make_module_body (name: module_name) (imports: concrete_import_list list) (p
 let concrete_decl_name = function
   | ConcreteConstantDecl (n, _, _) -> Some n
   | ConcreteOpaqueTypeDecl (n, _, _, _) -> Some n
-  | ConcreteTypeAliasDecl (ConcreteTypeAlias (n, _, _, _, _)) -> Some n
   | ConcreteRecordDecl (ConcreteRecord (n, _, _, _, _)) -> Some n
   | ConcreteUnionDecl (ConcreteUnion (n, _, _, _, _)) -> Some n
   | ConcreteFunctionDecl (n, _, _, _, _) -> Some n
@@ -161,7 +155,6 @@ let concrete_decl_name = function
 
 let def_name = function
   | ConcreteConstantDef (n, _, _, _) -> Some n
-  | ConcreteTypeAliasDef (ConcreteTypeAlias (n, _, _, _, _)) -> Some n
   | ConcreteRecordDef (ConcreteRecord (n, _, _, _, _)) -> Some n
   | ConcreteUnionDef (ConcreteUnion (n, _, _, _, _)) -> Some n
   | ConcreteFunctionDef (n, _, _, _, _, _, _) -> Some n

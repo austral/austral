@@ -14,8 +14,6 @@ let decl_type_signature (decl: decl): type_signature option =
   match decl with
   | Constant _ ->
      None
-  | TypeAlias { name; typarams; universe; _ } ->
-     Some (TypeSignature (name, typarams, universe))
   | Record { name; typarams; universe; _ } ->
      Some (TypeSignature (name, typarams, universe))
   | Union { name; typarams; universe; _ } ->

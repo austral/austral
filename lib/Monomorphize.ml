@@ -55,9 +55,6 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
      (match get_decl_by_name env (qident_to_sident name) with
       | Some decl ->
          (match decl with
-          | TypeAlias { id; _} ->
-             let (env, mono_id) = add_or_get_type_alias_monomorph env id args in
-             (MonoNamedType mono_id, env)
           | Record { id; _ } ->
              let (env, mono_id) = add_or_get_record_monomorph env id args in
              (MonoNamedType mono_id, env)
@@ -210,10 +207,6 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      let (ty, env) = strip_and_mono env ty in
      let (args, env) = monomorphize_named_expr_list env args in
      (MUnionConstructor (ty, case_name, args), env)
-  | TTypeAliasConstructor (ty, expr) ->
-     let (ty, env) = strip_and_mono env ty in
-     let (expr, env) = monomorphize_expr env expr in
-     (MTypeAliasConstructor (ty, expr), env)
   | TPath { head; elems; ty } ->
      let (ty, env) = strip_and_mono env ty in
      let (head, env) = monomorphize_expr env head in
@@ -386,15 +379,6 @@ let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
      let (value, env) = monomorphize_expr env value in
      let decl = MConstant (id, name, ty, value) in
      (Some decl, env)
-  | TTypeAlias (id, _, name, typarams, _, ty, _) ->
-     (* Concrete (i.e., no type parameters) type aliases can be monomorphized
-        immediately. Generic ones are monomorphized on demand. *)
-     if (typarams_size typarams) = 0 then
-       let (ty, env) = strip_and_mono env ty in
-       let decl = MTypeAlias (id, name, ty) in
-       (Some decl, env)
-     else
-       (None, env)
   | TRecord (id, _, name, typarams, _, slots, _) ->
      (* Concrete records are monomorphized immediately. Generic records are
         monomorphized on demand. *)
@@ -514,21 +498,6 @@ and instantiate_monomorphs (env: env) (monos: monomorph list): (env * mdecl list
 and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
   let qname = get_mono_qname env mono in
   match mono with
-  | MonoTypeAliasDefinition { id; type_id; tyargs; _ } ->
-     (* Find the type alias declaration and extract the type parameters and the
-        definition. *)
-     let (typarams, ty) = get_type_alias_definition env type_id in
-     (* Search/replace the type variables in `def` with the type arguments from
-        this monomorph. *)
-     let ty: ty = replace_type_variables typarams qname tyargs ty in
-     (* Strip and monomorphize the type. *)
-     let (ty, env) = strip_and_mono env ty in
-     (* Store the monomorphic type in the environment. *)
-     let env = store_type_alias_monomorph_definition env id ty in
-     (* Construct a monomorphic type alias decl. *)
-     let decl: mdecl = MTypeAliasMonomorph (id, ty) in
-     (* Return the new environment and the declaration. *)
-     (env, decl)
   | MonoRecordDefinition { id; type_id; tyargs; _ } ->
      with_frame "Instantiating record monomorph"
        (fun _ ->
@@ -656,12 +625,6 @@ and get_mono_qname (env: env) (mono: monomorph): qident =
     | None -> err "internal"
   in
   match mono with
-  | MonoTypeAliasDefinition { type_id; _ } ->
-     (match get_decl_by_id env type_id with
-      | Some (TypeAlias { name; mod_id; _ }) ->
-         make_qident (get_module_name mod_id, name, name)
-      | _ ->
-         err "internal")
   | MonoRecordDefinition { type_id; _ } ->
      (match get_decl_by_id env type_id with
       | Some (Record { name; mod_id; _ }) ->
@@ -694,13 +657,6 @@ and get_mono_qname (env: env) (mono: monomorph): qident =
              err "internal")
       | _ ->
          err "internal")
-
-and get_type_alias_definition (env: env) (id: decl_id): (typarams * ty) =
-  match get_decl_by_id env id with
-  | Some (TypeAlias { typarams; def; _ }) ->
-     (typarams, def)
-  | _ ->
-     err "internal"
 
 and get_record_definition (env: env) (id: decl_id): (typarams * typed_slot list) =
   match get_decl_by_id env id with

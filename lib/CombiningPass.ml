@@ -70,12 +70,6 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
          err "Not a constant")
   | ConcreteOpaqueTypeDecl (name, typarams, universe, docstring) ->
      (match def with
-      | ConcreteTypeAliasDef (ConcreteTypeAlias (name', typarams', universe', ty, _)) ->
-         if (name = name') && (typarams = typarams') && (universe = universe') then
-           let qname = make_qname name' in
-           CTypeAlias (TypeVisOpaque, name, name_typarams bi typarams qname, universe, qualify_typespec bi ty, docstring)
-         else
-           err "Mismatch"
       | ConcreteRecordDef (ConcreteRecord (name', typarams', universe', slots, _)) ->
          if (name = name') && (typarams = typarams') && (universe = universe') then
            let qname = make_qname name' in
@@ -151,14 +145,6 @@ let private_def module_name im def =
                 qualify_typespec im ty,
                 abs_expr im value,
                 docstring)
-  | ConcreteTypeAliasDef (ConcreteTypeAlias (name, typarams, universe, ty, docstring)) ->
-     let qname = make_qname name in
-     CTypeAlias (TypeVisPrivate,
-                 name,
-                 name_typarams im typarams qname,
-                 universe,
-                 qualify_typespec im ty,
-                 docstring)
   | ConcreteRecordDef (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
      let qname = make_qname name in
      CRecord (TypeVisPrivate,
@@ -246,9 +232,6 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
   | (Some name) ->
      (match decl with
       (* Some declarations don't need to have a matching body *)
-      | ConcreteTypeAliasDecl (ConcreteTypeAlias (name, typarams, universe, ty, docstring)) ->
-         let qname = make_qname name in
-         CTypeAlias (TypeVisPublic, name, name_typarams im typarams qname, universe, qualify_typespec im ty, docstring)
       | ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
          let qname = make_qname name in
          CRecord (TypeVisPublic,
@@ -324,8 +307,6 @@ let as_public (def: combined_definition): combined_definition =
   match def with
   | CConstant (_, name, ty, value, docstring) ->
      CConstant (VisPublic, name, ty, value, docstring)
-  | CTypeAlias (_, name, typarams, universe, def, docstring) ->
-     CTypeAlias (TypeVisPublic, name, typarams, universe, def, docstring)
   | CRecord (_, name, typarams, universe, slots, docstring) ->
      CRecord (TypeVisPublic, name, typarams, universe, slots, docstring)
   | CUnion (_, name, typarams, universe, cases, docstring) ->

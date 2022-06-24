@@ -83,7 +83,6 @@ and ser_expr =
   | SIfExpression of ser_expr * ser_expr * ser_expr
   | SRecordConstructor of ty * (identifier * ser_expr) list
   | SUnionConstructor of ty * identifier * (identifier * ser_expr) list
-  | STypeAliasConstructor of ty * ser_expr
   | SPath of {
       head: ser_expr;
       elems: ser_path_elem list;
@@ -120,13 +119,6 @@ type compiled_decl =
       ty: ty;
     }
   (** Constants in ACM files are always public. *)
-  | CompiledTypeAlias of {
-      vis: acm_type_vis;
-      name: identifier;
-      typarams: typarams;
-      universe: universe;
-      def: ty;
-    }
   | CompiledRecord of {
       vis: acm_type_vis;
       name: identifier;

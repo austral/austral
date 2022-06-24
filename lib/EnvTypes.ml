@@ -58,16 +58,6 @@ type decl =
       ty: ty;
       docstring: docstring;
     }
-  | TypeAlias of {
-      id: decl_id;
-      mod_id: mod_id;
-      vis: type_vis;
-      name: identifier;
-      docstring: docstring;
-      typarams: typarams;
-      universe: universe;
-      def: ty;
-    }
   | Record of {
       id: decl_id;
       mod_id: mod_id;
@@ -155,7 +145,6 @@ type ins_meth_rec = InsMethRec of {
 (** Callable things. *)
 type callable =
   | FunctionCallable of decl_id * typarams * value_parameter list * ty
-  | TypeAliasCallable of decl_id * typarams * universe * ty
   | RecordConstructor of decl_id * typarams * universe * typed_slot list
   | UnionConstructor of {
       union_id: decl_id;
@@ -171,13 +160,6 @@ type callable =
 
 (** Represents a monomorph. *)
 type monomorph =
-  | MonoTypeAliasDefinition of {
-      id: mono_id;
-      type_id: decl_id;
-      tyargs: mono_ty list;
-      def: mono_ty option;
-      (** The definition of the type alias, present once it's instantiated. *)
-    }
   | MonoRecordDefinition of {
       id: mono_id;
       type_id: decl_id;
@@ -212,16 +194,6 @@ type const_input = {
     name: identifier;
     ty: ty;
     docstring: docstring;
-  }
-
-type type_alias_input = {
-    mod_id: mod_id;
-    vis: type_vis;
-    name: identifier;
-    docstring: docstring;
-    typarams: typarams;
-    universe: universe;
-    def: ty;
   }
 
 type record_input = {

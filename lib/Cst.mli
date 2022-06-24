@@ -18,7 +18,6 @@ and concrete_import =
 and concrete_decl =
   | ConcreteConstantDecl of identifier * typespec * docstring
   | ConcreteOpaqueTypeDecl of identifier * concrete_type_param list * universe * docstring
-  | ConcreteTypeAliasDecl of concrete_type_alias
   | ConcreteRecordDecl of concrete_record
   | ConcreteUnionDecl of concrete_union
   | ConcreteFunctionDecl of identifier * concrete_type_param list * concrete_param list * typespec * docstring
@@ -27,15 +26,11 @@ and concrete_decl =
 
 and concrete_def =
   | ConcreteConstantDef of identifier * typespec * cexpr * docstring
-  | ConcreteTypeAliasDef of concrete_type_alias
   | ConcreteRecordDef of concrete_record
   | ConcreteUnionDef of concrete_union
   | ConcreteFunctionDef of identifier * concrete_type_param list * concrete_param list * typespec * cstmt * docstring * pragma list
   | ConcreteTypeClassDef of concrete_typeclass
   | ConcreteInstanceDef of concrete_instance
-
-and concrete_type_alias =
-  ConcreteTypeAlias of identifier * concrete_type_param list * universe * typespec * docstring
 
 and concrete_record =
   ConcreteRecord of identifier * concrete_type_param list * universe * concrete_slot list * docstring

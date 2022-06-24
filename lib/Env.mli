@@ -42,8 +42,6 @@ val module_name_from_id : env -> mod_id -> module_name
 
 val add_constant : env -> const_input -> (env * decl_id)
 
-val add_type_alias : env -> type_alias_input -> (env * decl_id)
-
 val add_record : env -> record_input -> (env * decl_id)
 
 val add_union : env -> union_input -> (env * decl_id)
@@ -102,8 +100,6 @@ val get_callable : env -> module_name -> sident -> callable option
 
 (** {1 Monomorph Functions} *)
 
-val add_type_alias_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
-
 val add_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
 val add_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
@@ -111,10 +107,6 @@ val add_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 val add_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
 val add_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
-
-(** Given a type alias' ID and a list of arguments, register a monomorph and
-   return its ID, or return the ID if it exists. *)
-val add_or_get_type_alias_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
 
 (** Given a record's ID and a list of arguments, register a monomorph and return
    its ID, or return the ID if it exists. *)
@@ -131,8 +123,6 @@ val add_or_get_function_monomorph : env -> decl_id -> mono_ty list -> (env * mon
 (** Given an instance method's ID and a list of type arguments, register a
    monomorph and return its ID, or return the ID if it exists. *)
 val add_or_get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
-
-val store_type_alias_monomorph_definition : env -> mono_id -> mono_ty -> env
 
 val store_record_monomorph_definition : env -> mono_id -> mono_slot list -> env
 
