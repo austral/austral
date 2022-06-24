@@ -82,17 +82,6 @@ let add_constant (env: env) (input: const_input): (env * decl_id) =
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
-let make_type_alias_decl (id: decl_id) (input: type_alias_input): decl =
-  let { mod_id; vis; name; docstring; typarams; universe; def } = input in
-  TypeAlias { id; mod_id; vis; name; docstring; typarams; universe; def }
-
-let add_type_alias (env: env) (input: type_alias_input): (env * decl_id) =
-  let id = fresh_decl_id () in
-  let decl = make_type_alias_decl id input in
-  let (Env { files; mods; methods; decls; monos }) = env in
-  let env = Env { files; mods; methods; decls = decl :: decls; monos } in
-  (env, id)
-
 let make_record_decl (id: decl_id) (input: record_input): decl =
   let { mod_id; vis; name; docstring; typarams; universe; slots } = input in
   Record { id; mod_id; vis; name; docstring; typarams; universe; slots }
@@ -252,8 +241,6 @@ let get_callable (env: env) (importing_module_name: module_name) (name: sident):
   match get_decl_by_name env name with
   | Some decl ->
      (match decl with
-      | TypeAlias { id; typarams; universe; def; _ } ->
-         Some (TypeAliasCallable (id, typarams, universe, def))
       | Record { id; typarams; universe; slots; _ } ->
          Some (RecordConstructor (id, typarams, universe, slots))
       | UnionCase { name; union_id; slots; _ } ->
@@ -370,13 +357,6 @@ let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id
   in
   List.find_opt pred methods
 
-let add_type_alias_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
-  let (Env { files; mods; methods; decls; monos }) = env in
-  let id = fresh_mono_id () in
-  let mono = MonoTypeAliasDefinition { id; type_id; tyargs; def = None } in
-  let env = Env { files; mods; methods; decls; monos = mono :: monos } in
-  (env, id)
-
 let add_record_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
@@ -407,7 +387,6 @@ let add_instance_method_monomorph (env: env) (method_id: ins_meth_id) (tyargs: m
 
 let monomorph_id (mono: monomorph): mono_id =
   match mono with
-  | MonoTypeAliasDefinition { id; _ } -> id
   | MonoRecordDefinition { id; _ } -> id
   | MonoUnionDefinition { id; _ } -> id
   | MonoFunction { id; _ } -> id
@@ -417,9 +396,6 @@ let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_
   let (Env { monos; _ }) = env in
   let pred (mono: monomorph): bool =
     match mono with
-    | MonoTypeAliasDefinition { type_id; tyargs; _ } ->
-      (equal_decl_id type_id decl_id)
-      && (List.equal equal_mono_ty tyargs args)
     | MonoRecordDefinition { type_id; tyargs; _ } ->
       (equal_decl_id type_id decl_id)
       && (List.equal equal_mono_ty tyargs args)
@@ -432,14 +408,6 @@ let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_
   match List.find_opt pred monos with
   | Some m -> Some (monomorph_id m)
   | None -> None
-
-let add_or_get_type_alias_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
-  (* TODO: Possibly type confusion vulnerability, since `get_type_monomorph`
-     doesn't care whether the mono is a type alias or a record or a union? *)
-  match get_type_monomorph env decl_id args with
-  | Some mono_id -> (env, mono_id)
-  | None ->
-    add_type_alias_monomorph env decl_id args
 
 let add_or_get_record_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
   match get_type_monomorph env decl_id args with
@@ -495,8 +463,6 @@ let add_or_get_instance_method_monomorph (env: env) (method_id: ins_meth_id) (ar
 
 let is_instantiated (mono: monomorph): bool =
   match mono with
-  | MonoTypeAliasDefinition { def; _ } ->
-    Option.is_some def
   | MonoRecordDefinition { slots; _ } ->
     Option.is_some slots
   | MonoUnionDefinition { cases; _ } ->
@@ -528,18 +494,6 @@ let pop_monomorph (env: env) (id: mono_id): (env * monomorph) =
     (env, mono)
   | None ->
     err "internal: monomorph with this ID does not exist"
-
-let store_type_alias_monomorph_definition (env: env) (id: mono_id) (ty: mono_ty): env =
-  let (env, mono) = pop_monomorph env id in
-  match mono with
-  | MonoTypeAliasDefinition { id; type_id; tyargs; def; } ->
-    let _ = def in
-    let new_mono = MonoTypeAliasDefinition { id; type_id; tyargs; def = Some ty; } in
-    let (Env { files; mods; methods; decls; monos }) = env in
-    let env = Env { files; mods; methods; decls; monos = new_mono :: monos } in
-    env
-  | _ ->
-    err "internal"
 
 let store_record_monomorph_definition (env: env) (id: mono_id) (new_slots: mono_slot list): env =
   let (env, mono) = pop_monomorph env id in
