@@ -223,10 +223,6 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
          ("tag", union_tag_value ty case_name);
          ("data", CStructInitializer [(gen_ident case_name, args)])
        ]
-  | MTypeAliasConstructor (ty, expr) ->
-     let ty = gen_type ty
-     and expr = CStructInitializer [("value", g expr)] in
-     CCast (expr, ty)
   | MPath { head; elems; _ } ->
      let p = gen_path mn (g head) (List.rev elems) in
      (match (get_type head) with
@@ -433,19 +429,6 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      let d = Desc "Constant" in
      [
        CConstantDefinition (d, gen_sident mn n, gen_type ty, gen_exp mn e)
-     ]
-  | MTypeAlias (_, n, ty) ->
-     let d = Desc "Type Alias" in
-     [
-       CStructDefinition (
-           d,
-           CStruct (
-               Some (gen_ident n),
-               [
-                 CSlot ("value", gen_type ty)
-               ]
-             )
-         )
      ]
   | MTypeAliasMonomorph (id, ty) ->
      let d = Desc ("Type alias monomorph: " ^ (mono_desc env id)) in

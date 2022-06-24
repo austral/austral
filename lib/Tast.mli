@@ -63,7 +63,6 @@ and texpr =
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
-  | TTypeAliasConstructor of ty * texpr
   | TPath of {
       head: texpr;
       elems: typed_path_elem list;
@@ -102,7 +101,6 @@ type typed_method_def =
 
 type typed_decl =
   | TConstant of decl_id * vis * identifier * ty * texpr * docstring
-  | TTypeAlias of decl_id * type_vis * identifier * typarams * universe * ty * docstring
   | TRecord of decl_id * type_vis * identifier * typarams * universe * typed_slot list * docstring
   | TUnion of decl_id * type_vis * identifier * typarams * universe * linked_case list * docstring
   | TFunction of decl_id * vis * identifier * typarams * value_parameter list * ty * tstmt * docstring

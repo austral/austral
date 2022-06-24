@@ -207,10 +207,6 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      let (ty, env) = strip_and_mono env ty in
      let (args, env) = monomorphize_named_expr_list env args in
      (MUnionConstructor (ty, case_name, args), env)
-  | TTypeAliasConstructor (ty, expr) ->
-     let (ty, env) = strip_and_mono env ty in
-     let (expr, env) = monomorphize_expr env expr in
-     (MTypeAliasConstructor (ty, expr), env)
   | TPath { head; elems; ty } ->
      let (ty, env) = strip_and_mono env ty in
      let (head, env) = monomorphize_expr env head in
@@ -383,15 +379,6 @@ let rec monomorphize_decl (env: env) (decl: typed_decl): (mdecl option * env) =
      let (value, env) = monomorphize_expr env value in
      let decl = MConstant (id, name, ty, value) in
      (Some decl, env)
-  | TTypeAlias (id, _, name, typarams, _, ty, _) ->
-     (* Concrete (i.e., no type parameters) type aliases can be monomorphized
-        immediately. Generic ones are monomorphized on demand. *)
-     if (typarams_size typarams) = 0 then
-       let (ty, env) = strip_and_mono env ty in
-       let decl = MTypeAlias (id, name, ty) in
-       (Some decl, env)
-     else
-       (None, env)
   | TRecord (id, _, name, typarams, _, slots, _) ->
      (* Concrete records are monomorphized immediately. Generic records are
         monomorphized on demand. *)

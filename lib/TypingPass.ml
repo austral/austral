@@ -1107,8 +1107,6 @@ and is_constant = function
      List.for_all (fun (_, v) -> is_constant v) values
   | TUnionConstructor (_, _, values) ->
      List.for_all (fun (_, v) -> is_constant v) values
-  | TTypeAliasConstructor (_, e) ->
-     is_constant e
   | TPath { head; elems; _ } ->
      (is_constant head) && (List.for_all is_path_elem_constant elems)
   | TEmbed _ ->

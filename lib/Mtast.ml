@@ -10,7 +10,6 @@ type mono_module = MonoModule of module_name * mdecl list
 
 and mdecl =
   | MConstant of decl_id * identifier * mono_ty * mexpr
-  | MTypeAlias of decl_id * identifier * mono_ty
   | MTypeAliasMonomorph of mono_id * mono_ty
   | MRecord of decl_id * identifier * mono_slot list
   | MRecordMonomorph of mono_id * mono_slot list
@@ -73,7 +72,6 @@ and mexpr =
   | MIfExpression of mexpr * mexpr * mexpr
   | MRecordConstructor of mono_ty * (identifier * mexpr) list
   | MUnionConstructor of mono_ty * identifier * (identifier * mexpr) list
-  | MTypeAliasConstructor of mono_ty * mexpr
   | MPath of {
       head: mexpr;
       elems: mtyped_path_elem list;
@@ -150,8 +148,6 @@ let rec get_type (e: mexpr): mono_ty =
   | MRecordConstructor (ty, _) ->
      ty
   | MUnionConstructor (ty, _, _) ->
-     ty
-  | MTypeAliasConstructor (ty, _) ->
      ty
   | MPath { ty; _ } ->
      ty

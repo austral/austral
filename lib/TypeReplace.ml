@@ -76,10 +76,6 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      let ty = replace_variables bindings ty
      and args = List.map (fun (n, e) -> (n, replace_tyvars_expr bindings e)) args in
      TUnionConstructor (ty, case_name, args)
-  | TTypeAliasConstructor (ty, expr) ->
-     let ty = replace_variables bindings ty
-     and expr = replace_tyvars_expr bindings expr in
-     TTypeAliasConstructor (ty, expr)
   | TPath { head; elems; ty } ->
      let head = replace_tyvars_expr bindings head
      and elems = List.map (replace_tyvars_path bindings) elems

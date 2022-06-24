@@ -78,8 +78,6 @@ let rec ser_expr (env: env) (expr: texpr): ser_expr =
      SRecordConstructor (ty, List.map (fun (n, e) -> (n, se e)) values)
   | TUnionConstructor (ty, name, values) ->
      SUnionConstructor (ty, name, List.map (fun (n, e) -> (n, se e)) values)
-  | TTypeAliasConstructor (ty, e) ->
-     STypeAliasConstructor (ty, se e)
   | TPath { head; elems; ty } ->
      SPath { head = se head; elems = List.map (ser_path_elem env) elems; ty; }
   | TEmbed (ty, name, values) ->
