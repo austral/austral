@@ -119,13 +119,6 @@ type compiled_decl =
       ty: ty;
     }
   (** Constants in ACM files are always public. *)
-  | CompiledTypeAlias of {
-      vis: acm_type_vis;
-      name: identifier;
-      typarams: typarams;
-      universe: universe;
-      def: ty;
-    }
   | CompiledRecord of {
       vis: acm_type_vis;
       name: identifier;
