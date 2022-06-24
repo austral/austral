@@ -188,13 +188,6 @@ type_decl:
     SEMI { ConcreteOpaqueTypeDecl (name, typarams, universe, doc) }
   ;
 
-type_alias:
-  | doc=docstringopt TYPE name=identifier
-    typarams=type_parameter_list COLON universe=universe
-    IS def=typespec
-    SEMI { ConcreteTypeAlias (name, typarams, universe, def, doc) }
-  ;
-
 record:
   | doc=docstringopt RECORD name=identifier
     typarams=type_parameter_list COLON universe=universe
