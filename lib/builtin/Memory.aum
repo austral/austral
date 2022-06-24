@@ -1,6 +1,6 @@
 module body Austral.Memory is
-    type Address[T: Type]: Free is Unit;
-    type Pointer[T: Type]: Free is Unit;
+    record Address[T: Type]: Free is end;
+    record Pointer[T: Type]: Free is end;
 
     generic [T: Type]
     function Null_Pointer(): Address[T] is
