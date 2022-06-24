@@ -1,1 +1,8 @@
-TODO: this should fail.
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    Record was declared to belong to the Free universe, but it contains a type that beloings to the Linear universe.
+  Code:
+    [no span available]
