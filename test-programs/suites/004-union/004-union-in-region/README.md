@@ -1,0 +1,1 @@
+Test that we can't define a union in the region universe.

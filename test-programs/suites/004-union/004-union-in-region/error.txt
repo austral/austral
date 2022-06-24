@@ -1,0 +1,8 @@
+Error:
+  Title: Generic Error
+  Location:
+    [no span available]
+  Description:
+    Trying to define a union in the Region universe. Regions are distinct from types.
+  Code:
+    [no span available]

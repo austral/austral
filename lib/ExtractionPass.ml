@@ -194,6 +194,13 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
        else
          ()
      in
+     (* If the universe is `Region`, fail. *)
+     let _ =
+       if universe = RegionUniverse then
+         err "Trying to define a record in the Region universe. Regions are distinct from types."
+       else
+         ()
+     in
      let (env, decl_id) = add_record env { mod_id; vis; name; docstring; typarams; universe; slots } in
      let decl = LRecord (decl_id, vis, name, typarams, universe, slots, docstring) in
      (env, decl)
@@ -212,6 +219,13 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let _ =
        if universe = FreeUniverse then
          check_typarams_are_free typarams
+       else
+         ()
+     in
+     (* If the universe is `Region`, fail. *)
+     let _ =
+       if universe = RegionUniverse then
+         err "Trying to define a union in the Region universe. Regions are distinct from types."
        else
          ()
      in

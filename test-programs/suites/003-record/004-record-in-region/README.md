@@ -1,0 +1,1 @@
+Test that we can't define a record in the region universe.
