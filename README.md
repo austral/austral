@@ -47,18 +47,35 @@ Anti-features:
 - No function overloading (except through typeclasses, where it is bounded).
 - No arithmetic precedence.
 
-## Examples
+## Example
 
-### Fibonacci
+Calculate and print the 10th Fibonacci number:
 
 ```
- function Fibonacci(n: Natural_64): Natural_64 is
-     if n < 2 then
-         return n;
-     else
-         return Fibonacci(n - 1) + Fibonacci(n - 2);
-     end if;
- end;
+module body Fib is
+    function Fib(n: Natural_64): Natural_64 is
+        if n < 2 then
+            return n;
+        else
+            return Fib(n - 1) + Fib(n - 2);
+        end if;
+    end;
+
+    function Main(root: Root_Capability): Root_Capability is
+        Print("Fib(10) = ");
+        PrintLn(Fib(10));
+        return root;
+    end;
+end module body.
+```
+
+Build and run:
+
+```bash
+$ austral compile --public-module=fib.aum --entrypoint=Fib:Main --output=fib.c
+$ gcc lib/prelude.c fib.c -o fib
+$ ./fib
+Fib(10) = 55
 ```
 
 ## Building
