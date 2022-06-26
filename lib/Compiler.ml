@@ -3,7 +3,6 @@ open Id
 open Env
 open BuiltIn
 open BuiltInModules
-open CPrelude
 open ParserInterface
 open CombiningPass
 open ExtractionPass
@@ -171,8 +170,8 @@ let empty_compiler: compiler =
       (* We have to compile the Austral.Pervasive module, followed by
          Austral.Memory, since the latter uses declarations from the former. *)
       let env: env = empty_env in
-      (* Start with the C++ prelude. *)
-      let c = Compiler (env, prelude_source) in
+      (* Start with the C prelude interface. *)
+      let c = Compiler (env, prelude_h) in
       let c =
         (* Handle errors during the compilation of the Austral,Pervasive
            module. Otherwise, a typo in the source code of this module will cause a
