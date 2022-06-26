@@ -1,8 +1,4 @@
-(** The C prelude. *)
-
-(** The source code of the C prelude. *)
-let prelude_source: string = {code|
-/* --- BEGIN PRELUDE --- */
+/* --- BEGIN prelude.h --- */
 #include <stdint.h>
 #include <stddef.h>
 
@@ -168,5 +164,4 @@ extern au_int64_t convert_double_to_int64(double value);
 extern float convert_double_to_float(double value);
 extern double convert_double_to_double(double value);
 
-/* --- END PRELUDE --- */
-|code}
+/* --- END prelude.h --- */

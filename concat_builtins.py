@@ -11,6 +11,8 @@ pervasive_int: str = read_file_to_string("lib/builtin/Pervasive.aui")
 pervasive_body: str = read_file_to_string("lib/builtin/Pervasive.aum")
 memory_int: str = read_file_to_string("lib/builtin/Memory.aui")
 memory_body: str = read_file_to_string("lib/builtin/Memory.aum")
+prelude_h: str = read_file_to_string("lib/prelude.h")
+prelude_c: str = read_file_to_string("lib/prelude.c")
 
 contents: str = f"""
 let pervasive_interface_source: string = {{code|
@@ -27,6 +29,14 @@ let memory_interface_source: string = {{code|
 
 let memory_body_source: string = {{code|
 {memory_body}
+|code}}
+
+let prelude_h: string = {{code|
+{prelude_h}
+|code}}
+
+let prelude_c: string = {{code|
+{prelude_c}
 |code}}
 """
 
