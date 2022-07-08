@@ -23,7 +23,7 @@ module body Test is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let p: Pair[Boolean, Boolean] := Pair(a => true, b => false);
+        let p: Pair[Bool, Bool] := Pair(a => true, b => false);
         Accept(p);
         return root;
     end;
