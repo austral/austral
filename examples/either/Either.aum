@@ -7,9 +7,9 @@ module body Example.Either is
 
     function Main(root: Root_Capability): Root_Capability is
         -- Left case.
-        let l: Either[Boolean, Integer_32] := Left(left => true);
+        let l: Either[Bool, Integer_32] := Left(left => true);
         case l of
-            when Left(left: Boolean) do
+            when Left(left: Bool) do
                 if left then
                     Put_Char('a');
                 end if;
@@ -17,9 +17,9 @@ module body Example.Either is
                 skip;
         end case;
         -- Right case.
-        let r: Either[Boolean, Integer_32] := Right(right => 10);
+        let r: Either[Bool, Integer_32] := Right(right => 10);
         case r of
-            when Left(left: Boolean) do
+            when Left(left: Bool) do
                 skip;
             when Right(right: Integer_32) do
                 if right = 10 then

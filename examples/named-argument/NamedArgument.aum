@@ -1,5 +1,5 @@
 module body Example.NamedArgument is
-    function F(x: Boolean, y: Boolean): Unit is
+    function F(x: Bool, y: Bool): Unit is
         return nil;
     end;
 
