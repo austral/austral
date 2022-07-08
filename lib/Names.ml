@@ -1,5 +1,5 @@
 let unit_name = "Unit"
-let bool_name = "Boolean"
+let bool_name = "Bool"
 
 let nat_prefix = "Natural_"
 let int_prefix = "Integer_"

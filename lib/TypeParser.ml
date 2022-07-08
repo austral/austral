@@ -48,7 +48,7 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
       match name_str with
       | "Unit" ->
          Some Unit
-      | "Boolean" ->
+      | "Bool" ->
          Some Boolean
       | "Natural_8" ->
          Some (Integer (Unsigned, Width8))
