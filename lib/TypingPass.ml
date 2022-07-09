@@ -809,9 +809,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                        = List.map (fun (n, ty, actual, rename) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual, rename)) bindings'
                      in
                      let newvars: (identifier * ty * var_source) list =
-                       List.map (fun (n, ty, actual, _) ->
+                       List.map (fun (_, ty, actual, rename) ->
                            let _ = match_type (env, module_name) ty actual in
-                           (n, ty, VarLocal))
+                           (rename, ty, VarLocal))
                          bindings''
                      in
                      let lexenv' = push_vars lexenv newvars in
