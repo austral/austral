@@ -3,9 +3,9 @@ module body Test is
         X: Int32;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let Rec : R := R(X => 10);
         let Y: Int32 := Rec.X;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

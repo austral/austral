@@ -3,11 +3,11 @@ module body Test is
         x: Int32;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         for i from 0 to 10 do
             let r: R := R(x => 32);
             let { x: Int32 } := r;
         end for;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

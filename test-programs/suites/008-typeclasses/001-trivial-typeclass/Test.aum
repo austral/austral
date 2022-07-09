@@ -41,7 +41,7 @@ module body Test is
     record Foo: Linear is
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let n8: Nat8 := 'a';
         PrintF(n8);
         PrintF('a' : Nat16);
@@ -52,6 +52,6 @@ module body Test is
         end;
         PrintF(&foo);
         let {} := foo;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

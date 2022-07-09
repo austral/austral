@@ -14,7 +14,7 @@ module body Test is
     -- This constant is private, since it appears in the module body file but not the interface file.
     constant Pi : Float64 := 3.14;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         if (Decimal_24 /= Hexadecimal_24) then
             Abort("Hexadecimal literals are broken.");
         end if;
@@ -27,6 +27,6 @@ module body Test is
         if (Char_Const /= 97) then
             Abort("Character literals are broken.");
         end if;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

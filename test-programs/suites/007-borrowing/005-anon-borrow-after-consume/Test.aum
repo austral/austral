@@ -3,13 +3,13 @@ module body Test is
         bar: Nat8;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Consume the record by destructuring.
         let { bar: Nat8 } := foo;
         -- Try to borrow it.
         &foo;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

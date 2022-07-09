@@ -8,10 +8,10 @@ module body Test is
         return nil;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let r: R := R(x => 32);
         Consume(r);
         Consume(r);
-        return root;
+        return ExitSuccess();
     end;
 end module body.

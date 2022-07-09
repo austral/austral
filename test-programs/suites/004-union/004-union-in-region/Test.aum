@@ -1,7 +1,7 @@
 module body Test is
     union Foo: Region is end;
 
-    function Main(root: RootCapability): RootCapability is
-        return root;
+    function Main(): ExitCode is
+        return ExitSuccess();
     end;
 end module body.

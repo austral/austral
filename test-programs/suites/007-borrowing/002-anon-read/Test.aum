@@ -8,13 +8,13 @@ module body Test is
         return nil;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Anonymously borrow it.
         Accept_Ref(&foo);
         -- Consume it by destructuring.
         let { bar: Nat8 } := foo;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

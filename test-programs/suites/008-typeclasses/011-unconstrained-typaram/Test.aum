@@ -15,8 +15,8 @@ module body Test is
         return nil;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         Foo(nil);
-        return root;
+        return ExitSuccess();
     end;
 end module body.

@@ -1,5 +1,5 @@
 module body Test is
-    function Main(root: RootCapability): RootCapability is
-        return root;
+    function Main(): ExitCode is
+        return ExitSuccess();
     end;
 end module body.
