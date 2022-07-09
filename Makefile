@@ -3,7 +3,7 @@ SRC := lib/*.ml lib/*.mli lib/*.mll lib/*.mly lib/dune bin/dune bin/austral.ml l
 
 all: $(BIN)
 
-lib/BuiltInModules.ml: lib/builtin/*.aui lib/builtin/*.aum
+lib/BuiltInModules.ml: lib/builtin/*.aui lib/builtin/*.aum lib/prelude.h lib/prelude.c
 	python3 concat_builtins.py
 
 $(BIN): $(SRC)
