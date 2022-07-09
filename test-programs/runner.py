@@ -261,66 +261,7 @@ def _run_success_test(test: Test):
         stderr=subprocess.PIPE,
     )
     code: int = result.returncode
-    if code == 0:
-        # Program ran successfully. Did it produce output?
-        stdout: str = result.stdout.decode("utf-8").strip()
-        if stdout and expected_output:
-            # Have output, expected output. Check they match.
-            if stdout == expected_output:
-                # Output matches. Pass.
-                print("PASS")
-            else:
-                # Output mismatch. Error.
-                report(
-                    properties=[
-                        ("Suite", suite_name),
-                        ("Test", test_name),
-                        (
-                            "Description",
-                            "program produced stdout, but it was not "
-                            "what we expected.",
-                        ),
-                    ],
-                    outputs=[
-                        ("ACTUAL STDOUT", stdout),
-                        ("EXPECTED STDOUT", expected_output),
-                    ],
-                )
-        elif stdout and (not expected_output):
-            # Have output, did not expect it. Error.
-            report(
-                properties=[
-                    ("Suite", suite_name),
-                    ("Test", test_name),
-                    (
-                        "Description",
-                        "program produced stdout, but we expected "
-                        "none.",
-                    ),
-                ],
-                outputs=[
-                    ("STDOUT", stdout),
-                ],
-            )
-        elif (not stdout) and expected_output:
-            # Don't have output, expected it. Error.
-            report(
-                properties=[
-                    ("Suite", suite_name),
-                    ("Test", test_name),
-                    (
-                        "Description",
-                        "did not produce stdout, but we expected output.",
-                    ),
-                ],
-                outputs=[
-                    ("EXPECTED OUTPUT", expected_output),
-                ],
-            )
-        else:
-            # Don't have output, didn't expect it. Pass.
-            print("PASS")
-    else:
+    if code != 0:
         # Program did not terminate successfully.
         report(
             properties=[
@@ -335,6 +276,64 @@ def _run_success_test(test: Test):
                 ("STDERR", result.stderr.decode("utf-8")),
             ],
         )
+    # Program ran successfully. Did it produce output?
+    stdout: str = result.stdout.decode("utf-8").strip()
+    if stdout and expected_output:
+        # Have output, expected output. Check they match.
+        if stdout == expected_output:
+            # Output matches. Pass.
+            print("PASS")
+        else:
+            # Output mismatch. Error.
+            report(
+                properties=[
+                    ("Suite", suite_name),
+                    ("Test", test_name),
+                    (
+                        "Description",
+                        "program produced stdout, but it was not "
+                        "what we expected.",
+                    ),
+                ],
+                outputs=[
+                    ("ACTUAL STDOUT", stdout),
+                    ("EXPECTED STDOUT", expected_output),
+                ],
+            )
+    elif stdout and (not expected_output):
+        # Have output, did not expect it. Error.
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                (
+                    "Description",
+                    "program produced stdout, but we expected "
+                    "none.",
+                ),
+            ],
+            outputs=[
+                ("STDOUT", stdout),
+            ],
+        )
+    elif (not stdout) and expected_output:
+        # Don't have output, expected it. Error.
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                (
+                    "Description",
+                    "did not produce stdout, but we expected output.",
+                ),
+            ],
+            outputs=[
+                ("EXPECTED OUTPUT", expected_output),
+            ],
+        )
+    else:
+        # Don't have output, didn't expect it. Pass.
+        print("PASS")
     # At this point, the test has passed. Delete the C code and the test binary.
     os.remove("test-programs/output.c")
     os.remove("test-programs/testbin")
