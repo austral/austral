@@ -88,7 +88,7 @@ module body Example.Box is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         -- Box a value, swap it, and unwrap it.
         let b: Either[Box[Int32], Int32] := Make('e');
         case b of
@@ -147,6 +147,6 @@ module body Example.Box is
             when Right(right: Int32) do
                 Abort("Unexpected.");
         end case;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

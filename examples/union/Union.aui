@@ -12,5 +12,5 @@ module Example.Union is
             value: Float64;
     end;
 
-    function Main(root: RootCapability): RootCapability;
+    function Main(): ExitCode;
 end module.

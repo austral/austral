@@ -4,5 +4,5 @@ module Example.GenericRecord is
         right: T;
     end;
 
-    function Main(root: RootCapability): RootCapability;
+    function Main(): ExitCode;
 end module.

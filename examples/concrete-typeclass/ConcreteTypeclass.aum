@@ -14,8 +14,8 @@ module body Example.ConcreteTypeclass is
         return X;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         Nil_To_Integer();
-        return root;
+        return ExitSuccess();
     end;
 end module body.

@@ -193,7 +193,7 @@ let get_exit_code_monomorph (env: env): mono_id =
   and n: identifier = make_ident exit_code_name in
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with
-  | Some (Record { id; _ }) ->
+  | Some (Union { id; _ }) ->
      (match get_type_monomorph env id [] with
       | Some id ->
          id

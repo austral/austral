@@ -9,7 +9,7 @@ module body Example.RTR is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let r: R := R(X => 97);
         borrow r as r2 in rho do
             let c: Int32 := !(r2->X);
@@ -17,6 +17,6 @@ module body Example.RTR is
         end;
         let { X: Int32 } := r;
         Put_Character(X);
-        return root;
+        return ExitSuccess();
     end;
 end module body.

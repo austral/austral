@@ -121,7 +121,7 @@ module body Example.Buffer is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         -- Create a buffer of e's.
         let buf: Buffer[Int32] := Initialize(3, 101);
         borrow buf as bufref in rho do
@@ -133,6 +133,6 @@ module body Example.Buffer is
             Put_Character(first);
         end;
         Destroy_Buffer(buf);
-        return root;
+        return ExitSuccess();
     end;
  end module body.

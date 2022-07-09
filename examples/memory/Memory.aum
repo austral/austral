@@ -11,7 +11,7 @@ import Austral.Memory (
 module body Example.Memory is
     pragma Unsafe_Module;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let addr: Address[Int32] := Allocate(sizeof(Int32));
         case Null_Check(addr) of
             when Some(value: Pointer[Int32]) do
@@ -20,6 +20,6 @@ module body Example.Memory is
                 -- Do nothing.
                 skip;
         end case;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

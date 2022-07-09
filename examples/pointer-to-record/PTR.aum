@@ -19,7 +19,7 @@ module body Example.PTR is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let r: R := R(X => 97);
         let addr: Address[R] := Allocate(sizeof(R));
         case Null_Check(addr) of
@@ -31,6 +31,6 @@ module body Example.PTR is
                 -- Do nothing.
                 skip;
         end case;
-        return root;
+        return ExitSuccess();
     end;
 end module body.
