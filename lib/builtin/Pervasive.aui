@@ -52,40 +52,40 @@ module Austral.Pervasive is
     constant Minimum_Index: Index;
     constant Maximum_Index: Index;
 
-    typeclass Trapping_Arithmetic(T: Type) is
+    typeclass TrappingArithmetic(T: Type) is
         method Trapping_Add(lhs: T, rhs: T): T;
         method Trapping_Subtract(lhs: T, rhs: T): T;
         method Trapping_Multiply(lhs: T, rhs: T): T;
         method Trapping_Divide(lhs: T, rhs: T): T;
     end;
 
-    typeclass Modular_Arithmetic(T: Type) is
+    typeclass ModularArithmetic(T: Type) is
         method Modular_Add(lhs: T, rhs: T): T;
         method Modular_Subtract(lhs: T, rhs: T): T;
         method Modular_Multiply(lhs: T, rhs: T): T;
         method Modular_Divide(lhs: T, rhs: T): T;
     end;
 
-    instance Trapping_Arithmetic(Nat8);
-    instance Trapping_Arithmetic(Int8);
-    instance Trapping_Arithmetic(Nat16);
-    instance Trapping_Arithmetic(Int16);
-    instance Trapping_Arithmetic(Nat32);
-    instance Trapping_Arithmetic(Int32);
-    instance Trapping_Arithmetic(Nat64);
-    instance Trapping_Arithmetic(Int64);
-    instance Trapping_Arithmetic(Index);
-    instance Trapping_Arithmetic(Float64);
+    instance TrappingArithmetic(Nat8);
+    instance TrappingArithmetic(Int8);
+    instance TrappingArithmetic(Nat16);
+    instance TrappingArithmetic(Int16);
+    instance TrappingArithmetic(Nat32);
+    instance TrappingArithmetic(Int32);
+    instance TrappingArithmetic(Nat64);
+    instance TrappingArithmetic(Int64);
+    instance TrappingArithmetic(Index);
+    instance TrappingArithmetic(Float64);
 
-    instance Modular_Arithmetic(Nat8);
-    instance Modular_Arithmetic(Int8);
-    instance Modular_Arithmetic(Nat16);
-    instance Modular_Arithmetic(Int16);
-    instance Modular_Arithmetic(Nat32);
-    instance Modular_Arithmetic(Int32);
-    instance Modular_Arithmetic(Nat64);
-    instance Modular_Arithmetic(Int64);
-    instance Modular_Arithmetic(Index);
+    instance ModularArithmetic(Nat8);
+    instance ModularArithmetic(Int8);
+    instance ModularArithmetic(Nat16);
+    instance ModularArithmetic(Int16);
+    instance ModularArithmetic(Nat32);
+    instance ModularArithmetic(Int32);
+    instance ModularArithmetic(Nat64);
+    instance ModularArithmetic(Int64);
+    instance ModularArithmetic(Index);
 
     typeclass Printable(A: Free) is
         method print(value: A): Unit;

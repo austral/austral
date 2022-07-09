@@ -37,12 +37,12 @@ let pervasive_imports =
         ConcreteImport (make_ident "Maximum_Int16", None);
         ConcreteImport (make_ident "Maximum_Int32", None);
         ConcreteImport (make_ident "Maximum_Int64", None);
-        ConcreteImport (make_ident "Trapping_Arithmetic", None);
+        ConcreteImport (make_ident "TrappingArithmetic", None);
         ConcreteImport (make_ident "Trapping_Add", None);
         ConcreteImport (make_ident "Trapping_Subtract", None);
         ConcreteImport (make_ident "Trapping_Multiply", None);
         ConcreteImport (make_ident "Trapping_Divide", None);
-        ConcreteImport (make_ident "Modular_Arithmetic", None);
+        ConcreteImport (make_ident "ModularArithmetic", None);
         ConcreteImport (make_ident "Modular_Add", None);
         ConcreteImport (make_ident "Modular_Subtract", None);
         ConcreteImport (make_ident "Modular_Multiply", None);
