@@ -138,6 +138,8 @@ let rec gen_type (ty: mono_ty): c_ty =
      CPointer (gen_type t)
   | MonoPointer t ->
      CPointer (gen_type t)
+  | MonoFnPtr _ ->
+     CNamedType "au_fnptr_t"
   | MonoRegionTyVar _ ->
      err "internal"
 
