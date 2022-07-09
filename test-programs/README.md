@@ -17,13 +17,13 @@ test-programs/
 
 The `suites` directory has numbered subdirectories, each representing a test suite: a collection of tests covering specific compiler features.
 
-Each test directory contains some Austral source files (in the simplest cases, `Test.aui` and `Test.aum`).
+Each test directory contains some Austral source files (in the simplest cases, `Test.aui` and `Test.aum`) and some control files:
 
-If the compilation is expected to fail, there should be a file called `austral-stderr.txt` containing the Austral compiler's expected output.
+1. `austral-stderr.txt` is the compiler's error message if the test is expected to fail.
 
-If compilation is expected to succeed and the program is expected to produce text output, there should be a file called `program-stdout.txt` containing the program's expected output.
+2. `program-stdout.txt` is the compiled program's stdout if the compiler is expected to succeed and the program is expected to produce stdout and return normally.
 
-If compilation is expected to succeed but no program output is expected, there's no need for an `program-stdout.txt` file.
+3. If neither file is present, the test is expected to compile and run successfully but produce no output.
 
 Suite and test directories are numbered so that tests run in a predictable order.
 
