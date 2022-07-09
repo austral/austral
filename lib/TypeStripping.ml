@@ -17,6 +17,7 @@ type stripped_ty =
   | SWriteRef of stripped_ty * stripped_ty
   | SAddress of stripped_ty
   | SPointer of stripped_ty
+  | SFnPtr of stripped_ty list * stripped_ty
   | SMonoTy of mono_id
   | SRegionTyVar of identifier * qident
 
@@ -91,5 +92,12 @@ and strip_type' (ty: ty): stripped_ty option =
          Some (SPointer ty)
       | None ->
          err "Internal: Pointer type instantiated with a region type.")
+  | FnPtr (args, rt) ->
+     let rt =
+       (match strip_type' rt with
+        | Some ty -> ty
+        | _ -> err "internal")
+     in
+     Some (SFnPtr (List.filter_map strip_type' args, rt))
   | MonoTy id ->
      Some (SMonoTy id)
