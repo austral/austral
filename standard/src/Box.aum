@@ -32,7 +32,7 @@ module body Standard.Box is
     generic [T: Type]
     function Unbox(box: Box[T]): T is
         let { pointer: Pointer[T] } := box;
-        let value: T := Load(pointer);
+        let value: T := load(pointer);
         deallocate(pointer);
         return value;
     end;
@@ -40,8 +40,8 @@ module body Standard.Box is
     generic [T: Free]
     function Swap_Free(box: Box[T], new: T): Box[T] is
         let { pointer: Pointer[T] } := box;
-        let old: T := Load(pointer);
-        Store(pointer, new);
+        let old: T := load(pointer);
+        store(pointer, new);
         let newbox: Box[T] := Box(pointer => pointer);
         return newbox;
     end;
@@ -50,7 +50,7 @@ module body Standard.Box is
     function Read_Free(boxref: Reference[Box[T], R]): T is
         let ptrref: Reference[Pointer[T], R] := boxref->pointer;
         let ptr: Pointer[T] := !ptrref;
-        let value: T := Load(ptr);
+        let value: T := load(ptr);
         return value;
     end;
 
@@ -58,7 +58,7 @@ module body Standard.Box is
     function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit is
         let ptrref: WriteReference[Pointer[T], R] := boxref->pointer;
         let ptr: Pointer[T] := !ptrref;
-        Store(ptr, value);
+        store(ptr, value);
         return nil;
     end;
 
@@ -72,8 +72,8 @@ module body Standard.Box is
     generic [T: Free, R: Region]
     function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
         let ptr: Pointer[T] := !(boxref->pointer);
-        let old_value: T := Load(ptr);
-        Store(ptr, value);
+        let old_value: T := load(ptr);
+        store(ptr, value);
         return old_value;
     end;
 end module body.

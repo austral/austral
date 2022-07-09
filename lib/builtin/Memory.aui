@@ -12,10 +12,10 @@ module Austral.Memory is
     function allocate(size: Index): Address[T];
 
     generic [T: Type]
-    function Load(pointer: Pointer[T]): T;
+    function load(pointer: Pointer[T]): T;
 
     generic [T: Type]
-    function Store(pointer: Pointer[T], value: T): Unit;
+    function store(pointer: Pointer[T], value: T): Unit;
 
     generic [T: Type]
     function deallocate(pointer: Pointer[T]): Unit;

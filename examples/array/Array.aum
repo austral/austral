@@ -5,8 +5,8 @@ import Austral.Memory (
     allocate,
     deallocate,
     positiveOffset,
-    Load,
-    Store
+    load,
+    store
 );
 
 module body Example.Array is
@@ -33,12 +33,12 @@ module body Example.Array is
                 let firstp: Pointer[Bool] := arr;
                 let secondp: Pointer[Bool] := positiveOffset(arr, 1);
                 let thirdp: Pointer[Bool] := positiveOffset(arr, 2);
-                Store(firstp, true);
-                Store(secondp, false);
-                Store(thirdp, true);
-                let first: Bool := Load(firstp);
-                let second: Bool := Load(secondp);
-                let third: Bool := Load(thirdp);
+                store(firstp, true);
+                store(secondp, false);
+                store(thirdp, true);
+                let first: Bool := load(firstp);
+                let second: Bool := load(secondp);
+                let third: Bool := load(thirdp);
                 Show_Bool(first);
                 Show_Bool(second);
                 Show_Bool(third);

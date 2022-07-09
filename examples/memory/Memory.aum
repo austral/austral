@@ -2,8 +2,6 @@ import Austral.Memory (
     Address,
     Pointer,
     allocate,
-    Load,
-    Store,
     deallocate,
     nullCheck
 );

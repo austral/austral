@@ -6,8 +6,8 @@ import Austral.Memory (
     deallocate,
     nullCheck,
     positiveOffset,
-    Store,
-    Load
+    store,
+    load
 );
 
 module body Example.Buffer is
@@ -78,7 +78,7 @@ module body Example.Buffer is
         let array: Pointer[T] := allocate_Or_Die(size);
         for i from 0 to size - 1 do
             let nth: Pointer[T] := positiveOffset(array, i);
-            Store(nth, elem);
+            store(nth, elem);
         end for;
         let buf: Buffer[T] := Buffer(
             capacity => size,
@@ -108,7 +108,7 @@ module body Example.Buffer is
     function Nth_Free(buffer: &[Buffer[T], R], index: Index): T is
         let arr: Pointer[T] := !(buffer->array);
         let nth_ptr: Pointer[T] := positiveOffset(arr, index);
-        let val: T := Load(nth_ptr);
+        let val: T := load(nth_ptr);
         return val;
     end;
 

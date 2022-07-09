@@ -3,9 +3,8 @@ import Austral.Memory (
     Pointer,
     nullCheck,
     allocate,
-    Load,
-    Store,
-    deallocate
+    deallocate,
+    store
 );
 
 module body Example.PTR is
@@ -24,7 +23,7 @@ module body Example.PTR is
         let addr: Address[R] := allocate(sizeof(R));
         case nullCheck(addr) of
             when Some(value: Pointer[R]) do
-                Store(value, r);
+                store(value, r);
                 Put_Character(value->X);
                 deallocate(value);
             when None do

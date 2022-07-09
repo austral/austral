@@ -26,12 +26,12 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function Load(pointer: Pointer[T]): T is
+    function load(pointer: Pointer[T]): T is
         return @embed(T, "*($1)", pointer);
     end;
 
     generic [T: Type]
-    function Store(pointer: Pointer[T], value: T): Unit is
+    function store(pointer: Pointer[T], value: T): Unit is
         @embed(Unit, "AU_STORE($1, $2)", pointer, value);
         return nil;
     end;
