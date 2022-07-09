@@ -9,7 +9,7 @@ module body Test is
         case Integer is
             value: Int32;
         case Float is
-            value: Double_Float;
+            value: Float64;
     end;
 
     function Main(root: Root_Capability): Root_Capability is
@@ -26,7 +26,7 @@ module body Test is
         case N of
             when Integer(value: Int32) do
                 skip;
-            when Float(value: Double_Float) do
+            when Float(value: Float64) do
                 skip;
         end case;
         return root;

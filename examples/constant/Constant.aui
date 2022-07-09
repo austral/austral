@@ -1,6 +1,6 @@
 module Example.Constant is
     -- This constant is public, since it appears in the interface file.
-    constant Rydberg_Constant : Double_Float;
+    constant Rydberg_Constant : Float64;
 
     function Main(root: Root_Capability): Root_Capability;
 end module.

@@ -68,7 +68,7 @@ module Austral.Pervasive is
     instance Trapping_Arithmetic(Nat64);
     instance Trapping_Arithmetic(Int64);
     instance Trapping_Arithmetic(Index);
-    instance Trapping_Arithmetic(Double_Float);
+    instance Trapping_Arithmetic(Float64);
 
     instance Modular_Arithmetic(Nat8);
     instance Modular_Arithmetic(Int8);
@@ -96,8 +96,8 @@ module Austral.Pervasive is
     instance Printable(Nat64);
     instance Printable(Int64);
     instance Printable(Index);
-    instance Printable(Single_Float);
-    instance Printable(Double_Float);
+    instance Printable(Float32);
+    instance Printable(Float64);
     generic [B: Free(Printable)]
     instance Printable(Fixed_Array[B]);
 

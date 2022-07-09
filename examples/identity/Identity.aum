@@ -6,7 +6,7 @@ module body Example.Identity is
 
     function Test(): Int32 is
         let x: Int32 := Identity(10);
-        let y: Double_Float := Identity(3.14);
+        let y: Float64 := Identity(3.14);
         return x;
     end;
 

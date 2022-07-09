@@ -13,7 +13,7 @@ module body Example.Union is
         case N of
             when Integer(value: Int32) do
                 skip;
-            when Float(value: Double_Float) do
+            when Float(value: Float64) do
                 skip;
         end case;
         return root;

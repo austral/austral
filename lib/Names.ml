@@ -13,8 +13,8 @@ let int32_name = "Int32"
 let nat64_name = "Nat64"
 let int64_name = "Int64"
 
-let single_float_name = "Single_Float"
-let double_float_name = "Double_Float"
+let single_float_name = "Float32"
+let double_float_name = "Float64"
 
 let read_ref_name  = "Reference"
 let write_ref_name = "WriteReference"

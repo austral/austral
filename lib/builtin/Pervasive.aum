@@ -389,24 +389,24 @@ module body Austral.Pervasive is
         end;
     end;
 
-    instance Trapping_Arithmetic(Double_Float) is
-        method Trapping_Add(lhs: Double_Float, rhs: Double_Float): Double_Float is
-            return @embed(Double_Float, "$1 + $2", lhs, rhs);
+    instance Trapping_Arithmetic(Float64) is
+        method Trapping_Add(lhs: Float64, rhs: Float64): Float64 is
+            return @embed(Float64, "$1 + $2", lhs, rhs);
         end;
 
-        method Trapping_Subtract(lhs: Double_Float, rhs: Double_Float): Double_Float is
-            return @embed(Double_Float, "$1 - $2", lhs, rhs);
+        method Trapping_Subtract(lhs: Float64, rhs: Float64): Float64 is
+            return @embed(Float64, "$1 - $2", lhs, rhs);
         end;
 
-        method Trapping_Multiply(lhs: Double_Float, rhs: Double_Float): Double_Float is
-            return @embed(Double_Float, "$1 * $2", lhs, rhs);
+        method Trapping_Multiply(lhs: Float64, rhs: Float64): Float64 is
+            return @embed(Float64, "$1 * $2", lhs, rhs);
         end;
 
-        method Trapping_Divide(lhs: Double_Float, rhs: Double_Float): Double_Float is
+        method Trapping_Divide(lhs: Float64, rhs: Float64): Float64 is
             if rhs = 0.0 then
-                Abort("Division by zero in Trapping_Divide (Double_Float)");
+                Abort("Division by zero in Trapping_Divide (Float64)");
             end if;
-            return @embed(Double_Float, "$1 / $2", lhs, rhs);
+            return @embed(Float64, "$1 / $2", lhs, rhs);
         end;
     end;
 
@@ -721,24 +721,24 @@ module body Austral.Pervasive is
         end;
     end;
 
-    instance Printable(Single_Float) is
-        method Print(value: Single_Float): Unit is
+    instance Printable(Float32) is
+        method Print(value: Float32): Unit is
             return @embed(Unit, "au_printf(\"%f\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Single_Float]): Unit is
+        method Print_Fixed_Array(array: Fixed_Array[Float32]): Unit is
             return nil;
         end;
     end;
 
-    instance Printable(Double_Float) is
-        method Print(value: Double_Float): Unit is
+    instance Printable(Float64) is
+        method Print(value: Float64): Unit is
             return @embed(Unit, "au_printf(\"%f\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Double_Float]): Unit is
+        method Print_Fixed_Array(array: Fixed_Array[Float64]): Unit is
             return nil;
         end;
     end;

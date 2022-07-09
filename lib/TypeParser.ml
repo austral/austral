@@ -68,9 +68,9 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
          Some (Integer (Signed, Width64))
       | "Index" ->
          Some (Integer (Unsigned, WidthIndex))
-      | "Single_Float" ->
+      | "Float32" ->
          Some SingleFloat
-      | "Double_Float" ->
+      | "Float64" ->
          Some DoubleFloat
       | "Static" ->
          Some (RegionTy static_region)

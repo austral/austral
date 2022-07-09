@@ -23,8 +23,8 @@ module body Test is
         end;
     end;
 
-    instance PrintFree(Double_Float) is
-        method PrintF(x: Double_Float): Unit is
+    instance PrintFree(Float64) is
+        method PrintF(x: Float64): Unit is
             Put_String("Float64");
             return nil;
         end;

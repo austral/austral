@@ -2,35 +2,35 @@ module body Example.Haversine is
     -- FFI stuff.
     pragma Unsafe_Module;
 
-    function Sin(value: Double_Float): Double_Float is
+    function Sin(value: Float64): Float64 is
         pragma Foreign_Import(External_Name => "sin");
     end;
 
-    function Cos(value: Double_Float): Double_Float is
+    function Cos(value: Float64): Float64 is
         pragma Foreign_Import(External_Name => "cos");
     end;
 
-    function Arcsin(value: Double_Float): Double_Float is
+    function Arcsin(value: Float64): Float64 is
         pragma Foreign_Import(External_Name => "asin");
     end;
 
-    function Sqrt(value: Double_Float): Double_Float is
+    function Sqrt(value: Float64): Float64 is
         pragma Foreign_Import(External_Name => "sqrt");
     end;
 
     -- Actual code.
 
     record Position: Free is
-        lat: Double_Float;
-        lon: Double_Float;
+        lat: Float64;
+        lon: Float64;
     end;
 
-    constant Earth_Radius : Double_Float := 6371.0;
+    constant Earth_Radius : Float64 := 6371.0;
 
-    function Great_Circle_Distance(p1: Position, p2: Position): Double_Float is
-        let a : Double_Float := Sin(0.5 * ((p2.lat) - (p1.lat)));
-        let b : Double_Float := Sin(0.5 * ((p2.lon) - (p1.lon)));
-        let c : Double_Float := a*a + Cos(p1.lat)*Cos(p2.lat)*b*b;
+    function Great_Circle_Distance(p1: Position, p2: Position): Float64 is
+        let a : Float64 := Sin(0.5 * ((p2.lat) - (p1.lat)));
+        let b : Float64 := Sin(0.5 * ((p2.lon) - (p1.lon)));
+        let c : Float64 := a*a + Cos(p1.lat)*Cos(p2.lat)*b*b;
         return 2.0 * Earth_Radius * Arcsin(Sqrt(c));
     end;
 

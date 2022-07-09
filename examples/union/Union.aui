@@ -9,7 +9,7 @@ module Example.Union is
         case Integer is
             value: Int32;
         case Float is
-            value: Double_Float;
+            value: Float64;
     end;
 
     function Main(root: Root_Capability): Root_Capability;

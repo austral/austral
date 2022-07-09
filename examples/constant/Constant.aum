@@ -1,5 +1,5 @@
 module body Example.Constant is
-    constant Rydberg_Constant : Double_Float := 10'973'731.568'160;
+    constant Rydberg_Constant : Float64 := 10'973'731.568'160;
 
     constant Decimal_24: Int32 := 24;
 
@@ -12,7 +12,7 @@ module body Example.Constant is
     constant Char_Const: Nat8 := 'a';
 
     -- This constant is private, since it appears in the module body file but not the interface file.
-    constant Pi : Double_Float := 3.14;
+    constant Pi : Float64 := 3.14;
 
     function Main(root: Root_Capability): Root_Capability is
         if (Decimal_24 /= Hexadecimal_24) then
