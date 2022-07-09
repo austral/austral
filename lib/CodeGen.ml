@@ -219,10 +219,10 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values)
   | MUnionConstructor (ty, case_name, values) ->
      let args = CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values) in
-     CStructInitializer [
-         ("tag", union_tag_value ty case_name);
-         ("data", CStructInitializer [(gen_ident case_name, args)])
-       ]
+     CCast (CStructInitializer [
+                ("tag", union_tag_value ty case_name);
+                ("data", CStructInitializer [(gen_ident case_name, args)])
+              ], gen_type ty)
   | MPath { head; elems; _ } ->
      let p = gen_path mn (g head) (List.rev elems) in
      (match (get_type head) with
