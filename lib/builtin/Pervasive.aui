@@ -53,17 +53,17 @@ module Austral.Pervasive is
     constant Maximum_Index: Index;
 
     typeclass TrappingArithmetic(T: Type) is
-        method Trapping_Add(lhs: T, rhs: T): T;
-        method Trapping_Subtract(lhs: T, rhs: T): T;
-        method Trapping_Multiply(lhs: T, rhs: T): T;
-        method Trapping_Divide(lhs: T, rhs: T): T;
+        method trappingAdd(lhs: T, rhs: T): T;
+        method trappingSubtract(lhs: T, rhs: T): T;
+        method trappingMultiply(lhs: T, rhs: T): T;
+        method trappingDivide(lhs: T, rhs: T): T;
     end;
 
     typeclass ModularArithmetic(T: Type) is
-        method Modular_Add(lhs: T, rhs: T): T;
-        method Modular_Subtract(lhs: T, rhs: T): T;
-        method Modular_Multiply(lhs: T, rhs: T): T;
-        method Modular_Divide(lhs: T, rhs: T): T;
+        method modularAdd(lhs: T, rhs: T): T;
+        method modularSubtract(lhs: T, rhs: T): T;
+        method modularMultiply(lhs: T, rhs: T): T;
+        method modularDivide(lhs: T, rhs: T): T;
     end;
 
     instance TrappingArithmetic(Nat8);

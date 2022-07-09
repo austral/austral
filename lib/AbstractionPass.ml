@@ -67,13 +67,13 @@ and abs_expr im expr =
      let op_name =
        match op with
        | Add ->
-          "Trapping_Add"
+          "trappingAdd"
        | Subtract ->
-          "Trapping_Subtract"
+          "trappingSubtract"
        | Multiply ->
-          "Trapping_Multiply"
+          "trappingMultiply"
        | Divide ->
-          "Trapping_Divide"
+          "trappingDivide"
      in
      let op_qname = make_qident (pervasive_module_name, make_ident op_name, make_ident op_name) in
      FunctionCall (op_qname, Positional [abs_expr im lhs; abs_expr im rhs])
