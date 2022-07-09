@@ -1056,12 +1056,12 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
         (* Check the type of each binding matches the type of the slot *)
         let bindings' = group_bindings_slots bindings slots in
         let bindings'' = List.map (fun (n, ty, actual, rename) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual, rename)) bindings' in
-        let newvars = List.map (fun (n, ty, actual, _) ->
+        let newvars = List.map (fun (_, ty, actual, rename) ->
                           if equal_ty ty actual then
-                            let _ = pi ("Binding name", n)
+                            let _ = pi ("Binding name", rename)
                             in
                             pt ("Binding type",  ty);
-                            (n, ty, VarLocal)
+                            (rename, ty, VarLocal)
                           else
                             err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
                         bindings'' in
