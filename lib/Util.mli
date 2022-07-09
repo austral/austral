@@ -70,3 +70,9 @@ val compile_c_code : string -> string -> command_output
 val map_with_context : (('c * 'a) -> ('c * 'b)) -> 'c -> 'a list -> ('c * ('b list))
 
 val iter_with_context : ('c -> 'a -> 'c) -> 'c -> 'a list -> 'c
+
+(** Get the last element of a list. Error for an empty list. *)
+val last : 'a list -> 'a
+
+(** Get all elements but the last one of a list. Error for an empty list. *)
+val butlast : 'a list -> 'a list

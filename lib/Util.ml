@@ -176,3 +176,20 @@ let rec iter_with_context (f: ('c -> 'a -> 'c)) (ctx: 'c) (list: 'a list): 'c =
      iter_with_context f ctx' rest
   | [] ->
      ctx
+
+let last (lst: 'a list): 'a =
+  let lst: 'a list = List.rev lst in
+  match lst with
+  | first::_ ->
+     first
+  | [] ->
+     internal_err "Util.last called with an empty list."
+
+
+let butlast (lst: 'a list): 'a list =
+  let lst: 'a list = List.rev lst in
+  match lst with
+  | _::rest ->
+     rest
+  | [] ->
+     internal_err "Util.butlast called with an empty list."
