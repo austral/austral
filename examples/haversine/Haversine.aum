@@ -30,8 +30,9 @@ module body Example.Haversine is
     function Great_Circle_Distance(p1: Position, p2: Position): Float64 is
         let a : Float64 := Sin(0.5 * ((p2.lat) - (p1.lat)));
         let b : Float64 := Sin(0.5 * ((p2.lon) - (p1.lon)));
-        let c : Float64 := a*a + Cos(p1.lat)*Cos(p2.lat)*b*b;
-        return 2.0 * Earth_Radius * Arcsin(Sqrt(c));
+        let b2 : Float64 := b*b;
+        let c : Float64 := (a*a) + (Cos(p1.lat)*(Cos(p2.lat)*b2));
+        return 2.0 * (Earth_Radius * Arcsin(Sqrt(c)));
     end;
 
     function main(): ExitCode is

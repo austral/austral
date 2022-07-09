@@ -474,26 +474,12 @@ comp_op:
   ;
 
 arith_expr:
-  | term PLUS arith_expr { CArith (from_loc $loc, Add, $1, $3) }
-  | term MINUS arith_expr { CArith (from_loc $loc, Subtract, $1, $3) }
-  | term { $1 }
+  | atomic_expression PLUS atomic_expression  { CArith (from_loc $loc, Add, $1, $3) }
+  | atomic_expression MINUS atomic_expression { CArith (from_loc $loc, Subtract, $1, $3) }
+  | atomic_expression MUL atomic_expression   { CArith (from_loc $loc, Multiply, $1, $3) }
+  | atomic_expression DIV atomic_expression   { CArith (from_loc $loc, Divide, $1, $3) }
+  | MINUS atomic_expression                   { CArith (from_loc $loc, Subtract, CIntConstant (from_loc $loc, "0"), $2) }
   ;
-
-term:
-  | factor MUL term { CArith (from_loc $loc, Multiply, $1, $3) }
-  | factor DIV term { CArith (from_loc $loc, Divide, $1, $3) }
-  | factor  { $1 }
-  | MINUS factor  { CArith (from_loc $loc, Subtract, CIntConstant (from_loc $loc, "0"), $2) }
-  ;
-
-factor:
-  | int_constant { $1 }
-  | float_constant { $1 }
-  | variable { $1 }
-  | funcall { $1 }
-  | parenthesized_expr { $1 }
-  ;
-
 
 /* Common */
 
