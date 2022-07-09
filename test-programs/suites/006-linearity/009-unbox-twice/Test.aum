@@ -39,7 +39,7 @@ module body Test is
         return value;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let e: Either[Box[Int32], Int32] := Make('e');
         case e of
             when Left(left: Box[Int32]) do
@@ -48,6 +48,6 @@ module body Test is
             when Right(right: Int32) do
                 skip;
         end case;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

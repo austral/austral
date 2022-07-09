@@ -23,3 +23,4 @@ let address_name = "Address"
 let pointer_name = "Pointer"
 
 let root_cap_name: string = "RootCapability"
+let exit_code_name: string = "ExitCode"

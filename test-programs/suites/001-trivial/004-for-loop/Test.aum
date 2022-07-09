@@ -5,7 +5,7 @@ module body Test is
         pragma Foreign_Import(External_Name => "puts");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         Put("Start");
         for i from 0 to 10 do
             if i = 0 then
@@ -43,6 +43,6 @@ module body Test is
             end if;
         end for;
         Put("End");
-        return root;
+        return ExitSuccess();
     end;
 end module body.

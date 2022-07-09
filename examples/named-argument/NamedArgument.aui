@@ -1,4 +1,4 @@
 module Example.NamedArgument is
     function F(x: Bool, y: Bool): Unit;
-    function Main(root: RootCapability): RootCapability;
+    function Main(): ExitCode;
 end module.

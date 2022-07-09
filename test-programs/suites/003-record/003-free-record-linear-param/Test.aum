@@ -2,7 +2,7 @@ module body Test is
     record Foo[A: Type]: Free is
     end;
 
-    function Main(root: RootCapability): RootCapability is
-        return root;
+    function Main(): ExitCode is
+        return ExitSuccess();
     end;
 end module body.

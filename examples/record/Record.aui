@@ -1,5 +1,5 @@
 module Example.Record is
     type R: Free;
 
-    function Main(root: RootCapability): RootCapability;
+    function Main(): ExitCode;
 end module.

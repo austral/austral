@@ -4,8 +4,8 @@ module body Test is
         y: Int8;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let r: R := R(x => 10, y => 10);
-        return root;
+        return ExitSuccess();
     end;
 end module body.

@@ -3,8 +3,8 @@ module body Test is
         x: Int32;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let r: R := R(x => 32);
-        return root;
+        return ExitSuccess();
     end;
 end module body.

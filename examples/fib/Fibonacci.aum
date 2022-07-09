@@ -8,8 +8,8 @@ module body Example.Fibonacci is
         end if;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         Fibonacci(30);
-        return root;
+        return ExitSuccess();
     end;
 end module body.

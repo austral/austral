@@ -10,5 +10,5 @@ Error:
      7 |         let r: R := R(x => 32);
      8 |         let { x: Int32 } := r;
      9 |         let { x: Int32 } := r;
-    10 |         return root;
+    10 |         return ExitSuccess();
     11 |     end;

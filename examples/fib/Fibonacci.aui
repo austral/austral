@@ -3,5 +3,5 @@ module Example.Fibonacci is
     The fibonacci function.
     """
     function Fibonacci(n: Nat64): Nat64;
-    function Main(root: RootCapability): RootCapability;
+    function Main(): ExitCode;
 end module.

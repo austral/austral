@@ -5,11 +5,11 @@ module body Test is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let size: Index := sizeof(Nat8);
         if size /= 1 then
             Put_Character('f');
         end if;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

@@ -9,7 +9,7 @@ module body Example.String is
         pragma Foreign_Import(External_Name => "puts");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let X: FixedArray[Nat8] := "Hello, world!";
         let len: Index := Fixed_Array_Size(X);
         if len = 13 then
@@ -45,6 +45,6 @@ module body Example.String is
                 C
             """
         );
-        return root;
+        return ExitSuccess();
     end;
 end module body.

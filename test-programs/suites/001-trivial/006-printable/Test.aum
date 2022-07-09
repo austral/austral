@@ -5,7 +5,7 @@ module body Test is
         pragma Foreign_Import(External_Name => "putchar");
 end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         PrintLn(nil);
         PrintLn(false);
         PrintLn(true);
@@ -24,6 +24,6 @@ end;
         PrintLn(3.14 : Float64);
         PrintLn(3.14 : Float64);
         PrintLn("Hello, world!");
-        return root;
+        return ExitSuccess();
     end;
 end module body.

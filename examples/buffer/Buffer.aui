@@ -32,5 +32,5 @@ module Example.Buffer is
     --generic [T: Type, R: Region]
     --function Remove_Nth(buffer: &![Buffer[T], R], index: Index): T;
 
-    function Main(root: RootCapability): RootCapability;
+    function Main(): ExitCode;
 end module.

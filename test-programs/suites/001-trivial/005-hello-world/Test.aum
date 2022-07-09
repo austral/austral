@@ -3,7 +3,7 @@ module body Test is
         return @embed(Unit, "au_printf(\"%c\", $1)", c);
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let arr: FixedArray[Nat8] := "Hello, world!";
         let n: Index := Fixed_Array_Size(arr) - 1;
         @embed(Unit, "au_printf(\"Length: %i\n\", $1)", n);
@@ -15,6 +15,6 @@ module body Test is
             Print_Char(arr[i]);
         end for;
         Print_Char('"');
-        return root;
+        return ExitSuccess();
     end;
 end module body.

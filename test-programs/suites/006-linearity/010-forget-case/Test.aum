@@ -3,7 +3,7 @@ module body Test is
         x: Int32;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let r: R := R(x => 32);
         let ropt: Option[R] := Some(value => r);
         case ropt of
@@ -12,6 +12,6 @@ module body Test is
             when None do
                 skip;
         end case;
-        return root;
+        return ExitSuccess();
     end;
 end module body.

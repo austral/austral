@@ -5,9 +5,9 @@ module body Test is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let c: Nat8 := @embed(Nat8, "$1 + $2", 90, 7);
         Put_Character(c);
-        return root;
+        return ExitSuccess();
     end;
 end module body.

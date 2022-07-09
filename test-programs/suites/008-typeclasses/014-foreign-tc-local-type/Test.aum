@@ -10,7 +10,7 @@ module body Test is
         end;
     end;
 
-    function Main(root: RootCapability): RootCapability is
-        return root;
+    function Main(): ExitCode is
+        return ExitSuccess();
     end;
 end module body.

@@ -3,8 +3,8 @@ module body Example.NamedArgument is
         return nil;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         F(y => false, x => true);
-        return root;
+        return ExitSuccess();
     end;
 end module body.

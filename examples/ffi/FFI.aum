@@ -9,9 +9,9 @@ module body Example.FFI is
         pragma Foreign_Import(External_Name => "puts");
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         Put_Character(97);
         Put_String("Hello, world!");
-        return root;
+        return ExitSuccess();
     end;
 end module body.

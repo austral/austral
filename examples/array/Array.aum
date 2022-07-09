@@ -25,7 +25,7 @@ module body Example.Array is
         return nil;
     end;
 
-    function Main(root: RootCapability): RootCapability is
+    function Main(): ExitCode is
         let addr: Address[Bool] := Allocate(3);
         case Null_Check(addr) of
             when Some(value: Pointer[Bool]) do
@@ -46,6 +46,6 @@ module body Example.Array is
             when None do
                 skip;
         end case;
-        return root;
+        return ExitSuccess();
     end;
 end module body.
