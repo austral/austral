@@ -1,0 +1,1 @@
+Test that integer literals work in record constructor calls.
