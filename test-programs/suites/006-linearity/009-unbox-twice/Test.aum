@@ -1,11 +1,11 @@
 import Austral.Memory (
     Pointer,
     Address,
-    Null_Check,
-    Allocate,
-    Load,
-    Store,
-    Deallocate
+    nullCheck,
+    allocate,
+    load,
+    store,
+    deallocate
 );
 
 module body Test is
@@ -17,10 +17,10 @@ module body Test is
 
     generic [T: Type]
     function Make(val: T): Either[Box[T], T] is
-        let addr: Address[T] := Allocate(sizeof(T));
-        case Null_Check(addr) of
+        let addr: Address[T] := allocate(sizeof(T));
+        case nullCheck(addr) of
             when Some(value: Pointer[T]) do
-                Store(value, val);
+                store(value, val);
                 let box: Box[T] := Box(pointer => value);
                 let left: Either[Box[T], T] := Left(left => box);
                 return left;
@@ -34,8 +34,8 @@ module body Test is
     generic [T: Type]
     function Unbox(box: Box[T]): T is
         let { pointer: Pointer[T] } := box;
-        let value: T := Load(pointer);
-        Deallocate(pointer);
+        let value: T := load(pointer);
+        deallocate(pointer);
         return value;
     end;
 

@@ -9,7 +9,7 @@ let is_abort (name: qident): bool =
   and orig: identifier = original_name name
   in
   (((mod_name_string mn) = "Austral.Pervasive")
-   && ((ident_string orig) = "Abort"))
+   && ((ident_string orig) = "abort"))
 
 let rec ends_in_return (stmt: astmt): bool =
   match stmt with

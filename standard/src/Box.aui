@@ -20,7 +20,7 @@ module Standard.Box is
     function Make(val: T): Option[Box[T]];
 
     """
-    Deallocate the memory and return the value pointed to by the Box.
+    deallocate the memory and return the value pointed to by the Box.
     """
     generic [T: Type]
     function Unbox(box: Box[T]): T;

@@ -1,20 +1,20 @@
 module body Austral.Pervasive is
     generic [T: Free, R: Region]
-    function Deref(ref: &[T, R]): T is
+    function deref(ref: &[T, R]): T is
         return @embed(T, "*$1", ref);
     end;
 
     generic [T: Free, R: Region]
-    function Deref_Write(ref: &![T, R]): T is
+    function derefWrite(ref: &![T, R]): T is
         return @embed(T, "*$1", ref);
     end;
 
     generic [T: Type]
-    function Fixed_Array_Size(arr: FixedArray[T]): Index is
+    function fixedArraySize(arr: FixedArray[T]): Index is
         return @embed(Index, "$1.size", arr);
     end;
 
-    function Abort(message: FixedArray[Nat8]): Unit is
+    function abort(message: FixedArray[Nat8]): Unit is
         return @embed(Unit, "au_abort($1)", message);
     end;
 
@@ -27,389 +27,389 @@ module body Austral.Pervasive is
         return nil;
     end;
 
-    constant Minimum_Nat8: Int8 := 0;
-    constant Maximum_Nat8: Nat8 := @embed(Nat8, "UINT8_MAX");
+    constant minimum_nat8: Int8 := 0;
+    constant maximum_nat8: Nat8 := @embed(Nat8, "UINT8_MAX");
 
-    constant Minimum_Nat16: Int8 := 0;
-    constant Maximum_Nat16: Nat16 := @embed(Nat16, "UINT16_MAX");
+    constant minimum_nat16: Int8 := 0;
+    constant maximum_nat16: Nat16 := @embed(Nat16, "UINT16_MAX");
 
-    constant Minimum_Nat32: Int8 := 0;
-    constant Maximum_Nat32: Nat32 := @embed(Nat32, "UINT32_MAX");
+    constant minimum_nat32: Int8 := 0;
+    constant maximum_nat32: Nat32 := @embed(Nat32, "UINT32_MAX");
 
-    constant Minimum_Nat64: Int8 := 0;
-    constant Maximum_Nat64: Nat64 := @embed(Nat64, "UINT64_MAX");
+    constant minimum_nat64: Int8 := 0;
+    constant maximum_nat64: Nat64 := @embed(Nat64, "UINT64_MAX");
 
-    constant Minimum_Int8: Int8 := @embed(Int8, "INT8_MIN");
-    constant Maximum_Int8: Int8 := @embed(Int8, "INT8_MAX");
+    constant minimum_int8: Int8 := @embed(Int8, "INT8_MIN");
+    constant maximum_int8: Int8 := @embed(Int8, "INT8_MAX");
 
-    constant Minimum_Int16: Int16 := @embed(Int16, "INT16_MIN");
-    constant Maximum_Int16: Int16 := @embed(Int16, "INT16_MAX");
+    constant minimum_int16: Int16 := @embed(Int16, "INT16_MIN");
+    constant maximum_int16: Int16 := @embed(Int16, "INT16_MAX");
 
-    constant Minimum_Int32: Int32 := @embed(Int32, "INT32_MIN");
-    constant Maximum_Int32: Int32 := @embed(Int32, "INT32_MAX");
+    constant minimum_int32: Int32 := @embed(Int32, "INT32_MIN");
+    constant maximum_int32: Int32 := @embed(Int32, "INT32_MAX");
 
-    constant Minimum_Int64: Int64 := @embed(Int64, "INT64_MIN");
-    constant Maximum_Int64: Int64 := @embed(Int64, "INT64_MAX");
+    constant minimum_int64: Int64 := @embed(Int64, "INT64_MIN");
+    constant maximum_int64: Int64 := @embed(Int64, "INT64_MAX");
 
-    constant Minimum_Index: Index := 0;
-    constant Maximum_Index: Index := @embed(Index, "SIZE_MAX");
+    constant minimum_index: Index := 0;
+    constant maximum_index: Index := @embed(Index, "SIZE_MAX");
 
     ---
     --- Trapping Arithmetic
     ---
 
-    instance Trapping_Arithmetic(Nat8) is
-        method Trapping_Add(lhs: Nat8, rhs: Nat8): Nat8 is
+    instance TrappingArithmetic(Nat8) is
+        method trappingAdd(lhs: Nat8, rhs: Nat8): Nat8 is
             let result: Nat8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Nat8)");
+                abort("Overflow in trappingAdd (Nat8)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Nat8, rhs: Nat8): Nat8 is
+        method trappingSubtract(lhs: Nat8, rhs: Nat8): Nat8 is
             let result: Nat8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Nat8)");
+                abort("Overflow in trappingSubtract (Nat8)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Nat8, rhs: Nat8): Nat8 is
+        method trappingMultiply(lhs: Nat8, rhs: Nat8): Nat8 is
             let result: Nat8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Nat8)");
+                abort("Overflow in trappingMultiply (Nat8)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Nat8, rhs: Nat8): Nat8 is
+        method trappingDivide(lhs: Nat8, rhs: Nat8): Nat8 is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Nat8)");
+                abort("Division by zero in trappingDivide (Nat8)");
             end if;
             return @embed(Nat8, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Int8) is
-        method Trapping_Add(lhs: Int8, rhs: Int8): Int8 is
+    instance TrappingArithmetic(Int8) is
+        method trappingAdd(lhs: Int8, rhs: Int8): Int8 is
             let result: Int8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Int8)");
+                abort("Overflow in trappingAdd (Int8)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Int8, rhs: Int8): Int8 is
+        method trappingSubtract(lhs: Int8, rhs: Int8): Int8 is
             let result: Int8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Int8)");
+                abort("Overflow in trappingSubtract (Int8)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Int8, rhs: Int8): Int8 is
+        method trappingMultiply(lhs: Int8, rhs: Int8): Int8 is
             let result: Int8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Int8)");
+                abort("Overflow in trappingMultiply (Int8)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Int8, rhs: Int8): Int8 is
+        method trappingDivide(lhs: Int8, rhs: Int8): Int8 is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Int8)");
+                abort("Division by zero in trappingDivide (Int8)");
             end if;
-            if (lhs = Minimum_Int8) and (rhs = -1) then
-                Abort("Overflow in Trapping_Divide (Int8)");
+            if (lhs = minimum_int8) and (rhs = -1) then
+                abort("Overflow in trappingDivide (Int8)");
             end if;
             return @embed(Int8, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Nat16) is
-        method Trapping_Add(lhs: Nat16, rhs: Nat16): Nat16 is
+    instance TrappingArithmetic(Nat16) is
+        method trappingAdd(lhs: Nat16, rhs: Nat16): Nat16 is
             let result: Nat16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Nat16)");
+                abort("Overflow in trappingAdd (Nat16)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Nat16, rhs: Nat16): Nat16 is
+        method trappingSubtract(lhs: Nat16, rhs: Nat16): Nat16 is
             let result: Nat16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Nat16)");
+                abort("Overflow in trappingSubtract (Nat16)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Nat16, rhs: Nat16): Nat16 is
+        method trappingMultiply(lhs: Nat16, rhs: Nat16): Nat16 is
             let result: Nat16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Nat16)");
+                abort("Overflow in trappingMultiply (Nat16)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Nat16, rhs: Nat16): Nat16 is
+        method trappingDivide(lhs: Nat16, rhs: Nat16): Nat16 is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Nat16)");
+                abort("Division by zero in trappingDivide (Nat16)");
             end if;
             return @embed(Nat16, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Int16) is
-        method Trapping_Add(lhs: Int16, rhs: Int16): Int16 is
+    instance TrappingArithmetic(Int16) is
+        method trappingAdd(lhs: Int16, rhs: Int16): Int16 is
             let result: Int16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Int16)");
+                abort("Overflow in trappingAdd (Int16)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Int16, rhs: Int16): Int16 is
+        method trappingSubtract(lhs: Int16, rhs: Int16): Int16 is
             let result: Int16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Int16)");
+                abort("Overflow in trappingSubtract (Int16)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Int16, rhs: Int16): Int16 is
+        method trappingMultiply(lhs: Int16, rhs: Int16): Int16 is
             let result: Int16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Int16)");
+                abort("Overflow in trappingMultiply (Int16)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Int16, rhs: Int16): Int16 is
+        method trappingDivide(lhs: Int16, rhs: Int16): Int16 is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Int16)");
+                abort("Division by zero in trappingDivide (Int16)");
             end if;
-            if (lhs = Minimum_Int16) and (rhs = -1) then
-                Abort("Overflow in Trapping_Divide (Int16)");
+            if (lhs = minimum_int16) and (rhs = -1) then
+                abort("Overflow in trappingDivide (Int16)");
             end if;
             return @embed(Int16, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Nat32) is
-        method Trapping_Add(lhs: Nat32, rhs: Nat32): Nat32 is
+    instance TrappingArithmetic(Nat32) is
+        method trappingAdd(lhs: Nat32, rhs: Nat32): Nat32 is
             let result: Nat32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Nat32)");
+                abort("Overflow in trappingAdd (Nat32)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Nat32, rhs: Nat32): Nat32 is
+        method trappingSubtract(lhs: Nat32, rhs: Nat32): Nat32 is
             let result: Nat32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Nat32)");
+                abort("Overflow in trappingSubtract (Nat32)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Nat32, rhs: Nat32): Nat32 is
+        method trappingMultiply(lhs: Nat32, rhs: Nat32): Nat32 is
             let result: Nat32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Nat32)");
+                abort("Overflow in trappingMultiply (Nat32)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Nat32, rhs: Nat32): Nat32 is
+        method trappingDivide(lhs: Nat32, rhs: Nat32): Nat32 is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Nat32)");
+                abort("Division by zero in trappingDivide (Nat32)");
             end if;
             return @embed(Nat32, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Int32) is
-        method Trapping_Add(lhs: Int32, rhs: Int32): Int32 is
+    instance TrappingArithmetic(Int32) is
+        method trappingAdd(lhs: Int32, rhs: Int32): Int32 is
             let result: Int32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Int32)");
+                abort("Overflow in trappingAdd (Int32)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Int32, rhs: Int32): Int32 is
+        method trappingSubtract(lhs: Int32, rhs: Int32): Int32 is
             let result: Int32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Int32)");
+                abort("Overflow in trappingSubtract (Int32)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Int32, rhs: Int32): Int32 is
+        method trappingMultiply(lhs: Int32, rhs: Int32): Int32 is
             let result: Int32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Int32)");
+                abort("Overflow in trappingMultiply (Int32)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Int32, rhs: Int32): Int32 is
+        method trappingDivide(lhs: Int32, rhs: Int32): Int32 is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Int32)");
+                abort("Division by zero in trappingDivide (Int32)");
             end if;
-            if (lhs = Minimum_Int32) and (rhs = -1) then
-                Abort("Overflow in Trapping_Divide (Int32)");
+            if (lhs = minimum_int32) and (rhs = -1) then
+                abort("Overflow in trappingDivide (Int32)");
             end if;
             return @embed(Int32, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Nat64) is
-        method Trapping_Add(lhs: Nat64, rhs: Nat64): Nat64 is
+    instance TrappingArithmetic(Nat64) is
+        method trappingAdd(lhs: Nat64, rhs: Nat64): Nat64 is
             let result: Nat64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Nat64)");
+                abort("Overflow in trappingAdd (Nat64)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Nat64, rhs: Nat64): Nat64 is
+        method trappingSubtract(lhs: Nat64, rhs: Nat64): Nat64 is
             let result: Nat64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Nat64)");
+                abort("Overflow in trappingSubtract (Nat64)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Nat64, rhs: Nat64): Nat64 is
+        method trappingMultiply(lhs: Nat64, rhs: Nat64): Nat64 is
             let result: Nat64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Nat64)");
+                abort("Overflow in trappingMultiply (Nat64)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Nat64, rhs: Nat64): Nat64 is
+        method trappingDivide(lhs: Nat64, rhs: Nat64): Nat64 is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Nat64)");
+                abort("Division by zero in trappingDivide (Nat64)");
             end if;
             return @embed(Nat64, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Int64) is
-        method Trapping_Add(lhs: Int64, rhs: Int64): Int64 is
+    instance TrappingArithmetic(Int64) is
+        method trappingAdd(lhs: Int64, rhs: Int64): Int64 is
             let result: Int64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Int64)");
+                abort("Overflow in trappingAdd (Int64)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Int64, rhs: Int64): Int64 is
+        method trappingSubtract(lhs: Int64, rhs: Int64): Int64 is
             let result: Int64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Int64)");
+                abort("Overflow in trappingSubtract (Int64)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Int64, rhs: Int64): Int64 is
+        method trappingMultiply(lhs: Int64, rhs: Int64): Int64 is
             let result: Int64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Int64)");
+                abort("Overflow in trappingMultiply (Int64)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Int64, rhs: Int64): Int64 is
+        method trappingDivide(lhs: Int64, rhs: Int64): Int64 is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Int64)");
+                abort("Division by zero in trappingDivide (Int64)");
             end if;
-            if (lhs = Minimum_Int64) and (rhs = -1) then
-                Abort("Overflow in Trapping_Divide (Int64)");
+            if (lhs = minimum_int64) and (rhs = -1) then
+                abort("Overflow in trappingDivide (Int64)");
             end if;
             return @embed(Int64, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Index) is
-        method Trapping_Add(lhs: Index, rhs: Index): Index is
+    instance TrappingArithmetic(Index) is
+        method trappingAdd(lhs: Index, rhs: Index): Index is
             let result: Index := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Add (Index)");
+                abort("Overflow in trappingAdd (Index)");
             end if;
             return result;
         end;
 
-        method Trapping_Subtract(lhs: Index, rhs: Index): Index is
+        method trappingSubtract(lhs: Index, rhs: Index): Index is
             let result: Index := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Subtract (Index)");
+                abort("Overflow in trappingSubtract (Index)");
             end if;
             return result;
         end;
 
-        method Trapping_Multiply(lhs: Index, rhs: Index): Index is
+        method trappingMultiply(lhs: Index, rhs: Index): Index is
             let result: Index := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in Trapping_Multiply (Index)");
+                abort("Overflow in trappingMultiply (Index)");
             end if;
             return result;
         end;
 
-        method Trapping_Divide(lhs: Index, rhs: Index): Index is
+        method trappingDivide(lhs: Index, rhs: Index): Index is
             if rhs = 0 then
-                Abort("Division by zero in Trapping_Divide (Index)");
+                abort("Division by zero in trappingDivide (Index)");
             end if;
             return @embed(Index, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Trapping_Arithmetic(Float64) is
-        method Trapping_Add(lhs: Float64, rhs: Float64): Float64 is
+    instance TrappingArithmetic(Float64) is
+        method trappingAdd(lhs: Float64, rhs: Float64): Float64 is
             return @embed(Float64, "$1 + $2", lhs, rhs);
         end;
 
-        method Trapping_Subtract(lhs: Float64, rhs: Float64): Float64 is
+        method trappingSubtract(lhs: Float64, rhs: Float64): Float64 is
             return @embed(Float64, "$1 - $2", lhs, rhs);
         end;
 
-        method Trapping_Multiply(lhs: Float64, rhs: Float64): Float64 is
+        method trappingMultiply(lhs: Float64, rhs: Float64): Float64 is
             return @embed(Float64, "$1 * $2", lhs, rhs);
         end;
 
-        method Trapping_Divide(lhs: Float64, rhs: Float64): Float64 is
+        method trappingDivide(lhs: Float64, rhs: Float64): Float64 is
             if rhs = 0.0 then
-                Abort("Division by zero in Trapping_Divide (Float64)");
+                abort("Division by zero in trappingDivide (Float64)");
             end if;
             return @embed(Float64, "$1 / $2", lhs, rhs);
         end;
@@ -420,190 +420,190 @@ module body Austral.Pervasive is
     --- Modular Arithmetic
     ---
 
-    instance Modular_Arithmetic(Nat8) is
-        method Modular_Add(lhs: Nat8, rhs: Nat8): Nat8 is
+    instance ModularArithmetic(Nat8) is
+        method modularAdd(lhs: Nat8, rhs: Nat8): Nat8 is
             return @embed(Nat8, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Nat8, rhs: Nat8): Nat8 is
+        method modularSubtract(lhs: Nat8, rhs: Nat8): Nat8 is
             return @embed(Nat8, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Nat8, rhs: Nat8): Nat8 is
+        method modularMultiply(lhs: Nat8, rhs: Nat8): Nat8 is
             return @embed(Nat8, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Nat8, rhs: Nat8): Nat8 is
+        method modularDivide(lhs: Nat8, rhs: Nat8): Nat8 is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Nat8)");
+                abort("Division by zero in modularDivide (Nat8)");
             end if;
             return @embed(Nat8, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Modular_Arithmetic(Int8) is
-        method Modular_Add(lhs: Int8, rhs: Int8): Int8 is
+    instance ModularArithmetic(Int8) is
+        method modularAdd(lhs: Int8, rhs: Int8): Int8 is
             return @embed(Int8, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Int8, rhs: Int8): Int8 is
+        method modularSubtract(lhs: Int8, rhs: Int8): Int8 is
             return @embed(Int8, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Int8, rhs: Int8): Int8 is
+        method modularMultiply(lhs: Int8, rhs: Int8): Int8 is
             return @embed(Int8, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Int8, rhs: Int8): Int8 is
+        method modularDivide(lhs: Int8, rhs: Int8): Int8 is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Int8)");
+                abort("Division by zero in modularDivide (Int8)");
             end if;
             return @embed(Int8, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Modular_Arithmetic(Nat16) is
-        method Modular_Add(lhs: Nat16, rhs: Nat16): Nat16 is
+    instance ModularArithmetic(Nat16) is
+        method modularAdd(lhs: Nat16, rhs: Nat16): Nat16 is
             return @embed(Nat16, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Nat16, rhs: Nat16): Nat16 is
+        method modularSubtract(lhs: Nat16, rhs: Nat16): Nat16 is
             return @embed(Nat16, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Nat16, rhs: Nat16): Nat16 is
+        method modularMultiply(lhs: Nat16, rhs: Nat16): Nat16 is
             return @embed(Nat16, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Nat16, rhs: Nat16): Nat16 is
+        method modularDivide(lhs: Nat16, rhs: Nat16): Nat16 is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Nat16)");
+                abort("Division by zero in modularDivide (Nat16)");
             end if;
             return @embed(Nat16, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Modular_Arithmetic(Int16) is
-        method Modular_Add(lhs: Int16, rhs: Int16): Int16 is
+    instance ModularArithmetic(Int16) is
+        method modularAdd(lhs: Int16, rhs: Int16): Int16 is
             return @embed(Int16, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Int16, rhs: Int16): Int16 is
+        method modularSubtract(lhs: Int16, rhs: Int16): Int16 is
             return @embed(Int16, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Int16, rhs: Int16): Int16 is
+        method modularMultiply(lhs: Int16, rhs: Int16): Int16 is
             return @embed(Int16, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Int16, rhs: Int16): Int16 is
+        method modularDivide(lhs: Int16, rhs: Int16): Int16 is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Int16)");
+                abort("Division by zero in modularDivide (Int16)");
             end if;
             return @embed(Int16, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Modular_Arithmetic(Nat32) is
-        method Modular_Add(lhs: Nat32, rhs: Nat32): Nat32 is
+    instance ModularArithmetic(Nat32) is
+        method modularAdd(lhs: Nat32, rhs: Nat32): Nat32 is
             return @embed(Nat32, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Nat32, rhs: Nat32): Nat32 is
+        method modularSubtract(lhs: Nat32, rhs: Nat32): Nat32 is
             return @embed(Nat32, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Nat32, rhs: Nat32): Nat32 is
+        method modularMultiply(lhs: Nat32, rhs: Nat32): Nat32 is
             return @embed(Nat32, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Nat32, rhs: Nat32): Nat32 is
+        method modularDivide(lhs: Nat32, rhs: Nat32): Nat32 is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Nat32)");
+                abort("Division by zero in modularDivide (Nat32)");
             end if;
             return @embed(Nat32, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Modular_Arithmetic(Int32) is
-        method Modular_Add(lhs: Int32, rhs: Int32): Int32 is
+    instance ModularArithmetic(Int32) is
+        method modularAdd(lhs: Int32, rhs: Int32): Int32 is
             return @embed(Int32, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Int32, rhs: Int32): Int32 is
+        method modularSubtract(lhs: Int32, rhs: Int32): Int32 is
             return @embed(Int32, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Int32, rhs: Int32): Int32 is
+        method modularMultiply(lhs: Int32, rhs: Int32): Int32 is
             return @embed(Int32, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Int32, rhs: Int32): Int32 is
+        method modularDivide(lhs: Int32, rhs: Int32): Int32 is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Int32)");
+                abort("Division by zero in modularDivide (Int32)");
             end if;
             return @embed(Int32, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Modular_Arithmetic(Nat64) is
-        method Modular_Add(lhs: Nat64, rhs: Nat64): Nat64 is
+    instance ModularArithmetic(Nat64) is
+        method modularAdd(lhs: Nat64, rhs: Nat64): Nat64 is
             return @embed(Nat64, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Nat64, rhs: Nat64): Nat64 is
+        method modularSubtract(lhs: Nat64, rhs: Nat64): Nat64 is
             return @embed(Nat64, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Nat64, rhs: Nat64): Nat64 is
+        method modularMultiply(lhs: Nat64, rhs: Nat64): Nat64 is
             return @embed(Nat64, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Nat64, rhs: Nat64): Nat64 is
+        method modularDivide(lhs: Nat64, rhs: Nat64): Nat64 is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Nat64)");
+                abort("Division by zero in modularDivide (Nat64)");
             end if;
             return @embed(Nat64, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Modular_Arithmetic(Int64) is
-        method Modular_Add(lhs: Int64, rhs: Int64): Int64 is
+    instance ModularArithmetic(Int64) is
+        method modularAdd(lhs: Int64, rhs: Int64): Int64 is
             return @embed(Int64, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Int64, rhs: Int64): Int64 is
+        method modularSubtract(lhs: Int64, rhs: Int64): Int64 is
             return @embed(Int64, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Int64, rhs: Int64): Int64 is
+        method modularMultiply(lhs: Int64, rhs: Int64): Int64 is
             return @embed(Int64, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Int64, rhs: Int64): Int64 is
+        method modularDivide(lhs: Int64, rhs: Int64): Int64 is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Int64)");
+                abort("Division by zero in modularDivide (Int64)");
             end if;
             return @embed(Int64, "$1 / $2", lhs, rhs);
         end;
     end;
 
-    instance Modular_Arithmetic(Index) is
-        method Modular_Add(lhs: Index, rhs: Index): Index is
+    instance ModularArithmetic(Index) is
+        method modularAdd(lhs: Index, rhs: Index): Index is
             return @embed(Index, "$1 + $2", lhs, rhs);
         end;
 
-        method Modular_Subtract(lhs: Index, rhs: Index): Index is
+        method modularSubtract(lhs: Index, rhs: Index): Index is
             return @embed(Index, "$1 - $2", lhs, rhs);
         end;
 
-        method Modular_Multiply(lhs: Index, rhs: Index): Index is
+        method modularMultiply(lhs: Index, rhs: Index): Index is
             return @embed(Index, "$1 * $2", lhs, rhs);
         end;
 
-        method Modular_Divide(lhs: Index, rhs: Index): Index is
+        method modularDivide(lhs: Index, rhs: Index): Index is
             if rhs = 0 then
-                Abort("Division by zero in Modular_Divide (Index)");
+                abort("Division by zero in modularDivide (Index)");
             end if;
             return @embed(Index, "$1 / $2", lhs, rhs);
         end;
@@ -646,7 +646,7 @@ module body Austral.Pervasive is
         end;
 
         method printFixedArray(array: FixedArray[Nat8]): Unit is
-            for i from 0 to Fixed_Array_Size(array) - 1 do
+            for i from 0 to fixedArraySize(array) - 1 do
                 @embed(Unit, "au_printf(\"%c\", $1)", array[i]);
             end for;
             return nil;

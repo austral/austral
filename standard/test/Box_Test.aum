@@ -37,7 +37,7 @@ module body Standard.Test.Box is
                     message => "Content is the letter 'a'"
                 );
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;
@@ -56,7 +56,7 @@ module body Standard.Test.Box is
                 end;
                 Unbox(value);
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;
@@ -75,7 +75,7 @@ module body Standard.Test.Box is
                     message => "Content is the letter 'a'"
                 );
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;
@@ -87,7 +87,7 @@ module body Standard.Test.Box is
             when Some(value: Box[Integer_32]) do
                 borrow value as boxref in rho do
                     let valueref: Reference[Integer_32, rho] := Get_Value_Ref(boxref);
-                    let contents: Integer_32 := Deref(valueref);
+                    let contents: Integer_32 := deref(valueref);
                     Assert_True(
                         value => (contents = 'a'),
                         message => "Content is the letter 'a'"
@@ -95,7 +95,7 @@ module body Standard.Test.Box is
                 end;
                 Unbox(value);
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;
@@ -114,7 +114,7 @@ module body Standard.Test.Box is
                     message => "Content is the letter 'a'"
                 );
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;

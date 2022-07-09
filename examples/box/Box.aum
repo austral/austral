@@ -1,13 +1,13 @@
 import Austral.Memory (
     Address,
     Pointer,
-    Null_Check,
-    Allocate,
-    Load,
-    Store,
-    Deallocate,
-    Load_Read_Reference,
-    Load_Write_Reference
+    nullCheck,
+    allocate,
+    load,
+    store,
+    deallocate,
+    loadRead,
+    loadWrite
 );
 
 module body Example.Box is
@@ -21,10 +21,10 @@ module body Example.Box is
     -- Construct a box from a value. If allocation fails, return the value.
     generic [T: Type]
     function Make(val: T): Either[Box[T], T] is
-        let addr: Address[T] := Allocate(sizeof(T));
-        case Null_Check(addr) of
+        let addr: Address[T] := allocate(sizeof(T));
+        case nullCheck(addr) of
             when Some(value: Pointer[T]) do
-                Store(value, val);
+                store(value, val);
                 let box: Box[T] := Box(pointer => value);
                 let left: Either[Box[T], T] := Left(left => box);
                 return left;
@@ -39,8 +39,8 @@ module body Example.Box is
     generic [T: Type]
     function Unbox(box: Box[T]): T is
         let { pointer: Pointer[T] } := box;
-        let value: T := Load(pointer);
-        Deallocate(pointer);
+        let value: T := load(pointer);
+        deallocate(pointer);
         return value;
     end;
 
@@ -48,8 +48,8 @@ module body Example.Box is
     generic [X: Free]
     function Swap_Free(box: Box[X], new: X): Box[X] is
         let { pointer: Pointer[X] } := box;
-        let old: X := Load(pointer);
-        Store(pointer, new);
+        let old: X := load(pointer);
+        store(pointer, new);
         let newbox: Box[X] := Box(pointer => pointer);
         return newbox;
     end;
@@ -58,29 +58,29 @@ module body Example.Box is
     function Read_Free(boxref: &[Box[T], R]): T is
         let ptrref: &[Pointer[T], R] := boxref->pointer;
         let ptr: Pointer[T] := !ptrref;
-        return Load(ptr);
+        return load(ptr);
     end;
 
     generic [T: Free, R: Region]
     function Store_Free(boxref: &![Box[T], R], value: T): Unit is
         let ptrref: &![Pointer[T], R] := boxref->pointer;
         let ptr: Pointer[T] := !(ptrref);
-        Store(ptr, value);
+        store(ptr, value);
         return nil;
     end;
 
     generic [T: Type, R: Region]
     function Get_Value_Ref(boxref: &[Box[T], R]): &[T, R] is
         let ptrref: &[Pointer[T], R] := boxref->pointer;
-        let ref: &[T, R] := Load_Read_Reference(ptrref);
+        let ref: &[T, R] := loadRead(ptrref);
         return ref;
     end;
 
     generic [T: Free, R: Region]
     function Swap_Mut(boxref: &![Box[T], R], value: T): T is
         let ptr: Pointer[T] := !(boxref->pointer);
-        let old_value: T := Load(ptr);
-        Store(ptr, value);
+        let old_value: T := load(ptr);
+        store(ptr, value);
         return old_value;
     end;
 
@@ -97,7 +97,7 @@ module body Example.Box is
                 let contents: Int32 := Unbox(newbox);
                 Put_Character(contents);
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         -- Box a value, read_free it and unbox it.
         let b2: Either[Box[Int32], Int32] := Make('a');
@@ -109,7 +109,7 @@ module body Example.Box is
                 end;
                 Unbox(left);
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         -- Box a value, store a new one through a mutable reference, and unbox it.
         let b3: Either[Box[Int32], Int32] := Make('e');
@@ -121,7 +121,7 @@ module body Example.Box is
                 let contents: Int32 := Unbox(left);
                 Put_Character(contents);
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         -- Box a value, load it through a reference, and unbox it.
         let b4: Either[Box[Int32], Int32] := Make('a');
@@ -134,7 +134,7 @@ module body Example.Box is
                 end;
                 Unbox(left);
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         -- Box a value, swap it through a mutable reference, and unbox it.
         let b5: Either[Box[Int32], Int32] := Make('e');
@@ -145,7 +145,7 @@ module body Example.Box is
                 end;
                 Put_Character(Unbox(left));
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return ExitSuccess();
     end;

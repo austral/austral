@@ -3,31 +3,31 @@ module Austral.Memory is
     type Pointer[T: Type]: Free;
 
     generic [T: Type]
-    function Null_Pointer(): Address[T];
+    function nullPointer(): Address[T];
 
     generic [T: Type]
-    function Null_Check(address: Address[T]): Option[Pointer[T]];
+    function nullCheck(address: Address[T]): Option[Pointer[T]];
 
     generic [T: Type]
-    function Allocate(size: Index): Address[T];
+    function allocate(size: Index): Address[T];
 
     generic [T: Type]
-    function Load(pointer: Pointer[T]): T;
+    function load(pointer: Pointer[T]): T;
 
     generic [T: Type]
-    function Store(pointer: Pointer[T], value: T): Unit;
+    function store(pointer: Pointer[T], value: T): Unit;
 
     generic [T: Type]
-    function Deallocate(pointer: Pointer[T]): Unit;
+    function deallocate(pointer: Pointer[T]): Unit;
 
     generic [T: Type, R: Region]
-    function Load_Read_Reference(ref: &[Pointer[T], R]): &[T, R];
+    function loadRead(ref: &[Pointer[T], R]): &[T, R];
 
     generic [T: Type, R: Region]
-    function Load_Write_Reference(ref: &![Pointer[T], R]): &![T, R];
+    function loadWrite(ref: &![Pointer[T], R]): &![T, R];
 
     generic [T: Type]
-    function Resize_Array(array: Pointer[T], size: Index): Pointer[T];
+    function resizeArray(array: Pointer[T], size: Index): Pointer[T];
 
     generic [T: Type, U: Type]
     function memmove(source: Pointer[T], destination: Pointer[U], count: Index): Unit;
@@ -36,8 +36,8 @@ module Austral.Memory is
     function memcpy(source: Pointer[T], destination: Pointer[U], count: Index): Unit;
 
     generic [T: Type]
-    function Positive_Offset(pointer: Pointer[T], offset: Index): Pointer[T];
+    function positiveOffset(pointer: Pointer[T], offset: Index): Pointer[T];
 
     generic [T: Type]
-    function Negative_Offset(pointer: Pointer[T], offset: Index): Pointer[T];
+    function negativeOffset(pointer: Pointer[T], offset: Index): Pointer[T];
 end module.

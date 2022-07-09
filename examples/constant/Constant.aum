@@ -16,16 +16,16 @@ module body Example.Constant is
 
     function main(): ExitCode is
         if (Decimal_24 /= Hexadecimal_24) then
-            Abort("Hexadecimal literals are broken.");
+            abort("Hexadecimal literals are broken.");
         end if;
         if (Decimal_24 /= Binary_24) then
-            Abort("Binary literals are broken.");
+            abort("Binary literals are broken.");
         end if;
         if (Decimal_24 /= Octal_24) then
-            Abort("Octal literals are broken.");
+            abort("Octal literals are broken.");
         end if;
         if (Char_Const /= 97) then
-            Abort("Character literals are broken.");
+            abort("Character literals are broken.");
         end if;
         return ExitSuccess();
     end;

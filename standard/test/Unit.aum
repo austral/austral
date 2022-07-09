@@ -22,7 +22,7 @@ module body Standard.Test.Unit is
         if value then
             Print_Constant_Line(" ✓");
         else
-            Abort("Assertion failed.");
+            abort("Assertion failed.");
         end if;
         return nil;
     end;

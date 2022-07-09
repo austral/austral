@@ -1,12 +1,12 @@
 import Austral.Memory (
     Address,
     Pointer,
-    Null_Check,
-    Allocate,
-    Deallocate,
-    Positive_Offset,
-    Load,
-    Store
+    nullCheck,
+    allocate,
+    deallocate,
+    positiveOffset,
+    load,
+    store
 );
 
 module body Example.Array is
@@ -26,23 +26,23 @@ module body Example.Array is
     end;
 
     function main(): ExitCode is
-        let addr: Address[Bool] := Allocate(3);
-        case Null_Check(addr) of
+        let addr: Address[Bool] := allocate(3);
+        case nullCheck(addr) of
             when Some(value: Pointer[Bool]) do
                 let arr: Pointer[Bool] := value;
                 let firstp: Pointer[Bool] := arr;
-                let secondp: Pointer[Bool] := Positive_Offset(arr, 1);
-                let thirdp: Pointer[Bool] := Positive_Offset(arr, 2);
-                Store(firstp, true);
-                Store(secondp, false);
-                Store(thirdp, true);
-                let first: Bool := Load(firstp);
-                let second: Bool := Load(secondp);
-                let third: Bool := Load(thirdp);
+                let secondp: Pointer[Bool] := positiveOffset(arr, 1);
+                let thirdp: Pointer[Bool] := positiveOffset(arr, 2);
+                store(firstp, true);
+                store(secondp, false);
+                store(thirdp, true);
+                let first: Bool := load(firstp);
+                let second: Bool := load(secondp);
+                let third: Bool := load(thirdp);
                 Show_Bool(first);
                 Show_Bool(second);
                 Show_Bool(third);
-                Deallocate(arr);
+                deallocate(arr);
             when None do
                 skip;
         end case;

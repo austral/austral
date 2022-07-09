@@ -13,15 +13,15 @@ module Austral.Pervasive is
     end;
 
     generic [T: Free, R: Region]
-    function Deref(ref: &[T, R]): T;
+    function deref(ref: &[T, R]): T;
 
     generic [T: Free, R: Region]
-    function Deref_Write(ref: &![T, R]): T;
+    function derefWrite(ref: &![T, R]): T;
 
     generic [T: Type]
-    function Fixed_Array_Size(arr: FixedArray[T]): Index;
+    function fixedArraySize(arr: FixedArray[T]): Index;
 
-    function Abort(message: FixedArray[Nat8]): Unit;
+    function abort(message: FixedArray[Nat8]): Unit;
 
     type RootCapability : Linear;
 
@@ -32,60 +32,60 @@ module Austral.Pervasive is
         case ExitFailure;
     end;
 
-    constant Maximum_Nat8: Nat8;
-    constant Maximum_Nat16: Nat16;
-    constant Maximum_Nat32: Nat32;
-    constant Maximum_Nat64: Nat64;
+    constant maximum_nat8: Nat8;
+    constant maximum_nat16: Nat16;
+    constant maximum_nat32: Nat32;
+    constant maximum_nat64: Nat64;
 
-    constant Minimum_Int8: Int8;
-    constant Maximum_Int8: Int8;
+    constant minimum_int8: Int8;
+    constant maximum_int8: Int8;
 
-    constant Minimum_Int16: Int16;
-    constant Maximum_Int16: Int16;
+    constant minimum_int16: Int16;
+    constant maximum_int16: Int16;
 
-    constant Minimum_Int32: Int32;
-    constant Maximum_Int32: Int32;
+    constant minimum_int32: Int32;
+    constant maximum_int32: Int32;
 
-    constant Minimum_Int64: Int64;
-    constant Maximum_Int64: Int64;
+    constant minimum_int64: Int64;
+    constant maximum_int64: Int64;
 
-    constant Minimum_Index: Index;
-    constant Maximum_Index: Index;
+    constant minimum_index: Index;
+    constant maximum_index: Index;
 
-    typeclass Trapping_Arithmetic(T: Type) is
-        method Trapping_Add(lhs: T, rhs: T): T;
-        method Trapping_Subtract(lhs: T, rhs: T): T;
-        method Trapping_Multiply(lhs: T, rhs: T): T;
-        method Trapping_Divide(lhs: T, rhs: T): T;
+    typeclass TrappingArithmetic(T: Type) is
+        method trappingAdd(lhs: T, rhs: T): T;
+        method trappingSubtract(lhs: T, rhs: T): T;
+        method trappingMultiply(lhs: T, rhs: T): T;
+        method trappingDivide(lhs: T, rhs: T): T;
     end;
 
-    typeclass Modular_Arithmetic(T: Type) is
-        method Modular_Add(lhs: T, rhs: T): T;
-        method Modular_Subtract(lhs: T, rhs: T): T;
-        method Modular_Multiply(lhs: T, rhs: T): T;
-        method Modular_Divide(lhs: T, rhs: T): T;
+    typeclass ModularArithmetic(T: Type) is
+        method modularAdd(lhs: T, rhs: T): T;
+        method modularSubtract(lhs: T, rhs: T): T;
+        method modularMultiply(lhs: T, rhs: T): T;
+        method modularDivide(lhs: T, rhs: T): T;
     end;
 
-    instance Trapping_Arithmetic(Nat8);
-    instance Trapping_Arithmetic(Int8);
-    instance Trapping_Arithmetic(Nat16);
-    instance Trapping_Arithmetic(Int16);
-    instance Trapping_Arithmetic(Nat32);
-    instance Trapping_Arithmetic(Int32);
-    instance Trapping_Arithmetic(Nat64);
-    instance Trapping_Arithmetic(Int64);
-    instance Trapping_Arithmetic(Index);
-    instance Trapping_Arithmetic(Float64);
+    instance TrappingArithmetic(Nat8);
+    instance TrappingArithmetic(Int8);
+    instance TrappingArithmetic(Nat16);
+    instance TrappingArithmetic(Int16);
+    instance TrappingArithmetic(Nat32);
+    instance TrappingArithmetic(Int32);
+    instance TrappingArithmetic(Nat64);
+    instance TrappingArithmetic(Int64);
+    instance TrappingArithmetic(Index);
+    instance TrappingArithmetic(Float64);
 
-    instance Modular_Arithmetic(Nat8);
-    instance Modular_Arithmetic(Int8);
-    instance Modular_Arithmetic(Nat16);
-    instance Modular_Arithmetic(Int16);
-    instance Modular_Arithmetic(Nat32);
-    instance Modular_Arithmetic(Int32);
-    instance Modular_Arithmetic(Nat64);
-    instance Modular_Arithmetic(Int64);
-    instance Modular_Arithmetic(Index);
+    instance ModularArithmetic(Nat8);
+    instance ModularArithmetic(Int8);
+    instance ModularArithmetic(Nat16);
+    instance ModularArithmetic(Int16);
+    instance ModularArithmetic(Nat32);
+    instance ModularArithmetic(Int32);
+    instance ModularArithmetic(Nat64);
+    instance ModularArithmetic(Int64);
+    instance ModularArithmetic(Index);
 
     typeclass Printable(A: Free) is
         method print(value: A): Unit;

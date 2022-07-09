@@ -6,7 +6,7 @@ module body Standard.IO.Console is
     end;
 
     function Print_Constant(string: Fixed_Array[Natural_8]): Unit is
-        for i from 0 to Fixed_Array_Size(string) do
+        for i from 0 to fixedArraySize(string) do
             Put_Character(string[i]);
         end for;
         return nil;
