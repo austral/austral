@@ -1,6 +1,6 @@
 import Austral.Memory (
     Pointer,
-    Allocate,
+    allocate,
     Load,
     Store,
     Deallocate,
@@ -17,7 +17,7 @@ module body Standard.Box is
 
     generic [T: Type]
     function Make(val: T): Option[Box[T]] is
-        let ptr: Option[Pointer[T]] := Allocate(val);
+        let ptr: Option[Pointer[T]] := allocate(val);
         case ptr of
             when Some(value: Pointer[T]) do
                 let box: Box[T] := Box(pointer => value);

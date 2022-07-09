@@ -2,7 +2,7 @@ import Austral.Memory (
     Address,
     Pointer,
     nullCheck,
-    Allocate,
+    allocate,
     Load,
     Store,
     Deallocate
@@ -21,7 +21,7 @@ module body Example.PTR is
 
     function main(): ExitCode is
         let r: R := R(X => 97);
-        let addr: Address[R] := Allocate(sizeof(R));
+        let addr: Address[R] := allocate(sizeof(R));
         case nullCheck(addr) of
             when Some(value: Pointer[R]) do
                 Store(value, r);
