@@ -5,7 +5,7 @@ module body Example.FFI is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Put_String(str: Fixed_Array[Nat8]): Int32 is
+    function Put_String(str: FixedArray[Nat8]): Int32 is
         pragma Foreign_Import(External_Name => "puts");
     end;
 

@@ -74,12 +74,12 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
          Some DoubleFloat
       | "Static" ->
          Some (RegionTy static_region)
-      | "Fixed_Array" ->
+      | "FixedArray" ->
          (match args with
           | [ty] ->
              Some (StaticArray ty)
           | _ ->
-             err "Invalid Fixed_Array type specifier.")
+             err "Invalid FixedArray type specifier.")
       | "Reference" ->
          (match args with
           | [ty; ty'] ->

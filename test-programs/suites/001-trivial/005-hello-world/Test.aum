@@ -4,7 +4,7 @@ module body Test is
     end;
 
     function Main(root: RootCapability): RootCapability is
-        let arr: Fixed_Array[Nat8] := "Hello, world!";
+        let arr: FixedArray[Nat8] := "Hello, world!";
         let n: Index := Fixed_Array_Size(arr) - 1;
         @embed(Unit, "au_printf(\"Length: %i\n\", $1)", n);
         for i from 0 to n do

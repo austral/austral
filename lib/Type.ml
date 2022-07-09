@@ -87,7 +87,7 @@ let rec type_string = function
   | NamedType (n, args, u) ->
      (qident_debug_name n) ^ args_string args ^ ": " ^ (universe_string u)
   | StaticArray t ->
-     "Static_Array[" ^ (type_string t) ^ "]: Free"
+     "FixedArray[" ^ (type_string t) ^ "]: Free"
   | RegionTy r ->
      "Region<" ^ (string_of_int (region_id r)) ^ ">"
   | ReadRef (t, r) ->

@@ -19,9 +19,9 @@ module Austral.Pervasive is
     function Deref_Write(ref: &![T, R]): T;
 
     generic [T: Type]
-    function Fixed_Array_Size(arr: Fixed_Array[T]): Index;
+    function Fixed_Array_Size(arr: FixedArray[T]): Index;
 
-    function Abort(message: Fixed_Array[Nat8]): Unit;
+    function Abort(message: FixedArray[Nat8]): Unit;
 
     type RootCapability : Linear;
 
@@ -83,7 +83,7 @@ module Austral.Pervasive is
     typeclass Printable(A: Free) is
         method Print(value: A): Unit;
 
-        method Print_Fixed_Array(array: Fixed_Array[A]): Unit;
+        method Print_Fixed_Array(array: FixedArray[A]): Unit;
     end;
 
     instance Printable(Unit);
@@ -99,7 +99,7 @@ module Austral.Pervasive is
     instance Printable(Float32);
     instance Printable(Float64);
     generic [B: Free(Printable)]
-    instance Printable(Fixed_Array[B]);
+    instance Printable(FixedArray[B]);
 
     generic [T: Free(Printable)]
     function PrintLn(value: T): Unit;

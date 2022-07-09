@@ -10,11 +10,11 @@ module body Austral.Pervasive is
     end;
 
     generic [T: Type]
-    function Fixed_Array_Size(arr: Fixed_Array[T]): Index is
+    function Fixed_Array_Size(arr: FixedArray[T]): Index is
         return @embed(Index, "$1.size", arr);
     end;
 
-    function Abort(message: Fixed_Array[Nat8]): Unit is
+    function Abort(message: FixedArray[Nat8]): Unit is
         return @embed(Unit, "au_abort($1)", message);
     end;
 
@@ -614,7 +614,7 @@ module body Austral.Pervasive is
             return value;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Unit]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Unit]): Unit is
             return nil;
         end;
     end;
@@ -625,7 +625,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Nat8]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Nat8]): Unit is
             for i from 0 to Fixed_Array_Size(array) - 1 do
                 @embed(Unit, "au_printf(\"%c\", $1)", array[i]);
             end for;
@@ -639,7 +639,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Nat16]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Nat16]): Unit is
             return nil;
         end;
     end;
@@ -650,7 +650,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Nat32]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Nat32]): Unit is
             return nil;
         end;
     end;
@@ -661,7 +661,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Nat64]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Nat64]): Unit is
             return nil;
         end;
     end;
@@ -672,7 +672,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Int8]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Int8]): Unit is
             return nil;
         end;
     end;
@@ -683,7 +683,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Int16]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Int16]): Unit is
             return nil;
         end;
     end;
@@ -694,7 +694,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Int32]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Int32]): Unit is
             return nil;
         end;
     end;
@@ -705,7 +705,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Int64]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Int64]): Unit is
             return nil;
         end;
     end;
@@ -716,7 +716,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Index]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Index]): Unit is
             return nil;
         end;
     end;
@@ -727,7 +727,7 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Float32]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Float32]): Unit is
             return nil;
         end;
     end;
@@ -738,18 +738,18 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Float64]): Unit is
+        method Print_Fixed_Array(array: FixedArray[Float64]): Unit is
             return nil;
         end;
     end;
 
     generic [B: Free(Printable)]
-    instance Printable(Fixed_Array[B]) is
-        method Print(value: Fixed_Array[B]): Unit is
+    instance Printable(FixedArray[B]) is
+        method Print(value: FixedArray[B]): Unit is
             return Print_Fixed_Array(value);
         end;
 
-        method Print_Fixed_Array(array: Fixed_Array[Fixed_Array[B]]): Unit is
+        method Print_Fixed_Array(array: FixedArray[FixedArray[B]]): Unit is
             return nil;
         end;
     end;
