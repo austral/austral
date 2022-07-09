@@ -22,6 +22,11 @@ module body Austral.Pervasive is
         value: Unit;
     end;
 
+    function surrenderRoot(cap: RootCapability): Unit is
+        let { value: Unit } := cap;
+        return nil;
+    end;
+
     constant Minimum_Nat8: Int8 := 0;
     constant Maximum_Nat8: Nat8 := @embed(Nat8, "UINT8_MAX");
 

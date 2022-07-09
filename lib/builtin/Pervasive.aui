@@ -25,6 +25,8 @@ module Austral.Pervasive is
 
     type RootCapability : Linear;
 
+    function surrenderRoot(cap: RootCapability): Unit;
+
     constant Maximum_Nat8: Nat8;
     constant Maximum_Nat16: Nat16;
     constant Maximum_Nat32: Nat32;
