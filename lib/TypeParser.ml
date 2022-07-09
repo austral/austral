@@ -29,6 +29,17 @@ let decl_type_signature (decl: decl): type_signature option =
   | Instance _ ->
      None
 
+let parse_function_pointer (args: ty list): ty =
+  match args with
+  | [] ->
+     err "Function pointer type specifier must have at least one argument."
+  | [r] ->
+     FnPtr ([], r)
+  | _ ->
+     let args: ty list = Util.butlast args
+     and rt: ty = Util.last args in
+     FnPtr (args, rt)
+
 let parse_built_in_type (name: qident) (args: ty list): ty option =
   if is_address_type name then
     match args with
@@ -100,6 +111,8 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
                err "WriteReference error: Not a region"
           | _ ->
              err "Invalid WriteReference type specifier.")
+      | "Fn" ->
+         Some (parse_function_pointer args)
       | _ ->
          None
 
