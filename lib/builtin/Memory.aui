@@ -18,7 +18,7 @@ module Austral.Memory is
     function Store(pointer: Pointer[T], value: T): Unit;
 
     generic [T: Type]
-    function Deallocate(pointer: Pointer[T]): Unit;
+    function deallocate(pointer: Pointer[T]): Unit;
 
     generic [T: Type, R: Region]
     function Load_Read_Reference(ref: &[Pointer[T], R]): &[T, R];

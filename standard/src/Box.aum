@@ -3,7 +3,7 @@ import Austral.Memory (
     allocate,
     Load,
     Store,
-    Deallocate,
+    deallocate,
     Load_Read_Reference,
     Load_Write_Reference
 );
@@ -33,7 +33,7 @@ module body Standard.Box is
     function Unbox(box: Box[T]): T is
         let { pointer: Pointer[T] } := box;
         let value: T := Load(pointer);
-        Deallocate(pointer);
+        deallocate(pointer);
         return value;
     end;
 

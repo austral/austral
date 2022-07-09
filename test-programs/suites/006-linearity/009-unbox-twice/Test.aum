@@ -5,7 +5,7 @@ import Austral.Memory (
     allocate,
     Load,
     Store,
-    Deallocate
+    deallocate
 );
 
 module body Test is
@@ -35,7 +35,7 @@ module body Test is
     function Unbox(box: Box[T]): T is
         let { pointer: Pointer[T] } := box;
         let value: T := Load(pointer);
-        Deallocate(pointer);
+        deallocate(pointer);
         return value;
     end;
 

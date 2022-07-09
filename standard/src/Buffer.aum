@@ -2,7 +2,7 @@ import Austral.Memory (
     Pointer,
     allocate_Array,
     Resize_Array,
-    Deallocate
+    deallocate
 );
 
 module body Standard.Buffer is
@@ -112,7 +112,7 @@ module body Standard.Buffer is
     generic [T: Type]
     function Destroy_Buffer(buffer: Buffer[T]): Unit is
         let { capacity: Natural_64, size: Natural_64, array: Pointer[T] } := buffer;
-        Deallocate(array);
+        deallocate(array);
         return nil;
     end;
 

@@ -37,7 +37,7 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function Deallocate(pointer: Pointer[T]): Unit is
+    function deallocate(pointer: Pointer[T]): Unit is
         @embed(Unit, "au_free($1)", pointer);
         return nil;
     end;

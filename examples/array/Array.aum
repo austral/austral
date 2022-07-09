@@ -3,7 +3,7 @@ import Austral.Memory (
     Pointer,
     nullCheck,
     allocate,
-    Deallocate,
+    deallocate,
     Positive_Offset,
     Load,
     Store
@@ -42,7 +42,7 @@ module body Example.Array is
                 Show_Bool(first);
                 Show_Bool(second);
                 Show_Bool(third);
-                Deallocate(arr);
+                deallocate(arr);
             when None do
                 skip;
         end case;

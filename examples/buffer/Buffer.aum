@@ -3,7 +3,7 @@ import Austral.Memory (
     Pointer,
     allocate,
     Resize_Array,
-    Deallocate,
+    deallocate,
     nullCheck,
     Positive_Offset,
     Store,
@@ -91,7 +91,7 @@ module body Example.Buffer is
     generic [T: Type]
     function Destroy_Buffer(buffer: Buffer[T]): Unit is
         let { capacity: Index, size: Index, array: Pointer[T] } := buffer;
-        Deallocate(array);
+        deallocate(array);
         return nil;
     end;
 
