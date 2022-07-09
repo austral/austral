@@ -614,18 +614,18 @@ module body Austral.Pervasive is
     ---
 
     instance Printable(Unit) is
-        method Print(value: Unit): Unit is
+        method print(value: Unit): Unit is
             return @embed(Unit, "au_printf(\"nil\")");
             return value;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Unit]): Unit is
+        method printFixedArray(array: FixedArray[Unit]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Bool) is
-        method Print(value: Bool): Unit is
+        method print(value: Bool): Unit is
             if value then
                 @embed(Unit, "au_printf(\"true\")");
             else
@@ -634,18 +634,18 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Unit]): Unit is
+        method printFixedArray(array: FixedArray[Unit]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Nat8) is
-        method Print(value: Nat8): Unit is
+        method print(value: Nat8): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Nat8]): Unit is
+        method printFixedArray(array: FixedArray[Nat8]): Unit is
             for i from 0 to Fixed_Array_Size(array) - 1 do
                 @embed(Unit, "au_printf(\"%c\", $1)", array[i]);
             end for;
@@ -654,129 +654,129 @@ module body Austral.Pervasive is
     end;
 
     instance Printable(Nat16) is
-        method Print(value: Nat16): Unit is
+        method print(value: Nat16): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Nat16]): Unit is
+        method printFixedArray(array: FixedArray[Nat16]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Nat32) is
-        method Print(value: Nat32): Unit is
+        method print(value: Nat32): Unit is
             return @embed(Unit, "au_printf(\"%u\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Nat32]): Unit is
+        method printFixedArray(array: FixedArray[Nat32]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Nat64) is
-        method Print(value: Nat64): Unit is
+        method print(value: Nat64): Unit is
             return @embed(Unit, "au_printf(\"%zu\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Nat64]): Unit is
+        method printFixedArray(array: FixedArray[Nat64]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Int8) is
-        method Print(value: Int8): Unit is
+        method print(value: Int8): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Int8]): Unit is
+        method printFixedArray(array: FixedArray[Int8]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Int16) is
-        method Print(value: Int16): Unit is
+        method print(value: Int16): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Int16]): Unit is
+        method printFixedArray(array: FixedArray[Int16]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Int32) is
-        method Print(value: Int32): Unit is
+        method print(value: Int32): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Int32]): Unit is
+        method printFixedArray(array: FixedArray[Int32]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Int64) is
-        method Print(value: Int64): Unit is
+        method print(value: Int64): Unit is
             return @embed(Unit, "au_printf(\"%li\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Int64]): Unit is
+        method printFixedArray(array: FixedArray[Int64]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Index) is
-        method Print(value: Index): Unit is
+        method print(value: Index): Unit is
             return @embed(Unit, "au_printf(\"%zu\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Index]): Unit is
+        method printFixedArray(array: FixedArray[Index]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Float32) is
-        method Print(value: Float32): Unit is
+        method print(value: Float32): Unit is
             return @embed(Unit, "au_printf(\"%f\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Float32]): Unit is
+        method printFixedArray(array: FixedArray[Float32]): Unit is
             return nil;
         end;
     end;
 
     instance Printable(Float64) is
-        method Print(value: Float64): Unit is
+        method print(value: Float64): Unit is
             return @embed(Unit, "au_printf(\"%f\", $1)", value);
             return nil;
         end;
 
-        method Print_Fixed_Array(array: FixedArray[Float64]): Unit is
+        method printFixedArray(array: FixedArray[Float64]): Unit is
             return nil;
         end;
     end;
 
     generic [B: Free(Printable)]
     instance Printable(FixedArray[B]) is
-        method Print(value: FixedArray[B]): Unit is
-            return Print_Fixed_Array(value);
+        method print(value: FixedArray[B]): Unit is
+            return printFixedArray(value);
         end;
 
-        method Print_Fixed_Array(array: FixedArray[FixedArray[B]]): Unit is
+        method printFixedArray(array: FixedArray[FixedArray[B]]): Unit is
             return nil;
         end;
     end;
 
     generic [T: Free(Printable)]
-    function PrintLn(value: T): Unit is
-        Print(value);
+    function printLn(value: T): Unit is
+        print(value);
         return @embed(Unit, "au_printf(\"\n\")");
     end;
 end module body.

@@ -6,24 +6,24 @@ module body Test is
 end;
 
     function Main(): ExitCode is
-        PrintLn(nil);
-        PrintLn(false);
-        PrintLn(true);
-        PrintLn(Maximum_Nat8);
-        PrintLn(Maximum_Nat16);
-        PrintLn(Maximum_Nat32);
-        PrintLn(Maximum_Nat64);
-        PrintLn(Minimum_Int8);
-        PrintLn(Minimum_Int16);
-        PrintLn(Minimum_Int32);
-        PrintLn(Minimum_Int64);
-        PrintLn(Maximum_Int8);
-        PrintLn(Maximum_Int16);
-        PrintLn(Maximum_Int32);
-        PrintLn(Maximum_Int64);
-        PrintLn(3.14 : Float64);
-        PrintLn(3.14 : Float64);
-        PrintLn("Hello, world!");
+        printLn(nil);
+        printLn(false);
+        printLn(true);
+        printLn(Maximum_Nat8);
+        printLn(Maximum_Nat16);
+        printLn(Maximum_Nat32);
+        printLn(Maximum_Nat64);
+        printLn(Minimum_Int8);
+        printLn(Minimum_Int16);
+        printLn(Minimum_Int32);
+        printLn(Minimum_Int64);
+        printLn(Maximum_Int8);
+        printLn(Maximum_Int16);
+        printLn(Maximum_Int32);
+        printLn(Maximum_Int64);
+        printLn(3.14 : Float64);
+        printLn(3.14 : Float64);
+        printLn("Hello, world!");
         return ExitSuccess();
     end;
 end module body.

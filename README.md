@@ -62,8 +62,8 @@ module body Fib is
     end;
 
     function Main(): ExitCode is
-        Print("fib(10) = ");
-        PrintLn(fib(10));
+        print("fib(10) = ");
+        printLn(fib(10));
         return ExitSuccess();
     end;
 end module body.

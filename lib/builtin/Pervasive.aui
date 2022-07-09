@@ -88,9 +88,9 @@ module Austral.Pervasive is
     instance Modular_Arithmetic(Index);
 
     typeclass Printable(A: Free) is
-        method Print(value: A): Unit;
+        method print(value: A): Unit;
 
-        method Print_Fixed_Array(array: FixedArray[A]): Unit;
+        method printFixedArray(array: FixedArray[A]): Unit;
     end;
 
     instance Printable(Unit);
@@ -110,5 +110,5 @@ module Austral.Pervasive is
     instance Printable(FixedArray[B]);
 
     generic [T: Free(Printable)]
-    function PrintLn(value: T): Unit;
+    function printLn(value: T): Unit;
 end module.
