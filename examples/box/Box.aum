@@ -97,7 +97,7 @@ module body Example.Box is
                 let contents: Int32 := Unbox(newbox);
                 Put_Character(contents);
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         -- Box a value, read_free it and unbox it.
         let b2: Either[Box[Int32], Int32] := Make('a');
@@ -109,7 +109,7 @@ module body Example.Box is
                 end;
                 Unbox(left);
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         -- Box a value, store a new one through a mutable reference, and unbox it.
         let b3: Either[Box[Int32], Int32] := Make('e');
@@ -121,7 +121,7 @@ module body Example.Box is
                 let contents: Int32 := Unbox(left);
                 Put_Character(contents);
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         -- Box a value, load it through a reference, and unbox it.
         let b4: Either[Box[Int32], Int32] := Make('a');
@@ -134,7 +134,7 @@ module body Example.Box is
                 end;
                 Unbox(left);
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         -- Box a value, swap it through a mutable reference, and unbox it.
         let b5: Either[Box[Int32], Int32] := Make('e');
@@ -145,7 +145,7 @@ module body Example.Box is
                 end;
                 Put_Character(Unbox(left));
             when Right(right: Int32) do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return ExitSuccess();
     end;

@@ -26,7 +26,7 @@ module body Standard.Buffer is
             when Some(value: Pointer[T]) do
                 return value;
             when None do
-                Abort("Array allocation failed.");
+                abort("Array allocation failed.");
         end case;
     end;
 
@@ -38,7 +38,7 @@ module body Standard.Buffer is
             when Some(value: Pointer[T]) do
                 return value;
             when None do
-                Abort("Array resizing failed.");
+                abort("Array resizing failed.");
         end case;
     end;
 
@@ -147,7 +147,7 @@ module body Standard.Buffer is
     --     -- If index = 0, the element will be placed at the zeroth position. If
     --     -- index = size, the element will be placed in the last position.
     --     if index > old_size then
-    --         Abort("Insertion index out of bounds.");
+    --         abort("Insertion index out of bounds.");
     --     end if;
     --     -- Increase the size by one, reallocating if necessary.
     --     Increase_Size_By_One(buffer);

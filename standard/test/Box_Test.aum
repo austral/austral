@@ -37,7 +37,7 @@ module body Standard.Test.Box is
                     message => "Content is the letter 'a'"
                 );
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;
@@ -56,7 +56,7 @@ module body Standard.Test.Box is
                 end;
                 Unbox(value);
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;
@@ -75,7 +75,7 @@ module body Standard.Test.Box is
                     message => "Content is the letter 'a'"
                 );
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;
@@ -95,7 +95,7 @@ module body Standard.Test.Box is
                 end;
                 Unbox(value);
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;
@@ -114,7 +114,7 @@ module body Standard.Test.Box is
                     message => "Content is the letter 'a'"
                 );
             when None do
-                Abort("Unexpected.");
+                abort("Unexpected.");
         end case;
         return nil;
     end;

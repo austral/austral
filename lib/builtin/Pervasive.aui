@@ -21,7 +21,7 @@ module Austral.Pervasive is
     generic [T: Type]
     function Fixed_Array_Size(arr: FixedArray[T]): Index;
 
-    function Abort(message: FixedArray[Nat8]): Unit;
+    function abort(message: FixedArray[Nat8]): Unit;
 
     type RootCapability : Linear;
 

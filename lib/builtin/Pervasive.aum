@@ -14,7 +14,7 @@ module body Austral.Pervasive is
         return @embed(Index, "$1.size", arr);
     end;
 
-    function Abort(message: FixedArray[Nat8]): Unit is
+    function abort(message: FixedArray[Nat8]): Unit is
         return @embed(Unit, "au_abort($1)", message);
     end;
 
@@ -63,7 +63,7 @@ module body Austral.Pervasive is
             let result: Nat8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Nat8)");
+                abort("Overflow in trappingAdd (Nat8)");
             end if;
             return result;
         end;
@@ -72,7 +72,7 @@ module body Austral.Pervasive is
             let result: Nat8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Nat8)");
+                abort("Overflow in trappingSubtract (Nat8)");
             end if;
             return result;
         end;
@@ -81,14 +81,14 @@ module body Austral.Pervasive is
             let result: Nat8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Nat8)");
+                abort("Overflow in trappingMultiply (Nat8)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Nat8, rhs: Nat8): Nat8 is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Nat8)");
+                abort("Division by zero in trappingDivide (Nat8)");
             end if;
             return @embed(Nat8, "$1 / $2", lhs, rhs);
         end;
@@ -99,7 +99,7 @@ module body Austral.Pervasive is
             let result: Int8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Int8)");
+                abort("Overflow in trappingAdd (Int8)");
             end if;
             return result;
         end;
@@ -108,7 +108,7 @@ module body Austral.Pervasive is
             let result: Int8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Int8)");
+                abort("Overflow in trappingSubtract (Int8)");
             end if;
             return result;
         end;
@@ -117,17 +117,17 @@ module body Austral.Pervasive is
             let result: Int8 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Int8)");
+                abort("Overflow in trappingMultiply (Int8)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Int8, rhs: Int8): Int8 is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Int8)");
+                abort("Division by zero in trappingDivide (Int8)");
             end if;
             if (lhs = Minimum_Int8) and (rhs = -1) then
-                Abort("Overflow in trappingDivide (Int8)");
+                abort("Overflow in trappingDivide (Int8)");
             end if;
             return @embed(Int8, "$1 / $2", lhs, rhs);
         end;
@@ -138,7 +138,7 @@ module body Austral.Pervasive is
             let result: Nat16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Nat16)");
+                abort("Overflow in trappingAdd (Nat16)");
             end if;
             return result;
         end;
@@ -147,7 +147,7 @@ module body Austral.Pervasive is
             let result: Nat16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Nat16)");
+                abort("Overflow in trappingSubtract (Nat16)");
             end if;
             return result;
         end;
@@ -156,14 +156,14 @@ module body Austral.Pervasive is
             let result: Nat16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Nat16)");
+                abort("Overflow in trappingMultiply (Nat16)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Nat16, rhs: Nat16): Nat16 is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Nat16)");
+                abort("Division by zero in trappingDivide (Nat16)");
             end if;
             return @embed(Nat16, "$1 / $2", lhs, rhs);
         end;
@@ -174,7 +174,7 @@ module body Austral.Pervasive is
             let result: Int16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Int16)");
+                abort("Overflow in trappingAdd (Int16)");
             end if;
             return result;
         end;
@@ -183,7 +183,7 @@ module body Austral.Pervasive is
             let result: Int16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Int16)");
+                abort("Overflow in trappingSubtract (Int16)");
             end if;
             return result;
         end;
@@ -192,17 +192,17 @@ module body Austral.Pervasive is
             let result: Int16 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Int16)");
+                abort("Overflow in trappingMultiply (Int16)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Int16, rhs: Int16): Int16 is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Int16)");
+                abort("Division by zero in trappingDivide (Int16)");
             end if;
             if (lhs = Minimum_Int16) and (rhs = -1) then
-                Abort("Overflow in trappingDivide (Int16)");
+                abort("Overflow in trappingDivide (Int16)");
             end if;
             return @embed(Int16, "$1 / $2", lhs, rhs);
         end;
@@ -213,7 +213,7 @@ module body Austral.Pervasive is
             let result: Nat32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Nat32)");
+                abort("Overflow in trappingAdd (Nat32)");
             end if;
             return result;
         end;
@@ -222,7 +222,7 @@ module body Austral.Pervasive is
             let result: Nat32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Nat32)");
+                abort("Overflow in trappingSubtract (Nat32)");
             end if;
             return result;
         end;
@@ -231,14 +231,14 @@ module body Austral.Pervasive is
             let result: Nat32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Nat32)");
+                abort("Overflow in trappingMultiply (Nat32)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Nat32, rhs: Nat32): Nat32 is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Nat32)");
+                abort("Division by zero in trappingDivide (Nat32)");
             end if;
             return @embed(Nat32, "$1 / $2", lhs, rhs);
         end;
@@ -249,7 +249,7 @@ module body Austral.Pervasive is
             let result: Int32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Int32)");
+                abort("Overflow in trappingAdd (Int32)");
             end if;
             return result;
         end;
@@ -258,7 +258,7 @@ module body Austral.Pervasive is
             let result: Int32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Int32)");
+                abort("Overflow in trappingSubtract (Int32)");
             end if;
             return result;
         end;
@@ -267,17 +267,17 @@ module body Austral.Pervasive is
             let result: Int32 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Int32)");
+                abort("Overflow in trappingMultiply (Int32)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Int32, rhs: Int32): Int32 is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Int32)");
+                abort("Division by zero in trappingDivide (Int32)");
             end if;
             if (lhs = Minimum_Int32) and (rhs = -1) then
-                Abort("Overflow in trappingDivide (Int32)");
+                abort("Overflow in trappingDivide (Int32)");
             end if;
             return @embed(Int32, "$1 / $2", lhs, rhs);
         end;
@@ -288,7 +288,7 @@ module body Austral.Pervasive is
             let result: Nat64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Nat64)");
+                abort("Overflow in trappingAdd (Nat64)");
             end if;
             return result;
         end;
@@ -297,7 +297,7 @@ module body Austral.Pervasive is
             let result: Nat64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Nat64)");
+                abort("Overflow in trappingSubtract (Nat64)");
             end if;
             return result;
         end;
@@ -306,14 +306,14 @@ module body Austral.Pervasive is
             let result: Nat64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Nat64)");
+                abort("Overflow in trappingMultiply (Nat64)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Nat64, rhs: Nat64): Nat64 is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Nat64)");
+                abort("Division by zero in trappingDivide (Nat64)");
             end if;
             return @embed(Nat64, "$1 / $2", lhs, rhs);
         end;
@@ -324,7 +324,7 @@ module body Austral.Pervasive is
             let result: Int64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Int64)");
+                abort("Overflow in trappingAdd (Int64)");
             end if;
             return result;
         end;
@@ -333,7 +333,7 @@ module body Austral.Pervasive is
             let result: Int64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Int64)");
+                abort("Overflow in trappingSubtract (Int64)");
             end if;
             return result;
         end;
@@ -342,17 +342,17 @@ module body Austral.Pervasive is
             let result: Int64 := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Int64)");
+                abort("Overflow in trappingMultiply (Int64)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Int64, rhs: Int64): Int64 is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Int64)");
+                abort("Division by zero in trappingDivide (Int64)");
             end if;
             if (lhs = Minimum_Int64) and (rhs = -1) then
-                Abort("Overflow in trappingDivide (Int64)");
+                abort("Overflow in trappingDivide (Int64)");
             end if;
             return @embed(Int64, "$1 / $2", lhs, rhs);
         end;
@@ -363,7 +363,7 @@ module body Austral.Pervasive is
             let result: Index := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingAdd (Index)");
+                abort("Overflow in trappingAdd (Index)");
             end if;
             return result;
         end;
@@ -372,7 +372,7 @@ module body Austral.Pervasive is
             let result: Index := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingSubtract (Index)");
+                abort("Overflow in trappingSubtract (Index)");
             end if;
             return result;
         end;
@@ -381,14 +381,14 @@ module body Austral.Pervasive is
             let result: Index := 0;
             let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
             if did_overflow then
-                Abort("Overflow in trappingMultiply (Index)");
+                abort("Overflow in trappingMultiply (Index)");
             end if;
             return result;
         end;
 
         method trappingDivide(lhs: Index, rhs: Index): Index is
             if rhs = 0 then
-                Abort("Division by zero in trappingDivide (Index)");
+                abort("Division by zero in trappingDivide (Index)");
             end if;
             return @embed(Index, "$1 / $2", lhs, rhs);
         end;
@@ -409,7 +409,7 @@ module body Austral.Pervasive is
 
         method trappingDivide(lhs: Float64, rhs: Float64): Float64 is
             if rhs = 0.0 then
-                Abort("Division by zero in trappingDivide (Float64)");
+                abort("Division by zero in trappingDivide (Float64)");
             end if;
             return @embed(Float64, "$1 / $2", lhs, rhs);
         end;
@@ -435,7 +435,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Nat8, rhs: Nat8): Nat8 is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Nat8)");
+                abort("Division by zero in modularDivide (Nat8)");
             end if;
             return @embed(Nat8, "$1 / $2", lhs, rhs);
         end;
@@ -456,7 +456,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Int8, rhs: Int8): Int8 is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Int8)");
+                abort("Division by zero in modularDivide (Int8)");
             end if;
             return @embed(Int8, "$1 / $2", lhs, rhs);
         end;
@@ -477,7 +477,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Nat16, rhs: Nat16): Nat16 is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Nat16)");
+                abort("Division by zero in modularDivide (Nat16)");
             end if;
             return @embed(Nat16, "$1 / $2", lhs, rhs);
         end;
@@ -498,7 +498,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Int16, rhs: Int16): Int16 is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Int16)");
+                abort("Division by zero in modularDivide (Int16)");
             end if;
             return @embed(Int16, "$1 / $2", lhs, rhs);
         end;
@@ -519,7 +519,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Nat32, rhs: Nat32): Nat32 is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Nat32)");
+                abort("Division by zero in modularDivide (Nat32)");
             end if;
             return @embed(Nat32, "$1 / $2", lhs, rhs);
         end;
@@ -540,7 +540,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Int32, rhs: Int32): Int32 is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Int32)");
+                abort("Division by zero in modularDivide (Int32)");
             end if;
             return @embed(Int32, "$1 / $2", lhs, rhs);
         end;
@@ -561,7 +561,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Nat64, rhs: Nat64): Nat64 is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Nat64)");
+                abort("Division by zero in modularDivide (Nat64)");
             end if;
             return @embed(Nat64, "$1 / $2", lhs, rhs);
         end;
@@ -582,7 +582,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Int64, rhs: Int64): Int64 is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Int64)");
+                abort("Division by zero in modularDivide (Int64)");
             end if;
             return @embed(Int64, "$1 / $2", lhs, rhs);
         end;
@@ -603,7 +603,7 @@ module body Austral.Pervasive is
 
         method modularDivide(lhs: Index, rhs: Index): Index is
             if rhs = 0 then
-                Abort("Division by zero in modularDivide (Index)");
+                abort("Division by zero in modularDivide (Index)");
             end if;
             return @embed(Index, "$1 / $2", lhs, rhs);
         end;

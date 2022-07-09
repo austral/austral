@@ -34,7 +34,7 @@ module body Example.Buffer is
             when Some(value: Pointer[T]) do
                 return value;
             when None do
-                Abort("Allocation failed.");
+                abort("Allocation failed.");
         end case;
     end;
 
