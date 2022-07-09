@@ -4,8 +4,8 @@ import Austral.Memory (
     Load,
     Store,
     deallocate,
-    Load_Read_Reference,
-    Load_Write_Reference
+    loadRead,
+    loadWrite
 );
 
 module body Standard.Box is
@@ -65,7 +65,7 @@ module body Standard.Box is
     generic [T: Type, R: Region]
     function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R] is
         let ptrref: Reference[Pointer[T], R] := boxref->pointer;
-        let ref: Reference[T, R] := Load_Read_Reference(ptrref);
+        let ref: Reference[T, R] := loadRead(ptrref);
         return ref;
     end;
 
