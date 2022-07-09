@@ -22,6 +22,9 @@ let pervasive_imports =
         ConcreteImport (make_ident "Abort", None);
         ConcreteImport (make_ident "RootCapability", None);
         ConcreteImport (make_ident "surrenderRoot", None);
+        ConcreteImport (make_ident "ExitCode", None);
+        ConcreteImport (make_ident "ExitSuccess", None);
+        ConcreteImport (make_ident "ExitFailure", None);
         ConcreteImport (make_ident "Maximum_Nat8", None);
         ConcreteImport (make_ident "Maximum_Nat16", None);
         ConcreteImport (make_ident "Maximum_Nat32", None);

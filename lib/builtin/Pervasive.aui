@@ -27,6 +27,11 @@ module Austral.Pervasive is
 
     function surrenderRoot(cap: RootCapability): Unit;
 
+    union ExitCode: Free is
+        case ExitSuccess;
+        case ExitFailure;
+    end;
+
     constant Maximum_Nat8: Nat8;
     constant Maximum_Nat16: Nat16;
     constant Maximum_Nat32: Nat32;
