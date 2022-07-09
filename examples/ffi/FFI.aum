@@ -9,7 +9,7 @@ module body Example.FFI is
         pragma Foreign_Import(External_Name => "puts");
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         Put_Character(97);
         Put_String("Hello, world!");
         return ExitSuccess();

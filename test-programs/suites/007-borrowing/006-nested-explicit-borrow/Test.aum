@@ -3,7 +3,7 @@ module body Test is
         bar: Nat8;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Borrow it.

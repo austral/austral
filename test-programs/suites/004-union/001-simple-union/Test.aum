@@ -12,7 +12,7 @@ module body Test is
             value: Float64;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let C : Color := Red();
         case C of
             when Red do

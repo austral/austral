@@ -8,7 +8,7 @@ module body Test is
         return nil;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let r: R := R(x => 32);
         let ropt: Option[R] := Some(value => r);
         case ropt of

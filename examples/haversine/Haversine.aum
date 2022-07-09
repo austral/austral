@@ -34,7 +34,7 @@ module body Example.Haversine is
         return 2.0 * Earth_Radius * Arcsin(Sqrt(c));
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         return ExitSuccess();
     end;
 end module body.

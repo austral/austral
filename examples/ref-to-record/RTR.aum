@@ -9,7 +9,7 @@ module body Example.RTR is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let r: R := R(X => 97);
         borrow r as r2 in rho do
             let c: Int32 := !(r2->X);

@@ -5,7 +5,7 @@ module body Example.GenericUnion is
             value: T;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let S: Optional2[Int32] := Some2(value => 10);
         let N: Optional2[Int32] := None2();
         return ExitSuccess();

@@ -3,7 +3,7 @@ module body Test is
         x: Int32;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let r: R := R(x => 32);
         return ExitSuccess();
     end;

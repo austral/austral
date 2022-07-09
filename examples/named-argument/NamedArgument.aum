@@ -3,7 +3,7 @@ module body Example.NamedArgument is
         return nil;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         F(y => false, x => true);
         return ExitSuccess();
     end;

@@ -11,7 +11,7 @@ module body Test is
         end;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         return ExitSuccess();
     end;
 end module body.

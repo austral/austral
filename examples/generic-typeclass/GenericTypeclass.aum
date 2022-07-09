@@ -23,7 +23,7 @@ module body Example.GenericTypeclass is
         end if;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         Pointer_To_Integer();
         return ExitSuccess();
     end;

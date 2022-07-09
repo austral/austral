@@ -61,7 +61,7 @@ module body Fib is
         end if;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         print("fib(10) = ");
         printLn(fib(10));
         return ExitSuccess();
@@ -72,7 +72,7 @@ end module body.
 Build and run:
 
 ```bash
-$ austral compile --public-module=fib.aum --entrypoint=Fib:Main --output=fib.c
+$ austral compile --public-module=fib.aum --entrypoint=Fib:main --output=fib.c
 $ gcc lib/prelude.c fib.c -o fib
 $ ./fib
 fib(10) = 55
@@ -124,7 +124,7 @@ $ austral compile \
     --module=src/A.aui,src/A.aum \
     --module=src/B.aui,src/B.aum \
     --module=src/C.aui,src/C.aum \
-    --entrypoint=C:Main \
+    --entrypoint=C:main \
     --output=program.c
 ```
 
@@ -137,7 +137,7 @@ $ austral compile \
     --module=src/A \
     --module=src/B \
     --module=src/C \
-    --entrypoint=C:Main \
+    --entrypoint=C:main \
     --output=program.c
 ```
 
@@ -148,8 +148,8 @@ The `--entrypoint` option must be the name of a module, followed by a colon,
 followed by the name of a public function with either of the following
 signatures:
 
-1. `function Main(): ExitCode;`
-2. `function Main(root: RootCapability): ExitCode;`
+1. `function main(): ExitCode;`
+2. `function main(root: RootCapability): ExitCode;`
 
 The `ExitCode` type has two constructors: `ExitSuccess()` and `ExitFailure()`.
 

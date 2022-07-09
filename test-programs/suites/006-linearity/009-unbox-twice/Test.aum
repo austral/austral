@@ -39,7 +39,7 @@ module body Test is
         return value;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let e: Either[Box[Int32], Int32] := Make('e');
         case e of
             when Left(left: Box[Int32]) do

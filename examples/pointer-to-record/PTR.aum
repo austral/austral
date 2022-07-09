@@ -19,7 +19,7 @@ module body Example.PTR is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let r: R := R(X => 97);
         let addr: Address[R] := Allocate(sizeof(R));
         case Null_Check(addr) of

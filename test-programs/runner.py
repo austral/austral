@@ -191,7 +191,7 @@ def _test_cmd(test: Test) -> list:
             "./austral",
             "compile",
             f"--public-module={body_path}",
-            "--entrypoint=Test:Main",
+            "--entrypoint=Test:main",
             "--output=test-programs/output.c",
         ]
 

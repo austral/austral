@@ -1,5 +1,5 @@
 module body Test is
-    function Main(root: RootCapability): ExitCode is
+    function main(root: RootCapability): ExitCode is
         surrenderRoot(root);
         return ExitSuccess();
     end;

@@ -2,7 +2,7 @@ module body Test is
     union Foo[A: Type]: Free is
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         return ExitSuccess();
     end;
 end module body.

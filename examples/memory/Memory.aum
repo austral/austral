@@ -11,7 +11,7 @@ import Austral.Memory (
 module body Example.Memory is
     pragma Unsafe_Module;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let addr: Address[Int32] := Allocate(sizeof(Int32));
         case Null_Check(addr) of
             when Some(value: Pointer[Int32]) do

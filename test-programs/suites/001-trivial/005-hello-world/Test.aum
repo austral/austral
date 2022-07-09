@@ -3,7 +3,7 @@ module body Test is
         return @embed(Unit, "au_printf(\"%c\", $1)", c);
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let arr: FixedArray[Nat8] := "Hello, world!";
         let n: Index := Fixed_Array_Size(arr) - 1;
         @embed(Unit, "au_printf(\"Length: %i\n\", $1)", n);

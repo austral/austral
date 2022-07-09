@@ -25,7 +25,7 @@ module body Example.Array is
         return nil;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let addr: Address[Bool] := Allocate(3);
         case Null_Check(addr) of
             when Some(value: Pointer[Bool]) do

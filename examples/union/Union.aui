@@ -12,5 +12,5 @@ module Example.Union is
             value: Float64;
     end;
 
-    function Main(): ExitCode;
+    function main(): ExitCode;
 end module.

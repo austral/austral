@@ -5,7 +5,7 @@ module body Example.Either is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         -- Left case.
         let l: Either[Bool, Int32] := Left(left => true);
         case l of

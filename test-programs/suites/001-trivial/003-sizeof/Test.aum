@@ -5,7 +5,7 @@ module body Test is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let size: Index := sizeof(Nat8);
         if size /= 1 then
             Put_Character('f');

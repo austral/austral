@@ -41,7 +41,7 @@ module body Test is
     record Foo: Linear is
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let n8: Nat8 := 'a';
         PrintF(n8);
         PrintF('a' : Nat16);

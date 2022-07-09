@@ -19,5 +19,5 @@ module Example.Box is
     generic [T: Free, R: Region]
     function Swap_Mut(boxref: &![Box[T], R], value: T): T;
 
-    function Main(): ExitCode;
+    function main(): ExitCode;
 end module.

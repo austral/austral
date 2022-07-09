@@ -88,7 +88,7 @@ module body Example.Box is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         -- Box a value, swap it, and unwrap it.
         let b: Either[Box[Int32], Int32] := Make('e');
         case b of

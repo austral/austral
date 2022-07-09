@@ -1,5 +1,5 @@
 module body Example.GenericRecord is
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let R: Pair[Int32] := Pair(left => 10, right => 10);
         let V: Int32 := R.left;
         return ExitSuccess();

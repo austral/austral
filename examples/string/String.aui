@@ -1,3 +1,3 @@
 module Example.String is
-    function Main(): ExitCode;
+    function main(): ExitCode;
 end module.

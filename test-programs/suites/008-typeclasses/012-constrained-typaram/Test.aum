@@ -26,7 +26,7 @@ module body Test is
         return nil;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         Foo(10);
         return ExitSuccess();
     end;

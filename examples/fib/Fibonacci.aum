@@ -8,7 +8,7 @@ module body Example.Fibonacci is
         end if;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         Fibonacci(30);
         return ExitSuccess();
     end;

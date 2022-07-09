@@ -4,7 +4,7 @@ module body Test is
         y: Int8;
     end;
 
-    function Main(): ExitCode is
+    function main(): ExitCode is
         let r: R := R(x => 10, y => 10);
         return ExitSuccess();
     end;
