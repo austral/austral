@@ -5,8 +5,8 @@ module body Test is
 
     function main(): ExitCode is
         let r: R := R(x => 32);
-        let { x: Int32 } := r;
-        let { x: Int32 } := r;
+        let { x as x1: Int32 } := r;
+        let { x as x2: Int32 } := r;
         return ExitSuccess();
     end;
 end module body.
