@@ -8,7 +8,7 @@ module body Test is
         return nil;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let r: R := R(x => 32);
         let ropt: Option[R] := Some(value => r);
         case ropt of

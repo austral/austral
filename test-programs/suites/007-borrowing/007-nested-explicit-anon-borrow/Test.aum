@@ -3,7 +3,7 @@ module body Test is
         bar: Nat8;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Borrow it.

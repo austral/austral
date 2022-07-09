@@ -6,8 +6,6 @@ open Names
 
 let pervasive_module_name = make_mod_name "Austral.Pervasive"
 
-let root_cap_type_name = make_ident "Root_Capability"
-
 let pervasive_imports =
   ConcreteImportList (
       pervasive_module_name,
@@ -22,7 +20,7 @@ let pervasive_imports =
         ConcreteImport (make_ident "Deref_Write", None);
         ConcreteImport (make_ident "Fixed_Array_Size", None);
         ConcreteImport (make_ident "Abort", None);
-        ConcreteImport (make_ident "Root_Capability", None);
+        ConcreteImport (make_ident "RootCapability", None);
         ConcreteImport (make_ident "Maximum_Nat8", None);
         ConcreteImport (make_ident "Maximum_Nat16", None);
         ConcreteImport (make_ident "Maximum_Nat32", None);

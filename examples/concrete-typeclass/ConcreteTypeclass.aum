@@ -14,7 +14,7 @@ module body Example.ConcreteTypeclass is
         return X;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         Nil_To_Integer();
         return root;
     end;

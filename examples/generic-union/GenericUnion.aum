@@ -5,7 +5,7 @@ module body Example.GenericUnion is
             value: T;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let S: Optional2[Int32] := Some2(value => 10);
         let N: Optional2[Int32] := None2();
         return root;

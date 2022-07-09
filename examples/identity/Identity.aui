@@ -2,5 +2,5 @@ module Example.Identity is
     generic [T: Type]
     function Identity(value: T): T;
 
-    function Main(root: Root_Capability): Root_Capability;
+    function Main(root: RootCapability): RootCapability;
 end module.

@@ -12,7 +12,7 @@ module body Test is
             value: Float64;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let C : Color := Red();
         case C of
             when Red do

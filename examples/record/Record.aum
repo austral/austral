@@ -3,7 +3,7 @@ module body Example.Record is
         X: Int32;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let Rec : R := R(X => 10);
         let Y: Int32 := Rec.X;
         return root;

@@ -3,7 +3,7 @@ module body Test is
         return @embed(Unit, "au_printf(\"%c\", $1)", c);
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let arr: Fixed_Array[Nat8] := "Hello, world!";
         let n: Index := Fixed_Array_Size(arr) - 1;
         @embed(Unit, "au_printf(\"Length: %i\n\", $1)", n);

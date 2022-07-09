@@ -1,3 +1,4 @@
+open Names
 open Identifier
 open Id
 open Env
@@ -110,11 +111,11 @@ let rec check_entrypoint_validity (env: env) (qi: qident): decl_id =
                   if is_root_cap_type rt then
                     id
                   else
-                    err "Entrypoint function must return a value of type Root_Capability."
+                    err "Entrypoint function must return a value of type RootCapability."
                 else
-                  err "Entrypoint function must take a single argument of type Root_Capability."
+                  err "Entrypoint function must take a single argument of type RootCapability."
              | _ ->
-                err "Entrypoint function must take a single argument of type Root_Capability."
+                err "Entrypoint function must take a single argument of type RootCapability."
            else
              err "Entrypoint function cannot be generic."
          else
@@ -127,7 +128,7 @@ let rec check_entrypoint_validity (env: env) (qi: qident): decl_id =
 and is_root_cap_type = function
   | NamedType (name, [], LinearUniverse) ->
      let m = equal_module_name (source_module_name name) pervasive_module_name
-     and n = equal_identifier (original_name name) root_cap_type_name in
+     and n = equal_identifier (original_name name) (make_ident root_cap_name) in
      m && n
   | _ ->
      false
@@ -138,7 +139,7 @@ let entrypoint_code root_cap_mono_id id =
 
 let get_root_capability_monomorph (env: env): mono_id =
   let mn: module_name = make_mod_name "Austral.Pervasive"
-  and n: identifier = make_ident "Root_Capability" in
+  and n: identifier = make_ident root_cap_name in
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with
   | Some (Record { id; _ }) ->
@@ -146,9 +147,9 @@ let get_root_capability_monomorph (env: env): mono_id =
       | Some id ->
          id
       | _ ->
-         err "No monomorph of Root_Capability.")
+         err "No monomorph of RootCapability.")
   | _ ->
-     err "Can't find the Root_Capability type in the environment."
+     err "Can't find the RootCapability type in the environment."
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in

@@ -3,7 +3,7 @@ module body Example.NamedArgument is
         return nil;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         F(y => false, x => true);
         return root;
     end;

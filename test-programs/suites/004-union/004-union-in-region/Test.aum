@@ -1,7 +1,7 @@
 module body Test is
     union Foo: Region is end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         return root;
     end;
 end module body.

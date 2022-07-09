@@ -39,7 +39,7 @@ module body Test is
         return value;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let e: Either[Box[Int32], Int32] := Make('e');
         case e of
             when Left(left: Box[Int32]) do

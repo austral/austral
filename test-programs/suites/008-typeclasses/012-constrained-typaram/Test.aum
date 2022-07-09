@@ -26,7 +26,7 @@ module body Test is
         return nil;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         Foo(10);
         return root;
     end;

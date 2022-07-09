@@ -21,3 +21,5 @@ let write_ref_name = "WriteReference"
 
 let address_name = "Address"
 let pointer_name = "Pointer"
+
+let root_cap_name: string = "RootCapability"

@@ -14,7 +14,7 @@ module body Example.Constant is
     -- This constant is private, since it appears in the module body file but not the interface file.
     constant Pi : Float64 := 3.14;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         if (Decimal_24 /= Hexadecimal_24) then
             Abort("Hexadecimal literals are broken.");
         end if;

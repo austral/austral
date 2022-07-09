@@ -18,7 +18,7 @@ module body Austral.Pervasive is
         return @embed(Unit, "au_abort($1)", message);
     end;
 
-    record Root_Capability: Linear is
+    record RootCapability: Linear is
         value: Unit;
     end;
 
