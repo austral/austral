@@ -196,7 +196,7 @@ record:
   ;
 
 slot:
-  | name=identifier COLON ty=typespec SEMI { ConcreteSlot (name, ty) }
+  | docstringopt name=identifier COLON ty=typespec SEMI { ConcreteSlot (name, ty) }
   ;
 
 union:
@@ -207,8 +207,8 @@ union:
   ;
 
 case:
-  | CASE name=identifier SEMI { ConcreteCase (name, []) }
-  | CASE name=identifier IS slots=slot* { ConcreteCase (name, slots) }
+  | docstringopt CASE name=identifier SEMI { ConcreteCase (name, []) }
+  | docstringopt CASE name=identifier IS slots=slot* { ConcreteCase (name, slots) }
   ;
 
 function_decl:
