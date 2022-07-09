@@ -4,7 +4,7 @@ import Austral.Memory (
     nullCheck,
     allocate,
     deallocate,
-    Positive_Offset,
+    positiveOffset,
     Load,
     Store
 );
@@ -31,8 +31,8 @@ module body Example.Array is
             when Some(value: Pointer[Bool]) do
                 let arr: Pointer[Bool] := value;
                 let firstp: Pointer[Bool] := arr;
-                let secondp: Pointer[Bool] := Positive_Offset(arr, 1);
-                let thirdp: Pointer[Bool] := Positive_Offset(arr, 2);
+                let secondp: Pointer[Bool] := positiveOffset(arr, 1);
+                let thirdp: Pointer[Bool] := positiveOffset(arr, 2);
                 Store(firstp, true);
                 Store(secondp, false);
                 Store(thirdp, true);

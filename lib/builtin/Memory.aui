@@ -36,8 +36,8 @@ module Austral.Memory is
     function memcpy(source: Pointer[T], destination: Pointer[U], count: Index): Unit;
 
     generic [T: Type]
-    function Positive_Offset(pointer: Pointer[T], offset: Index): Pointer[T];
+    function positiveOffset(pointer: Pointer[T], offset: Index): Pointer[T];
 
     generic [T: Type]
-    function Negative_Offset(pointer: Pointer[T], offset: Index): Pointer[T];
+    function negativeOffset(pointer: Pointer[T], offset: Index): Pointer[T];
 end module.

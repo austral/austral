@@ -71,12 +71,12 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function Positive_Offset(pointer: Pointer[T], offset: Index): Pointer[T] is
+    function positiveOffset(pointer: Pointer[T], offset: Index): Pointer[T] is
         return @embed(Pointer[T], "$1 + $2", pointer, offset);
     end;
 
     generic [T: Type]
-    function Negative_Offset(pointer: Pointer[T], offset: Index): Pointer[T] is
+    function negativeOffset(pointer: Pointer[T], offset: Index): Pointer[T] is
         return @embed(Pointer[T], "$1 - $2", pointer, offset);
     end;
 end module body.
