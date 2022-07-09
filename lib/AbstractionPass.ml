@@ -100,9 +100,9 @@ and abs_expr im expr =
   | CBorrowExpr (_, mode, var) ->
      BorrowExpr (mode, qualify_identifier im var)
 
-and abs_when im (ConcreteWhen (name, params, body)) =
+and abs_when im (ConcreteWhen (name, bindings, body)) =
   AbstractWhen (name,
-                List.map (fun (ConcreteParam (n, t)) -> (n, qualify_typespec im t)) params,
+                List.map (fun (ConcreteBinding { name; ty; rename; }) -> QBinding { name; ty = qualify_typespec im ty; rename }) bindings,
                 abs_stmt im body)
 
 and abs_arglist im args =
@@ -131,7 +131,7 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
       | CLet (span, n, t, v) ->
          ALet (span, n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
       | CDestructure (span, bs, e) ->
-         let bs' = List.map (fun (n, ts) -> (n, qualify_typespec im ts)) bs
+         let bs' = List.map (fun (ConcreteBinding {name; ty; rename; }) -> QBinding { name; ty = qualify_typespec im ty; rename; }) bs
          and e' = abs_expr im e
          and b = let_reshape im rest
          in

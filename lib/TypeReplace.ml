@@ -1,5 +1,4 @@
 open Tast
-open Type
 open TypeBindings
 
 let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
@@ -117,11 +116,11 @@ let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
      and value = replace_tyvars_expr bindings value
      and body = replace_tyvars_stmt bindings body in
      TLet (span, name, ty, value, body)
-  | TDestructure (span, params, value, body) ->
-     let params = List.map (fun (n, ty) -> (n, replace_variables bindings ty)) params
+  | TDestructure (span, bs, value, body) ->
+     let bs = List.map (fun (TypedBinding { name; ty; rename; }) -> TypedBinding { name; ty = replace_variables bindings ty; rename = rename; }) bs
      and value = replace_tyvars_expr bindings value
      and body = replace_tyvars_stmt bindings body in
-     TDestructure (span, params, value, body)
+     TDestructure (span, bs, value, body)
   | TAssign (span, lvalue, value) ->
      let lvalue = replace_tyvars_lvalue bindings lvalue
      and value = replace_tyvars_expr bindings value in
@@ -175,7 +174,7 @@ and replace_tyvars_lvalue (bindings: type_bindings) (lvalue: typed_lvalue): type
   TypedLValue (name, elems)
 
 and replace_tyvars_when (bindings: type_bindings) (twhen: typed_when): typed_when =
-  let (TypedWhen (name, params, body)) = twhen in
-  let params = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables bindings t)) params
+  let (TypedWhen (name, bs, body)) = twhen in
+  let bs = List.map (fun (TypedBinding { name; ty; rename; }) -> TypedBinding { name; ty = replace_variables bindings ty; rename }) bs
   and body = replace_tyvars_stmt bindings body in
-  TypedWhen (name, params, body)
+  TypedWhen (name, bs, body)

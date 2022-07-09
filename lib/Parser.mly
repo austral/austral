@@ -322,14 +322,22 @@ let_simple:
   ;
 
 let_destructure:
-  | LET LCURLY p=parameter_list RCURLY ASSIGN e=expression SEMI { CDestructure (from_loc $loc, List.map (fun (ConcreteParam (n, t)) -> (n, t)) p, e) }
+  | LET LCURLY b=binding_list RCURLY ASSIGN e=expression SEMI { CDestructure (from_loc $loc, b, e) }
+  ;
+
+binding_list:
+  | separated_list(COMMA, binding) { $1 }
+  ;
+
+binding:
+  | identifier COLON typespec { ConcreteBinding { name = $1; ty = $3; rename = $1 } }
   ;
 
 lvalue:
   | n=identifier elems=path_rest+ { ConcreteLValue (n, elems) }
 
 when_stmt:
-  | WHEN identifier LPAREN parameter_list RPAREN DO block { ConcreteWhen ($2, $4, $7) }
+  | WHEN identifier LPAREN binding_list RPAREN DO block { ConcreteWhen ($2, $4, $7) }
   | WHEN identifier DO block { ConcreteWhen ($2, [], $4) }
   ;
 

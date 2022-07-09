@@ -86,7 +86,7 @@ and cexpr =
 and cstmt =
   | CSkip of span
   | CLet of span * identifier * typespec * cexpr
-  | CDestructure of span * (identifier * typespec) list * cexpr
+  | CDestructure of span * concrete_binding list * cexpr
   | CAssign of span * concrete_lvalue * cexpr
   | CIf of span * cexpr * cstmt * cstmt
   | CCase of span * cexpr * concrete_when list
@@ -104,11 +104,18 @@ and cstmt =
   | CDiscarding of span * cexpr
   | CReturn of span * cexpr
 
+and concrete_binding =
+  ConcreteBinding of  {
+      name: identifier;
+      ty: typespec;
+      rename: identifier;
+    }
+
 and condition_branch =
   ConditionBranch of cexpr * cstmt
 
 and concrete_when =
-  ConcreteWhen of identifier * concrete_param list * cstmt
+  ConcreteWhen of identifier * concrete_binding list * cstmt
 
 and concrete_arglist =
   | ConcretePositionalArgs of cexpr list

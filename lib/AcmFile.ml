@@ -9,6 +9,7 @@ open Span
 open Common
 open Escape
 open ModuleNameSet
+open Tast
 open Region
 
 (** Types in ACM files are always either public or opaque. *)
@@ -21,7 +22,7 @@ type acm_type_vis =
 type ser_stmt =
   | SSkip of span
   | SLet of span * identifier * ty * ser_expr * ser_stmt
-  | SDestructure of span * (identifier * ty) list * ser_expr * ser_stmt
+  | SDestructure of span * typed_binding list * ser_expr * ser_stmt
   | SAssign of span * ser_lvalue * ser_expr
   | SIf of span * ser_expr * ser_stmt * ser_stmt
   | SCase of span * ser_expr * ser_when list
@@ -95,7 +96,7 @@ and ser_expr =
 [@@deriving sexp]
 
 and ser_when =
-  SerWhen of identifier * value_parameter list * ser_stmt
+  SerWhen of identifier * typed_binding list * ser_stmt
 [@@deriving sexp]
 
 and ser_path_elem =
