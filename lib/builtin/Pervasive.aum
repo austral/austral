@@ -27,32 +27,32 @@ module body Austral.Pervasive is
         return nil;
     end;
 
-    constant Minimum_Nat8: Int8 := 0;
-    constant Maximum_Nat8: Nat8 := @embed(Nat8, "UINT8_MAX");
+    constant minimum_nat8: Int8 := 0;
+    constant maximum_nat8: Nat8 := @embed(Nat8, "UINT8_MAX");
 
-    constant Minimum_Nat16: Int8 := 0;
-    constant Maximum_Nat16: Nat16 := @embed(Nat16, "UINT16_MAX");
+    constant minimum_nat16: Int8 := 0;
+    constant maximum_nat16: Nat16 := @embed(Nat16, "UINT16_MAX");
 
-    constant Minimum_Nat32: Int8 := 0;
-    constant Maximum_Nat32: Nat32 := @embed(Nat32, "UINT32_MAX");
+    constant minimum_nat32: Int8 := 0;
+    constant maximum_nat32: Nat32 := @embed(Nat32, "UINT32_MAX");
 
-    constant Minimum_Nat64: Int8 := 0;
-    constant Maximum_Nat64: Nat64 := @embed(Nat64, "UINT64_MAX");
+    constant minimum_nat64: Int8 := 0;
+    constant maximum_nat64: Nat64 := @embed(Nat64, "UINT64_MAX");
 
-    constant Minimum_Int8: Int8 := @embed(Int8, "INT8_MIN");
-    constant Maximum_Int8: Int8 := @embed(Int8, "INT8_MAX");
+    constant minimum_int8: Int8 := @embed(Int8, "INT8_MIN");
+    constant maximum_int8: Int8 := @embed(Int8, "INT8_MAX");
 
-    constant Minimum_Int16: Int16 := @embed(Int16, "INT16_MIN");
-    constant Maximum_Int16: Int16 := @embed(Int16, "INT16_MAX");
+    constant minimum_int16: Int16 := @embed(Int16, "INT16_MIN");
+    constant maximum_int16: Int16 := @embed(Int16, "INT16_MAX");
 
-    constant Minimum_Int32: Int32 := @embed(Int32, "INT32_MIN");
-    constant Maximum_Int32: Int32 := @embed(Int32, "INT32_MAX");
+    constant minimum_int32: Int32 := @embed(Int32, "INT32_MIN");
+    constant maximum_int32: Int32 := @embed(Int32, "INT32_MAX");
 
-    constant Minimum_Int64: Int64 := @embed(Int64, "INT64_MIN");
-    constant Maximum_Int64: Int64 := @embed(Int64, "INT64_MAX");
+    constant minimum_int64: Int64 := @embed(Int64, "INT64_MIN");
+    constant maximum_int64: Int64 := @embed(Int64, "INT64_MAX");
 
-    constant Minimum_Index: Index := 0;
-    constant Maximum_Index: Index := @embed(Index, "SIZE_MAX");
+    constant minimum_index: Index := 0;
+    constant maximum_index: Index := @embed(Index, "SIZE_MAX");
 
     ---
     --- Trapping Arithmetic
@@ -126,7 +126,7 @@ module body Austral.Pervasive is
             if rhs = 0 then
                 abort("Division by zero in trappingDivide (Int8)");
             end if;
-            if (lhs = Minimum_Int8) and (rhs = -1) then
+            if (lhs = minimum_int8) and (rhs = -1) then
                 abort("Overflow in trappingDivide (Int8)");
             end if;
             return @embed(Int8, "$1 / $2", lhs, rhs);
@@ -201,7 +201,7 @@ module body Austral.Pervasive is
             if rhs = 0 then
                 abort("Division by zero in trappingDivide (Int16)");
             end if;
-            if (lhs = Minimum_Int16) and (rhs = -1) then
+            if (lhs = minimum_int16) and (rhs = -1) then
                 abort("Overflow in trappingDivide (Int16)");
             end if;
             return @embed(Int16, "$1 / $2", lhs, rhs);
@@ -276,7 +276,7 @@ module body Austral.Pervasive is
             if rhs = 0 then
                 abort("Division by zero in trappingDivide (Int32)");
             end if;
-            if (lhs = Minimum_Int32) and (rhs = -1) then
+            if (lhs = minimum_int32) and (rhs = -1) then
                 abort("Overflow in trappingDivide (Int32)");
             end if;
             return @embed(Int32, "$1 / $2", lhs, rhs);
@@ -351,7 +351,7 @@ module body Austral.Pervasive is
             if rhs = 0 then
                 abort("Division by zero in trappingDivide (Int64)");
             end if;
-            if (lhs = Minimum_Int64) and (rhs = -1) then
+            if (lhs = minimum_int64) and (rhs = -1) then
                 abort("Overflow in trappingDivide (Int64)");
             end if;
             return @embed(Int64, "$1 / $2", lhs, rhs);

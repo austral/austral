@@ -32,25 +32,25 @@ module Austral.Pervasive is
         case ExitFailure;
     end;
 
-    constant Maximum_Nat8: Nat8;
-    constant Maximum_Nat16: Nat16;
-    constant Maximum_Nat32: Nat32;
-    constant Maximum_Nat64: Nat64;
+    constant maximum_nat8: Nat8;
+    constant maximum_nat16: Nat16;
+    constant maximum_nat32: Nat32;
+    constant maximum_nat64: Nat64;
 
-    constant Minimum_Int8: Int8;
-    constant Maximum_Int8: Int8;
+    constant minimum_int8: Int8;
+    constant maximum_int8: Int8;
 
-    constant Minimum_Int16: Int16;
-    constant Maximum_Int16: Int16;
+    constant minimum_int16: Int16;
+    constant maximum_int16: Int16;
 
-    constant Minimum_Int32: Int32;
-    constant Maximum_Int32: Int32;
+    constant minimum_int32: Int32;
+    constant maximum_int32: Int32;
 
-    constant Minimum_Int64: Int64;
-    constant Maximum_Int64: Int64;
+    constant minimum_int64: Int64;
+    constant maximum_int64: Int64;
 
-    constant Minimum_Index: Index;
-    constant Maximum_Index: Index;
+    constant minimum_index: Index;
+    constant maximum_index: Index;
 
     typeclass TrappingArithmetic(T: Type) is
         method trappingAdd(lhs: T, rhs: T): T;
