@@ -1,0 +1,65 @@
+"""
+Module body docstring.
+"""
+module body Test is
+    """
+    Private constant docstring.
+    """
+    constant pi : Float64 := 3.14;
+
+    """
+    Private record docstring.
+    """
+    record Vec3: Free is
+        """
+        Record slot.
+        """
+        x: Float32;
+        y: Float32;
+        z: Float32;
+    end;
+
+    """
+    Priate union docstring.
+    """
+    union Monochrome: Free is
+        """
+        Union case.
+        """
+        case White is
+            """
+            Union case slot.
+            """
+            value: Nat8;
+        case Black;
+    end;
+
+    """
+    Private typeclass docstring.
+    """
+    typeclass Derpable(T: Free) is
+        """
+        Private method.
+        """
+        method derp(value: T): Unit;
+    end;
+
+    """
+    Instance definition docstring.
+    """
+    instance Fooable(Int32) is
+        """
+        Method definition.
+        """
+        method foo(value: Int32): Unit is
+            return nil;
+        end;
+    end;
+
+    """
+    Function definition docstring.
+    """
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,1 @@
+Test that we can put docstrings in all the relevant places.

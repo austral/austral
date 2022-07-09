@@ -1,0 +1,56 @@
+"""
+Module interface docstring.
+"""
+module Test is
+    """
+    Public constant docstring.
+    """
+    constant pi : Float64;
+
+    """
+    Public record docstring.
+    """
+    record Vec2: Free is
+        """
+        Record slot.
+        """
+        x: Float32;
+        y: Float32;
+    end;
+
+    """
+    Public union docstring.
+    """
+    union Color: Free is
+        """
+        Union case.
+        """
+        case Red;
+        case Green;
+        case Blue is
+            """
+            Union case slot.
+            """
+            value: Int32;
+    end;
+
+    """
+    Public typeclass docstring.
+    """
+    typeclass Fooable(T: Free) is
+        """
+        Public method.
+        """
+        method foo(value: T): Unit;
+    end;
+
+    """
+    Public instance docstring.
+    """
+    instance Fooable(Int32);
+
+    """
+    Public function docstring.
+    """
+    function main(): ExitCode;
+end module.
