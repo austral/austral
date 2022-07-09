@@ -19,7 +19,7 @@ The `suites` directory has numbered subdirectories, each representing a test sui
 
 Each test directory contains some Austral source files (in the simplest cases, `Test.aui` and `Test.aum`).
 
-If the compilation is expected to fail, there should be a file called `error.txt` containing the compiler's expected output.
+If the compilation is expected to fail, there should be a file called `austral-stderr.txt` containing the Austral compiler's expected output.
 
 If compilation is expected to succeed and the program is expected to produce text output, there should be a file called `output.txt` containing the program's expected output.
 

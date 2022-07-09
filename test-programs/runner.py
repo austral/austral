@@ -104,11 +104,11 @@ def collect_suites() -> list:
         # Iterate over each test.
         for test_name in test_names:
             test_dir: str = os.path.join(suite_dir, test_name)
-            expected_error = _get_file_contents(test_dir, "error.txt")
+            expected_error = _get_file_contents(test_dir, "austral-stderr.txt")
             expected_output = _get_file_contents(test_dir, "output.txt")
             cli = _get_file_contents(test_dir, "cli.txt")
             if (expected_error is not None) and (expected_output is not None):
-                die("Can't have both `error.txt` and `output.txt` in the same test.")
+                die("Can't have both `austral-stderr.txt` and `output.txt` in the same test.")
             elif (expected_error is not None) and (expected_output is None):
                 # The test should fail to compile, and the compiler output must
                 # match the contents of the file.
@@ -133,7 +133,7 @@ def collect_suites() -> list:
                         expected_output=expected_output,
                     )
                 )
-            # There is neither an `error.txt` nor an `output.txt `file.
+            # There is neither a `austral-stderr.txt` nor an `output.txt `file.
             else:
                 # The program should compile and run successfully and produce no
                 # stdout.
