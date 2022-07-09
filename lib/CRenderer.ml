@@ -140,6 +140,18 @@ and render_stmt (i: indentation) (stmt: c_stmt): line list =
      [Line (i, "return " ^ (e v) ^ ";")]
   | CBlock ss ->
      List.concat (List.map (render_stmt i) ss)
+  | CLocalFunctionDeclaration (name, params, rt, linkage) ->
+     let s = (render_linkage linkage)
+             ^ (render_type rt)
+             ^ " "
+             ^ name
+             ^ "("
+             ^ (comma_sep (List.map (fun (CValueParam (n, t)) -> (render_type t) ^ " " ^ n) params))
+             ^ ");"
+     in
+     [
+       Line (i, s)
+     ]
   | CExplicitBlock ss ->
      let i' = indent i in
      List.concat [

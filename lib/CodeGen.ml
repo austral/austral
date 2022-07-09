@@ -492,7 +492,6 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
        CFunctionDefinition (d, gen_mono_id id, gen_params mn' params, gen_type rt, gen_stmt mn body)
      ]
   | MForeignFunction (id, _, params, rt, underlying) ->
-     let decl_d = Desc "Foreign function decl" in
      let def_d = Desc "Foreign function" in
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
@@ -524,7 +523,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      let ff_params = List.map (fun (MValueParameter (n, t)) -> CValueParam (gen_ident n, param_type_to_c_type t)) params
      and ff_rt = return_type_to_c_type rt in
-     let ff_decl = CFunctionDeclaration (decl_d, underlying, ff_params, ff_rt, LinkageExternal) in
+     let ff_local_decl = CLocalFunctionDeclaration (underlying, ff_params, ff_rt, LinkageExternal) in
      let make_param (n: identifier) (t: mono_ty) =
        if (gen_type t) = (CNamedType "au_array_t") then
          (* Extract the pointer from the Array struct *)
@@ -534,9 +533,12 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      let args = List.map (fun (MValueParameter (n, t)) -> make_param n t) params in
      let funcall = CFuncall (underlying, args) in
-     let body = CReturn funcall in
+     let body = CBlock [
+                    ff_local_decl;
+                    CReturn funcall
+                  ] in
      let def = CFunctionDefinition (def_d, gen_decl_id id, gen_params mn params, gen_type rt, body) in
-     [ff_decl; def]
+     [def]
   | MConcreteInstance (_, _, _, methods) ->
      List.map (gen_method mn) methods
   | MMethodMonomorph (id, params, rt, body) ->
