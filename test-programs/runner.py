@@ -62,14 +62,21 @@ class TestSuccess(Test):
 
 
 class TestFailure(Test):
-    def __init__(
-        self, name, suite_name, directory, cli, expected_compiler_error
-    ):
+    def __init__(self, name, suite_name, directory, cli, expected_compiler_error):
         self.name = name
         self.suite_name = suite_name
         self.directory = directory
         self.cli = cli
         self.expected_compiler_error = expected_compiler_error
+
+
+class TestProgramFailure(Test):
+    def __init__(self, name, suite_name, directory, cli, expected_program_stderr):
+        self.name = name
+        self.suite_name = suite_name
+        self.directory = directory
+        self.cli = cli
+        self.expected_program_stderr = expected_program_stderr
 
 
 class Suite(object):
@@ -106,9 +113,12 @@ def collect_suites() -> list:
             test_dir: str = os.path.join(suite_dir, test_name)
             expected_error = _get_file_contents(test_dir, "austral-stderr.txt")
             expected_output = _get_file_contents(test_dir, "program-stdout.txt")
+            program_stderr = _get_file_contents(test_dir, "program-stderr.txt")
             cli = _get_file_contents(test_dir, "cli.txt")
             if (expected_error is not None) and (expected_output is not None):
-                die("Can't have both `austral-stderr.txt` and `program-stdout.txt` in the same test.")
+                die(
+                    "Can't have both `austral-stderr.txt` and `program-stdout.txt` in the same test."
+                )
             elif (expected_error is not None) and (expected_output is None):
                 # The test should fail to compile, and the compiler output must
                 # match the contents of the file.
@@ -135,18 +145,31 @@ def collect_suites() -> list:
                 )
             # There is neither a `austral-stderr.txt` nor an `program-stdout.txt `file.
             else:
-                # The program should compile and run successfully and produce no
-                # stdout.
-                tests.append(
-                    TestSuccess(
-                        name=test_name,
-                        suite_name=suite_name,
-                        directory=test_dir,
-                        cli=cli,
-                        expected_output=None,
+                if program_stderr is None:
+                    # The program should compile and run successfully and produce no
+                    # stdout.
+                    tests.append(
+                        TestSuccess(
+                            name=test_name,
+                            suite_name=suite_name,
+                            directory=test_dir,
+                            cli=cli,
+                            expected_output=None,
+                        )
                     )
-                )
-        # Add the suite.
+                else:
+                    # The program should compile successfully, return a failure
+                    # exit code, and print stderr.
+                    tests.append(
+                        TestProgramFailure(
+                            name=test_name,
+                            suite_name=suite_name,
+                            directory=test_dir,
+                            cli=cli,
+                            expected_program_stderr=program_stderr,
+                        )
+                    )
+                    # Add the suite.
         suites.append(
             Suite(
                 name=suite_name,
@@ -177,6 +200,8 @@ def run_test(test: Test):
         _run_success_test(test)
     elif isinstance(test, TestFailure):
         _run_failure_test(test)
+    elif isinstance(test, TestProgramFailure):
+        _run_program_failure_test(test)
     else:
         die("Unknown test type.")
 
@@ -291,8 +316,7 @@ def _run_success_test(test: Test):
                     ("Test", test_name),
                     (
                         "Description",
-                        "program produced stdout, but it was not "
-                        "what we expected.",
+                        "program produced stdout, but it was not " "what we expected.",
                     ),
                 ],
                 outputs=[
@@ -308,8 +332,7 @@ def _run_success_test(test: Test):
                 ("Test", test_name),
                 (
                     "Description",
-                    "program produced stdout, but we expected "
-                    "none.",
+                    "program produced stdout, but we expected " "none.",
                 ),
             ],
             outputs=[
@@ -388,6 +411,132 @@ def _run_failure_test(test: TestFailure):
         )
     # Compilation failed and output matches.
     print("PASS")
+
+
+def _run_program_failure_test(test: Test):
+    # Find the source files.
+    expected_stderr: str = test.expected_program_stderr
+    suite_name: str = test.suite_name
+    test_name: str = test.name
+    # Construct the compiler command.
+    compile_cmd: list = _test_cmd(test)
+    # Call the compiler.
+    result: subprocess.CompletedProcess = subprocess.run(
+        compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    code: int = result.returncode
+    if code != 0:
+        # Compilation failed: print the output.
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                ("Description", "Austral compiler failed."),
+                ("Command", " ".join(compile_cmd)),
+                ("Return code", code),
+            ],
+            outputs=[
+                ("COMPILER STDOUT", result.stdout.decode("utf-8")),
+                ("STDERR", result.stderr.decode("utf-8")),
+            ],
+        )
+    # The compiler executed successfully. Compile the program with GCC.
+    gcc_cmd: list = [
+        "gcc",
+        "-fwrapv",  # Modular arithmetic semantics
+        "-Wno-builtin-declaration-mismatch",
+        "lib/prelude.c",
+        "test-programs/output.c",
+        "-lm",  # Math stdlib,
+        "-o",
+        "test-programs/testbin",
+    ]
+    # Call GCC.
+    result: subprocess.CompletedProcess = subprocess.run(
+        gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    code: int = result.returncode
+    if code != 0:
+        # GCC compilation failed.
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                ("Description", "GCC compiler failed."),
+                ("Command", " ".join(gcc_cmd)),
+                ("Return code", code),
+            ],
+            outputs=[
+                ("GCC STDOUT", result.stdout.decode("utf-8")),
+                ("GCC STDERR", result.stderr.decode("utf-8")),
+            ],
+        )
+    # GCC compilation succeeded. Run the program.
+    result: subprocess.CompletedProcess = subprocess.run(
+        ["./test-programs/testbin"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    code: int = result.returncode
+    if code == 0:
+        # Program did terminated successfully, but we didn't want that.
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                (
+                    "Description",
+                    "program terminated successfully, but we expected a failure.",
+                ),
+                ("Command", " ".join(["./test-programs/testbin"])),
+                ("Return code", code),
+            ],
+            outputs=[
+                ("STDOUT", result.stdout.decode("utf-8")),
+                ("STDERR", result.stderr.decode("utf-8")),
+            ],
+        )
+    # Did it produce output?
+    stderr: str = result.stderr.decode("utf-8").strip()
+    if stderr:
+        # Have stderr, expected stderr. Check they match.
+        if stderr == expected_stderr:
+            # Output matches. Pass.
+            print("PASS")
+        else:
+            # Output mismatch. Error.
+            report(
+                properties=[
+                    ("Suite", suite_name),
+                    ("Test", test_name),
+                    (
+                        "Description",
+                        "program produced stderr, but it was not what we expected.",
+                    ),
+                ],
+                outputs=[
+                    ("ACTUAL STDERR", stderr),
+                    ("EXPECTED STDERR", expected_stderr),
+                ],
+            )
+    else:
+        # Don't have output, expected it. Error.
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                (
+                    "Description",
+                    "did not produce stderr, but we expected stderr.",
+                ),
+            ],
+            outputs=[
+                ("EXPECTED STDERR", expected_stderr),
+            ],
+        )
+    # At this point, the test has passed. Delete the C code and the test binary.
+    os.remove("test-programs/output.c")
+    os.remove("test-programs/testbin")
 
 
 #

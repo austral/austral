@@ -1,0 +1,6 @@
+module body Test is
+    function main(): ExitCode is
+        abort("Herp derp");
+        return ExitSuccess();
+    end;
+end module body.
