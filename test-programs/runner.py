@@ -208,121 +208,7 @@ def _run_success_test(test: Test):
         compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     code: int = result.returncode
-    if code == 0:
-        # The compiler executed successfully. Compile the program with GCC.
-        gcc_cmd: list = [
-            "gcc",
-            "-fwrapv",  # Modular arithmetic semantics
-            "-Wno-builtin-declaration-mismatch",
-            "lib/prelude.c",
-            "test-programs/output.c",
-            "-lm",  # Math stdlib,
-            "-o",
-            "test-programs/testbin",
-        ]
-        # Call GCC.
-        result: subprocess.CompletedProcess = subprocess.run(
-            gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        code: int = result.returncode
-        if code == 0:
-            # GCC compilation succeeded. Run the program.
-            result: subprocess.CompletedProcess = subprocess.run(
-                ["./test-programs/testbin"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            code: int = result.returncode
-            if code == 0:
-                # Program ran successfully. Did it produce output?
-                stdout: str = result.stdout.decode("utf-8").strip()
-                if stdout and expected_output:
-                    # Have output, expected output. Check they match.
-                    if stdout == expected_output:
-                        # Output matches. Pass.
-                        print("PASS")
-                    else:
-                        # Output mismatch. Error.
-                        report(
-                            properties=[
-                                ("Suite", suite_name),
-                                ("Test", test_name),
-                                (
-                                    "Description",
-                                    "program produced stdout, but it was not "
-                                    "what we expected.",
-                                ),
-                            ],
-                            outputs=[
-                                ("ACTUAL STDOUT", stdout),
-                                ("EXPECTED STDOUT", expected_output),
-                            ],
-                        )
-                elif stdout and (not expected_output):
-                    # Have output, did not expect it. Error.
-                    report(
-                        properties=[
-                            ("Suite", suite_name),
-                            ("Test", test_name),
-                            (
-                                "Description",
-                                "program produced stdout, but we expected "
-                                "none.",
-                            ),
-                        ],
-                        outputs=[
-                            ("STDOUT", stdout),
-                        ],
-                    )
-                elif (not stdout) and expected_output:
-                    # Don't have output, expected it. Error.
-                    report(
-                        properties=[
-                            ("Suite", suite_name),
-                            ("Test", test_name),
-                            (
-                                "Description",
-                                "did not produce stdout, but we expected output.",
-                            ),
-                        ],
-                        outputs=[
-                            ("EXPECTED OUTPUT", expected_output),
-                        ],
-                    )
-                else:
-                    # Don't have output, didn't expect it. Pass.
-                    print("PASS")
-            else:
-                # Program did not terminate successfully.
-                report(
-                    properties=[
-                        ("Suite", suite_name),
-                        ("Test", test_name),
-                        ("Description", "program terminated abnormally."),
-                        ("Command", " ".join(["./test-programs/testbin"])),
-                        ("Return code", code),
-                    ],
-                    outputs=[
-                        ("STDOUT", result.stdout.decode("utf-8")),
-                        ("STDERR", result.stderr.decode("utf-8")),
-                    ],
-                )
-        else:
-            # GCC compilation failed.
-            report(
-                properties=[
-                    ("Suite", suite_name),
-                    ("Test", test_name),
-                    ("Description", "GCC compiler failed."),
-                    ("Command", " ".join(gcc_cmd)),
-                    ("Return code", code),
-                ],
-                outputs=[
-                    ("GCC STDOUT", result.stdout.decode("utf-8")),
-                    ("GCC STDERR", result.stderr.decode("utf-8")),
-                ],
-            )
-    else:
+    if code != 0:
         # Compilation failed: print the output.
         report(
             properties=[
@@ -335,6 +221,119 @@ def _run_success_test(test: Test):
             outputs=[
                 ("COMPILER STDOUT", result.stdout.decode("utf-8")),
                 ("STDERR", result.stderr.decode("utf-8")),
+            ],
+        )
+    # The compiler executed successfully. Compile the program with GCC.
+    gcc_cmd: list = [
+        "gcc",
+        "-fwrapv",  # Modular arithmetic semantics
+        "-Wno-builtin-declaration-mismatch",
+        "lib/prelude.c",
+        "test-programs/output.c",
+        "-lm",  # Math stdlib,
+        "-o",
+        "test-programs/testbin",
+    ]
+    # Call GCC.
+    result: subprocess.CompletedProcess = subprocess.run(
+        gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    code: int = result.returncode
+    if code == 0:
+        # GCC compilation succeeded. Run the program.
+        result: subprocess.CompletedProcess = subprocess.run(
+            ["./test-programs/testbin"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        code: int = result.returncode
+        if code == 0:
+            # Program ran successfully. Did it produce output?
+            stdout: str = result.stdout.decode("utf-8").strip()
+            if stdout and expected_output:
+                # Have output, expected output. Check they match.
+                if stdout == expected_output:
+                    # Output matches. Pass.
+                    print("PASS")
+                else:
+                    # Output mismatch. Error.
+                    report(
+                        properties=[
+                            ("Suite", suite_name),
+                            ("Test", test_name),
+                            (
+                                "Description",
+                                "program produced stdout, but it was not "
+                                "what we expected.",
+                            ),
+                        ],
+                        outputs=[
+                            ("ACTUAL STDOUT", stdout),
+                            ("EXPECTED STDOUT", expected_output),
+                        ],
+                    )
+            elif stdout and (not expected_output):
+                # Have output, did not expect it. Error.
+                report(
+                    properties=[
+                        ("Suite", suite_name),
+                        ("Test", test_name),
+                        (
+                            "Description",
+                            "program produced stdout, but we expected "
+                            "none.",
+                        ),
+                    ],
+                    outputs=[
+                        ("STDOUT", stdout),
+                    ],
+                )
+            elif (not stdout) and expected_output:
+                # Don't have output, expected it. Error.
+                report(
+                    properties=[
+                        ("Suite", suite_name),
+                        ("Test", test_name),
+                        (
+                            "Description",
+                            "did not produce stdout, but we expected output.",
+                        ),
+                    ],
+                    outputs=[
+                        ("EXPECTED OUTPUT", expected_output),
+                    ],
+                )
+            else:
+                # Don't have output, didn't expect it. Pass.
+                print("PASS")
+        else:
+            # Program did not terminate successfully.
+            report(
+                properties=[
+                    ("Suite", suite_name),
+                    ("Test", test_name),
+                    ("Description", "program terminated abnormally."),
+                    ("Command", " ".join(["./test-programs/testbin"])),
+                    ("Return code", code),
+                ],
+                outputs=[
+                    ("STDOUT", result.stdout.decode("utf-8")),
+                    ("STDERR", result.stderr.decode("utf-8")),
+                ],
+            )
+    else:
+        # GCC compilation failed.
+        report(
+            properties=[
+                ("Suite", suite_name),
+                ("Test", test_name),
+                ("Description", "GCC compiler failed."),
+                ("Command", " ".join(gcc_cmd)),
+                ("Return code", code),
+            ],
+            outputs=[
+                ("GCC STDOUT", result.stdout.decode("utf-8")),
+                ("GCC STDERR", result.stderr.decode("utf-8")),
             ],
         )
     # At this point, the test has passed. Delete the C code and the test binary.
