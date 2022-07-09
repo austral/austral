@@ -253,7 +253,6 @@ def _run_success_test(test: Test):
         "gcc",
         "-fwrapv",  # Modular arithmetic semantics
         "-Wno-builtin-declaration-mismatch",
-        "lib/prelude.c",
         "test-programs/output.c",
         "-lm",  # Math stdlib,
         "-o",
@@ -445,7 +444,6 @@ def _run_program_failure_test(test: Test):
         "gcc",
         "-fwrapv",  # Modular arithmetic semantics
         "-Wno-builtin-declaration-mismatch",
-        "lib/prelude.c",
         "test-programs/output.c",
         "-lm",  # Math stdlib,
         "-o",

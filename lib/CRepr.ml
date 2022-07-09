@@ -16,6 +16,7 @@ type c_ty =
 
 and c_slot = CSlot of string * c_ty
 and c_struct = CStruct of string option * c_slot list
+and c_param = CValueParam of string * c_ty
 
 type c_expr =
   | CBool of bool
@@ -51,6 +52,7 @@ type c_stmt =
   | CReturn of c_expr
   | CBlock of c_stmt list
   | CExplicitBlock of c_stmt list
+  | CLocalFunctionDeclaration of string * c_param list * c_ty * c_function_linkage
 
 (** Represents a case of a C switch statement *)
 and c_switch_case =
@@ -67,7 +69,5 @@ type c_decl =
   | CEnumDefinition of desc * string * string list
   | CFunctionDeclaration of desc * string * c_param list * c_ty * c_function_linkage
   | CFunctionDefinition of desc * string * c_param list * c_ty * c_stmt
-
-and c_param = CValueParam of string * c_ty
 
 type c_unit = CUnit of string * c_decl list
