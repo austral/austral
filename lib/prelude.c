@@ -31,26 +31,26 @@ typedef void*          au_fnptr_t;
  */
 
 typedef struct {
-    void*  data;
-    au_index_t size;
+  void*  data;
+  au_index_t size;
 } au_array_t;
 
 au_array_t au_make_array_from_string(const char* data, size_t size) {
-    return (au_array_t){ .data = (void*) data, .size = size };
+  return (au_array_t){ .data = (void*) data, .size = size };
 }
 
 au_unit_t au_abort_internal(const char* message) {
-    fprintf(stderr, "%s\n", message);
-    fflush(stderr);
-    _Exit(-1);
-    return nil;
+  fprintf(stderr, "%s\n", message);
+  fflush(stderr);
+  _Exit(-1);
+  return nil;
 }
 
 au_unit_t au_abort(au_array_t message) {
-    fprintf(stderr, "%s\n", (char*) message.data);
-    fflush(stderr);
-    _Exit(-1);
-    return nil;
+  fprintf(stderr, "%s\n", (char*) message.data);
+  fflush(stderr);
+  _Exit(-1);
+  return nil;
 }
 
 void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size) {
@@ -155,7 +155,7 @@ double convert_nat8_to_double(au_nat8_t value) {
 
 au_nat8_t convert_int8_to_nat8(au_int8_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int8 to Nat8: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int8 to Nat8: value is less than zero, but target type is a natural number.");
   }
   return (au_nat8_t)(value);
 }
@@ -168,7 +168,7 @@ au_int8_t convert_int8_to_int8(au_int8_t value) {
 
 au_nat16_t convert_int8_to_nat16(au_int8_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int8 to Nat16: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int8 to Nat16: value is less than zero, but target type is a natural number.");
   }
   return (au_nat16_t)(value);
 }
@@ -181,7 +181,7 @@ au_int16_t convert_int8_to_int16(au_int8_t value) {
 
 au_nat32_t convert_int8_to_nat32(au_int8_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int8 to Nat32: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int8 to Nat32: value is less than zero, but target type is a natural number.");
   }
   return (au_nat32_t)(value);
 }
@@ -194,7 +194,7 @@ au_int32_t convert_int8_to_int32(au_int8_t value) {
 
 au_nat64_t convert_int8_to_nat64(au_int8_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int8 to Nat64: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int8 to Nat64: value is less than zero, but target type is a natural number.");
   }
   return (au_nat64_t)(value);
 }
@@ -217,7 +217,7 @@ double convert_int8_to_double(au_int8_t value) {
 
 au_nat8_t convert_nat16_to_nat8(au_nat16_t value) {
   if (value > UINT8_MAX) {
-      au_abort_internal("Error when converting Nat16 to Nat8: value is larger than the maximum value of the Nat8 type.");
+    au_abort_internal("Error when converting Nat16 to Nat8: value is larger than the maximum value of the Nat8 type.");
   }
   return (au_nat8_t)(value);
 }
@@ -225,7 +225,7 @@ au_nat8_t convert_nat16_to_nat8(au_nat16_t value) {
 
 au_int8_t convert_nat16_to_int8(au_nat16_t value) {
   if (value > INT8_MAX) {
-      au_abort_internal("Error when converting Nat16 to Int8: value is larger than the maximum value of the Int8 type.");
+    au_abort_internal("Error when converting Nat16 to Int8: value is larger than the maximum value of the Int8 type.");
   }
   return (au_int8_t)(value);
 }
@@ -273,10 +273,10 @@ double convert_nat16_to_double(au_nat16_t value) {
 
 au_nat8_t convert_int16_to_nat8(au_int16_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int16 to Nat8: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int16 to Nat8: value is less than zero, but target type is a natural number.");
   }
   if (value > UINT8_MAX) {
-      au_abort_internal("Error when converting Int16 to Nat8: value is larger than the maximum value of the Nat8 type.");
+    au_abort_internal("Error when converting Int16 to Nat8: value is larger than the maximum value of the Nat8 type.");
   }
   return (au_nat8_t)(value);
 }
@@ -284,7 +284,7 @@ au_nat8_t convert_int16_to_nat8(au_int16_t value) {
 
 au_int8_t convert_int16_to_int8(au_int16_t value) {
   if (value > INT8_MAX) {
-      au_abort_internal("Error when converting Int16 to Int8: value is larger than the maximum value of the Int8 type.");
+    au_abort_internal("Error when converting Int16 to Int8: value is larger than the maximum value of the Int8 type.");
   }
   return (au_int8_t)(value);
 }
@@ -292,7 +292,7 @@ au_int8_t convert_int16_to_int8(au_int16_t value) {
 
 au_nat16_t convert_int16_to_nat16(au_int16_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int16 to Nat16: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int16 to Nat16: value is less than zero, but target type is a natural number.");
   }
   return (au_nat16_t)(value);
 }
@@ -305,7 +305,7 @@ au_int16_t convert_int16_to_int16(au_int16_t value) {
 
 au_nat32_t convert_int16_to_nat32(au_int16_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int16 to Nat32: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int16 to Nat32: value is less than zero, but target type is a natural number.");
   }
   return (au_nat32_t)(value);
 }
@@ -318,7 +318,7 @@ au_int32_t convert_int16_to_int32(au_int16_t value) {
 
 au_nat64_t convert_int16_to_nat64(au_int16_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int16 to Nat64: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int16 to Nat64: value is less than zero, but target type is a natural number.");
   }
   return (au_nat64_t)(value);
 }
@@ -341,7 +341,7 @@ double convert_int16_to_double(au_int16_t value) {
 
 au_nat8_t convert_nat32_to_nat8(au_nat32_t value) {
   if (value > UINT8_MAX) {
-      au_abort_internal("Error when converting Nat32 to Nat8: value is larger than the maximum value of the Nat8 type.");
+    au_abort_internal("Error when converting Nat32 to Nat8: value is larger than the maximum value of the Nat8 type.");
   }
   return (au_nat8_t)(value);
 }
@@ -349,7 +349,7 @@ au_nat8_t convert_nat32_to_nat8(au_nat32_t value) {
 
 au_int8_t convert_nat32_to_int8(au_nat32_t value) {
   if (value > INT8_MAX) {
-      au_abort_internal("Error when converting Nat32 to Int8: value is larger than the maximum value of the Int8 type.");
+    au_abort_internal("Error when converting Nat32 to Int8: value is larger than the maximum value of the Int8 type.");
   }
   return (au_int8_t)(value);
 }
@@ -357,7 +357,7 @@ au_int8_t convert_nat32_to_int8(au_nat32_t value) {
 
 au_nat16_t convert_nat32_to_nat16(au_nat32_t value) {
   if (value > UINT16_MAX) {
-      au_abort_internal("Error when converting Nat32 to Nat16: value is larger than the maximum value of the Nat16 type.");
+    au_abort_internal("Error when converting Nat32 to Nat16: value is larger than the maximum value of the Nat16 type.");
   }
   return (au_nat16_t)(value);
 }
@@ -365,7 +365,7 @@ au_nat16_t convert_nat32_to_nat16(au_nat32_t value) {
 
 au_int16_t convert_nat32_to_int16(au_nat32_t value) {
   if (value > INT16_MAX) {
-      au_abort_internal("Error when converting Nat32 to Int16: value is larger than the maximum value of the Int16 type.");
+    au_abort_internal("Error when converting Nat32 to Int16: value is larger than the maximum value of the Int16 type.");
   }
   return (au_int16_t)(value);
 }
@@ -403,10 +403,10 @@ double convert_nat32_to_double(au_nat32_t value) {
 
 au_nat8_t convert_int32_to_nat8(au_int32_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int32 to Nat8: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int32 to Nat8: value is less than zero, but target type is a natural number.");
   }
   if (value > UINT8_MAX) {
-      au_abort_internal("Error when converting Int32 to Nat8: value is larger than the maximum value of the Nat8 type.");
+    au_abort_internal("Error when converting Int32 to Nat8: value is larger than the maximum value of the Nat8 type.");
   }
   return (au_nat8_t)(value);
 }
@@ -414,7 +414,7 @@ au_nat8_t convert_int32_to_nat8(au_int32_t value) {
 
 au_int8_t convert_int32_to_int8(au_int32_t value) {
   if (value > INT8_MAX) {
-      au_abort_internal("Error when converting Int32 to Int8: value is larger than the maximum value of the Int8 type.");
+    au_abort_internal("Error when converting Int32 to Int8: value is larger than the maximum value of the Int8 type.");
   }
   return (au_int8_t)(value);
 }
@@ -422,10 +422,10 @@ au_int8_t convert_int32_to_int8(au_int32_t value) {
 
 au_nat16_t convert_int32_to_nat16(au_int32_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int32 to Nat16: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int32 to Nat16: value is less than zero, but target type is a natural number.");
   }
   if (value > UINT16_MAX) {
-      au_abort_internal("Error when converting Int32 to Nat16: value is larger than the maximum value of the Nat16 type.");
+    au_abort_internal("Error when converting Int32 to Nat16: value is larger than the maximum value of the Nat16 type.");
   }
   return (au_nat16_t)(value);
 }
@@ -433,7 +433,7 @@ au_nat16_t convert_int32_to_nat16(au_int32_t value) {
 
 au_int16_t convert_int32_to_int16(au_int32_t value) {
   if (value > INT16_MAX) {
-      au_abort_internal("Error when converting Int32 to Int16: value is larger than the maximum value of the Int16 type.");
+    au_abort_internal("Error when converting Int32 to Int16: value is larger than the maximum value of the Int16 type.");
   }
   return (au_int16_t)(value);
 }
@@ -441,7 +441,7 @@ au_int16_t convert_int32_to_int16(au_int32_t value) {
 
 au_nat32_t convert_int32_to_nat32(au_int32_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int32 to Nat32: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int32 to Nat32: value is less than zero, but target type is a natural number.");
   }
   return (au_nat32_t)(value);
 }
@@ -454,7 +454,7 @@ au_int32_t convert_int32_to_int32(au_int32_t value) {
 
 au_nat64_t convert_int32_to_nat64(au_int32_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int32 to Nat64: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int32 to Nat64: value is less than zero, but target type is a natural number.");
   }
   return (au_nat64_t)(value);
 }
@@ -477,7 +477,7 @@ double convert_int32_to_double(au_int32_t value) {
 
 au_nat8_t convert_nat64_to_nat8(au_nat64_t value) {
   if (value > UINT8_MAX) {
-      au_abort_internal("Error when converting Nat64 to Nat8: value is larger than the maximum value of the Nat8 type.");
+    au_abort_internal("Error when converting Nat64 to Nat8: value is larger than the maximum value of the Nat8 type.");
   }
   return (au_nat8_t)(value);
 }
@@ -485,7 +485,7 @@ au_nat8_t convert_nat64_to_nat8(au_nat64_t value) {
 
 au_int8_t convert_nat64_to_int8(au_nat64_t value) {
   if (value > INT8_MAX) {
-      au_abort_internal("Error when converting Nat64 to Int8: value is larger than the maximum value of the Int8 type.");
+    au_abort_internal("Error when converting Nat64 to Int8: value is larger than the maximum value of the Int8 type.");
   }
   return (au_int8_t)(value);
 }
@@ -493,7 +493,7 @@ au_int8_t convert_nat64_to_int8(au_nat64_t value) {
 
 au_nat16_t convert_nat64_to_nat16(au_nat64_t value) {
   if (value > UINT16_MAX) {
-      au_abort_internal("Error when converting Nat64 to Nat16: value is larger than the maximum value of the Nat16 type.");
+    au_abort_internal("Error when converting Nat64 to Nat16: value is larger than the maximum value of the Nat16 type.");
   }
   return (au_nat16_t)(value);
 }
@@ -501,7 +501,7 @@ au_nat16_t convert_nat64_to_nat16(au_nat64_t value) {
 
 au_int16_t convert_nat64_to_int16(au_nat64_t value) {
   if (value > INT16_MAX) {
-      au_abort_internal("Error when converting Nat64 to Int16: value is larger than the maximum value of the Int16 type.");
+    au_abort_internal("Error when converting Nat64 to Int16: value is larger than the maximum value of the Int16 type.");
   }
   return (au_int16_t)(value);
 }
@@ -509,7 +509,7 @@ au_int16_t convert_nat64_to_int16(au_nat64_t value) {
 
 au_nat32_t convert_nat64_to_nat32(au_nat64_t value) {
   if (value > UINT32_MAX) {
-      au_abort_internal("Error when converting Nat64 to Nat32: value is larger than the maximum value of the Nat32 type.");
+    au_abort_internal("Error when converting Nat64 to Nat32: value is larger than the maximum value of the Nat32 type.");
   }
   return (au_nat32_t)(value);
 }
@@ -517,7 +517,7 @@ au_nat32_t convert_nat64_to_nat32(au_nat64_t value) {
 
 au_int32_t convert_nat64_to_int32(au_nat64_t value) {
   if (value > INT32_MAX) {
-      au_abort_internal("Error when converting Nat64 to Int32: value is larger than the maximum value of the Int32 type.");
+    au_abort_internal("Error when converting Nat64 to Int32: value is larger than the maximum value of the Int32 type.");
   }
   return (au_int32_t)(value);
 }
@@ -545,10 +545,10 @@ double convert_nat64_to_double(au_nat64_t value) {
 
 au_nat8_t convert_int64_to_nat8(au_int64_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int64 to Nat8: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int64 to Nat8: value is less than zero, but target type is a natural number.");
   }
   if (value > UINT8_MAX) {
-      au_abort_internal("Error when converting Int64 to Nat8: value is larger than the maximum value of the Nat8 type.");
+    au_abort_internal("Error when converting Int64 to Nat8: value is larger than the maximum value of the Nat8 type.");
   }
   return (au_nat8_t)(value);
 }
@@ -556,7 +556,7 @@ au_nat8_t convert_int64_to_nat8(au_int64_t value) {
 
 au_int8_t convert_int64_to_int8(au_int64_t value) {
   if (value > INT8_MAX) {
-      au_abort_internal("Error when converting Int64 to Int8: value is larger than the maximum value of the Int8 type.");
+    au_abort_internal("Error when converting Int64 to Int8: value is larger than the maximum value of the Int8 type.");
   }
   return (au_int8_t)(value);
 }
@@ -564,10 +564,10 @@ au_int8_t convert_int64_to_int8(au_int64_t value) {
 
 au_nat16_t convert_int64_to_nat16(au_int64_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int64 to Nat16: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int64 to Nat16: value is less than zero, but target type is a natural number.");
   }
   if (value > UINT16_MAX) {
-      au_abort_internal("Error when converting Int64 to Nat16: value is larger than the maximum value of the Nat16 type.");
+    au_abort_internal("Error when converting Int64 to Nat16: value is larger than the maximum value of the Nat16 type.");
   }
   return (au_nat16_t)(value);
 }
@@ -575,7 +575,7 @@ au_nat16_t convert_int64_to_nat16(au_int64_t value) {
 
 au_int16_t convert_int64_to_int16(au_int64_t value) {
   if (value > INT16_MAX) {
-      au_abort_internal("Error when converting Int64 to Int16: value is larger than the maximum value of the Int16 type.");
+    au_abort_internal("Error when converting Int64 to Int16: value is larger than the maximum value of the Int16 type.");
   }
   return (au_int16_t)(value);
 }
@@ -583,10 +583,10 @@ au_int16_t convert_int64_to_int16(au_int64_t value) {
 
 au_nat32_t convert_int64_to_nat32(au_int64_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int64 to Nat32: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int64 to Nat32: value is less than zero, but target type is a natural number.");
   }
   if (value > UINT32_MAX) {
-      au_abort_internal("Error when converting Int64 to Nat32: value is larger than the maximum value of the Nat32 type.");
+    au_abort_internal("Error when converting Int64 to Nat32: value is larger than the maximum value of the Nat32 type.");
   }
   return (au_nat32_t)(value);
 }
@@ -594,7 +594,7 @@ au_nat32_t convert_int64_to_nat32(au_int64_t value) {
 
 au_int32_t convert_int64_to_int32(au_int64_t value) {
   if (value > INT32_MAX) {
-      au_abort_internal("Error when converting Int64 to Int32: value is larger than the maximum value of the Int32 type.");
+    au_abort_internal("Error when converting Int64 to Int32: value is larger than the maximum value of the Int32 type.");
   }
   return (au_int32_t)(value);
 }
@@ -602,7 +602,7 @@ au_int32_t convert_int64_to_int32(au_int64_t value) {
 
 au_nat64_t convert_int64_to_nat64(au_int64_t value) {
   if (value < 0) {
-      au_abort_internal("Error when converting Int64 to Nat64: value is less than zero, but target type is a natural number.");
+    au_abort_internal("Error when converting Int64 to Nat64: value is less than zero, but target type is a natural number.");
   }
   return (au_nat64_t)(value);
 }
