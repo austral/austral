@@ -6,7 +6,7 @@ set -euxo pipefail
 make
 # Run the OCaml tests.
 make test
-# Run the examples.
-./run-examples.sh
 # Run the end-to-end tests.
 python3 test-programs/runner.py
+# Run the examples.
+./run-examples.sh
