@@ -4,7 +4,7 @@ module body Test is
         y: Int8;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let r: R := R(x => 10, y => 10);
         return root;
     end;
