@@ -124,10 +124,10 @@ let rec check_entrypoint_validity (env: env) (name: qident): decl_id * entrypoin
              | [ValueParameter (_, pt)] ->
                 (* Single parameter case: the `root` parameter. *)
                 if is_root_cap_type pt then
-                  if is_root_cap_type rt then
+                  if is_exit_code_type rt then
                     (id, RootCapEntrypoint)
                   else
-                    err "Entrypoint function must return a value of type RootCapability."
+                    err "Entrypoint function must return a value of type ExitCode."
                 else
                   err "Entrypoint function must take a single argument of type RootCapability."
              | _ ->
@@ -157,9 +157,18 @@ and is_exit_code_type = function
   | _ ->
      false
 
-let entrypoint_code root_cap_mono_id id =
+let entrypoint_code root_cap_mono_id exit_code_mono_id id =
   let f = gen_decl_id id in
-  "int main() {\n    " ^ f ^ "((" ^ (gen_mono_id root_cap_mono_id) ^ "){ .value = false });\n    return 0;\n}\n"
+  let exit_code: string = gen_mono_id exit_code_mono_id in
+  ("int main() {\n"
+   ^ "    " ^ exit_code ^ " result = " ^ f ^ "((" ^ (gen_mono_id root_cap_mono_id) ^ "){ .value = false });\n"
+   ^ "    switch(result.tag) {\n"
+   ^ "        case " ^ exit_code ^ "_tag_ExitSuccess:\n"
+   ^ "            return 0;\n"
+   ^ "        case " ^ exit_code ^ "_tag_ExitFailure:\n"
+   ^ "            return 1;\n"
+   ^ "    }\n"
+   ^ "}")
 
 let empty_entrypoint_code (entrypoint_id: decl_id) (exit_code_id: mono_id): string =
   let f = gen_decl_id entrypoint_id in
@@ -211,7 +220,7 @@ let compile_entrypoint c mn i =
     | EmptyEntrypoint ->
        empty_entrypoint_code entrypoint_id (get_exit_code_monomorph (cenv c))
     | RootCapEntrypoint ->
-       entrypoint_code (get_root_capability_monomorph (cenv c)) entrypoint_id
+       entrypoint_code (get_root_capability_monomorph (cenv c)) (get_exit_code_monomorph (cenv c)) entrypoint_id
   in
   Compiler (m, code ^ "\n" ^ entry_code)
 

@@ -1,0 +1,1 @@
+Test of an entrypoint function that uses and immediately surrenders the root capability.
