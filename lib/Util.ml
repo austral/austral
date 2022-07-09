@@ -152,7 +152,7 @@ let run_command (command: string): command_output =
     }
 
 let compile_c_code (source_path: string) (output_path: string): command_output =
-  let cmd = "gcc -Wno-builtin-declaration-mismatch ../lib/prelude.c " ^ source_path ^ " -lm -o " ^ output_path in
+  let cmd = "gcc -Wno-builtin-declaration-mismatch " ^ source_path ^ " -lm -o " ^ output_path in
   let o = run_command cmd in
   let (CommandOutput { command; code; stdout; stderr }) = o in
   if code <> 0 then
