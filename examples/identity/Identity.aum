@@ -4,8 +4,8 @@ module body Example.Identity is
         return value;
     end;
 
-    function Test(): Integer_32 is
-        let x: Integer_32 := Identity(10);
+    function Test(): Int32 is
+        let x: Int32 := Identity(10);
         let y: Double_Float := Identity(3.14);
         return x;
     end;

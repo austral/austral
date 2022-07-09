@@ -71,8 +71,8 @@ let rec type_string = function
   | Integer (s, w) ->
      let sgn: string =
        match s with
-       | Unsigned -> "Natural_"
-       | Signed -> "Integer_"
+       | Unsigned -> nat_prefix
+       | Signed -> int_prefix
      in
      (match w with
       | Width8 -> sgn ^ "8"

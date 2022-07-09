@@ -3,8 +3,8 @@ module body Test is
         method Accept(value: T): Unit;
     end;
 
-    instance Acceptable(Integer_32) is
-        method Accept(value: Integer_32): Unit is
+    instance Acceptable(Int32) is
+        method Accept(value: Int32): Unit is
             return nil;
         end;
     end;

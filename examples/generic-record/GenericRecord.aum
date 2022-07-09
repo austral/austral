@@ -1,7 +1,7 @@
 module body Example.GenericRecord is
     function Main(root: Root_Capability): Root_Capability is
-        let R: Pair[Integer_32] := Pair(left => 10, right => 10);
-        let V: Integer_32 := R.left;
+        let R: Pair[Int32] := Pair(left => 10, right => 10);
+        let V: Int32 := R.left;
         return root;
     end;
 end module body.

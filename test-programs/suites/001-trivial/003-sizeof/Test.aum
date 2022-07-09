@@ -1,12 +1,12 @@
 module body Test is
     pragma Unsafe_Module;
 
-    function Put_Character(character: Natural_8): Integer_32 is
+    function Put_Character(character: Nat8): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let size: Index := sizeof(Natural_8);
+        let size: Index := sizeof(Nat8);
         if size /= 1 then
             Put_Character('f');
         end if;

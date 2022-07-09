@@ -3,8 +3,8 @@ module body Test is
         method Accept(x: T): Unit;
     end;
 
-    instance AcceptsLinear(Natural_8) is
-        method Accept(x: Natural_8): Unit is
+    instance AcceptsLinear(Nat8) is
+        method Accept(x: Nat8): Unit is
             return nil;
         end;
     end;

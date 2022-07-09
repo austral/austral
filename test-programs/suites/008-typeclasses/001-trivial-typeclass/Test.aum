@@ -1,7 +1,7 @@
 module body Test is
     pragma Unsafe_Module;
 
-    function Put_String(str: Fixed_Array[Natural_8]): Integer_32 is
+    function Put_String(str: Fixed_Array[Nat8]): Int32 is
         pragma Foreign_Import(External_Name => "puts");
     end;
 
@@ -9,15 +9,15 @@ module body Test is
         method PrintF(x: T): Unit;
     end;
 
-    instance PrintFree(Natural_8) is
-        method PrintF(x: Natural_8): Unit is
+    instance PrintFree(Nat8) is
+        method PrintF(x: Nat8): Unit is
             Put_String("Nat8");
             return nil;
         end;
     end;
 
-    instance PrintFree(Natural_16) is
-        method PrintF(x: Natural_16): Unit is
+    instance PrintFree(Nat16) is
+        method PrintF(x: Nat16): Unit is
             Put_String("Nat16");
             return nil;
         end;
@@ -42,9 +42,9 @@ module body Test is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let n8: Natural_8 := 'a';
+        let n8: Nat8 := 'a';
         PrintF(n8);
-        PrintF('a' : Natural_16);
+        PrintF('a' : Nat16);
         PrintF(3.14);
         let foo: Foo := Foo();
         borrow foo as fooref in rho do

@@ -12,10 +12,10 @@ module body Example.PTR is
     pragma Unsafe_Module;
 
     record R: Free is
-        X: Integer_32;
+        X: Int32;
     end;
 
-    function Put_Character(character: Integer_32): Integer_32 is
+    function Put_Character(character: Int32): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 

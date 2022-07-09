@@ -7,7 +7,7 @@ module Example.Union is
 
     union Number: Free is
         case Integer is
-            value: Integer_32;
+            value: Int32;
         case Float is
             value: Double_Float;
     end;

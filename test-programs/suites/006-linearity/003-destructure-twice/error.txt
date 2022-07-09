@@ -3,12 +3,12 @@ Error:
   Location:
     Filename: 'test-programs/suites/006-linearity/003-destructure-twice/Test.aum'
     From: line 9, column 8
-    To: line 9, column 35
+    To: line 9, column 30
   Description:
     push_var: var with this name already exists
   Code:
      7 |         let r: R := R(x => 32);
-     8 |         let { x: Integer_32 } := r;
-     9 |         let { x: Integer_32 } := r;
+     8 |         let { x: Int32 } := r;
+     9 |         let { x: Int32 } := r;
     10 |         return root;
     11 |     end;

@@ -1,5 +1,5 @@
 module body Example.Fibonacci is
-    function Fibonacci(n: Natural_64): Natural_64 is
+    function Fibonacci(n: Nat64): Nat64 is
         -- A simple recursive implementation.
         if n < 2 then
             return n;

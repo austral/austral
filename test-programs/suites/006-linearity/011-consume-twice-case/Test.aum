@@ -1,10 +1,10 @@
 module body Test is
     record R : Linear is
-        x: Integer_32;
+        x: Int32;
     end;
 
     function Consume(rec: R): Unit is
-        let { x: Integer_32 } := rec;
+        let { x: Int32 } := rec;
         return nil;
     end;
 

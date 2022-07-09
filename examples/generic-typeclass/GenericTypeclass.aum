@@ -4,21 +4,21 @@ module body Example.GenericTypeclass is
     pragma Unsafe_Module;
 
     typeclass Numerical(T: Free) is
-        method To_Integer(x: T): Integer_32;
+        method To_Integer(x: T): Int32;
     end;
 
     generic [T: Free]
     instance Numerical(Address[T]) is
-        method To_Integer(x: Address[T]): Integer_32 is
+        method To_Integer(x: Address[T]): Int32 is
             return 0;
         end;
     end;
 
-    function Pointer_To_Integer(): Integer_32 is
-        let ptr: Address[Integer_32] := Allocate(sizeof(Integer_32));
-        let null: Address[Integer_32] := Null_Pointer();
+    function Pointer_To_Integer(): Int32 is
+        let ptr: Address[Int32] := Allocate(sizeof(Int32));
+        let null: Address[Int32] := Null_Pointer();
         if ptr /= null then
-            let X: Integer_32 := To_Integer(ptr);
+            let X: Int32 := To_Integer(ptr);
             return X;
         end if;
     end;

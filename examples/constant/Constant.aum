@@ -1,15 +1,15 @@
 module body Example.Constant is
     constant Rydberg_Constant : Double_Float := 10'973'731.568'160;
 
-    constant Decimal_24: Integer_32 := 24;
+    constant Decimal_24: Int32 := 24;
 
-    constant Hexadecimal_24: Integer_32 := #x18;
+    constant Hexadecimal_24: Int32 := #x18;
 
-    constant Binary_24: Integer_32 := #b11000;
+    constant Binary_24: Int32 := #b11000;
 
-    constant Octal_24: Integer_32 := #o30;
+    constant Octal_24: Int32 := #o30;
 
-    constant Char_Const: Natural_8 := 'a';
+    constant Char_Const: Nat8 := 'a';
 
     -- This constant is private, since it appears in the module body file but not the interface file.
     constant Pi : Double_Float := 3.14;

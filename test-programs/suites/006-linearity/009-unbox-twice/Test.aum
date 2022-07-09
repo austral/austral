@@ -40,12 +40,12 @@ module body Test is
     end;
 
     function Main(root: Root_Capability): Root_Capability is
-        let e: Either[Box[Integer_32], Integer_32] := Make('e');
+        let e: Either[Box[Int32], Int32] := Make('e');
         case e of
-            when Left(left: Box[Integer_32]) do
+            when Left(left: Box[Int32]) do
                 Unbox(left);
                 Unbox(left);
-            when Right(right: Integer_32) do
+            when Right(right: Int32) do
                 skip;
         end case;
         return root;

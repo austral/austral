@@ -50,21 +50,21 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
          Some Unit
       | "Bool" ->
          Some Boolean
-      | "Natural_8" ->
+      | "Nat8" ->
          Some (Integer (Unsigned, Width8))
-      | "Natural_16" ->
+      | "Nat16" ->
          Some (Integer (Unsigned, Width16))
-      | "Natural_32" ->
+      | "Nat32" ->
          Some (Integer (Unsigned, Width32))
-      | "Natural_64" ->
+      | "Nat64" ->
          Some (Integer (Unsigned, Width64))
-      | "Integer_8" ->
+      | "Int8" ->
          Some (Integer (Signed, Width8))
-      | "Integer_16" ->
+      | "Int16" ->
          Some (Integer (Signed, Width16))
-      | "Integer_32" ->
+      | "Int32" ->
          Some (Integer (Signed, Width32))
-      | "Integer_64" ->
+      | "Int64" ->
          Some (Integer (Signed, Width64))
       | "Index" ->
          Some (Integer (Unsigned, WidthIndex))

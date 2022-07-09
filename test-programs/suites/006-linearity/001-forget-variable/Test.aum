@@ -1,6 +1,6 @@
 module body Test is
     record R : Linear is
-        x: Integer_32;
+        x: Int32;
     end;
 
     function Main(root: Root_Capability): Root_Capability is

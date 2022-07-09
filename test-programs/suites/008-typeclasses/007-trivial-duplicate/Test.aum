@@ -3,14 +3,14 @@ module body Test is
         method Accept(x: T): Unit;
     end;
 
-    instance Foo(Natural_8) is
-        method Accept(x: Natural_8): Unit is
+    instance Foo(Nat8) is
+        method Accept(x: Nat8): Unit is
             return nil;
         end;
     end;
 
-    instance Foo(Natural_8) is
-        method Accept(x: Natural_8): Unit is
+    instance Foo(Nat8) is
+        method Accept(x: Nat8): Unit is
             return nil;
         end;
     end;

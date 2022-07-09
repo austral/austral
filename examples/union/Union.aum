@@ -11,7 +11,7 @@ module body Example.Union is
         end case;
         let N : Number := Integer(value => 10);
         case N of
-            when Integer(value: Integer_32) do
+            when Integer(value: Int32) do
                 skip;
             when Float(value: Double_Float) do
                 skip;

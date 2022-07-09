@@ -7,7 +7,7 @@ module body Test is
 
     union Number: Free is
         case Integer is
-            value: Integer_32;
+            value: Int32;
         case Float is
             value: Double_Float;
     end;
@@ -24,7 +24,7 @@ module body Test is
         end case;
         let N : Number := Integer(value => 10);
         case N of
-            when Integer(value: Integer_32) do
+            when Integer(value: Int32) do
                 skip;
             when Float(value: Double_Float) do
                 skip;
