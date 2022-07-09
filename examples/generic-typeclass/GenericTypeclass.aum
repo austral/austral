@@ -1,4 +1,4 @@
-import Austral.Memory (Address, Allocate, Null_Pointer);
+import Austral.Memory (Address, Allocate, nullPointer);
 
 module body Example.GenericTypeclass is
     pragma Unsafe_Module;
@@ -16,7 +16,7 @@ module body Example.GenericTypeclass is
 
     function Pointer_To_Integer(): Int32 is
         let ptr: Address[Int32] := Allocate(sizeof(Int32));
-        let null: Address[Int32] := Null_Pointer();
+        let null: Address[Int32] := nullPointer();
         if ptr /= null then
             let X: Int32 := To_Integer(ptr);
             return X;

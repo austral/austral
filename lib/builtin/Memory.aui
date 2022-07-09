@@ -3,7 +3,7 @@ module Austral.Memory is
     type Pointer[T: Type]: Free;
 
     generic [T: Type]
-    function Null_Pointer(): Address[T];
+    function nullPointer(): Address[T];
 
     generic [T: Type]
     function Null_Check(address: Address[T]): Option[Pointer[T]];

@@ -3,13 +3,13 @@ module body Austral.Memory is
     record Pointer[T: Type]: Free is end;
 
     generic [T: Type]
-    function Null_Pointer(): Address[T] is
+    function nullPointer(): Address[T] is
         return @embed(Address[T], "NULL");
     end;
 
     generic [T: Type]
     function Null_Check(address: Address[T]): Option[Pointer[T]] is
-        let n: Address[T] := Null_Pointer();
+        let n: Address[T] := nullPointer();
         if address /= n then
             let ptr: Pointer[T] := @embed(Pointer[T], "$1", address);
             let opt: Option[Pointer[T]] := Some(value => ptr);
