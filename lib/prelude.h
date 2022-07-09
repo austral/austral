@@ -34,8 +34,8 @@ typedef void*          au_fnptr_t;
  */
 
 typedef struct {
-    void*  data;
-    size_t size;
+  void*  data;
+  size_t size;
 } au_array_t;
 
 extern void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size);
