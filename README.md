@@ -73,7 +73,7 @@ Build and run:
 
 ```bash
 $ austral compile --public-module=fib.aum --entrypoint=Fib:main --output=fib.c
-$ gcc lib/prelude.c fib.c -o fib
+$ gcc fib.c -o fib
 $ ./fib
 fib(10) = 55
 ```
@@ -168,7 +168,7 @@ $ austral typecheck \
 The generated code should be compiled with:
 
 ```
-gcc -fwrapv lib/prelude.c generated.c -lm
+gcc -fwrapv generated.c -lm
 ```
 
 ## Status
