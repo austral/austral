@@ -1,11 +1,11 @@
 module body Test is
     record R: Free is
-        X: Int32;
+        x: Int32;
     end;
 
     function main(): ExitCode is
-        let Rec : R := R(X => 10);
-        let Y: Int32 := Rec.X;
+        let Rec : R := R(x => 10);
+        let y: Int32 := Rec.x;
         return ExitSuccess();
     end;
 end module body.
