@@ -330,7 +330,8 @@ binding_list:
   ;
 
 binding:
-  | identifier COLON typespec { ConcreteBinding { name = $1; ty = $3; rename = $1 } }
+  | name=identifier COLON ty=typespec { ConcreteBinding { name = name; ty = ty; rename = name } }
+  | name=identifier AS rename=identifier COLON ty=typespec { ConcreteBinding { name = name; ty = ty; rename = rename } }
   ;
 
 lvalue:
