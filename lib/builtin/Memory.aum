@@ -53,7 +53,7 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function Resize_Array(array: Pointer[T], size: Index): Pointer[T] is
+    function resizeArray(array: Pointer[T], size: Index): Pointer[T] is
         let total: Index := (sizeof(T)) * size;
         return @embed(Pointer[T], "au_realloc($1, $2)", array, total);
     end;

@@ -2,7 +2,7 @@ import Austral.Memory (
     Address,
     Pointer,
     allocate,
-    Resize_Array,
+    resizeArray,
     deallocate,
     nullCheck,
     positiveOffset,

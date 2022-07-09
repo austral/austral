@@ -1,7 +1,7 @@
 import Austral.Memory (
     Pointer,
     allocate_Array,
-    Resize_Array,
+    resizeArray,
     deallocate
 );
 
@@ -33,7 +33,7 @@ module body Standard.Buffer is
     -- Resize the array, aborting if allocation fails
     generic [T: Type]
     function Resize_Or_Die(array: Pointer[T], new_size: Natural_64): Pointer[T] is
-        let arropt: Option[Pointer[T]] := Resize_Array(array, new_size);
+        let arropt: Option[Pointer[T]] := resizeArray(array, new_size);
         case arropt of
             when Some(value: Pointer[T]) do
                 return value;
