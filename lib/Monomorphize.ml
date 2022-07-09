@@ -285,7 +285,7 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
      let (body, env) = monomorphize_stmt env body in
      (MLet (name, ty, value, body), env)
   | TDestructure (_, bindings, value, body) ->
-     let (bindings, env) = monomorphize_named_ty_list env (List.map (fun (n, t) -> (n, strip_type t)) bindings) in
+     let (bindings, env) = monomorphize_binding_list env (List.map (fun (TypedBinding { name; ty; rename; }) -> (name, strip_type ty, rename)) bindings) in
      let (value, env) = monomorphize_expr env value in
      let (body, env) = monomorphize_stmt env body in
      (MDestructure (bindings, value, body), env)
@@ -345,30 +345,29 @@ and monomorphize_whens (env: env) (whens: typed_when list): (mtyped_when list * 
 
 and monomorphize_when (env: env) (w: typed_when): (mtyped_when * env) =
   let (TypedWhen (name, params, body)) = w in
-  let (params, env) = monomorphize_params env params in
+  let (bindings, env) = monomorphize_bindings env params in
   let (body, env) = monomorphize_stmt env body in
-  (MTypedWhen (name, params, body), env)
+  (MTypedWhen (name, bindings, body), env)
 
-and monomorphize_params (env: env) (params: value_parameter list): (mvalue_parameter list * env) =
-  match params with
+and monomorphize_bindings (env: env) (bindings: typed_binding list): (mono_binding list * env) =
+  match bindings with
   | first::rest ->
-     let (first, env) = monomorphize_param env first in
-     let (rest, env) = monomorphize_params env rest in
-     (first :: rest, env)
+     let (TypedBinding { name; ty; rename; }) = first in
+     let (ty, env) = monomorphize_ty env (strip_type ty) in
+     let (rest, env) = monomorphize_bindings env rest in
+     let binding = MonoBinding { name; ty; rename; } in
+     (binding :: rest, env)
   | [] ->
      ([], env)
 
-and monomorphize_param (env: env) (param: value_parameter): (mvalue_parameter * env) =
-  let (ValueParameter (name, ty)) = param in
-  let (ty, env) = strip_and_mono env ty in
-  (MValueParameter (name, ty), env)
-
-and monomorphize_named_ty_list (env: env) (tys: (identifier * stripped_ty) list): ((identifier * mono_ty) list * env) =
-  match tys with
-  | (name, first)::rest ->
-     let (first, env) = monomorphize_ty env first in
-     let (rest, env) = monomorphize_named_ty_list env rest in
-     ((name, first) :: rest, env)
+and monomorphize_binding_list (env: env) (bs: (identifier * stripped_ty * identifier) list): (mono_binding list * env) =
+  match bs with
+  | first::rest ->
+     let (name, ty, rename) = first in
+     let (ty, env) = monomorphize_ty env ty in
+     let (rest, env) = monomorphize_binding_list env rest in
+     let binding = MonoBinding { name; ty; rename; } in
+     (binding :: rest, env)
   | [] ->
      ([], env)
 

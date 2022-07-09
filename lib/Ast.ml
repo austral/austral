@@ -9,10 +9,17 @@ type qtypespec =
   | QWriteRef of qtypespec * qtypespec
 [@@deriving show]
 
+type qbinding =
+  QBinding of {
+      name: identifier;
+      ty: qtypespec;
+      rename: identifier;
+    }
+
 type astmt =
   | ASkip of span
   | ALet of span * identifier * qtypespec * aexpr * astmt
-  | ADestructure of span * (identifier * qtypespec) list * aexpr * astmt
+  | ADestructure of span * qbinding list * aexpr * astmt
   | AAssign of span * lvalue * aexpr
   | AIf of span * aexpr * astmt * astmt
   | AWhen of span * aexpr * astmt
@@ -59,7 +66,7 @@ and aexpr =
   | BorrowExpr of borrowing_mode * qident
 
 and abstract_when =
-  | AbstractWhen of identifier * (identifier * qtypespec) list * astmt
+  | AbstractWhen of identifier * qbinding list * astmt
 
 and abstract_arglist =
   | Positional of aexpr list

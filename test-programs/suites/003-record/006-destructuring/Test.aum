@@ -4,8 +4,9 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        let Rec : R := R(x => 10);
-        let y: Int32 := Rec.x;
+        let r: R := R(x => 10);
+        let { x: Int32 } := r;
+        printLn(x);
         return ExitSuccess();
     end;
 end module body.

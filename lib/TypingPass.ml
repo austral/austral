@@ -799,20 +799,26 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let typebindings = match_type (env, module_name) orig_type rec_ty in
                  if (vis = TypeVisPublic) || (module_name = source_module) then
                    (* Find the set of slot names and the set of binding names, and compare them *)
-                   let binding_names = List.map (fun (n, _) -> n) bindings
+                   let binding_names = List.map (fun (QBinding { name; _}) -> name) bindings
                    and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
                    if ident_set_eq binding_names slot_names then
-                     let bindings' = group_bindings_slots bindings slots in
-                     let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual)) bindings' in
-                     let newvars = List.map (fun (n, ty, actual) ->
-                                       let _ = match_type (env, module_name) ty actual in
-                                       (n, ty, VarLocal))
-                                     bindings'' in
+                     let bindings': (identifier * qtypespec * ty * identifier) list =
+                       group_bindings_slots bindings slots
+                     in
+                     let bindings'': (identifier * ty * ty * identifier) list
+                       = List.map (fun (n, ty, actual, rename) -> (n, parse_typespec env rm typarams ty, replace_variables typebindings actual, rename)) bindings'
+                     in
+                     let newvars: (identifier * ty * var_source) list =
+                       List.map (fun (_, ty, actual, rename) ->
+                           let _ = match_type (env, module_name) ty actual in
+                           (rename, ty, VarLocal))
+                         bindings''
+                     in
                      let lexenv' = push_vars lexenv newvars in
                      let body' = augment_stmt (update_lexenv ctx lexenv') body in
                      TDestructure (
                          span,
-                         List.map (fun (n, _, t) -> (n, t)) bindings'',
+                         List.map (fun (name, _, ty, rename) -> TypedBinding { name; ty; rename; }) bindings'',
                          value',
                          body'
                        )
@@ -1028,8 +1034,13 @@ and group_cases_whens (cases: decl list) (whens: abstract_when list): (typed_cas
   List.map (fun (TypedCase (n, s)) -> (TypedCase (n, s), List.find (fun (AbstractWhen (n', _, _)) -> n = n') whens))
     (List.map union_case_to_typed_case cases)
 
-and group_bindings_slots (bindings: (identifier * qtypespec) list) (slots: typed_slot list): (identifier * qtypespec * ty) list =
-  List.map (fun (n, t) -> (n, t, let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> n = n') slots in ty')) bindings
+and group_bindings_slots (bindings: qbinding list) (slots: typed_slot list): (identifier * qtypespec * ty * identifier) list =
+  let f (binding: qbinding): (identifier * qtypespec * ty * identifier) =
+    let QBinding { name; ty; rename; } = binding in
+    let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> equal_identifier name n') slots in
+    (name, ty, ty', rename)
+  in
+  List.map f bindings
 
 and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case): typed_when =
   with_frame "Augment when"
@@ -1039,24 +1050,24 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
       and (TypedCase (_, slots)) = c in
       pi ("Case name", name);
       (* Check the set of binding names is the same as the set of slots *)
-      let binding_names = List.map (fun (n, _) -> n) bindings
+      let binding_names = List.map (fun (QBinding { name; _ }) -> name) bindings
       and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
       if ident_set_eq binding_names slot_names then
         (* Check the type of each binding matches the type of the slot *)
         let bindings' = group_bindings_slots bindings slots in
-        let bindings'' = List.map (fun (n, ty, actual) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual)) bindings' in
-        let newvars = List.map (fun (n, ty, actual) ->
+        let bindings'' = List.map (fun (n, ty, actual, rename) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual, rename)) bindings' in
+        let newvars = List.map (fun (_, ty, actual, rename) ->
                           if equal_ty ty actual then
-                            let _ = pi ("Binding name", n)
+                            let _ = pi ("Binding name", rename)
                             in
                             pt ("Binding type",  ty);
-                            (n, ty, VarLocal)
+                            (rename, ty, VarLocal)
                           else
                             err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
                         bindings'' in
         let lexenv' = push_vars lexenv newvars in
         let body' = augment_stmt (update_lexenv ctx lexenv') body in
-        TypedWhen (name, List.map (fun (n, t, _) -> ValueParameter (n, t)) bindings'', body')
+        TypedWhen (name, List.map (fun (name, _, ty, rename) -> TypedBinding { name; ty; rename}) bindings'', body')
       else
         err "The set of slots in the case statement doesn't match the set of slots in the union definition.")
 

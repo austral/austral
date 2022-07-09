@@ -1,0 +1,1 @@
+Test that destructuring works with renaming.

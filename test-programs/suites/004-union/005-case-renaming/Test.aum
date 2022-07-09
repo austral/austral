@@ -1,0 +1,19 @@
+module body Test is
+    union Number: Free is
+        case Integer is
+            value: Int32;
+        case Float is
+            value: Float64;
+    end;
+
+    function main(): ExitCode is
+        let n : Number := Integer(value => 10);
+        case n of
+            when Integer(value as val: Int32) do
+                printLn(val);
+            when Float(value: Float64) do
+                skip;
+        end case;
+        return ExitSuccess();
+    end;
+end module body.

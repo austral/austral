@@ -6,6 +6,13 @@ open MonoType
 open Region
 open Error
 
+type mono_binding =
+  MonoBinding of {
+      name: identifier;
+      ty: mono_ty;
+      rename: identifier;
+    }
+
 type mono_module = MonoModule of module_name * mdecl list
 
 and mdecl =
@@ -26,7 +33,7 @@ and concrete_method =
 and mstmt =
   | MSkip
   | MLet of identifier * mono_ty * mexpr * mstmt
-  | MDestructure of (identifier * mono_ty) list * mexpr * mstmt
+  | MDestructure of mono_binding list * mexpr * mstmt
   | MAssign of mtyped_lvalue * mexpr
   | MIf of mexpr * mstmt * mstmt
   | MCase of mexpr * mtyped_when list
@@ -83,7 +90,7 @@ and mexpr =
   | MBorrowExpr of borrowing_mode * identifier * region * mono_ty
 
 and mtyped_when =
-  MTypedWhen of identifier * mvalue_parameter list * mstmt
+  MTypedWhen of identifier * mono_binding list * mstmt
 
 and mtyped_path_elem =
   | MSlotAccessor of identifier * mono_ty

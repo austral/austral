@@ -9,10 +9,18 @@ open Linked
 open Id
 open Span
 
+type typed_binding =
+  TypedBinding of {
+      name: identifier;
+      ty: ty;
+      rename: identifier;
+    }
+[@@deriving (show, sexp)]
+
 type tstmt =
   | TSkip of span
   | TLet of span * identifier * ty * texpr * tstmt
-  | TDestructure of span * (identifier * ty) list * texpr * tstmt
+  | TDestructure of span * typed_binding list * texpr * tstmt
   | TAssign of span * typed_lvalue * texpr
   | TIf of span * texpr * tstmt * tstmt
   | TCase of span * texpr * typed_when list
@@ -75,7 +83,7 @@ and texpr =
 [@@deriving show]
 
 and typed_when =
-  TypedWhen of identifier * value_parameter list * tstmt
+  TypedWhen of identifier * typed_binding list * tstmt
 [@@deriving show]
 
 and typed_path_elem =
