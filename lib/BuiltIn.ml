@@ -16,8 +16,8 @@ let pervasive_imports =
         ConcreteImport (make_ident "Either", None);
         ConcreteImport (make_ident "Left", None);
         ConcreteImport (make_ident "Right", None);
-        ConcreteImport (make_ident "Deref", None);
-        ConcreteImport (make_ident "Deref_Write", None);
+        ConcreteImport (make_ident "deref", None);
+        ConcreteImport (make_ident "derefWrite", None);
         ConcreteImport (make_ident "fixedArraySize", None);
         ConcreteImport (make_ident "abort", None);
         ConcreteImport (make_ident "RootCapability", None);

@@ -13,10 +13,10 @@ module Austral.Pervasive is
     end;
 
     generic [T: Free, R: Region]
-    function Deref(ref: &[T, R]): T;
+    function deref(ref: &[T, R]): T;
 
     generic [T: Free, R: Region]
-    function Deref_Write(ref: &![T, R]): T;
+    function derefWrite(ref: &![T, R]): T;
 
     generic [T: Type]
     function fixedArraySize(arr: FixedArray[T]): Index;

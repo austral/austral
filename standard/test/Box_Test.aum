@@ -87,7 +87,7 @@ module body Standard.Test.Box is
             when Some(value: Box[Integer_32]) do
                 borrow value as boxref in rho do
                     let valueref: Reference[Integer_32, rho] := Get_Value_Ref(boxref);
-                    let contents: Integer_32 := Deref(valueref);
+                    let contents: Integer_32 := deref(valueref);
                     Assert_True(
                         value => (contents = 'a'),
                         message => "Content is the letter 'a'"
