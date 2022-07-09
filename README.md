@@ -53,18 +53,18 @@ Calculate and print the 10th Fibonacci number:
 
 ```
 module body Fib is
-    function Fib(n: Natural_64): Natural_64 is
+    function fib(n: Nat64): Nat64 is
         if n < 2 then
             return n;
         else
-            return Fib(n - 1) + Fib(n - 2);
+            return fib(n - 1) + fib(n - 2);
         end if;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
-        Print("Fib(10) = ");
-        PrintLn(Fib(10));
-        return root;
+    function Main(): ExitCode is
+        Print("fib(10) = ");
+        PrintLn(fib(10));
+        return ExitSuccess();
     end;
 end module body.
 ```
@@ -75,7 +75,7 @@ Build and run:
 $ austral compile --public-module=fib.aum --entrypoint=Fib:Main --output=fib.c
 $ gcc lib/prelude.c fib.c -o fib
 $ ./fib
-Fib(10) = 55
+fib(10) = 55
 ```
 
 ## Building
@@ -145,11 +145,13 @@ The order in which `--module` options appear is the order in which they are
 compiled, so it matters.
 
 The `--entrypoint` option must be the name of a module, followed by a colon,
-followed by the name of a public function with the following signature:
+followed by the name of a public function with either of the following
+signatures:
 
-```
-function Main(root: Root_Capability): Root_Capability;
-```
+1. `function Main(): ExitCode;`
+2. `function Main(root: RootCapability): ExitCode;`
+
+The `ExitCode` type has two constructors: `ExitSuccess()` and `ExitFailure()`.
 
 Finally, the `--output` option is just the path to dump the compiled C to.
 
