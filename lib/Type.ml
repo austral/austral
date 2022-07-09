@@ -45,6 +45,7 @@ type ty =
   | TyVar of type_var
   | Address of ty
   | Pointer of ty
+  | FnPtr of ty list * ty
   | MonoTy of mono_id
 [@@deriving (show, sexp)]
 
@@ -108,8 +109,17 @@ let rec type_string = function
      address_name ^ "[" ^ (type_string ty) ^ "]"
   | Pointer ty ->
      pointer_name ^ "[" ^ (type_string ty) ^ "]"
+  | FnPtr (args, rt) ->
+     (match args with
+      | [] ->
+         (* No arguments case. *)
+         ("Fn[" ^ (type_string rt) ^ "]: Free")
+      | _ ->
+         (* Some arguments case. *)
+         let args': string = String.concat ", " (List.map type_string args) in
+         ("Fn[" ^ args' ^ ", " ^ (type_string rt) ^ "]: Free"))
   | MonoTy _ ->
-    "MonoTy"
+     "MonoTy"
 
 and args_string = function
   | (first::rest) -> "[" ^ (String.concat ", " (List.map type_string (first::rest))) ^ "]"
@@ -199,6 +209,13 @@ let rec equal_ty a b =
      (match b with
       | Pointer ty' ->
          equal_ty ty ty'
+      | _ ->
+         false)
+  | FnPtr (args, rt) ->
+     (match b with
+      | FnPtr (args', rt') ->
+         (List.for_all (fun (a', b') -> equal_ty a' b') (List.map2 (fun a' b' -> (a', b')) args args'))
+         && (equal_ty rt rt')
       | _ ->
         false)
   | MonoTy a ->

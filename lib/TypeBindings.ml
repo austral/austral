@@ -124,6 +124,8 @@ let rec replace_variables bindings ty =
      Address (replace_variables bindings ty)
   | Pointer ty ->
      Pointer (replace_variables bindings ty)
+  | FnPtr (args, rt) ->
+     FnPtr (List.map (replace_variables bindings) args, replace_variables bindings rt)
   | MonoTy id ->
      MonoTy id
 

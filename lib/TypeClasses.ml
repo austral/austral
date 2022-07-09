@@ -72,6 +72,11 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = is_tyvar ty in
      let _ = no_leftovers 1 in
      ()
+  | FnPtr (args, ty) ->
+     let args' = ty :: args in
+     let _ = all_distinct (List.map is_tyvar args') in
+     let _ = no_leftovers (List.length args') in
+     ()
   | MonoTy _ ->
      err "Not allowed"
 
@@ -130,6 +135,10 @@ let overlapping_instances (a: ty) (b: ty): bool =
      (match b with
       | Pointer _ -> true
       | _ -> true)
+  | FnPtr _ ->
+     (match b with
+      | FnPtr _ -> true
+      | _ -> false)
   | MonoTy _ ->
      err "Not allowed"
 
@@ -185,6 +194,8 @@ and is_type_local (env: env) (mod_id: mod_id) (ty: ty): bool =
   | Address _ ->
      true
   | Pointer _ ->
+     true
+  | FnPtr _ ->
      true
   | MonoTy _ ->
      (* Not applicable. *)

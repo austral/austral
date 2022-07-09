@@ -18,6 +18,7 @@ let type_universe = function
   | TyVar (TypeVariable (_, u, _, _)) -> u
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
+  | FnPtr _ -> FreeUniverse
   | MonoTy _ -> err "Not applicable"
 
 let is_numeric = function
@@ -34,6 +35,7 @@ let is_numeric = function
   | TyVar _ -> false
   | Address _ -> false
   | Pointer _ -> false
+  | FnPtr _ -> false
   | MonoTy _ -> err "Not applicable"
 
 let is_comparable = function
@@ -50,6 +52,7 @@ let is_comparable = function
   | TyVar _ -> false
   | Address _ -> true
   | Pointer _ -> true
+  | FnPtr _ -> true
   | MonoTy _ -> err "Not applicable"
 
 let rec type_variables = function
@@ -79,6 +82,11 @@ let rec type_variables = function
      type_variables ty
   | Pointer ty ->
      type_variables ty
+  | FnPtr (args, rt) ->
+     let args' = List.fold_left TypeVarSet.union TypeVarSet.empty (List.map type_variables args)
+     and rt' = type_variables rt
+     in
+     TypeVarSet.union args' rt'
   | MonoTy _ ->
     TypeVarSet.empty
 
@@ -118,6 +126,8 @@ let rec is_concrete = function
   | Address _ ->
      true
   | Pointer _ ->
+     true
+  | FnPtr _ ->
      true
   | MonoTy _ ->
      true

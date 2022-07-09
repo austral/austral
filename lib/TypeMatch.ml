@@ -118,6 +118,12 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          match_type ctx t t'
       | _ ->
          type_mismatch "Expected a Pointer, but got another type." a b)
+  | FnPtr (args, rt) ->
+     (match b with
+      | FnPtr (args', rt') ->
+         match_type_list ctx (rt :: args) (rt' :: args')
+      | _ ->
+         type_mismatch "Expected a function pointer, but got another type." a b)
   | MonoTy _ ->
      err "Not applicable"
 
