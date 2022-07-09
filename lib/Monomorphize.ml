@@ -65,6 +65,10 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
              err "internal: named type points to something that isn't a type")
       | None ->
          err "internal")
+  | SFnPtr (args, rt) ->
+     let (args, env) = monomorphize_ty_list env args in
+     let (rt, env) = monomorphize_ty env rt in
+     (MonoFnPtr (args, rt), env)
   | SMonoTy id ->
      (MonoNamedType id, env)
   | SRegionTyVar (name, source) ->
@@ -788,5 +792,7 @@ and mono_to_ty (ty: mono_ty): ty =
      Address (r ty)
   | MonoPointer ty ->
      Pointer (r ty)
+  | MonoFnPtr (args, rt) ->
+     FnPtr (List.map r args, r rt)
   | MonoRegionTyVar (name, source) ->
      TyVar (TypeVariable (name, RegionUniverse, source, []))
