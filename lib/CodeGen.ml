@@ -352,7 +352,7 @@ and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, b
   let get_binding binding_name =
     CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
   in
-  let bindings' = List.map (fun (MonoBinding { name; ty; _; }) -> CLet (gen_ident name, gen_type ty, get_binding name)) bindings in
+  let bindings' = List.map (fun (MonoBinding { name; ty; rename; }) -> CLet (gen_ident rename, gen_type ty, get_binding name)) bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 
