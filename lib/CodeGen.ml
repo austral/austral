@@ -290,7 +290,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   | MDestructure (bs, e, b) ->
      let tmp = new_variable () in
      let vardecl = CLet (tmp, gen_type (get_type e), ge e)
-     and bs' = List.map (fun (MonoBinding { name; ty; _ }) -> CLet (gen_ident name, gen_type ty, CStructAccessor (CVar tmp, gen_ident name))) bs
+     and bs' = List.map (fun (MonoBinding { name; ty; rename; }) -> CLet (gen_ident rename, gen_type ty, CStructAccessor (CVar tmp, gen_ident name))) bs
      and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
