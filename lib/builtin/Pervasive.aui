@@ -19,28 +19,28 @@ module Austral.Pervasive is
     function Deref_Write(ref: &![T, R]): T;
 
     generic [T: Type]
-    function Fixed_Array_Size(arr: Fixed_Array[T]): Index;
+    function Fixed_Array_Size(arr: FixedArray[T]): Index;
 
-    function Abort(message: Fixed_Array[Natural_8]): Unit;
+    function Abort(message: FixedArray[Nat8]): Unit;
 
-    type Root_Capability : Linear;
+    type RootCapability : Linear;
 
-    constant Maximum_Natural_8: Natural_8;
-    constant Maximum_Natural_16: Natural_16;
-    constant Maximum_Natural_32: Natural_32;
-    constant Maximum_Natural_64: Natural_64;
+    constant Maximum_Nat8: Nat8;
+    constant Maximum_Nat16: Nat16;
+    constant Maximum_Nat32: Nat32;
+    constant Maximum_Nat64: Nat64;
 
-    constant Minimum_Integer_8: Integer_8;
-    constant Maximum_Integer_8: Integer_8;
+    constant Minimum_Int8: Int8;
+    constant Maximum_Int8: Int8;
 
-    constant Minimum_Integer_16: Integer_16;
-    constant Maximum_Integer_16: Integer_16;
+    constant Minimum_Int16: Int16;
+    constant Maximum_Int16: Int16;
 
-    constant Minimum_Integer_32: Integer_32;
-    constant Maximum_Integer_32: Integer_32;
+    constant Minimum_Int32: Int32;
+    constant Maximum_Int32: Int32;
 
-    constant Minimum_Integer_64: Integer_64;
-    constant Maximum_Integer_64: Integer_64;
+    constant Minimum_Int64: Int64;
+    constant Maximum_Int64: Int64;
 
     constant Minimum_Index: Index;
     constant Maximum_Index: Index;
@@ -59,47 +59,47 @@ module Austral.Pervasive is
         method Modular_Divide(lhs: T, rhs: T): T;
     end;
 
-    instance Trapping_Arithmetic(Natural_8);
-    instance Trapping_Arithmetic(Integer_8);
-    instance Trapping_Arithmetic(Natural_16);
-    instance Trapping_Arithmetic(Integer_16);
-    instance Trapping_Arithmetic(Natural_32);
-    instance Trapping_Arithmetic(Integer_32);
-    instance Trapping_Arithmetic(Natural_64);
-    instance Trapping_Arithmetic(Integer_64);
+    instance Trapping_Arithmetic(Nat8);
+    instance Trapping_Arithmetic(Int8);
+    instance Trapping_Arithmetic(Nat16);
+    instance Trapping_Arithmetic(Int16);
+    instance Trapping_Arithmetic(Nat32);
+    instance Trapping_Arithmetic(Int32);
+    instance Trapping_Arithmetic(Nat64);
+    instance Trapping_Arithmetic(Int64);
     instance Trapping_Arithmetic(Index);
-    instance Trapping_Arithmetic(Double_Float);
+    instance Trapping_Arithmetic(Float64);
 
-    instance Modular_Arithmetic(Natural_8);
-    instance Modular_Arithmetic(Integer_8);
-    instance Modular_Arithmetic(Natural_16);
-    instance Modular_Arithmetic(Integer_16);
-    instance Modular_Arithmetic(Natural_32);
-    instance Modular_Arithmetic(Integer_32);
-    instance Modular_Arithmetic(Natural_64);
-    instance Modular_Arithmetic(Integer_64);
+    instance Modular_Arithmetic(Nat8);
+    instance Modular_Arithmetic(Int8);
+    instance Modular_Arithmetic(Nat16);
+    instance Modular_Arithmetic(Int16);
+    instance Modular_Arithmetic(Nat32);
+    instance Modular_Arithmetic(Int32);
+    instance Modular_Arithmetic(Nat64);
+    instance Modular_Arithmetic(Int64);
     instance Modular_Arithmetic(Index);
 
     typeclass Printable(A: Free) is
         method Print(value: A): Unit;
 
-        method Print_Fixed_Array(array: Fixed_Array[A]): Unit;
+        method Print_Fixed_Array(array: FixedArray[A]): Unit;
     end;
 
     instance Printable(Unit);
-    instance Printable(Natural_8);
-    instance Printable(Integer_8);
-    instance Printable(Natural_16);
-    instance Printable(Integer_16);
-    instance Printable(Natural_32);
-    instance Printable(Integer_32);
-    instance Printable(Natural_64);
-    instance Printable(Integer_64);
+    instance Printable(Nat8);
+    instance Printable(Int8);
+    instance Printable(Nat16);
+    instance Printable(Int16);
+    instance Printable(Nat32);
+    instance Printable(Int32);
+    instance Printable(Nat64);
+    instance Printable(Int64);
     instance Printable(Index);
-    instance Printable(Single_Float);
-    instance Printable(Double_Float);
+    instance Printable(Float32);
+    instance Printable(Float64);
     generic [B: Free(Printable)]
-    instance Printable(Fixed_Array[B]);
+    instance Printable(FixedArray[B]);
 
     generic [T: Free(Printable)]
     function PrintLn(value: T): Unit;

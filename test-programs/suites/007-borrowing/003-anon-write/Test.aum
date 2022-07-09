@@ -1,6 +1,6 @@
 module body Test is
     record Foo: Linear is
-        bar: Natural_8;
+        bar: Nat8;
     end;
 
     generic [T: Type, R: Region]
@@ -8,13 +8,13 @@ module body Test is
         return nil;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Anonymously borrow it.
         Accept_Ref(&!foo);
         -- Consume it by destructuring.
-        let { bar: Natural_8 } := foo;
+        let { bar: Nat8 } := foo;
         return root;
     end;
 end module body.

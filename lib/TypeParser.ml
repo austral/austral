@@ -48,38 +48,38 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
       match name_str with
       | "Unit" ->
          Some Unit
-      | "Boolean" ->
+      | "Bool" ->
          Some Boolean
-      | "Natural_8" ->
+      | "Nat8" ->
          Some (Integer (Unsigned, Width8))
-      | "Natural_16" ->
+      | "Nat16" ->
          Some (Integer (Unsigned, Width16))
-      | "Natural_32" ->
+      | "Nat32" ->
          Some (Integer (Unsigned, Width32))
-      | "Natural_64" ->
+      | "Nat64" ->
          Some (Integer (Unsigned, Width64))
-      | "Integer_8" ->
+      | "Int8" ->
          Some (Integer (Signed, Width8))
-      | "Integer_16" ->
+      | "Int16" ->
          Some (Integer (Signed, Width16))
-      | "Integer_32" ->
+      | "Int32" ->
          Some (Integer (Signed, Width32))
-      | "Integer_64" ->
+      | "Int64" ->
          Some (Integer (Signed, Width64))
       | "Index" ->
          Some (Integer (Unsigned, WidthIndex))
-      | "Single_Float" ->
+      | "Float32" ->
          Some SingleFloat
-      | "Double_Float" ->
+      | "Float64" ->
          Some DoubleFloat
       | "Static" ->
          Some (RegionTy static_region)
-      | "Fixed_Array" ->
+      | "FixedArray" ->
          (match args with
           | [ty] ->
              Some (StaticArray ty)
           | _ ->
-             err "Invalid Fixed_Array type specifier.")
+             err "Invalid FixedArray type specifier.")
       | "Reference" ->
          (match args with
           | [ty; ty'] ->

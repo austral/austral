@@ -1,9 +1,9 @@
 module body Test is
     record Foo: Linear is
-        bar: Natural_8;
+        bar: Nat8;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Borrow it.
@@ -14,7 +14,7 @@ module body Test is
             end;
         end;
         -- Consume the record by destructuring.
-        let { bar: Natural_8 } := foo;
+        let { bar: Nat8 } := foo;
         return root;
     end;
 end module body.

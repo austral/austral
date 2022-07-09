@@ -4,13 +4,13 @@ module body Example.Identity is
         return value;
     end;
 
-    function Test(): Integer_32 is
-        let x: Integer_32 := Identity(10);
-        let y: Double_Float := Identity(3.14);
+    function Test(): Int32 is
+        let x: Int32 := Identity(10);
+        let y: Float64 := Identity(3.14);
         return x;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         return root;
     end;
 end module body.

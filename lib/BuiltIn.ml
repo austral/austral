@@ -6,8 +6,6 @@ open Names
 
 let pervasive_module_name = make_mod_name "Austral.Pervasive"
 
-let root_cap_type_name = make_ident "Root_Capability"
-
 let pervasive_imports =
   ConcreteImportList (
       pervasive_module_name,
@@ -22,19 +20,19 @@ let pervasive_imports =
         ConcreteImport (make_ident "Deref_Write", None);
         ConcreteImport (make_ident "Fixed_Array_Size", None);
         ConcreteImport (make_ident "Abort", None);
-        ConcreteImport (make_ident "Root_Capability", None);
-        ConcreteImport (make_ident "Maximum_Natural_8", None);
-        ConcreteImport (make_ident "Maximum_Natural_16", None);
-        ConcreteImport (make_ident "Maximum_Natural_32", None);
-        ConcreteImport (make_ident "Maximum_Natural_64", None);
-        ConcreteImport (make_ident "Minimum_Integer_8", None);
-        ConcreteImport (make_ident "Minimum_Integer_16", None);
-        ConcreteImport (make_ident "Minimum_Integer_32", None);
-        ConcreteImport (make_ident "Minimum_Integer_64", None);
-        ConcreteImport (make_ident "Maximum_Integer_8", None);
-        ConcreteImport (make_ident "Maximum_Integer_16", None);
-        ConcreteImport (make_ident "Maximum_Integer_32", None);
-        ConcreteImport (make_ident "Maximum_Integer_64", None);
+        ConcreteImport (make_ident "RootCapability", None);
+        ConcreteImport (make_ident "Maximum_Nat8", None);
+        ConcreteImport (make_ident "Maximum_Nat16", None);
+        ConcreteImport (make_ident "Maximum_Nat32", None);
+        ConcreteImport (make_ident "Maximum_Nat64", None);
+        ConcreteImport (make_ident "Minimum_Int8", None);
+        ConcreteImport (make_ident "Minimum_Int16", None);
+        ConcreteImport (make_ident "Minimum_Int32", None);
+        ConcreteImport (make_ident "Minimum_Int64", None);
+        ConcreteImport (make_ident "Maximum_Int8", None);
+        ConcreteImport (make_ident "Maximum_Int16", None);
+        ConcreteImport (make_ident "Maximum_Int32", None);
+        ConcreteImport (make_ident "Maximum_Int64", None);
         ConcreteImport (make_ident "Trapping_Arithmetic", None);
         ConcreteImport (make_ident "Trapping_Add", None);
         ConcreteImport (make_ident "Trapping_Subtract", None);

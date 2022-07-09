@@ -3,8 +3,8 @@ module body Test is
         method Accept(value: T): Unit;
     end;
 
-    instance Acceptable(Integer_32) is
-        method Accept(value: Integer_32): Unit is
+    instance Acceptable(Int32) is
+        method Accept(value: Int32): Unit is
             return nil;
         end;
     end;
@@ -15,7 +15,7 @@ module body Test is
         return nil;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         Foo(nil);
         return root;
     end;

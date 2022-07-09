@@ -64,7 +64,7 @@ module body Example.Buffer is
     --     -- For simplicity, we want the buffer to always be non-empty. Also, most
     --     -- empty buffers won't stay empty in perpetuity. So to create an empty
     --     -- buffer we allocate Initial_Size.
-    --     let Initial_Size: Natural_64 := 16;
+    --     let Initial_Size: Nat64 := 16;
     --     let array: Heap_Array[T] := Allocate_Or_Die(Initial_Size);
     --     return Buffer(
     --         capacity => Initial_Size,
@@ -117,19 +117,19 @@ module body Example.Buffer is
     --    return buffer->array[index];
     -- end;
 
-    function Put_Character(character: Integer_32): Integer_32 is
+    function Put_Character(character: Int32): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         -- Create a buffer of e's.
-        let buf: Buffer[Integer_32] := Initialize(3, 101);
+        let buf: Buffer[Int32] := Initialize(3, 101);
         borrow buf as bufref in rho do
             let size: Index := Buffer_Size(bufref);
             if size = 3 then
                 Put_Character(97);
             end if;
-            let first: Integer_32 := Nth_Free(bufref, 0);
+            let first: Int32 := Nth_Free(bufref, 0);
             Put_Character(first);
         end;
         Destroy_Buffer(buf);

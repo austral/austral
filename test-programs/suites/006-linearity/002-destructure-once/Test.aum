@@ -1,11 +1,11 @@
 module body Test is
     record R : Linear is
-        x: Integer_32;
+        x: Int32;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let r: R := R(x => 32);
-        let { x: Integer_32 } := r;
+        let { x: Int32 } := r;
         return root;
     end;
 end module body.

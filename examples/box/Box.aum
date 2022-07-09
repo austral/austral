@@ -84,67 +84,67 @@ module body Example.Box is
         return old_value;
     end;
 
-    function Put_Character(character: Integer_32): Integer_32 is
+    function Put_Character(character: Int32): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         -- Box a value, swap it, and unwrap it.
-        let b: Either[Box[Integer_32], Integer_32] := Make('e');
+        let b: Either[Box[Int32], Int32] := Make('e');
         case b of
-            when Left(left: Box[Integer_32]) do
-                let newbox: Box[Integer_32] := Swap_Free(left, 'a');
-                let contents: Integer_32 := Unbox(newbox);
+            when Left(left: Box[Int32]) do
+                let newbox: Box[Int32] := Swap_Free(left, 'a');
+                let contents: Int32 := Unbox(newbox);
                 Put_Character(contents);
-            when Right(right: Integer_32) do
+            when Right(right: Int32) do
                 Abort("Unexpected.");
         end case;
         -- Box a value, read_free it and unbox it.
-        let b2: Either[Box[Integer_32], Integer_32] := Make('a');
+        let b2: Either[Box[Int32], Int32] := Make('a');
         case b2 of
-            when Left(left: Box[Integer_32]) do
+            when Left(left: Box[Int32]) do
                 borrow left as value2 in rho do
-                    let contents: Integer_32 := Read_Free(value2);
+                    let contents: Int32 := Read_Free(value2);
                     Put_Character(contents);
                 end;
                 Unbox(left);
-            when Right(right: Integer_32) do
+            when Right(right: Int32) do
                 Abort("Unexpected.");
         end case;
         -- Box a value, store a new one through a mutable reference, and unbox it.
-        let b3: Either[Box[Integer_32], Integer_32] := Make('e');
+        let b3: Either[Box[Int32], Int32] := Make('e');
         case b3 of
-            when Left(left: Box[Integer_32]) do
+            when Left(left: Box[Int32]) do
                 borrow! left as value2 in rho do
                     Store_Free(value2, 'a');
                 end;
-                let contents: Integer_32 := Unbox(left);
+                let contents: Int32 := Unbox(left);
                 Put_Character(contents);
-            when Right(right: Integer_32) do
+            when Right(right: Int32) do
                 Abort("Unexpected.");
         end case;
         -- Box a value, load it through a reference, and unbox it.
-        let b4: Either[Box[Integer_32], Integer_32] := Make('a');
+        let b4: Either[Box[Int32], Int32] := Make('a');
         case b4 of
-            when Left(left: Box[Integer_32]) do
+            when Left(left: Box[Int32]) do
                 borrow left as boxref in rho do
-                    let valueref: &[Integer_32, rho] := Get_Value_Ref(boxref);
-                    let contents: Integer_32 := !(valueref);
+                    let valueref: &[Int32, rho] := Get_Value_Ref(boxref);
+                    let contents: Int32 := !(valueref);
                     Put_Character(contents);
                 end;
                 Unbox(left);
-            when Right(right: Integer_32) do
+            when Right(right: Int32) do
                 Abort("Unexpected.");
         end case;
         -- Box a value, swap it through a mutable reference, and unbox it.
-        let b5: Either[Box[Integer_32], Integer_32] := Make('e');
+        let b5: Either[Box[Int32], Int32] := Make('e');
         case b5 of
-            when Left(left: Box[Integer_32]) do
+            when Left(left: Box[Int32]) do
                 borrow! left as boxmutref in rho do
                     Swap_Mut(boxmutref, 'a');
                 end;
                 Put_Character(Unbox(left));
-            when Right(right: Integer_32) do
+            when Right(right: Int32) do
                 Abort("Unexpected.");
         end case;
         return root;

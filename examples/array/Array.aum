@@ -12,11 +12,11 @@ import Austral.Memory (
 module body Example.Array is
     pragma Unsafe_Module;
 
-    function Put_Character(character: Natural_8): Integer_32 is
+    function Put_Character(character: Nat8): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Show_Bool(b: Boolean): Unit is
+    function Show_Bool(b: Bool): Unit is
         if b then
             Put_Character(84);
         else
@@ -25,20 +25,20 @@ module body Example.Array is
         return nil;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
-        let addr: Address[Boolean] := Allocate(3);
+    function Main(root: RootCapability): RootCapability is
+        let addr: Address[Bool] := Allocate(3);
         case Null_Check(addr) of
-            when Some(value: Pointer[Boolean]) do
-                let arr: Pointer[Boolean] := value;
-                let firstp: Pointer[Boolean] := arr;
-                let secondp: Pointer[Boolean] := Positive_Offset(arr, 1);
-                let thirdp: Pointer[Boolean] := Positive_Offset(arr, 2);
+            when Some(value: Pointer[Bool]) do
+                let arr: Pointer[Bool] := value;
+                let firstp: Pointer[Bool] := arr;
+                let secondp: Pointer[Bool] := Positive_Offset(arr, 1);
+                let thirdp: Pointer[Bool] := Positive_Offset(arr, 2);
                 Store(firstp, true);
                 Store(secondp, false);
                 Store(thirdp, true);
-                let first: Boolean := Load(firstp);
-                let second: Boolean := Load(secondp);
-                let third: Boolean := Load(thirdp);
+                let first: Bool := Load(firstp);
+                let second: Bool := Load(secondp);
+                let third: Bool := Load(thirdp);
                 Show_Bool(first);
                 Show_Bool(second);
                 Show_Bool(third);

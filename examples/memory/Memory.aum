@@ -11,10 +11,10 @@ import Austral.Memory (
 module body Example.Memory is
     pragma Unsafe_Module;
 
-    function Main(root: Root_Capability): Root_Capability is
-        let addr: Address[Integer_32] := Allocate(sizeof(Integer_32));
+    function Main(root: RootCapability): RootCapability is
+        let addr: Address[Int32] := Allocate(sizeof(Int32));
         case Null_Check(addr) of
-            when Some(value: Pointer[Integer_32]) do
+            when Some(value: Pointer[Int32]) do
                 Deallocate(value);
             when None do
                 -- Do nothing.

@@ -1,5 +1,5 @@
 module body Example.Union is
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         let C : Color := Red();
         case C of
             when Red do
@@ -11,9 +11,9 @@ module body Example.Union is
         end case;
         let N : Number := Integer(value => 10);
         case N of
-            when Integer(value: Integer_32) do
+            when Integer(value: Int32) do
                 skip;
-            when Float(value: Double_Float) do
+            when Float(value: Float64) do
                 skip;
         end case;
         return root;

@@ -3,19 +3,19 @@ module body Test is
         method Accept(x: T): Unit;
     end;
 
-    instance Foo(Natural_8) is
-        method Accept(x: Natural_8): Unit is
+    instance Foo(Nat8) is
+        method Accept(x: Nat8): Unit is
             return nil;
         end;
     end;
 
-    instance Foo(Natural_8) is
-        method Accept(x: Natural_8): Unit is
+    instance Foo(Nat8) is
+        method Accept(x: Nat8): Unit is
             return nil;
         end;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         return root;
     end;
 end module body.

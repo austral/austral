@@ -71,8 +71,8 @@ let rec type_string = function
   | Integer (s, w) ->
      let sgn: string =
        match s with
-       | Unsigned -> "Natural_"
-       | Signed -> "Integer_"
+       | Unsigned -> nat_prefix
+       | Signed -> int_prefix
      in
      (match w with
       | Width8 -> sgn ^ "8"
@@ -87,7 +87,7 @@ let rec type_string = function
   | NamedType (n, args, u) ->
      (qident_debug_name n) ^ args_string args ^ ": " ^ (universe_string u)
   | StaticArray t ->
-     "Static_Array[" ^ (type_string t) ^ "]: Free"
+     "FixedArray[" ^ (type_string t) ^ "]: Free"
   | RegionTy r ->
      "Region<" ^ (string_of_int (region_id r)) ^ ">"
   | ReadRef (t, r) ->

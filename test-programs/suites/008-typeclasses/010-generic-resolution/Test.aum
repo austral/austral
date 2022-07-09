@@ -1,7 +1,7 @@
 module body Test is
     pragma Unsafe_Module;
 
-    function Put_String(str: Fixed_Array[Natural_8]): Integer_32 is
+    function Put_String(str: FixedArray[Nat8]): Int32 is
         pragma Foreign_Import(External_Name => "puts");
     end;
 
@@ -22,8 +22,8 @@ module body Test is
         end;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
-        let p: Pair[Boolean, Boolean] := Pair(a => true, b => false);
+    function Main(root: RootCapability): RootCapability is
+        let p: Pair[Bool, Bool] := Pair(a => true, b => false);
         Accept(p);
         return root;
     end;

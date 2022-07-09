@@ -1,12 +1,12 @@
 module body Test is
     pragma Unsafe_Module;
 
-    function Put_Character(character: Natural_8): Integer_32 is
+    function Put_Character(character: Nat8): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
-        let c: Natural_8 := @embed(Natural_8, "$1 + $2", 90, 7);
+    function Main(root: RootCapability): RootCapability is
+        let c: Nat8 := @embed(Nat8, "$1 + $2", 90, 7);
         Put_Character(c);
         return root;
     end;

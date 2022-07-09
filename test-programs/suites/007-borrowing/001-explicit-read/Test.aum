@@ -1,27 +1,27 @@
 module body Test is
     pragma Unsafe_Module;
 
-    function Put_Character(character: Natural_8): Integer_32 is
+    function Put_Character(character: Nat8): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
     record Foo: Linear is
-        bar: Natural_8;
+        bar: Nat8;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Borrow it.
         borrow foo as fooref in rho do
             -- Extract a free value from the reference.
-            let subref: &[Natural_8, rho] := fooref->bar;
-            let b: Natural_8 := !subref;
+            let subref: &[Nat8, rho] := fooref->bar;
+            let b: Nat8 := !subref;
             -- Print it.
             Put_Character(b);
         end;
         -- Consume the record by destructuring.
-        let { bar: Natural_8 } := foo;
+        let { bar: Nat8 } := foo;
         return root;
     end;
 end module body.

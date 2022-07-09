@@ -1,26 +1,26 @@
 module body Test is
     pragma Unsafe_Module;
 
-    function Put_Character(character: Natural_8): Integer_32 is
+    function Put_Character(character: Nat8): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
 end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         PrintLn(nil);
-        PrintLn(Maximum_Natural_8);
-        PrintLn(Maximum_Natural_16);
-        PrintLn(Maximum_Natural_32);
-        PrintLn(Maximum_Natural_64);
-        PrintLn(Minimum_Integer_8);
-        PrintLn(Minimum_Integer_16);
-        PrintLn(Minimum_Integer_32);
-        PrintLn(Minimum_Integer_64);
-        PrintLn(Maximum_Integer_8);
-        PrintLn(Maximum_Integer_16);
-        PrintLn(Maximum_Integer_32);
-        PrintLn(Maximum_Integer_64);
-        PrintLn(3.14 : Single_Float);
-        PrintLn(3.14 : Double_Float);
+        PrintLn(Maximum_Nat8);
+        PrintLn(Maximum_Nat16);
+        PrintLn(Maximum_Nat32);
+        PrintLn(Maximum_Nat64);
+        PrintLn(Minimum_Int8);
+        PrintLn(Minimum_Int16);
+        PrintLn(Minimum_Int32);
+        PrintLn(Minimum_Int64);
+        PrintLn(Maximum_Int8);
+        PrintLn(Maximum_Int16);
+        PrintLn(Maximum_Int32);
+        PrintLn(Maximum_Int64);
+        PrintLn(3.14 : Float64);
+        PrintLn(3.14 : Float64);
         PrintLn("Hello, world!");
         return root;
     end;

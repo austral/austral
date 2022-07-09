@@ -1,15 +1,15 @@
 module body Example.FFI is
     pragma Unsafe_Module;
 
-    function Put_Character(character: Integer_32): Integer_32 is
+    function Put_Character(character: Int32): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;
 
-    function Put_String(str: Fixed_Array[Natural_8]): Integer_32 is
+    function Put_String(str: FixedArray[Nat8]): Int32 is
         pragma Foreign_Import(External_Name => "puts");
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         Put_Character(97);
         Put_String("Hello, world!");
         return root;

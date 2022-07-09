@@ -23,3 +23,5 @@ val write_ref_name : string
 
 val address_name : string
 val pointer_name : string
+
+val root_cap_name : string

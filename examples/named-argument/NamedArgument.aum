@@ -1,9 +1,9 @@
 module body Example.NamedArgument is
-    function F(x: Boolean, y: Boolean): Unit is
+    function F(x: Bool, y: Bool): Unit is
         return nil;
     end;
 
-    function Main(root: Root_Capability): Root_Capability is
+    function Main(root: RootCapability): RootCapability is
         F(y => false, x => true);
         return root;
     end;
