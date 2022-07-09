@@ -7,6 +7,8 @@ end;
 
     function Main(root: RootCapability): RootCapability is
         PrintLn(nil);
+        PrintLn(false);
+        PrintLn(true);
         PrintLn(Maximum_Nat8);
         PrintLn(Maximum_Nat16);
         PrintLn(Maximum_Nat32);

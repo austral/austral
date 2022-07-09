@@ -619,6 +619,21 @@ module body Austral.Pervasive is
         end;
     end;
 
+    instance Printable(Bool) is
+        method Print(value: Bool): Unit is
+            if value then
+                @embed(Unit, "au_printf(\"true\")");
+            else
+                @embed(Unit, "au_printf(\"false\")");
+            end if;
+            return nil;
+        end;
+
+        method Print_Fixed_Array(array: FixedArray[Unit]): Unit is
+            return nil;
+        end;
+    end;
+
     instance Printable(Nat8) is
         method Print(value: Nat8): Unit is
             return @embed(Unit, "au_printf(\"%i\", $1)", value);

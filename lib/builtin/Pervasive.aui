@@ -87,6 +87,7 @@ module Austral.Pervasive is
     end;
 
     instance Printable(Unit);
+    instance Printable(Bool);
     instance Printable(Nat8);
     instance Printable(Int8);
     instance Printable(Nat16);
