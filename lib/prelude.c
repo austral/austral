@@ -1,8 +1,5 @@
 #include <stdint.h>
 #include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <stdarg.h>
 
 /*
@@ -27,6 +24,12 @@ typedef void*          au_fnptr_t;
 #define true  1
 
 /*
+ * A little hack
+ */
+
+#define AU_STORE(ptr, val) (*(ptr) = (val), nil)
+
+/*
  * Pervasive
  */
 
@@ -40,13 +43,24 @@ au_array_t au_make_array_from_string(const char* data, size_t size) {
 }
 
 au_unit_t au_abort_internal(const char* message) {
+  extern int fprintf(void* stream, const char* format, ...);
+  extern int fflush(void* stream);
+  extern void _Exit(int status);
+  extern void* stderr;
+
   fprintf(stderr, "%s\n", message);
   fflush(stderr);
   _Exit(-1);
+
   return nil;
 }
 
 au_unit_t au_abort(au_array_t message) {
+  extern int fprintf(void* stream, const char* format, ...);
+  extern int fflush(void* stream);
+  extern void _Exit(int status);
+  extern void* stderr;
+
   fprintf(stderr, "%s\n", (char*) message.data);
   fflush(stderr);
   _Exit(-1);
@@ -67,6 +81,8 @@ void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size) {
 }
 
 au_unit_t au_printf(const char* format, ...) {
+  extern int vprintf(const char* format, va_list arg);
+
   va_list args;
   va_start(args, format);
   vprintf(format, args);
@@ -79,22 +95,32 @@ au_unit_t au_printf(const char* format, ...) {
  */
 
 void* au_calloc(size_t size, size_t count) {
+  extern void* calloc(size_t count, size_t size);
+
   return calloc(size, count);
 }
 
 void* au_realloc(void* ptr, size_t count) {
+  extern void* realloc(void *ptr, size_t size);
+
   return realloc(ptr, count);
 }
 
 void* au_memmove(void* destination, void* source, size_t count) {
+  extern void* memmove(void* destination, void* source, size_t count);
+
   return memmove(destination, source, count);
 }
 
 void* au_memcpy(void* destination, void* source, size_t count) {
+  extern void* memcpy(void* destination, void* source, size_t count);
+
   return memcpy(destination, source, count);
 }
 
 au_unit_t au_free(void* ptr) {
+  extern void free(void* ptr);
+
   free(ptr);
   return nil;
 };
