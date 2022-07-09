@@ -98,24 +98,40 @@ let rec compile_multiple c modules =
   | m::rest -> compile_multiple (compile_mod c m) rest
   | [] -> c
 
-let rec check_entrypoint_validity (env: env) (qi: qident): decl_id =
-  match get_decl_by_name env (qident_to_sident qi) with
+(** The kind of entrypoint function we have. *)
+type entrypoint_kind =
+  | EmptyEntrypoint
+  (** Zero-parameter entrypoint function. *)
+  | RootCapEntrypoint
+  (** Single-parameter entrypoint function with a root capability argument. *)
+
+(** Check the entrypoint function is valid, return the decl_id of the function
+    and the entrypoint kind. *)
+let rec check_entrypoint_validity (env: env) (name: qident): decl_id * entrypoint_kind =
+  match get_decl_by_name env (qident_to_sident name) with
   | Some decl ->
      (match decl with
       | Function { id; vis; typarams; value_params; rt; _ } ->
          if vis = VisPublic then
            if (typarams_size typarams) = 0 then
              match value_params with
+             | [] ->
+               (* Empty parameter list case *)
+                if is_exit_code_type rt then
+                  (id, EmptyEntrypoint)
+                else
+                  err "The return type of the entrypoint function must be `ExitCode`,"
              | [ValueParameter (_, pt)] ->
+                (* Single parameter case: the `root` parameter. *)
                 if is_root_cap_type pt then
                   if is_root_cap_type rt then
-                    id
+                    (id, RootCapEntrypoint)
                   else
                     err "Entrypoint function must return a value of type RootCapability."
                 else
                   err "Entrypoint function must take a single argument of type RootCapability."
              | _ ->
-                err "Entrypoint function must take a single argument of type RootCapability."
+                err "Entrypoint function must take a single parameter of type RootCapability, or zero parameters."
            else
              err "Entrypoint function cannot be generic."
          else
@@ -133,9 +149,30 @@ and is_root_cap_type = function
   | _ ->
      false
 
+and is_exit_code_type = function
+  | NamedType (name, [], FreeUniverse) ->
+     let m = equal_module_name (source_module_name name) pervasive_module_name
+     and n = equal_identifier (original_name name) (make_ident exit_code_name) in
+     m && n
+  | _ ->
+     false
+
 let entrypoint_code root_cap_mono_id id =
   let f = gen_decl_id id in
   "int main() {\n    " ^ f ^ "((" ^ (gen_mono_id root_cap_mono_id) ^ "){ .value = false });\n    return 0;\n}\n"
+
+let empty_entrypoint_code (entrypoint_id: decl_id) (exit_code_id: mono_id): string =
+  let f = gen_decl_id entrypoint_id in
+  let exit_code: string = gen_mono_id exit_code_id in
+  ("int main() {\n"
+   ^ "    " ^ exit_code ^ " result = " ^ f ^ "();\n"
+   ^ "    switch(result.tag) {\n"
+   ^ "        case " ^ exit_code ^ "_tag_ExitSuccess:\n"
+   ^ "            return 0;\n"
+   ^ "        case " ^ exit_code ^ "_tag_ExitFailure:\n"
+   ^ "            return 1;\n"
+   ^ "    }\n"
+   ^ "}")
 
 let get_root_capability_monomorph (env: env): mono_id =
   let mn: module_name = make_mod_name "Austral.Pervasive"
@@ -147,15 +184,36 @@ let get_root_capability_monomorph (env: env): mono_id =
       | Some id ->
          id
       | _ ->
-         err "No monomorph of RootCapability.")
+         internal_err "No monomorph of RootCapability.")
   | _ ->
-     err "Can't find the RootCapability type in the environment."
+     internal_err "Can't find the RootCapability type in the environment."
+
+let get_exit_code_monomorph (env: env): mono_id =
+  let mn: module_name = make_mod_name "Austral.Pervasive"
+  and n: identifier = make_ident exit_code_name in
+  let sn: sident = make_sident mn n in
+  match get_decl_by_name env sn with
+  | Some (Record { id; _ }) ->
+     (match get_type_monomorph env id [] with
+      | Some id ->
+         id
+      | _ ->
+         internal_err "No monomorph of ExitCode.")
+  | _ ->
+     internal_err "Can't find the ExitCode type in the environment."
 
 let compile_entrypoint c mn i =
   let qi = make_qident (mn, i, i) in
-  let entrypoint_id = check_entrypoint_validity (cenv c) qi in
+  let (entrypoint_id, kind): decl_id * entrypoint_kind = check_entrypoint_validity (cenv c) qi in
   let (Compiler (m, code)) = c in
-  Compiler (m, code ^ "\n" ^ (entrypoint_code (get_root_capability_monomorph (cenv c)) entrypoint_id))
+  let entry_code: string =
+    match kind with
+    | EmptyEntrypoint ->
+       empty_entrypoint_code entrypoint_id (get_exit_code_monomorph (cenv c))
+    | RootCapEntrypoint ->
+       entrypoint_code (get_root_capability_monomorph (cenv c)) entrypoint_id
+  in
+  Compiler (m, code ^ "\n" ^ entry_code)
 
 let fake_mod_source (is: string) (bs: string): module_source =
   TwoFileModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
