@@ -21,9 +21,9 @@ Each test directory contains some Austral source files (in the simplest cases, `
 
 If the compilation is expected to fail, there should be a file called `austral-stderr.txt` containing the Austral compiler's expected output.
 
-If compilation is expected to succeed and the program is expected to produce text output, there should be a file called `output.txt` containing the program's expected output.
+If compilation is expected to succeed and the program is expected to produce text output, there should be a file called `program-stdout.txt` containing the program's expected output.
 
-If compilation is expected to succeed but no program output is expected, there's no need for an `output.txt` file.
+If compilation is expected to succeed but no program output is expected, there's no need for an `program-stdout.txt` file.
 
 Suite and test directories are numbered so that tests run in a predictable order.
 
