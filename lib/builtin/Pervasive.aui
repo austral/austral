@@ -19,7 +19,7 @@ module Austral.Pervasive is
     function Deref_Write(ref: &![T, R]): T;
 
     generic [T: Type]
-    function Fixed_Array_Size(arr: FixedArray[T]): Index;
+    function fixedArraySize(arr: FixedArray[T]): Index;
 
     function abort(message: FixedArray[Nat8]): Unit;
 

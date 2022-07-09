@@ -11,7 +11,7 @@ module body Example.String is
 
     function main(): ExitCode is
         let X: FixedArray[Nat8] := "Hello, world!";
-        let len: Index := Fixed_Array_Size(X);
+        let len: Index := fixedArraySize(X);
         if len = 13 then
             Put_Character(X[0]);
             Put_String(X);
