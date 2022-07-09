@@ -6,7 +6,7 @@ module Austral.Memory is
     function nullPointer(): Address[T];
 
     generic [T: Type]
-    function Null_Check(address: Address[T]): Option[Pointer[T]];
+    function nullCheck(address: Address[T]): Option[Pointer[T]];
 
     generic [T: Type]
     function Allocate(size: Index): Address[T];

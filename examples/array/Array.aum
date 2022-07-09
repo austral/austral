@@ -1,7 +1,7 @@
 import Austral.Memory (
     Address,
     Pointer,
-    Null_Check,
+    nullCheck,
     Allocate,
     Deallocate,
     Positive_Offset,
@@ -27,7 +27,7 @@ module body Example.Array is
 
     function main(): ExitCode is
         let addr: Address[Bool] := Allocate(3);
-        case Null_Check(addr) of
+        case nullCheck(addr) of
             when Some(value: Pointer[Bool]) do
                 let arr: Pointer[Bool] := value;
                 let firstp: Pointer[Bool] := arr;

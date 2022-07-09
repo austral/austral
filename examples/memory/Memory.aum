@@ -5,7 +5,7 @@ import Austral.Memory (
     Load,
     Store,
     Deallocate,
-    Null_Check
+    nullCheck
 );
 
 module body Example.Memory is
@@ -13,7 +13,7 @@ module body Example.Memory is
 
     function main(): ExitCode is
         let addr: Address[Int32] := Allocate(sizeof(Int32));
-        case Null_Check(addr) of
+        case nullCheck(addr) of
             when Some(value: Pointer[Int32]) do
                 Deallocate(value);
             when None do
