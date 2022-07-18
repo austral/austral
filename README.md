@@ -37,6 +37,7 @@ Anti-features:
 - No implicit function calls.
 - No implicit type conversions.
 - No global state.
+- No subtyping.
 - No macros.
 - No reflection.
 - No Java-style @Annotations.
