@@ -49,6 +49,9 @@ void* get_stderr() {
 #elif defined(__FreeBSD__)
   extern void* __stderrp;
   return __stderrp;
+#elif defined(__OpenBSD__)
+  extern void* __stderrp;
+  return __stderrp;
 #else
   extern void* stderr;
   return stderr;
