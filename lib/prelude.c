@@ -42,7 +42,7 @@ au_array_t au_make_array_from_string(const char* data, size_t size) {
   return (au_array_t){ .data = (void*) data, .size = size };
 }
 
-void* get_stderr() {
+void* au_stderr() {
 #if defined(__APPLE__)
   extern void* __stderrp;
   return __stderrp;
@@ -63,7 +63,7 @@ au_unit_t au_abort_internal(const char* message) {
   extern int fflush(void* stream);
   extern void _Exit(int status);
 
-  void* stderr = get_stderr();
+  void* stderr = au_stderr();
 
   fprintf(stderr, "%s\n", message);
   fflush(stderr);
@@ -77,7 +77,7 @@ au_unit_t au_abort(au_array_t message) {
   extern int fflush(void* stream);
   extern void _Exit(int status);
 
-  void* stderr = get_stderr();
+  void* stderr = au_stderr();
 
   fprintf(stderr, "%s\n", (char*) message.data);
   fflush(stderr);
