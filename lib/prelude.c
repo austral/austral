@@ -50,8 +50,8 @@ void* au_stderr() {
   extern void* __stderrp;
   return __stderrp;
 #elif defined(__OpenBSD__)
-  extern void* __stderrp;
-  return __stderrp;
+  extern void *__sF;
+  return &__sF[2];
 #else
   extern void* stderr;
   return stderr;
