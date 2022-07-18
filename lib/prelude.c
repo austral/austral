@@ -76,7 +76,8 @@ au_unit_t au_abort(au_array_t message) {
   extern int fprintf(void* stream, const char* format, ...);
   extern int fflush(void* stream);
   extern void _Exit(int status);
-  extern void* stderr;
+
+  void* stderr = get_stderr();
 
   fprintf(stderr, "%s\n", (char*) message.data);
   fflush(stderr);
