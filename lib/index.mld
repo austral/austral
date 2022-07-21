@@ -75,4 +75,5 @@ The compiler backend.
 The compiler's large-scale control structures.
 
 - {!Austral_core.Cli}
+- {!Austral_core.Entrypoint}
 - {!Austral_core.Compiler}
