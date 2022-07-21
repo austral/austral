@@ -1,0 +1,1 @@
+Test that two unions can't have the same name.

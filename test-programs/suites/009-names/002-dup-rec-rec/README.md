@@ -1,0 +1,1 @@
+Test that two records can't have the same name.

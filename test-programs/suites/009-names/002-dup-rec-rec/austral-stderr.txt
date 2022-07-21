@@ -1,0 +1,8 @@
+Error:
+  Title: Declaration Error
+  Location:
+    [no span available]
+  Description:
+    A declaration with the name `A` already exists in the module `Test`
+  Code:
+    [no span available]

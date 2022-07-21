@@ -12,6 +12,8 @@ type error_kind =
   (** A parse error. *)
   | TypeError
   (** A type error. *)
+  | DeclarationError
+  (** An error in the structure of a declaration. *)
   | InternalError
   (** An internal error in the compiler. *)
 
