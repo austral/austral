@@ -1,0 +1,1 @@
+Test that two functions can't have the same name.

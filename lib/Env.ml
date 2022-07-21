@@ -36,6 +36,32 @@ type env = Env of {
 let empty_env: env =
   Env { files = []; mods = []; methods = []; decls = []; monos = []; }
 
+let get_module_by_id (env: env) (mod_id: mod_id): mod_rec option =
+  let (Env { mods; _ }) = env in
+  List.find_opt (fun (ModRec { id; _ }) -> equal_mod_id mod_id id) mods
+
+let get_module_by_name (env: env) (mod_name: module_name): mod_rec option =
+  let (Env { mods; _ }) = env in
+  List.find_opt (fun (ModRec { name; _ }) -> equal_module_name mod_name name) mods
+
+let ensure_no_mod_with_name (env: env) (name: module_name): unit =
+  match get_module_by_name env name with
+  | Some _ ->
+     austral_raise DeclarationError [
+         Text "A module with the name";
+         Code (mod_name_string name);
+         Text "already exists.";
+       ]
+  | None ->
+     ()
+
+let module_name_from_id (env: env) (mod_id: mod_id): module_name =
+  match get_module_by_id env mod_id with
+  | Some (ModRec { name; _ }) ->
+     name
+  | _ ->
+     internal_err "No module with this ID"
+
 let add_file (env: env) (input: file_input): (env * file_id) =
   let { path; contents } = input in
   let (Env { files; mods; methods; decls; monos }) = env in
@@ -46,6 +72,7 @@ let add_file (env: env) (input: file_input): (env * file_id) =
 
 let add_module (env: env) (input: mod_input): (env * mod_id) =
   let { name; interface_file; interface_docstring; body_file; body_docstring; kind; imported_instances; imports_from } = input in
+  let _ = ensure_no_mod_with_name env name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mod_id () in
   let md = ModRec {
@@ -63,19 +90,48 @@ let add_module (env: env) (input: mod_input): (env * mod_id) =
   let env = Env { files; mods = md :: mods; methods; decls; monos } in
   (env, id)
 
-let get_module_by_id (env: env) (mod_id: mod_id): mod_rec option =
-  let (Env { mods; _ }) = env in
-  List.find_opt (fun (ModRec { id; _ }) -> equal_mod_id mod_id id) mods
+let get_decl_by_name (env: env) (name: sident): decl option =
+  match get_module_by_name env (sident_module_name name) with
+  | Some (ModRec { id=target_mod_id; _ }) ->
+     let (Env { decls; _ }) = env in
+     let pred (d: decl) =
+       let mid = decl_mod_id d in
+       if equal_mod_id target_mod_id mid then
+         (* Module matches. *)
+         (match (decl_name d) with
+          | (Some dname) ->
+             (* Does the name match? *)
+             equal_identifier dname (sident_name name)
+          | None ->
+             false)
+       else
+         false
+     in
+     List.find_opt (fun d -> pred d) decls
+  | None ->
+     err "No such module."
 
-let get_module_by_name (env: env) (mod_name: module_name): mod_rec option =
-  let (Env { mods; _ }) = env in
-  List.find_opt (fun (ModRec { name; _ }) -> equal_module_name mod_name name) mods
+let ensure_no_decl_with_name (env: env) (mod_id: mod_id) (name: identifier): unit =
+  let mn: module_name = module_name_from_id env mod_id in
+  let ident: sident = make_sident mn name in
+  match get_decl_by_name env ident with
+  | Some _ ->
+     austral_raise DeclarationError [
+         Text "A declaration with the name";
+         Code (ident_string name);
+         Text "already exists in the module";
+         Code (mod_name_string mn);
+       ]
+  | None ->
+     ()
 
 let make_const_decl (id: decl_id) (input: const_input): decl =
   let { mod_id; vis; name; ty; docstring } = input in
   Constant { id; mod_id; vis; name; ty; docstring }
 
 let add_constant (env: env) (input: const_input): (env * decl_id) =
+  (* Check: no other decl with this name. *)
+  let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_const_decl id input in
@@ -87,6 +143,8 @@ let make_record_decl (id: decl_id) (input: record_input): decl =
   Record { id; mod_id; vis; name; docstring; typarams; universe; slots }
 
 let add_record (env: env) (input: record_input): (env * decl_id) =
+  (* Check: no other decl with this name. *)
+  let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_record_decl id input in
@@ -98,6 +156,8 @@ let make_union_decl (id: decl_id) (input: union_input): decl =
   Union { id; mod_id; vis; name; docstring; typarams; universe }
 
 let add_union (env: env) (input: union_input): (env * decl_id) =
+  (* Check: no other decl with this name. *)
+  let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_union_decl id input in
@@ -120,6 +180,8 @@ let make_function_decl (id: decl_id) (input: function_input): decl =
   Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body }
 
 let add_function (env: env) (input: function_input): (env * decl_id) =
+  (* Check: no other decl with this name. *)
+  let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_function_decl id input in
@@ -131,6 +193,8 @@ let make_type_class_decl (id: decl_id) (input: type_class_input): decl =
   TypeClass { id; mod_id; vis; name; docstring; param }
 
 let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
+  (* Check: no other decl with this name. *)
+  let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
   let decl = make_type_class_decl id input in
@@ -178,27 +242,6 @@ let get_instance_method_by_id (env: env) (ins_meth_id: ins_meth_id): ins_meth_re
   let (Env { methods; _ }) = env in
   List.find_opt (fun (InsMethRec { id; _ }) -> equal_ins_meth_id id ins_meth_id) methods
 
-let get_decl_by_name (env: env) (name: sident): decl option =
-  match get_module_by_name env (sident_module_name name) with
-  | Some (ModRec { id=target_mod_id; _ }) ->
-     let (Env { decls; _ }) = env in
-     let pred (d: decl) =
-       let mid = decl_mod_id d in
-       if equal_mod_id target_mod_id mid then
-         (* Module matches. *)
-         (match (decl_name d) with
-          | (Some dname) ->
-             (* Does the name match? *)
-             equal_identifier dname (sident_name name)
-          | None ->
-             false)
-       else
-         false
-     in
-     List.find_opt (fun d -> pred d) decls
-  | None ->
-     err "No such module."
-
 let get_method_from_typeclass_id_and_name (env: env) (typeclass_id: decl_id) (name: identifier): decl option =
   let (Env { decls; _ }) = env in
   let pred (decl: decl): bool =
@@ -219,13 +262,6 @@ let module_instances (env: env) (id: mod_id): decl list =
     | _ -> false
   in
   List.filter pred decls
-
-let module_name_from_id (env: env) (mod_id: mod_id): module_name =
-  match get_module_by_id env mod_id with
-  | Some (ModRec { name; _ }) ->
-     name
-  | _ ->
-     internal_err "No module with this ID"
 
 let get_union_cases (env: env) (id: decl_id): decl list =
   let (Env { decls; _ }) = env
