@@ -131,7 +131,13 @@ let internal_err (message: string) =
     AustralError {
         module_name = None;
         kind = InternalError;
-        text = [Text "Internal compiler error:"; Text message];
+        text = [
+            Text "Internal compiler error:";
+            Text message;
+            Break;
+            Text "This is a bug in the compiler, please open an issue here: ";
+            Code "https://github.com/austral/austral/issues"
+          ];
         span = None;
         source_ctx = None;
       }
