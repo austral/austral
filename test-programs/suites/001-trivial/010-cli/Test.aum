@@ -1,0 +1,14 @@
+module body Test is
+    function main(root: RootCapability): ExitCode is
+        print("Number of CLI arguments = ");
+        printLn(argumentCount());
+        for i from 0 to (argumentCount() - 1) do
+            print("    i = ");
+            printLn(i);
+            print("    i-th arg = ");
+            printLn(nthArgument(i));
+        end for;
+        surrenderRoot(root);
+        return ExitSuccess();
+    end;
+end module body.

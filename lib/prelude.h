@@ -61,6 +61,16 @@ extern void* au_memcpy(void* destination, void* source, size_t count);
 extern au_unit_t au_free(void* ptr);
 
 /*
+ * CLI functions
+ */
+
+void au_store_cli_args(int argc, char** argv);
+
+size_t au_get_argc();
+
+au_array_t au_get_nth_arg(size_t n);
+
+/*
  * Conversion functions
  */
 

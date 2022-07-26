@@ -50,6 +50,8 @@ let pervasive_imports =
         ConcreteImport (make_ident "Printable", None);
         ConcreteImport (make_ident "print", None);
         ConcreteImport (make_ident "printLn", None);
+        ConcreteImport (make_ident "argumentCount", None);
+        ConcreteImport (make_ident "nthArgument", None);
       ]
     )
 
