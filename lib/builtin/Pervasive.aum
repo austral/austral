@@ -27,6 +27,14 @@ module body Austral.Pervasive is
         return nil;
     end;
 
+    function argumentCount(): Index is
+        return @embed(Index, "au_get_argc()");
+    end;
+
+    function nthArgument(n: Index): FixedArray[Nat8] is
+        return @embed(FixedArray[Nat8], "au_get_nth_arg($1)", n);
+    end;
+
     constant minimum_nat8: Int8 := 0;
     constant maximum_nat8: Nat8 := @embed(Nat8, "UINT8_MAX");
 

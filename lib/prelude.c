@@ -144,6 +144,77 @@ au_unit_t au_free(void* ptr) {
 };
 
 /*
+ * CLI functions
+ */
+
+static int _au_argc = -1;
+
+static char** _au_argv = NULL;
+
+void au_store_cli_args(int argc, char** argv) {
+  // Sanity checks.
+  if (argc < 0) {
+    au_abort_internal("Entrypoint error: argc is negative.");
+  }
+  if (argv == NULL) {
+    au_abort_internal("Entrypoint error: argv is NULL.");
+  }
+  // Store values.
+  _au_argc = argc;
+  _au_argv = argv;
+}
+
+size_t au_get_argc() {
+  // Sanity check.
+  if (_au_argc == -1) {
+    au_abort_internal("Prelude error: argc was not set.");
+  }
+  // Correctness argument: if _au_argc is non-negative, being an `int`, it
+  // should fit inside `size_t`.
+  size_t argc = (size_t)(_au_argc);
+  return argc;
+}
+
+size_t _au_bounded_strlen(char* string, size_t bound) {
+  size_t size = 0;
+  for(size_t idx = 0; idx <= bound; idx++) {
+    if (string[idx] == '\0') {
+      return size;
+    }
+    size++;
+  }
+  au_abort_internal("Command line argument exceeds maximum length of 10 kibibytes.");
+}
+
+/* One kibibyte in bytes. */
+#define AU_KIBIBYTE 1024
+/* The maximum size of each CLI arg. */
+#define AU_MAX_ARG_SIZE (10*AU_KIBIBYTE)
+
+au_array_t au_get_nth_arg(size_t n) {
+  // Sanity check.
+  if (_au_argv == NULL) {
+    au_abort_internal("Prelude error: argv was not set.");
+  }
+  size_t argc = au_get_argc();
+  // Check array bounds.
+  if (n >= argc) {
+    au_abort_internal("Command line argument access out of bounds.");
+  }
+  // Retrieve the nth argument.
+  char* arg = _au_argv[n];
+  // Check non-null.
+  if (arg == NULL) {
+    au_abort_internal("Prelude error: command-line argument is NULL.");
+  }
+  // Measure the length.
+  size_t size = _au_bounded_strlen(arg, AU_MAX_ARG_SIZE);
+  // Otherwise, return it.
+  au_array_t arg_array = ((au_array_t){ .data = (void*)arg, .size = size });
+  return arg_array;
+}
+
+/*
  * Conversion functions
  */
 

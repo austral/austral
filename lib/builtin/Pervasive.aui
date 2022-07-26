@@ -27,6 +27,10 @@ module Austral.Pervasive is
 
     function surrenderRoot(cap: RootCapability): Unit;
 
+    function argumentCount(): Index;
+
+    function nthArgument(n: Index): FixedArray[Nat8];
+
     union ExitCode: Free is
         case ExitSuccess;
         case ExitFailure;

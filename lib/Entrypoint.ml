@@ -88,7 +88,8 @@ and is_exit_code_type = function
 let entrypoint_code root_cap_mono_id exit_code_mono_id id =
   let f = gen_decl_id id in
   let exit_code: string = gen_mono_id exit_code_mono_id in
-  ("int main() {\n"
+  ("int main(int argc, char** argv) {\n"
+   ^ "    au_store_cli_args(argc, argv);\n"
    ^ "    " ^ exit_code ^ " result = " ^ f ^ "((" ^ (gen_mono_id root_cap_mono_id) ^ "){ .value = false });\n"
    ^ "    switch(result.tag) {\n"
    ^ "        case " ^ exit_code ^ "_tag_ExitSuccess:\n"
@@ -101,7 +102,8 @@ let entrypoint_code root_cap_mono_id exit_code_mono_id id =
 let empty_entrypoint_code (entrypoint_id: decl_id) (exit_code_id: mono_id): string =
   let f = gen_decl_id entrypoint_id in
   let exit_code: string = gen_mono_id exit_code_id in
-  ("int main() {\n"
+  ("int main(int argc, char** argv) {\n"
+   ^ "    au_store_cli_args(argc, argv);\n"
    ^ "    " ^ exit_code ^ " result = " ^ f ^ "();\n"
    ^ "    switch(result.tag) {\n"
    ^ "        case " ^ exit_code ^ "_tag_ExitSuccess:\n"
