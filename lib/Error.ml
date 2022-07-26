@@ -10,6 +10,7 @@ type error_kind =
   | ParseError
   | TypeError
   | DeclarationError
+  | EntrypointError
   | InternalError
 
 type austral_error = AustralError of {
@@ -68,6 +69,7 @@ let error_title (kind: error_kind): string =
   | ParseError -> "Parse Error"
   | TypeError -> "Type Error"
   | DeclarationError -> "Declaration Error"
+  | EntrypointError -> "Entrypoint Definition Error"
   | InternalError -> "Internal Error"
 
 let indent_text (text: string) (indent: int): string =

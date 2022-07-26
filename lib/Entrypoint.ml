@@ -1,11 +1,16 @@
 open Id
 open Identifier
 open Env
+open Type
 open TypeParameters
 open Error
+open ErrorText
 open BuiltIn
 open Names
 open CodeGen
+
+let entrypoint_err (text: err_text): 'a =
+  austral_raise EntrypointError text
 
 (** The kind of entrypoint function we have. *)
 type entrypoint_kind =
@@ -29,26 +34,40 @@ let rec check_entrypoint_validity (env: env) (name: qident): decl_id * entrypoin
                 if is_exit_code_type rt then
                   (id, EmptyEntrypoint)
                 else
-                  err "The return type of the entrypoint function must be `ExitCode`,"
+                  entrypoint_err [
+                      Text "The return type of the entrypoint function must be `ExitCode`, but I got";
+                      Code (type_string rt)
+                    ]
              | [ValueParameter (_, pt)] ->
                 (* Single parameter case: the `root` parameter. *)
                 if is_root_cap_type pt then
                   if is_exit_code_type rt then
                     (id, RootCapEntrypoint)
                   else
-                    err "Entrypoint function must return a value of type ExitCode."
+                    entrypoint_err [
+                        Text "The return type of the entrypoint function must be `ExitCode`, but I got";
+                        Code (type_string rt)
+                      ]
                 else
-                  err "Entrypoint function must take a single argument of type RootCapability."
+                  entrypoint_err [
+                      Text "The parameter to the entrypoint function must be of type RootCapability, but I got";
+                      Code (type_string pt)
+                    ]
              | _ ->
-                err "Entrypoint function must take a single parameter of type RootCapability, or zero parameters."
+                entrypoint_err [Text "Entrypoint function must take a single parameter of type RootCapability, or zero parameters, but I got a different parameter list."]
            else
-             err "Entrypoint function cannot be generic."
+             entrypoint_err [Text "Entrypoint function cannot have type parameters generic."]
          else
-           err "Entrypoint function is not public."
+           entrypoint_err [Text "Entrypoint function is not public."]
       | _ ->
-         err "Entrypoint is not a function.")
+         entrypoint_err [Text "Entrypoint is not a function."])
   | None ->
-     err "Entrypoint does not exist."
+     entrypoint_err [
+         Text "Entrypoint function";
+         Code (ident_string (original_name name));
+         Text "does not exist in the module name";
+         Code (mod_name_string (source_module_name name));
+       ]
 
 and is_root_cap_type = function
   | NamedType (name, [], LinearUniverse) ->

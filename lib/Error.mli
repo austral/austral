@@ -14,6 +14,8 @@ type error_kind =
   (** A type error. *)
   | DeclarationError
   (** An error in the structure of a declaration. *)
+  | EntrypointError
+  (** An error with the definition of the program entrypoint. *)
   | InternalError
   (** An internal error in the compiler. *)
 
