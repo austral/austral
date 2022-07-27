@@ -1,9 +1,9 @@
-import Standard.Test.Unit (assertTrue);
+import Standard.Test.Tuples (tuplesTestSuite);
 
 module body Standard.Test is
     function Main(root: RootCapability): ExitCode is
         surrenderRoot(root);
-        assertTrue(true, "expect true");
+        tuplesTestSuite();
         return ExitSuccess();
     end;
 end module body.

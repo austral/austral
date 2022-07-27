@@ -1,5 +1,6 @@
 MODULES := --module=src/Tuples \
 	--module=test/Unit \
+	--module=test/Tuples \
 	--module=test/Main
 TEST_BIN := test_bin
 

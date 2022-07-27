@@ -1,0 +1,30 @@
+import Standard.Tuples (Pair, Triple);
+
+import Standard.Test.Unit (assertTrue);
+
+module body Standard.Test.Tuples is
+    function tuplesTestSuite(): Unit is
+        pairTest();
+        tripleTest();
+        return nil;
+    end;
+
+    function pairTest(): Unit is
+        let p: Pair[Bool, Int32] := Pair(first => false, second => 10);
+        assertTrue((p.first) = false, "`first` is false");
+        assertTrue((p.second) = 10, "`second` is 10");
+        return nil;
+    end;
+
+    function tripleTest(): Unit is
+        let t: Triple[Int32, Int32, Int32] := Triple(
+            first => 1,
+            second => 2,
+            third => 3
+        );
+        assertTrue((t.first) = 1, "`first` is 1");
+        assertTrue((t.second) = 2, "`second` is 2");
+        assertTrue((t.third) = 3, "`third` is 3");
+        return nil;
+    end;
+end module body.
