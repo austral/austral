@@ -1,0 +1,54 @@
+module Standard.Tuples is
+    record Pair[A: Type, B: Type]: Type is
+        first:  A;
+        second: B;
+    end;
+
+    record Triple[A: Type, B: Type, C: Type]: Type is
+        first:  A;
+        second: B;
+        third:  C;
+    end;
+
+    record Tuple4[
+        A: Type,
+        B: Type,
+        C: Type,
+        D: Type
+    ]: Type is
+        first:  A;
+        second: B;
+        third:  C;
+        fourth: D;
+    end;
+
+    record Tuple5[
+        A: Type,
+        B: Type,
+        C: Type,
+        D: Type,
+        E: Type
+    ]: Type is
+        first:  A;
+        second: B;
+        third:  C;
+        fourth: D;
+        fifth:  E;
+    end;
+
+    record Tuple6[
+        A: Type,
+        B: Type,
+        C: Type,
+        D: Type,
+        E: Type,
+        F: Type
+    ]: Type is
+        first:  A;
+        second: B;
+        third:  C;
+        fourth: D;
+        fifth:  E;
+        sixth:  F;
+    end;
+end module.

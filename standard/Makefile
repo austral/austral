@@ -1,26 +1,15 @@
-AUSTRAL := austral
-CPP := g++
-
-
-MODULES := --module=src/Box \
-	--module=src/Buffer \
-	--module=src/Console \
+MODULES := --module=src/Tuples \
 	--module=test/Unit \
-	--module=test/Box_Test \
-	--module=test/Buffer_Test \
 	--module=test/Main
-
 TEST_BIN := test_bin
 
-.DEFAULT: run-tests
-
-run-tests: $(TEST_BIN)
-	./$(TEST_BIN)
+.DEFAULT: all
+all: $(TEST_BIN)
 
 $(TEST_BIN): src/*.aui src/*.aum test/*.aui test/*.aum
-	$(AUSTRAL) compile $(MODULES) --entrypoint=Standard.Test:Main --output=test.cpp
-	$(CPP) -std=c++11 test.cpp -o $(TEST_BIN)
-	rm test.cpp
+	austral compile $(MODULES) --entrypoint=Standard.Test:Main --output=test.c
+	gcc -fwrapv test.c -o $(TEST_BIN)
+	rm test.c
 
 clean:
 	rm $(TEST_BIN)

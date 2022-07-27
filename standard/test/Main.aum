@@ -1,14 +1,9 @@
-import Standard.Test.Box (
-    Box_Test_Suite
-);
-import Standard.Test.Buffer (
-    Buffer_Test_Suite
-);
+import Standard.Test.Unit (assertTrue);
 
 module body Standard.Test is
-    function Main(root: Root_Capability): Root_Capability is
-        Box_Test_Suite();
-        Buffer_Test_Suite();
-        return root;
+    function Main(root: RootCapability): ExitCode is
+        surrenderRoot(root);
+        assertTrue(true, "expect true");
+        return ExitSuccess();
     end;
 end module body.

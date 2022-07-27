@@ -1,28 +1,34 @@
-import Standard.IO.Console (
-    Print_Constant,
-    Print_Constant_Line
-);
-
 module body Standard.Test.Unit is
-    function Suite_Heading(heading: Fixed_Array[Natural_8]): Unit is
-        Print_Constant("Suite: ");
-        Print_Constant_Line(heading);
+    function suiteHeading(heading: FixedArray[Nat8]): Unit is
+        print("Suite: ");
+        printLn(heading);
         return nil;
     end;
 
-    function Test_Heading(heading: Fixed_Array[Natural_8]): Unit is
-        Print_Constant("    Test: ");
-        Print_Constant_Line(heading);
+    function testHeading(heading: FixedArray[Nat8]): Unit is
+        print("    Test: ");
+        printLn(heading);
         return nil;
     end;
 
-    function Assert_True(value: Boolean, message: Fixed_Array[Natural_8]): Unit is
-        Print_Constant("        Assert: ");
-        Print_Constant(message);
+    function assertTrue(value: Bool, message: FixedArray[Nat8]): Unit is
+        print("        Assert: ");
+        print(message);
         if value then
-            Print_Constant_Line(" ✓");
+            printLn(" ✓");
         else
-            abort("Assertion failed.");
+            abort("Assertion failed (assertTrue).");
+        end if;
+        return nil;
+    end;
+
+    function assertFalse(value: Bool, message: FixedArray[Nat8]): Unit is
+        print("        Assert: ");
+        print(message);
+        if not value then
+            printLn(" ✓");
+        else
+            abort("Assertion failed (assertFalse).");
         end if;
         return nil;
     end;

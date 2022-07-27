@@ -1,6 +1,7 @@
 module Standard.Test.Unit is
-    function Suite_Heading(heading: Fixed_Array[Natural_8]): Unit;
-    function Test_Heading(heading: Fixed_Array[Natural_8]): Unit;
+    function suiteHeading(heading: FixedArray[Nat8]): Unit;
+    function testHeading(heading: FixedArray[Nat8]): Unit;
 
-    function Assert_True(value: Boolean, message: Fixed_Array[Natural_8]): Unit;
+    function assertTrue(value: Bool, message: FixedArray[Nat8]): Unit;
+    function assertFalse(value: Bool, message: FixedArray[Nat8]): Unit;
 end module.
