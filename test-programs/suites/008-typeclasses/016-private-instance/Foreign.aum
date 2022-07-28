@@ -1,0 +1,10 @@
+module body Foreign is
+    """
+    Private instance.
+    """
+    instance Foo(Bool) is
+        method foo(value: Bool): Unit is
+            return nil;
+        end;
+    end;
+end module body.

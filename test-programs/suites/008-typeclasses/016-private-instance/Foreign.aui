@@ -1,0 +1,5 @@
+module Foreign is
+    typeclass Foo(T: Free) is
+        method foo(value: T): Unit;
+    end;
+end module.
