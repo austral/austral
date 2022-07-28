@@ -1,7 +1,9 @@
-MODULES := --module=src/Tuples \
-	--module=test/Unit \
-	--module=test/Tuples \
-	--module=test/Main
+MODULES := --module=src/Tuples.aui,src/Tuples.aum \
+	--module=src/Bounded.aui,src/Bounded.aum \
+	--module=test/Unit.aui,test/Unit.aum \
+	--module=test/Tuples.aui,test/Tuples.aum \
+	--module=test/Bounded.aui,test/Bounded.aum \
+	--module=test/Main.aui,test/Main.aum
 TEST_BIN := test_bin
 
 .DEFAULT: all

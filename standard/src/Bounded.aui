@@ -1,0 +1,9 @@
+module Standard.Bounded is
+    typeclass Bounded(A: Type) is
+        method minBound(): A;
+
+        method maxBound(): A;
+    end;
+
+    instance Bounded(Bool);
+end module.

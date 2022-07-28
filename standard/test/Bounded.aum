@@ -1,0 +1,17 @@
+import Standard.Bounded (Bounded, minBound, maxBound);
+import Standard.Test.Unit (assertTrue, assertFalse);
+
+module body Standard.Test.Bounded is
+    function boundedTestSuite(): Unit is
+        boolTest();
+        return nil;
+    end;
+
+    function boolTest(): Unit is
+        let min: Bool := minBound();
+        let max: Bool := maxBound();
+        assertFalse(min, "minBound is false");
+        assertTrue(max, "maxBound is true");
+        return nil;
+    end;
+end module body.

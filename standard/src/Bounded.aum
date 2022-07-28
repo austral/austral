@@ -1,0 +1,11 @@
+module body Standard.Bounded is
+    instance Bounded(Bool) is
+        method minBound(): Bool is
+            return false;
+        end;
+
+        method maxBound(): Bool is
+            return true;
+        end;
+    end;
+end module body.
