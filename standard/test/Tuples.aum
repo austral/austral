@@ -1,11 +1,18 @@
-import Standard.Tuples (Pair, Triple);
-
+import Standard.Tuples (
+    Pair,
+    Triple,
+    Tuple4,
+    Tuple5,
+    Tuple6
+);
 import Standard.Test.Unit (assertTrue);
 
 module body Standard.Test.Tuples is
     function tuplesTestSuite(): Unit is
         pairTest();
         tripleTest();
+        quadrupleTest();
+        quintupleTest();
         return nil;
     end;
 
@@ -25,6 +32,54 @@ module body Standard.Test.Tuples is
         assertTrue((t.first) = 1, "`first` is 1");
         assertTrue((t.second) = 2, "`second` is 2");
         assertTrue((t.third) = 3, "`third` is 3");
+        return nil;
+    end;
+
+    function quadrupleTest(): Unit is
+        let t: Tuple4[Int32, Int32, Int32, Int32] := Tuple4(
+            first => 1,
+            second => 2,
+            third => 3,
+            fourth => 4
+        );
+        assertTrue((t.first) = 1, "`first` is 1");
+        assertTrue((t.second) = 2, "`second` is 2");
+        assertTrue((t.third) = 3, "`third` is 3");
+        assertTrue((t.fourth) = 4, "`fourth` is 4");
+        return nil;
+    end;
+
+    function quintupleTest(): Unit is
+        let t: Tuple5[Int32, Int32, Int32, Int32, Int32] := Tuple5(
+            first => 1,
+            second => 2,
+            third => 3,
+            fourth => 4,
+            fifth => 5
+        );
+        assertTrue((t.first) = 1, "`first` is 1");
+        assertTrue((t.second) = 2, "`second` is 2");
+        assertTrue((t.third) = 3, "`third` is 3");
+        assertTrue((t.fourth) = 4, "`fourth` is 4");
+        assertTrue((t.fifth) = 5, "`fifth` is 5");
+        return nil;
+    end;
+
+    function sextupleTest(): Unit is
+        let t: Tuple6[Int32, Int32, Int32, Int32, Int32, Int32] := Tuple6(
+            first => 1,
+            second => 2,
+            third => 3,
+            fourth => 4,
+            fifth => 5,
+            sixth => 6
+        );
+        assertTrue((t.first) = 1, "`first` is 1");
+        assertTrue((t.second) = 2, "`second` is 2");
+        assertTrue((t.third) = 3, "`third` is 3");
+        assertTrue((t.fourth) = 4, "`fourth` is 4");
+        assertTrue((t.fifth) = 5, "`fifth` is 5");
+        assertTrue((t.sixth) = 6, "`sixth` is 6");
         return nil;
     end;
 end module body.
