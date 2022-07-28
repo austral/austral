@@ -8,4 +8,94 @@ module body Standard.Bounded is
             return true;
         end;
     end;
+
+    instance Bounded(Nat8) is
+        method minBound(): Nat8 is
+            return 0;
+        end;
+
+        method maxBound(): Nat8 is
+            return maximum_nat8;
+        end;
+    end;
+
+    instance Bounded(Nat16) is
+        method minBound(): Nat16 is
+            return 0;
+        end;
+
+        method maxBound(): Nat16 is
+            return maximum_nat16;
+        end;
+    end;
+
+    instance Bounded(Nat32) is
+        method minBound(): Nat32 is
+            return 0;
+        end;
+
+        method maxBound(): Nat32 is
+            return maximum_nat32;
+        end;
+    end;
+
+    instance Bounded(Nat64) is
+        method minBound(): Nat64 is
+            return 0;
+        end;
+
+        method maxBound(): Nat64 is
+            return maximum_nat64;
+        end;
+    end;
+
+    instance Bounded(Int8) is
+        method minBound(): Int8 is
+            return minimum_int8;
+        end;
+
+        method maxBound(): Int8 is
+            return maximum_int8;
+        end;
+    end;
+
+    instance Bounded(Int16) is
+        method minBound(): Int16 is
+            return minimum_int16;
+        end;
+
+        method maxBound(): Int16 is
+            return maximum_int16;
+        end;
+    end;
+
+    instance Bounded(Int32) is
+        method minBound(): Int32 is
+            return minimum_int32;
+        end;
+
+        method maxBound(): Int32 is
+            return maximum_int32;
+        end;
+    end;
+
+    instance Bounded(Int64) is
+        method minBound(): Int64 is
+            return minimum_int64;
+        end;
+
+        method maxBound(): Int64 is
+            return maximum_int64;
+        end;
+    end;
+
+    instance Bounded(Index) is
+        method minBound(): Index is
+            return minimum_index;
+        end;
+
+        method maxBound(): Index is
+            return maximum_index;
+        end;
+    end;
 end module body.
