@@ -71,8 +71,11 @@ val get_decl_by_name : env -> sident -> decl option
 (** Find a typeclass method from its typeclass ID and name. *)
 val get_method_from_typeclass_id_and_name : env -> decl_id -> identifier -> decl option
 
-(** Return the typeclass instances defined in a module. *)
+(** Return all typeclass instances defined in a module. *)
 val module_instances: env -> mod_id -> decl list
+
+(** Return the public typeclass instances defined in a module. *)
+val module_public_instances: env -> mod_id -> decl list
 
 (** Return the list of cases of a union. *)
 val get_union_cases : env -> decl_id -> decl list

@@ -1,0 +1,1 @@
+./austral compile --module=$DIR/Foreign.aui,$DIR/Foreign.aum --public-module=$DIR/Test.aum --entrypoint=Test:main --output=test-programs/output.c

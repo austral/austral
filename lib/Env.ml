@@ -263,6 +263,17 @@ let module_instances (env: env) (id: mod_id): decl list =
   in
   List.filter pred decls
 
+let module_public_instances (env: env) (id: mod_id): decl list =
+  let (Env { decls; _ }) = env
+  and pred = function
+    | Instance { mod_id; vis; _ } ->
+       (match vis with
+        | VisPublic -> equal_mod_id mod_id id
+        | VisPrivate -> false)
+    | _ -> false
+  in
+  List.filter pred decls
+
 let get_union_cases (env: env) (id: decl_id): decl list =
   let (Env { decls; _ }) = env
   and pred = function

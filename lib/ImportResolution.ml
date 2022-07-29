@@ -79,7 +79,7 @@ let module_defined_instances (env: env) (mn: module_name): decl_id list =
   match (get_module_by_name env mn) with
   | Some mod_rec ->
      let ModRec { id; _ } = mod_rec in
-     let decls: decl list = module_instances env id in
+     let decls: decl list = module_public_instances env id in
      List.map decl_id decls
   | None ->
      []

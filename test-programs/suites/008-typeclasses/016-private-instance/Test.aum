@@ -1,0 +1,8 @@
+import Foreign (foo);
+
+module body Test is
+    function main(): ExitCode is
+        let u: Unit := foo(true);
+        return ExitSuccess();
+    end;
+end module body.
