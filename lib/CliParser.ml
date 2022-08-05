@@ -4,15 +4,18 @@ open Error
 
 type entrypoint =
   | Entrypoint of module_name * identifier
+[@@deriving eq]
 
 type mod_source =
   | ModuleSource of { inter_path: string; body_path: string }
   | ModuleBodySource of { body_path: string }
+[@@deriving eq]
 
 type target =
   | TypeCheck
   | Executable of { bin_path: string; entrypoint: entrypoint; }
   | CStandalone of { output_path: string; entrypoint: entrypoint option; }
+[@@deriving eq]
 
 type cmd =
   | HelpCommand
@@ -22,6 +25,7 @@ type cmd =
       modules: mod_source list;
       target: target;
     }
+[@@deriving eq]
 
 let check_leftovers (arglist: arglist): unit =
   if (arglist_size arglist) > 0 then
@@ -103,7 +107,7 @@ let parse_target_type (arglist: arglist): (arglist * target) =
         an entrypoint. *)
      parse_executable_target arglist
 
-let parse_compile_command' (arglist: arglist): cmd =
+let parse_compile_command' (arglist: arglist): (arglist * cmd) =
   (* Parse module list *)
   let (arglist, modules): (arglist * string list) = pop_positional arglist in
   let modules: mod_source list = List.map parse_mod_source modules in
@@ -113,14 +117,12 @@ let parse_compile_command' (arglist: arglist): cmd =
   else
     (* Parse the target type. *)
     let (arglist, target): (arglist * target) = parse_target_type arglist in
-    let _ = check_leftovers arglist in
-    WholeProgramCompile { modules = modules; target = target; }
+    (arglist, WholeProgramCompile { modules = modules; target = target; })
 
-let parse_compile_command (arglist: arglist): cmd =
+let parse_compile_command (arglist: arglist): (arglist * cmd) =
   match pop_bool_flag arglist "help" with
   | Some arglist ->
-     let _ = check_leftovers arglist in
-     CompileHelp
+     (arglist, CompileHelp)
   | None ->
      parse_compile_command' arglist
 
@@ -142,6 +144,8 @@ let parse (arglist: arglist): cmd =
          (match pos with
           | "compile"::rest ->
              let arglist = adjust_positional arglist rest in
-             parse_compile_command arglist
+             let (arglist, cmd) = parse_compile_command arglist in
+             let _ = check_leftovers arglist in
+             cmd
           | _ ->
              err "Unknown command line invocation."))
