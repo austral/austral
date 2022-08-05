@@ -2,4 +2,4 @@
 
 type version = int * int * int
 
-let version: version = (0, 0, 5)
+let version: version = (0, 0, 6)
