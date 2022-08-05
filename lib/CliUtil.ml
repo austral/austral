@@ -7,16 +7,19 @@ type arg =
 
 type arglist = ArgList of arg list
 
+let trim_flag (name: string): string =
+  String.sub name 2 ((String.length name) - 2)
+
 let parse_arg (arg: string): arg =
   if String.starts_with ~prefix:"--" arg then
     (* It's a flag. *)
     match String.split_on_char '=' arg with
     | [name] ->
        (* It's a boolean flag, e.g. --help *)
-       BoolFlag name
+       BoolFlag (trim_flag name)
     | [name; value] ->
        (* It's a value flag, e.g. --foo=bar *)
-       ValueFlag (name, value)
+       ValueFlag (trim_flag name, value)
     | _ ->
        err ("Invalid flag argument: '" ^ arg ^ "'")
   else
