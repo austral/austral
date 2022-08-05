@@ -127,25 +127,16 @@ let parse_compile_command (arglist: arglist): (arglist * cmd) =
      parse_compile_command' arglist
 
 let parse (arglist: arglist): cmd =
-  (* Try parsing `--help`. *)
-  match pop_bool_flag arglist "help" with
-  | Some arglist ->
-     let _ = check_leftovers arglist in
+  let args: arg list = arglist_to_list arglist in
+  match args with
+  | [BoolFlag "help"] ->
      HelpCommand
-  | None ->
-     (* Try parsing `--version`. *)
-     (match pop_bool_flag arglist "version" with
-      | Some arglist ->
-         let _ = check_leftovers arglist in
-         VersionCommand
-      | None ->
-         (* Try parsing the `compile` command. *)
-         let pos: string list = get_positional arglist in
-         (match pos with
-          | "compile"::rest ->
-             let arglist = adjust_positional arglist rest in
-             let (arglist, cmd) = parse_compile_command arglist in
-             let _ = check_leftovers arglist in
-             cmd
-          | _ ->
-             err "Unknown command line invocation."))
+  | [BoolFlag "version"] ->
+     VersionCommand
+  | (PositionalArg "compile")::rest ->
+     (* Try parsing the `compile` command. *)
+     let (arglist, cmd) = parse_compile_command (arglist_from_list rest) in
+     let _ = check_leftovers arglist in
+     cmd
+  | _ ->
+     err "Unknown command line invocation."
