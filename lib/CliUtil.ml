@@ -25,8 +25,10 @@ let parse_arg (arg: string): arg =
 
 let parse_args (args: string list): arglist =
   (** At least one argument, the name of the binary. *)
-  assert ((List.length args) > 0);
-  ArgList (List.map parse_arg (List.tl args))
+  if ((List.length args) < 1) then
+    err "Argument list must have at least one element in it, the path to the binary. Was the compiler invoked through a system call?"
+  else
+    ArgList (List.map parse_arg (List.tl args))
 
 let arglist_size (ArgList l): int =
   List.length l
@@ -102,3 +104,12 @@ let pop_positional (arglist: arglist): (arglist * string list) =
   let pos: arg list = List.filter is_pos l
   and nonpos: arg list = List.filter (fun a -> not (is_pos a)) l in
   (ArgList nonpos, List.map pos_name pos)
+
+let get_positional (arglist: arglist): string list =
+  let (ArgList l) = arglist in
+  List.map pos_name (List.filter is_pos l)
+
+let adjust_positional (arglist: arglist) (pos: string list): arglist =
+  let (arglist, _) = pop_positional arglist in
+  let (ArgList flags) = arglist in
+  ArgList (List.concat [flags; List.map (fun a -> PositionalArg a) pos])
