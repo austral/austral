@@ -2,7 +2,12 @@ open OUnit2
 open Austral_core.CliUtil
 
 let tests _ =
+  assert_equal [] (arglist_to_list (parse_args ["bin"]));
+  assert_equal [PositionalArg "foo"] (arglist_to_list (parse_args ["bin"; "foo"]));
+  assert_equal [PositionalArg "foo"; BoolFlag "foo"] (arglist_to_list (parse_args ["bin"; "foo"; "--foo"]));
+  assert_equal [PositionalArg "foo"; BoolFlag "foo"; ValueFlag ("foo", "bar")] (arglist_to_list (parse_args ["bin"; "foo"; "--foo"; "--foo=bar"]));
   let arglist: arglist = parse_args ["bin"; "--help"; "--foo=bar"; "derp"] in
+  assert_equal [BoolFlag "help"; ValueFlag ("foo", "bar"); PositionalArg "derp"] (arglist_to_list arglist);
   assert_equal None (pop_bool_flag arglist "none");
   assert_equal None (pop_value_flag arglist "none");
   assert_equal ["derp"] (get_positional arglist);

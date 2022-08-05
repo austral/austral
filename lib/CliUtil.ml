@@ -7,6 +7,8 @@ type arg =
 
 type arglist = ArgList of arg list
 
+let arglist_to_list (ArgList l) = l
+
 let trim_flag (name: string): string =
   String.sub name 2 ((String.length name) - 2)
 

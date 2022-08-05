@@ -1,7 +1,16 @@
 (** A CLI parser framework. *)
 
+(** Represents an argument. *)
+type arg =
+  | BoolFlag of string
+  | ValueFlag of string * string
+  | PositionalArg of string
+
 (** Represents a parsed argument list. *)
 type arglist
+
+(** Turn the arglist into a list of arguments. *)
+val arglist_to_list : arglist -> arg list
 
 (** Parse the CLI arguments into an arglist. *)
 val parse_args : string list -> arglist
