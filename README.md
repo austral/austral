@@ -83,7 +83,7 @@ fib(10) = 55
 
 Building the `austral` compiler requires `make` and the `dune` build system for
 OCaml, and a C compiler for building the resulting output. You should install OCaml
-4.12.0 or above.
+4.13.0 or above.
 
 First, install [opam][opam]. On Debian/Ubuntu you can just do `sudo apt-get install opam`.
 
