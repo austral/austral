@@ -1,5 +1,9 @@
 import Austral.Memory (
-    Pointer
+    Pointer,
+    Address,
+    allocate,
+    nullCheck,
+    store
 );
 
 
@@ -9,5 +13,21 @@ module body Standard.Box is
 
     record Box[T: Type]: Linear is
         pointer: Pointer[T];
+    end;
+
+    generic [T: Type]
+    function box(val: T): Either[Box[T], T] is
+        let addr: Address[T] := allocate(sizeof(T));
+        case nullCheck(addr) of
+            when Some(value: Pointer[T]) do
+                store(value, val);
+                let box: Box[T] := Box(pointer => value);
+                let left: Either[Box[T], T] := Left(left => box);
+                return left;
+            when None do
+                -- Allocation failed, return the object we tried to box.
+                let right: Either[Box[T], T] := Right(right => val);
+                return right;
+        end case;
     end;
 end module body.

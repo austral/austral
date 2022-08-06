@@ -7,4 +7,12 @@ module Standard.Box is
     A box is a linear pointer to an object in the heap.
     """
     type Box[T: Type]: Linear;
+
+    """
+    Allocate a box and put the given value inside.
+
+    If allocation fails, returns the value in order to prevent leaks.
+    """
+    generic [T: Type]
+    function box(val: T): Either[Box[T], T];
 end module.
