@@ -37,6 +37,12 @@ module Standard.Box is
     function storeFree(boxref: &![Box[T], R], value: T): Unit;
 
     """
+    Store a new value in the box, returning the old one.
+    """
+    generic [T: Type, R: Region]
+    function swap(boxref: &![Box[T], R], new: T): T;
+
+    """
     If the box contains a free value, store a new value inside, discarding the
     old one.
     """
