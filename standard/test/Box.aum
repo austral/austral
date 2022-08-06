@@ -1,10 +1,11 @@
 import Standard.Box (
     Box,
-    box,
+    makeBox,
     unbox
 );
 import Standard.Test.Unit (
     assertTrue,
+    assertFailure,
     suiteHeading,
     testHeading
 );
@@ -18,9 +19,14 @@ module body Standard.Test.Box is
 
     function basicLifecycleTest(): Unit is
         testHeading("Basic lifecycle.");
-        let b: Box[Int32] := box(10);
-        let i: Int32 := unbox(b);
-        assertTrue(i = 10, "box contents equal 10");
+        let e: Either[Box[Int32], Int32] := makeBox(10);
+        case e of
+            when Left(left as box: Box[Int32]) do
+                 let i: Int32 := unbox(box);
+                 assertTrue(i = 10, "box contents equal 10");
+            when Right(right: Int32) do
+                 assertFailure("makeBox failed.");
+        end case;
         return nil;
     end;
 end module body.

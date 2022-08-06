@@ -32,4 +32,10 @@ module body Standard.Test.Unit is
         end if;
         return nil;
     end;
+
+    function assertFailure(message: FixedArray[Nat8]): Unit is
+        print("        Assert failure: ");
+        print(message);
+        abort("Assertion failed (assertFailure).");
+    end;
 end module body.
