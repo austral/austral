@@ -35,4 +35,11 @@ module Standard.Box is
     """
     generic [T: Free, R: Region]
     function readFree(boxref: &[Box[T], R]): T;
+
+    """
+    If the box contains a free value, store a new value through a mutable
+    reference to the box, discarding the old one.
+    """
+    generic [T: Free, R: Region]
+    function storeFree(boxref: &![Box[T], R], value: T): Unit;
 end module.

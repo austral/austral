@@ -56,4 +56,12 @@ module body Standard.Box is
         let ptr: Pointer[T] := !ptrref;
         return load(ptr);
     end;
+
+    generic [T: Free, R: Region]
+    function storeFree(boxref: &![Box[T], R], value: T): Unit is
+        let ptrref: &![Pointer[T], R] := boxref->pointer;
+        let ptr: Pointer[T] := !(ptrref);
+        store(ptr, value);
+        return nil;
+    end;
 end module body.
