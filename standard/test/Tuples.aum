@@ -5,10 +5,15 @@ import Standard.Tuples (
     Tuple5,
     Tuple6
 );
-import Standard.Test.Unit (assertTrue);
+import Standard.Test.Unit (
+    assertTrue,
+    suiteHeading,
+    testHeading
+);
 
 module body Standard.Test.Tuples is
     function tuplesTestSuite(): Unit is
+        suiteHeading("Standard.Tuples");
         pairTest();
         tripleTest();
         quadrupleTest();
@@ -17,6 +22,7 @@ module body Standard.Test.Tuples is
     end;
 
     function pairTest(): Unit is
+        testHeading("Pair");
         let p: Pair[Bool, Int32] := Pair(first => false, second => 10);
         assertTrue((p.first) = false, "`first` is false");
         assertTrue((p.second) = 10, "`second` is 10");
@@ -24,6 +30,7 @@ module body Standard.Test.Tuples is
     end;
 
     function tripleTest(): Unit is
+        testHeading("Triple");
         let t: Triple[Int32, Int32, Int32] := Triple(
             first => 1,
             second => 2,
@@ -36,6 +43,7 @@ module body Standard.Test.Tuples is
     end;
 
     function quadrupleTest(): Unit is
+        testHeading("Tuple4");
         let t: Tuple4[Int32, Int32, Int32, Int32] := Tuple4(
             first => 1,
             second => 2,
@@ -50,6 +58,7 @@ module body Standard.Test.Tuples is
     end;
 
     function quintupleTest(): Unit is
+        testHeading("Tuple5");
         let t: Tuple5[Int32, Int32, Int32, Int32, Int32] := Tuple5(
             first => 1,
             second => 2,
@@ -66,6 +75,7 @@ module body Standard.Test.Tuples is
     end;
 
     function sextupleTest(): Unit is
+        testHeading("Tuple6");
         let t: Tuple6[Int32, Int32, Int32, Int32, Int32, Int32] := Tuple6(
             first => 1,
             second => 2,
