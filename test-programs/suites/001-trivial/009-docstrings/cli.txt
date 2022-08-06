@@ -1,1 +1,1 @@
-./austral compile --module=$DIR/Test.aui,$DIR/Test.aum --entrypoint=Test:main --output=test-programs/output.c
+./austral compile --target-type=c $DIR/Test.aui,$DIR/Test.aum --entrypoint=Test:main --output=test-programs/output.c

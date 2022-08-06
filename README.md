@@ -73,8 +73,7 @@ end module body.
 Build and run:
 
 ```bash
-$ austral compile --public-module=fib.aum --entrypoint=Fib:main --output=fib.c
-$ gcc fib.c -o fib
+$ austral compile fib.aum --entrypoint=Fib:main --output=fib
 $ ./fib
 fib(10) = 55
 ```
@@ -120,30 +119,14 @@ src/C.aum
 
 To compile this, run:
 
-```
+```bash
 $ austral compile \
-    --module=src/A.aui,src/A.aum \
-    --module=src/B.aui,src/B.aum \
-    --module=src/C.aui,src/C.aum \
+    src/A.aui,src/A.aum \
+    src/B.aui,src/B.aum \
+    src/C.aui,src/C.aum \
     --entrypoint=C:main \
-    --output=program.c
+    --output=program
 ```
-
-This is the most general invocation. Where module interface and module body
-files share the same path and name and differ only by their extension, you can
-use:
-
-```
-$ austral compile \
-    --module=src/A \
-    --module=src/B \
-    --module=src/C \
-    --entrypoint=C:main \
-    --output=program.c
-```
-
-The order in which `--module` options appear is the order in which they are
-compiled, so it matters.
 
 The `--entrypoint` option must be the name of a module, followed by a colon,
 followed by the name of a public function with either of the following
@@ -156,20 +139,30 @@ The `ExitCode` type has two constructors: `ExitSuccess()` and `ExitFailure()`.
 
 Finally, the `--output` option is just the path to dump the compiled C to.
 
-There's also a command to typecheck a program without outputting anything. Only
-`--module` flags are accepted:
+By default, the compiler will emit C code and invoke `cc` automatically to
+produce an executable. To just produce C code, use:
 
 ```bash
-$ austral typecheck \
-    --module=src/A \
-    --module=src/B \
-    --module=src/C
+$ austral compile --target-type=c [modules...] --entrypoint=Foo:main --output=program.c
 ```
 
-The generated code should be compiled with:
+If you don't need an entrypoint (because you're compiling a library), instead of
+`--entrypoint` you have to pass `--no-entrypoint`:
 
+```bash
+$ austral compile --target-type=c [modules...] --no-entrypoint --output=program.c
 ```
-gcc -fwrapv generated.c -lm
+
+If you just want to typecheck without compiling, use the `tc` target type:
+
+```bash
+$ austral compile --target-type=tc [modules...]
+```
+
+Generated C code should be compiled with:
+
+```bash
+$ gcc -fwrapv generated.c -lm
 ```
 
 ## Status

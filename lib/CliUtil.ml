@@ -7,16 +7,23 @@ type arg =
 
 type arglist = ArgList of arg list
 
+let arglist_to_list (ArgList l) = l
+
+let arglist_from_list l = ArgList l
+
+let trim_flag (name: string): string =
+  String.sub name 2 ((String.length name) - 2)
+
 let parse_arg (arg: string): arg =
   if String.starts_with ~prefix:"--" arg then
     (* It's a flag. *)
     match String.split_on_char '=' arg with
     | [name] ->
        (* It's a boolean flag, e.g. --help *)
-       BoolFlag name
+       BoolFlag (trim_flag name)
     | [name; value] ->
        (* It's a value flag, e.g. --foo=bar *)
-       ValueFlag (name, value)
+       ValueFlag (trim_flag name, value)
     | _ ->
        err ("Invalid flag argument: '" ^ arg ^ "'")
   else
@@ -108,8 +115,3 @@ let pop_positional (arglist: arglist): (arglist * string list) =
 let get_positional (arglist: arglist): string list =
   let (ArgList l) = arglist in
   List.map pos_name (List.filter is_pos l)
-
-let adjust_positional (arglist: arglist) (pos: string list): arglist =
-  let (arglist, _) = pop_positional arglist in
-  let (ArgList flags) = arglist in
-  ArgList (List.concat [flags; List.map (fun a -> PositionalArg a) pos])

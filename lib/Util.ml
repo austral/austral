@@ -152,7 +152,7 @@ let run_command (command: string): command_output =
     }
 
 let compile_c_code (source_path: string) (output_path: string): command_output =
-  let cmd = "gcc -Wno-builtin-declaration-mismatch " ^ source_path ^ " -lm -o " ^ output_path in
+  let cmd = "cc " ^ source_path ^ " -fwrapv -lm -o " ^ output_path in
   let o = run_command cmd in
   let (CommandOutput { command; code; stdout; stderr }) = o in
   if code <> 0 then
@@ -184,7 +184,6 @@ let last (lst: 'a list): 'a =
      first
   | [] ->
      internal_err "Util.last called with an empty list."
-
 
 let butlast (lst: 'a list): 'a list =
   let lst: 'a list = List.rev lst in
