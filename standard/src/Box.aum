@@ -40,4 +40,13 @@ module body Standard.Box is
         deallocate(pointer);
         return value;
     end;
+
+    generic [T: Free]
+    function swapFree(box: Box[T], new: T): Box[T] is
+        let { pointer: Pointer[T] } := box;
+        let old: T := load(pointer);
+        store(pointer, new);
+        let newbox: Box[T] := Box(pointer => pointer);
+        return newbox;
+    end;
 end module body.
