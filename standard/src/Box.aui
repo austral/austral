@@ -1,0 +1,10 @@
+"""
+This module implements the Box type, a linear pointer to a single object in the
+heap.
+"""
+module Standard.Box is
+    """
+    A box is a linear pointer to an object in the heap.
+    """
+    type Box[T: Type]: Linear;
+end module.

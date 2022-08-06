@@ -1,5 +1,7 @@
-MODULES := src/Tuples.aui,src/Tuples.aum \
+MODULES := \
+    src/Tuples.aui,src/Tuples.aum \
 	src/Bounded.aui,src/Bounded.aum \
+	src/Box.aui,src/Box.aum \
 	test/Unit.aui,test/Unit.aum \
 	test/Tuples.aui,test/Tuples.aum \
 	test/Bounded.aui,test/Bounded.aum \
