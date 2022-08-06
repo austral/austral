@@ -14,7 +14,7 @@ module Standard.Box is
     If allocation fails, returns the value in order to prevent leaks.
     """
     generic [T: Type]
-    function box(val: T): Either[Box[T], T];
+    function makeBox(val: T): Either[Box[T], T];
 
     """
     Deallocate the box and return its contents.
