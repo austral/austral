@@ -185,7 +185,6 @@ let last (lst: 'a list): 'a =
   | [] ->
      internal_err "Util.last called with an empty list."
 
-
 let butlast (lst: 'a list): 'a list =
   let lst: 'a list = List.rev lst in
   match lst with

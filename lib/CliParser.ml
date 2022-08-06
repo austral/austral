@@ -139,4 +139,4 @@ let parse (arglist: arglist): cmd =
      let _ = check_leftovers arglist in
      cmd
   | _ ->
-     err "Unknown command line invocation."
+     HelpCommand

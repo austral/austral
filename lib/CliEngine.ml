@@ -20,26 +20,20 @@ type source_map = string SourceMap.t
 
 (* Parsing file contents *)
 
-let make_module_source_from_body_file body_filename =
-  BodyModuleSource {
-      body_filename = body_filename;
-      body_code = read_file_to_string body_filename
-    }
-
-let make_module_source_from_two_files int_filename body_filename =
-  TwoFileModuleSource {
-      int_filename = int_filename;
-      int_code = read_file_to_string int_filename;
-      body_filename = body_filename;
-      body_code = read_file_to_string body_filename
-    }
-
 let make_module_source (m: mod_source): module_source =
   match m with
   | ModuleSource { inter_path; body_path; } ->
-     make_module_source_from_two_files inter_path body_path
+     TwoFileModuleSource {
+         int_filename = inter_path;
+         int_code = read_file_to_string inter_path;
+         body_filename = body_path;
+         body_code = read_file_to_string body_path
+       }
   | ModuleBodySource { body_path; } ->
-     make_module_source_from_body_file body_path
+     BodyModuleSource {
+         body_filename = body_path;
+         body_code = read_file_to_string body_path
+       }
 
 let parse_source_files (mods: mod_source list): (module_source list * source_map) =
   let contents = List.map make_module_source mods in
@@ -111,7 +105,7 @@ and print_compile_usage _: unit =
   print_endline "                    `bin` target.";
   print_endline "";
   print_endline "Positional arguments:";
-  print_endline "    module    Of the form 'file.aui,file.aum' for modules with";
+  print_endline "    module    Of the form 'file.aui:file.aum' for modules with";
   print_endline "              both an interface and body file, or 'file.aum' for";
   print_endline "              modules with only a body."
 
