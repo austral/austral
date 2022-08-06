@@ -1,0 +1,79 @@
+import Standard.Box (
+    Box,
+    makeBox,
+    unbox,
+    readFree,
+    storeFree,
+    swap
+);
+import Standard.Test.Unit (
+    assertTrue,
+    assertFailure,
+    suiteHeading,
+    testHeading
+);
+
+module body Standard.Test.Box is
+    function boxTestSuite(): Unit is
+        suiteHeading("Standard.Box");
+        basicLifecycleTest();
+        readFreeTest();
+        storeFreeTest();
+        swapTest();
+        return nil;
+    end;
+
+    function basicLifecycleTest(): Unit is
+        testHeading("Basic lifecycle: makeBox and unbox");
+        let e: Either[Box[Int32], Int32] := makeBox(10);
+        case e of
+            when Left(left as box: Box[Int32]) do
+                 let i: Int32 := unbox(box);
+                 assertTrue(i = 10, "box contents equal 10");
+            when Right(right: Int32) do
+                 assertFailure("makeBox failed.");
+        end case;
+        return nil;
+    end;
+
+    function readFreeTest(): Unit is
+        testHeading("readFree");
+        let e: Either[Box[Int32], Int32] := makeBox(10);
+        case e of
+            when Left(left as box: Box[Int32]) do
+                 let val: Int32 := readFree(&box);
+                 assertTrue(val = 10, "readFree result equals 10");
+                 unbox(box);
+            when Right(right: Int32) do
+                 assertFailure("makeBox failed.");
+        end case;
+        return nil;
+    end;
+
+    function storeFreeTest(): Unit is
+        testHeading("storeFree");
+        let e: Either[Box[Int32], Int32] := makeBox(10);
+        case e of
+            when Left(left as box: Box[Int32]) do
+                 storeFree(&!box, 20);
+                 assertTrue(unbox(box) = 20, "box contents equal 20");
+            when Right(right: Int32) do
+                 assertFailure("makeBox failed.");
+        end case;
+        return nil;
+    end;
+
+    function swapTest(): Unit is
+        testHeading("swap");
+        let e: Either[Box[Int32], Int32] := makeBox(10);
+        case e of
+            when Left(left as box: Box[Int32]) do
+                 let old: Int32 := swap(&!box, 20);
+                 assertTrue(old = 10, "old box contents equal 10");
+                 assertTrue(unbox(box) = 20, "box contents equal 20");
+            when Right(right: Int32) do
+                 assertFailure("makeBox failed.");
+        end case;
+        return nil;
+    end;
+end module body.

@@ -1,14 +1,13 @@
-import Standard.Test.Box (
-    Box_Test_Suite
-);
-import Standard.Test.Buffer (
-    Buffer_Test_Suite
-);
+import Standard.Test.Tuples (tuplesTestSuite);
+import Standard.Test.Bounded (boundedTestSuite);
+import Standard.Test.Box (boxTestSuite);
 
 module body Standard.Test is
-    function Main(root: Root_Capability): Root_Capability is
-        Box_Test_Suite();
-        Buffer_Test_Suite();
-        return root;
+    function Main(root: RootCapability): ExitCode is
+        surrenderRoot(root);
+        tuplesTestSuite();
+        boundedTestSuite();
+        boxTestSuite();
+        return ExitSuccess();
     end;
 end module body.

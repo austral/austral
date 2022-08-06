@@ -1,0 +1,118 @@
+import Standard.Bounded (
+    Bounded,
+    minBound,
+    maxBound
+);
+import Standard.Test.Unit (
+    suiteHeading,
+    testHeading,
+    assertTrue,
+    assertFalse
+);
+
+module body Standard.Test.Bounded is
+    function boundedTestSuite(): Unit is
+        suiteHeading("Standard.Bounded");
+        boolTest();
+        nat8Test();
+        nat16Test();
+        nat32Test();
+        nat64Test();
+        int8Test();
+        int16Test();
+        int32Test();
+        int64Test();
+        indexTest();
+        return nil;
+    end;
+
+    function boolTest(): Unit is
+        testHeading("Bool");
+        let min: Bool := minBound();
+        let max: Bool := maxBound();
+        assertFalse(min, "minBound is false");
+        assertTrue(max, "maxBound is true");
+        return nil;
+    end;
+
+    function nat8Test(): Unit is
+        testHeading("Nat8");
+        let min: Nat8 := minBound();
+        let max: Nat8 := maxBound();
+        assertTrue(min = 0, "Nat8 minBound is correct");
+        assertTrue(max = maximum_nat8, "Nat8 maxBound is correct");
+        return nil;
+    end;
+
+    function nat16Test(): Unit is
+        testHeading("Nat16");
+        let min: Nat16 := minBound();
+        let max: Nat16 := maxBound();
+        assertTrue(min = 0, "Nat16 minBound is correct");
+        assertTrue(max = maximum_nat16, "Nat16 maxBound is correct");
+        return nil;
+    end;
+
+    function nat32Test(): Unit is
+        testHeading("Nat32");
+        let min: Nat32 := minBound();
+        let max: Nat32 := maxBound();
+        assertTrue(min = 0, "Nat32 minBound is correct");
+        assertTrue(max = maximum_nat32, "Nat32 maxBound is correct");
+        return nil;
+    end;
+
+    function nat64Test(): Unit is
+        testHeading("Nat64");
+        let min: Nat64 := minBound();
+        let max: Nat64 := maxBound();
+        assertTrue(min = 0, "Nat64 minBound is correct");
+        assertTrue(max = maximum_nat64, "Nat64 maxBound is correct");
+        return nil;
+    end;
+
+    function int8Test(): Unit is
+        testHeading("Int8");
+        let min: Int8 := minBound();
+        let max: Int8 := maxBound();
+        assertTrue(min = minimum_int8, "Int8 minBound is correct");
+        assertTrue(max = maximum_int8, "Int8 maxBound is correct");
+        return nil;
+    end;
+
+    function int16Test(): Unit is
+        testHeading("Int16");
+        let min: Int16 := minBound();
+        let max: Int16 := maxBound();
+        assertTrue(min = minimum_int16, "Int16 minBound is correct");
+        assertTrue(max = maximum_int16, "Int16 maxBound is correct");
+        return nil;
+    end;
+
+    function int32Test(): Unit is
+        testHeading("Int32");
+        let min: Int32 := minBound();
+        let max: Int32 := maxBound();
+        assertTrue(min = minimum_int32, "Int32 minBound is correct");
+        assertTrue(max = maximum_int32, "Int32 maxBound is correct");
+        return nil;
+    end;
+
+    function int64Test(): Unit is
+        testHeading("Int64");
+        let min: Int64 := minBound();
+        let max: Int64 := maxBound();
+        assertTrue(min = minimum_int64, "Int64 minBound is correct");
+        assertTrue(max = maximum_int64, "Int64 maxBound is correct");
+        return nil;
+    end;
+
+    function indexTest(): Unit is
+        testHeading("Index");
+        let min: Index := minBound();
+        let max: Index := maxBound();
+        assertTrue(min = 0, "Index minBound is correct");
+        assertTrue(max = maximum_index, "Index maxBound is correct");
+        return nil;
+    end;
+end module body.

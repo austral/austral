@@ -385,7 +385,7 @@ and get_record_definition (env: env) (name: qident): (module_name * type_vis * t
 and get_slot_with_name slots slot_name =
   match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
   | Some s -> s
-  | None -> err "No slot with this name"
+  | None -> err ("No slot with this name: " ^ (ident_string slot_name))
 
 and augment_call (module_name: module_name) (env: env) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
   match get_callable env module_name (qident_to_sident name) with

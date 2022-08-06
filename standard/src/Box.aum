@@ -1,14 +1,16 @@
 import Austral.Memory (
     Pointer,
+    Address,
     allocate,
-    Load,
-    Store,
-    deallocate,
-    loadRead,
-    loadWrite
+    nullCheck,
+    store,
+    load,
+    deallocate
 );
 
+
 module body Standard.Box is
+    -- Mark this module as unsafe so we can use the FFI.
     pragma Unsafe_Module;
 
     record Box[T: Type]: Linear is
@@ -16,64 +18,49 @@ module body Standard.Box is
     end;
 
     generic [T: Type]
-    function Make(val: T): Option[Box[T]] is
-        let ptr: Option[Pointer[T]] := allocate(val);
-        case ptr of
+    function makeBox(val: T): Either[Box[T], T] is
+        let addr: Address[T] := allocate(sizeof(T));
+        case nullCheck(addr) of
             when Some(value: Pointer[T]) do
+                store(value, val);
                 let box: Box[T] := Box(pointer => value);
-                let boxopt: Option[Box[T]] := Some(value => box);
-                return boxopt;
+                let left: Either[Box[T], T] := Left(left => box);
+                return left;
             when None do
-                let boxopt: Option[Box[T]] := None();
-                return boxopt;
+                -- Allocation failed, return the object we tried to box.
+                let right: Either[Box[T], T] := Right(right => val);
+                return right;
         end case;
     end;
 
     generic [T: Type]
-    function Unbox(box: Box[T]): T is
+    function unbox(box: Box[T]): T is
         let { pointer: Pointer[T] } := box;
         let value: T := load(pointer);
         deallocate(pointer);
         return value;
     end;
 
-    generic [T: Free]
-    function Swap_Free(box: Box[T], new: T): Box[T] is
-        let { pointer: Pointer[T] } := box;
-        let old: T := load(pointer);
-        store(pointer, new);
-        let newbox: Box[T] := Box(pointer => pointer);
-        return newbox;
+    generic [T: Free, R: Region]
+    function readFree(boxref: &[Box[T], R]): T is
+        let ptrref: &[Pointer[T], R] := boxref->pointer;
+        let ptr: Pointer[T] := !ptrref;
+        return load(ptr);
     end;
 
     generic [T: Free, R: Region]
-    function Read_Free(boxref: Reference[Box[T], R]): T is
-        let ptrref: Reference[Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := !ptrref;
-        let value: T := load(ptr);
-        return value;
-    end;
-
-    generic [T: Free, R: Region]
-    function Store_Free(boxref: WriteReference[Box[T], R], value: T): Unit is
-        let ptrref: WriteReference[Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := !ptrref;
+    function storeFree(boxref: &![Box[T], R], value: T): Unit is
+        let ptrref: &![Pointer[T], R] := boxref->pointer;
+        let ptr: Pointer[T] := !(ptrref);
         store(ptr, value);
         return nil;
     end;
 
     generic [T: Type, R: Region]
-    function Get_Value_Ref(boxref: Reference[Box[T], R]): Reference[T, R] is
-        let ptrref: Reference[Pointer[T], R] := boxref->pointer;
-        let ref: Reference[T, R] := loadRead(ptrref);
-        return ref;
-    end;
-
-    generic [T: Free, R: Region]
-    function Swap_Mut(boxref: WriteReference[Box[T], R], value: T): T is
+    function swap(boxref: &![Box[T], R], new: T): T is
         let ptr: Pointer[T] := !(boxref->pointer);
-        let old_value: T := load(ptr);
-        store(ptr, value);
-        return old_value;
+        let old: T := load(ptr);
+        store(ptr, new);
+        return old;
     end;
 end module body.
