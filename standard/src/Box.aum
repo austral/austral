@@ -3,7 +3,9 @@ import Austral.Memory (
     Address,
     allocate,
     nullCheck,
-    store
+    store,
+    load,
+    deallocate
 );
 
 
@@ -29,5 +31,13 @@ module body Standard.Box is
                 let right: Either[Box[T], T] := Right(right => val);
                 return right;
         end case;
+    end;
+
+    generic [T: Type]
+    function unbox(box: Box[T]): T is
+        let { pointer: Pointer[T] } := box;
+        let value: T := load(pointer);
+        deallocate(pointer);
+        return value;
     end;
 end module body.
