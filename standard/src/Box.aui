@@ -23,13 +23,6 @@ module Standard.Box is
     function unbox(box: Box[T]): T;
 
     """
-    If the box contains a free value, store a new value inside, discarding the
-    old one.
-    """
-    generic [T: Free]
-    function swapFree(box: Box[T], new: T): Box[T];
-
-    """
     If the box contains a free value, load that value through a reference to the
     box.
     """
@@ -42,4 +35,11 @@ module Standard.Box is
     """
     generic [T: Free, R: Region]
     function storeFree(boxref: &![Box[T], R], value: T): Unit;
+
+    """
+    If the box contains a free value, store a new value inside, discarding the
+    old one.
+    """
+    generic [T: Free]
+    function swapFree(box: Box[T], new: T): Box[T];
 end module.

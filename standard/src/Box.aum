@@ -41,15 +41,6 @@ module body Standard.Box is
         return value;
     end;
 
-    generic [T: Free]
-    function swapFree(box: Box[T], new: T): Box[T] is
-        let { pointer: Pointer[T] } := box;
-        let old: T := load(pointer);
-        store(pointer, new);
-        let newbox: Box[T] := Box(pointer => pointer);
-        return newbox;
-    end;
-
     generic [T: Free, R: Region]
     function readFree(boxref: &[Box[T], R]): T is
         let ptrref: &[Pointer[T], R] := boxref->pointer;
@@ -63,5 +54,14 @@ module body Standard.Box is
         let ptr: Pointer[T] := !(ptrref);
         store(ptr, value);
         return nil;
+    end;
+
+    generic [T: Free]
+    function swapFree(box: Box[T], new: T): Box[T] is
+        let { pointer: Pointer[T] } := box;
+        let old: T := load(pointer);
+        store(pointer, new);
+        let newbox: Box[T] := Box(pointer => pointer);
+        return newbox;
     end;
 end module body.
