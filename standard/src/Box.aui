@@ -28,4 +28,11 @@ module Standard.Box is
     """
     generic [T: Free]
     function swapFree(box: Box[T], new: T): Box[T];
+
+    """
+    If the box contains a free value, load that value through a reference to the
+    box.
+    """
+    generic [T: Free, R: Region]
+    function readFree(boxref: &[Box[T], R]): T;
 end module.

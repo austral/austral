@@ -49,4 +49,11 @@ module body Standard.Box is
         let newbox: Box[T] := Box(pointer => pointer);
         return newbox;
     end;
+
+    generic [T: Free, R: Region]
+    function readFree(boxref: &[Box[T], R]): T is
+        let ptrref: &[Pointer[T], R] := boxref->pointer;
+        let ptr: Pointer[T] := !ptrref;
+        return load(ptr);
+    end;
 end module body.
