@@ -13,7 +13,6 @@ open CRenderer
 open Cst
 open Tast
 open Error
-open Util
 open Combined
 open Linked
 open Mtast
@@ -22,7 +21,6 @@ open ReturnCheck
 open LinearityCheck
 open Reporter
 open Entrypoint
-open Filename
 
 let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import_list): concrete_module_interface =
   let (ConcreteModuleInterface (mn, docstring, imports, decls)) = ci in
@@ -137,22 +135,3 @@ let empty_compiler: compiler =
           dump_and_die ()
       in
       c)
-
-let compile_and_run (modules: (string * string) list) (entrypoint: string): (int * string) =
-  let compiler = compile_multiple empty_compiler (List.map (fun (i, b) -> fake_mod_source i b) modules) in
-  let (entrypoint_mod, entrypoint_name) =
-    let ss = String.split_on_char ':' entrypoint in
-    match ss with
-    | [mn; i] ->
-       (make_mod_name mn, make_ident i)
-    | _ ->
-       err "Bad entrypoint format."
-  in
-  let compiler = compile_entrypoint compiler entrypoint_mod entrypoint_name in
-  let code = compiler_code compiler in
-  let code_path = temp_file "code" ".c"
-  and bin_path = temp_file "program" ".exe" in
-  write_string_to_file code_path code;
-  let _ = compile_c_code code_path bin_path in
-  let (CommandOutput { code; stdout; _ }) = run_command bin_path in
-  (code, stdout)
