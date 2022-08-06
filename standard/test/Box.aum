@@ -1,0 +1,26 @@
+import Standard.Box (
+    Box,
+    box,
+    unbox
+);
+import Standard.Test.Unit (
+    assertTrue,
+    suiteHeading,
+    testHeading
+);
+
+module body Standard.Test.Box is
+    function boxTestSuite(): Unit is
+        suiteHeading("Standard.Box");
+        basicLifecycleTest();
+        return nil;
+    end;
+
+    function basicLifecycleTest(): Unit is
+        testHeading("Basic lifecycle.");
+        let b: Box[Int32] := box(10);
+        let i: Int32 := unbox(b);
+        assertTrue(i = 10, "box contents equal 10");
+        return nil;
+    end;
+end module body.

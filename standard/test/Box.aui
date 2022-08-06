@@ -1,0 +1,3 @@
+module Standard.Test.Box is
+    function boxTestSuite(): Unit;
+end module.

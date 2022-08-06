@@ -5,6 +5,7 @@ MODULES := \
 	test/Unit.aui,test/Unit.aum \
 	test/Tuples.aui,test/Tuples.aum \
 	test/Bounded.aui,test/Bounded.aum \
+	test/Box.aui,test/Box.aum \
 	test/Main.aui,test/Main.aum
 TEST_BIN := test_bin
 
