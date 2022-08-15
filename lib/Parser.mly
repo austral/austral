@@ -282,7 +282,7 @@ instance_def:
   ;
 
 method_def:
-  | doc=docstringopt
+  | doc=docstringopt typarams=generic_segment
     METHOD name=identifier
     LPAREN params=parameter_list RPAREN COLON rt=typespec
     IS body=block END SEMI
