@@ -47,6 +47,20 @@ let add_source_ctx (error: austral_error) (ctx: source_ctx): austral_error =
   | None ->
      AustralError { module_name; kind; text; span; source_ctx = Some ctx; }
 
+let adorn_error_with_module_name (new_module_name: module_name) (f: unit -> 'a): 'a =
+  try
+    f ()
+  with Austral_error error ->
+    let (AustralError { module_name; kind; text; span; source_ctx }) = error in
+    match module_name with
+    | Some _ ->
+       (* The error already has a module name, do nothing. *)
+       raise (Austral_error error)
+    | None ->
+       (* Add the span *)
+       let new_err = AustralError { module_name = Some new_module_name; kind; text; span; source_ctx } in
+       raise (Austral_error new_err)
+
 let adorn_error_with_span (new_span: span) (f: unit -> 'a): 'a =
   try
     f ()
@@ -85,7 +99,16 @@ let indent_text (text: string) (indent: int): string =
   String.concat "\n" lines
 
 let render_error_to_plain (error: austral_error): string =
-  let (AustralError { span; kind; text; source_ctx; _ }) = error in
+  let (AustralError { span; kind; text; source_ctx; module_name }) = error in
+  let mn_text: string =
+    match module_name with
+    | Some mn ->
+       "  Module:\n"
+       ^ "    " ^ (mod_name_string mn) ^ "\n"
+    | None ->
+       "  Module:\n"
+       ^ "    [unknown]\n"
+  in
   let title: string = error_title kind in
   let span_text =
     match span with
@@ -108,6 +131,7 @@ let render_error_to_plain (error: austral_error): string =
   in
   "Error:\n"
   ^ "  Title: " ^ title ^ "\n"
+  ^ mn_text
   ^ span_text
   ^ "  Description:\n"
   ^ (indent_text (error_text_to_plain text) 4) ^ "\n"

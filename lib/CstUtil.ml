@@ -96,3 +96,11 @@ let make_pragma name args =
          err "Unsafe_Module pragma takes no arguments."
     else
       err ("Unknown pragma: " ^ s)
+
+let mod_int_name (inter: concrete_module_interface): module_name =
+  let (ConcreteModuleInterface (name, _, _, _)) = inter in
+  name
+
+let mod_body_name (body: concrete_module_body): module_name =
+  let (ConcreteModuleBody (name, _, _, _, _)) = body in
+  name

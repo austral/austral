@@ -1,5 +1,7 @@
 Error:
   Title: Declaration Error
+  Module:
+    Test
   Location:
     [no span available]
   Description:

@@ -1,5 +1,7 @@
 Error:
   Title: Generic Error
+  Module:
+    Test
   Location:
     Filename: 'test-programs/suites/008-typeclasses/016-private-instance/Test.aum'
     From: line 5, column 8

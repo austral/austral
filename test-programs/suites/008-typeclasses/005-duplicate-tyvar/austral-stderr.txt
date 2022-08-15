@@ -1,5 +1,7 @@
 Error:
   Title: Generic Error
+  Module:
+    Test
   Location:
     [no span available]
   Description:

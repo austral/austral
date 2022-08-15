@@ -11,6 +11,7 @@ open BodyExtractionPass
 open CodeGen
 open CRenderer
 open Cst
+open CstUtil
 open Tast
 open Error
 open Combined
@@ -55,39 +56,46 @@ type module_source =
       body_code: string
     }
 
-let parse_and_combine (env: env) (source: module_source): (env * combined_module * file_id option * file_id) =
+let parse_and_combine (env: env) (source: module_source): (env * module_name * combined_module * file_id option * file_id) =
   match source with
   | TwoFileModuleSource { int_filename; int_code; body_filename; body_code } ->
      let (env, int_file_id) = add_file env { path = int_filename; contents = int_code } in
      let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
-     let ci: concrete_module_interface = parse_module_int int_code int_filename
-     and cb: concrete_module_body = parse_module_body body_code body_filename
-     in
-     let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
-     and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
-     let combined: combined_module = combine env ci cb in
-     (env, combined, Some int_file_id, body_file_id)
+     let ci: concrete_module_interface = parse_module_int int_code int_filename in
+     let name: module_name = mod_int_name ci in
+     adorn_error_with_module_name name
+       (fun _ ->
+         let cb: concrete_module_body = parse_module_body body_code body_filename in
+         let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
+         and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
+         let combined: combined_module = combine env ci cb in
+         (env, name, combined, Some int_file_id, body_file_id))
   | BodyModuleSource { body_filename; body_code } ->
      let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
      let cb: concrete_module_body = parse_module_body body_code body_filename in
-     let cb: concrete_module_body = append_import_to_body cb pervasive_imports in
-     let combined: combined_module = body_as_combined env cb in
-     (env, combined, None, body_file_id)
+     let name: module_name = mod_body_name cb in
+     adorn_error_with_module_name name
+       (fun _ ->
+         let cb: concrete_module_body = append_import_to_body cb pervasive_imports in
+         let combined: combined_module = body_as_combined env cb in
+         (env, name, combined, None, body_file_id))
 
 let rec compile_mod (c: compiler) (source: module_source): compiler =
   with_frame "Compile module"
     (fun _ ->
       let env: env = cenv c in
-      let (env, combined, int_file_id, body_file_id) = parse_and_combine env source in
-      let _ = check_ends_in_return combined in
-      let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
-      let typed: typed_module = augment_module env linked in
-      let _ = check_module_linearity typed in
-      let env: env = extract_bodies env typed in
-      let (env, mono): (env * mono_module) = monomorphize env typed in
-      let unit = gen_module env mono in
-      let c_code: string = render_unit unit in
-      Compiler (env, (compiler_code c) ^ "\n" ^ c_code))
+      let (env, name, combined, int_file_id, body_file_id) = parse_and_combine env source in
+      adorn_error_with_module_name name
+       (fun _ ->
+         let _ = check_ends_in_return combined in
+         let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
+         let typed: typed_module = augment_module env linked in
+         let _ = check_module_linearity typed in
+         let env: env = extract_bodies env typed in
+         let (env, mono): (env * mono_module) = monomorphize env typed in
+         let unit = gen_module env mono in
+         let c_code: string = render_unit unit in
+         Compiler (env, (compiler_code c) ^ "\n" ^ c_code)))
 
 let rec compile_multiple c modules =
   match modules with
