@@ -19,6 +19,7 @@ Code used throughout the compiler.
 The compiler frontend.
 
 - {!Austral_core.Cst}
+- {!Austral_core.CstUtil}
 - {!Austral_core.Ast}
 - {!Austral_core.Combined}
 - {!Austral_core.Linked}

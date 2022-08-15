@@ -2,6 +2,7 @@
 open Identifier
 open Common
 open Cst
+open CstUtil
 open Type
 open Util
 open Span
@@ -281,7 +282,8 @@ instance_def:
   ;
 
 method_def:
-  | doc=docstringopt METHOD name=identifier
+  | doc=docstringopt
+    METHOD name=identifier
     LPAREN params=parameter_list RPAREN COLON rt=typespec
     IS body=block END SEMI
    { ConcreteMethodDef (name, params, rt, body, doc) }

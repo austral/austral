@@ -5,6 +5,7 @@ open Type
 open TypeParameters
 open AbstractionPass
 open Cst
+open CstUtil
 open Combined
 open Env
 open ImportResolution
