@@ -1,7 +1,7 @@
 Error:
   Title: Generic Error
   Module:
-    [unknown]
+    Test
   Location:
     [no span available]
   Description:
