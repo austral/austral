@@ -31,4 +31,4 @@ and qparam = QualifiedParameter of identifier * qtypespec
 
 and combined_method_decl = CMethodDecl of identifier * qparam list * qtypespec * docstring
 
-and combined_method_def = CMethodDef of identifier * qparam list * qtypespec * docstring * astmt
+and combined_method_def = CMethodDef of identifier * typarams * qparam list * qtypespec * docstring * astmt
