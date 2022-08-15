@@ -1,5 +1,7 @@
 Error:
   Title: Generic Error
+  Module:
+    [unknown]
   Location:
     [no span available]
   Description:

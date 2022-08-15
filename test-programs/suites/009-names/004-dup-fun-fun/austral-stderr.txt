@@ -1,5 +1,7 @@
 Error:
   Title: Declaration Error
+  Module:
+    [unknown]
   Location:
     [no span available]
   Description:

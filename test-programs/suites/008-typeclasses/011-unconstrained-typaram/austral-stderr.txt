@@ -1,5 +1,7 @@
 Error:
   Title: Generic Error
+  Module:
+    [unknown]
   Location:
     Filename: 'test-programs/suites/008-typeclasses/011-unconstrained-typaram/Test.aum'
     From: line 14, column 8
