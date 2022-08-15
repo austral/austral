@@ -356,7 +356,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
-     let method_map (CMethodDef (name, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
+     let method_map (CMethodDef (name, typarams, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
        let rm = region_map_from_typarams typarams in
        let value_params = List.map (parse_param typarams) params
        and rt = parse' rm typarams rt
@@ -372,6 +372,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            method_id = method_id;
            docstring = meth_docstring;
            name = name;
+           typarams = typarams;
            value_params = value_params;
            rt = rt;
            body = None;
