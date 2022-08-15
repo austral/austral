@@ -1,3 +1,5 @@
+(** This module implements Austral's concrete syntax tree, the first
+    intermediate representation in the compiler. *)
 open Identifier
 open Common
 open Type
