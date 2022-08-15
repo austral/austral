@@ -127,7 +127,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                       qname,
                       name_typarams bi typarams qname,
                       qualify_typespec ii argument,
-                      parse_method_defs bi methods,
+                      parse_method_defs module_name bi methods,
                       docstring)
          else
            err "Mismatch"
