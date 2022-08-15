@@ -389,12 +389,12 @@ let rec store_method_body (env: env) (ins_meth_id: ins_meth_id) (body: tstmt): e
   env
 
 and replace_method_body (meth: ins_meth_rec) (new_body: tstmt): ins_meth_rec =
-  let (InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body }) = meth in
+  let (InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body }) = meth in
   (match body with
    | Some _ ->
       err "Internal: function already has a body"
    | None ->
-      InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body=(Some new_body) })
+      InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body=(Some new_body) })
 
 let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id: decl_id) (name: identifier): ins_meth_rec option =
   let (Env { methods; _ }) = env in
