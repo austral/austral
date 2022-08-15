@@ -194,7 +194,7 @@ let private_def module_name im def =
                 qname,
                 name_typarams im typarams qname,
                 qualify_typespec im argument,
-                parse_method_defs im methods,
+                parse_method_defs module_name im methods,
                 docstring)
 
 let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
