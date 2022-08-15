@@ -202,8 +202,8 @@ let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
   (env, id)
 
 let make_type_class_method_decl (id: decl_id) (input: type_class_method_input): decl =
-  let { mod_id; vis; typeclass_id; name; docstring; value_params; rt } = input in
-  TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; value_params; rt }
+  let { mod_id; vis; typeclass_id; name; docstring; typarams; value_params; rt } = input in
+  TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; typarams; value_params; rt }
 
 let add_type_class_method (env: env) (input: type_class_method_input): (env * decl_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
