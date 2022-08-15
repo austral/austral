@@ -297,7 +297,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
      (* Convert the list of methods into a list of type_class_method records *)
      let typarams = typarams_from_list [typaram] in
-     let method_map (CMethodDecl (name, params, rt, docstring)): type_class_method_input =
+     let method_map (CMethodDecl (name, typarams, params, rt, docstring)): type_class_method_input =
        let rm = region_map_from_typarams typarams in
        let value_params = List.map (parse_param typarams) params
        and rt = parse' rm typarams rt in
@@ -307,6 +307,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
          typeclass_id;
          name;
          docstring;
+         typarams;
          value_params;
          rt;
        }
