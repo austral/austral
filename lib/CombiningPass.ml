@@ -32,19 +32,20 @@ let parse_params (imports: import_map) (params: concrete_param list): qparam lis
       QualifiedParameter (n, qualify_typespec imports t))
     params
 
-let parse_method_decls (imports: import_map) (methods: concrete_method_decl list): combined_method_decl list =
-  List.map (fun (ConcreteMethodDecl (n, params, rt, method_docstring)) ->
-      CMethodDecl (n,
-                   parse_params imports params,
-                   qualify_typespec imports rt,
-                   method_docstring))
-    methods
-
 let name_typarams (im: import_map) (params: concrete_type_param list) (name: qident): typarams =
   let lst: type_parameter list =
     List.map (fun (ConcreteTypeParam (n, u, cs)) -> TypeParameter (n, u, name, List.map (fun i -> qident_to_sident (qualify_identifier im i)) cs)) params
   in
   typarams_from_list lst
+
+let parse_method_decls (module_name: module_name) (imports: import_map) (methods: concrete_method_decl list): combined_method_decl list =
+  List.map (fun (ConcreteMethodDecl (n, typarams, params, rt, method_docstring)) ->
+      CMethodDecl (n,
+                   name_typarams imports typarams (make_qident (module_name, n, n)),
+                   parse_params imports params,
+                   qualify_typespec imports rt,
+                   method_docstring))
+    methods
 
 let parse_method_defs (module_name: module_name) (imports: import_map) (methods: concrete_method_def list): combined_method_def list =
   List.map (fun (ConcreteMethodDef (n, typarams, params, rt, body, method_docstring)) ->
