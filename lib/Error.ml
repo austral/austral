@@ -99,7 +99,16 @@ let indent_text (text: string) (indent: int): string =
   String.concat "\n" lines
 
 let render_error_to_plain (error: austral_error): string =
-  let (AustralError { span; kind; text; source_ctx; _ }) = error in
+  let (AustralError { span; kind; text; source_ctx; module_name }) = error in
+  let mn_text: string =
+    match module_name with
+    | Some mn ->
+       "  Module:\n"
+       ^ "    " ^ (mod_name_string mn) ^ "\n"
+    | None ->
+       "  Module:\n"
+       ^ "    [unknown]\n"
+  in
   let title: string = error_title kind in
   let span_text =
     match span with
@@ -122,6 +131,7 @@ let render_error_to_plain (error: austral_error): string =
   in
   "Error:\n"
   ^ "  Title: " ^ title ^ "\n"
+  ^ mn_text
   ^ span_text
   ^ "  Description:\n"
   ^ (indent_text (error_text_to_plain text) 4) ^ "\n"
