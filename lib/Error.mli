@@ -44,6 +44,10 @@ val austral_raise : error_kind -> err_text -> 'a
 (** Add a source context to an error if it doesn't have one. *)
 val add_source_ctx : austral_error -> source_ctx -> austral_error
 
+(** Run the callback, and if it throws an error that doesn't have a module name,
+    put the given module name in the error and rethrow it. *)
+val adorn_error_with_module_name : module_name -> (unit -> 'a) -> 'a
+
 (** Run the callback, and if it throws an error that doesn't have a span, put
     the given span in the error and rethrow it. *)
 val adorn_error_with_span : span -> (unit -> 'a) -> 'a
