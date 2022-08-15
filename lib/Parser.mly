@@ -234,9 +234,10 @@ typeclass:
   ;
 
 method_decl:
-  | doc=docstringopt METHOD name=identifier
+  | doc=docstringopt typarams=generic_segment
+    METHOD name=identifier
     LPAREN params=parameter_list RPAREN COLON rt=typespec SEMI
-   { ConcreteMethodDecl (name, params, rt, doc) }
+   { ConcreteMethodDecl (name, typarams, params, rt, doc) }
   ;
 
 instance_decl:
