@@ -19,3 +19,7 @@ val has_instance_decl : concrete_module_interface -> identifier -> concrete_type
 val get_instance_def : concrete_module_body -> identifier -> concrete_type_param list -> typespec -> concrete_instance option
 
 val make_pragma : identifier -> concrete_arglist -> pragma
+
+val mod_int_name : concrete_module_interface -> module_name
+
+val mod_body_name : concrete_module_body -> module_name
