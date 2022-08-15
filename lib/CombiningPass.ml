@@ -183,7 +183,7 @@ let private_def module_name im def =
                      tp
                   | _ ->
                      err "typeclass has more than one parameter"),
-                 parse_method_decls im methods,
+                 parse_method_decls module_name im methods,
                  docstring)
   | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
      (* Instance names might refer to an imported typeclass, so we have to
@@ -260,7 +260,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
                      tp
                   | _ ->
                      err "typeclass has more than one parameter"),
-                     parse_method_decls im methods,
+                     parse_method_decls module_name im methods,
                      docstring)
       | _ ->
          (* Other declarations need to match a body *)
