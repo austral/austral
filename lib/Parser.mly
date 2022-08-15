@@ -286,7 +286,7 @@ method_def:
     METHOD name=identifier
     LPAREN params=parameter_list RPAREN COLON rt=typespec
     IS body=block END SEMI
-   { ConcreteMethodDef (name, params, rt, body, doc) }
+   { ConcreteMethodDef (name, typarams, params, rt, body, doc) }
   ;
 
 /* Statements */
