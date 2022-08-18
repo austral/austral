@@ -47,6 +47,7 @@ Anti-features:
 - No first-class async.
 - No function overloading (except through typeclasses, where it is bounded).
 - No arithmetic precedence.
+- No variable shadowing.
 
 ## Example
 
