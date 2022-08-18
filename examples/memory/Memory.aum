@@ -10,7 +10,7 @@ module body Example.Memory is
     pragma Unsafe_Module;
 
     function main(): ExitCode is
-        let addr: Address[Int32] := allocate(sizeof(Int32));
+        let addr: Address[Int32] := allocate(1);
         case nullCheck(addr) of
             when Some(value: Pointer[Int32]) do
                 deallocate(value);

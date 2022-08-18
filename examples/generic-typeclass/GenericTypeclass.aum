@@ -15,7 +15,7 @@ module body Example.GenericTypeclass is
     end;
 
     function Pointer_To_Integer(): Int32 is
-        let ptr: Address[Int32] := allocate(sizeof(Int32));
+        let ptr: Address[Int32] := allocate(1);
         let null: Address[Int32] := nullPointer();
         if ptr /= null then
             let X: Int32 := To_Integer(ptr);
