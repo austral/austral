@@ -22,6 +22,9 @@ module body Austral.Memory is
 
     generic [T: Type]
     function allocate(count: Index): Address[T] is
+        if count = 0 then
+            abort("allocate called with count of zero");
+        end if;
         return @embed(Address[T], "au_calloc($1, $2)", sizeof(T), count);
     end;
 
