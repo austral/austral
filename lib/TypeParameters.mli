@@ -1,7 +1,7 @@
 (** This module implements an ordered set of type parameters. This is used to
     store the type parameter list in declarations. *)
 open Identifier
-open Type
+open TypeParameter
 
 (** An ordered set of type parameters keyed by the parameter's name. *)
 type typarams

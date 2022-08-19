@@ -1,5 +1,5 @@
 open Identifier
-open Type
+open TypeParameter
 open Error
 open Sexplib
 open Std
@@ -12,10 +12,6 @@ let empty_typarams: typarams = TyParams []
 let typarams_size (typarams: typarams): int =
   let (TyParams lst) = typarams in
   List.length lst
-
-let typaram_name (typaram: type_parameter): identifier =
-  let (TypeParameter (name, _, _, _)) = typaram in
-  name
 
 let get_typaram (typarams: typarams) (name: identifier): type_parameter option =
   let (TyParams lst) = typarams in
@@ -51,8 +47,8 @@ let merge_typarams (a: typarams) (b: typarams): typarams =
   in
   (* If any element of b appears in a, error. *)
   let _ =
-    List.map (fun (TypeParameter (name, _, _, _)) ->
-        if List.exists (fun (TypeParameter (name', _, _, _)) -> equal_identifier name name') al then
+    List.map (fun tp ->
+        if List.exists (fun tp' -> equal_identifier (typaram_name tp) (typaram_name tp')) al then
           err "Multiple type parameters have the same name."
         else
           ()) bl
