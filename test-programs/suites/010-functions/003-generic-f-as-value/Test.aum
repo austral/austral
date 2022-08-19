@@ -5,7 +5,7 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        let f: Function[Nat8, Nat8] := foo;
+        let f: Fn[Nat8, Nat8] := foo;
         return ExitSuccess();
     end;
 end module body.

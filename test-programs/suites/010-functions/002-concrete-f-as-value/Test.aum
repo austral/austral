@@ -4,7 +4,7 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        let f: Function[Unit] := foo;
+        let f: Fn[Unit] := foo;
         return ExitSuccess();
     end;
 end module body.
