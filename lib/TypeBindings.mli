@@ -1,3 +1,5 @@
+(** This module defines a type for type bindings: a map from type parameters to
+    types. *)
 open Identifier
 open Type
 
