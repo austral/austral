@@ -3,6 +3,7 @@ open Common
 open Escape
 open Type
 open Region
+open TypeParameter
 open TypeParameters
 open TypeBindings
 open Span

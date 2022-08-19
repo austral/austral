@@ -2,6 +2,7 @@
 open Identifier
 open Id
 open Type
+open TypeParameter
 open TypeParameters
 open Sexplib
 open Std

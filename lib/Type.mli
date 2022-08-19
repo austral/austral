@@ -22,9 +22,6 @@ type signedness =
   | Signed
 [@@deriving (eq, show, sexp)]
 
-type type_parameter = TypeParameter of identifier * universe * qident * sident list
-[@@deriving (show, sexp)]
-
 type type_var = TypeVariable of identifier * universe * qident * sident list
 [@@deriving (eq, show, sexp)]
 
@@ -69,5 +66,3 @@ val size_type : ty
 val string_type : ty
 
 val equal_ty : ty -> ty -> bool
-
-val typaram_to_tyvar : type_parameter -> type_var

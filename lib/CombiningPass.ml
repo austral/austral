@@ -1,7 +1,7 @@
 open Identifier
 open Imports
 open Qualifier
-open Type
+open TypeParameter
 open TypeParameters
 open AbstractionPass
 open Cst
@@ -34,7 +34,7 @@ let parse_params (imports: import_map) (params: concrete_param list): qparam lis
 
 let name_typarams (im: import_map) (params: concrete_type_param list) (name: qident): typarams =
   let lst: type_parameter list =
-    List.map (fun (ConcreteTypeParam (n, u, cs)) -> TypeParameter (n, u, name, List.map (fun i -> qident_to_sident (qualify_identifier im i)) cs)) params
+    List.map (fun (ConcreteTypeParam (n, u, cs)) -> make_typaram (n, u, name, List.map (fun i -> qident_to_sident (qualify_identifier im i)) cs)) params
   in
   typarams_from_list lst
 

@@ -25,9 +25,6 @@ type signedness =
   | Signed
 [@@deriving (eq, show, sexp)]
 
-type type_parameter = TypeParameter of identifier * universe * qident * sident list
-[@@deriving (show, sexp)]
-
 type type_var = TypeVariable of identifier * universe * qident * sident list
 [@@deriving (eq, show, sexp)]
 
@@ -224,7 +221,3 @@ let rec equal_ty a b =
        equal_mono_id a b
      | _ ->
        false)
-
-let typaram_to_tyvar (typaram: type_parameter): type_var =
-  let (TypeParameter (n, u, f, cs)) = typaram in
-  TypeVariable (n, u, f, cs)

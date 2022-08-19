@@ -2,6 +2,7 @@ open Identifier
 open BuiltIn
 open Type
 open TypeSignature
+open TypeParameter
 open TypeParameters
 open TypeSystem
 open Region
@@ -266,8 +267,9 @@ and check_param_arity_matches (params: typarams) (args: ty list): unit =
 and check_universes_match (params: typarams) (args: ty list): unit =
   let _ = List.map2 check_universes_match' (typarams_as_list params) args in ()
 
-and check_universes_match' (TypeParameter (_, param_u, _, _)) (arg: ty): unit =
-  let arg_u = type_universe arg in
+and check_universes_match' (tp: type_parameter) (arg: ty): unit =
+  let param_u = typaram_universe tp
+  and arg_u = type_universe arg in
   if universe_compatible param_u arg_u then
     ()
   else
