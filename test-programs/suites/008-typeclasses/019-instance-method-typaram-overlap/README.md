@@ -1,0 +1,1 @@
+Test that the type parameters in a generic instance can't overlap with the method typarams.

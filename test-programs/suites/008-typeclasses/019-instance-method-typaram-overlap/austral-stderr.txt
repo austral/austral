@@ -1,0 +1,10 @@
+Error:
+  Title: Generic Error
+  Module:
+    Test
+  Location:
+    [no span available]
+  Description:
+    Multiple type parameters have the same name.
+  Code:
+    [no span available]

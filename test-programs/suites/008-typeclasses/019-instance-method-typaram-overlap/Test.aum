@@ -1,0 +1,17 @@
+module body Test is
+    typeclass Foo(T: Free) is
+        method foo(x: T): Unit;
+    end;
+
+    generic [T: Type]
+    instance Foo(Nat8) is
+        generic [T: Type]
+        method foo(x: T): Unit is
+            return nil;
+        end;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.
