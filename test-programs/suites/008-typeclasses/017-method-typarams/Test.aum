@@ -15,7 +15,6 @@ module body Test is
 
     function main(): ExitCode is
         let n: Nat8 := 10;
-        PrintViaRef(&n);
         return ExitSuccess();
     end;
 end module body.
