@@ -192,6 +192,8 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CVar (gen_ident n)
   | MLocalVar (n, _) ->
      CVar (gen_ident n)
+  | MFunVar (id, _) ->
+     CVar (gen_mono_id id)
   | MConcreteFuncall (id, _, args, _) ->
      CFuncall (gen_decl_id id, List.map g args)
   | MGenericFuncall (id, args, _) ->
