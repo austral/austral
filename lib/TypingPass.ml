@@ -16,6 +16,7 @@ open EnvUtils
 open EnvExtras
 open Ast
 open Tast
+open TastUtil
 open Linked
 open Util
 open Reporter

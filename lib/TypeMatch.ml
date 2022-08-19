@@ -5,6 +5,7 @@ open Type
 open TypeBindings
 open TypeParameters
 open Tast
+open TastUtil
 open Env
 open EnvTypes
 open EnvExtras
