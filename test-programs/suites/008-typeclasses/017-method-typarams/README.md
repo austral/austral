@@ -1,0 +1,1 @@
+Test that method type parameters work as expected.

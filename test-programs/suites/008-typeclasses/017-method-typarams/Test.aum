@@ -1,0 +1,21 @@
+module body Test is
+    typeclass PrintViaRef(T: Free) is
+        generic [R: Region]
+        method PrintRef(ref: &[T, R]): Unit;
+    end;
+
+    instance PrintViaRef(Nat8) is
+        generic [R: Region]
+        method PrintRef(ref: &[Nat8, R]): Unit is
+            print("Ref = ");
+            printLn(!x);
+            return nil;
+        end;
+    end;
+
+    function main(): ExitCode is
+        let n: Nat8 := 10;
+        PrintViaRef(&n);
+        return ExitSuccess();
+    end;
+end module body.
