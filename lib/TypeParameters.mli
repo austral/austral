@@ -25,3 +25,6 @@ val typarams_as_list : typarams -> type_parameter list
 
 (** Convert a list into a type parameter set, checking uniqueness. *)
 val typarams_from_list : type_parameter list -> typarams
+
+(** Combine two sets of type parameters. Errors if there is overlap. *)
+val merge_typarams : typarams -> typarams -> typarams
