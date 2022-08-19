@@ -547,7 +547,8 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       ps ("Bindings", show_bindings bindings'');
       (* Check: the set of bindings equals the set of type parameters *)
       check_bindings (typarams_from_list [typaram]) bindings'';
-      let (TypeParameter (type_parameter_name, _, from, _)) = typaram in
+      let type_parameter_name: identifier = typaram_name typaram
+      and from: qident = typaram_source typaram in
       match get_binding bindings'' type_parameter_name from with
       | (Some dispatch_ty) ->
          pt ("Dispatch Type", dispatch_ty);

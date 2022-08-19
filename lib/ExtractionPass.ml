@@ -14,6 +14,7 @@ open EnvTypes
 open Imports
 open TypeParser
 open TypeSignature
+open TypeParameter
 open TypeParameters
 open TypeClasses
 open BuiltIn
@@ -62,7 +63,7 @@ let check_typarams_are_free (typarams: typarams): unit =
     | TypeUniverse ->
        err "This type was declared to be in the Free universe, but it has a type parameter in the Type universe."
   in
-  List.iter (fun (TypeParameter (_, u, _, _)) -> check_universe u) (typarams_as_list typarams)
+  List.iter (fun tp -> check_universe (typaram_universe tp)) (typarams_as_list typarams)
 
 let rec extract_type_signatures (CombinedModule { decls; _ }): type_signature list =
   List.filter_map extract_type_signatures' decls
@@ -285,8 +286,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
   | CTypeclass (vis, name, typaram, methods, docstring) ->
      (* Check: the universe is one of {Type, Linear, Free} *)
      let _ =
-       let TypeParameter (_, universe, _, _) = typaram in
-       match universe with
+       match typaram_universe typaram with
        | TypeUniverse -> ()
        | LinearUniverse -> ()
        | FreeUniverse -> ()
@@ -329,8 +329,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
        | Some decl ->
           (match decl with
            | TypeClass { id; mod_id; param; _ } ->
-              let TypeParameter (_, universe, _, _) = param in
-              (id, mod_id, universe)
+              (id, mod_id, typaram_universe param)
            | _ ->
               err "Type class name refers to something that is not a type class.")
        | None ->

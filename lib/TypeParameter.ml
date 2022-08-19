@@ -15,6 +15,9 @@ let typaram_name (TypeParameter (i, _, _, _)) =
 let typaram_universe (TypeParameter (_, u, _, _)) =
   u
 
+let typaram_source (TypeParameter (_, _, s, _)) =
+  s
+
 let typaram_constraints (TypeParameter (_, _, _, cs)) =
   cs
 
