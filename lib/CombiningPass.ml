@@ -2,7 +2,6 @@ open Identifier
 open Imports
 open Qualifier
 open TypeParameter
-open TypeParameters
 open AbstractionPass
 open Cst
 open CstUtil
@@ -32,11 +31,14 @@ let parse_params (imports: import_map) (params: concrete_param list): qparam lis
       QualifiedParameter (n, qualify_typespec imports t))
     params
 
-let name_typarams (im: import_map) (params: concrete_type_param list) (name: qident): typarams =
-  let lst: type_parameter list =
-    List.map (fun (ConcreteTypeParam (n, u, cs)) -> make_typaram (n, u, name, List.map (fun i -> qident_to_sident (qualify_identifier im i)) cs)) params
+
+
+let name_typarams (im: import_map) (params: concrete_type_param list) (name: qident): unsourced_typarams =
+  let _ = name in
+  let lst: unsourced_typaram list =
+    List.map (fun (ConcreteTypeParam (n, u, cs)) -> make_unsourced_typaram (n, u, List.map (fun i -> qident_to_sident (qualify_identifier im i)) cs)) params
   in
-  typarams_from_list lst
+  lst
 
 let parse_method_decls (module_name: module_name) (imports: import_map) (methods: concrete_method_decl list): combined_method_decl list =
   List.map (fun (ConcreteMethodDecl (n, typarams, params, rt, method_docstring)) ->
@@ -178,7 +180,7 @@ let private_def module_name im def =
      let qname = make_qname name in
      CTypeclass (VisPrivate,
                  name,
-                 (match (typarams_as_list (name_typarams im [typaram] qname)) with
+                 (match (name_typarams im [typaram] qname) with
                   | [tp] ->
                      tp
                   | _ ->
@@ -255,7 +257,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
          let qname = make_qname name in
          CTypeclass (VisPublic,
                      name,
-                 (match (typarams_as_list (name_typarams im [typaram] qname)) with
+                 (match (name_typarams im [typaram] qname) with
                   | [tp] ->
                      tp
                   | _ ->
