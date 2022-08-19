@@ -25,9 +25,6 @@ type signedness =
   | Signed
 [@@deriving (eq, show, sexp)]
 
-type type_parameter = TypeParameter of identifier * universe * qident * sident list
-[@@deriving (show, sexp)]
-
 type type_var = TypeVariable of identifier * universe * qident * sident list
 [@@deriving (eq, show, sexp)]
 

@@ -13,3 +13,5 @@ val typaram_name : type_parameter -> identifier
 val typaram_universe : type_parameter -> universe
 
 val typaram_constraints : type_parameter -> sident list
+
+val typaram_to_tyvar : type_parameter -> type_var
