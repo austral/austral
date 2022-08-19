@@ -653,7 +653,11 @@ and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arg
   List.map2 f params arguments
 
 and make_substs (bindings: type_bindings) (typarams: typarams): (identifier * ty) list =
-  let f (TypeParameter (n, u, from, _)) =
+  let f (tp: type_parameter): (identifier * ty) option =
+    let n = typaram_name tp
+    and u = typaram_universe tp
+    and from = typaram_source tp
+    in
     if u = RegionUniverse then
       None
     else
@@ -705,9 +709,13 @@ and is_return_type_polymorphic (params: value_parameter list) (rt: ty): bool =
    every type parameter is satisfied. *)
 and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
   if (typarams_size typarams) = (binding_count bindings) then
-    let check (TypeParameter (n, u, from, _)): unit =
+    let check (tp: type_parameter): unit =
+      let n = typaram_name tp
+      and u = typaram_universe tp
+      and from = typaram_source tp
+      in
       (match get_binding bindings n from with
-       | Some ty ->
+                    | Some ty ->
           if universe_compatible u (type_universe ty) then
             ()
           else
