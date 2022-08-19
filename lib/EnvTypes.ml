@@ -204,7 +204,7 @@ type record_input = {
     vis: type_vis;
     name: identifier;
     docstring: docstring;
-    typarams: typarams;
+    typarams: unsourced_typaram list;
     universe: universe;
     slots: typed_slot list;
   }
@@ -214,7 +214,7 @@ type union_input = {
     vis: type_vis;
     name: identifier;
     docstring: docstring;
-    typarams: typarams;
+    typarams: unsourced_typaram list;
     universe: universe;
   }
 
@@ -232,7 +232,7 @@ type function_input = {
     vis: vis;
     name: identifier;
     docstring: docstring;
-    typarams: typarams;
+    typarams: unsourced_typaram list;
     value_params: value_parameter list;
     rt: ty;
     external_name: string option;
@@ -244,7 +244,7 @@ type type_class_input = {
     vis: vis;
     name: identifier;
     docstring: docstring;
-    param: type_parameter;
+    param: unsourced_typaram;
   }
 
 type type_class_method_input = {
@@ -253,7 +253,7 @@ type type_class_method_input = {
     typeclass_id: decl_id;
     name: identifier;
     docstring: docstring;
-    typarams: typarams;
+    typarams: unsourced_typaram list;
     value_params: value_parameter list;
     rt: ty;
   }
@@ -263,7 +263,7 @@ type instance_input = {
     vis: vis;
     typeclass_id: decl_id;
     docstring: docstring;
-    typarams: typarams;
+    typarams: unsourced_typaram list;
     argument: ty;
   }
 
@@ -272,7 +272,7 @@ type instance_method_input = {
     method_id: decl_id;
     docstring: docstring;
     name: identifier;
-    typarams: typarams;
+    typarams: unsourced_typaram list;
     value_params: value_parameter list;
     rt: ty;
     body: tstmt option;
