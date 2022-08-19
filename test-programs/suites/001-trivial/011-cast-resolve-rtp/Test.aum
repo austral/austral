@@ -1,0 +1,16 @@
+module body Test is
+    typeclass Bounded(A: Type) is
+        method minBound(): A;
+    end;
+
+    instance Bounded(Nat8) is
+        method minBound(): Nat8 is
+            return 0;
+        end;
+    end;
+
+    function main(): ExitCode is
+        printLn(minBound() : Nat8);
+        return ExitSuccess();
+    end;
+end module body.
