@@ -202,8 +202,8 @@ let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
   (env, id)
 
 let make_type_class_method_decl (id: decl_id) (input: type_class_method_input): decl =
-  let { mod_id; vis; typeclass_id; name; docstring; value_params; rt } = input in
-  TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; value_params; rt }
+  let { mod_id; vis; typeclass_id; name; docstring; typarams; value_params; rt } = input in
+  TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; typarams; value_params; rt }
 
 let add_type_class_method (env: env) (input: type_class_method_input): (env * decl_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
@@ -224,8 +224,8 @@ let add_instance (env: env) (input: instance_input): (env * decl_id) =
   (env, id)
 
 let make_ins_meth (id: ins_meth_id) (input: instance_method_input): ins_meth_rec =
-  let { instance_id; method_id; docstring; name; value_params; rt; body } = input in
-  InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body }
+  let { instance_id; method_id; docstring; name; typarams; value_params; rt; body } = input in
+  InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body }
 
 let add_instance_method (env: env) (input: instance_method_input): (env * ins_meth_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
@@ -389,12 +389,12 @@ let rec store_method_body (env: env) (ins_meth_id: ins_meth_id) (body: tstmt): e
   env
 
 and replace_method_body (meth: ins_meth_rec) (new_body: tstmt): ins_meth_rec =
-  let (InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body }) = meth in
+  let (InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body }) = meth in
   (match body with
    | Some _ ->
       err "Internal: function already has a body"
    | None ->
-      InsMethRec { id; instance_id; method_id; docstring; name; value_params; rt; body=(Some new_body) })
+      InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body=(Some new_body) })
 
 let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id: decl_id) (name: identifier): ins_meth_rec option =
   let (Env { methods; _ }) = env in

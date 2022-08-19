@@ -43,3 +43,18 @@ let typarams_from_list (lst: type_parameter list): typarams =
   List.fold_left (fun set typaram -> add_typaram set typaram)
     empty_typarams
     lst
+
+let merge_typarams (a: typarams) (b: typarams): typarams =
+  (* Convert both sets to lists *)
+  let al: type_parameter list = typarams_as_list a
+  and bl: type_parameter list = typarams_as_list b
+  in
+  (* If any element of b appears in a, error. *)
+  let _ =
+    List.map (fun (TypeParameter (name, _, _, _)) ->
+        if List.exists (fun (TypeParameter (name', _, _, _)) -> equal_identifier name name') al then
+          err "Multiple type parameters have the same name."
+        else
+          ()) bl
+  in
+  TyParams (List.concat [al; bl])

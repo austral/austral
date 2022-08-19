@@ -32,28 +32,30 @@ let parse_params (imports: import_map) (params: concrete_param list): qparam lis
       QualifiedParameter (n, qualify_typespec imports t))
     params
 
-let parse_method_decls (imports: import_map) (methods: concrete_method_decl list): combined_method_decl list =
-  List.map (fun (ConcreteMethodDecl (n, params, rt, method_docstring)) ->
-      CMethodDecl (n,
-                   parse_params imports params,
-                   qualify_typespec imports rt,
-                   method_docstring))
-    methods
-
-let parse_method_defs (imports: import_map) (methods: concrete_method_def list): combined_method_def list =
-  List.map (fun (ConcreteMethodDef (n, params, rt, body, method_docstring)) ->
-      CMethodDef (n,
-                  parse_params imports params,
-                  qualify_typespec imports rt,
-                  method_docstring,
-                  abs_stmt imports body))
-    methods
-
 let name_typarams (im: import_map) (params: concrete_type_param list) (name: qident): typarams =
   let lst: type_parameter list =
     List.map (fun (ConcreteTypeParam (n, u, cs)) -> TypeParameter (n, u, name, List.map (fun i -> qident_to_sident (qualify_identifier im i)) cs)) params
   in
   typarams_from_list lst
+
+let parse_method_decls (module_name: module_name) (imports: import_map) (methods: concrete_method_decl list): combined_method_decl list =
+  List.map (fun (ConcreteMethodDecl (n, typarams, params, rt, method_docstring)) ->
+      CMethodDecl (n,
+                   name_typarams imports typarams (make_qident (module_name, n, n)),
+                   parse_params imports params,
+                   qualify_typespec imports rt,
+                   method_docstring))
+    methods
+
+let parse_method_defs (module_name: module_name) (imports: import_map) (methods: concrete_method_def list): combined_method_def list =
+  List.map (fun (ConcreteMethodDef (n, typarams, params, rt, body, method_docstring)) ->
+      CMethodDef (n,
+                  name_typarams imports typarams (make_qident (module_name, n, n)),
+                  parse_params imports params,
+                  qualify_typespec imports rt,
+                  method_docstring,
+                  abs_stmt imports body))
+    methods
 
 let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: concrete_def): combined_definition =
   let make_qname n =
@@ -126,7 +128,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                       qname,
                       name_typarams bi typarams qname,
                       qualify_typespec ii argument,
-                      parse_method_defs bi methods,
+                      parse_method_defs module_name bi methods,
                       docstring)
          else
            err "Mismatch"
@@ -181,7 +183,7 @@ let private_def module_name im def =
                      tp
                   | _ ->
                      err "typeclass has more than one parameter"),
-                 parse_method_decls im methods,
+                 parse_method_decls module_name im methods,
                  docstring)
   | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
      (* Instance names might refer to an imported typeclass, so we have to
@@ -193,7 +195,7 @@ let private_def module_name im def =
                 qname,
                 name_typarams im typarams qname,
                 qualify_typespec im argument,
-                parse_method_defs im methods,
+                parse_method_defs module_name im methods,
                 docstring)
 
 let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
@@ -258,7 +260,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
                      tp
                   | _ ->
                      err "typeclass has more than one parameter"),
-                     parse_method_decls im methods,
+                     parse_method_decls module_name im methods,
                      docstring)
       | _ ->
          (* Other declarations need to match a body *)

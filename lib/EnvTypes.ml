@@ -117,6 +117,7 @@ type decl =
       typeclass_id: decl_id;
       name: identifier;
       docstring: docstring;
+      typarams: typarams;
       value_params: value_parameter list;
       rt: ty;
     }
@@ -137,6 +138,7 @@ type ins_meth_rec = InsMethRec of {
       method_id: decl_id;
       docstring: docstring;
       name: identifier;
+      typarams: typarams;
       value_params: value_parameter list;
       rt: ty;
       body: tstmt option;
@@ -250,6 +252,7 @@ type type_class_method_input = {
     typeclass_id: decl_id;
     name: identifier;
     docstring: docstring;
+    typarams: typarams;
     value_params: value_parameter list;
     rt: ty;
   }
@@ -268,6 +271,7 @@ type instance_method_input = {
     method_id: decl_id;
     docstring: docstring;
     name: identifier;
+    typarams: typarams;
     value_params: value_parameter list;
     rt: ty;
     body: tstmt option;

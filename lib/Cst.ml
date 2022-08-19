@@ -53,10 +53,10 @@ and concrete_instance =
   ConcreteInstance of identifier * concrete_type_param list * typespec * concrete_method_def list * docstring
 
 and concrete_method_decl =
-  ConcreteMethodDecl of identifier * concrete_param list * typespec * docstring
+  ConcreteMethodDecl of identifier * concrete_type_param list * concrete_param list * typespec * docstring
 
 and concrete_method_def =
-  ConcreteMethodDef of identifier * concrete_param list * typespec * cstmt * docstring
+  ConcreteMethodDef of identifier * concrete_type_param list * concrete_param list * typespec * cstmt * docstring
 
 and typespec =
   | TypeSpecifier of identifier * typespec list

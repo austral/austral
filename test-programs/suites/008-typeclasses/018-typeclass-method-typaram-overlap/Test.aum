@@ -1,0 +1,10 @@
+module body Test is
+    typeclass PrintViaRef(T: Free) is
+        generic [T: Region]
+        method printRef(ref: &[T, T]): Unit;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

@@ -48,7 +48,7 @@ let rec ends_in_return (stmt: astmt): bool =
 let check_ends_in_return (CombinedModule { name=mn; decls; _ }): unit =
   with_frame "Return check"
     (fun _ ->
-      let check_method_ends_in_return (CMethodDef (name, _, _, _, body)): unit =
+      let check_method_ends_in_return (CMethodDef (name, _, _, _, _, body)): unit =
         if ends_in_return body then
           ()
         else

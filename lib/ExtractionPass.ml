@@ -297,16 +297,18 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
      (* Convert the list of methods into a list of type_class_method records *)
      let typarams = typarams_from_list [typaram] in
-     let method_map (CMethodDecl (name, params, rt, docstring)): type_class_method_input =
-       let rm = region_map_from_typarams typarams in
-       let value_params = List.map (parse_param typarams) params
-       and rt = parse' rm typarams rt in
+     let method_map (CMethodDecl (name, method_typarams, params, rt, docstring)): type_class_method_input =
+       let effective_typarams: typarams = merge_typarams typarams method_typarams in
+       let rm = region_map_from_typarams effective_typarams in
+       let value_params = List.map (parse_param effective_typarams) params
+       and rt = parse' rm effective_typarams rt in
        {
          mod_id;
          vis;
          typeclass_id;
          name;
          docstring;
+         typarams = method_typarams;
          value_params;
          rt;
        }
@@ -356,10 +358,11 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
-     let method_map (CMethodDef (name, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
-       let rm = region_map_from_typarams typarams in
-       let value_params = List.map (parse_param typarams) params
-       and rt = parse' rm typarams rt
+     let method_map (CMethodDef (name, method_typarams, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
+       let effective_typarams: typarams = merge_typarams typarams method_typarams in
+       let rm = region_map_from_typarams effective_typarams in
+       let value_params = List.map (parse_param effective_typarams) params
+       and rt = parse' rm effective_typarams rt
        and method_id: decl_id =
          (match get_method_from_typeclass_id_and_name env typeclass_id name with
           | Some (TypeClassMethod { id; _ }) ->
@@ -372,6 +375,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            method_id = method_id;
            docstring = meth_docstring;
            name = name;
+           typarams = method_typarams;
            value_params = value_params;
            rt = rt;
            body = None;
