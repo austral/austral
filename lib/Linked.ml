@@ -6,6 +6,7 @@ open Common
 open Imports
 open Ast
 open Type
+open TypeParameter
 open TypeParameters
 open Id
 

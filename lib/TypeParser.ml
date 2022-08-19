@@ -2,6 +2,7 @@ open Identifier
 open BuiltIn
 open Type
 open TypeSignature
+open TypeParameter
 open TypeParameters
 open TypeSystem
 open Region

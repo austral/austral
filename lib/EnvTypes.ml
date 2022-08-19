@@ -5,6 +5,7 @@ open ModIdSet
 open Identifier
 open Common
 open Type
+open TypeParameter
 open TypeParameters
 open Tast
 open MonoType

@@ -3,6 +3,7 @@ open Common
 open Imports
 open Ast
 open Type
+open TypeParameter
 open TypeParameters
 
 type combined_module = CombinedModule of {

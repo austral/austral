@@ -2,6 +2,7 @@ open Identifier
 open Imports
 open Qualifier
 open Type
+open TypeParameter
 open TypeParameters
 open AbstractionPass
 open Cst

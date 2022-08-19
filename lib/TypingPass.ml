@@ -6,6 +6,7 @@ open TypeBindings
 open TypeMatch
 open TypeVarSet
 open TypeParser
+open TypeParameter
 open TypeParameters
 open Region
 open Id

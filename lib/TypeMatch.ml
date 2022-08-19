@@ -3,6 +3,7 @@ open Identifier
 open IdentifierSet
 open Type
 open TypeBindings
+open TypeParameter
 open TypeParameters
 open Tast
 open TastUtil

@@ -7,6 +7,7 @@ open TypeStripping
 open MonoType
 open TypeBindings
 open TypeReplace
+open TypeParameter
 open TypeParameters
 open TypeMatch
 open Tast
