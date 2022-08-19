@@ -43,6 +43,7 @@ The compiler's middle end.
 - {!Austral_core.Env}
 - {!Austral_core.Region}
 - {!Austral_core.Tast}
+- {!Austral_core.TastUtil}
 - {!Austral_core.TypeBindings}
 - {!Austral_core.TypeMatch}
 - {!Austral_core.Type}
