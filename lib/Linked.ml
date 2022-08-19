@@ -1,3 +1,6 @@
+(** The linked representation is essentially the same as the combined
+    representation, but declarations are linked to their corresponding entry in
+    the environment. *)
 open Identifier
 open Common
 open Imports
@@ -5,10 +8,6 @@ open Ast
 open Type
 open TypeParameters
 open Id
-
-(** The linked representation is essentially the same as the combined
-    representation, but declarations are linked to their corresponding entry in
-    the environment. *)
 
 type linked_module = LinkedModule of {
       mod_id: mod_id;
