@@ -31,38 +31,32 @@ let parse_params (imports: import_map) (params: concrete_param list): qparam lis
       QualifiedParameter (n, qualify_typespec imports t))
     params
 
-
-
-let name_typarams (im: import_map) (params: concrete_type_param list) (name: qident): unsourced_typarams =
-  let _ = name in
+let make_typarams (im: import_map) (params: concrete_type_param list): unsourced_typarams =
   let lst: unsourced_typaram list =
     List.map (fun (ConcreteTypeParam (n, u, cs)) -> make_unsourced_typaram (n, u, List.map (fun i -> qident_to_sident (qualify_identifier im i)) cs)) params
   in
   lst
 
-let parse_method_decls (module_name: module_name) (imports: import_map) (methods: concrete_method_decl list): combined_method_decl list =
+let parse_method_decls (imports: import_map) (methods: concrete_method_decl list): combined_method_decl list =
   List.map (fun (ConcreteMethodDecl (n, typarams, params, rt, method_docstring)) ->
       CMethodDecl (n,
-                   name_typarams imports typarams (make_qident (module_name, n, n)),
+                   make_typarams imports typarams,
                    parse_params imports params,
                    qualify_typespec imports rt,
                    method_docstring))
     methods
 
-let parse_method_defs (module_name: module_name) (imports: import_map) (methods: concrete_method_def list): combined_method_def list =
+let parse_method_defs (imports: import_map) (methods: concrete_method_def list): combined_method_def list =
   List.map (fun (ConcreteMethodDef (n, typarams, params, rt, body, method_docstring)) ->
       CMethodDef (n,
-                  name_typarams imports typarams (make_qident (module_name, n, n)),
+                  make_typarams imports typarams,
                   parse_params imports params,
                   qualify_typespec imports rt,
                   method_docstring,
                   abs_stmt imports body))
     methods
 
-let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: concrete_def): combined_definition =
-  let make_qname n =
-    make_qident (module_name, n, n)
-  in
+let match_decls (ii: import_map) (bi: import_map) (decl: concrete_decl) (def: concrete_def): combined_definition =
   match decl with
   | ConcreteConstantDecl (name, ty, docstring) ->
      (match def with
@@ -77,10 +71,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
      (match def with
       | ConcreteRecordDef (ConcreteRecord (name', typarams', universe', slots, _)) ->
          if (name = name') && (typarams = typarams') && (universe = universe') then
-           let qname = make_qname name' in
            CRecord (TypeVisOpaque,
                     name,
-                    name_typarams bi typarams qname,
+                    make_typarams bi typarams,
                     universe,
                     parse_slots bi slots,
                     docstring)
@@ -88,10 +81,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
            err "Mismatch"
       | ConcreteUnionDef (ConcreteUnion (name', typarams', universe', cases, _)) ->
          if (name = name') && (typarams = typarams') && (universe = universe') then
-           let qname = make_qname name' in
            CUnion (TypeVisOpaque,
                    name,
-                   name_typarams bi typarams qname,
+                   make_typarams bi typarams,
                    universe,
                    parse_cases bi cases,
                    docstring)
@@ -103,10 +95,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
      (match def with
       | ConcreteFunctionDef (name', typarams', params', rt', body, _, pragmas) ->
          if (name = name') && (typarams = typarams') && (params = params') && (rt = rt') then
-           let qname = make_qname name' in
            CFunction (VisPublic,
                       name,
-                      name_typarams bi typarams qname,
+                      make_typarams bi typarams,
                       parse_params ii params,
                       qualify_typespec ii rt,
                       abs_stmt bi body,
@@ -128,9 +119,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
            let qname = qualify_identifier ii name in
            CInstance (VisPublic,
                       qname,
-                      name_typarams bi typarams qname,
+                      make_typarams bi typarams,
                       qualify_typespec ii argument,
-                      parse_method_defs module_name bi methods,
+                      parse_method_defs bi methods,
                       docstring)
          else
            err "Mismatch"
@@ -139,10 +130,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
   | _ ->
      err "Invalid decl in this context"
 
-let private_def module_name im def =
-  let make_qname n =
-    make_qident (module_name, n, n)
-  in
+let private_def im def =
   match def with
   | ConcreteConstantDef (name, ty, value, docstring) ->
      CConstant (VisPrivate,
@@ -151,41 +139,37 @@ let private_def module_name im def =
                 abs_expr im value,
                 docstring)
   | ConcreteRecordDef (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
-     let qname = make_qname name in
      CRecord (TypeVisPrivate,
               name,
-              name_typarams im typarams qname,
+              make_typarams im typarams,
               universe,
               parse_slots im slots,
               docstring)
   | ConcreteUnionDef (ConcreteUnion (name, typarams, universe, cases, docstring)) ->
-     let qname = make_qname name in
      CUnion (TypeVisPrivate,
              name,
-             name_typarams im typarams qname,
+             make_typarams im typarams,
              universe,
              parse_cases im cases,
              docstring)
   | ConcreteFunctionDef (name, typarams, params, rt, body, docstring, pragmas) ->
-     let qname = make_qname name in
      CFunction (VisPrivate,
                 name,
-                name_typarams im typarams qname,
+                make_typarams im typarams,
                 parse_params im params,
                 qualify_typespec im rt,
                 abs_stmt im body,
                 docstring,
                 pragmas)
   | ConcreteTypeClassDef (ConcreteTypeClass (name, typaram, methods, docstring)) ->
-     let qname = make_qname name in
      CTypeclass (VisPrivate,
                  name,
-                 (match (name_typarams im [typaram] qname) with
+                 (match (make_typarams im [typaram]) with
                   | [tp] ->
                      tp
                   | _ ->
                      err "typeclass has more than one parameter"),
-                 parse_method_decls module_name im methods,
+                 parse_method_decls im methods,
                  docstring)
   | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
      (* Instance names might refer to an imported typeclass, so we have to
@@ -195,9 +179,9 @@ let private_def module_name im def =
      let qname = qualify_identifier im name in
      CInstance (VisPrivate,
                 qname,
-                name_typarams im typarams qname,
+                make_typarams im typarams,
                 qualify_typespec im argument,
-                parse_method_defs module_name im methods,
+                parse_method_defs im methods,
                 docstring)
 
 let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
@@ -216,8 +200,8 @@ let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_modul
         let im = resolve mn kind env interface_imports
         and bm = resolve mn kind env body_imports
         in
-        let public_decls = List.map (parse_decl mn im bm cmb) decls
-        and private_decls = parse_defs mn cmi bm defs
+        let public_decls = List.map (parse_decl im bm cmb) decls
+        and private_decls = parse_defs cmi bm defs
         in
         CombinedModule {
             name = mn;
@@ -229,46 +213,40 @@ let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_modul
             decls = List.concat [public_decls; private_decls];
     })
 
-and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb: concrete_module_body) (decl: concrete_decl): combined_definition =
-  let make_qname n =
-    make_qident (module_name, n, n)
-  in
+and parse_decl (im: import_map) (bm: import_map) (cmb: concrete_module_body) (decl: concrete_decl): combined_definition =
   match concrete_decl_name decl with
   | (Some name) ->
      (match decl with
       (* Some declarations don't need to have a matching body *)
       | ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
-         let qname = make_qname name in
          CRecord (TypeVisPublic,
                   name,
-                  name_typarams im typarams qname,
+                  make_typarams im typarams,
                   universe,
                   parse_slots im slots,
                   docstring)
       | ConcreteUnionDecl (ConcreteUnion (name, typarams, universe, cases, docstring)) ->
-         let qname = make_qname name in
          CUnion (TypeVisPublic,
                  name,
-                 name_typarams im typarams qname,
+                 make_typarams im typarams,
                  universe,
                  parse_cases im cases,
                  docstring)
       | ConcreteTypeClassDecl (ConcreteTypeClass (name, typaram, methods, docstring)) ->
-         let qname = make_qname name in
          CTypeclass (VisPublic,
                      name,
-                 (match (name_typarams im [typaram] qname) with
+                 (match (make_typarams im [typaram]) with
                   | [tp] ->
                      tp
                   | _ ->
                      err "typeclass has more than one parameter"),
-                     parse_method_decls module_name im methods,
+                     parse_method_decls im methods,
                      docstring)
       | _ ->
          (* Other declarations need to match a body *)
          (match get_concrete_def cmb name with
           | (Some def) ->
-             match_decls module_name im bm decl def
+             match_decls im bm decl def
           | None ->
              err "Interface declaration has no corresponding body declaration"))
   | None ->
@@ -277,16 +255,16 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
          (* It's an instance declaration. Find the corresponding instance in the body. *)
          (match get_instance_def cmb name typarams argument with
           | (Some def) ->
-             match_decls module_name im bm decl (ConcreteInstanceDef def)
+             match_decls im bm decl (ConcreteInstanceDef def)
           | None ->
              err "Interface declaration has no corresponding body declaration")
       | _ ->
          err "Internal")
 
-and parse_defs (mn: module_name) (cmi: concrete_module_interface) (im: import_map) (defs: concrete_def list): combined_definition list =
-  List.filter_map (parse_def mn cmi im) defs
+and parse_defs (cmi: concrete_module_interface) (im: import_map) (defs: concrete_def list): combined_definition list =
+  List.filter_map (parse_def cmi im) defs
 
-and parse_def (module_name: module_name) (cmi: concrete_module_interface) (im: import_map) (def: concrete_def): combined_definition option =
+and parse_def (cmi: concrete_module_interface) (im: import_map) (def: concrete_def): combined_definition option =
   match def_name def with
   | (Some name) ->
      (* If this def exists in the interface, skip it *)
@@ -294,7 +272,7 @@ and parse_def (module_name: module_name) (cmi: concrete_module_interface) (im: i
       | (Some _) ->
          None
       | None ->
-         Some (private_def module_name im def))
+         Some (private_def im def))
   | None ->
      (match def with
       | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, _, _)) ->
@@ -304,7 +282,7 @@ and parse_def (module_name: module_name) (cmi: concrete_module_interface) (im: i
          if has_instance_decl cmi name typarams argument then
            None
          else
-           Some (private_def module_name im def)
+           Some (private_def im def)
       | _ ->
          err "Internal")
 
@@ -331,7 +309,7 @@ let body_as_combined (env: env) (body: concrete_module_body): combined_module =
       (* We fake an empty module interface. *)
       let cmi: concrete_module_interface = ConcreteModuleInterface (mn, Docstring "", [], []) in
       let imports = resolve mn kind env body_imports in
-      let decls = parse_defs mn cmi imports defs in
+      let decls = parse_defs cmi imports defs in
       (* Go through the declarations and make them public. *)
       let decls = List.map as_public decls in
       CombinedModule {
