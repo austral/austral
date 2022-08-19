@@ -1,13 +1,18 @@
 open Identifier
+open Id
 open Type
 open Sexplib
 open Std
 
-type type_parameter = TypeParameter of identifier * universe * qident * sident list
+type typaram_source =
+  | DeclSource of decl_id
+  | MethodSource of ins_meth_id
+
+type type_parameter = TypeParameter of identifier * universe * typaram_source * sident list
 [@@deriving (show, sexp)]
 
-let make_typaram (i, u, q, s) =
-  TypeParameter (i, u, q, s)
+let make_typaram (i, u, s, cs) =
+  TypeParameter (i, u, s, cs)
 
 let typaram_name (TypeParameter (i, _, _, _)) =
   i
