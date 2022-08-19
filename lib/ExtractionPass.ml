@@ -359,9 +359,10 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let (env, instance_id) = add_instance env input in
      (* Convert the list of methods into a list of instance_method_input records *)
      let method_map (CMethodDef (name, method_typarams, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
-       let rm = region_map_from_typarams typarams in
-       let value_params = List.map (parse_param typarams) params
-       and rt = parse' rm typarams rt
+       let effective_typarams: typarams = merge_typarams typarams method_typarams in
+       let rm = region_map_from_typarams effective_typarams in
+       let value_params = List.map (parse_param effective_typarams) params
+       and rt = parse' rm effective_typarams rt
        and method_id: decl_id =
          (match get_method_from_typeclass_id_and_name env typeclass_id name with
           | Some (TypeClassMethod { id; _ }) ->
