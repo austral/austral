@@ -30,3 +30,10 @@ val typaram_constraints : type_parameter -> sident list
 
 (** Transform a type parameter into an equivalent type variable. *)
 val typaram_to_tyvar : type_parameter -> type_var
+
+(** An unsourced type parameter is like a type parameter except it's not yet
+    linked to the declaration that defines it. *)
+type unsourced_typaram
+
+(** Create an unsourced type parameter. *)
+val make_unsourced_typaram : identifier * universe * sident list -> unsourced_typaram

@@ -29,3 +29,8 @@ let typaram_constraints (TypeParameter (_, _, _, cs)) =
 let typaram_to_tyvar (typaram: type_parameter): type_var =
   let (TypeParameter (n, u, f, cs)) = typaram in
   TypeVariable (n, u, f, cs)
+
+type unsourced_typaram = UnsourcedTyparam of identifier * universe * sident list
+
+let make_unsourced_typaram (i, u, cs) =
+  UnsourcedTyparam (i, u, cs)
