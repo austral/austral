@@ -51,6 +51,10 @@ let merge_typarams (a: typarams) (b: typarams): typarams =
   in
   (* If any element of b appears in a, error. *)
   let _ =
-    List.map (fun (TypeParameter (name, _, _, _)) -> List.exists (fun (TypeParameter (name', _, _, _)) -> equal_identifier name name') al) bl
+    List.map (fun (TypeParameter (name, _, _, _)) ->
+        if List.exists (fun (TypeParameter (name', _, _, _)) -> equal_identifier name name') al then
+          err "Multiple type parameters have the same name."
+        else
+          ()) bl
   in
   TyParams (List.concat [al; bl])
