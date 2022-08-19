@@ -1095,6 +1095,8 @@ and is_constant = function
      false
   | TLocalVar _ ->
      false
+  | TFunVar _ ->
+     true
   | TArithmetic (_, lhs, rhs) ->
      (is_constant lhs) && (is_constant rhs)
   | TFuncall _ ->
