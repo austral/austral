@@ -1,0 +1,11 @@
+module body Test is
+    generic [T: Free]
+    function foo(x: T): T is
+        return x;
+    end;
+
+    function main(): ExitCode is
+        let f: Function[Nat8, Nat8] := foo;
+        return ExitSuccess();
+    end;
+end module body.

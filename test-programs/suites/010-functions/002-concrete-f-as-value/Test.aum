@@ -1,0 +1,10 @@
+module body Test is
+    function foo(): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        let f: Function[Unit] := foo;
+        return ExitSuccess();
+    end;
+end module body.
