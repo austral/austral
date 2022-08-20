@@ -47,7 +47,7 @@ let rec get_type = function
      ty
   | TLocalVar (_, ty) ->
      ty
-  | TFunVar (_, ty) ->
+  | TFunVar (_, ty, _) ->
      ty
   | TArithmetic (_, lhs, _) ->
      get_type lhs

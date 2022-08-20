@@ -61,8 +61,8 @@ let rec ser_expr (env: env) (expr: texpr): ser_expr =
      SParamVar (name, ty)
   | TLocalVar (name, ty) ->
      SLocalVar (name, ty)
-  | TFunVar (id, ty) ->
-     SFunVar (get_func_ref env id, ty)
+  | TFunVar (id, ty, bindings) ->
+     SFunVar (get_func_ref env id, ty, bindings)
   | TArithmetic (op, lhs, rhs) ->
      SArithmetic (op, se lhs, se rhs)
   | TFuncall (_, name, values, ty, bindings) ->
