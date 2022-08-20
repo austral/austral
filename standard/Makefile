@@ -19,7 +19,7 @@ TEST_BIN := test_bin
 all: $(TEST_BIN)
 
 $(TEST_BIN): src/*.aui src/*.aum test/*.aui test/*.aum
-	austral compile $(MODULES) --entrypoint=Standard.Test:Main --output=$(TEST_BIN)
+	../austral compile $(MODULES) --entrypoint=Standard.Test:Main --output=$(TEST_BIN)
 
 clean:
 	rm $(TEST_BIN)
