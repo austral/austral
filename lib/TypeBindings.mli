@@ -2,6 +2,7 @@
     types. *)
 open Type
 open TypeParameter
+open Sexplib
 
 (** A type bindings value represents a map from type parameters to actual
     types. These are created as part of the type checking process. *)
@@ -31,3 +32,6 @@ val get_binding : type_bindings -> type_parameter -> ty option
 val replace_variables : type_bindings -> ty -> ty
 
 val show_bindings : type_bindings -> string
+
+val type_bindings_of_sexp : Sexp.t -> type_bindings
+val sexp_of_type_bindings : type_bindings -> Sexp.t

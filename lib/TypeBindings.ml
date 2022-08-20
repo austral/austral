@@ -2,6 +2,8 @@ open Identifier
 open Type
 open TypeParameter
 open TypeSystem
+open Sexplib
+open Std
 
 (* I don't know why OCaml requires map elements to be totally ordered as opposed
    to just comparable for equality. Anyways, we get around this by basically
@@ -145,3 +147,12 @@ let rec bindings_from_list lst =
 let pp_type_bindings _ _ = ()
 
 let show_type_bindings = show_bindings
+
+type serializable_bindings = (type_parameter * ty) list
+[@@deriving sexp]
+
+let type_bindings_of_sexp (sexp: Sexp.t): type_bindings =
+  bindings_from_list (serializable_bindings_of_sexp sexp)
+
+let sexp_of_type_bindings (bs: type_bindings): Sexp.t =
+  sexp_of_serializable_bindings (bindings_list bs)

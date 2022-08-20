@@ -9,6 +9,7 @@ open TypeParameter
 open TypeParameters
 open Tast
 open MonoType
+open MonoTypeBindings
 open Mtast
 
 (** A file record contains a file's path and contents. *)
@@ -166,28 +167,28 @@ type monomorph =
   | MonoRecordDefinition of {
       id: mono_id;
       type_id: decl_id;
-      tyargs: mono_ty list;
+      tyargs: mono_type_bindings;
       slots: (mono_slot list) option;
       (** The list of slots, if instantiated. *)
     }
   | MonoUnionDefinition of {
       id: mono_id;
       type_id: decl_id;
-      tyargs: mono_ty list;
+      tyargs: mono_type_bindings;
       cases: (mono_case list) option;
       (** The list of cases, if instantiated. *)
     }
   | MonoFunction of {
       id: mono_id;
       function_id: decl_id;
-      tyargs: mono_ty list;
+      tyargs: mono_type_bindings;
       body: mstmt option;
       (** The function body, if instantiated. *)
     }
   | MonoInstanceMethod of {
       id: mono_id;
       method_id: ins_meth_id;
-      tyargs: mono_ty list;
+      tyargs: mono_type_bindings;
       body: mstmt option;
     }
 

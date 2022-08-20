@@ -1,6 +1,7 @@
 open Identifier
 open Type
 open MonoType
+open MonoTypeBindings
 open Tast
 open Mtast
 open Id
@@ -404,28 +405,28 @@ let get_instance_method_from_instance_id_and_method_name (env: env) (instance_id
   in
   List.find_opt pred methods
 
-let add_record_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+let add_record_monomorph (env: env) (type_id: decl_id) (tyargs: mono_type_bindings): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
   let mono = MonoRecordDefinition { id; type_id; tyargs; slots = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
-let add_union_monomorph (env: env) (type_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+let add_union_monomorph (env: env) (type_id: decl_id) (tyargs: mono_type_bindings): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
   let mono = MonoUnionDefinition { id; type_id; tyargs; cases = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
-let add_function_monomorph (env: env) (function_id: decl_id) (tyargs: mono_ty list): (env * mono_id) =
+let add_function_monomorph (env: env) (function_id: decl_id) (tyargs: mono_type_bindings): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
   let mono = MonoFunction { id; function_id; tyargs; body = None } in
   let env = Env { files; mods; methods; decls; monos = mono :: monos } in
   (env, id)
 
-let add_instance_method_monomorph (env: env) (method_id: ins_meth_id) (tyargs: mono_ty list): (env * mono_id) =
+let add_instance_method_monomorph (env: env) (method_id: ins_meth_id) (tyargs: mono_type_bindings): (env * mono_id) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_mono_id () in
   let mono = MonoInstanceMethod { id; method_id; tyargs; body = None } in
@@ -439,16 +440,16 @@ let monomorph_id (mono: monomorph): mono_id =
   | MonoFunction { id; _ } -> id
   | MonoInstanceMethod { id; _ } -> id
 
-let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_id option =
+let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_type_bindings): mono_id option =
   let (Env { monos; _ }) = env in
   let pred (mono: monomorph): bool =
     match mono with
     | MonoRecordDefinition { type_id; tyargs; _ } ->
       (equal_decl_id type_id decl_id)
-      && (List.equal equal_mono_ty tyargs args)
+      && (equal_mono_bindings tyargs args)
     | MonoUnionDefinition { type_id; tyargs; _ } ->
       (equal_decl_id type_id decl_id)
-      && (List.equal equal_mono_ty tyargs args)
+      && (equal_mono_bindings tyargs args)
     | _ ->
       false
   in
@@ -456,25 +457,25 @@ let get_type_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_
   | Some m -> Some (monomorph_id m)
   | None -> None
 
-let add_or_get_record_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+let add_or_get_record_monomorph (env: env) (decl_id: decl_id) (args: mono_type_bindings): (env * mono_id) =
   match get_type_monomorph env decl_id args with
   | Some mono_id -> (env, mono_id)
   | None ->
     add_record_monomorph env decl_id args
 
-let add_or_get_union_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+let add_or_get_union_monomorph (env: env) (decl_id: decl_id) (args: mono_type_bindings): (env * mono_id) =
   match get_type_monomorph env decl_id args with
   | Some mono_id -> (env, mono_id)
   | None ->
     add_union_monomorph env decl_id args
 
-let get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): mono_id option =
+let get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_type_bindings): mono_id option =
   let (Env { monos; _ }) = env in
   let pred (mono: monomorph): bool =
     match mono with
     | MonoFunction { function_id; tyargs; _ } ->
       (equal_decl_id function_id decl_id)
-      && (List.equal equal_mono_ty tyargs args)
+      && (equal_mono_bindings tyargs args)
     | _ ->
       false
   in
@@ -482,19 +483,19 @@ let get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): m
   | Some m -> Some (monomorph_id m)
   | None -> None
 
-let add_or_get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_ty list): (env * mono_id) =
+let add_or_get_function_monomorph (env: env) (decl_id: decl_id) (args: mono_type_bindings): (env * mono_id) =
   match get_function_monomorph env decl_id args with
   | Some mono_id -> (env, mono_id)
   | None ->
     add_function_monomorph env decl_id args
 
-let get_instance_method_monomorph (env: env) (id: ins_meth_id) (args: mono_ty list): mono_id option =
+let get_instance_method_monomorph (env: env) (id: ins_meth_id) (args: mono_type_bindings): mono_id option =
   let (Env { monos; _ }) = env in
   let pred (mono: monomorph): bool =
     match mono with
     | MonoInstanceMethod { method_id; tyargs; _ } ->
       (equal_ins_meth_id method_id id)
-      && (List.equal equal_mono_ty tyargs args)
+      && (equal_mono_bindings tyargs args)
     | _ ->
       false
   in
@@ -502,7 +503,7 @@ let get_instance_method_monomorph (env: env) (id: ins_meth_id) (args: mono_ty li
   | Some m -> Some (monomorph_id m)
   | None -> None
 
-let add_or_get_instance_method_monomorph (env: env) (method_id: ins_meth_id) (args: mono_ty list): (env * mono_id) =
+let add_or_get_instance_method_monomorph (env: env) (method_id: ins_meth_id) (args: mono_type_bindings): (env * mono_id) =
   match get_instance_method_monomorph env method_id args with
   | Some mono_id -> (env, mono_id)
   | None ->

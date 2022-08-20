@@ -5,6 +5,7 @@ open EnvUtils
 open Type
 open TypeStripping
 open MonoType
+open MonoTypeBindings
 open TypeBindings
 open TypeReplace
 open TypeParameter
@@ -17,6 +18,19 @@ open Linked
 open Id
 open Reporter
 open Error
+
+let make_substs2 (bindings: type_bindings) (typarams: typarams): type_bindings =
+  let f (tp: type_parameter): (type_parameter * ty) option =
+    if (typaram_universe tp) = RegionUniverse then
+      None
+    else
+      match get_binding bindings tp with
+      | Some ty ->
+         Some (tp, ty)
+      | None ->
+         None
+  in
+  bindings_from_list (List.filter_map f (typarams_as_list typarams))
 
 (* Monomorphize type specifiers *)
 
@@ -56,11 +70,17 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
      (match get_decl_by_name env (qident_to_sident name) with
       | Some decl ->
          (match decl with
-          | Record { id; _ } ->
-             let (env, mono_id) = add_or_get_record_monomorph env id args in
+          | Record { id; typarams; _ } ->
+             let typarams: type_parameter list = typarams_as_list typarams in
+             let pairs: (type_parameter * mono_ty) list = List.map2 (fun tp mt -> (tp, mt)) typarams args in
+             let bindings: mono_type_bindings = mono_bindings_from_list pairs in
+             let (env, mono_id) = add_or_get_record_monomorph env id bindings in
              (MonoNamedType mono_id, env)
-          | Union { id; _ } ->
-             let (env, mono_id) = add_or_get_union_monomorph env id args in
+          | Union { id; typarams; _ } ->
+             let typarams: type_parameter list = typarams_as_list typarams in
+             let pairs: (type_parameter * mono_ty) list = List.map2 (fun tp mt -> (tp, mt)) typarams args in
+             let bindings: mono_type_bindings = mono_bindings_from_list pairs in
+             let (env, mono_id) = add_or_get_union_monomorph env id bindings in
              (MonoNamedType mono_id, env)
           | _ ->
              err "internal: named type points to something that isn't a type")
@@ -125,12 +145,14 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      (* Monomorphize the arglist *)
      let (args, env) = monomorphize_expr_list env args in
      (* Does the funcall have a substitution list? *)
-     if List.length substs > 0 then
+     if List.length (bindings_list substs) > 0 then
        (* The function is generic. *)
        (* Monomorphize the tyargs *)
-       let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
+       let typarams = List.map (fun (tp, _) -> tp) (bindings_list substs) in
+       let tyargs = List.map (fun (_, ty) -> strip_type ty) (bindings_list substs) in
        let (tyargs, env) = monomorphize_ty_list env tyargs in
-       let (env, mono_id) = add_or_get_function_monomorph env decl_id tyargs in
+       let substs: mono_type_bindings = mono_bindings_from_list (List.map2 (fun tp mt -> (tp, mt)) typarams tyargs) in
+       let (env, mono_id) = add_or_get_function_monomorph env decl_id substs in
        (MGenericFuncall (mono_id, args, rt), env)
      else
        (* The function is concrete. *)
@@ -146,11 +168,11 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
          if typarams_size typarams > 0 then
            (* The instance is generic. *)
            (* Monomorphize the tyargs *)
-           let _ = ps ("Substitutions", "[" ^ (String.concat ", " (List.map (fun (n, t) -> (ident_string n) ^ " : " ^ (type_string t)) substs)) ^ "]") in
-           let tyargs = List.map (fun (_, ty) -> strip_type ty) substs in
+           let typarams = List.map (fun (tp, _) -> tp) (bindings_list substs) in
+           let tyargs = List.map (fun (_, ty) -> strip_type ty) (bindings_list substs) in
            let (tyargs, env) = monomorphize_ty_list env tyargs in
-           ps ("Type arguments", String.concat ", " (List.map show_mono_ty tyargs));
-           let (env, mono_id) = add_or_get_instance_method_monomorph env ins_meth_id tyargs in
+           let substs: mono_type_bindings = mono_bindings_from_list (List.map2 (fun tp mt -> (tp, mt)) typarams tyargs) in
+           let (env, mono_id) = add_or_get_instance_method_monomorph env ins_meth_id substs in
            (MGenericMethodCall (ins_meth_id, mono_id, args, rt), env)
          else
            (* The instance is concrete. *)
@@ -177,7 +199,7 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
         | None -> err "Internal")
      in
      ps ("Bindings", show_bindings bindings);
-     let substs = make_substs instance_bindings typarams in
+     let substs = make_substs2 instance_bindings typarams in
      let mcall = TMethodCall (meth_id, method_name, typarams, arguments', rt, substs) in
      monomorphize_expr env mcall
   | TCast (expr, ty) ->
@@ -505,7 +527,6 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      with_frame "Instantiating record monomorph"
        (fun _ ->
          ps ("Monomorph ID", show_mono_id id);
-         ps ("Type arguments", String.concat ", " (List.map show_mono_ty tyargs));
          (* Find the record definition and extract the type parameters and the slot
             list. *)
          let (typarams, slots) = get_record_definition env type_id in
@@ -685,16 +706,13 @@ and monomorphize_case_list (env: env) (cases: typed_case list): (env * mono_case
     env
     cases
 
-and replace_type_variables (typarams: typarams) (args: mono_ty list) (ty: ty): ty =
+and replace_type_variables (typarams: typarams) (args: mono_type_bindings) (ty: ty): ty =
   with_frame "Replacing type variables"
     (fun _ ->
-      ps ("Type parameters", String.concat ", " (List.map show_type_parameter (typarams_as_list typarams)));
-      ps ("Type arguments", "[" ^ (String.concat ", " (List.map show_mono_ty args)) ^ "]");
-      ps ("Type", show_ty ty);
       let bindings: type_bindings = make_bindings typarams args in
       replace_variables bindings ty)
 
-and make_bindings (typarams: typarams) (args: mono_ty list): type_bindings =
+and make_bindings (typarams: typarams) (args: mono_type_bindings): type_bindings =
   with_frame "Make bindings"
     (fun _ ->
       (* Given a list of type parameters, a list of monomorphic type arguments
@@ -709,13 +727,13 @@ and make_bindings (typarams: typarams) (args: mono_ty list): type_bindings =
         (typaram_universe tp) <> RegionUniverse
       in
       let typarams = List.filter is_not_region (typarams_as_list typarams) in
-      if (List.length typarams) = (List.length args) then
+      if (List.length typarams) = (List.length (mono_bindings_as_list args)) then
         let pairs: (type_parameter * ty) list =
           List.map2
-            (fun typaram mty ->
+            (fun typaram (_, mty) ->
               (typaram, mono_to_ty mty))
             typarams
-            args
+            (mono_bindings_as_list args)
         in
         let _ = ps ("Pairs", String.concat ", " (List.map (fun (tp, t) -> "(" ^ (show_type_parameter tp) ^ ", " ^ (show_ty t) ^ ")") pairs)) in
         let b = bindings_from_list pairs in
@@ -725,7 +743,7 @@ and make_bindings (typarams: typarams) (args: mono_ty list): type_bindings =
         err ("Parameter list and argument list don't have the same length:\n\nparameters:\n"
              ^ (String.concat ", " (List.map show_type_parameter typarams))
              ^ "\narguments:\n"
-             ^ (String.concat ", " (List.map show_mono_ty args))))
+             ^ (String.concat ", " (List.map (fun (_, ty) -> show_mono_ty ty) (mono_bindings_as_list args)))))
 
 and mono_to_ty (ty: mono_ty): ty =
   let r = mono_to_ty in

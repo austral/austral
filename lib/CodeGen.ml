@@ -5,6 +5,7 @@ open EnvTypes
 open Env
 open EnvUtils
 open MonoType
+open MonoTypeBindings
 open Mtast
 open CRepr
 open Util
@@ -413,12 +414,12 @@ and get_decl_name_or_die (env: env) (id: decl_id): string =
   | None ->
      err "internal"
 
-and tyargs_string (args: mono_ty list): string =
+and tyargs_string (args: mono_type_bindings): string =
   "["
-  ^ (String.concat ", " (List.map show_mono_ty args))
+  ^ (String.concat ", " (List.map (fun (_, ty) -> show_mono_ty ty) (mono_bindings_as_list args)))
   ^ "]"
 
-and render_mono (env: env) (id: decl_id) (tyargs: mono_ty list): string =
+and render_mono (env: env) (id: decl_id) (tyargs: mono_type_bindings): string =
   (get_decl_name_or_die env id) ^ (tyargs_string tyargs)
 
 let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =

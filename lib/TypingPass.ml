@@ -650,21 +650,18 @@ and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arg
   in
   List.map2 f params arguments
 
-and make_substs (bindings: type_bindings) (typarams: typarams): (identifier * ty) list =
-  let f (tp: type_parameter): (identifier * ty) option =
-    let n = typaram_name tp
-    and u = typaram_universe tp
-    in
-    if u = RegionUniverse then
+and make_substs (bindings: type_bindings) (typarams: typarams): type_bindings =
+  let f (tp: type_parameter): (type_parameter * ty) option =
+    if (typaram_universe tp) = RegionUniverse then
       None
     else
       match get_binding bindings tp with
       | Some ty ->
-         Some (n, ty)
+         Some (tp, ty)
       | None ->
          None
   in
-  List.filter_map f (typarams_as_list typarams)
+  bindings_from_list (List.filter_map f (typarams_as_list typarams))
 
 and handle_return_type_polymorphism (env: env) (module_name: module_name) (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
   if is_return_type_polymorphic params rt then
