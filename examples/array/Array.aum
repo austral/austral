@@ -2,7 +2,7 @@ import Austral.Memory (
     Address,
     Pointer,
     nullCheck,
-    allocate,
+    allocateBuffer,
     deallocate,
     positiveOffset,
     load,
@@ -26,7 +26,7 @@ module body Example.Array is
     end;
 
     function main(): ExitCode is
-        let addr: Address[Bool] := allocate(3);
+        let addr: Address[Bool] := allocateBuffer(3);
         case nullCheck(addr) of
             when Some(value: Pointer[Bool]) do
                 let arr: Pointer[Bool] := value;

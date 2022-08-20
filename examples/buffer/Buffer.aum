@@ -1,7 +1,7 @@
 import Austral.Memory (
     Address,
     Pointer,
-    allocate,
+    allocateBuffer,
     resizeArray,
     deallocate,
     nullCheck,
@@ -29,7 +29,7 @@ module body Example.Buffer is
     -- allocate an array, and abort if allocation fails.
     generic [T: Type]
     function allocate_Or_Die(size: Index): Pointer[T] is
-        let addr: Address[T] := allocate(size);
+        let addr: Address[T] := allocateBuffer(size);
         case nullCheck(addr) of
             when Some(value: Pointer[T]) do
                 return value;

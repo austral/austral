@@ -17,7 +17,7 @@ module body Test is
 
     generic [T: Type]
     function Make(val: T): Either[Box[T], T] is
-        let addr: Address[T] := allocate(1);
+        let addr: Address[T] := allocate();
         case nullCheck(addr) of
             when Some(value: Pointer[T]) do
                 store(value, val);
