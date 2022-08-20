@@ -547,9 +547,7 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       ps ("Bindings", show_bindings bindings'');
       (* Check: the set of bindings equals the set of type parameters *)
       check_bindings (typarams_from_list [typaram]) bindings'';
-      let type_parameter_name: identifier = typaram_name typaram
-      and from: typaram_source = typaram_source typaram in
-      match get_binding bindings'' type_parameter_name from with
+      match get_binding bindings'' typaram with
       | (Some dispatch_ty) ->
          pt ("Dispatch Type", dispatch_ty);
          (* Is the dispatch type a type variable? *)
@@ -656,12 +654,11 @@ and make_substs (bindings: type_bindings) (typarams: typarams): (identifier * ty
   let f (tp: type_parameter): (identifier * ty) option =
     let n = typaram_name tp
     and u = typaram_universe tp
-    and from = typaram_source tp
     in
     if u = RegionUniverse then
       None
     else
-      match get_binding bindings n from with
+      match get_binding bindings tp with
       | Some ty ->
          Some (n, ty)
       | None ->
@@ -712,9 +709,8 @@ and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
     let check (tp: type_parameter): unit =
       let n = typaram_name tp
       and u = typaram_universe tp
-      and from = typaram_source tp
       in
-      (match get_binding bindings n from with
+      (match get_binding bindings tp with
                     | Some ty ->
           if universe_compatible u (type_universe ty) then
             ()
