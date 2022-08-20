@@ -1,0 +1,1 @@
+Test that functions that are only generic over regions are compiled properly.
