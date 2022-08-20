@@ -701,9 +701,10 @@ and make_bindings (typarams: typarams) (args: mono_ty list): type_bindings =
          (of the same length), return a type bindings object (implicitly
          converting the `mono_ty` into a `ty`).
 
-         Ideally we shouldn't need to bring the type parameters, rather, monomorphs
-         should be stored in the environment with an `(identifier, mono_ty)` map
-         rather than as a bare list of monomorphic type arguments. *)
+         Ideally we shouldn't need to bring the type parameters, rather,
+         monomorphs should be stored in the environment with an `(identifier,
+         mono_ty)` map rather than as a bare list of monomorphic type
+         arguments. This is a TODO. *)
       let is_not_region (tp: type_parameter): bool =
         (typaram_universe tp) <> RegionUniverse
       in
