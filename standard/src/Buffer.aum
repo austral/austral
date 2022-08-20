@@ -1,0 +1,78 @@
+import Austral.Memory (
+    Address,
+    Pointer,
+    allocate,
+    resizeArray,
+    deallocate,
+    nullCheck,
+    positiveOffset,
+    store,
+    load
+);
+
+module body Standard.Buffer is
+    -- Need this to use Austral.Memory.
+    pragma Unsafe_Module;
+
+    """
+    The growth factor times the array's capacity tells us the next size of
+    the array when resizing. Naively, we double the size of the array when
+    hitting the capacity.
+    """
+    constant Growth_Factor: Index := 2;
+
+    record Buffer[T: Type]: Linear is
+        -- The capacity is the true underlying size. It is different from the
+        -- size since we allocate more space than we need in order to minimize
+        -- frequent reallocation.
+        capacity: Index;
+        -- The number of elements actually stored in the array.
+        size: Index;
+        -- The underlying heap array.
+        array: Pointer[T];
+
+        -- Invariants:
+        --
+        --   capacity >= size
+    end;
+
+    --
+    -- Lifecycle functions.
+    --
+
+    generic [T: Free]
+    function initialize(size: Index, initialElement: T): Option[Buffer[T]] is
+        let addr: Address[T] := allocate(size);
+        case nullCheck(addr) of
+            when Some(value as array: Pointer[T]) do
+                for i from 0 to size - 1 do
+                    let nth: Pointer[T] := positiveOffset(array, i);
+                    store(nth, initialElement);
+                end for;
+                let buf: Buffer[T] := Buffer(
+                    capacity => size,
+                    size => size,
+                    array => array
+                );
+                return Some(value => buf);
+            when None do
+                return None();
+        end case;
+    end;
+
+    generic [T: Free]
+    function destroyFree(buffer: Buffer[T]): Unit is
+        let { capacity: Index, size: Index, array: Pointer[T] } := buffer;
+        deallocate(array);
+        return nil;
+    end;
+
+    --
+    -- Query functions.
+    --
+
+    generic [T: Free, R: Region]
+    function bufferSize(buffer: &[Buffer[T], R]): Index is
+        return !(buffer->size);
+    end;
+end module body.

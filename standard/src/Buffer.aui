@@ -1,0 +1,36 @@
+"""
+This module implements the Buffer type, a linear, resizable, heap-allocated buffer.
+"""
+module Standard.Buffer is
+    """
+    The buffer type.
+    """
+    type Buffer[T: Type]: Linear;
+
+    -- Lifecycle functions.
+
+    """
+    Create a buffer of the given size, filling all slots with copies of the given
+    initial element.
+
+    The contained type has to be Free so it can be copied any number of times.
+
+    If allocation fails, returns `None`.
+    """
+    generic [T: Free]
+    function initialize(size: Index, initialElement: T): Option[Buffer[T]];
+
+    """
+    Deallocate a buffer with Free elements.
+    """
+    generic [T: Free]
+    function destroyFree(buffer: Buffer[T]): Unit;
+
+    -- Query functions.
+
+    """
+    Return the number of elements in the buffer.
+    """
+    generic [T: Free, R: Region]
+    function bufferSize(buffer: &[Buffer[T], R]): Index;
+end module.
