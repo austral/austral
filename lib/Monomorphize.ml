@@ -132,6 +132,22 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   | TLocalVar (name, ty) ->
      let (ty, env) = strip_and_mono env ty in
      (MLocalVar (name, ty), env)
+  | TFunVar (decl_id, ty, bindings) ->
+     (* Monomorphize the type. *)
+     let (rt, env) = strip_and_mono env ty in
+     (* Does the funcall have a substitution list? *)
+     if List.length (bindings_list bindings) > 0 then
+       (* The function is generic. *)
+       (* Monomorphize the tyargs *)
+       let typarams = List.map (fun (tp, _) -> tp) (bindings_list bindings) in
+       let tyargs = List.map (fun (_, ty) -> strip_type ty) (bindings_list bindings) in
+       let (tyargs, env) = monomorphize_ty_list env tyargs in
+       let substs: mono_type_bindings = mono_bindings_from_list (List.map2 (fun tp mt -> (tp, mt)) typarams tyargs) in
+       let (env, mono_id) = add_or_get_function_monomorph env decl_id substs in
+       (MGenericFunVar (mono_id, rt), env)
+     else
+       (* The function is concrete. *)
+       (MConcreteFunVar (decl_id, rt), env)
   | TArithmetic (oper, lhs, rhs) ->
      let (lhs, env) = monomorphize_expr env lhs in
      let (rhs, env) = monomorphize_expr env rhs in
