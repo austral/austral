@@ -1,11 +1,11 @@
 module body Test is
     generic [T: Free]
-    function foo(x: T): T is
+    function bar(x: T): T is
         return x;
     end;
 
     function main(): ExitCode is
-        let f: Fn[Nat8, Nat8] := foo;
+        let f: Fn[Nat8, Nat8] := bar;
         return ExitSuccess();
     end;
 end module body.
