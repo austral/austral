@@ -505,7 +505,6 @@ and instantiate_monomorph (env: env) (mono: monomorph): (env * mdecl) =
      with_frame "Instantiating record monomorph"
        (fun _ ->
          ps ("Monomorph ID", show_mono_id id);
-         ps ("Type arguments", String.concat ", " (List.map show_mono_ty tyargs));
          (* Find the record definition and extract the type parameters and the slot
             list. *)
          let (typarams, slots) = get_record_definition env type_id in

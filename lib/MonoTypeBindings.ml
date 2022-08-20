@@ -23,3 +23,6 @@ module BindingsMap =
 type mono_type_bindings = MonoTypeBindings of mono_ty BindingsMap.t
 
 let empty_mono_bindings = MonoTypeBindings BindingsMap.empty
+
+let mono_bindings_as_list (MonoTypeBindings m) =
+  (BindingsMap.bindings m)
