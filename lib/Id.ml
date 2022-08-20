@@ -8,10 +8,10 @@ type mod_id = ModId of int
 [@@deriving (eq, sexp)]
 
 type decl_id = DeclId of int
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type ins_meth_id = InsMethId of int
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 type mono_id = MonoId of int
 [@@deriving (eq, show, sexp)]

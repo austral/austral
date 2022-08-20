@@ -13,11 +13,11 @@ type mod_id = ModId of int
 
 (** The type of declaration IDs. *)
 type decl_id = DeclId of int
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 (** The type of instance method IDs. *)
 type ins_meth_id = InsMethId of int
-[@@deriving (eq, show)]
+[@@deriving (eq, show, sexp)]
 
 (** The type of monomorph IDs. *)
 type mono_id = MonoId of int
