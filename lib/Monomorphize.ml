@@ -17,15 +17,19 @@ open Mtast
 open Linked
 open Id
 open Reporter
+open Region
 open Error
 
 let make_substs2 (bindings: type_bindings) (typarams: typarams): type_bindings =
   let f (tp: type_parameter): (type_parameter * ty) option =
-    match get_binding bindings tp with
-    | Some ty ->
-       Some (tp, ty)
-    | None ->
-       None
+    if (typaram_universe tp) = RegionUniverse then
+      Some (tp, RegionTy static_region)
+    else
+      match get_binding bindings tp with
+      | Some ty ->
+         Some (tp, ty)
+      | None ->
+         None
   in
   bindings_from_list (List.filter_map f (typarams_as_list typarams))
 
@@ -722,21 +726,33 @@ and monomorphize_case_list (env: env) (cases: typed_case list): (env * mono_case
 and replace_type_variables (typarams: typarams) (args: mono_type_bindings) (ty: ty): ty =
   with_frame "Replacing type variables"
     (fun _ ->
+      (*print_endline ("Typarams: " ^ (show_typarams typarams));
+      print_endline ("Args: " ^ (show_mono_type_bindings args));*)
       let bindings: type_bindings = make_bindings typarams args in
       replace_variables bindings ty)
 
 and make_bindings (typarams: typarams) (args: mono_type_bindings): type_bindings =
   with_frame "Make bindings"
     (fun _ ->
+      (* Given a list of type parameters, a list of monomorphic type arguments
+         (of the same length), return a type bindings object (implicitly
+         converting the `mono_ty` into a `ty`).
+         Ideally we shouldn't need to bring the type parameters, rather,
+         monomorphs should be stored in the environment with an `(identifier,
+         mono_ty)` map rather than as a bare list of monomorphic type
+         arguments. This is a TODO. *)
       let typarams = typarams_as_list typarams in
       if (List.length typarams) = (List.length (mono_bindings_as_list args)) then
         let pairs: (type_parameter * ty) list =
-          List.map2
-            (fun typaram (_, mty) ->
-              (typaram, mono_to_ty mty))
+          List.map (fun tp ->
+              (match get_mono_binding args tp with
+               | Some ty ->
+                  (tp, mono_to_ty ty)
+               | None ->
+                  err "Parameter not found."))
             typarams
-            (mono_bindings_as_list args)
         in
+        (*let _ = print_endline ("Pairs: " ^ (String.concat ", " (List.map (fun (tp, t) -> "(" ^ (ident_string (typaram_name tp)) ^ ", " ^ (show_ty t) ^ ")") pairs))) in*)
         let _ = ps ("Pairs", String.concat ", " (List.map (fun (tp, t) -> "(" ^ (show_type_parameter tp) ^ ", " ^ (show_ty t) ^ ")") pairs)) in
         let b = bindings_from_list pairs in
         ps ("Bindings", show_bindings b);

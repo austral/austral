@@ -32,3 +32,12 @@ let mono_bindings_from_list lst =
 
 let equal_mono_bindings (MonoTypeBindings a) (MonoTypeBindings b) =
   BindingsMap.equal equal_mono_ty a b
+
+let show_mono_type_bindings (MonoTypeBindings m) =
+  let show_binding (tp, t) =
+    (show_type_parameter tp) ^ " => " ^ (show_mono_ty t)
+  in
+  "MonoTypeBindings {" ^ (String.concat ", " (List.map show_binding (BindingsMap.bindings m))) ^ "}"
+
+let get_mono_binding (MonoTypeBindings m) tp =
+  BindingsMap.find_opt tp m

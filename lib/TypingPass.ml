@@ -671,11 +671,14 @@ and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arg
 
 and make_substs (bindings: type_bindings) (typarams: typarams): type_bindings =
   let f (tp: type_parameter): (type_parameter * ty) option =
-    match get_binding bindings tp with
-    | Some ty ->
-       Some (tp, ty)
-    | None ->
-       None
+    if (typaram_universe tp) = RegionUniverse then
+      Some (tp, RegionTy static_region)
+    else
+      match get_binding bindings tp with
+      | Some ty ->
+         Some (tp, ty)
+      | None ->
+         None
   in
   bindings_from_list (List.filter_map f (typarams_as_list typarams))
 
