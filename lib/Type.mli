@@ -22,7 +22,13 @@ type signedness =
   | Signed
 [@@deriving (eq, show, sexp)]
 
-type type_var = TypeVariable of identifier * universe * qident * sident list
+(** The place where a type parameter was defined: either a declaration or an instance method. *)
+type typaram_source =
+  | DeclSource of decl_id
+  | MethodSource of ins_meth_id
+[@@deriving (eq, show, sexp)]
+
+type type_var = TypeVariable of identifier * universe * typaram_source * sident list
 [@@deriving (eq, show, sexp)]
 
 type ty =

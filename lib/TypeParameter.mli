@@ -1,13 +1,6 @@
 (** This module defines the type_parameter type. *)
 open Identifier
-open Id
 open Type
-
-(** The place where a type parameter was defined: either a declaration or an instance method. *)
-type typaram_source =
-  | DeclSource of decl_id
-  | MethodSource of ins_meth_id
-[@@deriving (show, sexp)]
 
 (** Represents type parameters. *)
 type type_parameter

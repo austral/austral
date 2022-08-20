@@ -25,7 +25,12 @@ type signedness =
   | Signed
 [@@deriving (eq, show, sexp)]
 
-type type_var = TypeVariable of identifier * universe * qident * sident list
+type typaram_source =
+  | DeclSource of decl_id
+  | MethodSource of ins_meth_id
+[@@deriving (eq, show, sexp)]
+
+type type_var = TypeVariable of identifier * universe * typaram_source * sident list
 [@@deriving (eq, show, sexp)]
 
 type ty =

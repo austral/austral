@@ -1,13 +1,7 @@
 open Identifier
-open Id
 open Type
 open Sexplib
 open Std
-
-type typaram_source =
-  | DeclSource of decl_id
-  | MethodSource of ins_meth_id
-[@@deriving (show, sexp)]
 
 type type_parameter = TypeParameter of identifier * universe * typaram_source * sident list
 [@@deriving (show, sexp)]
