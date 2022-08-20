@@ -18,6 +18,7 @@ typedef unsigned long  au_nat64_t;
 typedef signed   long  au_int64_t;
 typedef size_t         au_index_t;
 typedef void*          au_fnptr_t;
+typedef unsigned char  au_region_t;
 
 #define nil   0
 #define false 0

@@ -21,14 +21,11 @@ open Error
 
 let make_substs2 (bindings: type_bindings) (typarams: typarams): type_bindings =
   let f (tp: type_parameter): (type_parameter * ty) option =
-    if (typaram_universe tp) = RegionUniverse then
-      None
-    else
-      match get_binding bindings tp with
-      | Some ty ->
-         Some (tp, ty)
-      | None ->
-         None
+    match get_binding bindings tp with
+    | Some ty ->
+       Some (tp, ty)
+    | None ->
+       None
   in
   bindings_from_list (List.filter_map f (typarams_as_list typarams))
 
@@ -715,18 +712,7 @@ and replace_type_variables (typarams: typarams) (args: mono_type_bindings) (ty: 
 and make_bindings (typarams: typarams) (args: mono_type_bindings): type_bindings =
   with_frame "Make bindings"
     (fun _ ->
-      (* Given a list of type parameters, a list of monomorphic type arguments
-         (of the same length), return a type bindings object (implicitly
-         converting the `mono_ty` into a `ty`).
-
-         Ideally we shouldn't need to bring the type parameters, rather,
-         monomorphs should be stored in the environment with an `(identifier,
-         mono_ty)` map rather than as a bare list of monomorphic type
-         arguments. This is a TODO. *)
-      let is_not_region (tp: type_parameter): bool =
-        (typaram_universe tp) <> RegionUniverse
-      in
-      let typarams = List.filter is_not_region (typarams_as_list typarams) in
+      let typarams = typarams_as_list typarams in
       if (List.length typarams) = (List.length (mono_bindings_as_list args)) then
         let pairs: (type_parameter * ty) list =
           List.map2

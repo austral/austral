@@ -1,0 +1,13 @@
+module body Test is
+    generic [R: Region]
+    function getInt(ref: &[RootCapability, R]): Int32 is
+        return 10;
+    end;
+
+    function main(root: RootCapability): ExitCode is
+        print("value = ");
+        printLn(getInt(&root));
+        surrenderRoot(root);
+        return ExitSuccess();
+    end;
+end module body.
