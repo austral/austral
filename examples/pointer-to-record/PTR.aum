@@ -20,7 +20,7 @@ module body Example.PTR is
 
     function main(): ExitCode is
         let r: R := R(X => 97);
-        let addr: Address[R] := allocate(1);
+        let addr: Address[R] := allocate();
         case nullCheck(addr) of
             when Some(value: Pointer[R]) do
                 store(value, r);

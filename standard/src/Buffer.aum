@@ -1,7 +1,7 @@
 import Austral.Memory (
     Address,
     Pointer,
-    allocate,
+    allocateBuffer,
     resizeArray,
     deallocate,
     nullCheck,
@@ -42,7 +42,7 @@ module body Standard.Buffer is
 
     generic [T: Free]
     function initialize(size: Index, initialElement: T): Option[Buffer[T]] is
-        let addr: Address[T] := allocate(size);
+        let addr: Address[T] := allocateBuffer(size);
         case nullCheck(addr) of
             when Some(value as array: Pointer[T]) do
                 for i from 0 to size - 1 do

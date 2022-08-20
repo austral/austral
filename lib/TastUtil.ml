@@ -9,6 +9,7 @@ let arglist_size = function
   | (TNamedArglist l) -> List.length l
 
 let rec arglist_to_positional (args, names) =
+  (* TODO: better error reporting *)
   assert ((arglist_size args) = (List.length names));
   assert (names_match args names);
   match args with
