@@ -129,13 +129,14 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
   | MonoTy _ ->
      err "Not applicable"
 
-and match_type_var (ctx: ctx) (TypeVariable (name, universe, from, constraints)) ty =
+and match_type_var (ctx: ctx) (tv: type_var) (ty: ty): type_bindings =
+  let (TypeVariable (name, universe, from, constraints)) = tv in
   (* Check if the argument type is a variable. *)
   match ty with
   | (TyVar (TypeVariable (i', u', from', constraints'))) ->
      (* When the argument type is a type variable, check if the variables have
         the same name and provenance. *)
-     if (equal_identifier name i') && (universe = u') && (equal_qident from from') then
+     if (equal_identifier name i') && (universe = u') && (equal_typaram_source from from') then
        (* If so, do nothing: we don't want circular bindings *)
        empty_bindings
      else
@@ -148,12 +149,12 @@ and match_type_var (ctx: ctx) (TypeVariable (name, universe, from, constraints))
           that accepts an argument `x` of generic type `U`. If we encounter a
           function call `f(x)`, then the parameter type is `T` and the argument
           type is `U`, so we create a binding `T -> U`.  *)
-       add_binding empty_bindings name from ty
+       add_binding empty_bindings (tyvar_to_typaram tv) ty
   | _ ->
      (* Check that the type implements the type variable's constraints, if any. *)
      check_type_implements_constraints ctx ty constraints;
      (* If the constraints are satisfied, add a straightforward binding. *)
-     add_binding empty_bindings name from ty
+     add_binding empty_bindings (tyvar_to_typaram tv) ty
 
 and check_tyvar_implements_constraints (param: sident list) (arg: sident list): bool =
   (* Check that the param is a subset of the param. *)
