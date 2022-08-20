@@ -1,0 +1,15 @@
+module body Standard.Equality is
+    instance PartialEquality(Unit) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Unit, R], b: &[Unit, S]): Bool is
+             return true;
+        end;
+    end;
+
+    instance Equality(Unit) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Unit, R], b: &[Unit, S]): Bool is
+             return true;
+        end;
+    end;
+end module body.

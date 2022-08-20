@@ -1,0 +1,26 @@
+import Standard.Equality (
+    partialEq,
+    equal
+);
+import Standard.Test.Unit (
+    suiteHeading,
+    testHeading,
+    assertTrue,
+    assertFalse
+);
+
+module body Standard.Test.Equality is
+    function equalityTestSuite(): Unit is
+        suiteHeading("Standard.Equality");
+        unitTest();
+        return nil;
+    end;
+
+    function unitTest(): Unit is
+        testHeading("Unit");
+        let u: Unit := nil;
+        assertTrue(partialEq(&u, &u), "nil is partially equivalent to itself.");
+        assertTrue(equal(&u, &u), "nil is equal to itself.");
+        return nil;
+    end;
+end module body.

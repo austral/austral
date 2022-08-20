@@ -1,5 +1,6 @@
 import Standard.Test.Tuples (tuplesTestSuite);
 import Standard.Test.Bounded (boundedTestSuite);
+import Standard.Test.Equality (equalityTestSuite);
 import Standard.Test.Box (boxTestSuite);
 import Standard.Test.Buffer (bufferTestSuite);
 
@@ -8,6 +9,7 @@ module body Standard.Test is
         surrenderRoot(root);
         tuplesTestSuite();
         boundedTestSuite();
+        equalityTestSuite();
         boxTestSuite();
         bufferTestSuite();
         return ExitSuccess();
