@@ -1,0 +1,24 @@
+import Standard.Order (
+    equal
+);
+import Standard.Test.Unit (
+    suiteHeading,
+    testHeading,
+    assertTrue,
+    assertFalse
+);
+
+module body Standard.Test.Order is
+    function orderTestSuite(): Unit is
+        suiteHeading("Standard.Order");
+        nat8Test();
+        return nil;
+    end;
+
+    function nat8Test(): Unit is
+        testHeading("Nat8");
+        let a: Nat8 := 0;
+        assertTrue(equal(&a, &a), "equal() works");
+        return nil;
+    end;
+end module body.

@@ -1,0 +1,3 @@
+module Standard.Test.Order is
+    function orderTestSuite(): Unit;
+end module.

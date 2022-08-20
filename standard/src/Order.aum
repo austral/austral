@@ -1,0 +1,37 @@
+module body Standard.Order is
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function equal(a: &[T, R], b: &[T, S]): Bool is
+        case compare(a, b) of
+             when Equal do
+                  return true;
+             when LessThan do
+                  return false;
+             when GreaterThan do
+                  return false;
+        end case;
+    end;
+
+    instance PartialOrder(Nat8) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Nat8, R], b: &[Nat8, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Nat8) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Nat8, R], b: &[Nat8, S]): Ordering is
+            let av: Nat8 := !a;
+            let bv: Nat8 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+end module body.
