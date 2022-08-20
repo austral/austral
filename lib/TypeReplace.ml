@@ -22,6 +22,10 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
   | TLocalVar (name, ty) ->
      let ty = replace_variables bindings ty in
      TLocalVar (name, ty)
+  | TFunVar (id, ty, substs) ->
+     let ty = replace_variables bindings ty
+     and substs = bindings_from_list (List.map (fun (n, t) -> (n, replace_variables bindings t)) (bindings_list substs)) in
+     TFunVar (id, ty, substs)
   | TArithmetic (oper, lhs, rhs) ->
      let lhs = replace_tyvars_expr bindings lhs
      and rhs = replace_tyvars_expr bindings rhs in

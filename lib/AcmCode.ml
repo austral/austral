@@ -4,6 +4,7 @@ open Identifier
 open Tast
 open AcmFile
 open Env
+open EnvExtras
 open Error
 
 let get_instance_ref (env: env) (id: decl_id): ins_ref =
@@ -29,6 +30,18 @@ let get_method_ref (env: env) (id: ins_meth_id): ins_meth_ref =
   | None ->
      err "internal: Not in env"
 
+let get_func_ref (env: env) (id: decl_id): named_decl_ref =
+  match get_decl_by_id env id with
+  | Some (Function { mod_id; name; _ }) ->
+     DeclRef {
+         module_name = get_module_name_or_die env mod_id;
+         decl_name = name;
+       }
+  | Some _ ->
+     err "Not a function"
+  | None ->
+     err "internal: Not in env"
+
 let rec ser_expr (env: env) (expr: texpr): ser_expr =
   let se = ser_expr env in
   match expr with
@@ -48,6 +61,8 @@ let rec ser_expr (env: env) (expr: texpr): ser_expr =
      SParamVar (name, ty)
   | TLocalVar (name, ty) ->
      SLocalVar (name, ty)
+  | TFunVar (id, ty, bindings) ->
+     SFunVar (get_func_ref env id, ty, bindings)
   | TArithmetic (op, lhs, rhs) ->
      SArithmetic (op, se lhs, se rhs)
   | TFuncall (_, name, values, ty, bindings) ->

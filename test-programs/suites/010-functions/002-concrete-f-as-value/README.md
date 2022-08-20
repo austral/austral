@@ -1,0 +1,1 @@
+Test that we can access a concrete function as a value.

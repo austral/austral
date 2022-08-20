@@ -44,17 +44,36 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
       | StringConstant s ->
          TStringConstant s
       | Variable name ->
-         (match get_variable env lexenv name with
-          | Some (ty, src) ->
-             (match src with
-              | VarConstant ->
-                 TConstVar (name, ty)
-              | VarParam ->
-                 TParamVar ((original_name name), ty)
-              | VarLocal ->
-                 TLocalVar ((original_name name), ty))
-          | None ->
-             err ("I can't find the variable named " ^ (ident_string (original_name name))))
+         (match get_decl_by_name env (qident_to_sident name) with
+          | Some (Function { id; typarams; value_params; rt; _ }) ->
+             let arg_tys: ty list = List.map (fun (ValueParameter (_, ty)) -> ty) value_params in
+             let fn_ty: ty = FnPtr (arg_tys, rt) in
+             if (typarams_size typarams > 0) then
+               (* Function is generic, need an asserted type. *)
+               (match asserted_ty with
+                | Some asserted_ty ->
+                   let bindings: type_bindings = match_type (env, module_name) fn_ty asserted_ty in
+                   let rt: ty = replace_variables bindings rt
+                   and arg_tys: ty list = List.map (replace_variables bindings) arg_tys in
+                   let effective_fn_ty: ty = FnPtr (arg_tys, rt) in
+                   TFunVar (id, effective_fn_ty, bindings)
+                | None ->
+                   err "Function is generic, but no asserted type found.")
+             else
+               (* Function is concrete. *)
+               TFunVar (id, fn_ty, empty_bindings)
+          | _ ->
+             (match get_variable env lexenv name with
+              | Some (ty, src) ->
+                 (match src with
+                  | VarConstant ->
+                     TConstVar (name, ty)
+                  | VarParam ->
+                     TParamVar ((original_name name), ty)
+                  | VarLocal ->
+                     TLocalVar ((original_name name), ty))
+              | None ->
+                 err ("I can't find the variable named " ^ (ident_string (original_name name)))))
       | FunctionCall (name, args) ->
          augment_call module_name env asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
       | ArithmeticExpression (op, lhs, rhs) ->
@@ -1095,6 +1114,8 @@ and is_constant = function
      false
   | TLocalVar _ ->
      false
+  | TFunVar _ ->
+     true
   | TArithmetic (_, lhs, rhs) ->
      (is_constant lhs) && (is_constant rhs)
   | TFuncall _ ->

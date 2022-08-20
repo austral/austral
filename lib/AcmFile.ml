@@ -59,6 +59,12 @@ and ins_meth_ref =
   InsMethRef of ins_ref * identifier
 [@@deriving sexp]
 
+(** A reference to a named declaration. *)
+and named_decl_ref = DeclRef of {
+    module_name: module_name;
+    decl_name: identifier;
+  }
+
 (** The serialized form of an expression. *)
 and ser_expr =
   | SNilConstant
@@ -69,6 +75,7 @@ and ser_expr =
   | SConstVar of qident * ty
   | SParamVar of identifier * ty
   | SLocalVar of identifier * ty
+  | SFunVar of named_decl_ref * ty * type_bindings
   | SArithmetic of arithmetic_operator * ser_expr * ser_expr
   | SFuncall of qident * ser_expr list * ty * type_bindings
   | SMethodCall of ins_meth_ref * typarams * ser_expr list * ty * type_bindings

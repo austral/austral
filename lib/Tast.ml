@@ -51,6 +51,8 @@ and texpr =
   | TConstVar of qident * ty
   | TParamVar of identifier * ty
   | TLocalVar of identifier * ty
+  | TFunVar of decl_id * ty * type_bindings
+  (** Represents accessing a function as a value. *)
   | TArithmetic of arithmetic_operator * texpr * texpr
   | TFuncall of decl_id * qident * texpr list * ty * type_bindings
   | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * type_bindings
