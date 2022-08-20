@@ -697,9 +697,9 @@ and replace_type_variables (typarams: typarams) (args: mono_ty list) (ty: ty): t
 and make_bindings (typarams: typarams) (args: mono_ty list): type_bindings =
   with_frame "Make bindings"
     (fun _ ->
-      (* Given a list of type parameters, a list of monomorphic type arguments (of
-         qthe same length), return a type bindings object (implicitly converting the
-         `mono_ty` into a `ty`).
+      (* Given a list of type parameters, a list of monomorphic type arguments
+         (of the same length), return a type bindings object (implicitly
+         converting the `mono_ty` into a `ty`).
 
          Ideally we shouldn't need to bring the type parameters, rather, monomorphs
          should be stored in the environment with an `(identifier, mono_ty)` map
