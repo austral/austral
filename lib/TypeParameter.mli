@@ -24,3 +24,6 @@ val typaram_constraints : type_parameter -> sident list
 
 (** Transform a type parameter into an equivalent type variable. *)
 val typaram_to_tyvar : type_parameter -> type_var
+
+(** Transform a type variable into an equivalent type parameter. *)
+val tyvar_to_typaram : type_var -> type_parameter

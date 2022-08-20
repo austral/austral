@@ -1,23 +1,27 @@
 open Identifier
 open Type
+open TypeParameter
 open TypeSystem
+
+(* I don't know why OCaml requires map elements to be totally ordered as opposed
+   to just comparable for equality. Anyways, we get around this by basically
+   serializing the type parameter into a string, which can be totally
+   ordered. *)
+
+let typaram_as_string (tp: type_parameter): string =
+  let name: string = ident_string (typaram_name tp)
+  and uni: string = show_universe (typaram_universe tp)
+  and src: string = qident_debug_name (typaram_source tp)
+  and cs: string = String.concat "," (List.map show_sident (typaram_constraints tp))
+  in
+  name ^ ";" ^ uni ^ ";" ^ src ^ ";" ^ cs
 
 module BindingsMap =
   Map.Make(
       struct
-        open Identifier
-        type t = (identifier * qident)
-        let compare (n, f) (n', f') =
-          (* Turn a qident into a string. *)
-          let qs (qname: qident): string =
-            (mod_name_string (source_module_name qname))
-            ^ (ident_string (original_name qname))
-            ^ (ident_string (local_name qname))
-          in
-          let a = (ident_string n) ^ (qs f)
-          and b = (ident_string n') ^ (qs f')
-          in
-          compare a b
+        type t = type_parameter
+        let compare (a: type_parameter) (b: type_parameter): int =
+          compare (typaram_as_string a) (typaram_as_string b)
       end
     )
 
@@ -27,13 +31,13 @@ let binding_count (TypeBindings m) =
   BindingsMap.cardinal m
 
 let bindings_list (TypeBindings m) =
-  List.map (fun ((n, f), t) -> (n, f, t)) (BindingsMap.bindings m)
+  (BindingsMap.bindings m)
 
 let empty_bindings = TypeBindings BindingsMap.empty
 
 let show_bindings (TypeBindings m) =
-  let show_binding ((n, f), t) =
-    (show_identifier n) ^ " from " ^ (qident_debug_name f) ^ " => " ^ (show_ty t)
+  let show_binding (tp, t) =
+    (show_type_parameter tp) ^ " => " ^ (show_ty t)
   in
   "TypeBindings {" ^ (String.concat ", " (List.map show_binding (BindingsMap.bindings m))) ^ "}"
 
@@ -51,15 +55,15 @@ let binding_conflict name from ty ty' =
   in
   err str
    *)
-let get_binding (TypeBindings m) name from =
-  BindingsMap.find_opt (name, from) m
+let get_binding (TypeBindings m) tp =
+  BindingsMap.find_opt tp m
 
 (* Add a binding to the map.
 
    If a binding with this name already exists, fail if the types are
    distinct. *)
-let add_binding (TypeBindings m) name from ty =
-  match BindingsMap.find_opt (name, from) m with
+let add_binding (TypeBindings m) name ty =
+  match BindingsMap.find_opt name m with
   | Some ty' ->
      if equal_ty ty ty' then
        TypeBindings m
@@ -68,19 +72,19 @@ let add_binding (TypeBindings m) name from ty =
        (* let _ = print_endline (show_bindings (TypeBindings m)) in
        binding_conflict name from ty ty' *)
        (* Power through it. *)
-       TypeBindings (BindingsMap.add (name, from) ty' m)
+       TypeBindings (BindingsMap.add name ty' m)
   | None ->
-     TypeBindings (BindingsMap.add (name, from) ty m)
+     TypeBindings (BindingsMap.add name ty m)
 
 (* Add multiple bindings to a bindings map. *)
-let rec add_bindings bs triples =
-  match triples with
-  | (name, from, ty)::rest -> add_bindings (add_binding bs name from ty) rest
+let rec add_bindings bs pairs =
+  match pairs with
+  | (tp, ty)::rest -> add_bindings (add_binding bs tp ty) rest
   | [] -> bs
 
 let merge_bindings (TypeBindings a) (TypeBindings b) =
-  let m = add_bindings empty_bindings (List.map (fun ((n, f), t) -> (n, f, t)) (BindingsMap.bindings a)) in
-  add_bindings m (List.map (fun ((n, f), t) -> (n, f, t)) (BindingsMap.bindings b))
+  let m = add_bindings empty_bindings (List.map (fun (tp, t) -> (tp, t)) (BindingsMap.bindings a)) in
+  add_bindings m (List.map (fun (tp, t) -> (tp, t)) (BindingsMap.bindings b))
 
 let rec replace_variables bindings ty =
   match ty with
@@ -108,10 +112,10 @@ let rec replace_variables bindings ty =
        NamedType (n, a', u')
      else
        NamedType (n, a', u)
-  | TyVar (TypeVariable (n, u, from, constraints)) ->
-     (match get_binding bindings n from with
+  | TyVar tv ->
+     (match get_binding bindings (tyvar_to_typaram tv) with
       | Some ty -> ty
-      | None -> TyVar (TypeVariable (n, u, from, constraints)))
+      | None -> TyVar tv)
   | StaticArray ty ->
      StaticArray (replace_variables bindings ty)
   | RegionTy r ->
@@ -131,9 +135,9 @@ let rec replace_variables bindings ty =
 
 let rec bindings_from_list lst =
   match lst with
-  | (name, source, ty)::rest ->
+  | (tp, ty)::rest ->
      let bindings = empty_bindings in
-     let bindings = add_binding bindings name source ty in
+     let bindings = add_binding bindings tp ty in
      merge_bindings bindings (bindings_from_list rest)
   | [] ->
    empty_bindings

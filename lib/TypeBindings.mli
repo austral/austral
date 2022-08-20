@@ -1,10 +1,10 @@
 (** This module defines a type for type bindings: a map from type parameters to
     types. *)
-open Identifier
 open Type
+open TypeParameter
 
-(* A type bindings value represents a map of type parameter names to actual
-   types. These are created as part of the type checking process. *)
+(** A type bindings value represents a map from type parameters to actual
+    types. These are created as part of the type checking process. *)
 type type_bindings
 
 val pp_type_bindings : Format.formatter -> type_bindings -> unit
@@ -13,17 +13,17 @@ val show_type_bindings : type_bindings -> string
 
 val binding_count : type_bindings -> int
 
-val bindings_list : type_bindings -> (identifier * qident * ty) list
+val bindings_list : type_bindings -> (type_parameter * ty) list
 
 val empty_bindings : type_bindings
 
-val bindings_from_list : (identifier * qident * ty) list -> type_bindings
+val bindings_from_list : (type_parameter * ty) list -> type_bindings
 
 val merge_bindings : type_bindings -> type_bindings -> type_bindings
 
-val add_binding : type_bindings -> identifier -> qident -> ty -> type_bindings
+val add_binding : type_bindings -> type_parameter -> ty -> type_bindings
 
-val get_binding : type_bindings -> identifier -> qident -> ty option
+val get_binding : type_bindings -> type_parameter -> ty option
 
 (* Given a set of bindings, and a type expression, replace every type variable
    in the expression with the value from the bindings. If the variable is not
