@@ -158,10 +158,6 @@ let union_type_id = function
 let union_tag_enum_name (id: mono_id): string =
   (gen_mono_id id) ^ "_tag"
 
-(* Like union_tag_enum_name but for union definitions. *)
-let local_union_tag_enum_name (n: identifier): string =
-  (gen_ident n) ^ "_tag"
-
 let local_union_tag_enum_name_from_id (id: mono_id): string =
   (gen_mono_id id) ^ "_tag"
 
@@ -442,24 +438,8 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      [
        CNamedStructDefinition (d, gen_mono_id id, gen_slots slots)
      ]
-  | MUnion (_, n, cases) ->
-     let enum_d = Desc "Union tag enum" in
-     let union_d = Desc "Union" in
-     let enum_def = CEnumDefinition (
-                        enum_d,
-                        (gen_ident n) ^ "_tag",
-                        List.map (fun (MonoCase (n', _)) -> (gen_ident n) ^ "_tag_" ^ (gen_ident n')) cases
-                      )
-     and union_def = CNamedStructDefinition (
-                         union_d,
-                         gen_ident n,
-                         [
-                           CSlot ("tag", CNamedType (local_union_tag_enum_name n));
-                           CSlot ("data", CUnionType (gen_cases cases))
-                         ]
-                       )
-     in
-     [enum_def; union_def]
+  | MUnion _ ->
+     []
   | MUnionMonomorph (id, cases) ->
      let enum_d = Desc ("Union monomorph tag enum: " ^ (mono_desc env id)) in
      let union_d = Desc ("Union monomorph: " ^ (mono_desc env id)) in

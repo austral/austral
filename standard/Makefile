@@ -2,12 +2,14 @@ MODULES := \
     src/Tuples.aui,src/Tuples.aum \
 	src/Bounded.aui,src/Bounded.aum \
     src/Equality.aui,src/Equality.aum \
+    src/Order.aui,src/Order.aum \
 	src/Box.aui,src/Box.aum \
 	src/Buffer.aui,src/Buffer.aum \
 	test/Unit.aui,test/Unit.aum \
 	test/Tuples.aui,test/Tuples.aum \
 	test/Bounded.aui,test/Bounded.aum \
 	test/Equality.aui,test/Equality.aum \
+	test/Order.aui,test/Order.aum \
 	test/Box.aui,test/Box.aum \
 	test/Buffer.aui,test/Buffer.aum \
 	test/Main.aui,test/Main.aum
