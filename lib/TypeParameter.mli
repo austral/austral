@@ -7,6 +7,7 @@ open Type
 type typaram_source =
   | DeclSource of decl_id
   | MethodSource of ins_meth_id
+[@@deriving (show, sexp)]
 
 (** Represents type parameters. *)
 type type_parameter
