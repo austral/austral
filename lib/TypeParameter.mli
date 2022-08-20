@@ -4,7 +4,7 @@ open Type
 
 (** Represents type parameters. *)
 type type_parameter
-[@@deriving (show, sexp)]
+[@@deriving (eq, show, sexp)]
 
 (** Construct a type parameter. *)
 val make_typaram : identifier * universe * typaram_source * sident list -> type_parameter

@@ -4,7 +4,7 @@ open Sexplib
 open Std
 
 type type_parameter = TypeParameter of identifier * universe * typaram_source * sident list
-[@@deriving (show, sexp)]
+[@@deriving (eq, show, sexp)]
 
 let make_typaram (i, u, s, cs) =
   TypeParameter (i, u, s, cs)
