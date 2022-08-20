@@ -37,3 +37,6 @@ type unsourced_typaram
 
 (** Create an unsourced type parameter. *)
 val make_unsourced_typaram : identifier * universe * sident list -> unsourced_typaram
+
+(** Given an unsourced typaram, and a typaram source, return a type parameter that links to the source. *)
+val link_typaram : unsourced_typaram -> typaram_source -> type_parameter

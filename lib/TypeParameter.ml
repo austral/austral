@@ -34,3 +34,7 @@ type unsourced_typaram = UnsourcedTyparam of identifier * universe * sident list
 
 let make_unsourced_typaram (i, u, cs) =
   UnsourcedTyparam (i, u, cs)
+
+let link_typaram (utp: unsourced_typaram) (source: typaram_source): type_parameter =
+  let (UnsourcedTyparam (name, universe, constraints)) = utp in
+  TypeParameter (name, universe, source, constraints)
