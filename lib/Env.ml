@@ -8,6 +8,8 @@ open DeclIdSet
 open LexEnv
 open EnvTypes
 open EnvUtils
+open TypeParameter
+open TypeParameters
 open Error
 
 (** The file environment stores the contents of files for error reporting. *)
@@ -138,31 +140,41 @@ let add_constant (env: env) (input: const_input): (env * decl_id) =
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
-let make_record_decl (id: decl_id) (input: record_input): decl =
+let source_typarams_for_decl (typarams: unsourced_typaram list) (id: decl_id): typarams =
+  let typarams: type_parameter list = List.map (fun utp -> link_typaram utp (DeclSource id)) typarams in
+  typarams_from_list typarams
+
+let source_typarams_for_instance_method (typarams: unsourced_typaram list) (id: ins_meth_id): typarams =
+  let typarams: type_parameter list = List.map (fun utp -> link_typaram utp (MethodSource id)) typarams in
+  typarams_from_list typarams
+
+let make_record_decl (id: decl_id) (input: record_input): decl * typarams =
   let { mod_id; vis; name; docstring; typarams; universe; slots } = input in
-  Record { id; mod_id; vis; name; docstring; typarams; universe; slots }
+  let typarams = source_typarams_for_decl typarams id in
+  (Record { id; mod_id; vis; name; docstring; typarams; universe; slots }, typarams)
 
-let add_record (env: env) (input: record_input): (env * decl_id) =
+let add_record (env: env) (input: record_input): (env * decl_id * typarams) =
   (* Check: no other decl with this name. *)
   let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
-  let decl = make_record_decl id input in
+  let (decl, typarams) = make_record_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
-  (env, id)
+  (env, id, typarams)
 
-let make_union_decl (id: decl_id) (input: union_input): decl =
+let make_union_decl (id: decl_id) (input: union_input): decl * typarams =
   let { mod_id; vis; name; docstring; typarams; universe } = input in
-  Union { id; mod_id; vis; name; docstring; typarams; universe }
+  let typarams = source_typarams_for_decl typarams id in
+  (Union { id; mod_id; vis; name; docstring; typarams; universe }, typarams)
 
-let add_union (env: env) (input: union_input): (env * decl_id) =
+let add_union (env: env) (input: union_input): (env * decl_id * typarams) =
   (* Check: no other decl with this name. *)
   let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
-  let decl = make_union_decl id input in
+  let (decl, typarams) = make_union_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
-  (env, id)
+  (env, id, typarams)
 
 let make_union_case_decl (id: decl_id) (input: union_case_input): decl =
   let { mod_id; vis; union_id; name; docstring; slots } = input in
@@ -175,64 +187,69 @@ let add_union_case (env: env) (input: union_case_input): (env * decl_id) =
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
   (env, id)
 
-let make_function_decl (id: decl_id) (input: function_input): decl =
+let make_function_decl (id: decl_id) (input: function_input): decl * typarams =
   let { mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } = input in
-  Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body }
+  let typarams = source_typarams_for_decl typarams id in
+  (Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body }, typarams)
 
-let add_function (env: env) (input: function_input): (env * decl_id) =
+let add_function (env: env) (input: function_input): (env * decl_id * typarams) =
   (* Check: no other decl with this name. *)
   let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
-  let decl = make_function_decl id input in
+  let (decl, typarams) = make_function_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
-  (env, id)
+  (env, id, typarams)
 
-let make_type_class_decl (id: decl_id) (input: type_class_input): decl =
+let make_type_class_decl (id: decl_id) (input: type_class_input): decl * type_parameter =
   let { mod_id; vis; name; docstring; param } = input in
-  TypeClass { id; mod_id; vis; name; docstring; param }
+  let param = link_typaram param (DeclSource id) in
+  (TypeClass { id; mod_id; vis; name; docstring; param }, param)
 
-let add_type_class (env: env) (input: type_class_input): (env * decl_id) =
+let add_type_class (env: env) (input: type_class_input): (env * decl_id * type_parameter) =
   (* Check: no other decl with this name. *)
   let _ = ensure_no_decl_with_name env input.mod_id input.name in
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
-  let decl = make_type_class_decl id input in
+  let (decl, param) = make_type_class_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
-  (env, id)
+  (env, id, param)
 
-let make_type_class_method_decl (id: decl_id) (input: type_class_method_input): decl =
+let make_type_class_method_decl (id: decl_id) (input: type_class_method_input): decl * typarams =
   let { mod_id; vis; typeclass_id; name; docstring; typarams; value_params; rt } = input in
-  TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; typarams; value_params; rt }
+  let typarams = source_typarams_for_decl typarams id in
+  (TypeClassMethod { id; mod_id; vis; typeclass_id; name; docstring; typarams; value_params; rt }, typarams)
 
-let add_type_class_method (env: env) (input: type_class_method_input): (env * decl_id) =
+let add_type_class_method (env: env) (input: type_class_method_input): (env * decl_id * typarams) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
-  let decl = make_type_class_method_decl id input in
+  let (decl, typarams) = make_type_class_method_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
-  (env, id)
+  (env, id, typarams)
 
-let make_instance_decl (id: decl_id) (input: instance_input): decl =
+let make_instance_decl (id: decl_id) (input: instance_input): decl * typarams =
   let { mod_id; vis; typeclass_id; docstring; typarams; argument } = input in
-  Instance { id; mod_id; vis; typeclass_id; docstring; typarams; argument }
+  let typarams = source_typarams_for_decl typarams id in
+  (Instance { id; mod_id; vis; typeclass_id; docstring; typarams; argument }, typarams)
 
-let add_instance (env: env) (input: instance_input): (env * decl_id) =
+let add_instance (env: env) (input: instance_input): (env * decl_id * typarams) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_decl_id () in
-  let decl = make_instance_decl id input in
+  let (decl, typarams) = make_instance_decl id input in
   let env = Env { files; mods; methods; decls = decl :: decls; monos } in
-  (env, id)
+  (env, id, typarams)
 
-let make_ins_meth (id: ins_meth_id) (input: instance_method_input): ins_meth_rec =
+let make_ins_meth (id: ins_meth_id) (input: instance_method_input): ins_meth_rec * typarams =
   let { instance_id; method_id; docstring; name; typarams; value_params; rt; body } = input in
-  InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body }
+  let typarams = source_typarams_for_instance_method typarams id in
+  (InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body }, typarams)
 
-let add_instance_method (env: env) (input: instance_method_input): (env * ins_meth_id) =
+let add_instance_method (env: env) (input: instance_method_input): (env * ins_meth_id * typarams) =
   let (Env { files; mods; methods; decls; monos }) = env in
   let id = fresh_ins_meth_id () in
-  let meth = make_ins_meth id input in
+  let (meth, typarams) = make_ins_meth id input in
   let env = Env { files; mods; methods = meth :: methods; decls; monos } in
-  (env, id)
+  (env, id, typarams)
 
 let get_decl_by_id (env: env) (id: decl_id): decl option =
   let (Env { decls; _ }) = env in

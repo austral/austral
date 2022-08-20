@@ -1,5 +1,7 @@
 open Identifier
 open Type
+open TypeParameter
+open TypeParameters
 open MonoType
 open Tast
 open Mtast
@@ -42,21 +44,21 @@ val module_name_from_id : env -> mod_id -> module_name
 
 val add_constant : env -> const_input -> (env * decl_id)
 
-val add_record : env -> record_input -> (env * decl_id)
+val add_record : env -> record_input -> (env * decl_id * typarams)
 
-val add_union : env -> union_input -> (env * decl_id)
+val add_union : env -> union_input -> (env * decl_id * typarams)
 
 val add_union_case : env -> union_case_input -> (env * decl_id)
 
-val add_function : env -> function_input -> (env * decl_id)
+val add_function : env -> function_input -> (env * decl_id * typarams)
 
-val add_type_class : env -> type_class_input -> (env * decl_id)
+val add_type_class : env -> type_class_input -> (env * decl_id * type_parameter)
 
-val add_type_class_method : env -> type_class_method_input -> (env * decl_id)
+val add_type_class_method : env -> type_class_method_input -> (env * decl_id * typarams)
 
-val add_instance : env -> instance_input -> (env * decl_id)
+val add_instance : env -> instance_input -> (env * decl_id * typarams)
 
-val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
+val add_instance_method : env -> instance_method_input -> (env * ins_meth_id * typarams)
 
 (** {2 Retrieve} *)
 
