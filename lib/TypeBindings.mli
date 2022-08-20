@@ -3,8 +3,8 @@
 open Identifier
 open Type
 
-(* A type bindings value represents a map of type parameter names to actual
-   types. These are created as part of the type checking process. *)
+(** A type bindings value represents a map from type parameters to actual
+    types. These are created as part of the type checking process. *)
 type type_bindings
 
 val pp_type_bindings : Format.formatter -> type_bindings -> unit
