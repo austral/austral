@@ -19,7 +19,7 @@ let type_universe = function
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
   | FnPtr _ -> FreeUniverse
-  | MonoTy _ -> FreeUniverse (*err "type_universe called with MonoTy argument"*)
+  | MonoTy _ -> FreeUniverse (* TODO: arguably this should error, but the compiler crashes if it errors *)
 
 let is_numeric = function
   | Unit -> false

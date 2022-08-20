@@ -726,21 +726,12 @@ and monomorphize_case_list (env: env) (cases: typed_case list): (env * mono_case
 and replace_type_variables (typarams: typarams) (args: mono_type_bindings) (ty: ty): ty =
   with_frame "Replacing type variables"
     (fun _ ->
-      (*print_endline ("Typarams: " ^ (show_typarams typarams));
-      print_endline ("Args: " ^ (show_mono_type_bindings args));*)
       let bindings: type_bindings = make_bindings typarams args in
       replace_variables bindings ty)
 
 and make_bindings (typarams: typarams) (args: mono_type_bindings): type_bindings =
   with_frame "Make bindings"
     (fun _ ->
-      (* Given a list of type parameters, a list of monomorphic type arguments
-         (of the same length), return a type bindings object (implicitly
-         converting the `mono_ty` into a `ty`).
-         Ideally we shouldn't need to bring the type parameters, rather,
-         monomorphs should be stored in the environment with an `(identifier,
-         mono_ty)` map rather than as a bare list of monomorphic type
-         arguments. This is a TODO. *)
       let typarams = typarams_as_list typarams in
       if (List.length typarams) = (List.length (mono_bindings_as_list args)) then
         let pairs: (type_parameter * ty) list =
@@ -752,7 +743,6 @@ and make_bindings (typarams: typarams) (args: mono_type_bindings): type_bindings
                   err "Parameter not found."))
             typarams
         in
-        (*let _ = print_endline ("Pairs: " ^ (String.concat ", " (List.map (fun (tp, t) -> "(" ^ (ident_string (typaram_name tp)) ^ ", " ^ (show_ty t) ^ ")") pairs))) in*)
         let _ = ps ("Pairs", String.concat ", " (List.map (fun (tp, t) -> "(" ^ (show_type_parameter tp) ^ ", " ^ (show_ty t) ^ ")") pairs)) in
         let b = bindings_from_list pairs in
         ps ("Bindings", show_bindings b);
