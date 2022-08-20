@@ -19,7 +19,7 @@ type stripped_ty =
   | SPointer of stripped_ty
   | SFnPtr of stripped_ty list * stripped_ty
   | SMonoTy of mono_id
-  | SRegionTyVar of identifier * qident
+  | SRegionTyVar of identifier * typaram_source
 
 let rec strip_type (ty: ty): stripped_ty =
   match strip_type' ty with

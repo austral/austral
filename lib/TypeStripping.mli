@@ -23,7 +23,7 @@ type stripped_ty =
   | SPointer of stripped_ty
   | SFnPtr of stripped_ty list * stripped_ty
   | SMonoTy of mono_id
-  | SRegionTyVar of identifier * qident
+  | SRegionTyVar of identifier * typaram_source
 
 (** Strip a type specifier. *)
 val strip_type : ty -> stripped_ty
