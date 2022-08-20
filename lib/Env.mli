@@ -1,6 +1,7 @@
 open Identifier
 open Type
 open MonoType
+open MonoTypeBindings
 open Tast
 open Mtast
 open Id
@@ -103,29 +104,29 @@ val get_callable : env -> module_name -> sident -> callable option
 
 (** {1 Monomorph Functions} *)
 
-val add_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+val add_record_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
 
-val add_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+val add_union_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
 
-val add_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+val add_function_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
 
-val add_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
+val add_instance_method_monomorph : env -> ins_meth_id -> mono_type_bindings -> (env * mono_id)
 
 (** Given a record's ID and a list of arguments, register a monomorph and return
    its ID, or return the ID if it exists. *)
-val add_or_get_record_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+val add_or_get_record_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
 
 (** Given a union's ID and a list of arguments, register a monomorph and return
    its ID, or return the ID if it exists. *)
-val add_or_get_union_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+val add_or_get_union_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
 
 (** Given a function's ID and a list of type arguments, register a monomorph and
    return its ID, or return the ID if it exists. *)
-val add_or_get_function_monomorph : env -> decl_id -> mono_ty list -> (env * mono_id)
+val add_or_get_function_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
 
 (** Given an instance method's ID and a list of type arguments, register a
    monomorph and return its ID, or return the ID if it exists. *)
-val add_or_get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> (env * mono_id)
+val add_or_get_instance_method_monomorph : env -> ins_meth_id -> mono_type_bindings -> (env * mono_id)
 
 val store_record_monomorph_definition : env -> mono_id -> mono_slot list -> env
 
@@ -137,15 +138,15 @@ val store_instance_method_monomorph_definition : env -> mono_id -> mstmt -> env
 
 (** Given the ID of a type declaration and a set of monomorphic type arguments,
    return the ID of the corresponding monomorph if it exists. *)
-val get_type_monomorph : env -> decl_id -> mono_ty list -> mono_id option
+val get_type_monomorph : env -> decl_id -> mono_type_bindings -> mono_id option
 
 (** Given the ID of a function and a set of monomorphic type arguments, return
    the ID of the corresponding monomorph if it exists. *)
-val get_function_monomorph : env -> decl_id -> mono_ty list -> mono_id option
+val get_function_monomorph : env -> decl_id -> mono_type_bindings -> mono_id option
 
 (** Given the ID of an instance method and a set of monomorphic type arguments,
    return the ID of the corresponding monomorph if it exists. *)
-val get_instance_method_monomorph : env -> ins_meth_id -> mono_ty list -> mono_id option
+val get_instance_method_monomorph : env -> ins_meth_id -> mono_type_bindings -> mono_id option
 
 (** Get all uninstantiated monomorphs. *)
 val get_uninstantiated_monomorphs : env -> monomorph list

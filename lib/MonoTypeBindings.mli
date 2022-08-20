@@ -8,3 +8,5 @@ type mono_type_bindings
 val empty_mono_bindings : mono_type_bindings
 
 val mono_bindings_as_list : mono_type_bindings -> (type_parameter * mono_ty) list
+
+val equal_mono_bindings : mono_type_bindings -> mono_type_bindings -> bool

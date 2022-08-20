@@ -8,6 +8,7 @@ open ErrorText
 open BuiltIn
 open Names
 open CodeGen
+open MonoTypeBindings
 
 let entrypoint_err (text: err_text): 'a =
   austral_raise EntrypointError text
@@ -119,7 +120,7 @@ let get_root_capability_monomorph (env: env): mono_id =
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with
   | Some (Record { id; _ }) ->
-     (match get_type_monomorph env id [] with
+     (match get_type_monomorph env id empty_mono_bindings with
       | Some id ->
          id
       | _ ->
@@ -133,7 +134,7 @@ let get_exit_code_monomorph (env: env): mono_id =
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with
   | Some (Union { id; _ }) ->
-     (match get_type_monomorph env id [] with
+     (match get_type_monomorph env id empty_mono_bindings with
       | Some id ->
          id
       | _ ->

@@ -52,8 +52,8 @@ and texpr =
   | TParamVar of identifier * ty
   | TLocalVar of identifier * ty
   | TArithmetic of arithmetic_operator * texpr * texpr
-  | TFuncall of decl_id * qident * texpr list * ty * (identifier * ty) list
-  | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * (identifier * ty) list
+  | TFuncall of decl_id * qident * texpr list * ty * type_bindings
+  | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * type_bindings
   | TVarMethodCall of {
       source_module_name: module_name;
       typeclass_id: decl_id;

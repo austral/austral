@@ -4,6 +4,7 @@ open Id
 open Type
 open TypeParameter
 open TypeParameters
+open TypeBindings
 open Sexplib
 open Std
 open Span
@@ -69,8 +70,8 @@ and ser_expr =
   | SParamVar of identifier * ty
   | SLocalVar of identifier * ty
   | SArithmetic of arithmetic_operator * ser_expr * ser_expr
-  | SFuncall of qident * ser_expr list * ty * (identifier * ty) list
-  | SMethodCall of ins_meth_ref * typarams * ser_expr list * ty * (identifier * ty) list
+  | SFuncall of qident * ser_expr list * ty * type_bindings
+  | SMethodCall of ins_meth_ref * typarams * ser_expr list * ty * type_bindings
   | SVarMethodCall of {
       method_name: sident;
       args: ser_expr list;

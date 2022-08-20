@@ -26,3 +26,6 @@ let empty_mono_bindings = MonoTypeBindings BindingsMap.empty
 
 let mono_bindings_as_list (MonoTypeBindings m) =
   (BindingsMap.bindings m)
+
+let equal_mono_bindings (MonoTypeBindings a) (MonoTypeBindings b) =
+  BindingsMap.equal equal_mono_ty a b
