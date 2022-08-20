@@ -4,6 +4,26 @@ open TypeParameter
 open TypeSystem
 open Sexplib
 open Std
+open Error
+
+let universe_compatible param arg =
+  (* The check here is:
+
+     1. If the parameter universe is Free, the argument universe must be Free.
+     2. If the parameter universe is Linear, the argument universe must be Linear.
+     3. If the parameter universe is Type, the argument universe must be any one of Free, Linear, or
+        type.
+     4. If the parameter universe is Region, the argument universe must be Region.
+   *)
+  match param with
+  | FreeUniverse ->
+     arg = FreeUniverse
+  | LinearUniverse ->
+     arg = LinearUniverse
+  | TypeUniverse ->
+     (arg = FreeUniverse) || (arg = LinearUniverse) || (arg = TypeUniverse)
+  | RegionUniverse ->
+     arg = RegionUniverse
 
 (* I don't know why OCaml requires map elements to be totally ordered as opposed
    to just comparable for equality. Anyways, we get around this by basically
@@ -64,8 +84,8 @@ let get_binding (TypeBindings m) tp =
 
    If a binding with this name already exists, fail if the types are
    distinct. *)
-let add_binding (TypeBindings m) name ty =
-  match BindingsMap.find_opt name m with
+let add_binding (TypeBindings m) (tp: type_parameter) ty =
+  match BindingsMap.find_opt tp m with
   | Some ty' ->
      if equal_ty ty ty' then
        TypeBindings m
@@ -74,9 +94,12 @@ let add_binding (TypeBindings m) name ty =
        (* let _ = print_endline (show_bindings (TypeBindings m)) in
        binding_conflict name from ty ty' *)
        (* Power through it. *)
-       TypeBindings (BindingsMap.add name ty' m)
+       TypeBindings (BindingsMap.add tp ty' m)
   | None ->
-     TypeBindings (BindingsMap.add name ty m)
+     if universe_compatible (typaram_universe tp) (type_universe ty) then
+       TypeBindings (BindingsMap.add tp ty m)
+     else
+       err ("Trying to add a binding to a bindings map whose universes don't match. The type parameter is `" ^ (show_type_parameter tp) ^ "` while the type is `" ^ (show_ty ty) ^ "`.")
 
 (* Add multiple bindings to a bindings map. *)
 let rec add_bindings bs pairs =

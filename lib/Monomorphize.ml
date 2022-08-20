@@ -17,15 +17,19 @@ open Mtast
 open Linked
 open Id
 open Reporter
+open Region
 open Error
 
 let make_substs2 (bindings: type_bindings) (typarams: typarams): type_bindings =
   let f (tp: type_parameter): (type_parameter * ty) option =
-    match get_binding bindings tp with
-    | Some ty ->
-       Some (tp, ty)
-    | None ->
-       None
+    if (typaram_universe tp) = RegionUniverse then
+      Some (tp, RegionTy static_region)
+    else
+      match get_binding bindings tp with
+      | Some ty ->
+         Some (tp, ty)
+      | None ->
+         None
   in
   bindings_from_list (List.filter_map f (typarams_as_list typarams))
 
@@ -731,11 +735,13 @@ and make_bindings (typarams: typarams) (args: mono_type_bindings): type_bindings
       let typarams = typarams_as_list typarams in
       if (List.length typarams) = (List.length (mono_bindings_as_list args)) then
         let pairs: (type_parameter * ty) list =
-          List.map2
-            (fun typaram (_, mty) ->
-              (typaram, mono_to_ty mty))
+          List.map (fun tp ->
+              (match get_mono_binding args tp with
+               | Some ty ->
+                  (tp, mono_to_ty ty)
+               | None ->
+                  err "Parameter not found."))
             typarams
-            (mono_bindings_as_list args)
         in
         let _ = ps ("Pairs", String.concat ", " (List.map (fun (tp, t) -> "(" ^ (show_type_parameter tp) ^ ", " ^ (show_ty t) ^ ")") pairs)) in
         let b = bindings_from_list pairs in

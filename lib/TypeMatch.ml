@@ -127,7 +127,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
       | _ ->
          type_mismatch "Expected a function pointer, but got another type." a b)
   | MonoTy _ ->
-     err "Not applicable"
+     err "match_type called with MonoTy argument"
 
 and match_type_var (ctx: ctx) (tv: type_var) (ty: ty): type_bindings =
   let (TypeVariable (name, universe, from, constraints)) = tv in

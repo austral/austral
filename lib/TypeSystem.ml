@@ -19,7 +19,7 @@ let type_universe = function
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
   | FnPtr _ -> FreeUniverse
-  | MonoTy _ -> err "Not applicable"
+  | MonoTy _ -> FreeUniverse (* TODO: arguably this should error, but the compiler crashes if it errors *)
 
 let is_numeric = function
   | Unit -> false
@@ -36,7 +36,7 @@ let is_numeric = function
   | Address _ -> false
   | Pointer _ -> false
   | FnPtr _ -> false
-  | MonoTy _ -> err "Not applicable"
+  | MonoTy _ -> err "is_numeric called with MonoTy argument"
 
 let is_comparable = function
   | Unit -> true
@@ -53,7 +53,7 @@ let is_comparable = function
   | Address _ -> true
   | Pointer _ -> true
   | FnPtr _ -> true
-  | MonoTy _ -> err "Not applicable"
+  | MonoTy _ -> err "is_comparable called with MonoTy argument"
 
 let rec type_variables = function
   | Unit ->
