@@ -4,11 +4,13 @@ open CliEngine
 open Error
 
 let rec main (args: string list): unit =
+  let _ = Printexc.record_backtrace true in
   try
     main' args;
     exit 0
   with Austral_error error ->
     Printf.eprintf "%s" (render_error_to_plain error);
+    print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     dump_and_die ()
 
 and main' (args: string list): unit =

@@ -119,7 +119,6 @@ and exec_compile (modules: mod_source list) (target: target): unit =
     (* Print errors *)
     let error: austral_error = try_adding_source_ctx error source_map in
     Printf.eprintf "%s" (render_error_to_plain error);
-    print_endline ("Backtrace:\n" ^ (Printexc.get_backtrace ()));
     dump_and_die ()
 
 and dump_and_die _: unit =
