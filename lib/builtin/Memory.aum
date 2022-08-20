@@ -21,7 +21,12 @@ module body Austral.Memory is
     end;
 
     generic [T: Type]
-    function allocate(count: Index): Address[T] is
+    function allocate(): Address[T] is
+        return allocateBuffer(1);
+    end;
+
+    generic [T: Type]
+    function allocateBuffer(count: Index): Address[T] is
         if count = 0 then
             abort("allocate called with count of zero");
         end if;
