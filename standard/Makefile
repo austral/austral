@@ -2,10 +2,12 @@ MODULES := \
     src/Tuples.aui,src/Tuples.aum \
 	src/Bounded.aui,src/Bounded.aum \
 	src/Box.aui,src/Box.aum \
+	src/Buffer.aui,src/Buffer.aum \
 	test/Unit.aui,test/Unit.aum \
 	test/Tuples.aui,test/Tuples.aum \
 	test/Bounded.aui,test/Bounded.aum \
 	test/Box.aui,test/Box.aum \
+	test/Buffer.aui,test/Buffer.aum \
 	test/Main.aui,test/Main.aum
 TEST_BIN := test_bin
 

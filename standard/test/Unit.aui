@@ -5,5 +5,6 @@ module Standard.Test.Unit is
     function assertTrue(value: Bool, message: FixedArray[Nat8]): Unit;
     function assertFalse(value: Bool, message: FixedArray[Nat8]): Unit;
 
+    function assertSuccess(message: FixedArray[Nat8]): Unit;
     function assertFailure(message: FixedArray[Nat8]): Unit;
 end module.

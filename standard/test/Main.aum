@@ -1,6 +1,7 @@
 import Standard.Test.Tuples (tuplesTestSuite);
 import Standard.Test.Bounded (boundedTestSuite);
 import Standard.Test.Box (boxTestSuite);
+import Standard.Test.Buffer (bufferTestSuite);
 
 module body Standard.Test is
     function Main(root: RootCapability): ExitCode is
@@ -8,6 +9,7 @@ module body Standard.Test is
         tuplesTestSuite();
         boundedTestSuite();
         boxTestSuite();
+        bufferTestSuite();
         return ExitSuccess();
     end;
 end module body.
