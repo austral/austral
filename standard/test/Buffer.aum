@@ -1,0 +1,34 @@
+import Standard.Buffer (
+    Buffer,
+    initialize,
+    destroyFree,
+    bufferSize
+);
+import Standard.Test.Unit (
+    assertTrue,
+    assertSuccess,
+    assertFailure,
+    suiteHeading,
+    testHeading
+);
+
+module body Standard.Test.Buffer is
+    function bufferTestSuite(): Unit is
+        suiteHeading("Standard.Buffer");
+        basicLifecycleTest();
+        return nil;
+    end;
+
+    function basicLifecycleTest(): Unit is
+        testHeading("Basic lifecycle: initialize and destroyFree and unbox");
+        let opt: Option[Buffer[Int32]] := initialize(size => 10, initialElement => 10);
+        case opt of
+            when Some(value as buffer: Buffer[Int32]) do
+                 destroyFree(buffer);
+                 assertSuccess("destroyFree succeeded");
+            when None do
+                 assertFailure("initialize failed.");
+        end case;
+        return nil;
+    end;
+end module body.

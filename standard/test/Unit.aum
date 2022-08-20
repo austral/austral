@@ -33,6 +33,13 @@ module body Standard.Test.Unit is
         return nil;
     end;
 
+    function assertSuccess(message: FixedArray[Nat8]): Unit is
+        print("        Assert: ");
+        print(message);
+        printLn(" ✓");
+        return nil;
+    end;
+
     function assertFailure(message: FixedArray[Nat8]): Unit is
         print("        Assert failure: ");
         print(message);
