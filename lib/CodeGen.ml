@@ -130,7 +130,7 @@ let rec gen_type (ty: mono_ty): c_ty =
   | MonoStaticArray _ ->
      CNamedType "au_array_t"
   | MonoRegionTy _ ->
-     err "TODO: Codegen for region types"
+     CNamedType "au_region_t"
   | MonoReadRef (t, _) ->
      CPointer (gen_type t)
   | MonoWriteRef (t, _) ->
