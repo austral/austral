@@ -100,6 +100,8 @@ let gen_ins_meth_id (id: ins_meth_id): string =
 
 (* Types *)
 
+let fn_type: c_ty = CNamedType "au_fnptr_t"
+
 let rec gen_type (ty: mono_ty): c_ty =
   match ty with
   | MonoUnit ->
@@ -140,7 +142,7 @@ let rec gen_type (ty: mono_ty): c_ty =
   | MonoPointer t ->
      CPointer (gen_type t)
   | MonoFnPtr _ ->
-     CNamedType "au_fnptr_t"
+     fn_type
   | MonoRegionTyVar _ ->
      err "internal"
 
@@ -192,8 +194,10 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CVar (gen_ident n)
   | MLocalVar (n, _) ->
      CVar (gen_ident n)
-  | MFunVar (id, _) ->
-     CVar (gen_mono_id id)
+  | MGenericFunVar (id, _) ->
+     CCast (CVar (gen_mono_id id), fn_type)
+  | MConcreteFunVar (id, _) ->
+     CCast (CVar (gen_decl_id id), fn_type)
   | MConcreteFuncall (id, _, args, _) ->
      CFuncall (gen_decl_id id, List.map g args)
   | MGenericFuncall (id, args, _) ->
