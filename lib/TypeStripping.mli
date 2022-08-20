@@ -6,8 +6,8 @@ open Region
 (** A stripped type specifier is the same as a type specifier, but type variable
    case have been removed.
 
-    The reason for this is: by the time we get to the monomorphization stage,
-   all type variables should have been replaced by their type arguments.  *)
+   The reason for this is: by the time we get to the monomorphization stage, all
+   type variables should have been replaced by their type arguments.  *)
 type stripped_ty =
   | SUnit
   | SBoolean
