@@ -61,6 +61,7 @@ The compiler's middle end.
 - {!Austral_core.LinearityCheck}
 - {!Austral_core.TypeStripping}
 - {!Austral_core.MonoType}
+- {!Austral_core.MonoTypeBindings}
 - {!Austral_core.Mtast}
 - {!Austral_core.Monomorphize}
 - {!Austral_core.ReturnCheck}
