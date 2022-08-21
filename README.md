@@ -175,6 +175,22 @@ $ gcc -fwrapv generated.c -lm
 2. A standard library with a few basic data structures and capability-based
    filesystem access is being designed.
 
+## Contributing
+
+If you find a bug, or something that works unintuitively, please [open an
+issue](https://github.com/austral/austral/issues/new). It helps improve the
+experience for future users.
+
+The easiest thing to work on is [improving the compiler's
+diagnostics](https://github.com/austral/austral/issues/256). It's usually fairly
+easy to improve an error message significantly.
+
+You can also try adding [more end-to-end tests to the
+compiler](https://github.com/austral/austral/tree/master/test-programs/suites),
+or write [text for the website](https://austral-lang.org/), such as for the
+[tutorial](https://austral-lang.org/tutorial/) or the [example
+programs](https://austral-lang.org/examples/).
+
 # License
 
 Copyright 2018–2022 [Fernando Borretti][fernando].
