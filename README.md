@@ -191,6 +191,19 @@ or write [text for the website](https://austral-lang.org/), such as for the
 [tutorial](https://austral-lang.org/tutorial/) or the [example
 programs](https://austral-lang.org/examples/).
 
+## Roadmap
+
+Currently:
+
+- Working on [release 0.0.7](https://github.com/austral/austral/issues/290),
+  when the core language can be considered done.
+
+Near-future work:
+
+- Expanding the [standard
+  library](https://github.com/austral/austral/tree/master/standard).
+- Build tooling and package manager.
+
 # License
 
 Copyright 2018–2022 [Fernando Borretti][fernando].
