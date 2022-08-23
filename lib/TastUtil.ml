@@ -87,7 +87,7 @@ let rec get_type = function
       | _ ->
          err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
   | TSizeOf _ ->
-     Integer (Unsigned, WidthIndex)
+     Integer (Unsigned, WidthByteSize)
   | TBorrowExpr (mode, _, region, ty) ->
      (match mode with
       | ReadBorrow ->

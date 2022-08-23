@@ -224,6 +224,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                         | Width16 -> "16"
                         | Width32 -> "32"
                         | Width64 -> "64"
+                        | WidthByteSize -> "bytesize"
                         | WidthIndex -> "index")
                in
                s ^ w
@@ -752,11 +753,11 @@ let is_boolean = function
   | Boolean -> true
   | _ -> false
 
-let is_compatible_with_size_type = function
+let is_compatible_with_index_type = function
   | TIntConstant _ ->
      true
   | e ->
-     (get_type e) = size_type
+     (get_type e) = index_type
 
 type stmt_ctx = StmtCtx of module_name * env * region_map * typarams * lexenv * ty
 
@@ -924,9 +925,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            (fun _ ->
              let i' = augment_expr module_name env rm typarams lexenv None initial
              and f' = augment_expr module_name env rm typarams lexenv None final in
-             if is_compatible_with_size_type i' then
-               if is_compatible_with_size_type f' then
-                 let lexenv' = push_var lexenv name size_type VarLocal in
+             if is_compatible_with_index_type i' then
+               if is_compatible_with_index_type f' then
+                 let lexenv' = push_var lexenv name index_type VarLocal in
                  let b' = augment_stmt (update_lexenv ctx lexenv') body in
                  TFor (span, name, i', f', b')
                else

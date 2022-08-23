@@ -62,6 +62,9 @@ module body Austral.Pervasive is
     constant minimum_index: Index := 0;
     constant maximum_index: Index := @embed(Index, "SIZE_MAX");
 
+    constant minimum_bytesize: ByteSize := 0;
+    constant maximum_bytesize: ByteSize := @embed(ByteSize, "SIZE_MAX");
+
     ---
     --- Trapping Arithmetic
     ---
@@ -402,6 +405,42 @@ module body Austral.Pervasive is
         end;
     end;
 
+    instance TrappingArithmetic(ByteSize) is
+        method trappingAdd(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            let result: ByteSize := 0;
+            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                abort("Overflow in trappingAdd (ByteSize)");
+            end if;
+            return result;
+        end;
+
+        method trappingSubtract(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            let result: ByteSize := 0;
+            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                abort("Overflow in trappingSubtract (ByteSize)");
+            end if;
+            return result;
+        end;
+
+        method trappingMultiply(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            let result: ByteSize := 0;
+            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+            if did_overflow then
+                abort("Overflow in trappingMultiply (ByteSize)");
+            end if;
+            return result;
+        end;
+
+        method trappingDivide(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            if rhs = 0 then
+                abort("Division by zero in trappingDivide (ByteSize)");
+            end if;
+            return @embed(ByteSize, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
     instance TrappingArithmetic(Float64) is
         method trappingAdd(lhs: Float64, rhs: Float64): Float64 is
             return @embed(Float64, "$1 + $2", lhs, rhs);
@@ -617,6 +656,27 @@ module body Austral.Pervasive is
         end;
     end;
 
+    instance ModularArithmetic(ByteSize) is
+        method modularAdd(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            return @embed(ByteSize, "$1 + $2", lhs, rhs);
+        end;
+
+        method modularSubtract(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            return @embed(ByteSize, "$1 - $2", lhs, rhs);
+        end;
+
+        method modularMultiply(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            return @embed(ByteSize, "$1 * $2", lhs, rhs);
+        end;
+
+        method modularDivide(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            if rhs = 0 then
+                abort("Division by zero in modularDivide (ByteSize)");
+            end if;
+            return @embed(ByteSize, "$1 / $2", lhs, rhs);
+        end;
+    end;
+
     ---
     --- Printable
     ---
@@ -745,6 +805,17 @@ module body Austral.Pervasive is
         end;
 
         method printFixedArray(array: FixedArray[Index]): Unit is
+            return nil;
+        end;
+    end;
+
+    instance Printable(ByteSize) is
+        method print(value: ByteSize): Unit is
+            return @embed(Unit, "au_printf(\"%zu\", $1)", value);
+            return nil;
+        end;
+
+        method printFixedArray(array: FixedArray[ByteSize]): Unit is
             return nil;
         end;
     end;

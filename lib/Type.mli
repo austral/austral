@@ -14,6 +14,7 @@ type integer_width =
   | Width16
   | Width32
   | Width64
+  | WidthByteSize
   | WidthIndex
 [@@deriving (eq, show, sexp)]
 
@@ -61,7 +62,7 @@ val universe_string : universe -> string
 val type_string : ty -> string
 
 (* The type of array sizes and indices *)
-val size_type : ty
+val index_type : ty
 
 val string_type : ty
 

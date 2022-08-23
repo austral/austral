@@ -33,10 +33,10 @@ module Austral.Memory is
     function resizeArray(array: Pointer[T], size: Index): Pointer[T];
 
     generic [T: Type, U: Type]
-    function memmove(source: Pointer[T], destination: Pointer[U], count: Index): Unit;
+    function memmove(source: Pointer[T], destination: Pointer[U], count: ByteSize): Unit;
 
     generic [T: Type, U: Type]
-    function memcpy(source: Pointer[T], destination: Pointer[U], count: Index): Unit;
+    function memcpy(source: Pointer[T], destination: Pointer[U], count: ByteSize): Unit;
 
     generic [T: Type]
     function positiveOffset(pointer: Pointer[T], offset: Index): Pointer[T];

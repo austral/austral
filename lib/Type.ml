@@ -17,6 +17,7 @@ type integer_width =
   | Width16
   | Width32
   | Width64
+  | WidthByteSize
   | WidthIndex
 [@@deriving (eq, show, sexp)]
 
@@ -77,6 +78,7 @@ let rec type_string = function
       | Width16 -> sgn ^ "16"
       | Width32 -> sgn ^ "32"
       | Width64 -> sgn ^ "64"
+      | WidthByteSize -> "ByteSize"
       | WidthIndex -> "Index")
   | SingleFloat ->
      single_float_name
@@ -122,7 +124,7 @@ and args_string = function
   | (first::rest) -> "[" ^ (String.concat ", " (List.map type_string (first::rest))) ^ "]"
   | [] -> ""
 
-let size_type = Integer (Unsigned, WidthIndex)
+let index_type = Integer (Unsigned, WidthIndex)
 
 let string_type = StaticArray (Integer (Unsigned, Width8))
 

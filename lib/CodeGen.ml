@@ -120,6 +120,7 @@ let rec gen_type (ty: mono_ty): c_ty =
        | Width16 -> sgn ^ "16_t"
        | Width32 -> sgn ^ "32_t"
        | Width64 -> sgn ^ "64_t"
+       | WidthByteSize -> "size_t"
        | WidthIndex -> "au_index_t"
      in
      CNamedType name

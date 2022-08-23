@@ -56,6 +56,10 @@ module Austral.Pervasive is
     constant minimum_index: Index;
     constant maximum_index: Index;
 
+    constant minimum_bytesize: ByteSize;
+    constant maximum_bytesize: ByteSize;
+
+
     typeclass TrappingArithmetic(T: Type) is
         method trappingAdd(lhs: T, rhs: T): T;
         method trappingSubtract(lhs: T, rhs: T): T;
@@ -79,6 +83,7 @@ module Austral.Pervasive is
     instance TrappingArithmetic(Nat64);
     instance TrappingArithmetic(Int64);
     instance TrappingArithmetic(Index);
+    instance TrappingArithmetic(ByteSize);
     instance TrappingArithmetic(Float64);
 
     instance ModularArithmetic(Nat8);
@@ -90,6 +95,7 @@ module Austral.Pervasive is
     instance ModularArithmetic(Nat64);
     instance ModularArithmetic(Int64);
     instance ModularArithmetic(Index);
+    instance ModularArithmetic(ByteSize);
 
     typeclass Printable(A: Free) is
         method print(value: A): Unit;
@@ -108,6 +114,7 @@ module Austral.Pervasive is
     instance Printable(Nat64);
     instance Printable(Int64);
     instance Printable(Index);
+    instance Printable(ByteSize);
     instance Printable(Float32);
     instance Printable(Float64);
     generic [B: Free(Printable)]
