@@ -59,31 +59,27 @@ void* au_stderr() {
 #endif
 }
 
-au_unit_t au_abort_internal(const char* message) {
+au_unit_t au_print_error(const char * message) 
+{
   extern int fprintf(void* stream, const char* format, ...);
   extern int fflush(void* stream);
-  extern void _Exit(int status);
-
   void* stderr = au_stderr();
-
-  fprintf(stderr, "%s\n", message);
+  fprintf(stderr, "%s", message);
   fflush(stderr);
-  _Exit(-1);
+  return nil;
+}
 
+
+au_unit_t au_abort_internal(const char* message) {
+  extern void _Exit(int status);
+  au_print_error(message);
+  au_print_error("\n");
+  _Exit(-1);
   return nil;
 }
 
 au_unit_t au_abort(au_array_t message) {
-  extern int fprintf(void* stream, const char* format, ...);
-  extern int fflush(void* stream);
-  extern void _Exit(int status);
-
-  void* stderr = au_stderr();
-
-  fprintf(stderr, "%s\n", (char*) message.data);
-  fflush(stderr);
-  _Exit(-1);
-  return nil;
+  return au_abort_internal((const char *)message.data);
 }
 
 void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size) {
@@ -640,6 +636,10 @@ au_int32_t convert_nat64_to_int32(au_nat64_t value) {
 
 
 au_nat64_t convert_nat64_to_nat64(au_nat64_t value) {
+  return (au_nat64_t)(value);
+}
+
+au_nat64_t convert_natindex_to_nat64(au_nat64_t value) {
   return (au_nat64_t)(value);
 }
 

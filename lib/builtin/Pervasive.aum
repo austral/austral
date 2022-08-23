@@ -69,375 +69,240 @@ module body Austral.Pervasive is
     --- Trapping Arithmetic
     ---
 
+    function badOp(msg: FixedArray[Nat8], typ: FixedArray[Nat8]): Unit is
+        @embed(Unit, "au_print_error((char*)$1.data)", typ);
+        @embed(Unit, "au_print_error(\": \")");
+        abort(msg);
+    end;
+
+    generic [T: Free]
+    function trappingAddGen(typ: FixedArray[Nat8], lhs: T, rhs: T): T is
+        let result: T := lhs;
+        let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
+        if did_overflow then
+            badOp("Overflow in trappingAdd", typ);
+        end if;
+        return result;
+    end;
+
+    generic [T: Free]
+    function trappingSubtractGen(typ: FixedArray[Nat8], lhs: T, rhs: T): T is
+        let result: T := lhs;
+        let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
+        if did_overflow then
+            badOp("Overflow in trappingSubtract", typ);
+        end if;
+        return result;
+    end;
+
+
+    generic [T: Free]
+    function trappingMultiplyGen(typ: FixedArray[Nat8], lhs: T, rhs: T): T is
+        let result: T := lhs;
+        let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
+        if did_overflow then
+            badOp("Overflow in trappingMultiply", typ);
+        end if;
+        return result;
+    end;
+
+    generic [T: Free]
+    function trappingDivideGen(typ: FixedArray[Nat8], lhs: T, rhs: T): T is
+        if rhs = 0 then
+            badOp("Division by zero in trappingDivide", typ);
+        end if;
+        return @embed(T, "$1 / $2", lhs, rhs);
+    end;
+
+    generic [T: Free]
+    function trappingSignedDivideGen(typ: FixedArray[Nat8], mint: T, lhs: T, rhs: T): T is
+        if rhs = 0 then
+            badOp("Division by zero in trappingDivide", typ);
+        end if;
+        if (lhs = mint) and (rhs =  -1) then
+            badOp("Overflow in trappingDivide", typ);
+        end if;
+        return @embed(T, "$1 / $2", lhs, rhs);
+    end;
+
+
     instance TrappingArithmetic(Nat8) is
         method trappingAdd(lhs: Nat8, rhs: Nat8): Nat8 is
-            let result: Nat8 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Nat8)");
-            end if;
-            return result;
+            return trappingAddGen("Nat8", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Nat8, rhs: Nat8): Nat8 is
-            let result: Nat8 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Nat8)");
-            end if;
-            return result;
+            return trappingSubtractGen("Nat8", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Nat8, rhs: Nat8): Nat8 is
-            let result: Nat8 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Nat8)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Nat8", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Nat8, rhs: Nat8): Nat8 is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Nat8)");
-            end if;
-            return @embed(Nat8, "$1 / $2", lhs, rhs);
+            return trappingDivideGen("Nat8", lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(Int8) is
         method trappingAdd(lhs: Int8, rhs: Int8): Int8 is
-            let result: Int8 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Int8)");
-            end if;
-            return result;
+            return trappingAddGen("Int8", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Int8, rhs: Int8): Int8 is
-            let result: Int8 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Int8)");
-            end if;
-            return result;
+            return trappingSubtractGen("Int8", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Int8, rhs: Int8): Int8 is
-            let result: Int8 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Int8)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Int8", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Int8, rhs: Int8): Int8 is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Int8)");
-            end if;
-            if (lhs = minimum_int8) and (rhs = -1) then
-                abort("Overflow in trappingDivide (Int8)");
-            end if;
-            return @embed(Int8, "$1 / $2", lhs, rhs);
+            return trappingSignedDivideGen("Int8", minimum_int8, lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(Nat16) is
         method trappingAdd(lhs: Nat16, rhs: Nat16): Nat16 is
-            let result: Nat16 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Nat16)");
-            end if;
-            return result;
+            return trappingAddGen("Nat16", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Nat16, rhs: Nat16): Nat16 is
-            let result: Nat16 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Nat16)");
-            end if;
-            return result;
+            return trappingSubtractGen("Nat8", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Nat16, rhs: Nat16): Nat16 is
-            let result: Nat16 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Nat16)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Nat16", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Nat16, rhs: Nat16): Nat16 is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Nat16)");
-            end if;
-            return @embed(Nat16, "$1 / $2", lhs, rhs);
+            return trappingDivideGen("Nat16", lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(Int16) is
         method trappingAdd(lhs: Int16, rhs: Int16): Int16 is
-            let result: Int16 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Int16)");
-            end if;
-            return result;
+            return trappingAddGen("Int16", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Int16, rhs: Int16): Int16 is
-            let result: Int16 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Int16)");
-            end if;
-            return result;
+            return trappingSubtractGen("Int16", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Int16, rhs: Int16): Int16 is
-            let result: Int16 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Int16)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Int16", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Int16, rhs: Int16): Int16 is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Int16)");
-            end if;
-            if (lhs = minimum_int16) and (rhs = -1) then
-                abort("Overflow in trappingDivide (Int16)");
-            end if;
-            return @embed(Int16, "$1 / $2", lhs, rhs);
+            return trappingSignedDivideGen("Int16", minimum_int16, lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(Nat32) is
         method trappingAdd(lhs: Nat32, rhs: Nat32): Nat32 is
-            let result: Nat32 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Nat32)");
-            end if;
-            return result;
+            return trappingAddGen("Nat32", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Nat32, rhs: Nat32): Nat32 is
-            let result: Nat32 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Nat32)");
-            end if;
-            return result;
+            return trappingSubtractGen("Nat32", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Nat32, rhs: Nat32): Nat32 is
-            let result: Nat32 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Nat32)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Nat32", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Nat32, rhs: Nat32): Nat32 is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Nat32)");
-            end if;
-            return @embed(Nat32, "$1 / $2", lhs, rhs);
+            return trappingDivideGen("Nat32", lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(Int32) is
         method trappingAdd(lhs: Int32, rhs: Int32): Int32 is
-            let result: Int32 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Int32)");
-            end if;
-            return result;
+            return trappingAddGen("Int32", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Int32, rhs: Int32): Int32 is
-            let result: Int32 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Int32)");
-            end if;
-            return result;
+            return trappingSubtractGen("Int32", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Int32, rhs: Int32): Int32 is
-            let result: Int32 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Int32)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Int32", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Int32, rhs: Int32): Int32 is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Int32)");
-            end if;
-            if (lhs = minimum_int32) and (rhs = -1) then
-                abort("Overflow in trappingDivide (Int32)");
-            end if;
-            return @embed(Int32, "$1 / $2", lhs, rhs);
+            return trappingSignedDivideGen("Int32", minimum_int32, lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(Nat64) is
         method trappingAdd(lhs: Nat64, rhs: Nat64): Nat64 is
-            let result: Nat64 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Nat64)");
-            end if;
-            return result;
+            return trappingAddGen("Nat64", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Nat64, rhs: Nat64): Nat64 is
-            let result: Nat64 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Nat64)");
-            end if;
-            return result;
+            return trappingSubtractGen("Nat64", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Nat64, rhs: Nat64): Nat64 is
-            let result: Nat64 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Nat64)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Nat64", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Nat64, rhs: Nat64): Nat64 is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Nat64)");
-            end if;
-            return @embed(Nat64, "$1 / $2", lhs, rhs);
+            return trappingDivideGen("Nat64", lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(Int64) is
         method trappingAdd(lhs: Int64, rhs: Int64): Int64 is
-            let result: Int64 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Int64)");
-            end if;
-            return result;
+            return trappingAddGen("Int64", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Int64, rhs: Int64): Int64 is
-            let result: Int64 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Int64)");
-            end if;
-            return result;
+            return trappingSubtractGen("Int64", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Int64, rhs: Int64): Int64 is
-            let result: Int64 := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Int64)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Int64", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Int64, rhs: Int64): Int64 is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Int64)");
-            end if;
-            if (lhs = minimum_int64) and (rhs = -1) then
-                abort("Overflow in trappingDivide (Int64)");
-            end if;
-            return @embed(Int64, "$1 / $2", lhs, rhs);
+            return trappingSignedDivideGen("Int64", minimum_int64, lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(Index) is
         method trappingAdd(lhs: Index, rhs: Index): Index is
-            let result: Index := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (Index)");
-            end if;
-            return result;
+            return trappingAddGen("Index", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: Index, rhs: Index): Index is
-            let result: Index := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (Index)");
-            end if;
-            return result;
+            return trappingSubtractGen("Index", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: Index, rhs: Index): Index is
-            let result: Index := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (Index)");
-            end if;
-            return result;
+            return trappingMultiplyGen("Index", lhs, rhs);
         end;
 
         method trappingDivide(lhs: Index, rhs: Index): Index is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (Index)");
-            end if;
-            return @embed(Index, "$1 / $2", lhs, rhs);
+            return trappingDivideGen("Index", lhs, rhs);
         end;
     end;
 
     instance TrappingArithmetic(ByteSize) is
         method trappingAdd(lhs: ByteSize, rhs: ByteSize): ByteSize is
-            let result: ByteSize := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_add_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingAdd (ByteSize)");
-            end if;
-            return result;
+            return trappingAddGen("ByteSize", lhs, rhs);
         end;
 
         method trappingSubtract(lhs: ByteSize, rhs: ByteSize): ByteSize is
-            let result: ByteSize := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_sub_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingSubtract (ByteSize)");
-            end if;
-            return result;
+            return trappingSubtractGen("ByteSize", lhs, rhs);
         end;
 
         method trappingMultiply(lhs: ByteSize, rhs: ByteSize): ByteSize is
-            let result: ByteSize := 0;
-            let did_overflow: Bool := @embed(Bool, "__builtin_mul_overflow($1, $2, &$3)", lhs, rhs, result);
-            if did_overflow then
-                abort("Overflow in trappingMultiply (ByteSize)");
-            end if;
-            return result;
+            return trappingMultiplyGen("ByteSize", lhs, rhs);
         end;
 
         method trappingDivide(lhs: ByteSize, rhs: ByteSize): ByteSize is
-            if rhs = 0 then
-                abort("Division by zero in trappingDivide (ByteSize)");
-            end if;
-            return @embed(ByteSize, "$1 / $2", lhs, rhs);
+            return trappingDivideGen("ByteSize", lhs, rhs);
         end;
     end;
 
