@@ -1429,4 +1429,92 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    -- ToIndex
+
+    instance ToIndex(Nat8) is
+        method toIndex(value: Nat8): Option[Index] is
+            if (value <= @embed(Nat8, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Nat16) is
+        method toIndex(value: Nat16): Option[Index] is
+            if (value <= @embed(Nat16, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Nat32) is
+        method toIndex(value: Nat32): Option[Index] is
+            if (value <= @embed(Nat32, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Nat64) is
+        method toIndex(value: Nat64): Option[Index] is
+            if (value <= @embed(Nat64, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Int8) is
+        method toIndex(value: Int8): Option[Index] is
+            if (value >= 0) and (value <= @embed(Int8, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Int16) is
+        method toIndex(value: Int16): Option[Index] is
+            if (value >= 0) and (value <= @embed(Int16, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Int32) is
+        method toIndex(value: Int32): Option[Index] is
+            if (value >= 0) and (value <= @embed(Int32, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Int64) is
+        method toIndex(value: Int64): Option[Index] is
+            if (value >= 0) and (value <= @embed(Int64, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Index) is
+        method toIndex(value: Index): Option[Index] is
+            return Some(value => value);
+        end;
+    end;
 end module body.
