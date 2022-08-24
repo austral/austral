@@ -799,9 +799,9 @@ module body Austral.Pervasive is
     end;
 
     instance ToNat8(Nat16) is
-        method toNat8(value: Nat16): Option[Nat16] is
+        method toNat8(value: Nat16): Option[Nat8] is
             if value <= @embed(Nat16, "UINT8_MAX") then
-                return Some(value => value);
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
             else
                 return None();
             end if;
@@ -809,9 +809,9 @@ module body Austral.Pervasive is
     end;
 
     instance ToNat8(Nat32) is
-        method toNat8(value: Nat32): Option[Nat32] is
+        method toNat8(value: Nat32): Option[Nat8] is
             if value <= @embed(Nat32, "UINT8_MAX") then
-                return Some(value => value);
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
             else
                 return None();
             end if;
@@ -819,9 +819,49 @@ module body Austral.Pervasive is
     end;
 
     instance ToNat8(Nat64) is
-        method toNat8(value: Nat64): Option[Nat64] is
+        method toNat8(value: Nat64): Option[Nat8] is
             if value <= @embed(Nat64, "UINT8_MAX") then
-                return Some(value => value);
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Int8) is
+        method toNat8(value: Int8): Option[Nat8] is
+            if value >= 0 then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Int16) is
+        method toNat8(value: Int16): Option[Nat8] is
+            if (value >= 0) and (value <= @embed(Int16, "UINT8_MAX")) then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Int32) is
+        method toNat8(value: Int32): Option[Nat8] is
+            if (value >= 0) and (value <= @embed(Int32, "UINT8_MAX")) then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Int64) is
+        method toNat8(value: Int64): Option[Nat8] is
+            if (value >= 0) and (value <= @embed(Int64, "UINT8_MAX")) then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
             else
                 return None();
             end if;
