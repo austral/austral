@@ -1119,4 +1119,46 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    -- ToInt8
+
+    instance ToInt8(Nat8) is
+        method toInt8(value: Nat8): Option[Nat8] is
+            if value <= @embed(Nat8, "INT8_MAX") then
+                return Some(value => @embed(Nat8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Nat16) is
+        method toInt8(value: Nat16): Option[Nat8] is
+            if value <= @embed(Nat16, "INT8_MAX") then
+                return Some(value => @embed(Nat8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Nat32) is
+        method toInt8(value: Nat32): Option[Nat8] is
+            if value <= @embed(Nat32, "INT8_MAX") then
+                return Some(value => @embed(Nat8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Nat64) is
+        method toInt8(value: Nat64): Option[Nat8] is
+            if value <= @embed(Nat64, "INT8_MAX") then
+                return Some(value => @embed(Nat8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
 end module body.
