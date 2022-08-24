@@ -1197,4 +1197,14 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    instance ToInt8(Index) is
+        method toInt8(value: Index): Option[Int8] is
+            if (value >= @embed(Index, "INT8_MIN")) and (value <= @embed(Index, "INT8_MAX")) then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
 end module body.
