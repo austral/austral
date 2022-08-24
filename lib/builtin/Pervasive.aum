@@ -792,6 +792,8 @@ module body Austral.Pervasive is
     --- Integer conversions.
     ---
 
+    --- ToNat8
+
     instance ToNat8(Nat8) is
         method toNat8(value: Nat8): Option[Nat8] is
             return Some(value => value);
@@ -872,6 +874,90 @@ module body Austral.Pervasive is
         method toNat8(value: Index): Option[Nat8] is
             if (value >= 0) and (value <= @embed(Index, "UINT8_MAX")) then
                 return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    --- ToNat16
+
+    instance ToNat16(Nat8) is
+        method toNat16(value: Nat8): Option[Nat16] is
+            return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat16(Nat16) is
+        method toNat16(value: Nat16): Option[Nat16] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToNat16(Nat32) is
+        method toNat16(value: Nat32): Option[Nat16] is
+            if value <= @embed(Nat32, "UINT16_MAX") then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Nat64) is
+        method toNat16(value: Nat64): Option[Nat16] is
+            if value <= @embed(Nat64, "UINT16_MAX") then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Int8) is
+        method toNat16(value: Int8): Option[Nat16] is
+            if value >= 0 then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Int16) is
+        method toNat16(value: Int16): Option[Nat16] is
+            if (value >= 0) and (value <= @embed(Int16, "UINT16_MAX")) then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Int32) is
+        method toNat16(value: Int32): Option[Nat16] is
+            if (value >= 0) and (value <= @embed(Int32, "UINT16_MAX")) then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Int64) is
+        method toNat16(value: Int64): Option[Nat16] is
+            if (value >= 0) and (value <= @embed(Int64, "UINT16_MAX")) then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Index) is
+        method toNat16(value: Index): Option[Nat16] is
+            if (value >= 0) and (value <= @embed(Index, "UINT16_MAX")) then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
             else
                 return None();
             end if;
