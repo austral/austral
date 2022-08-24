@@ -787,4 +787,731 @@ module body Austral.Pervasive is
         print(value);
         return @embed(Unit, "au_printf(\"\n\")");
     end;
+
+    ---
+    --- Integer conversions.
+    ---
+
+    --- ToNat8
+
+    instance ToNat8(Nat8) is
+        method toNat8(value: Nat8): Option[Nat8] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToNat8(Nat16) is
+        method toNat8(value: Nat16): Option[Nat8] is
+            if value <= @embed(Nat16, "UINT8_MAX") then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Nat32) is
+        method toNat8(value: Nat32): Option[Nat8] is
+            if value <= @embed(Nat32, "UINT8_MAX") then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Nat64) is
+        method toNat8(value: Nat64): Option[Nat8] is
+            if value <= @embed(Nat64, "UINT8_MAX") then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Int8) is
+        method toNat8(value: Int8): Option[Nat8] is
+            if value >= 0 then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Int16) is
+        method toNat8(value: Int16): Option[Nat8] is
+            if (value >= 0) and (value <= @embed(Int16, "UINT8_MAX")) then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Int32) is
+        method toNat8(value: Int32): Option[Nat8] is
+            if (value >= 0) and (value <= @embed(Int32, "UINT8_MAX")) then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Int64) is
+        method toNat8(value: Int64): Option[Nat8] is
+            if (value >= 0) and (value <= @embed(Int64, "UINT8_MAX")) then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat8(Index) is
+        method toNat8(value: Index): Option[Nat8] is
+            if (value >= 0) and (value <= @embed(Index, "UINT8_MAX")) then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    --- ToNat16
+
+    instance ToNat16(Nat8) is
+        method toNat16(value: Nat8): Option[Nat16] is
+            return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat16(Nat16) is
+        method toNat16(value: Nat16): Option[Nat16] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToNat16(Nat32) is
+        method toNat16(value: Nat32): Option[Nat16] is
+            if value <= @embed(Nat32, "UINT16_MAX") then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Nat64) is
+        method toNat16(value: Nat64): Option[Nat16] is
+            if value <= @embed(Nat64, "UINT16_MAX") then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Int8) is
+        method toNat16(value: Int8): Option[Nat16] is
+            if value >= 0 then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Int16) is
+        method toNat16(value: Int16): Option[Nat16] is
+            if (value >= 0) then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Int32) is
+        method toNat16(value: Int32): Option[Nat16] is
+            if (value >= 0) and (value <= @embed(Int32, "UINT16_MAX")) then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Int64) is
+        method toNat16(value: Int64): Option[Nat16] is
+            if (value >= 0) and (value <= @embed(Int64, "UINT16_MAX")) then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat16(Index) is
+        method toNat16(value: Index): Option[Nat16] is
+            if (value >= 0) and (value <= @embed(Index, "UINT16_MAX")) then
+                return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    -- ToNat32
+
+    instance ToNat32(Nat8) is
+        method toNat32(value: Nat8): Option[Nat32] is
+            return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat32(Nat16) is
+        method toNat32(value: Nat16): Option[Nat32] is
+            return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat32(Nat32) is
+        method toNat32(value: Nat32): Option[Nat32] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToNat32(Nat64) is
+        method toNat32(value: Nat64): Option[Nat32] is
+            if value <= @embed(Nat64, "UINT32_MAX") then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Int8) is
+        method toNat32(value: Int8): Option[Nat32] is
+            if value >= 0 then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Int16) is
+        method toNat32(value: Int16): Option[Nat32] is
+            if value >= 0 then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Int32) is
+        method toNat32(value: Int32): Option[Nat32] is
+            if value >= 0 then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Int64) is
+        method toNat32(value: Int64): Option[Nat32] is
+            if (value >= 0) and (value <= @embed(Int64, "UINT32_MAX")) then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Index) is
+        method toNat32(value: Index): Option[Nat32] is
+            if (value >= 0) and (value <= @embed(Index, "UINT32_MAX")) then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    -- ToNat64
+
+    instance ToNat64(Nat8) is
+        method toNat64(value: Nat8): Option[Nat64] is
+            return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat64(Nat16) is
+        method toNat64(value: Nat16): Option[Nat64] is
+            return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat64(Nat32) is
+        method toNat64(value: Nat32): Option[Nat64] is
+            return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat64(Nat64) is
+        method toNat64(value: Nat64): Option[Nat64] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToNat64(Int8) is
+        method toNat64(value: Int8): Option[Nat64] is
+            if value >= 0 then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat64(Int16) is
+        method toNat64(value: Int16): Option[Nat64] is
+            if value >= 0 then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat64(Int32) is
+        method toNat64(value: Int32): Option[Nat64] is
+            if value >= 0 then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat64(Int64) is
+        method toNat64(value: Int64): Option[Nat64] is
+            if value >= 0 then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat64(Index) is
+        method toNat64(value: Index): Option[Nat64] is
+            if (value >= 0) and (value <= @embed(Index, "UINT64_MAX")) then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    -- ToInt8
+
+    instance ToInt8(Nat8) is
+        method toInt8(value: Nat8): Option[Int8] is
+            if value <= @embed(Nat8, "INT8_MAX") then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Nat16) is
+        method toInt8(value: Nat16): Option[Int8] is
+            if value <= @embed(Nat16, "INT8_MAX") then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Nat32) is
+        method toInt8(value: Nat32): Option[Int8] is
+            if value <= @embed(Nat32, "INT8_MAX") then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Nat64) is
+        method toInt8(value: Nat64): Option[Int8] is
+            if value <= @embed(Nat64, "INT8_MAX") then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Int8) is
+        method toInt8(value: Int8): Option[Int8] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToInt8(Int16) is
+        method toInt8(value: Int16): Option[Int8] is
+            if (value >= @embed(Int16, "INT8_MIN")) and (value <= @embed(Int16, "INT8_MAX")) then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Int32) is
+        method toInt8(value: Int32): Option[Int8] is
+            if (value >= @embed(Int32, "INT8_MIN")) and (value <= @embed(Int32, "INT8_MAX")) then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Int64) is
+        method toInt8(value: Int64): Option[Int8] is
+            if (value >= @embed(Int64, "INT8_MIN")) and (value <= @embed(Int64, "INT8_MAX")) then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt8(Index) is
+        method toInt8(value: Index): Option[Int8] is
+            if (value >= @embed(Index, "INT8_MIN")) and (value <= @embed(Index, "INT8_MAX")) then
+                return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    -- ToInt16
+
+    instance ToInt16(Nat8) is
+        method toInt16(value: Nat8): Option[Int16] is
+            -- `Nat8` is strictly contained by `Int16`, so no checks are necessary.
+            return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt16(Nat16) is
+        method toInt16(value: Nat16): Option[Int16] is
+            if value <= @embed(Nat16, "INT16_MAX") then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Nat32) is
+        method toInt16(value: Nat32): Option[Int16] is
+            if value <= @embed(Nat32, "INT16_MAX") then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Nat64) is
+        method toInt16(value: Nat64): Option[Int16] is
+            if value <= @embed(Nat64, "INT16_MAX") then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Int8) is
+        method toInt16(value: Int8): Option[Int16] is
+            return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt16(Int16) is
+        method toInt16(value: Int16): Option[Int16] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToInt16(Int32) is
+        method toInt16(value: Int32): Option[Int16] is
+            if (value >= @embed(Int32, "INT16_MIN")) and (value <= @embed(Int32, "INT16_MAX")) then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Int64) is
+        method toInt16(value: Int64): Option[Int16] is
+            if (value >= @embed(Int64, "INT16_MIN")) and (value <= @embed(Int64, "INT16_MAX")) then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Index) is
+        method toInt16(value: Index): Option[Int16] is
+            if (value >= @embed(Index, "INT16_MIN")) and (value <= @embed(Index, "INT16_MAX")) then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    -- ToInt32
+
+    instance ToInt32(Nat8) is
+        method toInt32(value: Nat8): Option[Int32] is
+            -- `Nat8` is strictly contained by `Int32`, so no checks are necessary.
+            return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt32(Nat16) is
+        method toInt32(value: Nat16): Option[Int32] is
+            -- `Nat16` is strictly contained by `Int32`, so no checks are necessary.
+            return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt32(Nat32) is
+        method toInt32(value: Nat32): Option[Int32] is
+            if value <= @embed(Nat32, "INT32_MAX") then
+                return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt32(Nat64) is
+        method toInt32(value: Nat64): Option[Int32] is
+            if value <= @embed(Nat64, "INT32_MAX") then
+                return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt32(Int8) is
+        method toInt32(value: Int8): Option[Int32] is
+            return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt32(Int16) is
+        method toInt32(value: Int16): Option[Int32] is
+            return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt32(Int32) is
+        method toInt32(value: Int32): Option[Int32] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToInt32(Int64) is
+        method toInt32(value: Int64): Option[Int32] is
+            if (value >= @embed(Int64, "INT32_MIN")) and (value <= @embed(Int64, "INT32_MAX")) then
+                return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt32(Index) is
+        method toInt32(value: Index): Option[Int32] is
+            if (value >= @embed(Index, "INT32_MIN")) and (value <= @embed(Index, "INT32_MAX")) then
+                return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    -- ToInt64
+
+    instance ToInt64(Nat8) is
+        method toInt64(value: Nat8): Option[Int64] is
+            -- `Nat8` is strictly contained by `Int32`, so no checks are necessary.
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Nat16) is
+        method toInt64(value: Nat16): Option[Int64] is
+            -- `Nat16` is strictly contained by `Int64`, so no checks are necessary.
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Nat32) is
+        method toInt64(value: Nat32): Option[Int64] is
+            -- `Nat32` is strictly contained by `Int64`, so no checks are necessary.
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Nat64) is
+        method toInt64(value: Nat64): Option[Int64] is
+            if value <= @embed(Nat64, "INT64_MAX") then
+                return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt64(Int8) is
+        method toInt64(value: Int8): Option[Int64] is
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Int16) is
+        method toInt64(value: Int16): Option[Int64] is
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Int32) is
+        method toInt64(value: Int32): Option[Int64] is
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Int64) is
+        method toInt64(value: Int64): Option[Int64] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToInt64(Index) is
+        method toInt64(value: Index): Option[Int64] is
+            if (value >= @embed(Index, "INT64_MIN")) and (value <= @embed(Index, "INT64_MAX")) then
+                return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    -- ToIndex
+
+    instance ToIndex(Nat8) is
+        method toIndex(value: Nat8): Option[Index] is
+            return Some(value => @embed(Index, "((au_index_t)($1))", value));
+        end;
+    end;
+
+    instance ToIndex(Nat16) is
+        method toIndex(value: Nat16): Option[Index] is
+            if (value <= @embed(Nat16, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Nat32) is
+        method toIndex(value: Nat32): Option[Index] is
+            if (value <= @embed(Nat32, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Nat64) is
+        method toIndex(value: Nat64): Option[Index] is
+            if (value <= @embed(Nat64, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Int8) is
+        method toIndex(value: Int8): Option[Index] is
+            if (value >= 0) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Int16) is
+        method toIndex(value: Int16): Option[Index] is
+            if (value >= 0) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Int32) is
+        method toIndex(value: Int32): Option[Index] is
+            let cast: Index := @embed(Index, "((au_index_t)($1))", value);
+            if (value >= 0) and (cast <= @embed(Index, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Int64) is
+        method toIndex(value: Int64): Option[Index] is
+            if (value >= 0) and (value <= @embed(Int64, "SIZE_MAX")) then
+                return Some(value => @embed(Index, "((au_index_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToIndex(Index) is
+        method toIndex(value: Index): Option[Index] is
+            return Some(value => value);
+        end;
+    end;
 end module body.
