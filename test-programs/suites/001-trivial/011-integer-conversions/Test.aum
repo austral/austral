@@ -487,6 +487,67 @@ module body Test is
         return nil;
     end;
 
+    function toIndexTest(): Unit is
+        printLn("Index");
+        print("    Nat8(0) = ");
+        case toIndex(0 : Int8) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toIndex(0 : Index) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toIndex(0 : Index) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toIndex(0 : Index) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toIndex(0 : Int8) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toIndex(0 : Int16) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toIndex(0 : Int32) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toIndex(0 : Index) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
     function main(): ExitCode is
         toNat8Test();
         toNat16Test();
@@ -496,6 +557,7 @@ module body Test is
         toInt16Test();
         toInt32Test();
         toInt64Test();
+        toIndexTest();
         return ExitSuccess();
     end;
 end module body.
