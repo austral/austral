@@ -214,7 +214,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
            | _ -> false
          in
          let target_type = parse_typespec env rm typarams ty in
-         (* By passing target_type as the asserted type we're doing point 4. *)
+         (* By passing target_type as the asserted type we're doing point 3. *)
          let expr' = augment_expr module_name env rm typarams lexenv (Some target_type) expr in
          (* For 1: if the expression is an int literal and the target type is an
             int type, do the conversion. Similarly, if the expression is a float
@@ -228,7 +228,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
              (* Otherwise, if the expression has a mutable reference type and the
                 target type is a read reference, and they point to the same underlying
                 type and underlying region, just convert it to a read ref. This does
-                point 3. *)
+                point 2. *)
              (match (get_type expr') with
               | WriteRef (underlying_ty, region) ->
                  (match target_type with
@@ -240,7 +240,11 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                   | _ ->
                      err "Bad conversion.")
               | _ ->
-                 err "Bad conversion")
+                 (try
+                    let _ = match_type (env, module_name) target_type (get_type expr') in
+                    expr'
+                  with Austral_error _ ->
+                    err "Bad conversion"))
       | SizeOf ty ->
          TSizeOf (parse_typespec env rm typarams ty)
       | BorrowExpr (mode, name) ->
