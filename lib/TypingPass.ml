@@ -190,75 +190,57 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
       | Typecast (expr, ty) ->
          (* The typecast operator has four uses:
 
-            1. Clarifying the type of integer and floating point constants.
+            1. Clarifying the type of integer and floating point literals.
 
-            2. Converting between different integer and floating point types
-            (otherwise, you get a combinatorial explosion of typeclasses).
+            2. Converting write references to read references.
 
-            3. Converting write references to read references.
-
-            4. Clarifying the type of return type polymorphic functions.
+            3. Clarifying the type of return type polymorphic functions.
 
           *)
+         let is_int_expr = function
+           | TIntConstant _ -> true
+           | _ -> false
+         and is_float_expr = function
+           | TFloatConstant _ -> true
+           | _ -> false
 
-         let rec is_int_or_float_type = function
+         and is_int_type = function
            | Integer _ -> true
+           | _ -> false
+
+         and is_float_type = function
            | SingleFloat -> true
            | DoubleFloat -> true
            | _ -> false
-
-         and augment_numeric_conversion (expr: texpr) (ty: ty): texpr =
-           let source_type_name = type_conversion_name (get_type expr)
-           and target_type_name = type_conversion_name ty in
-           let conversion_function_call = "convert_" ^ source_type_name ^ "_to_" ^ target_type_name ^ "($1)" in
-           TEmbed (ty, conversion_function_call, [expr])
-
-         and type_conversion_name (ty: ty): string =
-           (match ty with
-            | Integer (signedness, width) ->
-               let s = (match signedness with
-                        | Unsigned -> "nat"
-                        | Signed -> "int")
-               and w = (match width with
-                        | Width8 -> "8"
-                        | Width16 -> "16"
-                        | Width32 -> "32"
-                        | Width64 -> "64"
-                        | WidthIndex -> "index")
-               in
-               s ^ w
-            | SingleFloat ->
-               "float"
-            | DoubleFloat ->
-               "double"
-            | _ ->
-               err "Invalid type for numeric conversion.")
          in
-
          let target_type = parse_typespec env rm typarams ty in
          (* By passing target_type as the asserted type we're doing point 4. *)
          let expr' = augment_expr module_name env rm typarams lexenv (Some target_type) expr in
-         (* For 1 and 2: if the expression has an int or float type, and the type is
-            an integer or float constant, do the conversion: *)
-         if (is_int_or_float_type (get_type expr')) && (is_int_or_float_type target_type) then
-           augment_numeric_conversion expr' target_type
+         (* For 1: if the expression is an int literal and the target type is an
+            int type, do the conversion. Similarly, if the expression is a float
+            constant and the target type is a float, do the conversion. *)
+         if (is_int_expr expr') && (is_int_type target_type) then
+           TCast (expr', target_type)
          else
-           (* Otherwise, if the expression has a mutable reference type and the
-              target type is a read reference, and they point to the same underlying
-              type and underlying region, just convert it to a read ref. This does
-              point 3. *)
-           (match (get_type expr') with
-            | WriteRef (underlying_ty, region) ->
-               (match target_type with
-                | ReadRef (underlying_ty', region') ->
-                   if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
-                     TCast (expr', target_type)
-                   else
-                     err "Cannot convert because the references have different underlying types or regions."
-                | _ ->
-                   err "Bad conversion.")
-            | _ ->
-               err "Bad conversion")
+           if (is_float_expr expr') && (is_float_type target_type) then
+             TCast (expr', target_type)
+           else
+             (* Otherwise, if the expression has a mutable reference type and the
+                target type is a read reference, and they point to the same underlying
+                type and underlying region, just convert it to a read ref. This does
+                point 3. *)
+             (match (get_type expr') with
+              | WriteRef (underlying_ty, region) ->
+                 (match target_type with
+                  | ReadRef (underlying_ty', region') ->
+                     if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
+                       TCast (expr', target_type)
+                     else
+                       err "Cannot convert because the references have different underlying types or regions."
+                  | _ ->
+                     err "Bad conversion.")
+              | _ ->
+                 err "Bad conversion")
       | SizeOf ty ->
          TSizeOf (parse_typespec env rm typarams ty)
       | BorrowExpr (mode, name) ->
@@ -727,7 +709,7 @@ and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
       and u = typaram_universe tp
       in
       (match get_binding bindings tp with
-                    | Some ty ->
+       | Some ty ->
           if universe_compatible u (type_universe ty) then
             ()
           else
