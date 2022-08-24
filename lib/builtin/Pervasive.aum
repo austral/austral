@@ -1043,4 +1043,80 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    -- ToNat64
+
+    instance ToNat64(Nat8) is
+        method toNat64(value: Nat8): Option[Nat64] is
+            return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat64(Nat16) is
+        method toNat64(value: Nat16): Option[Nat64] is
+            return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat64(Nat64) is
+        method toNat64(value: Nat32): Option[Nat64] is
+            return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat64(Nat64) is
+        method toNat64(value: Nat64): Option[Nat64] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToNat64(Int8) is
+        method toNat64(value: Int8): Option[Nat64] is
+            if value >= 0 then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat64(Int16) is
+        method toNat64(value: Int16): Option[Nat64] is
+            if (value >= 0) and (value <= @embed(Int16, "UINT64_MAX")) then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat64(Int32) is
+        method toNat64(value: Int32): Option[Nat64] is
+            if (value >= 0) and (value <= @embed(Int32, "UINT64_MAX")) then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat64(Int64) is
+        method toNat64(value: Int64): Option[Nat64] is
+            if (value >= 0) and (value <= @embed(Int64, "UINT64_MAX")) then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat64(Index) is
+        method toNat64(value: Index): Option[Nat64] is
+            if (value >= 0) and (value <= @embed(Index, "UINT64_MAX")) then
+                return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
 end module body.
