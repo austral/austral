@@ -1058,7 +1058,7 @@ module body Austral.Pervasive is
         end;
     end;
 
-    instance ToNat64(Nat64) is
+    instance ToNat64(Nat32) is
         method toNat64(value: Nat32): Option[Nat64] is
             return Some(value => @embed(Nat64, "((au_nat64_t)($1))", value));
         end;
