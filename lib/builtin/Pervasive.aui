@@ -121,4 +121,7 @@ module Austral.Pervasive is
     end;
 
     instance ToNat8(Nat8);
+    instance ToNat8(Nat16);
+    instance ToNat8(Nat32);
+    instance ToNat8(Nat64);
 end module.
