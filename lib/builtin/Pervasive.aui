@@ -180,4 +180,8 @@ module Austral.Pervasive is
     instance ToInt8(Nat16);
     instance ToInt8(Nat32);
     instance ToInt8(Nat64);
+    instance ToInt8(Int8);
+    instance ToInt8(Int16);
+    instance ToInt8(Int32);
+    instance ToInt8(Int64);
 end module.
