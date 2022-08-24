@@ -1288,4 +1288,78 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    -- ToInt32
+
+    instance ToInt32(Nat8) is
+        method toInt32(value: Nat8): Option[Int32] is
+            -- `Nat8` is strictly contained by `Int32`, so no checks are necessary.
+            return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt32(Nat16) is
+        method toInt32(value: Nat16): Option[Int32] is
+            -- `Nat16` is strictly contained by `Int32`, so no checks are necessary.
+            return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt32(Nat32) is
+        method toInt32(value: Nat32): Option[Int32] is
+            if value <= @embed(Nat32, "INT32_MAX") then
+                return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt32(Nat64) is
+        method toInt32(value: Nat64): Option[Int32] is
+            if value <= @embed(Nat64, "INT32_MAX") then
+                return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt32(Int8) is
+        method toInt32(value: Int8): Option[Int32] is
+            return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt32(Int16) is
+        method toInt32(value: Int16): Option[Int32] is
+            return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt32(Int32) is
+        method toInt32(value: Int32): Option[Int32] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToInt32(Int64) is
+        method toInt32(value: Int64): Option[Int32] is
+            if (value >= @embed(Int64, "INT32_MIN")) and (value <= @embed(Int64, "INT32_MAX")) then
+                return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt32(Index) is
+        method toInt32(value: Index): Option[Int32] is
+            if (value >= @embed(Index, "INT32_MIN")) and (value <= @embed(Index, "INT32_MAX")) then
+                return Some(value => @embed(Int32, "((au_int32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
 end module body.
