@@ -926,7 +926,7 @@ module body Austral.Pervasive is
 
     instance ToNat16(Int16) is
         method toNat16(value: Int16): Option[Nat16] is
-            if (value >= 0) and (value <= @embed(Int16, "UINT16_MAX")) then
+            if (value >= 0) then
                 return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
             else
                 return None();
