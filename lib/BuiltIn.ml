@@ -54,6 +54,24 @@ let pervasive_imports =
         ConcreteImport (make_ident "printLn", None);
         ConcreteImport (make_ident "argumentCount", None);
         ConcreteImport (make_ident "nthArgument", None);
+        ConcreteImport (make_ident "ToNat8", None);
+        ConcreteImport (make_ident "toNat8", None);
+        ConcreteImport (make_ident "ToNat16", None);
+        ConcreteImport (make_ident "toNat16", None);
+        ConcreteImport (make_ident "ToNat32", None);
+        ConcreteImport (make_ident "toNat32", None);
+        ConcreteImport (make_ident "ToNat64", None);
+        ConcreteImport (make_ident "toNat64", None);
+        ConcreteImport (make_ident "ToInt8", None);
+        ConcreteImport (make_ident "toInt8", None);
+        ConcreteImport (make_ident "ToInt16", None);
+        ConcreteImport (make_ident "toInt16", None);
+        ConcreteImport (make_ident "ToInt32", None);
+        ConcreteImport (make_ident "toInt32", None);
+        ConcreteImport (make_ident "ToInt64", None);
+        ConcreteImport (make_ident "toInt64", None);
+        ConcreteImport (make_ident "ToIndex", None);
+        ConcreteImport (make_ident "toIndex", None);
       ]
     )
 
