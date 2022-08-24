@@ -1362,4 +1362,71 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    -- ToInt64
+
+    instance ToInt64(Nat8) is
+        method toInt64(value: Nat8): Option[Int64] is
+            -- `Nat8` is strictly contained by `Int32`, so no checks are necessary.
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Nat16) is
+        method toInt64(value: Nat16): Option[Int64] is
+            -- `Nat16` is strictly contained by `Int64`, so no checks are necessary.
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Nat32) is
+        method toInt64(value: Nat32): Option[Int64] is
+            -- `Nat32` is strictly contained by `Int64`, so no checks are necessary.
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Nat64) is
+        method toInt64(value: Nat64): Option[Int64] is
+            if value <= @embed(Nat64, "INT64_MAX") then
+                return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt64(Int8) is
+        method toInt64(value: Int8): Option[Int64] is
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Int16) is
+        method toInt64(value: Int16): Option[Int64] is
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Int32) is
+        method toInt64(value: Int32): Option[Int64] is
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Int64) is
+        method toInt64(value: Int64): Option[Int64] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToInt64(Index) is
+        method toInt64(value: Index): Option[Int64] is
+            if (value >= @embed(Index, "INT64_MIN")) and (value <= @embed(Index, "INT64_MAX")) then
+                return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
 end module body.
