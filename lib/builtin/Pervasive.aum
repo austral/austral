@@ -1434,11 +1434,7 @@ module body Austral.Pervasive is
 
     instance ToIndex(Nat8) is
         method toIndex(value: Nat8): Option[Index] is
-            if (value <= @embed(Nat8, "SIZE_MAX")) then
-                return Some(value => @embed(Index, "((au_index_t)($1))", value));
-            else
-                return None();
-            end if;
+            return Some(value => @embed(Index, "((au_index_t)($1))", value));
         end;
     end;
 
@@ -1474,7 +1470,7 @@ module body Austral.Pervasive is
 
     instance ToIndex(Int8) is
         method toIndex(value: Int8): Option[Index] is
-            if (value >= 0) and (value <= @embed(Int8, "SIZE_MAX")) then
+            if (value >= 0) then
                 return Some(value => @embed(Index, "((au_index_t)($1))", value));
             else
                 return None();
@@ -1484,7 +1480,7 @@ module body Austral.Pervasive is
 
     instance ToIndex(Int16) is
         method toIndex(value: Int16): Option[Index] is
-            if (value >= 0) and (value <= @embed(Int16, "SIZE_MAX")) then
+            if (value >= 0) then
                 return Some(value => @embed(Index, "((au_index_t)($1))", value));
             else
                 return None();
@@ -1494,7 +1490,8 @@ module body Austral.Pervasive is
 
     instance ToIndex(Int32) is
         method toIndex(value: Int32): Option[Index] is
-            if (value >= 0) and (value <= @embed(Int32, "SIZE_MAX")) then
+            let cast: Index := @embed(Index, "((au_index_t)($1))", value);
+            if (value >= 0) and (cast <= @embed(Index, "SIZE_MAX")) then
                 return Some(value => @embed(Index, "((au_index_t)($1))", value));
             else
                 return None();
