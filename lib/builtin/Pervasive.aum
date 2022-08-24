@@ -1006,7 +1006,7 @@ module body Austral.Pervasive is
 
     instance ToNat32(Int16) is
         method toNat32(value: Int16): Option[Nat32] is
-            if (value >= 0) and (value <= @embed(Int16, "UINT32_MAX")) then
+            if value >= 0 then
                 return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
             else
                 return None();
@@ -1016,7 +1016,7 @@ module body Austral.Pervasive is
 
     instance ToNat32(Int32) is
         method toNat32(value: Int32): Option[Nat32] is
-            if (value >= 0) and (value <= @embed(Int32, "UINT32_MAX")) then
+            if value >= 0 then
                 return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
             else
                 return None();
