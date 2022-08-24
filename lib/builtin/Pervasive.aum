@@ -963,4 +963,84 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    -- ToNat32
+
+    instance ToNat32(Nat8) is
+        method toNat32(value: Nat8): Option[Nat32] is
+            return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat32(Nat16) is
+        method toNat32(value: Nat16): Option[Nat32] is
+            return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat32(Nat32) is
+        method toNat32(value: Nat32): Option[Nat32] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToNat32(Nat64) is
+        method toNat32(value: Nat64): Option[Nat32] is
+            if value <= @embed(Nat64, "UINT32_MAX") then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Int8) is
+        method toNat32(value: Int8): Option[Nat32] is
+            if value >= 0 then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Int16) is
+        method toNat32(value: Int16): Option[Nat32] is
+            if (value >= 0) and (value <= @embed(Int16, "UINT32_MAX")) then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Int32) is
+        method toNat32(value: Int32): Option[Nat32] is
+            if (value >= 0) and (value <= @embed(Int32, "UINT32_MAX")) then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Int64) is
+        method toNat32(value: Int64): Option[Nat32] is
+            if (value >= 0) and (value <= @embed(Int64, "UINT32_MAX")) then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToNat32(Index) is
+        method toNat32(value: Index): Option[Nat32] is
+            if (value >= 0) and (value <= @embed(Index, "UINT32_MAX")) then
+                return Some(value => @embed(Nat32, "((au_nat32_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
 end module body.
