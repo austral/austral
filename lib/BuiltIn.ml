@@ -37,6 +37,8 @@ let pervasive_imports =
         ConcreteImport (make_ident "maximum_int16", None);
         ConcreteImport (make_ident "maximum_int32", None);
         ConcreteImport (make_ident "maximum_int64", None);
+        ConcreteImport (make_ident "minimum_bytesize", None);
+        ConcreteImport (make_ident "maximum_bytesize", None);
         ConcreteImport (make_ident "minimum_index", None);
         ConcreteImport (make_ident "maximum_index", None);
         ConcreteImport (make_ident "TrappingArithmetic", None);

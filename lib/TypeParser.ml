@@ -78,6 +78,8 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
          Some (Integer (Signed, Width32))
       | "Int64" ->
          Some (Integer (Signed, Width64))
+      | "ByteSize" ->
+         Some (Integer (Unsigned, WidthByteSize))
       | "Index" ->
          Some (Integer (Unsigned, WidthIndex))
       | "Float32" ->

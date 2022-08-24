@@ -62,18 +62,18 @@ module body Austral.Memory is
 
     generic [T: Type]
     function resizeArray(array: Pointer[T], size: Index): Pointer[T] is
-        let total: Index := (sizeof(T)) * size;
+        let total: ByteSize := sizeof(T) * size;
         return @embed(Pointer[T], "au_realloc($1, $2)", array, total);
     end;
 
     generic [T: Type, U: Type]
-    function memmove(source: Pointer[T], destination: Pointer[U], count: Index): Unit is
+    function memmove(source: Pointer[T], destination: Pointer[U], count: ByteSize): Unit is
         @embed(Pointer[T], "au_memmove($1, $2, $3)", destination, source, count);
         return nil;
     end;
 
     generic [T: Type, U: Type]
-    function memcpy(source: Pointer[T], destination: Pointer[U], count: Index): Unit is
+    function memcpy(source: Pointer[T], destination: Pointer[U], count: ByteSize): Unit is
         @embed(Pointer[T], "au_memcpy($1, $2, $3)", destination, source, count);
         return nil;
     end;

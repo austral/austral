@@ -6,7 +6,7 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        let size: Index := sizeof(Nat8);
+        let size: ByteSize := sizeof(Nat8);
         if size /= 1 then
             Put_Character('f');
         end if;
