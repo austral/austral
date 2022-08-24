@@ -787,4 +787,14 @@ module body Austral.Pervasive is
         print(value);
         return @embed(Unit, "au_printf(\"\n\")");
     end;
+
+    ---
+    --- Integer conversions.
+    ---
+
+    instance ToNat8(Nat8) is
+        method toNat8(value: Nat8): Option[Nat8] is
+            return Some(value => value);
+        end;
+    end;
 end module body.

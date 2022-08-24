@@ -115,4 +115,10 @@ module Austral.Pervasive is
 
     generic [T: Free(Printable)]
     function printLn(value: T): Unit;
+
+    typeclass ToNat8(T: Type) is
+        method toNat8(value: T): Option[Nat8];
+    end;
+
+    instance ToNat8(Nat8);
 end module.
