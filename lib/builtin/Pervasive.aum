@@ -867,4 +867,14 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    instance ToNat8(Index) is
+        method toNat8(value: Index): Option[Nat8] is
+            if (value >= 0) and (value <= @embed(Index, "UINT8_MAX")) then
+                return Some(value => @embed(Nat8, "((au_nat8_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
 end module body.
