@@ -1207,4 +1207,85 @@ module body Austral.Pervasive is
             end if;
         end;
     end;
+
+    -- ToInt16
+
+    instance ToInt16(Nat8) is
+        method toInt16(value: Nat8): Option[Int16] is
+            -- `Nat8` is strictly contained by `Int16`, so no checks are necessary.
+            return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt16(Nat16) is
+        method toInt16(value: Nat16): Option[Int16] is
+            if value <= @embed(Nat16, "INT16_MAX") then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Nat32) is
+        method toInt16(value: Nat32): Option[Int16] is
+            if value <= @embed(Nat32, "INT16_MAX") then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Nat64) is
+        method toInt16(value: Nat64): Option[Int16] is
+            if value <= @embed(Nat64, "INT16_MAX") then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Int8) is
+        method toInt16(value: Int8): Option[Int16] is
+            return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt16(Int16) is
+        method toInt16(value: Int16): Option[Int16] is
+            return Some(value => value);
+        end;
+    end;
+
+    instance ToInt16(Int32) is
+        method toInt16(value: Int32): Option[Int16] is
+            if (value >= @embed(Int32, "INT16_MIN")) and (value <= @embed(Int32, "INT16_MAX")) then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Int64) is
+        method toInt16(value: Int64): Option[Int16] is
+            if (value >= @embed(Int64, "INT16_MIN")) and (value <= @embed(Int64, "INT16_MAX")) then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
+
+    instance ToInt16(Index) is
+        method toInt16(value: Index): Option[Int16] is
+            if (value >= @embed(Index, "INT16_MIN")) and (value <= @embed(Index, "INT16_MAX")) then
+                return Some(value => @embed(Int16, "((au_int16_t)($1))", value));
+            else
+                return None();
+            end if;
+        end;
+    end;
 end module body.
