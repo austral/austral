@@ -10,7 +10,8 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        printLn(minBound() : Nat8);
+        let bound: Nat8 := minBound();
+        printLn(bound);
         return ExitSuccess();
     end;
 end module body.
