@@ -1,3 +1,6 @@
+(** Simple types used throughout the codebase. *)
+
+(** The four arithmetic operators. *)
 type arithmetic_operator =
   | Add
   | Subtract
@@ -5,6 +8,7 @@ type arithmetic_operator =
   | Divide
 [@@deriving (show, sexp)]
 
+(** The comparison operators. *)
 type comparison_operator =
   | Equal
   | NotEqual
@@ -14,13 +18,16 @@ type comparison_operator =
   | GreaterThanOrEqual
 [@@deriving (show, sexp)]
 
+(** The type of documentation strings. *)
 type docstring = Docstring of string
 
+(** The type of declaration pragmas. *)
 type pragma =
   | ForeignImportPragma of string
   | ForeignExportPragma of string
   | UnsafeModulePragma
 
+(** Whether a reference is a read reference or a write reference. *)
 type borrowing_mode =
   | ReadBorrow
   | WriteBorrow
