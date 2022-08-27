@@ -18,6 +18,7 @@ type docstring = Docstring of string
 
 type pragma =
   | ForeignImportPragma of string
+  | ForeignExportPragma of string
   | UnsafeModulePragma
 
 type borrowing_mode =
