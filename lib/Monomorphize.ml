@@ -781,24 +781,19 @@ and mono_to_ty (ty: mono_ty): ty =
   | MonoRegionTyVar (name, source) ->
      TyVar (TypeVariable (name, RegionUniverse, source, []))
 
-let convert_id_to_decl (env: env) (id: decl_id): typed_decl =
+let monomorphize_wrapper (env: env) (id: decl_id): env =
   match get_decl_by_id env id with
-  | Some (Function { id; name; value_params; rt; body; _ }) ->
-     (match body with
-      | Some body ->
-         TFunction (id, VisPrivate, name, empty_typarams, value_params, rt, body, Docstring "")
-      | None ->
-         internal_err "Function has no body.")
+  | Some (Function { id; _ }) ->
+     let (env, _) = add_or_get_function_monomorph env id empty_mono_bindings in
+     env
   | _ ->
      internal_err "Didn't find wrapper in env."
 
 let monomorphize_wrappers (env: env): env =
   (* Get the IDs of all the wrapper functions. *)
   let ids: decl_id list = List.map (fun (id, _) -> id) (get_export_functions env) in
-  (* Convert the functions to typed functions. *)
-  let decls: typed_decl list = List.map (convert_id_to_decl env) ids in
   (* Monomorphize wrappers. *)
-  let (env, _) = Util.map_with_context (fun (env, decl) -> let (decl', env') = monomorphize_decl env decl in (env', decl')) env decls in
+  let env: env = Util.iter_with_context (fun env id -> monomorphize_wrapper env id) env ids in
   (* Instantiate monomorphs *)
   let (env, _) = instantiate_monomorphs_until_exhausted env in
   env
