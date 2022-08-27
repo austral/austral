@@ -267,7 +267,21 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            Some s
         | _ ->
            None)
-    in
+     and export_name: string option =
+       (match pragmas with
+        | [ForeignExportPragma name] ->
+           Some name
+        | _ ->
+           None)
+     in
+     let _ =
+       (* Check: if we have both an export name and an external name, raise an error. *)
+       match (external_name, export_name) with
+       | (Some _, Some _) ->
+          err "A function can't have the Foreign_Import and Foreign_Export pragmas simultaneously."
+       | _ ->
+          ()
+     in
      let fn_input: function_input = {
          mod_id = mod_id;
          vis = vis;
