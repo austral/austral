@@ -783,10 +783,10 @@ and mono_to_ty (ty: mono_ty): ty =
 
 let convert_id_to_decl (env: env) (id: decl_id): typed_decl =
   match get_decl_by_id env id with
-  | Some (Function { id; name; typarams; value_params; rt; body; _ }) ->
+  | Some (Function { id; name; value_params; rt; body; _ }) ->
      (match body with
       | Some body ->
-         TFunction (id, VisPrivate, name, typarams, value_params, rt, body, Docstring "")
+         TFunction (id, VisPrivate, name, empty_typarams, value_params, rt, body, Docstring "")
       | None ->
          internal_err "Function has no body.")
   | _ ->
@@ -798,5 +798,7 @@ let monomorphize_wrappers (env: env): env =
   (* Convert the functions to typed functions. *)
   let decls: typed_decl list = List.map (convert_id_to_decl env) ids in
   (* Monomorphize wrappers. *)
-  let (env, _) = Util.map_with_context (fun (env, decl) -> let (decl, env) = monomorphize_decl env decl in (env, decl)) env decls in
+  let (env, _) = Util.map_with_context (fun (env, decl) -> let (decl', env') = monomorphize_decl env decl in (env', decl')) env decls in
+  (* Instantiate monomorphs *)
+  let (env, _) = instantiate_monomorphs_until_exhausted env in
   env

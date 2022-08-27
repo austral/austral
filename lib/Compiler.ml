@@ -121,6 +121,7 @@ let dump_and_die _: 'a =
 
 let post_compile (compiler: compiler): compiler =
   let env: env = cenv compiler in
+  let env: env = monomorphize_wrappers env in
   let wrappers: c_unit = CUnit ("Wrappers", all_wrappers env) in
   let wrapper_code: string = render_unit wrappers in
   let code: string = (compiler_code compiler) ^ "\n" ^ wrapper_code in
