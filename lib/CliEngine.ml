@@ -158,6 +158,8 @@ and exec_target (mods: module_source list) (target: target): unit =
 and exec_compile_to_bin (mods: module_source list) (bin_path: string) (entrypoint: entrypoint): unit =
   (* Compile everything to a C file. *)
   let compiler = compile_multiple empty_compiler mods in
+  (* Compile the wrapper functions *)
+  let compiler = post_compile compiler in
   (* Compile the entrypoint. *)
   let compiler =
     let (Entrypoint (module_name, name)) = entrypoint in
@@ -173,6 +175,8 @@ and exec_compile_to_bin (mods: module_source list) (bin_path: string) (entrypoin
 and exec_compile_to_c (mods: module_source list) (output_path: string) (entrypoint: entrypoint option): unit =
   (* Compile everything to a C file. *)
   let compiler = compile_multiple empty_compiler mods in
+  (* Compile the wrapper functions *)
+  let compiler = post_compile compiler in
   (* Compile the entrypoint, if needed. *)
   let compiler =
     match entrypoint with
