@@ -267,7 +267,32 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            Some s
         | _ ->
            None)
-    in
+     and export_name: string option =
+       (match pragmas with
+        | [ForeignExportPragma name] ->
+           Some name
+        | _ ->
+           None)
+     in
+     let _ =
+       (* Check: if we have both an export name and an external name, raise an error. *)
+       match (external_name, export_name) with
+       | (Some _, Some _) ->
+          err "A function can't have the Foreign_Import and Foreign_Export pragmas simultaneously."
+       | _ ->
+          ()
+     in
+     let _ =
+       (* Check: if we have an export name the function can't be generic *)
+       match export_name with
+       | Some _ ->
+          if typarams_size typarams > 0 then
+            err "You can't export generic functions."
+          else
+            ()
+       | None ->
+          ()
+     in
      let fn_input: function_input = {
          mod_id = mod_id;
          vis = vis;
@@ -281,6 +306,14 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
        }
      in
      let (env, decl_id) = add_function env fn_input in
+     let env =
+       (* If the function has an export name, register it in the environment. *)
+       match export_name with
+       | Some name ->
+          add_exported_function env decl_id name
+       | None ->
+          env
+     in
      let decl = LFunction (decl_id, vis, name, typarams, value_params, rt, body, docstring, pragmas) in
      (env, decl)
   | CTypeclass (vis, name, typaram, methods, docstring) ->

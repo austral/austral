@@ -73,6 +73,7 @@ The compiler backend.
 - {!Austral_core.CodeGen}
 - {!Austral_core.CRepr}
 - {!Austral_core.CRenderer}
+- {!Austral_core.ExportInstantiation}
 
 {1 Integration}
 

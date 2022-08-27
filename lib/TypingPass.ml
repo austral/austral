@@ -1177,6 +1177,10 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
                  err "Can't declare a foreign function in a safe module."
              else
                err "Foreign functions can't have type parameters."
+          | [ForeignExportPragma _] ->
+             let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
+             let body' = augment_stmt ctx body in
+             TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
           | [] ->
              let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
              let body' = augment_stmt ctx body in

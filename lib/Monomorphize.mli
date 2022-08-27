@@ -45,3 +45,5 @@ val monomorphize_decl : env -> typed_decl -> (mdecl option * env)
 
 *)
 val monomorphize : env -> typed_module -> (env * mono_module)
+
+val monomorphize_wrappers : env -> env * mdecl list

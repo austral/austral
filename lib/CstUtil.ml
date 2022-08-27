@@ -79,23 +79,31 @@ let make_pragma name args =
   if s = "Foreign_Import" then
     match args with
     | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
-       (* FIXME: For some reason if we move `make_ident "External_Name"` to `a`
-          in the pattern above, a weird syntax error happens. *)
-       if a = make_ident "External_Name" then
+       if equal_identifier a (make_ident "External_Name") then
          ForeignImportPragma f
        else
          err "Invalid foreign import pragma"
     | _ ->
        err "Invalid foreign import pragma"
   else
-    if s = "Unsafe_Module" then
+    if s = "Foreign_Export" then
       match args with
-      | ConcretePositionalArgs [] ->
-         UnsafeModulePragma
+      | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
+         if equal_identifier a (make_ident "External_Name") then
+           ForeignExportPragma f
+         else
+           err "Invalid foreign export pragma"
       | _ ->
-         err "Unsafe_Module pragma takes no arguments."
+         err "Invalid foreign export pragma"
     else
-      err ("Unknown pragma: " ^ s)
+      if s = "Unsafe_Module" then
+        match args with
+        | ConcretePositionalArgs [] ->
+           UnsafeModulePragma
+        | _ ->
+           err "Unsafe_Module pragma takes no arguments."
+      else
+        err ("Unknown pragma: " ^ s)
 
 let mod_int_name (inter: concrete_module_interface): module_name =
   let (ConcreteModuleInterface (name, _, _, _)) = inter in

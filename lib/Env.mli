@@ -59,6 +59,10 @@ val add_instance : env -> instance_input -> (env * decl_id)
 
 val add_instance_method : env -> instance_method_input -> (env * ins_meth_id)
 
+(** Given a function ID, and the export name of that function, register them in
+    the environment. *)
+val add_exported_function : env -> decl_id -> string -> env
+
 (** {2 Retrieve} *)
 
 (** Retrieve a declaration by ID, returning {!None} if it doesn't exist. *)
@@ -86,6 +90,10 @@ val get_instance_method_from_instance_id_and_method_name : env -> decl_id -> ide
 
 (** Get an instance method by ID. *)
 val get_instance_method : env -> ins_meth_id -> ins_meth_rec option
+
+(** Return a list of all exported functions in the environment, as (ID, export
+    name) pairs. *)
+val get_export_functions : env -> (decl_id * string) list
 
 (** {2 Update} *)
 

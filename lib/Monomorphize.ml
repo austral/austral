@@ -780,3 +780,20 @@ and mono_to_ty (ty: mono_ty): ty =
      FnPtr (List.map r args, r rt)
   | MonoRegionTyVar (name, source) ->
      TyVar (TypeVariable (name, RegionUniverse, source, []))
+
+let monomorphize_wrapper (env: env) (id: decl_id): env =
+  match get_decl_by_id env id with
+  | Some (Function { id; _ }) ->
+     let (env, _) = add_or_get_function_monomorph env id empty_mono_bindings in
+     env
+  | _ ->
+     internal_err "Didn't find wrapper in env."
+
+let monomorphize_wrappers (env: env): env * mdecl list =
+  (* Get the IDs of all the wrapper functions. *)
+  let ids: decl_id list = List.map (fun (id, _) -> id) (get_export_functions env) in
+  (* Monomorphize wrappers. *)
+  let env: env = Util.iter_with_context (fun env id -> monomorphize_wrapper env id) env ids in
+  (* Instantiate monomorphs *)
+  let (env, decls): (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+  (env, decls)
