@@ -79,8 +79,6 @@ let make_pragma name args =
   if s = "Foreign_Import" then
     match args with
     | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
-       (* FIXME: For some reason if we move `make_ident "External_Name"` to `a`
-          in the pattern above, a weird syntax error happens. *)
        if a = make_ident "External_Name" then
          ForeignImportPragma f
        else
