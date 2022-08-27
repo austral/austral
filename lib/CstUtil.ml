@@ -79,7 +79,7 @@ let make_pragma name args =
   if s = "Foreign_Import" then
     match args with
     | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
-       if a = make_ident "External_Name" then
+       if equal_identifier a (make_ident "External_Name") then
          ForeignImportPragma f
        else
          err "Invalid foreign import pragma"
@@ -89,7 +89,7 @@ let make_pragma name args =
     if s = "Foreign_Export" then
       match args with
       | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
-         if a = make_ident "External_Name" then
+         if equal_identifier a (make_ident "External_Name") then
            ForeignExportPragma f
          else
            err "Invalid foreign export pragma"
