@@ -493,13 +493,25 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
            gen_type t
         | MonoDoubleFloat ->
            gen_type t
+        | MonoNamedType _ ->
+           err "Not allowed"
         | MonoStaticArray (MonoInteger (Unsigned, Width8)) ->
            c_string_type
+        | MonoStaticArray _ ->
+           err "Not allowed"
+        | MonoRegionTy _ ->
+           err "Not allowed"
+        | MonoReadRef _ ->
+           err "Not allowed"
+        | MonoWriteRef _ ->
+           err "Not allowed"
         | MonoAddress _ ->
            gen_type t
-        | MonoNamedType _ ->
-           err "Not implemented"
-        | _ ->
+        | MonoPointer _ ->
+           gen_type t
+        | MonoFnPtr _ ->
+           gen_type t
+        | MonoRegionTyVar _ ->
            err "Not allowed")
      in
      let return_type_to_c_type t =
