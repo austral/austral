@@ -23,3 +23,5 @@ val compile_mod : compiler -> module_source -> compiler
 val compile_multiple : compiler -> module_source list -> compiler
 
 val compile_entrypoint : compiler -> module_name -> identifier -> compiler
+
+val post_compile : compiler -> compiler
