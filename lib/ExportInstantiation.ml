@@ -89,3 +89,6 @@ let make_wrapper (env: env) (decl_id: decl_id) (export_name: string): c_decl =
           CReturn (CFuncall (gen_mono_id mono_id, List.map (fun (ValueParameter (n, _)) -> CVar (gen_ident n)) params))
       ]
     )
+
+let all_wrappers (env: env): c_decl list =
+  List.map (fun (id, name) -> make_wrapper env id name) (get_export_functions env)
