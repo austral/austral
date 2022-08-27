@@ -10,7 +10,7 @@ open CRepr
 let get_export_monomorph (env: env) (id: decl_id): mono_id =
   match get_decl_by_id env id with
   | Some (Function { id; _ }) ->
-     (match get_type_monomorph env id empty_mono_bindings with
+     (match get_function_monomorph env id empty_mono_bindings with
       | Some id ->
          id
       | _ ->

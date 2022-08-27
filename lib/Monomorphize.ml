@@ -789,11 +789,11 @@ let monomorphize_wrapper (env: env) (id: decl_id): env =
   | _ ->
      internal_err "Didn't find wrapper in env."
 
-let monomorphize_wrappers (env: env): env =
+let monomorphize_wrappers (env: env): env * mdecl list =
   (* Get the IDs of all the wrapper functions. *)
   let ids: decl_id list = List.map (fun (id, _) -> id) (get_export_functions env) in
   (* Monomorphize wrappers. *)
   let env: env = Util.iter_with_context (fun env id -> monomorphize_wrapper env id) env ids in
   (* Instantiate monomorphs *)
-  let (env, _) = instantiate_monomorphs_until_exhausted env in
-  env
+  let (env, decls): (env * mdecl list) = instantiate_monomorphs_until_exhausted env in
+  (env, decls)

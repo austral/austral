@@ -121,10 +121,12 @@ let dump_and_die _: 'a =
 
 let post_compile (compiler: compiler): compiler =
   let env: env = cenv compiler in
-  let env: env = monomorphize_wrappers env in
+  let (env, decls): env * mdecl list = monomorphize_wrappers env in
+  let unit: c_unit = gen_module env (MonoModule (make_mod_name "Austral.Wrappers", decls)) in
+  let unit_code: string = render_unit unit in
   let wrappers: c_unit = CUnit ("Wrappers", all_wrappers env) in
   let wrapper_code: string = render_unit wrappers in
-  let code: string = (compiler_code compiler) ^ "\n" ^ wrapper_code in
+  let code: string = (compiler_code compiler) ^ "\n" ^ unit_code ^ "\n" ^ wrapper_code in
   Compiler (env, code)
 
 let empty_compiler: compiler =
