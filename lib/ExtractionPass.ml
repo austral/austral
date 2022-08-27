@@ -282,6 +282,17 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
        | _ ->
           ()
      in
+     let _ =
+       (* Check: if we have an export name the function can't be generic *)
+       match export_name with
+       | Some _ ->
+          if typarams_size typarams > 0 then
+            err "You can't export generic functions."
+          else
+            ()
+       | None ->
+          ()
+     in
      let fn_input: function_input = {
          mod_id = mod_id;
          vis = vis;
