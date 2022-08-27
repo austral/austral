@@ -295,6 +295,14 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
        }
      in
      let (env, decl_id) = add_function env fn_input in
+     let env =
+       (* If the function has an export name, register it in the environment. *)
+       match export_name with
+       | Some name ->
+          add_exported_function env decl_id name
+       | None ->
+          env
+     in
      let decl = LFunction (decl_id, vis, name, typarams, value_params, rt, body, docstring, pragmas) in
      (env, decl)
   | CTypeclass (vis, name, typaram, methods, docstring) ->
