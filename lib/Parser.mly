@@ -481,7 +481,7 @@ comp_op:
   | NEQ { NotEqual }
   | LT { LessThan }
   | LTE { LessThanOrEqual }
-  | GT { GreaterThanOrEqual }
+  | GT { GreaterThan }
   | GTE { GreaterThanOrEqual }
   ;
 

@@ -66,10 +66,10 @@ rule token = parse
   (* Comparison operators *)
   | "=" { EQ }
   | "/=" { NEQ }
-  | "<" { LT }
   | "<=" { LTE }
-  | ">" { GT }
+  | "<" { LT }
   | ">=" { GTE }
+  | ">" { GT }
   (* Logical operators *)
   | "and" { AND }
   | "or" { OR }
