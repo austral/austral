@@ -72,6 +72,7 @@ and mexpr =
   (** Represents a call to an instance method of a concrete instance. *)
   | MGenericMethodCall of ins_meth_id * mono_id * mexpr list * mono_ty
   (** Represents a call to an instance method of a generic instance. *)
+  | MFptrCall of identifier * mexpr list * mono_ty
   | MCast of mexpr * mono_ty
   | MComparison of comparison_operator * mexpr * mexpr
   | MConjunction of mexpr * mexpr
@@ -145,6 +146,8 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MGenericMethodCall (_, _, _, ty) ->
      ty
+  | MFptrCall (_, _, rt) ->
+     rt
   | MCast (_, ty) ->
      ty
   | MComparison _ ->

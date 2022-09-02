@@ -219,6 +219,10 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      let substs = make_substs2 instance_bindings typarams in
      let mcall = TMethodCall (meth_id, method_name, typarams, arguments', rt, substs) in
      monomorphize_expr env mcall
+  | TFptrCall (name, args, ty) ->
+     let (args, env) = monomorphize_expr_list env args in
+     let (ty, env) = strip_and_mono env ty in
+     (MFptrCall (name, args, ty), env)
   | TCast (expr, ty) ->
      let (ty, env) = strip_and_mono env ty in
      let (expr, env) = monomorphize_expr env expr in
