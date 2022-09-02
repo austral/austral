@@ -419,7 +419,7 @@ and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (
   (* We extract the parameter types and return type from the function pointer
      type. *)
   let (paramtys, rt): (ty list * ty) =
-    match ty with
+    match fn_ptr_ty with
     | FnPtr (paramtys, rt) -> (paramtys, rt)
     | _ -> err "Trying to call something that isn't a function pointer type."
   in
@@ -427,8 +427,13 @@ and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (
      parameter names are fake, but this is so we can reuse the arity-checking,
      value parameter list-checking infrastructure we use elsewhere. *)
   let params: value_parameter list = List.map (fun paramty -> ValueParameter (make_ident "fake", paramty)) paramtys in
-  let _ = (module_name, env, name, fn_ptr_ty, asserted_ty, args, params, rt) in
-  err "Calling function pointers is not implemented yet."
+  (* Check synthetic parameter list against argument list. *)
+  let bindings = check_argument_list env module_name params args in
+  (* Use the bindings to get the effective return type *)
+  let rt' = replace_variables bindings rt in
+  let (bindings', rt'') = handle_return_type_polymorphism env module_name name params rt' asserted_ty bindings in
+  let arguments = cast_arguments bindings' params args in
+  TFptrCall (name, arguments, rt'')
 
 and augment_callable (module_name: module_name) (env: env) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
   with_frame "Augment callable"
