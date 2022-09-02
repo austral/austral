@@ -207,6 +207,9 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CFuncall (gen_ins_meth_id id, List.map g args)
   | MGenericMethodCall (_, id, args, _) ->
      CFuncall (gen_mono_id id, List.map g args)
+  | MFptrCall (name, args, ty) ->
+     let argtys: mono_ty list = List.map get_type args in
+     CFptrCall (CVar (gen_ident name), gen_type ty, List.map gen_type argtys, List.map g args)
   | MCast (e, t) ->
      CCast (g e, gen_type t)
   | MArithmetic (op, lhs, rhs) ->
