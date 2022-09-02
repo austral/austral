@@ -58,6 +58,8 @@ let rec get_type = function
      ty
   | TVarMethodCall { rt; _ } ->
      rt
+  | TFptrCall (_, _, rt) ->
+     rt
   | TCast (_, ty) ->
      ty
   | TComparison _ ->
