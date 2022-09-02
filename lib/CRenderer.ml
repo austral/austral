@@ -196,6 +196,13 @@ and render_expr = function
   | (CVar s) -> s
   | (CFuncall (n, a)) ->
      n ^ (paren (comma_sep (List.map e a)))
+  | CFptrCall (expr, rt, argtys, args) ->
+     let rt: string = render_type rt
+     and argtys: string = String.concat ", " (List.map render_type argtys)
+     and expr: string = render_expr expr
+     and args: string = String.concat ", " (List.map render_expr args)
+     in
+     ("((" ^ rt ^ "(*)(" ^ argtys ^ "))(" ^ expr ^ "))(" ^ args ^ ");")
   | (CCast (e, t)) ->
      let e' = render_expr e
      and t' = render_type t in

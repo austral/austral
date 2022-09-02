@@ -47,6 +47,10 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      and rt = replace_variables bindings rt
      in
      TVarMethodCall { source_module_name; typeclass_id; params; method_name; args; dispatch_ty; rt; bindings=bindings'; }
+  | TFptrCall (name, args, rt) ->
+     let args = List.map (replace_tyvars_expr bindings) args
+     and rt = replace_variables bindings rt in
+     TFptrCall (name, args, rt)
   | TCast (expr, ty) ->
      let expr = replace_tyvars_expr bindings expr
      and ty = replace_variables bindings ty in

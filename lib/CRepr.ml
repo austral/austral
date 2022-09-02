@@ -25,6 +25,7 @@ type c_expr =
   | CString of escaped_string
   | CVar of string
   | CFuncall of string * c_expr list
+  | CFptrCall of c_expr * c_ty * c_ty list * c_expr list
   | CCast of c_expr * c_ty
   | CArithmetic of arithmetic_operator * c_expr * c_expr
   | CComparison of comparison_operator * c_expr * c_expr

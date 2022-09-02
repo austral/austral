@@ -75,7 +75,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
               | None ->
                  err ("I can't find the variable named " ^ (ident_string (original_name name)))))
       | FunctionCall (name, args) ->
-         augment_call module_name env asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
+         augment_call module_name env lexenv asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
       | ArithmeticExpression (op, lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
@@ -394,12 +394,46 @@ and get_slot_with_name slots slot_name =
   | Some s -> s
   | None -> err ("No slot with this name: " ^ (ident_string slot_name))
 
-and augment_call (module_name: module_name) (env: env) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
-  match get_callable env module_name (qident_to_sident name) with
-  | Some callable ->
-     augment_callable module_name env name callable asserted_ty args
+and augment_call (module_name: module_name) (env: env) (lexenv: lexenv) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
+  (* First, check if the callable name is a variable. *)
+  match get_var lexenv (local_name name) with
+  | Some (ty, _) ->
+     augment_fptr_call module_name env (local_name name) ty asserted_ty args
   | None ->
-     err ("No callable with this name: " ^ (qident_debug_name name))
+     (* Otherwise, find a callable from the environment. *)
+     (match get_callable env module_name (qident_to_sident name) with
+      | Some callable ->
+         augment_callable module_name env name callable asserted_ty args
+      | None ->
+         err ("No callable with this name: " ^ (qident_debug_name name)))
+
+and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
+  (* Because function pointers don't preserve value parameter names, we can't
+     accept named argument lists. *)
+  let args: texpr list =
+    match args with
+    | TPositionalArglist args -> args
+    | TNamedArglist _ ->
+       err "You can't call a function pointer with a named argument list, because function pointers don't preserve parameter names, so we wouldn't know how to assign arguments to parameters."
+  in
+  (* We extract the parameter types and return type from the function pointer
+     type. *)
+  let (paramtys, rt): (ty list * ty) =
+    match fn_ptr_ty with
+    | FnPtr (paramtys, rt) -> (paramtys, rt)
+    | _ -> err "Trying to call something that isn't a function pointer type."
+  in
+  (* Then, we synthesize a parameter list from the function pointer type. The
+     parameter names are fake, but this is so we can reuse the arity-checking,
+     value parameter list-checking infrastructure we use elsewhere. *)
+  let params: value_parameter list = List.map (fun paramty -> ValueParameter (make_ident "fake", paramty)) paramtys in
+  (* Check synthetic parameter list against argument list. *)
+  let bindings = check_argument_list env module_name params args in
+  (* Use the bindings to get the effective return type *)
+  let rt' = replace_variables bindings rt in
+  let (bindings', rt'') = handle_return_type_polymorphism env module_name name params rt' asserted_ty bindings in
+  let arguments = cast_arguments bindings' params args in
+  TFptrCall (name, arguments, rt'')
 
 and augment_callable (module_name: module_name) (env: env) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
   with_frame "Augment callable"
@@ -434,7 +468,7 @@ and augment_function_call (env: env) (module_name: module_name) (id: decl_id) na
       (* For simplicity, and to reduce duplication of code, we convert the argument
          list to a positional list. *)
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-      let arguments = arglist_to_positional (args, param_names) in
+      let arguments: texpr list = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
       let bindings = check_argument_list env module_name params arguments in
       (* Use the bindings to get the effective return type *)
@@ -1112,6 +1146,8 @@ and is_constant = function
   | TMethodCall _ ->
      false
   | TVarMethodCall _ ->
+     false
+  | TFptrCall _ ->
      false
   | TCast _ ->
      true
