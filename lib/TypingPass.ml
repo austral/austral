@@ -451,7 +451,7 @@ and augment_function_call (env: env) (module_name: module_name) (id: decl_id) na
       (* For simplicity, and to reduce duplication of code, we convert the argument
          list to a positional list. *)
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-      let arguments = arglist_to_positional (args, param_names) in
+      let arguments: texpr list = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
       let bindings = check_argument_list env module_name params arguments in
       (* Use the bindings to get the effective return type *)

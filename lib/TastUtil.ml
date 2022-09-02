@@ -8,7 +8,7 @@ let arglist_size = function
   | (TPositionalArglist l) -> List.length l
   | (TNamedArglist l) -> List.length l
 
-let rec arglist_to_positional (args, names) =
+let rec arglist_to_positional (args, names): texpr list =
   (* TODO: better error reporting *)
   assert ((arglist_size args) = (List.length names));
   assert (names_match args names);
