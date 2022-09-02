@@ -408,6 +408,13 @@ and augment_call (module_name: module_name) (env: env) (lexenv: lexenv) (asserte
          err ("No callable with this name: " ^ (qident_debug_name name)))
 
 and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
+  (* Because function pointers don't preserve value parameter names, we can't accept named argument lists. *)
+  let args: texpr list =
+    match args with
+    | TPositionalArglist args -> args
+    | TNamedArglist _ ->
+       err "You can't call a function pointer with a named argument list, because function pointers don't preserve parameter names, so we wouldn't know how to assign arguments to parameters."
+  in
   let _ = (module_name, env, name, fn_ptr_ty, asserted_ty, args) in
   err "Calling function pointers is not implemented yet."
 
