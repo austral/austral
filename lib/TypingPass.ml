@@ -75,7 +75,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
               | None ->
                  err ("I can't find the variable named " ^ (ident_string (original_name name)))))
       | FunctionCall (name, args) ->
-         augment_call module_name env asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
+         augment_call module_name env lexenv asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
       | ArithmeticExpression (op, lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
@@ -394,12 +394,22 @@ and get_slot_with_name slots slot_name =
   | Some s -> s
   | None -> err ("No slot with this name: " ^ (ident_string slot_name))
 
-and augment_call (module_name: module_name) (env: env) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
-  match get_callable env module_name (qident_to_sident name) with
-  | Some callable ->
-     augment_callable module_name env name callable asserted_ty args
+and augment_call (module_name: module_name) (env: env) (lexenv: lexenv) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
+  (* First, check if the callable name is a variable. *)
+  match get_var lexenv (local_name name) with
+  | Some (ty, _) ->
+     augment_fptr_call module_name env (local_name name) ty asserted_ty args
   | None ->
-     err ("No callable with this name: " ^ (qident_debug_name name))
+     (* Otherwise, find a callable from the environment. *)
+     (match get_callable env module_name (qident_to_sident name) with
+      | Some callable ->
+         augment_callable module_name env name callable asserted_ty args
+      | None ->
+         err ("No callable with this name: " ^ (qident_debug_name name)))
+
+and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
+  let _ = (module_name, env, name, fn_ptr_ty, asserted_ty, args) in
+  err "Calling function pointers is not implemented yet."
 
 and augment_callable (module_name: module_name) (env: env) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
   with_frame "Augment callable"
