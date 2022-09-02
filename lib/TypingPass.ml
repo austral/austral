@@ -1147,6 +1147,8 @@ and is_constant = function
      false
   | TVarMethodCall _ ->
      false
+  | TFptrCall _ ->
+     false
   | TCast _ ->
      true
   | TComparison (_, lhs, rhs) ->
