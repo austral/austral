@@ -6,18 +6,18 @@ module Standard.Equality is
     Represents a partial equivalence relation, that is, a total equivalence
     relation that is non-reflexive.
     """
-	typeclass PartialEquality(T: Type) is
+    typeclass PartialEquality(T: Type) is
         generic [R: Region, S: Region]
-		method partialEq(a: &[T, R], b: &[T, S]): Bool;
-	end;
+        method partialEq(a: &[T, R], b: &[T, S]): Bool;
+    end;
 
     """
     Represents a total equivalence relation.
     """
-	typeclass Equality(T: Type) is
+    typeclass Equality(T: Type) is
         generic [R: Region, S: Region]
-		method equal(a: &[T, R], b: &[T, S]): Bool;
-	end;
+        method equal(a: &[T, R], b: &[T, S]): Bool;
+    end;
 
     instance PartialEquality(Unit);
     instance Equality(Unit);
