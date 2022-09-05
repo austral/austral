@@ -77,6 +77,8 @@ let rec ser_expr (env: env) (expr: texpr): ser_expr =
          dispatch_ty = dispatch_ty;
          rt = rt;
        }
+  | TFptrCall (name, args, ty) ->
+     SFptrCall (name, List.map se args, ty)
   | TCast (e, ty) ->
      SCast (se e, ty)
   | TComparison (op, lhs, rhs) ->

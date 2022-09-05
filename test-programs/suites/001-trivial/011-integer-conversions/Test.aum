@@ -1,0 +1,563 @@
+module body Test is
+    function toNat8Test(): Unit is
+        printLn("Nat8");
+        print("    Nat8(0) = ");
+        case toNat8(0 : Nat8) of
+            when Some(value: Nat8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toNat8(0 : Nat16) of
+            when Some(value: Nat8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toNat8(0 : Nat32) of
+            when Some(value: Nat8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toNat8(0 : Nat64) of
+            when Some(value: Nat8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toNat8(0 : Int8) of
+            when Some(value: Nat8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toNat8(0 : Int16) of
+            when Some(value: Nat8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toNat8(0 : Int32) of
+            when Some(value: Nat8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toNat8(0 : Int64) of
+            when Some(value: Nat8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toNat16Test(): Unit is
+        printLn("Nat16");
+        print("    Nat8(0) = ");
+        case toNat16(0 : Nat8) of
+            when Some(value: Nat16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toNat16(0 : Nat16) of
+            when Some(value: Nat16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toNat16(0 : Nat32) of
+            when Some(value: Nat16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toNat16(0 : Nat64) of
+            when Some(value: Nat16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toNat16(0 : Int8) of
+            when Some(value: Nat16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toNat16(0 : Int16) of
+            when Some(value: Nat16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toNat16(0 : Int32) of
+            when Some(value: Nat16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toNat16(0 : Int64) of
+            when Some(value: Nat16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toNat32Test(): Unit is
+        printLn("Nat32");
+        print("    Nat8(0) = ");
+        case toNat32(0 : Nat8) of
+            when Some(value: Nat32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toNat32(0 : Nat32) of
+            when Some(value: Nat32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toNat32(0 : Nat32) of
+            when Some(value: Nat32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toNat32(0 : Nat64) of
+            when Some(value: Nat32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toNat32(0 : Int8) of
+            when Some(value: Nat32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toNat32(0 : Int16) of
+            when Some(value: Nat32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toNat32(0 : Int32) of
+            when Some(value: Nat32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toNat32(0 : Int64) of
+            when Some(value: Nat32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toNat64Test(): Unit is
+        printLn("Nat64");
+        print("    Nat8(0) = ");
+        case toNat64(0 : Nat8) of
+            when Some(value: Nat64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toNat64(0 : Nat64) of
+            when Some(value: Nat64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toNat64(0 : Nat64) of
+            when Some(value: Nat64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toNat64(0 : Nat64) of
+            when Some(value: Nat64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toNat64(0 : Int8) of
+            when Some(value: Nat64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toNat64(0 : Int16) of
+            when Some(value: Nat64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toNat64(0 : Int32) of
+            when Some(value: Nat64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toNat64(0 : Int64) of
+            when Some(value: Nat64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toInt8Test(): Unit is
+        printLn("Int8");
+        print("    Nat8(0) = ");
+        case toInt8(0 : Int8) of
+            when Some(value: Int8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toInt8(0 : Int16) of
+            when Some(value: Int8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toInt8(0 : Int32) of
+            when Some(value: Int8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toInt8(0 : Int64) of
+            when Some(value: Int8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toInt8(0 : Int8) of
+            when Some(value: Int8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toInt8(0 : Int16) of
+            when Some(value: Int8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toInt8(0 : Int32) of
+            when Some(value: Int8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toInt8(0 : Int64) of
+            when Some(value: Int8) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toInt16Test(): Unit is
+        printLn("Int16");
+        print("    Nat8(0) = ");
+        case toInt16(0 : Int8) of
+            when Some(value: Int16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toInt16(0 : Int16) of
+            when Some(value: Int16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toInt16(0 : Int32) of
+            when Some(value: Int16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toInt16(0 : Int64) of
+            when Some(value: Int16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toInt16(0 : Int8) of
+            when Some(value: Int16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toInt16(0 : Int16) of
+            when Some(value: Int16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toInt16(0 : Int32) of
+            when Some(value: Int16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toInt16(0 : Int64) of
+            when Some(value: Int16) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toInt32Test(): Unit is
+        printLn("Int32");
+        print("    Nat8(0) = ");
+        case toInt32(0 : Int8) of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toInt32(0 : Int32) of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toInt32(0 : Int32) of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toInt32(0 : Int64) of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toInt32(0 : Int8) of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toInt32(0 : Int16) of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toInt32(0 : Int32) of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toInt32(0 : Int64) of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toInt64Test(): Unit is
+        printLn("Int64");
+        print("    Nat8(0) = ");
+        case toInt64(0 : Int8) of
+            when Some(value: Int64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toInt64(0 : Int64) of
+            when Some(value: Int64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toInt64(0 : Int64) of
+            when Some(value: Int64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toInt64(0 : Int64) of
+            when Some(value: Int64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toInt64(0 : Int8) of
+            when Some(value: Int64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toInt64(0 : Int16) of
+            when Some(value: Int64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toInt64(0 : Int32) of
+            when Some(value: Int64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toInt64(0 : Int64) of
+            when Some(value: Int64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toIndexTest(): Unit is
+        printLn("Index");
+        print("    Nat8(0) = ");
+        case toIndex(0 : Int8) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toIndex(0 : Index) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toIndex(0 : Index) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toIndex(0 : Index) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toIndex(0 : Int8) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toIndex(0 : Int16) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toIndex(0 : Int32) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toIndex(0 : Index) of
+            when Some(value: Index) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        toNat8Test();
+        toNat16Test();
+        toNat32Test();
+        toNat64Test();
+        toInt8Test();
+        toInt16Test();
+        toInt32Test();
+        toInt64Test();
+        toIndexTest();
+        return ExitSuccess();
+    end;
+end module body.

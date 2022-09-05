@@ -66,6 +66,7 @@ and texpr =
       rt: ty;
       bindings: type_bindings;
     }
+  | TFptrCall of identifier * texpr list * ty
   | TCast of texpr * ty
   | TComparison of comparison_operator * texpr * texpr
   | TConjunction of texpr * texpr

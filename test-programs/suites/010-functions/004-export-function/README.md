@@ -1,0 +1,1 @@
+Test that we can export a function to C.

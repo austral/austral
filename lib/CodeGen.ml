@@ -207,6 +207,9 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CFuncall (gen_ins_meth_id id, List.map g args)
   | MGenericMethodCall (_, id, args, _) ->
      CFuncall (gen_mono_id id, List.map g args)
+  | MFptrCall (name, args, ty) ->
+     let argtys: mono_ty list = List.map get_type args in
+     CFptrCall (CVar (gen_ident name), gen_type ty, List.map gen_type argtys, List.map g args)
   | MCast (e, t) ->
      CCast (g e, gen_type t)
   | MArithmetic (op, lhs, rhs) ->
@@ -493,13 +496,25 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
            gen_type t
         | MonoDoubleFloat ->
            gen_type t
+        | MonoNamedType _ ->
+           err "Not allowed"
         | MonoStaticArray (MonoInteger (Unsigned, Width8)) ->
            c_string_type
+        | MonoStaticArray _ ->
+           err "Not allowed"
+        | MonoRegionTy _ ->
+           err "Not allowed"
+        | MonoReadRef _ ->
+           err "Not allowed"
+        | MonoWriteRef _ ->
+           err "Not allowed"
         | MonoAddress _ ->
            gen_type t
-        | MonoNamedType _ ->
-           err "Not implemented"
-        | _ ->
+        | MonoPointer _ ->
+           gen_type t
+        | MonoFnPtr _ ->
+           gen_type t
+        | MonoRegionTyVar _ ->
            err "Not allowed")
      in
      let return_type_to_c_type t =

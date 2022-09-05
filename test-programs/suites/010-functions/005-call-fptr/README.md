@@ -1,0 +1,1 @@
+Test that we can call function pointers.

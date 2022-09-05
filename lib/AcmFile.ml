@@ -85,6 +85,7 @@ and ser_expr =
       dispatch_ty: ty;
       rt: ty;
     }
+  | SFptrCall of identifier * ser_expr list * ty
   | SCast of ser_expr * ty
   | SComparison of comparison_operator * ser_expr * ser_expr
   | SConjunction of ser_expr * ser_expr

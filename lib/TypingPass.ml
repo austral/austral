@@ -75,7 +75,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
               | None ->
                  err ("I can't find the variable named " ^ (ident_string (original_name name)))))
       | FunctionCall (name, args) ->
-         augment_call module_name env asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
+         augment_call module_name env lexenv asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
       | ArithmeticExpression (op, lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
@@ -190,76 +190,61 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
       | Typecast (expr, ty) ->
          (* The typecast operator has four uses:
 
-            1. Clarifying the type of integer and floating point constants.
+            1. Clarifying the type of integer and floating point literals.
 
-            2. Converting between different integer and floating point types
-            (otherwise, you get a combinatorial explosion of typeclasses).
+            2. Converting write references to read references.
 
-            3. Converting write references to read references.
-
-            4. Clarifying the type of return type polymorphic functions.
+            3. Clarifying the type of return type polymorphic functions.
 
           *)
+         let is_int_expr = function
+           | TIntConstant _ -> true
+           | _ -> false
+         and is_float_expr = function
+           | TFloatConstant _ -> true
+           | _ -> false
 
-         let rec is_int_or_float_type = function
+         and is_int_type = function
            | Integer _ -> true
+           | _ -> false
+
+         and is_float_type = function
            | SingleFloat -> true
            | DoubleFloat -> true
            | _ -> false
-
-         and augment_numeric_conversion (expr: texpr) (ty: ty): texpr =
-           let source_type_name = type_conversion_name (get_type expr)
-           and target_type_name = type_conversion_name ty in
-           let conversion_function_call = "convert_" ^ source_type_name ^ "_to_" ^ target_type_name ^ "($1)" in
-           TEmbed (ty, conversion_function_call, [expr])
-
-         and type_conversion_name (ty: ty): string =
-           (match ty with
-            | Integer (signedness, width) ->
-               let s = (match signedness with
-                        | Unsigned -> "nat"
-                        | Signed -> "int")
-               and w = (match width with
-                        | Width8 -> "8"
-                        | Width16 -> "16"
-                        | Width32 -> "32"
-                        | Width64 -> "64"
-                        | WidthByteSize -> "bytesize"
-                        | WidthIndex -> "index")
-               in
-               s ^ w
-            | SingleFloat ->
-               "float"
-            | DoubleFloat ->
-               "double"
-            | _ ->
-               err "Invalid type for numeric conversion.")
          in
-
          let target_type = parse_typespec env rm typarams ty in
-         (* By passing target_type as the asserted type we're doing point 4. *)
+         (* By passing target_type as the asserted type we're doing point 3. *)
          let expr' = augment_expr module_name env rm typarams lexenv (Some target_type) expr in
-         (* For 1 and 2: if the expression has an int or float type, and the type is
-            an integer or float constant, do the conversion: *)
-         if (is_int_or_float_type (get_type expr')) && (is_int_or_float_type target_type) then
-           augment_numeric_conversion expr' target_type
+         (* For 1: if the expression is an int literal and the target type is an
+            int type, do the conversion. Similarly, if the expression is a float
+            constant and the target type is a float, do the conversion. *)
+         if (is_int_expr expr') && (is_int_type target_type) then
+           TCast (expr', target_type)
          else
-           (* Otherwise, if the expression has a mutable reference type and the
-              target type is a read reference, and they point to the same underlying
-              type and underlying region, just convert it to a read ref. This does
-              point 3. *)
-           (match (get_type expr') with
-            | WriteRef (underlying_ty, region) ->
-               (match target_type with
-                | ReadRef (underlying_ty', region') ->
-                   if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
-                     TCast (expr', target_type)
-                   else
-                     err "Cannot convert because the references have different underlying types or regions."
-                | _ ->
-                   err "Bad conversion.")
-            | _ ->
-               err "Bad conversion")
+           if (is_float_expr expr') && (is_float_type target_type) then
+             TCast (expr', target_type)
+           else
+             (* Otherwise, if the expression has a mutable reference type and the
+                target type is a read reference, and they point to the same underlying
+                type and underlying region, just convert it to a read ref. This does
+                point 2. *)
+             (match (get_type expr') with
+              | WriteRef (underlying_ty, region) ->
+                 (match target_type with
+                  | ReadRef (underlying_ty', region') ->
+                     if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
+                       TCast (expr', target_type)
+                     else
+                       err "Cannot convert because the references have different underlying types or regions."
+                  | _ ->
+                     err "Bad conversion.")
+              | _ ->
+                 (try
+                    let _ = match_type (env, module_name) target_type (get_type expr') in
+                    expr'
+                  with Austral_error _ ->
+                    err "Bad conversion"))
       | SizeOf ty ->
          TSizeOf (parse_typespec env rm typarams ty)
       | BorrowExpr (mode, name) ->
@@ -409,12 +394,46 @@ and get_slot_with_name slots slot_name =
   | Some s -> s
   | None -> err ("No slot with this name: " ^ (ident_string slot_name))
 
-and augment_call (module_name: module_name) (env: env) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
-  match get_callable env module_name (qident_to_sident name) with
-  | Some callable ->
-     augment_callable module_name env name callable asserted_ty args
+and augment_call (module_name: module_name) (env: env) (lexenv: lexenv) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
+  (* First, check if the callable name is a variable. *)
+  match get_var lexenv (local_name name) with
+  | Some (ty, _) ->
+     augment_fptr_call module_name env (local_name name) ty asserted_ty args
   | None ->
-     err ("No callable with this name: " ^ (qident_debug_name name))
+     (* Otherwise, find a callable from the environment. *)
+     (match get_callable env module_name (qident_to_sident name) with
+      | Some callable ->
+         augment_callable module_name env name callable asserted_ty args
+      | None ->
+         err ("No callable with this name: " ^ (qident_debug_name name)))
+
+and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
+  (* Because function pointers don't preserve value parameter names, we can't
+     accept named argument lists. *)
+  let args: texpr list =
+    match args with
+    | TPositionalArglist args -> args
+    | TNamedArglist _ ->
+       err "You can't call a function pointer with a named argument list, because function pointers don't preserve parameter names, so we wouldn't know how to assign arguments to parameters."
+  in
+  (* We extract the parameter types and return type from the function pointer
+     type. *)
+  let (paramtys, rt): (ty list * ty) =
+    match fn_ptr_ty with
+    | FnPtr (paramtys, rt) -> (paramtys, rt)
+    | _ -> err "Trying to call something that isn't a function pointer type."
+  in
+  (* Then, we synthesize a parameter list from the function pointer type. The
+     parameter names are fake, but this is so we can reuse the arity-checking,
+     value parameter list-checking infrastructure we use elsewhere. *)
+  let params: value_parameter list = List.map (fun paramty -> ValueParameter (make_ident "fake", paramty)) paramtys in
+  (* Check synthetic parameter list against argument list. *)
+  let bindings = check_argument_list env module_name params args in
+  (* Use the bindings to get the effective return type *)
+  let rt' = replace_variables bindings rt in
+  let (bindings', rt'') = handle_return_type_polymorphism env module_name name params rt' asserted_ty bindings in
+  let arguments = cast_arguments bindings' params args in
+  TFptrCall (name, arguments, rt'')
 
 and augment_callable (module_name: module_name) (env: env) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
   with_frame "Augment callable"
@@ -449,7 +468,7 @@ and augment_function_call (env: env) (module_name: module_name) (id: decl_id) na
       (* For simplicity, and to reduce duplication of code, we convert the argument
          list to a positional list. *)
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-      let arguments = arglist_to_positional (args, param_names) in
+      let arguments: texpr list = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
       let bindings = check_argument_list env module_name params arguments in
       (* Use the bindings to get the effective return type *)
@@ -728,7 +747,7 @@ and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
       and u = typaram_universe tp
       in
       (match get_binding bindings tp with
-                    | Some ty ->
+       | Some ty ->
           if universe_compatible u (type_universe ty) then
             ()
           else
@@ -1128,6 +1147,8 @@ and is_constant = function
      false
   | TVarMethodCall _ ->
      false
+  | TFptrCall _ ->
+     false
   | TCast _ ->
      true
   | TComparison (_, lhs, rhs) ->
@@ -1192,6 +1213,10 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
                  err "Can't declare a foreign function in a safe module."
              else
                err "Foreign functions can't have type parameters."
+          | [ForeignExportPragma _] ->
+             let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
+             let body' = augment_stmt ctx body in
+             TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
           | [] ->
              let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
              let body' = augment_stmt ctx body in

@@ -12,4 +12,8 @@ val gen_ident : identifier -> string
 
 val gen_module_name : module_name -> string
 
+val c_string_type : c_ty
+
+val fn_type : c_ty
+
 val gen_module : env -> mono_module -> c_unit

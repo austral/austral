@@ -1,0 +1,12 @@
+module body Test is
+    function adder(x: Int32, y: Int32): Int32 is
+        return x + y;
+    end;
+
+    function main(): ExitCode is
+        let f: Fn[Int32, Int32, Int32] := adder;
+        let result: Int32 := f(10, 20);
+        printLn(result);
+        return ExitSuccess();
+    end;
+end module body.

@@ -23,6 +23,7 @@ end;
         printLn(maximum_int64);
         printLn(3.14 : Float64);
         printLn(3.14 : Float64);
+        printLn("");
         printLn("Hello, world!");
         return ExitSuccess();
     end;
