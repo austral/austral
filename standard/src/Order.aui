@@ -5,36 +5,36 @@ module Standard.Order is
     """
     Represents the result of comparing the order of two values.
     """
-	union Ordering: Free is
-		case LessThan;
-		case Equal;
-		case GreaterThan;
-	end;
+    union Ordering: Free is
+        case LessThan;
+        case Equal;
+        case GreaterThan;
+    end;
 
     """
     Represents the result of comparing two values for (partial) order.
     """
-	union PartialOrdering: Free is
-		case Comparable is
-			order: Ordering;
-		case Incomparable;
-	end;
+    union PartialOrdering: Free is
+        case Comparable is
+            order: Ordering;
+        case Incomparable;
+    end;
 
     """
     Represents a partial order.
     """
-	typeclass PartialOrder(T: Type) is
+    typeclass PartialOrder(T: Type) is
         generic [R: Region, S: Region]
-		method partialCompare(a: &[T, R], b: &[T, S]): PartialOrdering;
-	end;
+        method partialCompare(a: &[T, R], b: &[T, S]): PartialOrdering;
+    end;
 
     """
     Represents a total order.
     """
-	typeclass TotalOrder(T: Type) is
+    typeclass TotalOrder(T: Type) is
         generic [R: Region, S: Region]
-		method compare(a: &[T, R], b: &[T, S]): Ordering;
-	end;
+        method compare(a: &[T, R], b: &[T, S]): Ordering;
+    end;
 
     generic [T: Type(TotalOrder), R: Region, S: Region]
     function equal(a: &[T, R], b: &[T, S]): Bool;
