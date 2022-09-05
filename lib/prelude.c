@@ -59,27 +59,31 @@ void* au_stderr() {
 #endif
 }
 
-au_unit_t au_print_error(const char * message) 
-{
+au_unit_t au_abort_internal(const char* message) {
   extern int fprintf(void* stream, const char* format, ...);
   extern int fflush(void* stream);
-  void* stderr = au_stderr();
-  fprintf(stderr, "%s", message);
-  fflush(stderr);
-  return nil;
-}
-
-
-au_unit_t au_abort_internal(const char* message) {
   extern void _Exit(int status);
-  au_print_error(message);
-  au_print_error("\n");
+
+  void* stderr = au_stderr();
+
+  fprintf(stderr, "%s\n", message);
+  fflush(stderr);
   _Exit(-1);
+
   return nil;
 }
 
 au_unit_t au_abort(au_array_t message) {
-  return au_abort_internal((const char *)message.data);
+  extern int fprintf(void* stream, const char* format, ...);
+  extern int fflush(void* stream);
+  extern void _Exit(int status);
+
+  void* stderr = au_stderr();
+
+  fprintf(stderr, "%s\n", (char*) message.data);
+  fflush(stderr);
+  _Exit(-1);
+  return nil;
 }
 
 void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size) {
