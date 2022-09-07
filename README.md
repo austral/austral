@@ -2,8 +2,6 @@
 
 ![Build status badge](https://github.com/austral/austral/actions/workflows/build-and-test.yml/badge.svg)
 
-**Not done yet.**
-
 Austral is a new language.
 
 Features:
