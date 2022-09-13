@@ -97,6 +97,17 @@ module body Standard.Buffer is
         return load(positiveOffset(arr, index));
     end;
 
+    generic [T: Free, R: Region]
+    function nthOpt(buffer: &[Buffer[T], R], index: Index): Option[T] is
+        if index >= bufferSize(buffer) then
+            return None();
+        else
+            let arr: Pointer[T] := !(buffer->array);
+            let val: T := load(positiveOffset(arr, index));
+            return Some(value => val);
+        end if;
+    end;
+
     ---
     --- Internal.
     ---

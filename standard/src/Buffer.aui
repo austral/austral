@@ -55,4 +55,12 @@ module Standard.Buffer is
     """
     generic [T: Free, R: Region]
     function nthFree(buffer: &[Buffer[T], R], index: Index): T;
+
+    """
+    Retrieve the nth element of a Buffer of free elements.
+
+    Returns `None` if the index is out of bounds.
+    """
+    generic [T: Free, R: Region]
+    function nthOpt(buffer: &[Buffer[T], R], index: Index): Option[T];
 end module.
