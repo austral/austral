@@ -85,4 +85,14 @@ module body Standard.Buffer is
     function bufferSize(buffer: &[Buffer[T], R]): Index is
         return !(buffer->size);
     end;
+
+    ---
+    --- Retrieval functions.
+    ---
+
+    generic [T: Free, R: Region]
+    function nthFree(buffer: &[Buffer[T], R], index: Index): T is
+        let arr: Pointer[T] := !(buffer->array);
+        return load(positiveOffset(arr, index));
+    end;
 end module body.

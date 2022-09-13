@@ -39,4 +39,14 @@ module Standard.Buffer is
     """
     generic [T: Free, R: Region]
     function bufferSize(buffer: &[Buffer[T], R]): Index;
+
+    -- Retrieval functions.
+
+    """
+    Retrieve the nth element of a Buffer of free elements.
+
+    Abort if the index is out of bounds.
+    """
+    generic [T: Free, R: Region]
+    function nthFree(buffer: &[Buffer[T], R], index: Index): T;
 end module.
