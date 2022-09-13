@@ -26,6 +26,12 @@ module Standard.Buffer is
     generic [T: Free]
     function destroyFree(buffer: Buffer[T]): Unit;
 
+    """
+    Destroy an empty buffer.
+    """
+    generic [T: Type]
+    function destroyEmpty(buffer: Buffer[T]): Unit;
+
     -- Query functions.
 
     """
