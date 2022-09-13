@@ -92,7 +92,19 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function nthFree(buffer: &[Buffer[T], R], index: Index): T is
+        checkInBounds(buffer, index);
         let arr: Pointer[T] := !(buffer->array);
         return load(positiveOffset(arr, index));
+    end;
+
+    ---
+    --- Internal.
+    ---
+
+    generic [T: Free, R: Region]
+    function checkInBounds(buffer: &[Buffer[T], R], index: Index): T is
+        if index >= bufferSize(buffer) then
+            abort("Index out of bounds.");
+        end if;
     end;
 end module body.
