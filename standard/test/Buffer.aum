@@ -2,7 +2,9 @@ import Standard.Buffer (
     Buffer,
     initialize,
     destroyFree,
-    bufferSize
+    bufferSize,
+    nthFree,
+    nthOpt
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -16,6 +18,8 @@ module body Standard.Test.Buffer is
     function bufferTestSuite(): Unit is
         suiteHeading("Standard.Buffer");
         basicLifecycleTest();
+        nthFreeTest();
+        nthOptTest();
         return nil;
     end;
 
@@ -24,6 +28,48 @@ module body Standard.Test.Buffer is
         let opt: Option[Buffer[Int32]] := initialize(size => 10, initialElement => 10);
         case opt of
             when Some(value as buffer: Buffer[Int32]) do
+                 destroyFree(buffer);
+                 assertSuccess("destroyFree succeeded");
+            when None do
+                 assertFailure("initialize failed.");
+        end case;
+        return nil;
+    end;
+
+    function nthFreeTest(): Unit is
+        testHeading("nthFree");
+        let opt: Option[Buffer[Int32]] := initialize(size => 10, initialElement => 10);
+        case opt of
+            when Some(value as buffer: Buffer[Int32]) do
+                 let first: Int32 := nthFree(&buffer, 0);
+                 assertTrue((first = 10), "`first` equals 10");
+                 let last: Int32 := nthFree(&buffer, 9);
+                 assertTrue((last = 10), "`last` equals 10");
+                 destroyFree(buffer);
+                 assertSuccess("destroyFree succeeded");
+            when None do
+                 assertFailure("initialize failed.");
+        end case;
+        return nil;
+    end;
+
+    function nthOptTest(): Unit is
+        testHeading("nthOpt");
+        let opt: Option[Buffer[Int32]] := initialize(size => 10, initialElement => 10);
+        case opt of
+            when Some(value as buffer: Buffer[Int32]) do
+                 case nthOpt(&buffer, 0) of
+                     when Some(value as first: Int32) do
+                          assertTrue((first = 10), "`first` equals 10");
+                     when None do
+                          assertFailure("nthOpt failed.");
+                 end case;
+                 case nthOpt(&buffer, 10) of
+                     when Some(value as first: Int32) do
+                         assertFailure("nthOpt failed.");
+                     when None do
+                         assertSuccess("nthOpt with index = 10 returns None.");
+                 end case;
                  destroyFree(buffer);
                  assertSuccess("destroyFree succeeded");
             when None do

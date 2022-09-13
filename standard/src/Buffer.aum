@@ -67,6 +67,16 @@ module body Standard.Buffer is
         return nil;
     end;
 
+    generic [T: Type]
+    function destroyEmpty(buffer: Buffer[T]): Unit is
+        let { capacity: Index, size: Index, array: Pointer[T] } := buffer;
+        if size /= 0 then
+            abort("destroyEmpty called with a non-empty buffer.");
+        end if;
+        deallocate(array);
+        return nil;
+    end;
+
     --
     -- Query functions.
     --
@@ -74,5 +84,38 @@ module body Standard.Buffer is
     generic [T: Free, R: Region]
     function bufferSize(buffer: &[Buffer[T], R]): Index is
         return !(buffer->size);
+    end;
+
+    ---
+    --- Retrieval functions.
+    ---
+
+    generic [T: Free, R: Region]
+    function nthFree(buffer: &[Buffer[T], R], index: Index): T is
+        checkInBounds(buffer, index);
+        let arr: Pointer[T] := !(buffer->array);
+        return load(positiveOffset(arr, index));
+    end;
+
+    generic [T: Free, R: Region]
+    function nthOpt(buffer: &[Buffer[T], R], index: Index): Option[T] is
+        if index >= bufferSize(buffer) then
+            return None();
+        else
+            let arr: Pointer[T] := !(buffer->array);
+            let val: T := load(positiveOffset(arr, index));
+            return Some(value => val);
+        end if;
+    end;
+
+    ---
+    --- Internal.
+    ---
+
+    generic [T: Free, R: Region]
+    function checkInBounds(buffer: &[Buffer[T], R], index: Index): T is
+        if index >= bufferSize(buffer) then
+            abort("Index out of bounds.");
+        end if;
     end;
 end module body.
