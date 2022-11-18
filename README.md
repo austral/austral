@@ -51,7 +51,7 @@ Anti-features:
 
 Calculate and print the 10th Fibonacci number:
 
-```
+```ml
 module body Fib is
     function fib(n: Nat64): Nat64 is
         if n < 2 then
