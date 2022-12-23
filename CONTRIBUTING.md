@@ -28,6 +28,26 @@ $ ./run-tests.sh
 
 ## Contribution Areas
 
+This section documents the areas where contributions are currently needed.
+
+### Compiler Diagnostics
+
+[WIP]
+
+### Tutorials
+
+[WIP]
+
+### Example Programs
+
+[WIP]
+
+### Standard Library
+
+[WIP]
+
+### Compiler Documentation
+
 [WIP]
 
 # Testing
