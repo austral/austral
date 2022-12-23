@@ -6,7 +6,7 @@ open an issue or a PR. Thank you for considering a contribution!
 
 Communication channels:
 
-- [GithHub Issues][issues]
+- [GitHub Issues][issues]
 
 [issues]: https://github.com/austral/austral/issues
 
