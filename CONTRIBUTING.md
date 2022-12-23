@@ -13,7 +13,7 @@ Communication channels:
 For bug reports, questions, and feature requests, please open an issue
 [here][issues].
 
-# Development Environment
+## Development Environment
 
 Short version:
 
