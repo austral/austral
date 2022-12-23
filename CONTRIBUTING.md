@@ -32,7 +32,38 @@ This section documents the areas where contributions are currently needed.
 
 ### Compiler Diagnostics
 
-[WIP]
+- **Where:**
+  - https://github.com/austral/austral/tree/master/lib
+  - https://github.com/austral/austral/blob/master/lib/Error.mli
+  - https://github.com/austral/austral/blob/master/lib/ErrorText.mli
+
+The primary purpose of a compiler is to provide clear and useful diagnostics and
+error messages.
+
+This area is one where improvements can always be made, so there's infinite room
+for contributions. Also, there is plenty of low-hanging fruit: many of the fixes
+in this area are simple and can have a big impact on the user experience.
+
+The infrastructure for writing structured, informative error messages is already
+in place, so this is simply a matter of putting in the effort to identify and
+fix problems with the current error messages.
+
+Contributions from the community are most welcome. If you don't have the time or
+knowledge to open a PR to fix an error message, it is good enough to just open
+an issue to raise than an error message you encountered was confusing or had
+insufficient context.
+
+Specific contribution areas:
+
+- **Improvement:** improving existing error messages by clarifying the text and
+  adding more contextual information.
+
+- **Editing:** clarifying the prose in error messages to make them clearer to
+  understand.
+
+Open issues:
+
+- https://github.com/austral/austral/issues/302
 
 ### Tutorials
 
