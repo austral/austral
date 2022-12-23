@@ -175,19 +175,7 @@ $ gcc -fwrapv generated.c -lm
 
 ## Contributing
 
-If you find a bug, or something that works unintuitively, please [open an
-issue](https://github.com/austral/austral/issues/new). It helps improve the
-experience for future users.
-
-The easiest thing to work on is [improving the compiler's
-diagnostics](https://github.com/austral/austral/issues/256). It's usually fairly
-easy to improve an error message significantly.
-
-You can also try adding [more end-to-end tests to the
-compiler](https://github.com/austral/austral/tree/master/test-programs/suites),
-or write [text for the website](https://austral-lang.org/), such as for the
-[tutorial](https://austral-lang.org/tutorial/) or the [example
-programs](https://austral-lang.org/examples/).
+See: [`CONTRIBUTING.md`](https://github.com/austral/austral/blob/master/CONTRIBUTING.md)
 
 ## Roadmap
 

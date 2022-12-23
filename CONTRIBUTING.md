@@ -10,6 +10,22 @@ Communication channels:
 
 [issues]: https://github.com/austral/austral/issues
 
+## Short Version
+
+If you find a bug, or something that works unintuitively, please [open an
+issue](https://github.com/austral/austral/issues/new). It helps improve the
+experience for future users.
+
+The easiest thing to work on is [improving the compiler's
+diagnostics](https://github.com/austral/austral/issues/256). It's usually fairly
+easy to improve an error message significantly.
+
+You can also try adding [more end-to-end tests to the
+compiler](https://github.com/austral/austral/tree/master/test-programs/suites),
+or write [text for the website](https://austral-lang.org/), such as for the
+[tutorial](https://austral-lang.org/tutorial/) or the [example
+programs](https://austral-lang.org/examples/).
+
 ## How to Contribute
 
 For bug reports, questions, and feature requests, please open an issue
@@ -38,6 +54,7 @@ This section documents the areas where contributions are currently needed.
   - https://github.com/austral/austral/tree/master/lib
   - https://github.com/austral/austral/blob/master/lib/Error.mli
   - https://github.com/austral/austral/blob/master/lib/ErrorText.mli
+  - https://github.com/austral/austral/issues/256
 
 The primary purpose of a compiler is to provide clear and useful diagnostics and
 error messages.
