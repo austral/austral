@@ -112,7 +112,28 @@ small, but we hope it will grow and help new users understand the language.
 
 ### Standard Library
 
-[WIP]
+- **Where:**
+  - https://github.com/austral/austral/tree/master/standard
+
+The standard library largely does not exist. So contributions here involve:
+
+- Thinking and debating what the APIs should be.
+- Thinking about how well-known data structures and interfaces from other
+  programming languages have to be adjusted to leverage linear types and
+  capability-based security (e.g.: what does a capability-secure filesystem API
+  look like?).
+- Implementing the standard library interfaces.
+- Writing unit tests for the existing standard library code.
+
+If you have strong opinions about standard library APIs, or if you know any
+mistakes that other programming languages have made that you don't want to see
+repeated, we want to hear from you. Or if you just like implementing data
+structures, that's useful too.
+
+Since both linear types and capability-based security are fairly unique
+features, there's not much prior art here to imitate, so we welcome
+contributions from everyone as well as new ideas and approaches.
+
 
 ### Compiler Documentation
 
