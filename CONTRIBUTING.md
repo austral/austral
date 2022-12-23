@@ -1,6 +1,8 @@
 # Contributing
 
-This document describes how and where to contribute to Austral.
+This document describes how and where to contribute to Austral. We welcome
+contributions from anyone: you don't have to be a member of the community to
+open an issue or a PR. Thank you for considering a contribution!
 
 Communication channels:
 
