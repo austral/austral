@@ -36,6 +36,12 @@ Every push runs a [GitHub Actions workflow][ci]. This builds the compiler and
 runs the OCaml tests, the end-to-end tests, the examples, and the standard
 library tests.
 
+To run the tests manually, just run:
+
+```bash
+$ ./run-tests.sh
+```
+
 [ci]: https://github.com/austral/austral/blob/master/.github/workflows/build-and-test.yml
 
 # Reviews
