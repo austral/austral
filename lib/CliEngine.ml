@@ -101,7 +101,7 @@ and print_compile_usage _: unit =
   print_endline "    --output        Path to the output file.";
   print_endline "    --entrypoint    The name of the entrypoint function, in the";
   print_endline "                    format `<module nae>:<function name>`.";
-  print_endline "    --no-entrypint  Don't compile an entrypoint. Incompatible with";
+  print_endline "    --no-entrypoint  Don't compile an entrypoint. Incompatible with";
   print_endline "                    `bin` target.";
   print_endline "";
   print_endline "Positional arguments:";
