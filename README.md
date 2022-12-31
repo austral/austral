@@ -191,6 +191,10 @@ or write [text for the website](https://austral-lang.org/), such as for the
 [tutorial](https://austral-lang.org/tutorial/) or the [example
 programs](https://austral-lang.org/examples/).
 
+## Community
+
+- [Discord](https://discord.gg/8cEuAcD8pM)
+
 ## Roadmap
 
 Currently:
