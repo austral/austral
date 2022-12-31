@@ -204,7 +204,7 @@ Near-future work:
 
 # License
 
-Copyright 2018–2022 [Fernando Borretti][fernando].
+Copyright 2018–2023 [Fernando Borretti][fernando].
 
 Licensed under the GPLv3 license. See the COPYING file for details.
 
