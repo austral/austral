@@ -170,29 +170,33 @@ $ gcc -fwrapv generated.c -lm
    limitation is it does not support separate compilation. In practice this is
    not a problem: there's not enough Austral code for this to matter.
 
-2. A standard library with a few basic data structures and capability-based
+2. The compiler implements every feature of the spec.
+
+3. A standard library with a few basic data structures and capability-based
    filesystem access is being designed.
 
 ## Contributing
 
 See: [`CONTRIBUTING.md`](https://github.com/austral/austral/blob/master/CONTRIBUTING.md)
 
+## Community
+
+- [Discord](https://discord.gg/8cEuAcD8pM)
+
 ## Roadmap
 
 Currently:
 
-- Working on [release 0.0.7](https://github.com/austral/austral/issues/290),
-  when the core language can be considered done.
+- Expanding the [standard
+  library](https://github.com/austral/austral/tree/master/standard).
 
 Near-future work:
 
-- Expanding the [standard
-  library](https://github.com/austral/austral/tree/master/standard).
 - Build tooling and package manager.
 
 # License
 
-Copyright 2018–2022 [Fernando Borretti][fernando].
+Copyright 2018–2023 [Fernando Borretti][fernando].
 
 Licensed under the GPLv3 license. See the COPYING file for details.
 
