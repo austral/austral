@@ -1,0 +1,1 @@
+Unit test showcasing summation over a fixed array.

@@ -1,0 +1,14 @@
+module body Test is
+    function sum(array: FixedArray[Nat8]) : Nat8 is
+        let res : Nat8 := 0;
+        for i from 0 to fixedArraySize(array) - 1 do
+            res := res + (array[i]);
+        end for;
+        return res;
+    end;
+
+    function main(): ExitCode is
+        printLn(sum("000")); -- 48 + 48 + 48
+        return ExitSuccess();
+    end;
+end module body.
