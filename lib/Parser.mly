@@ -380,6 +380,7 @@ atomic_expression:
   | int_constant { $1 }
   | float_constant { $1 }
   | string_constant { $1 }
+  | path { $1 }
   | variable { $1 }
   | funcall { $1 }
   | parenthesized_expr { $1 }
@@ -443,7 +444,6 @@ intrinsic:
   ;
 
 compound_expression:
-  | path { $1 }
   | atomic_expression comp_op atomic_expression { CComparison (from_loc $loc, $2, $1, $3) }
   | atomic_expression AND atomic_expression { CConjunction (from_loc $loc, $1, $3) }
   | atomic_expression OR atomic_expression { CDisjunction (from_loc $loc, $1, $3) }
