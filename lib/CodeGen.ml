@@ -265,7 +265,7 @@ and gen_path (mn: module_name) (expr: c_expr) (elems: mtyped_path_elem list): c_
      let expr' = gen_path_elem mn expr elem in
      gen_path mn expr' rest
   | [] ->
-     err "Empty path"
+     expr
 
 and gen_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_path_elem): c_expr =
   match elem with

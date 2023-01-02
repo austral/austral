@@ -876,19 +876,28 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            (fun _ ->
              (match get_var lexenv var with
               | Some (var_ty, _) ->
-                 let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
-                 let value = augment_expr module_name env rm typarams lexenv None value in
-                 let path = TPath {
-                                head = value;
-                                elems = elems;
-                                ty = get_path_ty_from_elems elems
-                              }
-                 in
-                 let universe = type_universe (get_type path) in
-                 if universe = FreeUniverse then
-                   TAssign (span, TypedLValue (var, elems), value)
-                 else
-                   err "Paths must end in the free universe"
+                 (match elems with
+                  | [] ->
+                     let value = augment_expr module_name env rm typarams lexenv None value in
+                     let universe = type_universe (get_type value) in
+                     if universe = FreeUniverse then
+                       TAssign (span, TypedLValue (var, []), value)
+                     else
+                       err "L-values must end in the free universe"
+                  | elems ->
+                     let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
+                     let value = augment_expr module_name env rm typarams lexenv None value in
+                     let path = TPath {
+                                    head = value;
+                                    elems = elems;
+                                    ty = get_path_ty_from_elems elems
+                                  }
+                     in
+                     let universe = type_universe (get_type path) in
+                     if universe = FreeUniverse then
+                       TAssign (span, TypedLValue (var, elems), value)
+                     else
+                       err "L-values must end in the free universe")
               | None ->
                  err "No var with this name."))
       | AIf (span, c, t, f) ->

@@ -338,7 +338,7 @@ binding:
   ;
 
 lvalue:
-  | n=identifier elems=path_rest+ { ConcreteLValue (n, elems) }
+  | n=identifier elems=path_rest* { ConcreteLValue (n, elems) }
 
 when_stmt:
   | WHEN identifier LPAREN binding_list RPAREN DO block { ConcreteWhen ($2, $4, $7) }
