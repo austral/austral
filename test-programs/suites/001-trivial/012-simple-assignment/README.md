@@ -1,0 +1,1 @@
+Test that updating a variable works.
