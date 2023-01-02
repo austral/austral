@@ -19,7 +19,7 @@ In prioritizing these, I realized that the tutorial and the standard library inv
 So, here's the broad roadmap for Q1, sorted by decreasing priority.
 
 1. Improve the tutorial, add a lot more content on defining generic datatypes. At least an example of a linked list.
-2. Write some of the standard library.
+2. Write some of the standard library: broadly-useful type classes, generic containers and algorithms, file and terminal I/O. No need to go crazy with capabilities yet.
 3. A really basic build system.
 
 Stretch goals:
