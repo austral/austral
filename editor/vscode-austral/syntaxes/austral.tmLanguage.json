@@ -1,0 +1,38 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Austral",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.austral",
+					"match": "\\b(if|case|while|for|return)\\b"
+				},
+				{
+					"name": "keyword.other.austral",
+					"match": "\\b(end\\s+if|end\\s+case|end\\s+while|end\\s+for|end|from|to|do|of|let|then|else|else\\s+if|is|module\\s+body|end\\s+module\\s+body|module|end\\s+module|generic|method|function|instance|pragma|constant|record|union|typeclass|import|when)\\b"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.austral",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.austral",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.austral"
+}
