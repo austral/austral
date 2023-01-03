@@ -7,6 +7,9 @@
 		},
 		{
 			"include": "#strings"
+		},
+		{
+			"include": "#triplestrings"
 		}
 	],
 	"repository": {
@@ -26,6 +29,17 @@
 			"name": "string.quoted.double.austral",
 			"begin": "\"",
 			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.austral",
+					"match": "\\\\."
+				}
+			]
+		},
+		"triplestrings": {
+			"name": "string.quoted.triple.austral",
+			"begin": "\"\"\"",
+			"end": "\"\"\"",
 			"patterns": [
 				{
 					"name": "constant.character.escape.austral",
