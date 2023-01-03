@@ -175,7 +175,7 @@ let rec get_type (e: mexpr): mono_ty =
       | MonoWriteRef (t, _) ->
          t
       | _ ->
-         err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
+         internal_err ("a dereference expression was constructed whose argument is not a reference type."))
   | MTypecast (_, ty) ->
      ty
   | MSizeOf _ ->

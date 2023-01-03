@@ -87,7 +87,7 @@ let rec get_type = function
       | WriteRef (t, _) ->
          t
       | _ ->
-         err ("Internal error: a dereference expression was constructed whose argument is not a reference type."))
+         internal_err ("a dereference expression was constructed whose argument is not a reference type."))
   | TSizeOf _ ->
      Integer (Unsigned, WidthByteSize)
   | TBorrowExpr (mode, _, region, ty) ->

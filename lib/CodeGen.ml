@@ -145,7 +145,7 @@ let rec gen_type (ty: mono_ty): c_ty =
   | MonoFnPtr _ ->
      fn_type
   | MonoRegionTyVar _ ->
-     err "internal"
+     internal_err "Invalid C type"
 
 (* Expressions *)
 
@@ -155,7 +155,7 @@ let union_type_id = function
   | MonoNamedType id ->
      id
   | _ ->
-     err "Internal error: Union is not a named type?"
+     internal_err "Union is not a named type?"
 
 (* Given the ID of a union type, returns the name of the
    union's tag enum. *)
@@ -388,11 +388,11 @@ let get_original_module_name (env: env) (id: mono_id): module_name =
           | Some (ModRec { name; _ }) ->
              name
           | _ ->
-             err "Internal")
+             internal_err "Couldn't get module record")
       | _ ->
-         err "internal")
+         internal_err "Couldn't get function")
   | _ ->
-     err "internal"
+     internal_err "Couldn't get monomorph"
 
 let rec mono_desc (env: env) (id: mono_id): string =
   let mono = get_mono_or_die env id in
@@ -411,7 +411,7 @@ and get_mono_or_die (env: env) (id: mono_id): monomorph =
   | Some mono ->
      mono
   | None ->
-     err "internal"
+     internal_err "Couldn't get monomorph"
 
 and get_decl_name_or_die (env: env) (id: decl_id): string =
   match get_decl_by_id env id with
@@ -422,7 +422,7 @@ and get_decl_name_or_die (env: env) (id: decl_id): string =
       | None ->
          err "decl has no name")
   | None ->
-     err "internal"
+     internal_err "Couldn't find decl"
 
 and tyargs_string (args: mono_type_bindings): string =
   "["

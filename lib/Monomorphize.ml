@@ -84,9 +84,9 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
              let (env, mono_id) = add_or_get_union_monomorph env id bindings in
              (MonoNamedType mono_id, env)
           | _ ->
-             err "internal: named type points to something that isn't a type")
+             internal_err ("named type `" ^ (qident_debug_name name) ^ "`points to something that isn't a type"))
       | None ->
-         err "internal")
+         internal_err ("Couldn't get declaration for named type `" ^ (qident_debug_name name) ^ "`."))
   | SFnPtr (args, rt) ->
      let (args, env) = monomorphize_ty_list env args in
      let (rt, env) = monomorphize_ty env rt in
@@ -207,13 +207,21 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      let arguments' = cast_arguments instance_bindings params' args in
      let typarams = (match instance with
                      | Instance { typarams; _ } -> typarams
-                     | _ -> err "Internal")
+                     | _ -> internal_err ("Couldn't find instance for var method call `"
+                                          ^ (qident_debug_name method_name)
+                                          ^ "` with typeclass ID `"
+                                          ^ (show_decl_id typeclass_id)
+                                          ^ "`."))
      in
      let instance_id: decl_id = decl_id instance in
      let meth_id: ins_meth_id =
        (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name method_name) with
         | Some (InsMethRec { id; _ }) -> id
-        | None -> err "Internal")
+        | None -> internal_err ("Couldn't find instance method from instance ID `"
+                                ^ (show_decl_id instance_id)
+                                ^ "` and method name `"
+                                ^ (method_name |> original_name |> ident_string)
+                                ^ "`."))
      in
      ps ("Bindings", show_bindings bindings);
      let substs = make_substs2 instance_bindings typarams in
@@ -667,14 +675,14 @@ and get_record_definition (env: env) (id: decl_id): (typarams * typed_slot list)
   | Some (Record { typarams; slots; _ }) ->
      (typarams, slots)
   | _ ->
-     err "internal"
+     internal_err ("couldn't get record definition for ID `" ^ (show_decl_id id) ^ "`.")
 
 and get_union_typarams (env: env) (id: decl_id): typarams =
   match get_decl_by_id env id with
   | Some (Union { typarams; _ }) ->
      typarams
   | _ ->
-     err "internal"
+     internal_err ("couldn't get union typeparams for ID `" ^ (show_decl_id id) ^ "`.")
 
 and get_union_typed_cases (env: env) (union_id: decl_id): typed_case list =
   let cases: decl list = get_union_cases env union_id in
@@ -683,20 +691,20 @@ and get_union_typed_cases (env: env) (union_id: decl_id): typed_case list =
     | UnionCase { name; slots; _ } ->
        TypedCase (name, slots)
     | _ ->
-       err "Internal: not a union"
+       internal_err ("ID `" ^ (show_decl_id union_id) ^ "` is not a union")
   in
   List.map mapper cases
 
 and get_function_definition (env: env) (id: decl_id): (typarams * value_parameter list * ty * tstmt) =
   match get_decl_by_id env id with
-  | Some (Function { typarams; value_params; rt; body; _ }) ->
+  | Some (Function { name; typarams; value_params; rt; body; _ }) ->
      (match body with
       | Some body ->
          (typarams, value_params, rt, body)
       | None ->
-         err "internal: function has no body")
+         internal_err ("function `" ^ (ident_string name) ^ "` has no body"))
   | _ ->
-     err "internal"
+     internal_err ("ID `" ^ (show_decl_id id) ^ "is not a function")
 
 and get_method_definition (env: env) (id: ins_meth_id): (typarams * value_parameter list * ty * tstmt) =
   match get_instance_method env id with
@@ -707,11 +715,11 @@ and get_method_definition (env: env) (id: ins_meth_id): (typarams * value_parame
           | Some body ->
              (typarams, value_params, rt, body)
           | None ->
-             err "internal: method has no body")
+             internal_err ("method with ID `" ^ (show_decl_id instance_id) ^ "` has no body"))
       | _ ->
-         err "internal: not an instance")
+         internal_err ("ID `" ^ (show_decl_id instance_id) ^ "`not an instance"))
   | _ ->
-     err "internal"
+     internal_err ("ID `" ^ (show_ins_meth_id id) ^ "`not an instance method")
 
 and monomorphize_slot_list (env: env) (slots: typed_slot list): (env * mono_slot list) =
   let names: identifier list = List.map (fun (TypedSlot (n, _)) -> n) slots in

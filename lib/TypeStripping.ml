@@ -26,7 +26,7 @@ let rec strip_type (ty: ty): stripped_ty =
   | Some ty ->
      ty
   | None ->
-     err "strip_type called with a region type as its argument"
+     internal_err "strip_type called with a region type as its argument"
 
 and strip_type' (ty: ty): stripped_ty option =
   match ty with
@@ -47,7 +47,7 @@ and strip_type' (ty: ty): stripped_ty option =
       | Some elem_ty ->
          Some (SStaticArray elem_ty)
       | None ->
-         err "Internal: array instantiated with a region type.")
+         internal_err "array instantiated with a region type.")
   | RegionTy r ->
      Some (SRegionTy r)
   | ReadRef (ty, r) ->
@@ -57,9 +57,9 @@ and strip_type' (ty: ty): stripped_ty option =
           | Some r ->
              Some (SReadRef (ty, r))
           | None ->
-             err "internal")
+             internal_err "unable to strip read ref type")
       | None ->
-         err "Internal: read ref instantiated with a region type.")
+         internal_err "read ref instantiated with a region type.")
   | WriteRef (ty, r) ->
      (match (strip_type' ty) with
       | Some ty ->
@@ -67,9 +67,9 @@ and strip_type' (ty: ty): stripped_ty option =
           | Some r ->
              Some (SWriteRef (ty, r))
           | None ->
-             err "internal")
+             internal_err "unable to strip write ref type")
       | None ->
-         err "Internal: write ref instantiated with a region type.")
+         internal_err "write ref instantiated with a region type.")
   | TyVar (TypeVariable (name, u, source, _)) ->
      if u = RegionUniverse then
        Some (SRegionTyVar (name, source))
@@ -85,18 +85,18 @@ and strip_type' (ty: ty): stripped_ty option =
       | Some ty ->
          Some (SAddress ty)
       | None ->
-         err "Internal: Address type instantiated with a region type.")
+         internal_err "Address type instantiated with a region type.")
   | Pointer ty ->
      (match (strip_type' ty) with
       | Some ty ->
          Some (SPointer ty)
       | None ->
-         err "Internal: Pointer type instantiated with a region type.")
+         internal_err "Pointer type instantiated with a region type.")
   | FnPtr (args, rt) ->
      let rt =
        (match strip_type' rt with
         | Some ty -> ty
-        | _ -> err "internal")
+        | _ -> internal_err "Function pointer type instantiated with a region type.")
      in
      Some (SFnPtr (List.filter_map strip_type' args, rt))
   | MonoTy id ->

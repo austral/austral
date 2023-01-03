@@ -360,7 +360,7 @@ let rec store_function_body (env: env) (fn_id: decl_id) (body: tstmt): env =
                     | Some d ->
                        d
                     | _ ->
-                       err "Internal: No function with this ID.")
+                       internal_err ("No function with this ID: " ^ (show_decl_id fn_id)))
   in
   let new_decl: decl = replace_function_body decl body in
   let decls_without_existing_one: decl list = List.filter (fun (d: decl) -> not (equal_decl_id (decl_id d) fn_id)) decls in
@@ -372,11 +372,11 @@ and replace_function_body (decl: decl) (new_body: tstmt): decl =
   | Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body } ->
      (match body with
       | Some _ ->
-         err "Internal: function already has a body"
+         internal_err ("function `" ^ (ident_string name) ^ "` already has a body")
       | None ->
          Function { id; mod_id; vis; name; docstring; typarams; value_params; rt; external_name; body=(Some new_body) })
   | _ ->
-     err "Internal: not a function."
+     internal_err "not a function."
 
 let rec store_method_body (env: env) (ins_meth_id: ins_meth_id) (body: tstmt): env =
   let (Env { files; mods; methods; decls; monos; exports }) = env in
@@ -384,7 +384,7 @@ let rec store_method_body (env: env) (ins_meth_id: ins_meth_id) (body: tstmt): e
                               | Some m ->
                                  m
                               | _ ->
-                                 err "Internal: No instance method with this ID.")
+                                 internal_err ("No instance method with this ID " ^ (show_ins_meth_id ins_meth_id)))
   in
   let new_method: ins_meth_rec = replace_method_body meth body in
   let methods_without_existing_one: ins_meth_rec list = List.filter (fun (InsMethRec { id; _ }) -> not (equal_ins_meth_id id ins_meth_id)) methods in
@@ -395,7 +395,7 @@ and replace_method_body (meth: ins_meth_rec) (new_body: tstmt): ins_meth_rec =
   let (InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body }) = meth in
   (match body with
    | Some _ ->
-      err "Internal: function already has a body"
+      internal_err ("function `" ^ (ident_string name) ^ "` already has a body")
    | None ->
       InsMethRec { id; instance_id; method_id; docstring; name; typarams; value_params; rt; body=(Some new_body) })
 
@@ -543,7 +543,7 @@ let pop_monomorph (env: env) (id: mono_id): (env * monomorph) =
     let env = Env { files; mods; methods; decls; monos = other_monos; exports } in
     (env, mono)
   | None ->
-    err "internal: monomorph with this ID does not exist"
+    internal_err ("monomorph with this ID does not exist: " ^ (show_mono_id id))
 
 let store_record_monomorph_definition (env: env) (id: mono_id) (new_slots: mono_slot list): env =
   let (env, mono) = pop_monomorph env id in
@@ -555,7 +555,7 @@ let store_record_monomorph_definition (env: env) (id: mono_id) (new_slots: mono_
     let env = Env { files; mods; methods; decls; monos = new_mono :: monos; exports } in
     env
   | _ ->
-    err "internal"
+    internal_err ("Couldn't find monomorph record definition with ID: " ^ (show_mono_id id))
 
 let store_union_monomorph_definition (env: env) (id: mono_id) (new_cases: mono_case list): env =
   let (env, mono) = pop_monomorph env id in
@@ -567,7 +567,7 @@ let store_union_monomorph_definition (env: env) (id: mono_id) (new_cases: mono_c
     let env = Env { files; mods; methods; decls; monos = new_mono :: monos; exports } in
     env
   | _ ->
-    err "internal"
+    internal_err ("Couldn't find monomorph union definition with ID: " ^ (show_mono_id id))
 
 let store_function_monomorph_definition (env: env) (id: mono_id) (new_body: mstmt): env =
   let (env, mono) = pop_monomorph env id in
@@ -579,7 +579,7 @@ let store_function_monomorph_definition (env: env) (id: mono_id) (new_body: mstm
     let env = Env { files; mods; methods; decls; monos = new_mono :: monos; exports } in
     env
   | _ ->
-    err "internal"
+    internal_err ("Couldn't find monomorph function definition with ID: " ^ (show_mono_id id))
 
 let store_instance_method_monomorph_definition (env: env) (id: mono_id) (new_body: mstmt): env =
   let (env, mono) = pop_monomorph env id in
@@ -591,7 +591,7 @@ let store_instance_method_monomorph_definition (env: env) (id: mono_id) (new_bod
     let env = Env { files; mods; methods; decls; monos = new_mono :: monos; exports } in
     env
   | _ ->
-    err "internal"
+    internal_err ("Couldn't find monomorph instance method definition with ID: " ^ (show_mono_id id))
 
 let get_instance_method (env: env) (target_id: ins_meth_id): ins_meth_rec option =
   let (Env { methods; _ }) = env in

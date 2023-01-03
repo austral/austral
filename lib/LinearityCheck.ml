@@ -33,7 +33,7 @@ let get_entry_or_fail (tbl: state_tbl) (name: identifier): (loop_depth * var_sta
   match get_entry tbl name with
   | Some p -> p
   | None ->
-     err ("Internal: variable `"
+     internal_err ("variable `"
           ^ (ident_string name)
           ^ "` not in state table. Table contents: \n\n"
           ^ (show_state_tbl tbl))

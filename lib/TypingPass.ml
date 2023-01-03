@@ -449,7 +449,7 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
                                      (* TODO: constructing a fake qident *)
                                      make_qident (module_name_from_id env mod_id, name, name)
                                   | _ ->
-                                     err "Internal")
+                                     internal_err ("no type name found for ID `" ^ (show_decl_id union_id) ^ "`"))
          in
          augment_union_constructor env module_name type_name type_params universe case asserted_ty args
       | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
@@ -457,7 +457,7 @@ and augment_callable (module_name: module_name) (env: env) (name: qident) (calla
                       | Some (TypeClass { param; _ }) ->
                          param
                       | _ ->
-                         err "Internal")
+                         internal_err ("no type parameter found for ID `" ^ (show_decl_id typeclass_id) ^ "`"))
          in
          augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args)
 
@@ -626,19 +626,21 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
              let arguments' = cast_arguments instance_bindings params' arguments in
              let typarams = (match instance with
                              | Instance { typarams; _ } -> typarams
-                             | _ -> err "Internal")
+                             | _ -> internal_err "Couldn't get instance while getting type parameters")
              in
              let instance_id: decl_id = decl_id instance in
              let meth_id: ins_meth_id =
                (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
                 | Some (InsMethRec { id; _ }) -> id
-                | None -> err "Internal")
+                | None -> internal_err ("Couldn't get instance method for `"
+                                       ^ (ident_string (original_name callable_name))
+                                       ^ "`"))
              in
              ps ("Bindings", show_bindings bindings'');
              let substs = make_substs instance_bindings typarams in
              TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs))
       | None ->
-         err "Internal: couldn't extract dispatch type.")
+         internal_err "couldn't extract dispatch type.")
 
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
@@ -671,7 +673,15 @@ and check_argument_list' (env: env) (module_name: module_name) (bindings: type_b
   | ([], []) ->
      bindings
   | _ ->
-     err "Internal"
+   internal_err ("couldn't check argument list in module `"
+                 ^ (mod_name_string module_name)
+                 ^ "` with bindings: "
+                 ^ (show_type_bindings bindings)
+                 ^ ",\n params: `{ "
+                 ^ (String.concat ", " (List.map show_value_parameter params))
+                 ^ " }`,\n and args: `{ "
+                 ^ (String.concat ", " (List.map show_texpr args))
+                 ^ "}`")
 
 and match_parameter (env: env) (module_name: module_name) (param: value_parameter) (arg: texpr): type_bindings =
   let (ValueParameter (_, ty)) = param in

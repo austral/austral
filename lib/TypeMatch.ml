@@ -229,7 +229,7 @@ and get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) 
       | [a] ->
          Some a
       | _::_ ->
-         internal_err "Multiple instances satisfy this call. This is an internal error in the compiler: the compiler should validate that there are no overlapping instances."
+         internal_err "Multiple instances satisfy this call. The compiler should validate that there are no overlapping instances."
       | [] ->
          None)
 

@@ -17,18 +17,18 @@ let get_instance_ref (env: env) (id: decl_id): ins_ref =
           | Some (ModRec { name; _ }) ->
              InsRef { module_name=name; typeclass_name; argument }
           | _ ->
-             err "internal")
+            internal_err "Not in env")
       | _ ->
-         err "internal")
+        internal_err "Not in env")
   | _ ->
-     err "internal"
+     internal_err "Not in env"
 
 let get_method_ref (env: env) (id: ins_meth_id): ins_meth_ref =
   match get_instance_method env id with
   | Some (InsMethRec { instance_id; name; _ }) ->
      InsMethRef (get_instance_ref env instance_id, name)
   | None ->
-     err "internal: Not in env"
+     internal_err "Not in env"
 
 let get_func_ref (env: env) (id: decl_id): named_decl_ref =
   match get_decl_by_id env id with
@@ -40,7 +40,7 @@ let get_func_ref (env: env) (id: decl_id): named_decl_ref =
   | Some _ ->
      err "Not a function"
   | None ->
-     err "internal: Not in env"
+     internal_err "Not in env"
 
 let rec ser_expr (env: env) (expr: texpr): ser_expr =
   let se = ser_expr env in
