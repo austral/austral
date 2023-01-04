@@ -256,6 +256,94 @@
 							"include": "#comment"
 						}
 					]
+				},
+				{
+					"comment": "union declaration",
+					"begin": "(union)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s+(is)",
+					"end": "\\bend\\s*",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.declaration.union.austral storage.type.union.austral"
+						},
+						"2": {
+							"name": "entity.name.type.austral"
+						},
+						"3": {
+							"name": "punctuation.brackets.square.austral"
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#context_type_param_list"
+								}
+							]
+						},
+						"5": {
+							"name": "punctuation.brackets.square.austral"
+						},
+						"6": {
+							"name": "punctuation.colon.austral"
+						},
+						"7": {
+							"name": "entity.name.universe.austral entity.name.type.austral"
+						},
+						"8": {
+							"name": "storage.type.union.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "keyword.other.austral storage.type.union.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#string_triple"
+						},
+						{
+							"match": "\\b(case)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(;)",
+							"captures": {
+								"1": {
+									"name": "keyword.declaration.case.austral storage.type.case.austral"
+								},
+								"2": {
+									"name": "entity.name.type.austral"
+								},
+								"3": {
+									"name": "punctuation.semicolon.austral"
+								}
+							}
+						},
+						{
+							"begin": "\\b(case)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s+(is)",
+							"end": "(?=case|end)",
+							"beginCaptures": {
+								"1": {
+									"name": "keyword.declaration.case.austral storage.type.case.austral"
+								},
+								"2": {
+									"name": "entity.name.type.austral"
+								},
+								"3": {
+									"name": "storage.type.case.austral"
+								}
+							},
+							"patterns": [
+								{
+									"include": "#comment"
+								},
+								{
+									"include": "#string_triple"
+								},
+								{
+									"include": "#slot"
+								}
+							]
+						},
+						{
+							"include": "#comment"
+						}
+					]
 				}
 			]
 		},
