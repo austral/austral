@@ -136,6 +136,68 @@
 							"include": "#typespec"
 						}
 					]
+				},
+				{
+					"comment": "paramaterized type declaration",
+					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\[)(.*)(\\])\\s*(:)\\s(Free|Linear|Type|Region)\\s*;",
+					"captures": {
+						"1": {
+							"name": "keyword.other.austral storage.type.constant.austral"
+						},
+						"2": {
+							"name": "entity.name.type.austral"
+						},
+						"3": {
+							"name": "punctuation.brackets.square.austral"
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#typespec"
+								},
+								{
+									"include": "#comment"
+								},
+								{
+									"match": ",",
+									"name": "punctuation.comma.austral"
+								}
+							]
+						},
+						"5": {
+							"name": "punctuation.brackets.square.austral"
+						},
+						"6": {
+							"name": "punctuation.colon.austral"
+						},
+						"7": {
+							"name": "entity.name.universe.austral entity.name.type.austral"
+						},
+						"8": {
+							"name": "punctuation.semicolon.austral"
+						}
+					}
+				},
+				{
+					"comment": "type declaration",
+					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)\\s*(Free|Linear|Region|Type)\\s*(;)",
+					"captures": {
+						"1": {
+							"name": "keyword.other.austral storage.type.constant.austral"
+						},
+						"2": {
+							"name": "entity.name.type.austral"
+						},
+						"3": {
+							"name": "punctuation.colon.austral"
+						},
+						"4": {
+							"name": "entity.name.universe.austral entity.name.type.austral"
+						},
+						"5": {
+							"name": "punctuation.semicolon.austral"
+						}
+					}
 				}
 			]
 		},
