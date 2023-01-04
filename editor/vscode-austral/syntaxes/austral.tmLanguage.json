@@ -40,18 +40,12 @@
 			"patterns": [
 				{
 					"comment": "paramterized types",
-					"begin": "(?:(&!)|(&))?([a-zA-Z][A-Za-z0-9_]*)(\\[)",
+					"begin": "([a-zA-Z][A-Za-z0-9_]*)(\\[)",
 					"beginCaptures": {
 						"1": {
-							"name": "operator.punctuation.borrow-write.austral"
-						},
-						"2": {
-							"name": "operator.punctuation.borrow-bread.austral"
-						},
-						"3": {
 							"name": "entity.name.type.austral"
 						},
-						"4": {
+						"2": {
 							"name": "punctuation.brackets.square.austral"
 						}
 					},
