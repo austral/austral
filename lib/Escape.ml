@@ -15,7 +15,6 @@ and escape_list lst =
   | ('\\' :: 'r' :: rest) -> '\r' :: (escape_list rest)
   | ('\\' :: 't' :: rest) -> '\t' :: (escape_list rest)
   | ('\\' :: '\'' :: rest) -> '\'' :: (escape_list rest)
-  | ('\\' :: '"' :: '"' :: '"' :: rest) -> '"' :: '"' :: '"' :: (escape_list rest)
   | ('\\' :: '"' :: rest) -> '"' :: (escape_list rest)
   | ('\\' :: '\\' :: rest) -> '\\' :: (escape_list rest)
   | ('\\' :: ' ' :: rest) -> consume_whitespace (' ' :: rest)

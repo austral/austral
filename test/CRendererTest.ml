@@ -9,7 +9,8 @@ let test_render_bool _ =
 
 let test_render_string _ =
   assert_equal (r_e (CString  (escape_string "abcd"))) "\"abcd\"";
-  assert_equal (r_e (CString (escape_string "\""))) "\"\\\"\""
+  assert_equal (r_e (CString (escape_string "\""))) "\"\\\"\"";
+  assert_equal (r_e (CString (escape_string "\"\"\""))) "\"\\\"\\\"\\\"\""
   
   
   let suite =
