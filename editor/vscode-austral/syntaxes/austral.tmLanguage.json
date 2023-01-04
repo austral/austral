@@ -33,8 +33,13 @@
 			]
 		},
 		"comment": {
-			"match": "\\s*--.*",
-			"name": "comment.line.austral"
+			"match": "\\s*(--).*",
+			"name": "comment.line.austral",
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.comment.austral"
+				}
+			}
 		},
 		"typespec": {
 			"patterns": [
