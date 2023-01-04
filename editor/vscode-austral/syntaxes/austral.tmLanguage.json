@@ -346,6 +346,23 @@
 					]
 				},
 				{
+					"begin": "(generic)\\s*(\\[)",
+					"end": "\\]",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.generic.austral"
+						},
+						"2": {
+							"name": "punctuation.brackets.square.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#context_type_param_list"
+						}
+					]
+				},
+				{
 					"begin": "(function)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
 					"end": ";",
 					"beginCaptures": {
