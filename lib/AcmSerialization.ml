@@ -16,7 +16,7 @@ let par_mod_id_set (sexp: sexp): ModuleNameSet.t =
   | List atoms ->
      ModuleNameSet.of_list (List.map module_name_of_sexp atoms)
   | _ ->
-     err "internal: bad parse"
+    internal_err "bad parse"
 
 (* compiled_module *)
 
@@ -39,7 +39,7 @@ let par_compiled_module (sexp: sexp): compiled_module =
                   | List decls ->
                      List.map compiled_decl_of_sexp decls
                   | _ ->
-                    err "internal: bad parse");
+                    internal_err "bad parse");
        }
   | _ ->
-     err "internal: bad acm parse"
+     internal_err "bad acm parse"

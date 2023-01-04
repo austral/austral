@@ -279,7 +279,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
           | None ->
              err "Interface declaration has no corresponding body declaration")
       | _ ->
-         err "Internal")
+         internal_err "Couldn't parse declaration declaration")
 
 and parse_defs (mn: module_name) (cmi: concrete_module_interface) (im: import_map) (defs: concrete_def list): combined_definition list =
   List.filter_map (parse_def mn cmi im) defs
@@ -304,7 +304,7 @@ and parse_def (module_name: module_name) (cmi: concrete_module_interface) (im: i
          else
            Some (private_def module_name im def)
       | _ ->
-         err "Internal")
+         internal_err "Couldn't parse definition")
 
 let as_public (def: combined_definition): combined_definition =
   match def with

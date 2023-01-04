@@ -18,7 +18,9 @@ let get_decl_by_name_or_die (env: env) (name: sident): decl =
   match get_decl_by_name env name with
   | Some decl -> decl
   | None ->
-     internal_err "No declaration with name."
+     internal_err ("No declaration with name `"
+                   ^ ident_string (sident_name name)
+                   ^ "`.")
 
 let get_decl_sident_or_die (env: env) (id: decl_id): sident =
   match get_decl_by_id env id with
@@ -29,7 +31,9 @@ let get_decl_sident_or_die (env: env) (id: decl_id): sident =
       | None ->
          err "decl has no name")
   | None ->
-     err "internal"
+   internal_err ("decl with ID `" 
+                  ^ (show_decl_id id)
+                  ^ "` doesn't exist")
 
 let get_decl_name_or_die (env: env) (id: decl_id): string =
   match get_decl_by_id env id with
@@ -40,11 +44,17 @@ let get_decl_name_or_die (env: env) (id: decl_id): string =
       | None ->
          err "decl has no name")
   | None ->
-     err "internal"
+   internal_err ("decl with ID `" 
+                  ^ (show_decl_id id)
+                  ^ "` doesn't exist")
 
 let get_method_id_or_die (env: env) (typeclass_id: decl_id) (name: qident) =
   match get_method_from_typeclass_id_and_name env typeclass_id (original_name name) with
   | Some (TypeClassMethod { id; _ }) ->
      id
   | _ ->
-     internal_err "Could not retrieve method from the typeclass ID and the name."
+     internal_err ("Could not retrieve method from the typeclass ID `"
+                   ^ (show_decl_id typeclass_id)
+                   ^ "` and the name `"
+                   ^ (qident_debug_name name)
+                   ^ "`.")

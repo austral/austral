@@ -105,7 +105,7 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id o
       (List.map (fun mn ->
            match get_module_by_name env mn with
            | Some (ModRec { id; _ }) -> id
-           | None -> err "Internal")
+           | None -> internal_err ("Couldn't find module `" ^ (mod_name_string mn) ^ "`."))
          (List.of_seq (ModuleNameSet.to_seq module_names)))
   in
   (* Add the module to the environment. *)

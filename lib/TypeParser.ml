@@ -153,7 +153,7 @@ let rec effective_universe name (typarams: typarams) declared_universe args =
   | LinearUniverse ->
      LinearUniverse
   | RegionUniverse ->
-     err "effective_universe called with a region type"
+     internal_err "effective_universe called with a region type"
   | TypeUniverse ->
      assert ((typarams_size typarams) > 0);
      if any_arg_is_linear args then
