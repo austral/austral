@@ -87,14 +87,7 @@
 					},
 					"patterns": [
 						{
-							"include": "#typespec"
-						},
-						{
-							"include": "#comment"
-						},
-						{
-							"match": ",",
-							"name": "punctuation.comma.austral"
+							"include": "#context_type_param_list"
 						}
 					]
 				},
@@ -106,6 +99,20 @@
 				{
 					"name": "entity.name.type.austral",
 					"match": "\\b[a-zA-Z][A-Za-z0-9_]*\\b"
+				}
+			]
+		},
+		"context_type_param_list": {
+			"patterns": [
+				{
+					"include": "#typespec"
+				},
+				{
+					"include": "#comment"
+				},
+				{
+					"match": ",",
+					"name": "punctuation.comma.austral"
 				}
 			]
 		},
@@ -138,8 +145,8 @@
 					]
 				},
 				{
-					"comment": "paramaterized type declaration",
-					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\[)(.*)(\\])\\s*(:)\\s(Free|Linear|Type|Region)\\s*;",
+					"comment": "type declaration",
+					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s*;",
 					"captures": {
 						"1": {
 							"name": "keyword.declaration.type.austral storage.type.austral"
@@ -153,14 +160,7 @@
 						"4": {
 							"patterns": [
 								{
-									"include": "#typespec"
-								},
-								{
-									"include": "#comment"
-								},
-								{
-									"match": ",",
-									"name": "punctuation.comma.austral"
+									"include": "#context_type_param_list"
 								}
 							]
 						},
@@ -174,27 +174,6 @@
 							"name": "entity.name.universe.austral entity.name.type.austral"
 						},
 						"8": {
-							"name": "punctuation.semicolon.austral"
-						}
-					}
-				},
-				{
-					"comment": "type declaration",
-					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)\\s*(Free|Linear|Region|Type)\\s*(;)",
-					"captures": {
-						"1": {
-							"name": "keyword.declaration.type.austral storage.type.austral"
-						},
-						"2": {
-							"name": "entity.name.type.austral"
-						},
-						"3": {
-							"name": "punctuation.colon.austral"
-						},
-						"4": {
-							"name": "entity.name.universe.austral entity.name.type.austral"
-						},
-						"5": {
 							"name": "punctuation.semicolon.austral"
 						}
 					}
