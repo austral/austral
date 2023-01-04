@@ -142,7 +142,7 @@
 					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\[)(.*)(\\])\\s*(:)\\s(Free|Linear|Type|Region)\\s*;",
 					"captures": {
 						"1": {
-							"name": "keyword.other.austral storage.type.constant.austral"
+							"name": "keyword.declaration.type.austral storage.type.austral"
 						},
 						"2": {
 							"name": "entity.name.type.austral"
@@ -183,7 +183,7 @@
 					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)\\s*(Free|Linear|Region|Type)\\s*(;)",
 					"captures": {
 						"1": {
-							"name": "keyword.other.austral storage.type.constant.austral"
+							"name": "keyword.declaration.type.austral storage.type.austral"
 						},
 						"2": {
 							"name": "entity.name.type.austral"
