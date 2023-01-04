@@ -6,10 +6,10 @@
 			"include": "#keywords"
 		},
 		{
-			"include": "#strings"
+			"include": "#string"
 		},
 		{
-			"include": "#triplestrings"
+			"include": "#string_triple"
 		}
 	],
 	"repository": {
@@ -25,7 +25,7 @@
 				}
 			]
 		},
-		"strings": {
+		"string": {
 			"name": "string.quoted.double.austral",
 			"begin": "\"",
 			"end": "\"",
@@ -36,7 +36,7 @@
 				}
 			]
 		},
-		"triplestrings": {
+		"string_triple": {
 			"name": "string.quoted.triple.austral",
 			"begin": "\"\"\"",
 			"end": "\"\"\"",
