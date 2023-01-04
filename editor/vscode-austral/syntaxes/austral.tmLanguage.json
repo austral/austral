@@ -25,6 +25,20 @@
 				}
 			]
 		},
+		"escapes": {
+			"comment": "string escape characters",
+			"patterns": [
+				{
+					"name": "constant.character.escape.austral",
+					"match": "\\\\(n|r|t|\\| |')"
+				},
+				{
+					"comment": "mark unmatched escapes as illegal",
+					"name": "invalid.illegal.escape-sequence.austral",
+					"match": "\\\\."
+				}
+			]
+		},
 		"string": {
 			"name": "string.quoted.double.austral",
 			"begin": "\"",
@@ -32,7 +46,10 @@
 			"patterns": [
 				{
 					"name": "constant.character.escape.austral",
-					"match": "\\\\."
+					"match": "\\\\\""
+				},
+				{
+					"include": "#escapes"
 				}
 			]
 		},
@@ -43,7 +60,10 @@
 			"patterns": [
 				{
 					"name": "constant.character.escape.austral",
-					"match": "\\\\."
+					"match": "\\\\\"\"\""
+				},
+				{
+					"include": "#escapes"
 				}
 			]
 		}
