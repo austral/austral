@@ -41,6 +41,23 @@
 				}
 			}
 		},
+		"generic": {
+			"begin": "(generic)\\s*(\\[)",
+			"end": "\\]",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.other.generic.austral"
+				},
+				"2": {
+					"name": "punctuation.brackets.square.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#context_type_param_list"
+				}
+			]
+		},
 		"typespec": {
 			"patterns": [
 				{
@@ -250,12 +267,12 @@
 							"name": "entity.name.universe.austral entity.name.type.austral"
 						},
 						"8": {
-							"name": "storage.type.record.austral"
+							"name": "storage.type.record.austral keyword.other.is.austral"
 						}
 					},
 					"endCaptures": {
 						"0": {
-							"name": "keyword.other.austral storage.type.record.austral"
+							"name": "keyword.other.end.austral storage.type.record.austral"
 						}
 					},
 					"patterns": [
@@ -301,12 +318,12 @@
 							"name": "entity.name.universe.austral entity.name.type.austral"
 						},
 						"8": {
-							"name": "storage.type.union.austral"
+							"name": "storage.type.union.austral keyword.other.is.austral"
 						}
 					},
 					"endCaptures": {
 						"0": {
-							"name": "keyword.other.austral storage.type.union.austral"
+							"name": "keyword.other.end.austral storage.type.union.austral"
 						}
 					},
 					"patterns": [
@@ -359,21 +376,7 @@
 					]
 				},
 				{
-					"begin": "(generic)\\s*(\\[)",
-					"end": "\\]",
-					"beginCaptures": {
-						"1": {
-							"name": "keyword.other.generic.austral"
-						},
-						"2": {
-							"name": "punctuation.brackets.square.austral"
-						}
-					},
-					"patterns": [
-						{
-							"include": "#context_type_param_list"
-						}
-					]
+					"include": "#generic"
 				},
 				{
 					"begin": "(function)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
@@ -407,6 +410,81 @@
 							"match": "[\\(\\)]"
 						}
 					]
+				},
+				{
+					"comment": "typeclass declaration",
+					"begin": "(typeclass)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\()(.*)(\\)))?\\s+(is)",
+					"end": "\\b(end)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.declaration.typeclass.austral storage.type.typeclass.austral"
+						},
+						"2": {
+							"name": "entity.name.type.austral"
+						},
+						"3": {
+							"name": "punctuation.brackets.round.austral"
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#context_type_param_list"
+								}
+							]
+						},
+						"5": {
+							"name": "punctuation.brackets.round.austral"
+						},
+						"6": {
+							"name": "storage.type.typeclass.austral keyword.other.is.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "keyword.other.end.austral storage.type.union.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#string_triple"
+						},
+						{
+							"begin": "(method)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
+							"end": ";",
+							"beginCaptures": {
+								"1": {
+									"name": "keyword.other.method.austral"
+								},
+								"2": {
+									"name": "entity.name.function.method.austral"
+								}
+							},
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.semicolon.austral"
+								}
+							},
+							"patterns": [
+								{
+									"include": "#comment"
+								},
+								{
+									"include": "#typespec"
+								},
+								{
+									"name": "punctuation.colon.austral",
+									"match": ":"
+								},
+								{
+									"name": "punctuation.brackets.round.austral",
+									"match": "[\\(\\)]"
+								}
+							]
+						},
+						{
+							"include": "#comment"
+						}
+					]
 				}
 			]
 		},
@@ -424,7 +502,7 @@
 							"name": "entity.name.module.austral"
 						},
 						"3": {
-							"name": "storage.type.module.austral"
+							"name": "storage.type.module.austral keyword.other.is.austral"
 						}
 					},
 					"endCaptures": {
