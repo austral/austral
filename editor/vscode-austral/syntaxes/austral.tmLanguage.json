@@ -58,7 +58,7 @@
 					"end": "]",
 					"endCaptures": {
 						"0": {
-							"name": "punctuation.brackets.angle.austral"
+							"name": "punctuation.brackets.square.austral"
 						}
 					},
 					"patterns": [
