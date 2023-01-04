@@ -146,7 +146,7 @@
 				},
 				{
 					"comment": "type declaration",
-					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s*;",
+					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s*(;)",
 					"captures": {
 						"1": {
 							"name": "keyword.declaration.type.austral storage.type.austral"
@@ -177,6 +177,73 @@
 							"name": "punctuation.semicolon.austral"
 						}
 					}
+				},
+				{
+					"comment": "record declaration",
+					"begin": "(record)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s+(is)",
+					"end": "\\bend\\s*",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.declaration.record.austral storage.type.austral"
+						},
+						"2": {
+							"name": "entity.name.type.austral"
+						},
+						"3": {
+							"name": "punctuation.brackets.square.austral"
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#context_type_param_list"
+								}
+							]
+						},
+						"5": {
+							"name": "punctuation.brackets.square.austral"
+						},
+						"6": {
+							"name": "punctuation.colon.austral"
+						},
+						"7": {
+							"name": "entity.name.universe.austral entity.name.type.austral"
+						},
+						"8": {
+							"name": "storage.type.record.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "keyword.other.austral storage.type.record.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#string_triple"
+						},
+						{
+							"begin": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
+							"end": ";",
+							"beginCaptures": {
+								"1": {
+									"name": "entity.name.member.austral"
+								},
+								"2": {
+									"name": "punctuation.colon.austral"
+								}
+							},
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.semicolon.austral"
+								}
+							},
+							"patterns": [
+								{
+									"include": "#typespec"
+								}
+							]
+						}
+					]
 				}
 			]
 		},
