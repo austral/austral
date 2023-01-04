@@ -116,6 +116,29 @@
 				}
 			]
 		},
+		"slot": {
+			"comment": "member values used in records and unions",
+			"begin": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
+			"end": ";",
+			"beginCaptures": {
+				"1": {
+					"name": "entity.name.member.austral"
+				},
+				"2": {
+					"name": "punctuation.colon.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.semicolon.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#typespec"
+				}
+			]
+		},
 		"declarations": {
 			"patterns": [
 				{
@@ -222,26 +245,10 @@
 							"include": "#string_triple"
 						},
 						{
-							"begin": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
-							"end": ";",
-							"beginCaptures": {
-								"1": {
-									"name": "entity.name.member.austral"
-								},
-								"2": {
-									"name": "punctuation.colon.austral"
-								}
-							},
-							"endCaptures": {
-								"0": {
-									"name": "punctuation.semicolon.austral"
-								}
-							},
-							"patterns": [
-								{
-									"include": "#typespec"
-								}
-							]
+							"include": "#slot"
+						},
+						{
+							"include": "#comment"
 						}
 					]
 				}
