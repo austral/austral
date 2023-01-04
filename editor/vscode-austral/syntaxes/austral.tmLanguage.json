@@ -344,6 +344,39 @@
 							"include": "#comment"
 						}
 					]
+				},
+				{
+					"begin": "(function)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
+					"end": ";",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.function.austral"
+						},
+						"2": {
+							"name": "entity.name.function.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.semicolon.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#comment"
+						},
+						{
+							"include": "#typespec"
+						},
+						{
+							"name": "punctuation.colon.austral",
+							"match": ":"
+						},
+						{
+							"name": "punctuation.brackets.round.austral",
+							"match": "[\\(\\)]"
+						}
+					]
 				}
 			]
 		},
