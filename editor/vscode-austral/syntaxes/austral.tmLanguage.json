@@ -485,6 +485,33 @@
 							"include": "#comment"
 						}
 					]
+				},
+				{
+					"match": "\\b(instance)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))\\s*(;)",
+					"captures": {
+						"1": {
+							"name": "keyword.other.instance.austral"
+						},
+						"2": {
+							"name": "entity.name.type.austral"
+						},
+						"3": {
+							"name": "punctuation.brackets.round.austral"
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#typespec"
+								}
+							]
+						},
+						"5": {
+							"name": "punctuation.brackets.round.austral"
+						},
+						"6": {
+							"name": "punctuation.semicolon.austral"
+						}
+					}
 				}
 			]
 		},
