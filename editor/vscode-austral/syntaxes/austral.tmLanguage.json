@@ -110,7 +110,16 @@
 		"context_type_param_list": {
 			"patterns": [
 				{
-					"include": "#typespec"
+					"match": "\\b(Free|Linear|Type|Region)\\b",
+					"name": "entity.name.universe.austral entity.name.type.austral"
+				},
+				{
+					"match": ":",
+					"name": "punctuation.comma.austral"
+				},
+				{
+					"match": "([a-zA-Z][a-zA-Z0-9_]*)",
+					"name": "entity.name.type.austral"
 				},
 				{
 					"include": "#comment"
@@ -118,6 +127,10 @@
 				{
 					"match": ",",
 					"name": "punctuation.comma.austral"
+				},
+				{
+					"match": "[\\(\\)]",
+					"name": "punctuation.brackets.round.austral"
 				}
 			]
 		},
