@@ -118,7 +118,8 @@
 		"declarations": {
 			"patterns": [
 				{
-					"begin": "(constant)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*:",
+					"comment": "constant declaration",
+					"begin": "(constant)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
 					"end": ";",
 					"beginCaptures": {
 						"1": {
@@ -126,6 +127,14 @@
 						},
 						"2": {
 							"name": "entity.name.constant.austral"
+						},
+						"3": {
+							"name": "punctuation.colon.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.semicolon.austral"
 						}
 					},
 					"patterns": [
