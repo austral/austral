@@ -33,7 +33,7 @@
 			]
 		},
 		"comment": {
-			"match": "--(?!\n)",
+			"match": "\\s*--.*",
 			"name": "comment.line.austral"
 		},
 		"typespec": {
