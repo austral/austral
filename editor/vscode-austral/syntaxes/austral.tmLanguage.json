@@ -79,6 +79,34 @@
 			"match": "#b[0-1][0-1']*",
 			"name": "constant.numeric.bin.austral"
 		},
+		"char_constant": {
+			"name": "string.quoted.single.char.austral",
+			"begin": "'",
+			"end": "'",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.char.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.char.austral"
+				}
+			},
+			"patterns": [
+				{
+					"comment": "Valid ASCII chars for char constants",
+					"match": "[a-zA-Z0-9\\ \\!\"#\\$%&'\\)\\(*+,\\-\\./:;<=>?@`~\\[\\]^_{}|]"
+				},
+				{
+					"include": "#escapes"
+				},
+				{
+					"match": ".*",
+					"name": "invalid.illegal.char-literal.austral"
+				}
+			]
+		},
 		"typespec": {
 			"patterns": [
 				{
