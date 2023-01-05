@@ -4,7 +4,8 @@ import Standard.Box (
     unbox,
     readFree,
     storeFree,
-    swap
+    swap,
+    unboxReadRef
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -20,6 +21,7 @@ module body Standard.Test.Box is
         readFreeTest();
         storeFreeTest();
         swapTest();
+        unboxReadRefTest();
         return nil;
     end;
 
@@ -71,6 +73,20 @@ module body Standard.Test.Box is
                  let old: Int32 := swap(&!box, 20);
                  assertTrue(old = 10, "old box contents equal 10");
                  assertTrue(unbox(box) = 20, "box contents equal 20");
+            when Right(right: Int32) do
+                 assertFailure("makeBox failed.");
+        end case;
+        return nil;
+    end;
+
+    function unboxReadRefTest(): Unit is
+        testHeading("unboxReadRef");
+        let e: Either[Box[Int32], Int32] := makeBox(10);
+        case e of
+            when Left(left as box: Box[Int32]) do
+                 let val: Int32 := !unboxReadRef(&box);
+                 assertTrue(val = 10, "value from reference equals 10");
+                 assertTrue(unbox(box) = 10, "unbox value equals 10");
             when Right(right: Int32) do
                  assertFailure("makeBox failed.");
         end case;
