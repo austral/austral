@@ -5,7 +5,8 @@ import Austral.Memory (
     nullCheck,
     store,
     load,
-    deallocate
+    deallocate,
+    loadRead
 );
 
 
@@ -62,5 +63,10 @@ module body Standard.Box is
         let old: T := load(ptr);
         store(ptr, new);
         return old;
+    end;
+
+    generic [T: Type, R: Region]
+    function unboxReadRef(ref: &[Box[T], R]): &[T, R] is
+        return loadRead(ref->pointer);
     end;
 end module body.

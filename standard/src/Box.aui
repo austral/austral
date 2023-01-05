@@ -41,4 +41,10 @@ module Standard.Box is
     """
     generic [T: Type, R: Region]
     function swap(boxref: &![Box[T], R], new: T): T;
+
+    """
+    Given a reference to a box, return a reference to its contents.
+    """
+    generic [T: Type, R: Region]
+    function unboxReadRef(ref: &[Box[T], R]): &[T, R];
 end module.
