@@ -611,7 +611,7 @@
 			"patterns": [
 				{
 					"name": "constant.character.escape.austral",
-					"match": "\\\\(n|r|t|\\| |')"
+					"match": "\\\\(n|r|t|\\\\| |')"
 				},
 				{
 					"comment": "mark unmatched escapes as illegal",
