@@ -71,6 +71,14 @@
 			"match": "#x[0-9a-fA-F][0-9a-fA-F']*",
 			"name": "constant.numeric.hex.austral"
 		},
+		"oct_constant": {
+			"match": "#o[0-7][0-7']*",
+			"name": "constant.numeric.octal.austral"
+		},
+		"bin_constant": {
+			"match": "#b[0-1][0-1']*",
+			"name": "constant.numeric.bin.austral"
+		},
 		"typespec": {
 			"patterns": [
 				{
