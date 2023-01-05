@@ -58,6 +58,15 @@
 				}
 			]
 		},
+		"dec_constant": {
+			"match": "([+\\-])?[0-9][0-9']*",
+			"captures": {
+				"1": {
+					"name": "keyword.operator.sign.rust"
+				}
+			},
+			"name": "constant.numeric.decimal.austral"
+		},
 		"typespec": {
 			"patterns": [
 				{
