@@ -67,6 +67,10 @@
 			},
 			"name": "constant.numeric.decimal.austral"
 		},
+		"hex_constant": {
+			"match": "#x[0-9a-fA-F][0-9a-fA-F']*",
+			"name": "constant.numeric.hex.austral"
+		},
 		"typespec": {
 			"patterns": [
 				{
