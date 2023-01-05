@@ -9,6 +9,9 @@
 			"include": "#keywords"
 		},
 		{
+			"include": "#integer_constants"
+		},
+		{
 			"include": "#string"
 		},
 		{
@@ -58,52 +61,61 @@
 				}
 			]
 		},
-		"dec_constant": {
-			"match": "([+\\-])?[0-9][0-9']*",
-			"captures": {
-				"1": {
-					"name": "keyword.operator.sign.rust"
-				}
-			},
-			"name": "constant.numeric.decimal.austral"
-		},
-		"hex_constant": {
-			"match": "#x[0-9a-fA-F][0-9a-fA-F']*",
-			"name": "constant.numeric.hex.austral"
-		},
-		"oct_constant": {
-			"match": "#o[0-7][0-7']*",
-			"name": "constant.numeric.octal.austral"
-		},
-		"bin_constant": {
-			"match": "#b[0-1][0-1']*",
-			"name": "constant.numeric.bin.austral"
-		},
-		"char_constant": {
-			"name": "string.quoted.single.char.austral",
-			"begin": "'",
-			"end": "'",
-			"beginCaptures": {
-				"0": {
-					"name": "punctuation.definition.char.austral"
-				}
-			},
-			"endCaptures": {
-				"0": {
-					"name": "punctuation.definition.char.austral"
-				}
-			},
+		"integer_constants": {
 			"patterns": [
 				{
-					"comment": "Valid ASCII chars for char constants",
-					"match": "[a-zA-Z0-9\\ \\!\"#\\$%&'\\)\\(*+,\\-\\./:;<=>?@`~\\[\\]^_{}|]"
+					"comment": "decimal integer constant",
+					"match": "([+\\-])?[0-9][0-9']*",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.sign.rust"
+						}
+					},
+					"name": "constant.numeric.decimal.austral"
 				},
 				{
-					"include": "#escapes"
+					"comment": "hexadecimal integer constant",
+					"match": "#x[0-9a-fA-F][0-9a-fA-F']*",
+					"name": "constant.numeric.hex.austral"
 				},
 				{
-					"match": ".*",
-					"name": "invalid.illegal.char-literal.austral"
+					"comment": "octal integer constant",
+					"match": "#o[0-7][0-7']*",
+					"name": "constant.numeric.octal.austral"
+				},
+				{
+					"comment": "binary integer constant",
+					"match": "#b[0-1][0-1']*",
+					"name": "constant.numeric.bin.austral"
+				},
+				{
+					"comment": "char (Nat8) constant",
+					"name": "string.quoted.single.char.austral",
+					"begin": "'",
+					"end": "'",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.char.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.char.austral"
+						}
+					},
+					"patterns": [
+						{
+							"comment": "Valid ASCII chars for char constants",
+							"match": "[a-zA-Z0-9\\ \\!\"#\\$%&'\\)\\(*+,\\-\\./:;<=>?@`~\\[\\]^_{}|]"
+						},
+						{
+							"include": "#escapes"
+						},
+						{
+							"match": ".*",
+							"name": "invalid.illegal.char-literal.austral"
+						}
+					]
 				}
 			]
 		},
