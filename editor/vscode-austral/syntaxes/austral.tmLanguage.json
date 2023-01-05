@@ -105,14 +105,18 @@
 					},
 					"patterns": [
 						{
+							"include": "#escapes"
+						},
+						{
+							"match": ".{2,}(?=')",
+							"name": "invalid.illegal.char-literal.austral"
+						},
+						{
 							"comment": "Valid ASCII chars for char constants",
 							"match": "[a-zA-Z0-9\\ \\!\"#\\$%&'\\)\\(*+,\\-\\./:;<=>?@`~\\[\\]^_{}|]"
 						},
 						{
-							"include": "#escapes"
-						},
-						{
-							"match": ".*",
+							"match": ".*(?=')",
 							"name": "invalid.illegal.char-literal.austral"
 						}
 					]
