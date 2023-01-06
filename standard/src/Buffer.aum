@@ -135,6 +135,9 @@ module body Standard.Buffer is
     """
     generic [T: Free, R: Region]
     function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
+        if index >= buf->size then
+            abort("storeNth: index out of range");
+        end if;
         let ptr: Pointer[T] := positiveOffset(buf->array, pos);
         store(ptr, element);
         return nil;
