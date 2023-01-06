@@ -687,6 +687,41 @@
 				}
 			]
 		},
+		"function_decl": {
+			"match": "(function|method)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))\\s*(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
+			"captures": {
+				"1": {
+					"name": "storage.type.function.austral"
+				},
+				"2": {
+					"name": "entity.name.function.method.austral"
+				},
+				"3": {
+					"name": "punctuation.section.parameters.begin.bracket.round.austral"
+				},
+				"4": {
+					"patterns": [
+						{
+							"include": "#context_function_paramater_def"
+						}
+					]
+				},
+				"5": {
+					"name": "punctuation.section.parameters.end.bracket.round.austral"
+				},
+				"6": {
+					"name": "punctuation.definition.function.return-type.austral"
+				},
+				"7": {
+					"name": "meta.return-type.austral",
+					"patterns": [
+						{
+							"include": "#typespec"
+						}
+					]
+				}
+			}
+		},
 		"declarations": {
 			"patterns": [
 				{
@@ -736,39 +771,7 @@
 					"include": "#generic"
 				},
 				{
-					"match": "(function)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))\\s*(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
-					"captures": {
-						"1": {
-							"name": "keyword.other.method.austral"
-						},
-						"2": {
-							"name": "entity.name.function.method.austral"
-						},
-						"3": {
-							"name": "punctuation.section.parameters.begin.bracket.round.austral"
-						},
-						"4": {
-							"patterns": [
-								{
-									"include": "#context_function_paramater_def"
-								}
-							]
-						},
-						"5": {
-							"name": "punctuation.section.parameters.end.bracket.round.austral"
-						},
-						"6": {
-							"name": "punctuation.definition.function.return-type.austral"
-						},
-						"7": {
-							"name": "meta.return-type.austral",
-							"patterns": [
-								{
-									"include": "#typespec"
-								}
-							]
-						}
-					}
+					"include": "#function_decl"
 				},
 				{
 					"comment": "typeclass declaration",
@@ -808,26 +811,11 @@
 							"include": "#string_triple"
 						},
 						{
-							"begin": "(method)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
-							"end": ";",
-							"beginCaptures": {
-								"1": {
-									"name": "keyword.other.method.austral"
-								},
-								"2": {
-									"name": "entity.name.function.method.austral"
-								}
-							},
-							"endCaptures": {
-								"0": {
-									"name": "punctuation.section.parameters.end.bracket.round.austral"
-								}
-							},
-							"patterns": [
-								{
-									"include": "#context_function_paramater_def"
-								}
-							]
+							"match": "function",
+							"name": "invalid.illegal.function-in-typeclass.austral"
+						},
+						{
+							"include": "#function_decl"
 						},
 						{
 							"include": "#comment"
