@@ -486,7 +486,7 @@
 					"name": "entity.name.member.austral"
 				},
 				"2": {
-					"name": "punctuation.colon.austral"
+					"name": "keyword.operator.type.annotation.austral"
 				}
 			},
 			"endCaptures": {
@@ -739,6 +739,12 @@
 			},
 			"patterns": [
 				{
+					"include": "#let_simple"
+				},
+				{
+					"include": "#let_destructure"
+				},
+				{
 					"include": "#expression"
 				},
 				{
@@ -748,6 +754,60 @@
 					"include": "#assignment"
 				}
 			]
+		},
+		"let_destructure": {
+			"begin": "(let)\\s+(\\{)",
+			"end": "\\}",
+			"beginCaptures": {
+				"1": {
+					"name": "storage.type.variable.austal"
+				},
+				"2": {
+					"name": "punctuation.definition.binding-pattern.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.binding-pattern.austral"
+				}
+			},
+			"patterns": [
+				{
+					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.type.annotation.austral"
+						},
+						"2": {
+							"name": "meta.binding-type.austral",
+							"patterns": [
+								{
+									"include": "#typespec"
+								}
+							]
+						}
+					}
+				},
+				{
+					"match": "\\b[a-zA-Z][a-zA-Z0-9_]*\\b",
+					"name": "variable.other.binding.austral"
+				},
+				{
+					"match": "\\bas\\b",
+					"name": "keyword.operator.as.austral"
+				}
+			]
+		},
+		"let_simple": {
+			"match": "(let)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
+			"captures": {
+				"1": {
+					"name": "storage.type.variable.austal"
+				},
+				"2": {
+					"name": "variable.other.let.austral"
+				}
+			}
 		},
 		"declarations": {
 			"patterns": [
