@@ -51,6 +51,12 @@ module Standard.Buffer is
     generic [T: Type, R: Region]
     function length(buf: &[Buffer[T], R]): Index;
 
+    """
+    Return the nth element of `buf`.
+    """
+    generic [T: Free, R: Region]
+    function nth(buf: &![Buffer[T], R], pos: Index): T;
+
     ---
     --- Update
     ---
@@ -59,7 +65,7 @@ module Standard.Buffer is
     Store `element` in the given position of `buf`.
     """
     generic [T: Free, R: Region]
-    function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
+    function storeNth(buf: &![Buffer[T], R], pos: Indexlement: T): Unit;
 
     ""
     Store `element` in the given position of `buf`, and return the element
