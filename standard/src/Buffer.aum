@@ -266,6 +266,7 @@ module body Standard.Buffer is
         -- Pointer to the start of the chunk.
         let start_ptr: Pointer[T] := positiveOffset(ptr, chunk_start);
         -- Size of the chunk in bytes.
+        -- FIXME HERE: we need a way to convert `ByteSize` to `Index`.
         let elem_size: ByteSize := 0;
         let size: Index := elem_size;
         -- Pointer to the start of the destination.
