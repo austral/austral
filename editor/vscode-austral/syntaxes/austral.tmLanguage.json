@@ -237,6 +237,30 @@
 				}
 			]
 		},
+		"operators": {
+			"patterns": [
+				{
+					"comment": "logical operators",
+					"match": "\\b(not|and|or)\\b",
+					"name": "keyword.operator.logical.$0.austral"
+				},
+				{
+					"comment": "comparison operators",
+					"match": "(=|/=|<=|<|>=|>)",
+					"name": "keyword.operator.comparison.austral"
+				},
+				{
+					"comment": "borrow operators",
+					"match": "(&|&!)",
+					"name": "keyword.operator.borrow.austral"
+				},
+				{
+					"comment": "arithmetic operators",
+					"match": "(\\+|-|/|\\*)",
+					"name": "keyword.operator.arithmetic.austral"
+				}
+			]
+		},
 		"expression": {
 			"patterns": [
 				{
@@ -244,6 +268,9 @@
 				},
 				{
 					"include": "#constants"
+				},
+				{
+					"include": "#operators"
 				},
 				{
 					"comment": "sub-expression",
