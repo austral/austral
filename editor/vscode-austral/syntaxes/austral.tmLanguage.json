@@ -199,6 +199,32 @@
 				}
 			]
 		},
+		"function_call": {
+			"begin": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()",
+			"end": "\\)",
+			"beginCaptures": {
+				"1": {
+					"name": "entity.name.function.austral"
+				},
+				"2": {
+					"name": "punctuation.section.arguments.begin.bracket.round.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.arguments.begin.bracket.round.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#expression"
+				},
+				{
+					"name": "punctuation.separator.delimiter.comma.austal",
+					"match": ","
+				}
+			]
+		},
 		"expression": {
 			"patterns": [
 				{
@@ -249,6 +275,9 @@
 							"include": "#typespec"
 						}
 					]
+				},
+				{
+					"include": "#function_call"
 				},
 				{
 					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\b",
