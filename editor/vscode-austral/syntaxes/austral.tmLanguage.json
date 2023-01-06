@@ -208,6 +208,29 @@
 					"include": "#constants"
 				},
 				{
+					"comment": "sizeof operator",
+					"begin": "\\b(sizeof)\\s*(\\()",
+					"end": "\\)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.operator.sizeof.austral"
+						},
+						"2": {
+							"name": "punctuation.section.arguments.begin.bracket.round.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.arguments.begin.bracket.round.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#typespec"
+						}
+					]
+				},
+				{
 					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\b",
 					"name": "variable.other.austral"
 				},
