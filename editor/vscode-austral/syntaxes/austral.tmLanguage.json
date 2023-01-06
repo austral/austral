@@ -689,7 +689,7 @@
 		},
 		"function_decl": {
 			"name": "meta.$1.austral",
-			"match": "(function|method)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))\\s*(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
+			"match": "(function|method)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\()(.*)(\\)))?\\s*(?:(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?))?",
 			"captures": {
 				"1": {
 					"name": "storage.type.function.austral"
