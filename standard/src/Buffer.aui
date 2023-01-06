@@ -7,6 +7,10 @@ module Standard.Buffer is
     """
     type Buffer[T: Type]: Linear;
 
+    ---
+    --- Lifecycle
+    ---
+
     """
     Allocates an empty buffer. Aborts on allocation failure.
     """
@@ -36,4 +40,18 @@ module Standard.Buffer is
     """
     generic [T: Free]
     function safeInitialize(size: Index, initialElement: T): Option[Buffer[T]];
+
+    ---
+    --- Retrieve
+    ---
+
+    ---
+    --- Update
+    ---
+
+    """
+    Store `element` in every position of `buf`.
+    """
+    generic [T: Free, R: Region]
+    function fill(buf: &![Buffer[T], R], element: T): Unit;
 end module.

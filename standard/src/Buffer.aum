@@ -54,6 +54,10 @@ module body Standard.Buffer is
         return nil;
     end;
 
+    ---
+    --- Lifecycle
+    ---
+
     generic [T: Type]
     function allocateEmpty(): Buffer[T] is
         let opt: Option[Buffer[T]] := safeAllocateEmpty();
@@ -73,7 +77,7 @@ module body Standard.Buffer is
                 let buf: Buffer[T] := Buffer(
                     capacity => minimum_capacity,
                     size => 0,
-                    data => value,
+                    array => value,
                 );
                 return Some(buf);
             when None do
@@ -101,12 +105,27 @@ module body Standard.Buffer is
                 let buf: Buffer[T] := Buffer(
                     capacity => capacity,
                     size => size,
-                    data => value,
+                    array => value,
                 );
                 fill(&!buf, initialElement);
                 return Some(buf);
             when None do
                 return None();
         end case;
+    end;
+
+    ---
+    --- Retrieve
+    ---
+
+    ---
+    --- Update
+    ---
+
+    generic [T: Free, R: Region]
+    function fill(buf: &![Buffer[T], R], element: T): Unit is
+        for i from 0 to buf-> size - 1 do
+            storeNth(buf, element);
+        end for;
     end;
 end module body.
