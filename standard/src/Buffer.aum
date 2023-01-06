@@ -8,7 +8,8 @@ import Austral.Memory (
     positiveOffset,
     store,
     load,
-    memcpy
+    memcpy,
+    memmove
 );
 
 module body Standard.Buffer is
@@ -220,7 +221,57 @@ module body Standard.Buffer is
         return nil;
     end;
 
+    generic [T: Free, R: Region]
+    function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
+        -- Check `pos` is in bounds.
+        if pos >= (!buf->size) then
+            abort("insert: index out of range");
+        end if;
+        -- If insertion would increase make `size` match `capacity`, resize
+        -- the array.
+        if ((!buf->size) + 1) = (!buf->capacity) then
+            bump(buf);
+        end if;
+        -- If the array is non-empty, we have to move everything to the right of
+        -- the position one step to the right.
+        if (!buf->size) > 0 then
+           shiftRight(
+               ptr => !buf->array,
+               chunk_start => pos,
+               chunk_length => (!buf->size) - pos,
+               count => 1
+           );
+        end if;
+        -- Insert.
+        let index_ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        store(index_ptr, element);
+        buf->size := (!buf->size) + 1;
+        return nil;
+    end;
+
     ---
     --- Removal
     ---
+
+    ---
+    --- Utilities
+    ---
+
+    """
+    In the given poiner, shift the chunk of memory from the position
+    `chunk_start` to `chunk_start + chunk_length` by `count` steps to the right.
+    """
+    generic [T: Type]
+    function shiftRight(ptr: Pointer[T], chunk_start: Index, chunk_length: Index, count: Index): Unit is
+        -- Pointer to the start of the chunk.
+        let start_ptr: Pointer[T] := positiveOffset(ptr, chunk_start);
+        -- Size of the chunk in bytes.
+        let elem_size: ByteSize := 0;
+        let size: Index := elem_size;
+        -- Pointer to the start of the destination.
+        let target_ptr: Pointer[T] := positiveOffset(start_ptr, size);
+        -- Move.
+        memmove(target_ptr, start_ptr, size);
+        return nil;
+    end;
 end module body.

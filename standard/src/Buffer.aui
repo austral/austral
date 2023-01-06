@@ -91,4 +91,11 @@ module Standard.Buffer is
     """
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit;
+
+    ---
+    --- Insertion
+    ---
+
+    generic [T: Free, R: Region]
+    function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
 end module.
