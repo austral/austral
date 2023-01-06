@@ -9,7 +9,7 @@
 			"include": "#keywords"
 		},
 		{
-			"include": "#integer_constants"
+			"include": "#constants"
 		},
 		{
 			"include": "#string"
@@ -60,6 +60,37 @@
 					"include": "#context_type_param_list"
 				}
 			]
+		},
+		"constants": {
+			"patterns": [
+				{
+					"include": "#float_constant"
+				},
+				{
+					"include": "#bool_constants"
+				},
+				{
+					"include": "#nil_constant"
+				},
+				{
+					"include": "#integer_constants"
+				}
+			]
+		},
+		"float_constant": {
+			"comment": "decimal float constant",
+			"match": "([+\\-])?[0-9][0-9']*\\.([0-9][0-9']*)?([eE][+\\-]?[0-9][0-9']*)?",
+			"name": "constant.numeric.decimal.float.austral"
+		},
+		"bool_constants": {
+			"comment": "boolean constant",
+			"match": "\\b(true|false)\\b",
+			"name": "constant.language.bool.austral"
+		},
+		"nil_constant": {
+			"comment": "nil constant",
+			"match": "\\bnil\\b",
+			"name": "constant.language.nil.austral"
 		},
 		"integer_constants": {
 			"patterns": [
