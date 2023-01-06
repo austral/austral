@@ -155,10 +155,10 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function nth(buf: &![Buffer[T], R], pos: Index): T is
-        if pos >= buf->size then
+        if pos >= (!buf->size) then
             abort("nth: index out of range");
         end if;
-        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
         let elem: T := load(ptr);
         return elem;
     end;
@@ -172,10 +172,10 @@ module body Standard.Buffer is
     """
     generic [T: Free, R: Region]
     function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
-        if pos >= !buf->size then
+        if pos >= (!buf->size) then
             abort("storeNth: index out of range");
         end if;
-        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
         store(ptr, element);
         return nil;
     end;
@@ -183,10 +183,10 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T is
-        if pos >= !buf->size then
+        if pos >= (!buf->size) then
             abort("swapNth: index out of range");
         end if;
-        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
         let previous: T := load(ptr);
         store(ptr, element);
         return previous;
@@ -194,7 +194,7 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit is
-        for i from 0 to buf-> size - 1 do
+        for i from 0 to (!buf->size) - 1 do
             storeNth(buf, element);
         end for;
         return nil;
