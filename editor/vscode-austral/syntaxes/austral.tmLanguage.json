@@ -80,6 +80,29 @@
 				}
 			]
 		},
+		"assignment": {
+			"comment": "the := ...; part of an assignment statement",
+			"begin": ":=",
+			"end": ";",
+			"beginCaptures": {
+				"0": {
+					"name": "keyword.operator.assign.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.semicolon.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#expression"
+				}
+			]
+		},
 		"float_constant": {
 			"comment": "decimal float constant",
 			"match": "([+\\-])?[0-9][0-9']*\\.([0-9][0-9']*)?([eE][+\\-]?[0-9][0-9']*)?",
