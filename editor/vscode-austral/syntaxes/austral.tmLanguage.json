@@ -736,26 +736,39 @@
 					"include": "#generic"
 				},
 				{
-					"begin": "(function)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
-					"end": ";",
-					"beginCaptures": {
+					"match": "(function)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))\\s*(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
+					"captures": {
 						"1": {
-							"name": "keyword.other.function.austral"
+							"name": "keyword.other.method.austral"
 						},
 						"2": {
-							"name": "entity.name.function.austral"
+							"name": "entity.name.function.method.austral"
+						},
+						"3": {
+							"name": "punctuation.section.parameters.begin.bracket.round.austral"
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#context_function_paramater_def"
+								}
+							]
+						},
+						"5": {
+							"name": "punctuation.section.parameters.end.bracket.round.austral"
+						},
+						"6": {
+							"name": "punctuation.definition.function.return-type.austral"
+						},
+						"7": {
+							"name": "meta.return-type.austral",
+							"patterns": [
+								{
+									"include": "#typespec"
+								}
+							]
 						}
-					},
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.semicolon.austral"
-						}
-					},
-					"patterns": [
-						{
-							"include": "#context_function_paramater_def"
-						}
-					]
+					}
 				},
 				{
 					"comment": "typeclass declaration",
@@ -807,7 +820,7 @@
 							},
 							"endCaptures": {
 								"0": {
-									"name": "punctuation.semicolon.austral"
+									"name": "punctuation.section.parameters.end.bracket.round.austral"
 								}
 							},
 							"patterns": [
