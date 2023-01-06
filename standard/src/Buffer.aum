@@ -77,7 +77,7 @@ module body Standard.Buffer is
                 let buf: Buffer[T] := Buffer(
                     capacity => minimum_capacity,
                     size => 0,
-                    array => value,
+                    array => value
                 );
                 return Some(buf);
             when None do
