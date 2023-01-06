@@ -730,11 +730,18 @@
 							"include": "#comment"
 						},
 						{
-							"include": "#typespec"
+							"match": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
+							"captures": {
+								"1": {
+									"name": "variable.parameter.austral"
+								},
+								"2": {
+									"name": "punctuation.colon.austral"
+								}
+							}
 						},
 						{
-							"name": "punctuation.colon.austral",
-							"match": ":"
+							"include": "#typespec"
 						},
 						{
 							"name": "punctuation.brackets.round.austral",
