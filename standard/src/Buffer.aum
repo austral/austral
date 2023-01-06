@@ -172,7 +172,7 @@ module body Standard.Buffer is
     """
     generic [T: Free, R: Region]
     function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
-        if pos >= buf->size then
+        if pos >= !buf->size then
             abort("storeNth: index out of range");
         end if;
         let ptr: Pointer[T] := positiveOffset(buf->array, pos);
@@ -183,7 +183,7 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T is
-        if pos >= buf->size then
+        if pos >= !buf->size then
             abort("swapNth: index out of range");
         end if;
         let ptr: Pointer[T] := positiveOffset(buf->array, pos);
