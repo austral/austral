@@ -19,4 +19,21 @@ module Standard.Buffer is
     """
     generic [T: Type]
     function safeAllocateEmpty(): Option[Buffer[T]];
+
+    """
+    Create a buffer of the given size, filling all slots with copies of the given
+    initial element.
+
+    The contained type has to be Free so it can be copied any number of times.
+
+    Aborts on allocation failure.
+    """
+    generic [T: Free]
+    function initialize(size: Index, initialElement: T): Buffer[T];
+
+    """
+    Like `initialize`, but returns `None` on allocation failure.
+    """
+    generic [T: Free]
+    function safeInitialize(size: Index, initialElement: T): Option[Buffer[T]];
 end module.

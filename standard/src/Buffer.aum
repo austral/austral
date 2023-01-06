@@ -80,4 +80,33 @@ module body Standard.Buffer is
                 return None();
         end case;
     end;
+
+    generic [T: Free]
+    function initialize(size: Index, initialElement: T): Buffer[T] is
+        let opt: Option[Buffer[T]] := safeInitialize(size, initialElement);
+        case opt of
+            when Some(value: Buffer[T]) do
+                return value;
+            when None do
+                abort("initialize: allocation failed");
+        end case;
+    end;
+
+    generic [T: Free]
+    function safeInitialize(size: Index, initialElement: T): Option[Buffer[T]] is
+        let capacity: Index := max(size, minimum_capacity);
+        let addr: Address[T] := allocateBuffer(capacity);
+        case nullCheck(addr) of
+            when Some(value: Pointer[T]) do
+                let buf: Buffer[T] := Buffer(
+                    capacity => capacity,
+                    size => size,
+                    data => value,
+                );
+                fill(&!buf, initialElement);
+                return Some(buf);
+            when None do
+                return None();
+        end case;
+    end;
 end module body.
