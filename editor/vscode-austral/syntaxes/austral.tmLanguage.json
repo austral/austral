@@ -661,6 +661,32 @@
 				}
 			]
 		},
+		"context_function_paramater_def": {
+			"name": "meta.function.parameters.austral",
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"match": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
+					"captures": {
+						"1": {
+							"name": "variable.parameter.austral"
+						},
+						"2": {
+							"name": "punctuation.colon.austral"
+						}
+					}
+				},
+				{
+					"include": "#typespec"
+				},
+				{
+					"name": "punctuation.brackets.round.austral",
+					"match": "[\\(\\)]"
+				}
+			]
+		},
 		"declarations": {
 			"patterns": [
 				{
@@ -727,25 +753,7 @@
 					},
 					"patterns": [
 						{
-							"include": "#comment"
-						},
-						{
-							"match": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
-							"captures": {
-								"1": {
-									"name": "variable.parameter.austral"
-								},
-								"2": {
-									"name": "punctuation.colon.austral"
-								}
-							}
-						},
-						{
-							"include": "#typespec"
-						},
-						{
-							"name": "punctuation.brackets.round.austral",
-							"match": "[\\(\\)]"
+							"include": "#context_function_paramater_def"
 						}
 					]
 				},
@@ -804,18 +812,7 @@
 							},
 							"patterns": [
 								{
-									"include": "#comment"
-								},
-								{
-									"include": "#typespec"
-								},
-								{
-									"name": "punctuation.colon.austral",
-									"match": ":"
-								},
-								{
-									"name": "punctuation.brackets.round.austral",
-									"match": "[\\(\\)]"
+									"include": "#context_function_paramater_def"
 								}
 							]
 						},
