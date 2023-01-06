@@ -195,7 +195,7 @@ module body Standard.Buffer is
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit is
         for i from 0 to (!buf->size) - 1 do
-            storeNth(buf, element);
+            storeNth(buf, i, element);
         end for;
         return nil;
     end;
