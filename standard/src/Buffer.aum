@@ -14,6 +14,12 @@ module body Standard.Buffer is
     pragma Unsafe_Module;
 
     """
+    The smallest value of capacity. Enforced at array allocation
+    time.
+    """
+    constant minimum_capacity: Index := 16;
+
+    """
     The growth factor times the array's capacity tells us the next size of
     the array when resizing. Naively, we double the size of the array when
     hitting the capacity.
