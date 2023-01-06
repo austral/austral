@@ -6,9 +6,6 @@
 			"include": "#comment"
 		},
 		{
-			"include": "#expression"
-		},
-		{
 			"include": "#module"
 		},
 		{
@@ -479,9 +476,8 @@
 		},
 		"constant_decl": {
 			"comment": "constant declaration",
-			"begin": "(constant)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
-			"end": ";",
-			"beginCaptures": {
+			"match": "(constant)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
+			"captures": {
 				"1": {
 					"name": "keyword.other.austral storage.type.constant.austral"
 				},
@@ -490,18 +486,15 @@
 				},
 				"3": {
 					"name": "punctuation.colon.austral"
+				},
+				"4": {
+					"patterns": [
+						{
+							"include": "#typespec"
+						}
+					]
 				}
-			},
-			"endCaptures": {
-				"0": {
-					"name": "punctuation.semicolon.austral"
-				}
-			},
-			"patterns": [
-				{
-					"include": "#typespec"
-				}
-			]
+			}
 		},
 		"declarations": {
 			"patterns": [
