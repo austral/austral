@@ -114,6 +114,23 @@ module body Standard.Buffer is
         end case;
     end;
 
+    generic [T: Free]
+    function destroyFree(buffer: Buffer[T]): Unit is
+        let { capacity: Index, size: Index, array: Pointer[T] } := buffer;
+        deallocate(array);
+        return nil;
+    end;
+
+    generic [T: Type]
+    function destroyEmpty(buffer: Buffer[T]): Unit is
+        let { capacity: Index, size: Index, array: Pointer[T] } := buffer;
+        if size /= 0 then
+            abort("destroyEmpty called with a non-empty buffer.");
+        end if;
+        deallocate(array);
+        return nil;
+    end;
+
     ---
     --- Retrieve
     ---

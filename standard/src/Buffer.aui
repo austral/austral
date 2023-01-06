@@ -41,6 +41,18 @@ module Standard.Buffer is
     generic [T: Free]
     function safeInitialize(size: Index, initialElement: T): Option[Buffer[T]];
 
+    """
+    Deallocate a buffer with Free elements.
+    """
+    generic [T: Free]
+    function destroyFree(buffer: Buffer[T]): Unit;
+
+    """
+    Destroy an empty buffer.
+    """
+    generic [T: Type]
+    function destroyEmpty(buffer: Buffer[T]): Unit;
+
     ---
     --- Retrieve
     ---
