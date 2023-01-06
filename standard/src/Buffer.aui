@@ -50,6 +50,12 @@ module Standard.Buffer is
     ---
 
     """
+    Store `element` in the given position of `buf`.
+    """
+    generic [T: Free, R: Region]
+    function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
+
+    """
     Store `element` in every position of `buf`.
     """
     generic [T: Free, R: Region]
