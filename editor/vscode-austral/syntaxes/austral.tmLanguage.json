@@ -208,6 +208,26 @@
 					"include": "#constants"
 				},
 				{
+					"comment": "sub-expression",
+					"begin": "\\(",
+					"end": "\\)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.expression.begin.bracket.round.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.expression.begin.bracket.round.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#expression"
+						}
+					]
+				},
+				{
 					"comment": "sizeof operator",
 					"begin": "\\b(sizeof)\\s*(\\()",
 					"end": "\\)",
