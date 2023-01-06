@@ -2,5 +2,8 @@
 This module implements the Buffer type, a linear, resizable, heap-allocated buffer.
 """
 module Standard.Buffer is
-
+    """
+    The buffer type.
+    """
+    type Buffer[T: Type]: Linear;
 end module.

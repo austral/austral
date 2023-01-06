@@ -11,5 +11,23 @@ import Austral.Memory (
 );
 
 module body Standard.Buffer is
+    pragma Unsafe_Module;
 
+    """
+    The growth factor times the array's capacity tells us the next size of
+    the array when resizing. Naively, we double the size of the array when
+    hitting the capacity.
+    """
+    constant growth_factor: Index := 2;
+
+    record Buffer[T: Type]: Linear is
+        -- The capacity is the true underlying size. It is different from the
+        -- size since we allocate more space than we need in order to minimize
+        -- frequent reallocation.
+        capacity: Index;
+        -- The number of elements actually stored in the array.
+        size: Index;
+        -- The underlying heap array.
+        array: Pointer[T];
+    end;
 end module body.
