@@ -53,4 +53,31 @@ module body Standard.Buffer is
         end;
         return nil;
     end;
+
+    generic [T: Type]
+    function allocateEmpty(): Buffer[T] is
+        let opt: Option[Buffer[T]] := safeAllocateEmpty();
+        case opt of
+            when Some(value: Buffer[T]) do
+                return value;
+            when None do
+                abort("allocateEmpty: allocation failed");
+        end case;
+    end;
+
+    generic [T: Type]
+    function safeAllocateEmpty(): Option[Buffer[T]] is
+        let addr: Address[T] := allocateBuffer(minimum_capacity);
+        case nullCheck(addr) of
+            when Some(value: Pointer[T]) do
+                let buf: Buffer[T] := Buffer(
+                    capacity => minimum_capacity,
+                    size => 0,
+                    data => value,
+                );
+                return Some(buf);
+            when None do
+                return None();
+        end case;
+    end;
 end module body.

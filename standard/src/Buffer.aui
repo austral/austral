@@ -6,4 +6,17 @@ module Standard.Buffer is
     The buffer type.
     """
     type Buffer[T: Type]: Linear;
+
+    """
+    Allocates an empty buffer. Aborts on allocation failure.
+    """
+    generic [T: Type]
+    function allocateEmpty(): Buffer[T];
+
+    """
+    Allocates an empty buffer. Returns `None` on allocation
+    failure.
+    """
+    generic [T: Type]
+    function safeAllocateEmpty(): Option[Buffer[T]];
 end module.
