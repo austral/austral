@@ -288,7 +288,7 @@
 			"patterns": [
 				{
 					"match": "\\b(if|then|else)\\b",
-					"name": "keyword.control.inline.austral"
+					"name": "keyword.control.$1.inline.austral"
 				},
 				{
 					"match": "\\bsizeof\\b",
@@ -297,6 +297,18 @@
 				{
 					"match": "(\\@embed)",
 					"name": "keyword.operator.embed.austral keyword.other.embed.austral"
+				}
+			]
+		},
+		"statement_keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.$1.austral",
+					"match": "\\b(return|case|for|while|if|then|else|skip)\\b"
+				},
+				{
+					"name": "keyword.other.${0/ /\\-/}.austral",
+					"match": "\\bend\\s+(for|while|if|case)\\b"
 				}
 			]
 		},
@@ -723,6 +735,70 @@
 				}
 			}
 		},
+		"statements": {
+			"patterns": [
+				{
+					"include": "#let_simple"
+				},
+				{
+					"include": "#let_destructure"
+				},
+				{
+					"include": "#if_statement"
+				},
+				{
+					"include": "#if_body"
+				},
+				{
+					"include": "#statement_keywords"
+				},
+				{
+					"include": "#expression"
+				},
+				{
+					"include": "#constant_decl"
+				},
+				{
+					"include": "#assignment"
+				}
+			]
+		},
+		"if_statement": {
+			"comment": "head of an (else) if statement",
+			"begin": "\\b(else\\s+)?if\\b",
+			"end": "(?=\\bthen\\b)",
+			"beginCaptures": {
+				"0": {
+					"name": "keyword.control.$0.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#expression"
+				}
+			]
+		},
+		"if_body": {
+			"name": "meta.if-body.austral",
+			"comment": "the body of an if/else statement",
+			"begin": "\\b(then|else)\\b",
+			"end": "\\b(?:(?=else)|(end\\s+if))\\b",
+			"beginCaptures": {
+				"0": {
+					"name": "keyword.control.$0.a.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "keyword.other.$0.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#statements"
+				}
+			]
+		},
 		"function_body": {
 			"name": "meta.function.austral",
 			"begin": "(?<=(function|method).+)(is)",
@@ -739,19 +815,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#let_simple"
-				},
-				{
-					"include": "#let_destructure"
-				},
-				{
-					"include": "#expression"
-				},
-				{
-					"include": "#constant_decl"
-				},
-				{
-					"include": "#assignment"
+					"include": "#statements"
 				}
 			]
 		},
