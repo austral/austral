@@ -79,7 +79,7 @@ module body Standard.Buffer is
                     size => 0,
                     array => value
                 );
-                return Some(buf);
+                return Some(value => buf);
             when None do
                 return None();
         end case;
@@ -108,10 +108,19 @@ module body Standard.Buffer is
                     array => value
                 );
                 fill(&!buf, initialElement);
-                return Some(buf);
+                return Some(value => buf);
             when None do
                 return None();
         end case;
+    end;
+
+    -- TODO: move this to a better place
+    function max(a: Index, b: Index): Index is
+        if a > b then
+            return a;
+        else
+            return b;
+        end if;
     end;
 
     generic [T: Free]
@@ -140,13 +149,13 @@ module body Standard.Buffer is
     """
     generic [T: Type, R: Region]
     function length(buf: &[Buffer[T], R]): Index is
-        return buf->size;
+        return !buf->size;
     end;
 
 
     generic [T: Free, R: Region]
     function nth(buf: &![Buffer[T], R], pos: Index): T is
-        if index >= buf->size then
+        if pos >= buf->size then
             abort("nth: index out of range");
         end if;
         let ptr: Pointer[T] := positiveOffset(buf->array, pos);
@@ -163,7 +172,7 @@ module body Standard.Buffer is
     """
     generic [T: Free, R: Region]
     function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
-        if index >= buf->size then
+        if pos >= buf->size then
             abort("storeNth: index out of range");
         end if;
         let ptr: Pointer[T] := positiveOffset(buf->array, pos);
@@ -174,7 +183,7 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T is
-        if index >= buf->size then
+        if pos >= buf->size then
             abort("swapNth: index out of range");
         end if;
         let ptr: Pointer[T] := positiveOffset(buf->array, pos);
