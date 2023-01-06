@@ -3,6 +3,12 @@
 	"name": "Austral",
 	"patterns": [
 		{
+			"include": "#comment"
+		},
+		{
+			"include": "#path"
+		},
+		{
 			"include": "#module"
 		},
 		{
@@ -151,6 +157,55 @@
 							"name": "invalid.illegal.char-literal.austral"
 						}
 					]
+				}
+			]
+		},
+		"path": {
+			"patterns": [
+				{
+					"comment": "array access",
+					"begin": "(?<=[\\)\\]a-zA-Z0-9_])(\\[)",
+					"end": "\\]",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.begin.bracket.square.c"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.end.bracket.square.c"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#expression"
+						}
+					]
+				},
+				{
+					"comment": "slot access (including pointer)",
+					"match": "(?<=[\\)\\]a-zA-Z0-9_])(?:(\\.)|(->))([a-zA-Z][a-zA-Z0-9_]*)",
+					"captures": {
+						"1": {
+							"name": "punctuation.separator.slot-access.austral"
+						},
+						"2": {
+							"name": "punctuation.separator.pointer-slot-access.austral"
+						},
+						"3": {
+							"name": "variable.other.member.austral"
+						}
+					}
+				}
+			]
+		},
+		"expression": {
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#constants"
 				}
 			]
 		},
