@@ -261,6 +261,22 @@
 				}
 			]
 		},
+		"expression_keywords": {
+			"patterns": [
+				{
+					"match": "\\b(if|then|else)\\b",
+					"name": "keyword.control.inline.austral"
+				},
+				{
+					"match": "\\bsizeof\\b",
+					"name": "keyword.operator.sizeof.austral keyword.other.sizeof.austral"
+				},
+				{
+					"match": "(\\@embed)",
+					"name": "keyword.operator.embed.austral keyword.other.embed.austral"
+				}
+			]
+		},
 		"expression": {
 			"patterns": [
 				{
@@ -271,6 +287,9 @@
 				},
 				{
 					"include": "#operators"
+				},
+				{
+					"include": "#expression_keywords"
 				},
 				{
 					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[.*\\])?)",
