@@ -273,6 +273,21 @@
 					"include": "#operators"
 				},
 				{
+					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[.*\\])?)",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.typecast.austral"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#typespec"
+								}
+							]
+						}
+					}
+				},
+				{
 					"comment": "sub-expression",
 					"begin": "\\(",
 					"end": "\\)",
