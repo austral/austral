@@ -137,5 +137,6 @@ module body Standard.Buffer is
         for i from 0 to buf-> size - 1 do
             storeNth(buf, element);
         end for;
+        return nil;
     end;
 end module body.
