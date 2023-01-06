@@ -30,4 +30,21 @@ module body Standard.Buffer is
         -- The underlying heap array.
         array: Pointer[T];
     end;
+
+    """
+    Check invariants.
+    """
+    generic [T: Type, R: Region]
+    function invariants(buf: &[Buffer[T], R]): Unit is
+        -- Size is always strictly less than the capacity. When resizing, if
+        -- the size matches the capacity, we bump up.
+        if buf-> size >= buf->capacity then
+            abort("Buffer size >= capacity");
+        end;
+        -- Capacity is always non-zero.
+        if buf->capacity = 0 then
+            abort("Buffer capacity = 0");
+        end;
+        return nil;
+    end;
 end module body.
