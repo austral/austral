@@ -6,6 +6,9 @@
 			"include": "#comment"
 		},
 		{
+			"include": "#module_body"
+		},
+		{
 			"include": "#module"
 		},
 		{
@@ -862,6 +865,39 @@
 					"patterns": [
 						{
 							"include": "#declarations"
+						}
+					]
+				}
+			]
+		},
+		"module_body": {
+			"patterns": [
+				{
+					"comment": "module body",
+					"begin": "(module\\s+body)\\s+([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s+(is)",
+					"end": "end\\s+module\\s+body\\s*\\.",
+					"beginCaptures": {
+						"1": {
+							"name": "storage.type.module.austral"
+						},
+						"2": {
+							"name": "entity.name.module.austral"
+						},
+						"3": {
+							"name": "storage.type.module.austral keyword.other.is.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "storage.type.module.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#declarations"
+						},
+						{
+							"include": "#assignment"
 						}
 					]
 				}
