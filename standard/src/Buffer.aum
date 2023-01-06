@@ -7,7 +7,8 @@ import Austral.Memory (
     nullCheck,
     positiveOffset,
     store,
-    load
+    load,
+    memcpy
 );
 
 module body Standard.Buffer is
@@ -203,6 +204,21 @@ module body Standard.Buffer is
     ---
     --- Insertion
     ---
+
+    """
+    Increase the capacity of the array.
+
+    Aborts on allocation failure.
+    """
+    generic [T: Free, R: Region]
+    function bump(buf: &![Buffer[T], R]): Unit is
+        let new_capacity: Index := (!buf->capacity) * 2;
+        let new_array: Pointer[T] := resizeArray(!buf->array, new_capacity);
+        memcpy(new_array, !buf->array, sizeof(T) * (!buf->size));
+        buf->capacity := new_capacity;
+        buf->array := new_array;
+        return nil;
+    end;
 
     ---
     --- Removal
