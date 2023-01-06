@@ -199,4 +199,12 @@ module body Standard.Buffer is
         end for;
         return nil;
     end;
+
+    ---
+    --- Insertion
+    ---
+
+    ---
+    --- Removal
+    ---
 end module body.
