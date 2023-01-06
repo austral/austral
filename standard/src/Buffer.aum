@@ -46,11 +46,11 @@ module body Standard.Buffer is
         -- the size matches the capacity, we bump up.
         if buf-> size >= buf->capacity then
             abort("Buffer size >= capacity");
-        end;
+        end if;
         -- Capacity is always non-zero.
         if buf->capacity = 0 then
             abort("Buffer capacity = 0");
-        end;
+        end if;
         return nil;
     end;
 
