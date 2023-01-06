@@ -143,6 +143,18 @@ module body Standard.Buffer is
         return nil;
     end;
 
+
+    generic [T: Type, R: Region]
+    function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T is
+        if index >= buf->size then
+            abort("storeNth: index out of range");
+        end if;
+        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
+        let previous: T := load(ptr);
+        store(ptr, element);
+        return previous;
+    end;
+
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit is
         for i from 0 to buf-> size - 1 do
