@@ -44,11 +44,11 @@ module body Standard.Buffer is
     function invariants(buf: &[Buffer[T], R]): Unit is
         -- Size is always strictly less than the capacity. When resizing, if
         -- the size matches the capacity, we bump up.
-        if buf-> size >= buf->capacity then
+        if (!buf->size) >= (!buf->capacity) then
             abort("Buffer size >= capacity");
         end if;
         -- Capacity is always non-zero.
-        if buf->capacity = 0 then
+        if (!buf->capacity) = 0 then
             abort("Buffer capacity = 0");
         end if;
         return nil;
