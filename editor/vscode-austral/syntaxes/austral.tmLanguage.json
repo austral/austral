@@ -805,7 +805,7 @@
 			"end": "\\b(end)\\b",
 			"beginCaptures": {
 				"0": {
-					"name": "punctuation.definition.block.end.austral keyword.other.is.austral"
+					"name": "punctuation.definition.block.begin.austral keyword.other.is.austral"
 				}
 			},
 			"endCaptures": {
