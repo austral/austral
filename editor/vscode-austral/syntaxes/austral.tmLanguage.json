@@ -796,6 +796,90 @@
 				}
 			]
 		},
+		"case_head": {
+			"begin": "\\bcase\\b",
+			"end": "(?=\\bof\\b)",
+			"beginCaptures": {
+				"0": {
+					"name": "keyword.control.$0.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#expression"
+				}
+			]
+		},
+		"when_head": {
+			"begin": "\\bwhen\\b",
+			"end": "\\bdo\\b",
+			"beginCaptures": {
+				"0": {
+					"name": "keyword.control.$0.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.begin.austral keyword.control.$0.austral"
+				}
+			},
+			"patterns": [
+				{
+					"match": "\\b[a-zA-Z][a-zA-Z0-9_]*\\b",
+					"name": "entity.name.type.austral"
+				},
+				{
+					"begin": "\\(",
+					"end": "\\)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.binding-pattern.begin.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.binding-pattern.end.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#comment"
+						},
+						{
+							"include": "#context_binding_list"
+						}
+					]
+				}
+			]
+		},
+		"case_body": {
+			"begin": "\\bof\\b",
+			"end": "\\bend case\\b",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.begin.austral keyword.control.$0.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.end.austral keyword.control.$0.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#when_head"
+				},
+				{
+					"include": "#statements"
+				}
+			]
+		},
 		"statements": {
 			"patterns": [
 				{
@@ -808,6 +892,9 @@
 					"include": "#if_statement"
 				},
 				{
+					"include": "#case_head"
+				},
+				{
 					"include": "#for_loop_head"
 				},
 				{
@@ -815,6 +902,9 @@
 				},
 				{
 					"include": "#if_body"
+				},
+				{
+					"include": "#case_body"
 				},
 				{
 					"include": "#loop_body"
@@ -869,6 +959,34 @@
 				}
 			]
 		},
+		"context_binding_list": {
+			"patterns": [
+				{
+					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.type.annotation.austral"
+						},
+						"2": {
+							"name": "meta.binding-type.austral",
+							"patterns": [
+								{
+									"include": "#typespec"
+								}
+							]
+						}
+					}
+				},
+				{
+					"match": "\\b[a-zA-Z][a-zA-Z0-9_]*\\b",
+					"name": "variable.other.binding.austral"
+				},
+				{
+					"match": "\\bas\\b",
+					"name": "keyword.operator.as.austral"
+				}
+			]
+		},
 		"function_body": {
 			"name": "meta.function.austral",
 			"begin": "(?<=(function|method).+)(is)",
@@ -897,38 +1015,17 @@
 					"name": "storage.type.variable.austal"
 				},
 				"2": {
-					"name": "punctuation.definition.binding-pattern.austral"
+					"name": "punctuation.definition.binding-pattern.begin.austral"
 				}
 			},
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.binding-pattern.austral"
+					"name": "punctuation.definition.binding-pattern.end.austral"
 				}
 			},
 			"patterns": [
 				{
-					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
-					"captures": {
-						"1": {
-							"name": "keyword.operator.type.annotation.austral"
-						},
-						"2": {
-							"name": "meta.binding-type.austral",
-							"patterns": [
-								{
-									"include": "#typespec"
-								}
-							]
-						}
-					}
-				},
-				{
-					"match": "\\b[a-zA-Z][a-zA-Z0-9_]*\\b",
-					"name": "variable.other.binding.austral"
-				},
-				{
-					"match": "\\bas\\b",
-					"name": "keyword.operator.as.austral"
+					"include": "#context_binding_list"
 				}
 			]
 		},
