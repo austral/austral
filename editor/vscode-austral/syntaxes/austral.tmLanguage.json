@@ -735,6 +735,67 @@
 				}
 			}
 		},
+		"for_loop_head": {
+			"begin": "\\bfor\\b",
+			"end": "(?=\\bdo\\b)",
+			"beginCaptures": {
+				"0": {
+					"name": "keyword.control.for.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "keyword.control.do.austral"
+				}
+			},
+			"patterns": [
+				{
+					"match": "\\b(from|to)\\b",
+					"name": "keyword.control.$0.austral"
+				},
+				{
+					"include": "#expression"
+				}
+			]
+		},
+		"while_loop_head": {
+			"begin": "\\bwhile\\b",
+			"end": "(?=\\bdo\\b)",
+			"beginCaptures": {
+				"0": {
+					"name": "keyword.control.while.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "keyword.control.do.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#expression"
+				}
+			]
+		},
+		"loop_body": {
+			"begin": "do",
+			"end": "\\bend\\s+(for|while)\\b",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.begin.austral keyword.control.$0.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.end.austral keyword.control.$0.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#statements"
+				}
+			]
+		},
 		"statements": {
 			"patterns": [
 				{
@@ -747,7 +808,16 @@
 					"include": "#if_statement"
 				},
 				{
+					"include": "#for_loop_head"
+				},
+				{
+					"include": "#while_loop_head"
+				},
+				{
 					"include": "#if_body"
+				},
+				{
+					"include": "#loop_body"
 				},
 				{
 					"include": "#statement_keywords"
