@@ -1,0 +1,17 @@
+
+Error:
+  Title: Type Error
+  Module:
+    IntWrapper
+  Location:
+    Filename: 'test-programs/suites/012-numbers/add-Nat8-Nat64/Test.aum'
+    From: line 3, column 8
+    To: line 3, column 31
+  Description:
+    Expected a value of type `Nat8` , but got a value of type `Nat64`
+  Code:
+    1 | module body IntWrapper is
+    2 |     function main() : ExitCode is
+    3 |         let a: Nat8 := 10;
+    4 |         let b: Nat64 := 20;
+    5 |         let c: Nat8 := a * b;

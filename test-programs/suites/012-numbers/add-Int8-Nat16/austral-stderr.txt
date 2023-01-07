@@ -1,0 +1,17 @@
+
+Error:
+  Title: Type Error
+  Module:
+    IntWrapper
+  Location:
+    Filename: 'test-programs/suites/012-numbers/add-Int8-Nat16/Test.aum'
+    From: line 3, column 8
+    To: line 3, column 31
+  Description:
+    Expected a value of type `Int8` , but got a value of type `Nat16`
+  Code:
+    1 | module body IntWrapper is
+    2 |     function main() : ExitCode is
+    3 |         let a: Int8 := 10;
+    4 |         let b: Nat16 := 20;
+    5 |         let c: Int8 := a * b;
