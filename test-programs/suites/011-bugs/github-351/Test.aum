@@ -1,0 +1,23 @@
+module body Test is
+  record Wrapper : Linear is
+    val : Int32;
+  end;
+
+  function get (n : Int32) : Wrapper is
+    return Wrapper( val => 42 );
+  end;
+
+  function drop(w : Wrapper) : Unit is
+    let { val : Int32 }  := w;
+    printLn("Dropping ");
+    printLn(val);
+    return nil;
+  end;
+
+  function main() : ExitCode is
+    let w : Wrapper := Wrapper( val => 42 );
+    printLn(w.val);
+    drop(w); -- consume 
+    return ExitSuccess();
+  end;
+end module body.
