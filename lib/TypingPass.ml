@@ -110,18 +110,21 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
            in
            augment_call module_name env lexenv asserted_ty op_qname args
          in
+         let arith_error _ =
+           austral_raise TypeError [
+               Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
+               Code (type_string lhs_ty);
+               Text "but the RHS has type";
+               Code (type_string rhs_ty)
+             ]
+         in
          (* Are the types the same? *)
          if lhs_ty = rhs_ty then
            (* If the types are the same type, check it is a numeric type. *)
            if (is_numeric lhs_ty) then
              augment_arithmetic_call ()
            else
-             austral_raise TypeError [
-                 Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
-                 Code (type_string lhs_ty);
-                 Text "but the RHS has type";
-                 Code (type_string rhs_ty)
-               ]
+             arith_error ()
          else
            (* If the types are different, check if at least one operator is a constant.*)
            let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
@@ -130,12 +133,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
              (* If either operand is a constant, let it pass *)
              augment_arithmetic_call ()
            else
-             austral_raise TypeError [
-                 Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
-                 Code (type_string lhs_ty);
-                 Text ", but the RHS has type";
-                 Code (type_string rhs_ty)
-               ]
+             arith_error ()
       | Comparison (op, lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
