@@ -158,7 +158,7 @@ module body Standard.Buffer is
 
 
     generic [T: Free, R: Region]
-    function nth(buf: &![Buffer[T], R], pos: Index): T is
+    function nth(buf: &[Buffer[T], R], pos: Index): T is
         if pos >= (!buf->size) then
             abort("nth: index out of range");
         end if;

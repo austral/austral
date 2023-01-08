@@ -67,7 +67,7 @@ module Standard.Buffer is
     Return the nth element of `buf`.
     """
     generic [T: Free, R: Region]
-    function nth(buf: &![Buffer[T], R], pos: Index): T;
+    function nth(buf: &[Buffer[T], R], pos: Index): T;
 
     ---
     --- Update
