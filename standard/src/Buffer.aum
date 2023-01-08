@@ -380,7 +380,7 @@ module body Standard.Buffer is
     --- Reversal
     ---
 
-    generic [T: Free, R: Region]
+    generic [T: Type, R: Region]
     function reverse(buf: &![Buffer[T], R]): Unit is
         if (!buf->size) > 0 then
             for i from 0 to (!buf->size) / 2 do
