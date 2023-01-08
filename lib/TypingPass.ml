@@ -21,6 +21,7 @@ open TastUtil
 open Linked
 open Util
 open Reporter
+open BuiltIn
 open Error
 
 (* Since the extraction pass has already happened, we can simplify the call to
@@ -84,11 +85,36 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
          let lhs_ty = get_type lhs'
          and rhs_ty = get_type rhs'
          in
+         let augment_arithmetic_call _ =
+             (* Because method calls don't implement the lenient type checking
+                rules for arithmetic, we have to cast the arguments to their
+                expected types, so that constants are allowed to be used as
+                arguments. This means we have to transform a `ty` into a type
+                specifier. *)
+           let op_name =
+             match op with
+             | Add ->
+                "trappingAdd"
+             | Subtract ->
+                "trappingSubtract"
+             | Multiply ->
+                "trappingMultiply"
+             | Divide ->
+                "trappingDivide"
+           in
+           let op_qname = make_qident (pervasive_module_name, make_ident op_name, make_ident op_name) in
+           let args: typed_arglist = TPositionalArglist [
+                          TCast (lhs', lhs_ty);
+                          TCast (rhs', lhs_ty);
+                        ]
+           in
+           augment_call module_name env lexenv asserted_ty op_qname args
+         in
          (* Are the types the same? *)
          if lhs_ty = rhs_ty then
            (* If the types are the same type, check it is a numeric type. *)
            if (is_numeric lhs_ty) then
-             TArithmetic (op, lhs', rhs')
+             augment_arithmetic_call ()
            else
              austral_raise TypeError [
                  Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
@@ -102,7 +128,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
            and are_float_constants = (is_float_constant lhs) || (is_float_constant rhs) in
            if (are_int_constants || are_float_constants) then
              (* If either operand is a constant, let it pass *)
-             TArithmetic (op, lhs', rhs')
+             augment_arithmetic_call ()
            else
              austral_raise TypeError [
                  Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
@@ -649,8 +675,8 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
                (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
                 | Some (InsMethRec { id; _ }) -> id
                 | None -> internal_err ("Couldn't get instance method for `"
-                                       ^ (ident_string (original_name callable_name))
-                                       ^ "`"))
+                                        ^ (ident_string (original_name callable_name))
+                                        ^ "`"))
              in
              ps ("Bindings", show_bindings bindings'');
              let substs = make_substs instance_bindings typarams in
@@ -689,15 +715,15 @@ and check_argument_list' (env: env) (module_name: module_name) (bindings: type_b
   | ([], []) ->
      bindings
   | _ ->
-   internal_err ("couldn't check argument list in module `"
-                 ^ (mod_name_string module_name)
-                 ^ "` with bindings: "
-                 ^ (show_type_bindings bindings)
-                 ^ ",\n params: `{ "
-                 ^ (String.concat ", " (List.map show_value_parameter params))
-                 ^ " }`,\n and args: `{ "
-                 ^ (String.concat ", " (List.map show_texpr args))
-                 ^ "}`")
+     internal_err ("couldn't check argument list in module `"
+                   ^ (mod_name_string module_name)
+                   ^ "` with bindings: "
+                   ^ (show_type_bindings bindings)
+                   ^ ",\n params: `{ "
+                   ^ (String.concat ", " (List.map show_value_parameter params))
+                   ^ " }`,\n and args: `{ "
+                   ^ (String.concat ", " (List.map show_texpr args))
+                   ^ "}`")
 
 and match_parameter (env: env) (module_name: module_name) (param: value_parameter) (arg: texpr): type_bindings =
   let (ValueParameter (_, ty)) = param in
@@ -1176,7 +1202,7 @@ and is_constant = function
      true
   | TArithmetic (_, lhs, rhs) ->
      (is_constant lhs) && (is_constant rhs)
-  | TFuncall _ ->
+   | TFuncall _ ->
      false
   | TMethodCall _ ->
      false
