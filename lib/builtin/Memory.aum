@@ -92,4 +92,11 @@ module body Austral.Memory is
     function negativeOffset(pointer: Pointer[T], offset: Index): Pointer[T] is
         return @embed(Pointer[T], "$1 - $2", pointer, offset);
     end;
+
+    function arraySizeInBytes(elem_size: ByteSize, count: Index): ByteSize is
+        -- FIXME: Use a proper Index->ByteSize conversion function.
+        let count_bytes: ByteSize := @embed(ByteSize, "$1", count);
+        let size: ByteSize := elem_size * count_bytes;
+        return size;
+    end;
 end module body.

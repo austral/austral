@@ -43,4 +43,6 @@ module Austral.Memory is
 
     generic [T: Type]
     function negativeOffset(pointer: Pointer[T], offset: Index): Pointer[T];
+
+    function arraySizeInBytes(elem_size: ByteSize, count: Index): ByteSize;
 end module.
