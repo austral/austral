@@ -1206,6 +1206,58 @@
 				}
 			}
 		},
+		"instance_head": {
+			"name": "meta.instance.austral",
+			"match": "\\b(instance)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))",
+			"captures": {
+				"1": {
+					"name": "keyword.other.instance.austral"
+				},
+				"2": {
+					"name": "entity.name.type.austral"
+				},
+				"3": {
+					"name": "punctuation.brackets.round.austral"
+				},
+				"4": {
+					"patterns": [
+						{
+							"include": "#typespec"
+						}
+					]
+				},
+				"5": {
+					"name": "punctuation.brackets.round.austral"
+				}
+			}
+		},
+		"instance_body": {
+			"name": "meta.instance.austral",
+			"begin": "(?<=instance.+)(is)",
+			"end": "\\b(end)\\b",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.instance.begin.austral keyword.other.is.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.instance.end.austral keyword.other.end.austral"
+				}
+			},
+			"patterns": [
+				{
+					"match": "\\bfunction\\b",
+					"name": "invalid.illegal.function-in-instance.austral"
+				},
+				{
+					"include": "#function_decl"
+				},
+				{
+					"include": "#function_body"
+				}
+			]
+		},
 		"declarations": {
 			"patterns": [
 				{
@@ -1309,32 +1361,7 @@
 					]
 				},
 				{
-					"name": "meta.instance.austral",
-					"match": "\\b(instance)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))\\s*(;)",
-					"captures": {
-						"1": {
-							"name": "keyword.other.instance.austral"
-						},
-						"2": {
-							"name": "entity.name.type.austral"
-						},
-						"3": {
-							"name": "punctuation.brackets.round.austral"
-						},
-						"4": {
-							"patterns": [
-								{
-									"include": "#typespec"
-								}
-							]
-						},
-						"5": {
-							"name": "punctuation.brackets.round.austral"
-						},
-						"6": {
-							"name": "punctuation.semicolon.austral"
-						}
-					}
+					"include": "#instance_head"
 				}
 			]
 		},
@@ -1396,6 +1423,9 @@
 			"patterns": [
 				{
 					"include": "#pragma"
+				},
+				{
+					"include": "#instance_body"
 				},
 				{
 					"include": "#function_body"
