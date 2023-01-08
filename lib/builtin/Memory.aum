@@ -60,9 +60,14 @@ module body Austral.Memory is
         return @embed(&![T, R], "*($1)", ref);
     end;
 
+    function sizeToIndex(size: ByteSize): Index is
+        -- Arguably this should be in `Pervasive`.
+        return @embed(Index, "$1", size);
+    end;
+
     generic [T: Type]
     function resizeArray(array: Pointer[T], size: Index): Pointer[T] is
-        let total: ByteSize := sizeof(T) * size;
+        let total: Index := sizeToIndex(sizeof(T)) * size;
         return @embed(Pointer[T], "au_realloc($1, $2)", array, total);
     end;
 
