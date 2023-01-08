@@ -196,6 +196,26 @@ module body Standard.Buffer is
         return previous;
     end;
 
+    generic [T: Type, R: Region]
+    function swapIndex(buf: &![Buffer[T], R], a: Index, b: Index): Unit is
+        if a >= (!buf->size) then
+            abort("swapIndex: first index out of range");
+        end if;
+        if b >= (!buf->size) then
+            abort("swapIndex: second index out of range");
+        end if;
+        -- Load a and b.
+        let a_ptr: Pointer[T] := positiveOffset(!buf->array, a);
+        let b_ptr: Pointer[T] := positiveOffset(!buf->array, b);
+        let elem_a: T := load(a_ptr);
+        let elem_b: T := load(b_ptr);
+        -- Store b in a.
+        store(a_ptr, elem_b);
+        -- Store a in b.
+        store(b_ptr, elem_a);
+        return nil;
+    end;
+
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit is
         for i from 0 to (!buf->size) - 1 do
@@ -335,6 +355,18 @@ module body Standard.Buffer is
         let target_ptr: Pointer[T] := negativeOffset(start_ptr, count);
         -- Move.
         memmove(target_ptr, start_ptr, chunk_size);
+        return nil;
+    end;
+
+    ---
+    --- Reversal
+    ---
+
+    generic [T: Free, R: Region]
+    function reverse(buf: &![Buffer[T], R]): Unit is
+        for i from 0 to (!buf->size) / 2 do
+            swapIndex(buf, i, ((!buf->size) - i) - 1);
+        end for;
         return nil;
     end;
 end module body.

@@ -86,6 +86,9 @@ module Standard.Buffer is
     generic [T: Type, R: Region]
     function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T;
 
+    generic [T: Type, R: Region]
+    function swapIndex(buf: &![Buffer[T], R], a: Index, b: Index): Unit;
+
     """
     Store `element` in every position of `buf`.
     """
@@ -117,4 +120,11 @@ module Standard.Buffer is
 
     generic [T: Free, R: Region]
     function removeLast(buf: &![Buffer[T], R]): T;
+
+    ---
+    --- Reversal
+    ---
+
+    generic [T: Free, R: Region]
+    function reverse(buf: &![Buffer[T], R]): Unit;
 end module.
