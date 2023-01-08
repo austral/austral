@@ -1,6 +1,4 @@
 open Imports
-open Identifier
-open BuiltIn
 open Cst
 open Ast
 open Escape
@@ -64,19 +62,7 @@ and abs_expr im expr =
   | CFuncall (_, name, args) ->
      FunctionCall (qualify_identifier im name, abs_arglist im args)
   | CArith (_, op, lhs, rhs) ->
-     let op_name =
-       match op with
-       | Add ->
-          "trappingAdd"
-       | Subtract ->
-          "trappingSubtract"
-       | Multiply ->
-          "trappingMultiply"
-       | Divide ->
-          "trappingDivide"
-     in
-     let op_qname = make_qident (pervasive_module_name, make_ident op_name, make_ident op_name) in
-     FunctionCall (op_qname, Positional [abs_expr im lhs; abs_expr im rhs])
+     ArithmeticExpression (op, abs_expr im lhs, abs_expr im rhs)
   | CComparison (_, op, lhs, rhs) ->
      Comparison (op, abs_expr im lhs, abs_expr im rhs)
   | CConjunction (_, lhs, rhs) ->
