@@ -290,6 +290,16 @@ module body Standard.Buffer is
         return elem;
     end;
 
+    generic [T: Free, R: Region]
+    function removeFirst(buf: &![Buffer[T], R]): T is
+        return remove(buf, 0);
+    end;
+
+    generic [T: Free, R: Region]
+    function removeLast(buf: &![Buffer[T], R]): T is
+        return remove(buf, (!buf->size) - 1);
+    end;
+
     ---
     --- Utilities
     ---
