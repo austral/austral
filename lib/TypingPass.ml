@@ -1198,9 +1198,7 @@ and is_constant = function
      false
   | TFunVar _ ->
      true
-  | TArithmetic (_, lhs, rhs) ->
-     (is_constant lhs) && (is_constant rhs)
-   | TFuncall _ ->
+  | TFuncall _ ->
      false
   | TMethodCall _ ->
      false

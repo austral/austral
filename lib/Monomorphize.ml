@@ -152,10 +152,6 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      else
        (* The function is concrete. *)
        (MConcreteFunVar (decl_id, rt), env)
-  | TArithmetic (oper, lhs, rhs) ->
-     let (lhs, env) = monomorphize_expr env lhs in
-     let (rhs, env) = monomorphize_expr env rhs in
-     (MArithmetic (oper, lhs, rhs), env)
   | TFuncall (decl_id, name, args, rt, substs) ->
      (* Monomorphize the return type. *)
      let (rt, env) = strip_and_mono env rt in

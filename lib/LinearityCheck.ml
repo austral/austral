@@ -165,8 +165,6 @@ let rec count (name: identifier) (expr: texpr): appearances =
        zero_appearances
   | TFunVar _ ->
      zero_appearances
-  | TArithmetic (_, lhs, rhs) ->
-     merge (c lhs) (c rhs)
   | TFuncall (_, _, args, _, _) ->
      merge_list (List.map c args)
   | TMethodCall (_, _, _, args, _, _) ->

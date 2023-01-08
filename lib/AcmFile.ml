@@ -76,7 +76,6 @@ and ser_expr =
   | SParamVar of identifier * ty
   | SLocalVar of identifier * ty
   | SFunVar of named_decl_ref * ty * type_bindings
-  | SArithmetic of arithmetic_operator * ser_expr * ser_expr
   | SFuncall of qident * ser_expr list * ty * type_bindings
   | SMethodCall of ins_meth_ref * typarams * ser_expr list * ty * type_bindings
   | SVarMethodCall of {
