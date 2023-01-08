@@ -55,7 +55,7 @@ module body Standard.Test.Buffer is
     function initializeTest(): Unit is
         testHeading("initialize, length, nth, and destroyFree");
         let b: Buffer[Int32] := initialize(3, 10);
-        assertTrue(length(&b) = 3, "length = 3");
+        assertLength(&b, 3);
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
         assertTrue(nth(&b, 1) = 10, "[1] = 10");
         assertTrue(nth(&b, 2) = 10, "[2] = 10");
@@ -67,7 +67,7 @@ module body Standard.Test.Buffer is
     function storeTest(): Unit is
         testHeading("storeNth");
         let b: Buffer[Int32] := initialize(1, 10);
-        assertTrue(length(&b) = 1, "length = 1");
+        assertLength(&b, 1);
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
         storeNth(&!b, 0, 20);
         assertTrue(nth(&b, 0) = 20, "[0] = 20");
@@ -79,7 +79,7 @@ module body Standard.Test.Buffer is
     function swapNthTest(): Unit is
         testHeading("swapNth");
         let b: Buffer[Int32] := initialize(1, 10);
-        assertTrue(length(&b) = 1, "length = 1");
+        assertLength(&b, 1);
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
         let old: Int32 := swapNth(&!b, 0, 20);
         assertTrue(old = 10, "old = 10");
@@ -92,7 +92,7 @@ module body Standard.Test.Buffer is
     function swapIndexTest(): Unit is
         testHeading("swapIndex");
         let b: Buffer[Int32] := initialize(2, 0);
-        assertTrue(length(&b) = 2, "length = 2");
+        assertLength(&b, 2);
         storeNth(&!b, 0, 10);
         storeNth(&!b, 1, 20);
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
@@ -109,7 +109,7 @@ module body Standard.Test.Buffer is
         testHeading("initialize then fill");
         let b: Buffer[Int32] := initialize(3, 10);
         fill(&!b, 20);
-        assertTrue(length(&b) = 3, "length = 3");
+        assertLength(&b, 3);
         assertTrue(nth(&b, 0) = 20, "[0] = 20");
         assertTrue(nth(&b, 1) = 20, "[1] = 20");
         assertTrue(nth(&b, 2) = 20, "[2] = 20");
@@ -122,22 +122,22 @@ module body Standard.Test.Buffer is
         testHeading("insertFront");
         let b: Buffer[Int32] := allocateEmpty();
         -- []
-        assertTrue(length(&b) = 0, "length = 0");
+        assertLength(&b, 0);
         -- [3]
         insertFront(&!b, 3);
-        assertTrue(length(&b) = 1, "length = 1");
-        assertTrue(nth(&b, 0) = 3, "[0] = 3");
+        assertLength(&b, 1);
+        assertNth(&b, 0, 3);
         -- [2, 3]
         insertFront(&!b, 2);
-        assertTrue(length(&b) = 2, "length = 2");
-        assertTrue(nth(&b, 0) = 2, "[0] = 2");
-        assertTrue(nth(&b, 1) = 3, "[1] = 3");
+        assertLength(&b, 2);
+        assertNth(&b, 0, 2);
+        assertNth(&b, 1, 3);
         -- [1,2,3]
         insertFront(&!b, 1);
-        assertTrue(length(&b) = 3, "length = 3");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
-        assertTrue(nth(&b, 1) = 2, "[1] = 2");
-        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        assertLength(&b, 3);
+        assertNth(&b, 0, 1);
+        assertNth(&b, 1, 2);
+        assertNth(&b, 2, 3);
         destroyFree(b);
         return nil;
     end;
@@ -146,22 +146,22 @@ module body Standard.Test.Buffer is
         testHeading("insertBack");
         let b: Buffer[Int32] := allocateEmpty();
         -- []
-        assertTrue(length(&b) = 0, "length = 0");
+        assertLength(&b, 0);
         -- [1]
         insertBack(&!b, 1);
-        assertTrue(length(&b) = 1, "length = 1");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertLength(&b, 1);
+        assertNth(&b, 0, 1);
         -- [1, 2]
         insertBack(&!b, 2);
-        assertTrue(length(&b) = 2, "length = 2");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
-        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertLength(&b, 2);
+        assertNth(&b, 0, 1);
+        assertNth(&b, 1, 2);
         -- [1,2,3]
         insertBack(&!b, 3);
-        assertTrue(length(&b) = 3, "length = 3");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
-        assertTrue(nth(&b, 1) = 2, "[1] = 2");
-        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        assertLength(&b, 3);
+        assertNth(&b, 0, 1);
+        assertNth(&b, 1, 2);
+        assertNth(&b, 2, 3);
         destroyFree(b);
         return nil;
     end;
@@ -170,27 +170,27 @@ module body Standard.Test.Buffer is
         testHeading("removeFirst");
         let b: Buffer[Int32] := allocateEmpty();
         -- []
-        assertTrue(length(&b) = 0, "length = 0");
+        assertLength(&b, 0);
         insertBack(&!b, 1);
         insertBack(&!b, 2);
         insertBack(&!b, 3);
         -- [1,2,3]
-        assertTrue(length(&b) = 3, "length = 3");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
-        assertTrue(nth(&b, 1) = 2, "[1] = 2");
-        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        assertLength(&b, 3);
+        assertNth(&b, 0, 1);
+        assertNth(&b, 1, 2);
+        assertNth(&b, 2, 3);
         -- [2,3]
         removeFirst(&!b);
-        assertTrue(length(&b) = 2, "length = 2");
-        assertTrue(nth(&b, 0) = 2, "[0] = 2");
-        assertTrue(nth(&b, 1) = 3, "[1] = 3");
+        assertLength(&b, 2);
+        assertNth(&b, 0, 2);
+        assertNth(&b, 1, 3);
         -- [3]
         removeFirst(&!b);
-        assertTrue(length(&b) = 1, "length = 1");
-        assertTrue(nth(&b, 0) = 3, "[0] = 3");
+        assertLength(&b, 1);
+        assertNth(&b, 0, 3);
         -- []
         removeFirst(&!b);
-        assertTrue(length(&b) = 0, "length = 0");
+        assertLength(&b, 0);
         destroyEmpty(b);
         return nil;
     end;
@@ -199,27 +199,27 @@ module body Standard.Test.Buffer is
         testHeading("removeLast");
         let b: Buffer[Int32] := allocateEmpty();
         -- []
-        assertTrue(length(&b) = 0, "length = 0");
+        assertLength(&b, 0);
         insertBack(&!b, 1);
         insertBack(&!b, 2);
         insertBack(&!b, 3);
         -- [1,2,3]
-        assertTrue(length(&b) = 3, "length = 3");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
-        assertTrue(nth(&b, 1) = 2, "[1] = 2");
-        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        assertLength(&b, 3);
+        assertNth(&b, 0, 1);
+        assertNth(&b, 1, 2);
+        assertNth(&b, 2, 3);
         -- [1,2]
         removeLast(&!b);
-        assertTrue(length(&b) = 2, "length = 2");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
-        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertLength(&b, 2);
+        assertNth(&b, 0, 1);
+        assertNth(&b, 1, 2);
         -- [1]
         removeLast(&!b);
-        assertTrue(length(&b) = 1, "length = 1");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertLength(&b, 1);
+        assertNth(&b, 0, 1);
         -- []
         removeLast(&!b);
-        assertTrue(length(&b) = 0, "length = 0");
+        assertLength(&b, 0);
         destroyEmpty(b);
         return nil;
     end;
@@ -228,9 +228,9 @@ module body Standard.Test.Buffer is
         testHeading("reverse (empty)");
         -- Test empty array
         let b: Buffer[Int32] := allocateEmpty();
-        assertTrue(length(&b) = 0, "length = 0");
+        assertLength(&b, 0);
         reverse(&!b);
-        assertTrue(length(&b) = 0, "length = 0");
+        assertLength(&b, 0);
         destroyFree(b);
         return nil;
     end;
@@ -243,17 +243,33 @@ module body Standard.Test.Buffer is
         insertBack(&!b, 2);
         insertBack(&!b, 3);
         -- [1,2,3]
-        assertTrue(length(&b) = 3, "length = 3");
-        assertTrue(nth(&b, 0) = 1, "[0] = 1");
-        assertTrue(nth(&b, 1) = 2, "[1] = 2");
-        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        assertLength(&b, 3);
+        assertNth(&b, 0, 1);
+        assertNth(&b, 1, 2);
+        assertNth(&b, 2, 3);
         reverse(&!b);
         -- [3,2,1]
-        assertTrue(length(&b) = 3, "length = 3");
-        assertTrue(nth(&b, 0) = 3, "[0] = 3");
-        assertTrue(nth(&b, 1) = 2, "[1] = 2");
-        assertTrue(nth(&b, 2) = 1, "[2] = 1");
+        assertLength(&b, 3);
+        assertNth(&b, 0, 3);
+        assertNth(&b, 1, 2);
+        assertNth(&b, 2, 1);
         destroyFree(b);
+        return nil;
+    end;
+
+    ---
+    --- Utilities
+    ---
+
+    generic [T: Type, R: Region]
+    function assertLength(ref: &[Buffer[T], R], len: Index): Unit is
+        assertTrue(length(ref) = len, "length");
+        return nil;
+    end;
+
+    generic [T: Free, R: Region]
+    function assertNth(ref: &[Buffer[T], R], pos: Index, value: T): Unit is
+        assertTrue(nth(ref, pos) = value, "nth");
         return nil;
     end;
 end module body.
