@@ -23,12 +23,8 @@ jobs:
       - name: Set up opam
         run: opam init
 
-      - name: Choose OCaml version
-        run: opam switch create 4.13.0
-
       - name: Install dune
         run: opam install dune
-
 
   build-windows-macos:
     strategy:
