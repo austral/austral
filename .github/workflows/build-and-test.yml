@@ -28,6 +28,7 @@ jobs:
         run: opam init
 
       - name: Install OCaml dependencies
+        if: steps.opam-cache.outputs.cache-hit != 'true'
         run: ./install-ocaml-deps.sh
 
       - name: Build
