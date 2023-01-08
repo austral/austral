@@ -294,7 +294,7 @@ module body Standard.Buffer is
     --- Removal
     ---
 
-    generic [T: Free, R: Region]
+    generic [T: Type, R: Region]
     function remove(buf: &![Buffer[T], R], pos: Index): T is
         -- Check array is non-empty.
         if (!buf->size) = 0 then
@@ -320,12 +320,12 @@ module body Standard.Buffer is
         return elem;
     end;
 
-    generic [T: Free, R: Region]
+    generic [T: Type, R: Region]
     function removeFirst(buf: &![Buffer[T], R]): T is
         return remove(buf, 0);
     end;
 
-    generic [T: Free, R: Region]
+    generic [T: Type, R: Region]
     function removeLast(buf: &![Buffer[T], R]): T is
         return remove(buf, (!buf->size) - 1);
     end;

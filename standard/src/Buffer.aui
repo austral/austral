@@ -112,13 +112,13 @@ module Standard.Buffer is
     --- Removal
     ---
 
-    generic [T: Free, R: Region]
+    generic [T: Type, R: Region]
     function remove(buf: &![Buffer[T], R], pos: Index): T;
 
-    generic [T: Free, R: Region]
+    generic [T: Type, R: Region]
     function removeFirst(buf: &![Buffer[T], R]): T;
 
-    generic [T: Free, R: Region]
+    generic [T: Type, R: Region]
     function removeLast(buf: &![Buffer[T], R]): T;
 
     ---
