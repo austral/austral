@@ -3,6 +3,9 @@
 	"name": "Austral",
 	"patterns": [
 		{
+			"include": "#import"
+		},
+		{
 			"include": "#comment"
 		},
 		{
@@ -49,6 +52,43 @@
 					"name": "punctuation.definition.comment.austral"
 				}
 			}
+		},
+		"import": {
+			"begin": "(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*)(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s*(\\()",
+			"end": "\\)",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.import.austral"
+				},
+				"2": {
+					"name": "entity.name.module.austral"
+				},
+				"3": {
+					"name": "punctuation.section.imports.begin.bracket.round.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.imports.begin.bracket.round.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"match": "\\bas\\b",
+					"name": "keyword.control.import.as.austral"
+				},
+				{
+					"name": "punctuation.separator.delimiter.comma.austal",
+					"match": ","
+				},
+				{
+					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\b",
+					"name": "entity.name.import-symbol.austral"
+				}
+			]
 		},
 		"generic": {
 			"begin": "(generic)\\s*(\\[)",
