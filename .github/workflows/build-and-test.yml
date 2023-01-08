@@ -7,11 +7,9 @@ jobs:
   build-and-test-linux:
     strategy:
       fail-fast: true
-      matrix:
-        os:
-          - ubuntu-latest
 
-    runs-on: ${{ matrix.os }}
+    runs-on:
+      - ubuntu-latest
 
     steps:
       - name: Checkout
