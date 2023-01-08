@@ -245,7 +245,7 @@ module body Standard.Buffer is
     generic [T: Free, R: Region]
     function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
         -- Check `pos` is in bounds.
-        if pos >= (!buf->size) then
+        if pos > (!buf->size) then
             abort("insert: index out of range");
         end if;
         -- If insertion would increase make `size` match `capacity`, resize
@@ -336,7 +336,11 @@ module body Standard.Buffer is
         -- Pointer to the start of the destination.
         let target_ptr: Pointer[T] := positiveOffset(start_ptr, count);
         -- Move.
-        memmove(target_ptr, start_ptr, chunk_size);
+        memmove(
+            source => start_ptr,
+            destination => target_ptr,
+            count => chunk_size
+        );
         return nil;
     end;
 
@@ -353,7 +357,11 @@ module body Standard.Buffer is
         -- Pointer to the start of the destination.
         let target_ptr: Pointer[T] := negativeOffset(start_ptr, count);
         -- Move.
-        memmove(target_ptr, start_ptr, chunk_size);
+        memmove(
+            source => start_ptr,
+            destination => target_ptr,
+            count => chunk_size
+        );
         return nil;
     end;
 
