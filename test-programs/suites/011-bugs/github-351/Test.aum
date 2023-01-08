@@ -9,7 +9,7 @@ module body Test is
 
   function drop(w : Wrapper) : Unit is
     let { val : Int32 }  := w;
-    printLn("Dropping ");
+    printLn("Dropping");
     printLn(val);
     return nil;
   end;
@@ -17,7 +17,7 @@ module body Test is
   function main() : ExitCode is
     let w : Wrapper := Wrapper( val => 42 );
     printLn(w.val);
-    drop(w); -- consume 
+    drop(w); -- consume
     return ExitSuccess();
   end;
 end module body.
