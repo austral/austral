@@ -80,6 +80,12 @@
 				},
 				{
 					"include": "#integer_constants"
+				},
+				{
+					"include": "#triple_string"
+				},
+				{
+					"include": "#string"
 				}
 			]
 		},
