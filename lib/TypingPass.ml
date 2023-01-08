@@ -91,7 +91,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
              TArithmetic (op, lhs', rhs')
            else
              austral_raise GenericError [
-                 Text "Both operands to an arithmetic expression must be comparable types. The LHS has type";
+                 Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
                  Code (type_string lhs_ty);
                  Text ", but the RHS has type";
                  Code (type_string rhs_ty)
@@ -104,7 +104,12 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
              (* If either operand is a constant, let it pass *)
              TArithmetic (op, lhs', rhs')
            else
-             err "Both operands to an arithmetic expression must be of the same type"
+             austral_raise GenericError [
+                 Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
+                 Code (type_string lhs_ty);
+                 Text ", but the RHS has type";
+                 Code (type_string rhs_ty)
+               ]
       | Comparison (op, lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
