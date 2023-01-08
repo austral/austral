@@ -31,6 +31,27 @@ jobs:
       - name: Install dune
         run: opam install dune
 
+      - name: Install OCaml dependencies
+        run: ./install-ocaml-deps.sh
+
+      - name: Build
+        run: make
+
+      - name: Install
+        run: sudo make install
+        if: runner.os == 'Linux'
+
+      - name: Run tests
+        run: ./run-tests.sh
+        if: runner.os == 'Linux'
+
+      - name: Upload compiler binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: austral-${{ runner.os }}-bin
+          path: austral
+          retention-days: 1
+
   build-windows-macos:
     strategy:
       fail-fast: true
