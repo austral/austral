@@ -15,7 +15,8 @@ import Standard.Buffer (
     insertBack,
     remove,
     removeFirst,
-    removeLast
+    removeLast,
+    reverse
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -38,6 +39,8 @@ module body Standard.Test.Buffer is
         insertBackTest();
         removeFirstTest();
         removeLastTest();
+        reverseEmptyTest();
+        reverseNonEmptyTest();
         return nil;
     end;
 
@@ -218,6 +221,39 @@ module body Standard.Test.Buffer is
         removeLast(&!b);
         assertTrue(length(&b) = 0, "length = 0");
         destroyEmpty(b);
+        return nil;
+    end;
+
+    function reverseEmptyTest(): Unit is
+        testHeading("reverse (empty)");
+        -- Test empty array
+        let b: Buffer[Int32] := allocateEmpty();
+        assertTrue(length(&b) = 0, "length = 0");
+        reverse(&!b);
+        assertTrue(length(&b) = 0, "length = 0");
+        destroyFree(b);
+        return nil;
+    end;
+
+    function reverseNonEmptyTest(): Unit is
+        testHeading("reverse (non-empty)");
+        -- Test non-empty array
+        let b: Buffer[Int32] := allocateEmpty();
+        insertBack(&!b, 1);
+        insertBack(&!b, 2);
+        insertBack(&!b, 3);
+        -- [1,2,3]
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        reverse(&!b);
+        -- [3,2,1]
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 3, "[0] = 3");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 1, "[2] = 1");
+        destroyFree(b);
         return nil;
     end;
 end module body.

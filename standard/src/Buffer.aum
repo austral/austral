@@ -375,9 +375,12 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function reverse(buf: &![Buffer[T], R]): Unit is
-        for i from 0 to (!buf->size) / 2 do
-            swapIndex(buf, i, ((!buf->size) - i) - 1);
-        end for;
+        if (!buf->size) > 0 then
+            for i from 0 to (!buf->size) / 2 do
+                let j: Index := ((!buf->size) - i) - 1;
+                swapIndex(buf, i, j);
+            end for;
+        end if;
         return nil;
     end;
 end module body.
