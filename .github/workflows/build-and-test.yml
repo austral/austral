@@ -18,7 +18,16 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install opam
-        run: bash -c "sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)"
+        run: apt-get install opam
+
+      - name: Set up opam
+        run: opam init
+
+      - name: Choose OCaml version
+        run: opam switch create 4.13.0
+
+      - name: Install dune
+        run: opam install dune
 
 
   build-windows-macos:
