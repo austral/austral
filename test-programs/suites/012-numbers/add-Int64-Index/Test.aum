@@ -1,0 +1,10 @@
+
+module body Test is
+    function main() : ExitCode is
+        let a: Int64    := 10;
+        let b: Index    := 20;
+        let c: Int64    := a * b;
+        return ExitSuccess();
+    end;
+end module body.
+    

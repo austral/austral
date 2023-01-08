@@ -1,0 +1,10 @@
+
+module body Test is
+    function main() : ExitCode is
+        let a: Nat32    := 10;
+        let b: Int32    := 20;
+        let c: Nat32    := a * b;
+        return ExitSuccess();
+    end;
+end module body.
+    

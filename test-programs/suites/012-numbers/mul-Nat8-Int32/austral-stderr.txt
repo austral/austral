@@ -1,0 +1,17 @@
+
+Error:
+  Title: Type Error
+  Module:
+    Test
+  Location:
+    Filename: 'test-programs/suites/012-numbers/mul-Nat8-Int32/Test.aum'
+    From: line 5, column 8
+    To: line 5, column 33
+  Description:
+    Both operands to an arithmetic expression must be compatible types. The LHS has type `Nat8` but the RHS has type `Int32`
+  Code:
+    3 |         let a: Nat8     := 10;
+    4 |         let b: Int32    := 20;
+    5 |         let c: Nat8     := a * b;
+    6 |         return ExitSuccess();
+    7 |     end;

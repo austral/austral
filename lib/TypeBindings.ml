@@ -90,11 +90,14 @@ let add_binding (TypeBindings m) (tp: type_parameter) ty =
      if equal_ty ty ty' then
        TypeBindings m
      else
-       (* FIXME: Should we fail here? *)
-       (* let _ = print_endline (show_bindings (TypeBindings m)) in
-       binding_conflict name from ty ty' *)
-       (* Power through it. *)
-       TypeBindings (BindingsMap.add tp ty' m)
+       austral_raise GenericError [
+           Text "Incompatible type bindings. The parameter";
+           Code (ident_string (typaram_name tp));
+           Text "is bound to";
+           Code (type_string ty');
+           Text "but now we're trying to bind it to";
+           Code (type_string ty);
+         ]
   | None ->
      if universe_compatible (typaram_universe tp) (type_universe ty) then
        TypeBindings (BindingsMap.add tp ty m)

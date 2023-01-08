@@ -1,0 +1,17 @@
+
+Error:
+  Title: Type Error
+  Module:
+    Test
+  Location:
+    Filename: 'test-programs/suites/012-numbers/mul-Nat64-Index/Test.aum'
+    From: line 5, column 8
+    To: line 5, column 33
+  Description:
+    Both operands to an arithmetic expression must be compatible types. The LHS has type `Nat64` but the RHS has type `Index`
+  Code:
+    3 |         let a: Nat64    := 10;
+    4 |         let b: Index    := 20;
+    5 |         let c: Nat64    := a * b;
+    6 |         return ExitSuccess();
+    7 |     end;
