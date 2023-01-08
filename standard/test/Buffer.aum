@@ -12,7 +12,10 @@ import Standard.Buffer (
     swapIndex,
     insert,
     insertFront,
-    insertBack
+    insertBack,
+    remove,
+    removeFirst,
+    removeLast
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -32,6 +35,7 @@ module body Standard.Test.Buffer is
         swapIndexTest();
         fillTest();
         insertFrontTest();
+        insertBackTest();
         return nil;
     end;
 
@@ -125,6 +129,30 @@ module body Standard.Test.Buffer is
         assertTrue(nth(&b, 1) = 3, "[1] = 3");
         -- [1,2,3]
         insertFront(&!b, 1);
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        destroyFree(b);
+        return nil;
+    end;
+
+    function insertBackTest(): Unit is
+        testHeading("insertBack");
+        let b: Buffer[Int32] := allocateEmpty();
+        -- []
+        assertTrue(length(&b) = 0, "length = 0");
+        -- [1]
+        insertBack(&!b, 1);
+        assertTrue(length(&b) = 1, "length = 1");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        -- [1, 2]
+        insertBack(&!b, 2);
+        assertTrue(length(&b) = 2, "length = 2");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        -- [1,2,3]
+        insertBack(&!b, 3);
         assertTrue(length(&b) = 3, "length = 3");
         assertTrue(nth(&b, 0) = 1, "[0] = 1");
         assertTrue(nth(&b, 1) = 2, "[1] = 2");
