@@ -91,7 +91,7 @@ let add_binding (TypeBindings m) (tp: type_parameter) ty =
        TypeBindings m
      else
        austral_raise GenericError [
-           Text "Incompatible type bindings. The parameter ";
+           Text "Incompatible type bindings. The parameter";
            Code (ident_string (typaram_name tp));
            Text "is bound to";
            Code (type_string ty');
