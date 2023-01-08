@@ -258,12 +258,37 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function insertBack(buf: &![Buffer[T], R], element: T): Unit is
-        return insert(buf, 0, element);
+        return insert(buf, !buf->size, element);
     end;
 
     ---
     --- Removal
     ---
+
+    generic [T: Free, R: Region]
+    function remove(buf: &![Buffer[T], R], pos: Index): T is
+        -- Check array is non-empty.
+        if (!buf->size) = 0 then
+            abort("remove: array is empty");
+        end if;
+        -- Check position is in bounds.
+        if pos >= (!buf->size) then
+            abort("insert: index out of range");
+        end if;
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let elem: T := load(ptr);
+        -- Move all elements right form `pos` one step to the left, unless this is the last index of the array.
+        if pos < ((!buf->size) - 1) then
+            shiftLeft(
+                ptr => !buf->array,
+                chunk_start => pos + 1,
+                chunk_length => ((!buf->size) - 1) - pos,
+                count => 1
+            );
+        end if;
+        buf->size := (!buf->size) - 1;
+        return elem;
+    end;
 
     ---
     --- Utilities

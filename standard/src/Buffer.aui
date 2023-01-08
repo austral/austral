@@ -104,4 +104,11 @@ module Standard.Buffer is
 
     generic [T: Free, R: Region]
     function insertBack(buf: &![Buffer[T], R], element: T): Unit;
+
+    ---
+    --- Removal
+    ---
+
+    generic [T: Free, R: Region]
+    function remove(buf: &![Buffer[T], R], pos: Index): T;
 end module.
