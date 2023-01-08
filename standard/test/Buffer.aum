@@ -8,7 +8,8 @@ import Standard.Buffer (
     destroyFree,
     fill,
     storeNth,
-    swapNth
+    swapNth,
+    swapIndex
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -25,6 +26,7 @@ module body Standard.Test.Buffer is
         initializeTest();
         storeTest();
         swapNthTest();
+        swapIndexTest();
         fillTest();
         return nil;
     end;
@@ -69,6 +71,22 @@ module body Standard.Test.Buffer is
         let old: Int32 := swapNth(&!b, 0, 20);
         assertTrue(old = 10, "old = 10");
         assertTrue(nth(&b, 0) = 20, "[0] = 20");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function swapIndexTest(): Unit is
+        testHeading("swapIndex");
+        let b: Buffer[Int32] := initialize(2, 0);
+        assertTrue(length(&b) = 2, "length = 2");
+        storeNth(&!b, 0, 10);
+        storeNth(&!b, 1, 20);
+        assertTrue(nth(&b, 0) = 10, "[0] = 10");
+        assertTrue(nth(&b, 1) = 20, "[1] = 20");
+        swapIndex(&!b, 0, 1);
+        assertTrue(nth(&b, 0) = 20, "[0] = 20");
+        assertTrue(nth(&b, 1) = 10, "[1] = 10");
         destroyFree(b);
         assertSuccess("destroyFree complete");
         return nil;
