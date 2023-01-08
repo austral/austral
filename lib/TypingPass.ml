@@ -119,7 +119,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
              austral_raise TypeError [
                  Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
                  Code (type_string lhs_ty);
-                 Text ", but the RHS has type";
+                 Text "but the RHS has type";
                  Code (type_string rhs_ty)
                ]
          else
