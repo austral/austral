@@ -329,6 +329,21 @@ module body Standard.Buffer is
     function removeLast(buf: &![Buffer[T], R]): T is
         return remove(buf, (!buf->size) - 1);
     end;
+    ---
+    --- Reversal
+    ---
+
+    generic [T: Type, R: Region]
+    function reverse(buf: &![Buffer[T], R]): Unit is
+        if (!buf->size) > 0 then
+            for i from 0 to (!buf->size) / 2 do
+                let j: Index := ((!buf->size) - i) - 1;
+                swapIndex(buf, i, j);
+            end for;
+        end if;
+        -- invariants(buf : &[Buffer[T], R]);
+        return nil;
+    end;
 
     ---
     --- Utilities
@@ -376,19 +391,4 @@ module body Standard.Buffer is
         return nil;
     end;
 
-    ---
-    --- Reversal
-    ---
-
-    generic [T: Type, R: Region]
-    function reverse(buf: &![Buffer[T], R]): Unit is
-        if (!buf->size) > 0 then
-            for i from 0 to (!buf->size) / 2 do
-                let j: Index := ((!buf->size) - i) - 1;
-                swapIndex(buf, i, j);
-            end for;
-        end if;
-        -- invariants(buf : &[Buffer[T], R]);
-        return nil;
-    end;
 end module body.
