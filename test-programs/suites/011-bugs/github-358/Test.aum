@@ -1,0 +1,12 @@
+module body Test is
+    record Bar: Free is
+    end;
+
+    record Foo: Linear is
+        bar: Bar;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.
