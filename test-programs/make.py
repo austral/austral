@@ -24,9 +24,9 @@ def code(typea: str, typeb: str) -> str:
     return f"""
 module body Test is
     function main() : ExitCode is
-        let a: {a} := {aconst};
-        let b: {b} := {bconst};
-        let c: {a} := a * b;
+        let a: {a: <8} := {aconst};
+        let b: {b: <8} := {bconst};
+        let c: {a: <8} := a * b;
         return ExitSuccess();
     end;
 end module body.
@@ -39,20 +39,19 @@ def errs(dirname, a,b):
 Error:
   Title: Type Error
   Module:
-    IntWrapper
+    Test
   Location:
     Filename: 'test-programs/suites/012-numbers/{dirname}/Test.aum'
-    From: line 3, column 8
-    To: line 3, column 31
+    From: line 5, column 8
+    To: line 5, column 33
   Description:
-    Expected a value of type `{a}` , but got a value of type `{b}`
+    Both operands to an arithmetic expression must be compatible types. The LHS has type `{a}` but the RHS has type `{b}`
   Code:
-    1 | module body IntWrapper is
-    2 |     function main() : ExitCode is
-    3 |         let a: {a} := {aconst};
-    4 |         let b: {b} := {bconst};
-    5 |         let c: {a} := a * b;
-"""
+    3 |         let a: {a: <8} := 10;
+    4 |         let b: {b: <8} := 20;
+    5 |         let c: {a: <8} := a * b;
+    6 |         return ExitSuccess();
+    7 |     end;"""
 
 base: str = "suites/012-numbers/"
 

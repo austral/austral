@@ -1,9 +1,9 @@
 
 module body Test is
     function main() : ExitCode is
-        let a: Nat8 := 10;
-        let b: Int16 := 20;
-        let c: Nat8 := a * b;
+        let a: Nat8     := 10;
+        let b: Int16    := 20;
+        let c: Nat8     := a * b;
         return ExitSuccess();
     end;
 end module body.

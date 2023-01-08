@@ -2,16 +2,16 @@
 Error:
   Title: Type Error
   Module:
-    IntWrapper
+    Test
   Location:
     Filename: 'test-programs/suites/012-numbers/add-Int16-Nat64/Test.aum'
-    From: line 3, column 8
-    To: line 3, column 31
+    From: line 5, column 8
+    To: line 5, column 33
   Description:
-    Expected a value of type `Int16` , but got a value of type `Nat64`
+    Both operands to an arithmetic expression must be compatible types. The LHS has type `Int16` but the RHS has type `Nat64`
   Code:
-    1 | module body IntWrapper is
-    2 |     function main() : ExitCode is
-    3 |         let a: Int16 := 10;
-    4 |         let b: Nat64 := 20;
-    5 |         let c: Int16 := a * b;
+    3 |         let a: Int16    := 10;
+    4 |         let b: Nat64    := 20;
+    5 |         let c: Int16    := a * b;
+    6 |         return ExitSuccess();
+    7 |     end;

@@ -2,16 +2,16 @@
 Error:
   Title: Type Error
   Module:
-    IntWrapper
+    Test
   Location:
     Filename: 'test-programs/suites/012-numbers/add-Int64-Index/Test.aum'
-    From: line 3, column 8
-    To: line 3, column 31
+    From: line 5, column 8
+    To: line 5, column 33
   Description:
-    Expected a value of type `Int64` , but got a value of type `Index`
+    Both operands to an arithmetic expression must be compatible types. The LHS has type `Int64` but the RHS has type `Index`
   Code:
-    1 | module body IntWrapper is
-    2 |     function main() : ExitCode is
-    3 |         let a: Int64 := 10;
-    4 |         let b: Index := 20;
-    5 |         let c: Int64 := a * b;
+    3 |         let a: Int64    := 10;
+    4 |         let b: Index    := 20;
+    5 |         let c: Int64    := a * b;
+    6 |         return ExitSuccess();
+    7 |     end;
