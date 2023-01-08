@@ -90,7 +90,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
            if (is_numeric lhs_ty) then
              TArithmetic (op, lhs', rhs')
            else
-             austral_raise GenericError [
+             austral_raise TypeError [
                  Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
                  Code (type_string lhs_ty);
                  Text ", but the RHS has type";
@@ -104,7 +104,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
              (* If either operand is a constant, let it pass *)
              TArithmetic (op, lhs', rhs')
            else
-             austral_raise GenericError [
+             austral_raise TypeError [
                  Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
                  Code (type_string lhs_ty);
                  Text ", but the RHS has type";
