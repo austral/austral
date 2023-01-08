@@ -7,7 +7,8 @@ import Standard.Buffer (
     nth,
     destroyFree,
     fill,
-    storeNth
+    storeNth,
+    swapNth
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -23,6 +24,7 @@ module body Standard.Test.Buffer is
         basicLifecycleTest();
         initializeTest();
         storeTest();
+        swapNthTest();
         fillTest();
         return nil;
     end;
@@ -53,6 +55,19 @@ module body Standard.Test.Buffer is
         assertTrue(length(&b) = 1, "length = 1");
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
         storeNth(&!b, 0, 20);
+        assertTrue(nth(&b, 0) = 20, "[0] = 20");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function swapNthTest(): Unit is
+        testHeading("swapNth");
+        let b: Buffer[Int32] := initialize(1, 10);
+        assertTrue(length(&b) = 1, "length = 1");
+        assertTrue(nth(&b, 0) = 10, "[0] = 10");
+        let old: Int32 := swapNth(&!b, 0, 20);
+        assertTrue(old = 10, "old = 10");
         assertTrue(nth(&b, 0) = 20, "[0] = 20");
         destroyFree(b);
         assertSuccess("destroyFree complete");
