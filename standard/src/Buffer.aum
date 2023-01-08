@@ -6,6 +6,7 @@ import Austral.Memory (
     deallocate,
     nullCheck,
     positiveOffset,
+    negativeOffset,
     store,
     load,
     memcpy,
@@ -270,6 +271,23 @@ module body Standard.Buffer is
         let chunk_size: ByteSize := arraySizeInBytes(sizeof(T), chunk_length);
         -- Pointer to the start of the destination.
         let target_ptr: Pointer[T] := positiveOffset(start_ptr, count);
+        -- Move.
+        memmove(target_ptr, start_ptr, chunk_size);
+        return nil;
+    end;
+
+    """
+    In the given poiner, shift the chunk of memory from the position
+    `chunk_start` to `chunk_start + chunk_length` by `count` steps to the left.
+    """
+    generic [T: Type]
+    function shiftLeft(ptr: Pointer[T], chunk_start: Index, chunk_length: Index, count: Index): Unit is
+        -- Pointer to the start of the chunk.
+        let start_ptr: Pointer[T] := positiveOffset(ptr, chunk_start);
+        -- Size of the chunk in bytes.
+        let chunk_size: ByteSize := arraySizeInBytes(sizeof(T), chunk_length);
+        -- Pointer to the start of the destination.
+        let target_ptr: Pointer[T] := negativeOffset(start_ptr, count);
         -- Move.
         memmove(target_ptr, start_ptr, chunk_size);
         return nil;
