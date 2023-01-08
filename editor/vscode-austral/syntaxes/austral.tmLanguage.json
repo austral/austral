@@ -53,8 +53,29 @@
 				}
 			}
 		},
+		"context_import_symbol_list": {
+			"name": "meta.import.symbols.austral",
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"match": "\\bas\\b",
+					"name": "keyword.control.import.as.austral"
+				},
+				{
+					"name": "punctuation.separator.delimiter.comma.austal",
+					"match": ","
+				},
+				{
+					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\b",
+					"name": "entity.name.import-symbol.austral"
+				}
+			]
+		},
 		"import": {
-			"begin": "(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*)(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s*(\\()",
+			"name": "meta.import.austral",
+			"begin": "\\b(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*)(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s*(\\()",
 			"end": "\\)",
 			"beginCaptures": {
 				"1": {
@@ -74,23 +95,12 @@
 			},
 			"patterns": [
 				{
-					"include": "#comment"
-				},
-				{
-					"match": "\\bas\\b",
-					"name": "keyword.control.import.as.austral"
-				},
-				{
-					"name": "punctuation.separator.delimiter.comma.austal",
-					"match": ","
-				},
-				{
-					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\b",
-					"name": "entity.name.import-symbol.austral"
+					"include": "#context_import_symbol_list"
 				}
 			]
 		},
 		"generic": {
+			"name": "meta.generic-decl.austral",
 			"begin": "(generic)\\s*(\\[)",
 			"end": "\\]",
 			"beginCaptures": {
@@ -233,6 +243,7 @@
 			"patterns": [
 				{
 					"comment": "array access",
+					"name": "meta.access.array.austral",
 					"begin": "(?<=[\\)\\]a-zA-Z0-9_])(\\[)",
 					"end": "\\]",
 					"beginCaptures": {
@@ -253,6 +264,7 @@
 				},
 				{
 					"comment": "slot access (including pointer)",
+					"name": "meta.access.slot.austral",
 					"match": "(?<=[\\)\\]a-zA-Z0-9_])(?:(\\.)|(->))([a-zA-Z][a-zA-Z0-9_]*)",
 					"captures": {
 						"1": {
@@ -314,6 +326,7 @@
 			]
 		},
 		"pragma_params": {
+			"name": "meta.pragma.austral",
 			"begin": "(pragma)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()",
 			"end": "\\)",
 			"beginCaptures": {
@@ -334,6 +347,7 @@
 			},
 			"patterns": [
 				{
+					"name": "meta.pragma.arguments.austral",
 					"include": "#context_paramater_list"
 				}
 			]
@@ -406,7 +420,7 @@
 					"match": "\\b(return|case|for|while|if|then|else|skip)\\b"
 				},
 				{
-					"name": "keyword.other.${0/ /\\-/}.austral",
+					"name": "keyword.other.end.$1.austral",
 					"match": "\\bend\\s+(for|while|if|case)\\b"
 				}
 			]
@@ -496,6 +510,7 @@
 			]
 		},
 		"typespec": {
+			"name": "meta.typespec.austral",
 			"patterns": [
 				{
 					"comment": "paramterized types",
@@ -562,6 +577,7 @@
 			]
 		},
 		"context_type_param_list": {
+			"name": "meta.type-paramater-list.austral",
 			"patterns": [
 				{
 					"match": "\\b(Free|Linear|Type|Region)\\b",
@@ -613,6 +629,7 @@
 		},
 		"constant_decl": {
 			"comment": "constant declaration",
+			"name": "meta.constant.austral",
 			"match": "(constant)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
 			"captures": {
 				"1": {
@@ -635,6 +652,7 @@
 		},
 		"record_def": {
 			"comment": "record declaration",
+			"name": "meta.record.austral",
 			"begin": "(record)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s+(is)",
 			"end": "\\bend\\s*",
 			"beginCaptures": {
@@ -686,8 +704,9 @@
 		},
 		"union_def": {
 			"comment": "union declaration",
+			"name": "meta.union.austral",
 			"begin": "(union)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s+(is)",
-			"end": "\\bend\\s*",
+			"end": "\\bend\\b",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.declaration.union.austral storage.type.union.austral"
@@ -773,7 +792,7 @@
 			]
 		},
 		"context_function_paramater_def": {
-			"name": "meta.function.parameters.austral",
+			"name": "meta.function-decl.parameters.austral",
 			"patterns": [
 				{
 					"include": "#comment"
@@ -799,7 +818,7 @@
 			]
 		},
 		"function_decl": {
-			"name": "meta.$1.austral",
+			"name": "meta.$1-decl.austral",
 			"match": "(function|method)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\()(.*)(\\)))?\\s*(?:(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?))?",
 			"captures": {
 				"1": {
@@ -835,6 +854,7 @@
 			}
 		},
 		"for_loop_head": {
+			"name": "meta.loop.for.austral",
 			"begin": "\\bfor\\b",
 			"end": "(?=\\bdo\\b)",
 			"beginCaptures": {
@@ -858,6 +878,7 @@
 			]
 		},
 		"while_loop_head": {
+			"name": "meta.loop.while.austral",
 			"begin": "\\bwhile\\b",
 			"end": "(?=\\bdo\\b)",
 			"beginCaptures": {
@@ -877,6 +898,7 @@
 			]
 		},
 		"do_block": {
+			"name": "meta.block.do.austral",
 			"begin": "\\bdo\\b",
 			"end": "\\bend(?:\\s+(for|while))?\\b",
 			"beginCaptures": {
@@ -896,6 +918,7 @@
 			]
 		},
 		"case_head": {
+			"name": "meta.case.austral",
 			"begin": "\\bcase\\b",
 			"end": "(?=\\bof\\b)",
 			"beginCaptures": {
@@ -913,6 +936,7 @@
 			]
 		},
 		"when_head": {
+			"name": "meta.case.when.austral",
 			"begin": "\\bwhen\\b",
 			"end": "\\bdo\\b",
 			"beginCaptures": {
@@ -955,6 +979,7 @@
 			]
 		},
 		"borrow_head": {
+			"name": "meta.borrow.austral",
 			"match": "(?:(\\&\\!)|(\\&))(.*)(?=do)",
 			"captures": {
 				"1": {
@@ -986,6 +1011,7 @@
 			}
 		},
 		"case_body": {
+			"name": "meta.body.case.austral",
 			"begin": "\\bof\\b",
 			"end": "\\bend case\\b",
 			"beginCaptures": {
@@ -1025,7 +1051,7 @@
 					"include": "#borrow_head"
 				},
 				{
-					"include": "#if_statement"
+					"include": "#if_head"
 				},
 				{
 					"include": "#case_head"
@@ -1059,8 +1085,9 @@
 				}
 			]
 		},
-		"if_statement": {
+		"if_head": {
 			"comment": "head of an (else) if statement",
+			"name": "meta.if.austral",
 			"begin": "\\b(else\\s+)?if\\b",
 			"end": "(?=\\bthen\\b)",
 			"beginCaptures": {
@@ -1075,7 +1102,7 @@
 			]
 		},
 		"if_body": {
-			"name": "meta.if-body.austral",
+			"name": "meta.if.body.austral",
 			"comment": "the body of an if/else statement",
 			"begin": "\\b(then|else)\\b",
 			"end": "\\b(?:(?=else)|(end\\s+if))\\b",
@@ -1096,6 +1123,7 @@
 			]
 		},
 		"context_binding_list": {
+			"name": "meta.bindings.austral",
 			"patterns": [
 				{
 					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
@@ -1144,6 +1172,7 @@
 			]
 		},
 		"let_destructure": {
+			"name": "meta.let.destructure.austral",
 			"begin": "(let)\\s+(\\{)",
 			"end": "\\}",
 			"beginCaptures": {
@@ -1166,6 +1195,7 @@
 			]
 		},
 		"let_simple": {
+			"name": "meta.let.destructure.austral",
 			"match": "(let)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
 			"captures": {
 				"1": {
@@ -1189,6 +1219,7 @@
 				},
 				{
 					"comment": "type declaration",
+					"name": "meta.type.austral",
 					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s*(;)",
 					"captures": {
 						"1": {
@@ -1229,6 +1260,7 @@
 				},
 				{
 					"comment": "typeclass declaration",
+					"name": "meta.typeclass.austral",
 					"begin": "(typeclass)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\()(.*)(\\)))?\\s+(is)",
 					"end": "\\b(end)",
 					"beginCaptures": {
@@ -1277,6 +1309,7 @@
 					]
 				},
 				{
+					"name": "meta.instance.austral",
 					"match": "\\b(instance)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))\\s*(;)",
 					"captures": {
 						"1": {
@@ -1309,6 +1342,7 @@
 			"patterns": [
 				{
 					"comment": "module interface",
+					"name": "meta.module.interface.austral",
 					"begin": "(module)\\s+([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s+(is)",
 					"end": "end\\s+module\\s*\\.",
 					"beginCaptures": {
@@ -1339,46 +1373,44 @@
 			]
 		},
 		"module_body": {
+			"comment": "module body",
+			"name": "meta.module.body.austral",
+			"begin": "(module\\s+body)\\s+([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s+(is)",
+			"end": "end\\s+module\\s+body\\s*\\.",
+			"beginCaptures": {
+				"1": {
+					"name": "storage.type.module.austral"
+				},
+				"2": {
+					"name": "entity.name.module.austral"
+				},
+				"3": {
+					"name": "storage.type.module.austral keyword.other.is.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "storage.type.module.austral"
+				}
+			},
 			"patterns": [
 				{
-					"comment": "module body",
-					"begin": "(module\\s+body)\\s+([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s+(is)",
-					"end": "end\\s+module\\s+body\\s*\\.",
-					"beginCaptures": {
-						"1": {
-							"name": "storage.type.module.austral"
-						},
-						"2": {
-							"name": "entity.name.module.austral"
-						},
-						"3": {
-							"name": "storage.type.module.austral keyword.other.is.austral"
-						}
-					},
-					"endCaptures": {
-						"0": {
-							"name": "storage.type.module.austral"
-						}
-					},
-					"patterns": [
-						{
-							"include": "#pragma"
-						},
-						{
-							"include": "#function_body"
-						},
-						{
-							"include": "#declarations"
-						},
-						{
-							"include": "#assignment"
-						}
-					]
+					"include": "#pragma"
+				},
+				{
+					"include": "#function_body"
+				},
+				{
+					"include": "#declarations"
+				},
+				{
+					"include": "#assignment"
 				}
 			]
 		},
 		"escapes": {
 			"comment": "string escape characters",
+			"name": "meta.string.escape.austral",
 			"patterns": [
 				{
 					"name": "constant.character.escape.austral",
