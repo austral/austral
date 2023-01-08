@@ -63,8 +63,6 @@ let rec ser_expr (env: env) (expr: texpr): ser_expr =
      SLocalVar (name, ty)
   | TFunVar (id, ty, bindings) ->
      SFunVar (get_func_ref env id, ty, bindings)
-  | TArithmetic (op, lhs, rhs) ->
-     SArithmetic (op, se lhs, se rhs)
   | TFuncall (_, name, values, ty, bindings) ->
      SFuncall (name, List.map se values, ty, bindings)
   | TMethodCall (ins_meth_id, _, typarams, args, ty, bindings) ->

@@ -50,8 +50,6 @@ let rec get_type = function
      ty
   | TFunVar (_, ty, _) ->
      ty
-  | TArithmetic (_, lhs, _) ->
-     get_type lhs
   | TFuncall (_, _, _, ty, _) ->
      ty
   | TMethodCall (_, _, _, _, ty, _) ->

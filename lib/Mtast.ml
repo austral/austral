@@ -63,7 +63,6 @@ and mexpr =
   | MLocalVar of identifier * mono_ty
   | MGenericFunVar of mono_id * mono_ty
   | MConcreteFunVar of decl_id * mono_ty
-  | MArithmetic of arithmetic_operator * mexpr * mexpr
   | MConcreteFuncall of decl_id * qident * mexpr list * mono_ty
   (** Represents a call to a concrete function. *)
   | MGenericFuncall of mono_id * mexpr list * mono_ty
@@ -136,8 +135,6 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MConcreteFunVar (_, ty) ->
      ty
-  | MArithmetic (_, lhs, _) ->
-     get_type lhs
   | MConcreteFuncall (_, _, _, ty) ->
      ty
   | MGenericFuncall (_, _, ty) ->

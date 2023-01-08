@@ -212,8 +212,6 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CFptrCall (CVar (gen_ident name), gen_type ty, List.map gen_type argtys, List.map g args)
   | MCast (e, t) ->
      CCast (g e, gen_type t)
-  | MArithmetic (op, lhs, rhs) ->
-     CArithmetic (op, g lhs, g rhs)
   | MComparison (op, lhs, rhs) ->
      CComparison (op, g lhs, g rhs)
   | MConjunction (lhs, rhs) ->

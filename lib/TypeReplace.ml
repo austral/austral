@@ -26,10 +26,6 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      let ty = replace_variables bindings ty
      and substs = bindings_from_list (List.map (fun (n, t) -> (n, replace_variables bindings t)) (bindings_list substs)) in
      TFunVar (id, ty, substs)
-  | TArithmetic (oper, lhs, rhs) ->
-     let lhs = replace_tyvars_expr bindings lhs
-     and rhs = replace_tyvars_expr bindings rhs in
-     TArithmetic (oper, lhs, rhs)
   | TFuncall (id, name, args, rt, substs) ->
      let args = List.map (replace_tyvars_expr bindings) args
      and rt = replace_variables bindings rt
