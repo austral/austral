@@ -17,6 +17,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: opam cache
+        id: opam-cache
+        uses: actions/cache@v3
+        with:
+          path: "~/.opam"
+          key: opam-{{ hashFiles('~/.opam') }}
+
       - name: Install opam
         run: sudo apt-get install opam
 
