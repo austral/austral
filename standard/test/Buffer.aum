@@ -1,5 +1,7 @@
 import Standard.Buffer (
-    Buffer
+    Buffer,
+    allocateEmpty,
+    destroyEmpty
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -17,7 +19,10 @@ module body Standard.Test.Buffer is
     end;
 
     function basicLifecycleTest(): Unit is
-        testHeading("Basic lifecycle: initialize and destroyFree and unbox");
+        testHeading("Basic lifecycle: allocateEmpty and destroyEmpty");
+        let b: Buffer[Int32] := allocateEmpty();
+        destroyEmpty(b);
+        assertSuccess("Basic lifecycle done.");
         return nil;
     end;
 end module body.
