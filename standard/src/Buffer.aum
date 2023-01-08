@@ -9,7 +9,8 @@ import Austral.Memory (
     store,
     load,
     memcpy,
-    memmove
+    memmove,
+    arraySizeInBytes
 );
 
 module body Standard.Buffer is
@@ -215,7 +216,7 @@ module body Standard.Buffer is
     function bump(buf: &![Buffer[T], R]): Unit is
         let new_capacity: Index := (!buf->capacity) * 2;
         let new_array: Pointer[T] := resizeArray(!buf->array, new_capacity);
-        memcpy(new_array, !buf->array, sizeof(T) * (!buf->size));
+        memcpy(new_array, !buf->array, arraySizeInBytes(sizeof(T), !buf->size));
         buf->capacity := new_capacity;
         buf->array := new_array;
         return nil;
@@ -266,13 +267,11 @@ module body Standard.Buffer is
         -- Pointer to the start of the chunk.
         let start_ptr: Pointer[T] := positiveOffset(ptr, chunk_start);
         -- Size of the chunk in bytes.
-        -- FIXME HERE: we need a way to convert `ByteSize` to `Index`.
-        let elem_size: ByteSize := 0;
-        let size: Index := elem_size;
+        let chunk_size: ByteSize := arraySizeInBytes(sizeof(T), chunk_length);
         -- Pointer to the start of the destination.
-        let target_ptr: Pointer[T] := positiveOffset(start_ptr, size);
+        let target_ptr: Pointer[T] := positiveOffset(start_ptr, count);
         -- Move.
-        memmove(target_ptr, start_ptr, size);
+        memmove(target_ptr, start_ptr, chunk_size);
         return nil;
     end;
 end module body.
