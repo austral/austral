@@ -236,7 +236,11 @@ module body Standard.Buffer is
     function bump(buf: &![Buffer[T], R]): Unit is
         let new_capacity: Index := (!buf->capacity) * 2;
         let new_array: Pointer[T] := resizeArray(!buf->array, new_capacity);
-        memcpy(new_array, !buf->array, arraySizeInBytes(sizeof(T), !buf->size));
+        memcpy(
+            destination => new_array,
+            source => !buf->array,
+            count => arraySizeInBytes(sizeof(T), !buf->size)
+        );
         buf->capacity := new_capacity;
         buf->array := new_array;
         return nil;
