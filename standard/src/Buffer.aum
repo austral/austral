@@ -156,7 +156,6 @@ module body Standard.Buffer is
         return !buf->size;
     end;
 
-
     generic [T: Free, R: Region]
     function nth(buf: &[Buffer[T], R], pos: Index): T is
         if pos >= (!buf->size) then

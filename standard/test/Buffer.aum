@@ -32,7 +32,7 @@ module body Standard.Test.Buffer is
     end;
 
     function initializeTest(): Unit is
-        testHeading("initialize, nth, and destroyFree");
+        testHeading("initialize, length, nth, and destroyFree");
         let b: Buffer[Int32] := initialize(3, 10);
         assertTrue(length(&b) = 3, "length = 3");
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
