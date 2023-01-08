@@ -180,6 +180,7 @@ module body Standard.Buffer is
         end if;
         let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
         store(ptr, element);
+        -- invariants(buf : &[Buffer[T], R]);
         return nil;
     end;
 
@@ -192,6 +193,7 @@ module body Standard.Buffer is
         let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
         let previous: T := load(ptr);
         store(ptr, element);
+        -- invariants(buf : &[Buffer[T], R]);
         return previous;
     end;
 
@@ -212,6 +214,7 @@ module body Standard.Buffer is
         store(a_ptr, elem_b);
         -- Store a in b.
         store(b_ptr, elem_a);
+        -- invariants(buf : &[Buffer[T], R]);
         return nil;
     end;
 
@@ -220,6 +223,7 @@ module body Standard.Buffer is
         for i from 0 to (!buf->size) - 1 do
             storeNth(buf, i, element);
         end for;
+        -- invariants(buf : &[Buffer[T], R]);
         return nil;
     end;
 
@@ -243,6 +247,7 @@ module body Standard.Buffer is
         );
         buf->capacity := new_capacity;
         buf->array := new_array;
+        -- invariants(buf : &[Buffer[T], R]);
         return nil;
     end;
 
@@ -271,6 +276,7 @@ module body Standard.Buffer is
         let index_ptr: Pointer[T] := positiveOffset(!buf->array, pos);
         store(index_ptr, element);
         buf->size := (!buf->size) + 1;
+        -- invariants(buf : &[Buffer[T], R]);
         return nil;
     end;
 
@@ -310,6 +316,7 @@ module body Standard.Buffer is
             );
         end if;
         buf->size := (!buf->size) - 1;
+        -- invariants(buf : &[Buffer[T], R]);
         return elem;
     end;
 
@@ -381,6 +388,7 @@ module body Standard.Buffer is
                 swapIndex(buf, i, j);
             end for;
         end if;
+        -- invariants(buf : &[Buffer[T], R]);
         return nil;
     end;
 end module body.
