@@ -20,7 +20,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "~/.opam"
-          key: opam-${{ hashFiles('~/.opam') }}
+          key: opam-linux-${{ hashFiles('~/.opam') }}
 
       - name: Install opam
         run: sudo apt-get install opam
