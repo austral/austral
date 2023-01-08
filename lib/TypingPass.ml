@@ -77,11 +77,17 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
       | FunctionCall (name, args) ->
          augment_call module_name env lexenv asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
       | ArithmeticExpression (op, lhs, rhs) ->
+         (* Augment operands. *)
          let lhs' = aug lhs
          and rhs' = aug rhs in
-         if (get_type lhs') = (get_type rhs') then
+         (* Get the types. *)
+         let lhs_ty = get_type lhs'
+         and rhs_ty = get_type rhs'
+         in
+         (* Are the types the same? *)
+         if lhs_ty = rhs_ty then
            (* If the types are the same type, check it is a numeric type. *)
-           if (is_numeric (get_type lhs')) then
+           if (is_numeric lhs_ty) then
              TArithmetic (op, lhs', rhs')
            else
              err "Both operands to an arithmetic expression must be comparable types."
