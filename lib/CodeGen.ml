@@ -222,8 +222,8 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CNegation (g e)
   | MIfExpression (c, t, f) ->
      CIfExpression (g c, g t, g f)
-  | MRecordConstructor (_, values) ->
-     CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values)
+  | MRecordConstructor (ty, values) ->
+     CCast (CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values), gen_type ty)
   | MUnionConstructor (ty, case_name, values) ->
      let args = CStructInitializer (List.map (fun (n, v) -> (gen_ident n, g v)) values) in
      CCast (CStructInitializer [
