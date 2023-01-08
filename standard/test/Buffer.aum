@@ -1,10 +1,22 @@
 import Standard.Buffer (
     Buffer,
+    allocateEmpty,
+    destroyEmpty,
     initialize,
+    length,
+    nth,
     destroyFree,
-    bufferSize,
-    nthFree,
-    nthOpt
+    fill,
+    storeNth,
+    swapNth,
+    swapIndex,
+    insert,
+    insertFront,
+    insertBack,
+    remove,
+    removeFirst,
+    removeLast,
+    reverse
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -18,63 +30,230 @@ module body Standard.Test.Buffer is
     function bufferTestSuite(): Unit is
         suiteHeading("Standard.Buffer");
         basicLifecycleTest();
-        nthFreeTest();
-        nthOptTest();
+        initializeTest();
+        storeTest();
+        swapNthTest();
+        swapIndexTest();
+        fillTest();
+        insertFrontTest();
+        insertBackTest();
+        removeFirstTest();
+        removeLastTest();
+        reverseEmptyTest();
+        reverseNonEmptyTest();
         return nil;
     end;
 
     function basicLifecycleTest(): Unit is
-        testHeading("Basic lifecycle: initialize and destroyFree and unbox");
-        let opt: Option[Buffer[Int32]] := initialize(size => 10, initialElement => 10);
-        case opt of
-            when Some(value as buffer: Buffer[Int32]) do
-                 destroyFree(buffer);
-                 assertSuccess("destroyFree succeeded");
-            when None do
-                 assertFailure("initialize failed.");
-        end case;
+        testHeading("Basic lifecycle: allocateEmpty and destroyEmpty");
+        let b: Buffer[Int32] := allocateEmpty();
+        destroyEmpty(b);
+        assertSuccess("Basic lifecycle done.");
         return nil;
     end;
 
-    function nthFreeTest(): Unit is
-        testHeading("nthFree");
-        let opt: Option[Buffer[Int32]] := initialize(size => 10, initialElement => 10);
-        case opt of
-            when Some(value as buffer: Buffer[Int32]) do
-                 let first: Int32 := nthFree(&buffer, 0);
-                 assertTrue((first = 10), "`first` equals 10");
-                 let last: Int32 := nthFree(&buffer, 9);
-                 assertTrue((last = 10), "`last` equals 10");
-                 destroyFree(buffer);
-                 assertSuccess("destroyFree succeeded");
-            when None do
-                 assertFailure("initialize failed.");
-        end case;
+    function initializeTest(): Unit is
+        testHeading("initialize, length, nth, and destroyFree");
+        let b: Buffer[Int32] := initialize(3, 10);
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 10, "[0] = 10");
+        assertTrue(nth(&b, 1) = 10, "[1] = 10");
+        assertTrue(nth(&b, 2) = 10, "[2] = 10");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
         return nil;
     end;
 
-    function nthOptTest(): Unit is
-        testHeading("nthOpt");
-        let opt: Option[Buffer[Int32]] := initialize(size => 10, initialElement => 10);
-        case opt of
-            when Some(value as buffer: Buffer[Int32]) do
-                 case nthOpt(&buffer, 0) of
-                     when Some(value as first: Int32) do
-                          assertTrue((first = 10), "`first` equals 10");
-                     when None do
-                          assertFailure("nthOpt failed.");
-                 end case;
-                 case nthOpt(&buffer, 10) of
-                     when Some(value as first: Int32) do
-                         assertFailure("nthOpt failed.");
-                     when None do
-                         assertSuccess("nthOpt with index = 10 returns None.");
-                 end case;
-                 destroyFree(buffer);
-                 assertSuccess("destroyFree succeeded");
-            when None do
-                 assertFailure("initialize failed.");
-        end case;
+    function storeTest(): Unit is
+        testHeading("storeNth");
+        let b: Buffer[Int32] := initialize(1, 10);
+        assertTrue(length(&b) = 1, "length = 1");
+        assertTrue(nth(&b, 0) = 10, "[0] = 10");
+        storeNth(&!b, 0, 20);
+        assertTrue(nth(&b, 0) = 20, "[0] = 20");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function swapNthTest(): Unit is
+        testHeading("swapNth");
+        let b: Buffer[Int32] := initialize(1, 10);
+        assertTrue(length(&b) = 1, "length = 1");
+        assertTrue(nth(&b, 0) = 10, "[0] = 10");
+        let old: Int32 := swapNth(&!b, 0, 20);
+        assertTrue(old = 10, "old = 10");
+        assertTrue(nth(&b, 0) = 20, "[0] = 20");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function swapIndexTest(): Unit is
+        testHeading("swapIndex");
+        let b: Buffer[Int32] := initialize(2, 0);
+        assertTrue(length(&b) = 2, "length = 2");
+        storeNth(&!b, 0, 10);
+        storeNth(&!b, 1, 20);
+        assertTrue(nth(&b, 0) = 10, "[0] = 10");
+        assertTrue(nth(&b, 1) = 20, "[1] = 20");
+        swapIndex(&!b, 0, 1);
+        assertTrue(nth(&b, 0) = 20, "[0] = 20");
+        assertTrue(nth(&b, 1) = 10, "[1] = 10");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function fillTest(): Unit is
+        testHeading("initialize then fill");
+        let b: Buffer[Int32] := initialize(3, 10);
+        fill(&!b, 20);
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 20, "[0] = 20");
+        assertTrue(nth(&b, 1) = 20, "[1] = 20");
+        assertTrue(nth(&b, 2) = 20, "[2] = 20");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function insertFrontTest(): Unit is
+        testHeading("insertFront");
+        let b: Buffer[Int32] := allocateEmpty();
+        -- []
+        assertTrue(length(&b) = 0, "length = 0");
+        -- [3]
+        insertFront(&!b, 3);
+        assertTrue(length(&b) = 1, "length = 1");
+        assertTrue(nth(&b, 0) = 3, "[0] = 3");
+        -- [2, 3]
+        insertFront(&!b, 2);
+        assertTrue(length(&b) = 2, "length = 2");
+        assertTrue(nth(&b, 0) = 2, "[0] = 2");
+        assertTrue(nth(&b, 1) = 3, "[1] = 3");
+        -- [1,2,3]
+        insertFront(&!b, 1);
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        destroyFree(b);
+        return nil;
+    end;
+
+    function insertBackTest(): Unit is
+        testHeading("insertBack");
+        let b: Buffer[Int32] := allocateEmpty();
+        -- []
+        assertTrue(length(&b) = 0, "length = 0");
+        -- [1]
+        insertBack(&!b, 1);
+        assertTrue(length(&b) = 1, "length = 1");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        -- [1, 2]
+        insertBack(&!b, 2);
+        assertTrue(length(&b) = 2, "length = 2");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        -- [1,2,3]
+        insertBack(&!b, 3);
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        destroyFree(b);
+        return nil;
+    end;
+
+    function removeFirstTest(): Unit is
+        testHeading("removeFirst");
+        let b: Buffer[Int32] := allocateEmpty();
+        -- []
+        assertTrue(length(&b) = 0, "length = 0");
+        insertBack(&!b, 1);
+        insertBack(&!b, 2);
+        insertBack(&!b, 3);
+        -- [1,2,3]
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        -- [2,3]
+        removeFirst(&!b);
+        assertTrue(length(&b) = 2, "length = 2");
+        assertTrue(nth(&b, 0) = 2, "[0] = 2");
+        assertTrue(nth(&b, 1) = 3, "[1] = 3");
+        -- [3]
+        removeFirst(&!b);
+        assertTrue(length(&b) = 1, "length = 1");
+        assertTrue(nth(&b, 0) = 3, "[0] = 3");
+        -- []
+        removeFirst(&!b);
+        assertTrue(length(&b) = 0, "length = 0");
+        destroyEmpty(b);
+        return nil;
+    end;
+
+    function removeLastTest(): Unit is
+        testHeading("removeLast");
+        let b: Buffer[Int32] := allocateEmpty();
+        -- []
+        assertTrue(length(&b) = 0, "length = 0");
+        insertBack(&!b, 1);
+        insertBack(&!b, 2);
+        insertBack(&!b, 3);
+        -- [1,2,3]
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        -- [1,2]
+        removeLast(&!b);
+        assertTrue(length(&b) = 2, "length = 2");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        -- [1]
+        removeLast(&!b);
+        assertTrue(length(&b) = 1, "length = 1");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        -- []
+        removeLast(&!b);
+        assertTrue(length(&b) = 0, "length = 0");
+        destroyEmpty(b);
+        return nil;
+    end;
+
+    function reverseEmptyTest(): Unit is
+        testHeading("reverse (empty)");
+        -- Test empty array
+        let b: Buffer[Int32] := allocateEmpty();
+        assertTrue(length(&b) = 0, "length = 0");
+        reverse(&!b);
+        assertTrue(length(&b) = 0, "length = 0");
+        destroyFree(b);
+        return nil;
+    end;
+
+    function reverseNonEmptyTest(): Unit is
+        testHeading("reverse (non-empty)");
+        -- Test non-empty array
+        let b: Buffer[Int32] := allocateEmpty();
+        insertBack(&!b, 1);
+        insertBack(&!b, 2);
+        insertBack(&!b, 3);
+        -- [1,2,3]
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 1, "[0] = 1");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 3, "[2] = 3");
+        reverse(&!b);
+        -- [3,2,1]
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 3, "[0] = 3");
+        assertTrue(nth(&b, 1) = 2, "[1] = 2");
+        assertTrue(nth(&b, 2) = 1, "[2] = 1");
+        destroyFree(b);
         return nil;
     end;
 end module body.

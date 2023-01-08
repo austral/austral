@@ -10,11 +10,22 @@ let arglist_size = function
 
 let rec arglist_to_positional (args, names): texpr list =
   (* TODO: better error reporting *)
-  assert ((arglist_size args) = (List.length names));
-  assert (names_match args names);
-  match args with
-  | (TPositionalArglist l) -> l
-  | (TNamedArglist l) -> reorder_arglist l names
+  let expected = List.length names
+  and actual = arglist_size args
+  in
+  if expected = actual then
+    let _ = assert (names_match args names) in
+    match args with
+    | (TPositionalArglist l) -> l
+    | (TNamedArglist l) -> reorder_arglist l names
+  else
+    austral_raise GenericError
+      [
+        Text "Wrong number of arguments. Expected";
+        Code (string_of_int expected);
+        Text "and got";
+        Code (string_of_int actual)
+      ]
 
 and names_match arglist names =
   match arglist with

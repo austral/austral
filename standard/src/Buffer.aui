@@ -7,9 +7,22 @@ module Standard.Buffer is
     """
     type Buffer[T: Type]: Linear;
 
-    --
-    -- Lifecycle functions.
-    --
+    ---
+    --- Lifecycle
+    ---
+
+    """
+    Allocates an empty buffer. Aborts on allocation failure.
+    """
+    generic [T: Type]
+    function allocateEmpty(): Buffer[T];
+
+    """
+    Allocates an empty buffer. Returns `None` on allocation
+    failure.
+    """
+    generic [T: Type]
+    function safeAllocateEmpty(): Option[Buffer[T]];
 
     """
     Create a buffer of the given size, filling all slots with copies of the given
@@ -17,10 +30,16 @@ module Standard.Buffer is
 
     The contained type has to be Free so it can be copied any number of times.
 
-    If allocation fails, returns `None`.
+    Aborts on allocation failure.
     """
     generic [T: Free]
-    function initialize(size: Index, initialElement: T): Option[Buffer[T]];
+    function initialize(size: Index, initialElement: T): Buffer[T];
+
+    """
+    Like `initialize`, but returns `None` on allocation failure.
+    """
+    generic [T: Free]
+    function safeInitialize(size: Index, initialElement: T): Option[Buffer[T]];
 
     """
     Deallocate a buffer with Free elements.
@@ -34,33 +53,78 @@ module Standard.Buffer is
     generic [T: Type]
     function destroyEmpty(buffer: Buffer[T]): Unit;
 
-    --
-    -- Query functions.
-    --
-
-    """
-    Return the number of elements in the buffer.
-    """
-    generic [T: Free, R: Region]
-    function bufferSize(buffer: &[Buffer[T], R]): Index;
-
     ---
-    --- Retrieval functions.
+    --- Retrieve
     ---
 
     """
-    Retrieve the nth element of a Buffer of free elements.
+    Return the length of the buffer.
+    """
+    generic [T: Type, R: Region]
+    function length(buf: &[Buffer[T], R]): Index;
 
-    Abort if the index is out of bounds.
+    """
+    Return the nth element of `buf`.
     """
     generic [T: Free, R: Region]
-    function nthFree(buffer: &[Buffer[T], R], index: Index): T;
+    function nth(buf: &[Buffer[T], R], pos: Index): T;
+
+    ---
+    --- Update
+    ---
 
     """
-    Retrieve the nth element of a Buffer of free elements.
-
-    Returns `None` if the index is out of bounds.
+    Store `element` in the given position of `buf`.
     """
     generic [T: Free, R: Region]
-    function nthOpt(buffer: &[Buffer[T], R], index: Index): Option[T];
+    function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
+
+    """
+    Store `element` in the given position of `buf`, and return the element
+    that was previoulys there.
+    """
+    generic [T: Type, R: Region]
+    function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T;
+
+    generic [T: Type, R: Region]
+    function swapIndex(buf: &![Buffer[T], R], a: Index, b: Index): Unit;
+
+    """
+    Store `element` in every position of `buf`.
+    """
+    generic [T: Free, R: Region]
+    function fill(buf: &![Buffer[T], R], element: T): Unit;
+
+    ---
+    --- Insertion
+    ---
+
+    generic [T: Free, R: Region]
+    function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
+
+    generic [T: Free, R: Region]
+    function insertFront(buf: &![Buffer[T], R], element: T): Unit;
+
+    generic [T: Free, R: Region]
+    function insertBack(buf: &![Buffer[T], R], element: T): Unit;
+
+    ---
+    --- Removal
+    ---
+
+    generic [T: Free, R: Region]
+    function remove(buf: &![Buffer[T], R], pos: Index): T;
+
+    generic [T: Free, R: Region]
+    function removeFirst(buf: &![Buffer[T], R]): T;
+
+    generic [T: Free, R: Region]
+    function removeLast(buf: &![Buffer[T], R]): T;
+
+    ---
+    --- Reversal
+    ---
+
+    generic [T: Free, R: Region]
+    function reverse(buf: &![Buffer[T], R]): Unit;
 end module.

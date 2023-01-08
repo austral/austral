@@ -6,20 +6,29 @@ import Austral.Memory (
     deallocate,
     nullCheck,
     positiveOffset,
+    negativeOffset,
     store,
-    load
+    load,
+    memcpy,
+    memmove,
+    arraySizeInBytes
 );
 
 module body Standard.Buffer is
-    -- Need this to use Austral.Memory.
     pragma Unsafe_Module;
+
+    """
+    The smallest value of capacity. Enforced at array allocation
+    time.
+    """
+    constant minimum_capacity: Index := 16;
 
     """
     The growth factor times the array's capacity tells us the next size of
     the array when resizing. Naively, we double the size of the array when
     hitting the capacity.
     """
-    constant Growth_Factor: Index := 2;
+    constant growth_factor: Index := 2;
 
     record Buffer[T: Type]: Linear is
         -- The capacity is the true underlying size. It is different from the
@@ -30,34 +39,92 @@ module body Standard.Buffer is
         size: Index;
         -- The underlying heap array.
         array: Pointer[T];
-
-        -- Invariants:
-        --
-        --   capacity >= size
     end;
 
-    --
-    -- Lifecycle functions.
-    --
+    """
+    Check invariants.
+    """
+    generic [T: Type, R: Region]
+    function invariants(buf: &[Buffer[T], R]): Unit is
+        -- Size is always strictly less than the capacity. When resizing, if
+        -- the size matches the capacity, we bump up.
+        if (!buf->size) >= (!buf->capacity) then
+            abort("Buffer size >= capacity");
+        end if;
+        -- Capacity is always non-zero.
+        if (!buf->capacity) = 0 then
+            abort("Buffer capacity = 0");
+        end if;
+        return nil;
+    end;
 
-    generic [T: Free]
-    function initialize(size: Index, initialElement: T): Option[Buffer[T]] is
-        let addr: Address[T] := allocateBuffer(size);
+    ---
+    --- Lifecycle
+    ---
+
+    generic [T: Type]
+    function allocateEmpty(): Buffer[T] is
+        let opt: Option[Buffer[T]] := safeAllocateEmpty();
+        case opt of
+            when Some(value: Buffer[T]) do
+                return value;
+            when None do
+                abort("allocateEmpty: allocation failed");
+        end case;
+    end;
+
+    generic [T: Type]
+    function safeAllocateEmpty(): Option[Buffer[T]] is
+        let addr: Address[T] := allocateBuffer(minimum_capacity);
         case nullCheck(addr) of
-            when Some(value as array: Pointer[T]) do
-                for i from 0 to size - 1 do
-                    let nth: Pointer[T] := positiveOffset(array, i);
-                    store(nth, initialElement);
-                end for;
+            when Some(value: Pointer[T]) do
                 let buf: Buffer[T] := Buffer(
-                    capacity => size,
-                    size => size,
-                    array => array
+                    capacity => minimum_capacity,
+                    size => 0,
+                    array => value
                 );
                 return Some(value => buf);
             when None do
                 return None();
         end case;
+    end;
+
+    generic [T: Free]
+    function initialize(size: Index, initialElement: T): Buffer[T] is
+        let opt: Option[Buffer[T]] := safeInitialize(size, initialElement);
+        case opt of
+            when Some(value: Buffer[T]) do
+                return value;
+            when None do
+                abort("initialize: allocation failed");
+        end case;
+    end;
+
+    generic [T: Free]
+    function safeInitialize(size: Index, initialElement: T): Option[Buffer[T]] is
+        let capacity: Index := max(size, minimum_capacity);
+        let addr: Address[T] := allocateBuffer(capacity);
+        case nullCheck(addr) of
+            when Some(value: Pointer[T]) do
+                let buf: Buffer[T] := Buffer(
+                    capacity => capacity,
+                    size => size,
+                    array => value
+                );
+                fill(&!buf, initialElement);
+                return Some(value => buf);
+            when None do
+                return None();
+        end case;
+    end;
+
+    -- TODO: move this to a better place
+    function max(a: Index, b: Index): Index is
+        if a > b then
+            return a;
+        else
+            return b;
+        end if;
     end;
 
     generic [T: Free]
@@ -77,45 +144,243 @@ module body Standard.Buffer is
         return nil;
     end;
 
-    --
-    -- Query functions.
-    --
-
-    generic [T: Free, R: Region]
-    function bufferSize(buffer: &[Buffer[T], R]): Index is
-        return !(buffer->size);
-    end;
-
     ---
-    --- Retrieval functions.
+    --- Retrieve
     ---
 
-    generic [T: Free, R: Region]
-    function nthFree(buffer: &[Buffer[T], R], index: Index): T is
-        checkInBounds(buffer, index);
-        let arr: Pointer[T] := !(buffer->array);
-        return load(positiveOffset(arr, index));
+    """
+    Return the length of the buffer.
+    """
+    generic [T: Type, R: Region]
+    function length(buf: &[Buffer[T], R]): Index is
+        return !buf->size;
     end;
 
     generic [T: Free, R: Region]
-    function nthOpt(buffer: &[Buffer[T], R], index: Index): Option[T] is
-        if index >= bufferSize(buffer) then
-            return None();
-        else
-            let arr: Pointer[T] := !(buffer->array);
-            let val: T := load(positiveOffset(arr, index));
-            return Some(value => val);
+    function nth(buf: &[Buffer[T], R], pos: Index): T is
+        if pos >= (!buf->size) then
+            abort("nth: index out of range");
         end if;
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let elem: T := load(ptr);
+        return elem;
     end;
 
     ---
-    --- Internal.
+    --- Update
+    ---
+
+    """
+    Store `element` in the given position of `buf`.
+    """
+    generic [T: Free, R: Region]
+    function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
+        if pos >= (!buf->size) then
+            abort("storeNth: index out of range");
+        end if;
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        store(ptr, element);
+        return nil;
+    end;
+
+
+    generic [T: Type, R: Region]
+    function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T is
+        if pos >= (!buf->size) then
+            abort("swapNth: index out of range");
+        end if;
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let previous: T := load(ptr);
+        store(ptr, element);
+        return previous;
+    end;
+
+    generic [T: Type, R: Region]
+    function swapIndex(buf: &![Buffer[T], R], a: Index, b: Index): Unit is
+        if a >= (!buf->size) then
+            abort("swapIndex: first index out of range");
+        end if;
+        if b >= (!buf->size) then
+            abort("swapIndex: second index out of range");
+        end if;
+        -- Load a and b.
+        let a_ptr: Pointer[T] := positiveOffset(!buf->array, a);
+        let b_ptr: Pointer[T] := positiveOffset(!buf->array, b);
+        let elem_a: T := load(a_ptr);
+        let elem_b: T := load(b_ptr);
+        -- Store b in a.
+        store(a_ptr, elem_b);
+        -- Store a in b.
+        store(b_ptr, elem_a);
+        return nil;
+    end;
+
+    generic [T: Free, R: Region]
+    function fill(buf: &![Buffer[T], R], element: T): Unit is
+        for i from 0 to (!buf->size) - 1 do
+            storeNth(buf, i, element);
+        end for;
+        return nil;
+    end;
+
+    ---
+    --- Insertion
+    ---
+
+    """
+    Increase the capacity of the array.
+
+    Aborts on allocation failure.
+    """
+    generic [T: Free, R: Region]
+    function bump(buf: &![Buffer[T], R]): Unit is
+        let new_capacity: Index := (!buf->capacity) * 2;
+        let new_array: Pointer[T] := resizeArray(!buf->array, new_capacity);
+        memcpy(
+            destination => new_array,
+            source => !buf->array,
+            count => arraySizeInBytes(sizeof(T), !buf->size)
+        );
+        buf->capacity := new_capacity;
+        buf->array := new_array;
+        return nil;
+    end;
+
+    generic [T: Free, R: Region]
+    function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
+        -- Check `pos` is in bounds.
+        if pos > (!buf->size) then
+            abort("insert: index out of range");
+        end if;
+        -- If insertion would increase make `size` match `capacity`, resize
+        -- the array.
+        if ((!buf->size) + 1) = (!buf->capacity) then
+            bump(buf);
+        end if;
+        -- If the array is non-empty, we have to move everything to the right of
+        -- the position one step to the right.
+        if (!buf->size) > 0 then
+           shiftRight(
+               ptr => !buf->array,
+               chunk_start => pos,
+               chunk_length => (!buf->size) - pos,
+               count => 1
+           );
+        end if;
+        -- Insert.
+        let index_ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        store(index_ptr, element);
+        buf->size := (!buf->size) + 1;
+        return nil;
+    end;
+
+    generic [T: Free, R: Region]
+    function insertFront(buf: &![Buffer[T], R], element: T): Unit is
+        return insert(buf, 0, element);
+    end;
+
+    generic [T: Free, R: Region]
+    function insertBack(buf: &![Buffer[T], R], element: T): Unit is
+        return insert(buf, !buf->size, element);
+    end;
+
+    ---
+    --- Removal
     ---
 
     generic [T: Free, R: Region]
-    function checkInBounds(buffer: &[Buffer[T], R], index: Index): T is
-        if index >= bufferSize(buffer) then
-            abort("Index out of bounds.");
+    function remove(buf: &![Buffer[T], R], pos: Index): T is
+        -- Check array is non-empty.
+        if (!buf->size) = 0 then
+            abort("remove: array is empty");
         end if;
+        -- Check position is in bounds.
+        if pos >= (!buf->size) then
+            abort("insert: index out of range");
+        end if;
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let elem: T := load(ptr);
+        -- Move all elements right form `pos` one step to the left, unless this is the last index of the array.
+        if pos < ((!buf->size) - 1) then
+            shiftLeft(
+                ptr => !buf->array,
+                chunk_start => pos + 1,
+                chunk_length => ((!buf->size) - 1) - pos,
+                count => 1
+            );
+        end if;
+        buf->size := (!buf->size) - 1;
+        return elem;
+    end;
+
+    generic [T: Free, R: Region]
+    function removeFirst(buf: &![Buffer[T], R]): T is
+        return remove(buf, 0);
+    end;
+
+    generic [T: Free, R: Region]
+    function removeLast(buf: &![Buffer[T], R]): T is
+        return remove(buf, (!buf->size) - 1);
+    end;
+
+    ---
+    --- Utilities
+    ---
+
+    """
+    In the given poiner, shift the chunk of memory from the position
+    `chunk_start` to `chunk_start + chunk_length` by `count` steps to the right.
+    """
+    generic [T: Type]
+    function shiftRight(ptr: Pointer[T], chunk_start: Index, chunk_length: Index, count: Index): Unit is
+        -- Pointer to the start of the chunk.
+        let start_ptr: Pointer[T] := positiveOffset(ptr, chunk_start);
+        -- Size of the chunk in bytes.
+        let chunk_size: ByteSize := arraySizeInBytes(sizeof(T), chunk_length);
+        -- Pointer to the start of the destination.
+        let target_ptr: Pointer[T] := positiveOffset(start_ptr, count);
+        -- Move.
+        memmove(
+            source => start_ptr,
+            destination => target_ptr,
+            count => chunk_size
+        );
+        return nil;
+    end;
+
+    """
+    In the given poiner, shift the chunk of memory from the position
+    `chunk_start` to `chunk_start + chunk_length` by `count` steps to the left.
+    """
+    generic [T: Type]
+    function shiftLeft(ptr: Pointer[T], chunk_start: Index, chunk_length: Index, count: Index): Unit is
+        -- Pointer to the start of the chunk.
+        let start_ptr: Pointer[T] := positiveOffset(ptr, chunk_start);
+        -- Size of the chunk in bytes.
+        let chunk_size: ByteSize := arraySizeInBytes(sizeof(T), chunk_length);
+        -- Pointer to the start of the destination.
+        let target_ptr: Pointer[T] := negativeOffset(start_ptr, count);
+        -- Move.
+        memmove(
+            source => start_ptr,
+            destination => target_ptr,
+            count => chunk_size
+        );
+        return nil;
+    end;
+
+    ---
+    --- Reversal
+    ---
+
+    generic [T: Free, R: Region]
+    function reverse(buf: &![Buffer[T], R]): Unit is
+        if (!buf->size) > 0 then
+            for i from 0 to (!buf->size) / 2 do
+                let j: Index := ((!buf->size) - i) - 1;
+                swapIndex(buf, i, j);
+            end for;
+        end if;
+        return nil;
     end;
 end module body.

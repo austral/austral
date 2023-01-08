@@ -156,6 +156,7 @@ and read_string = parse
 
 and read_triple_string = parse
   | "\"\"\"" { let c = Buffer.contents triple_string_acc in Buffer.clear triple_string_acc; TRIPLE_STRING_CONSTANT c }
+  | '\n' { advance_line lexbuf; Buffer.add_string triple_string_acc "\n"; read_triple_string lexbuf }
   | '\\' "\"\"\"" { Buffer.add_string triple_string_acc "\"\"\""; read_triple_string lexbuf }
   | eof { err "End of file in triple-quoted string." }
   | _ { Buffer.add_string triple_string_acc (Lexing.lexeme lexbuf); read_triple_string lexbuf }
