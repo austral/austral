@@ -20,16 +20,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "~/.opam"
-          key: opam-linux-${{ hashFiles('/home/runner/.opam/**') }}
+          key: opam-linux-${{ hashFiles('install-ocaml-deps.sh') }}
 
       - name: Install opam
         run: sudo apt-get install opam
 
       - name: Set up opam
         run: opam init
-
-      - name: Install dune
-        run: opam install dune
 
       - name: Install OCaml dependencies
         run: ./install-ocaml-deps.sh
