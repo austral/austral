@@ -777,9 +777,9 @@
 				}
 			]
 		},
-		"loop_body": {
+		"do_block": {
 			"begin": "\\bdo\\b",
-			"end": "\\bend\\s+(for|while)\\b",
+			"end": "\\bend(?:\\s+(for|while))?\\b",
 			"beginCaptures": {
 				"0": {
 					"name": "punctuation.definition.block.begin.austral keyword.control.$0.austral"
@@ -855,6 +855,38 @@
 				}
 			]
 		},
+		"borrow_head": {
+			"match": "(?:(\\&\\!)|(\\&))(.*)(?=do)",
+			"captures": {
+				"1": {
+					"name": "keyword.operator.borrow.read.austral"
+				},
+				"2": {
+					"name": "keyword.operator.borrow.write.austral"
+				},
+				"3": {
+					"patterns": [
+						{
+							"include": "#comment"
+						},
+						{
+							"match": "(?=in)\\s+([a-zA-Z][a-z0-9_]*)",
+							"name": "entity.name.type.region.austral"
+		
+						},
+						{
+							"match": "\\b(as|in)\\b",
+							"name": "keyword.other.$0.austral"
+						},
+						{
+							"match": "[a-zA-Z][a-zA-Z0-9_]*",
+							"name": "variable.name.austral"
+						}
+					]
+				}
+			}
+			
+		},
 		"case_body": {
 			"begin": "\\bof\\b",
 			"end": "\\bend case\\b",
@@ -889,6 +921,9 @@
 					"include": "#let_destructure"
 				},
 				{
+					"include": "#borrow_head"
+				},
+				{
 					"include": "#if_statement"
 				},
 				{
@@ -907,7 +942,7 @@
 					"include": "#case_body"
 				},
 				{
-					"include": "#loop_body"
+					"include": "#do_block"
 				},
 				{
 					"include": "#statement_keywords"
