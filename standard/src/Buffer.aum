@@ -251,6 +251,16 @@ module body Standard.Buffer is
         return nil;
     end;
 
+    generic [T: Free, R: Region]
+    function insertFront(buf: &![Buffer[T], R], element: T): Unit is
+        return insert(buf, 0, element);
+    end;
+
+    generic [T: Free, R: Region]
+    function insertBack(buf: &![Buffer[T], R], element: T): Unit is
+        return insert(buf, 0, element);
+    end;
+
     ---
     --- Removal
     ---

@@ -98,4 +98,10 @@ module Standard.Buffer is
 
     generic [T: Free, R: Region]
     function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
+
+    generic [T: Free, R: Region]
+    function insertFront(buf: &![Buffer[T], R], element: T): Unit;
+
+    generic [T: Free, R: Region]
+    function insertBack(buf: &![Buffer[T], R], element: T): Unit;
 end module.
