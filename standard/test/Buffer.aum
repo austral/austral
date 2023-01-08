@@ -5,7 +5,8 @@ import Standard.Buffer (
     initialize,
     length,
     nth,
-    destroyFree
+    destroyFree,
+    fill
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -20,6 +21,7 @@ module body Standard.Test.Buffer is
         suiteHeading("Standard.Buffer");
         basicLifecycleTest();
         initializeTest();
+        fillTest();
         return nil;
     end;
 
@@ -38,6 +40,19 @@ module body Standard.Test.Buffer is
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
         assertTrue(nth(&b, 1) = 10, "[1] = 10");
         assertTrue(nth(&b, 2) = 10, "[2] = 10");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function fillTest(): Unit is
+        testHeading("initialize then fill");
+        let b: Buffer[Int32] := initialize(3, 10);
+        fill(&!b, 20);
+        assertTrue(length(&b) = 3, "length = 3");
+        assertTrue(nth(&b, 0) = 20, "[0] = 20");
+        assertTrue(nth(&b, 1) = 20, "[1] = 20");
+        assertTrue(nth(&b, 2) = 20, "[2] = 20");
         destroyFree(b);
         assertSuccess("destroyFree complete");
         return nil;
