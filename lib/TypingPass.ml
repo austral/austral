@@ -115,7 +115,8 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
                Code (type_string lhs_ty);
                Text "but the RHS has type";
-               Code (type_string rhs_ty)
+               Code (type_string rhs_ty);
+               Text "."
              ]
          in
          (* Are the types the same? *)
