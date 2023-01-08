@@ -90,7 +90,12 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
            if (is_numeric lhs_ty) then
              TArithmetic (op, lhs', rhs')
            else
-             err "Both operands to an arithmetic expression must be comparable types."
+             austral_raise GenericError [
+                 Text "Both operands to an arithmetic expression must be comparable types. The LHS has type";
+                 Code (type_string lhs_ty);
+                 Text ", but the RHS has type";
+                 Code (type_string rhs_ty)
+               ]
          else
            (* If the types are different, check if at least one operator is a constant.*)
            let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
