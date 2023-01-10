@@ -24,7 +24,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.$0.austral",
-					"match": "\\b(import|if|then|else|case|when|whiledo|of|for|return|(else\\s+if))\\b"
+					"match": "\\b(skip|import|if|then|else|case|when|whiledo|of|for|return|(else\\s+if))\\b"
 				},
 				{
 					"name": "keyword.control.end.$1.austral",
