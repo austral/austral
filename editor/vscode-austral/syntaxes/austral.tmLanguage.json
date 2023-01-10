@@ -236,7 +236,7 @@
 				}
 			]
 		},
-		"statements": {
+		"context_block": {
 			"patterns": [
 				{
 					"include": "#let_simple"
@@ -1025,7 +1025,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#statements"
+					"include": "#context_block"
 				}
 			]
 		},
@@ -1144,7 +1144,7 @@
 					"include": "#when_head"
 				},
 				{
-					"include": "#statements"
+					"include": "#context_block"
 				}
 			]
 		},
@@ -1181,7 +1181,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#statements"
+					"include": "#context_block"
 				}
 			]
 		},
@@ -1230,7 +1230,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#statements"
+					"include": "#context_block"
 				}
 			]
 		},
