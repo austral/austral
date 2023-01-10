@@ -331,8 +331,14 @@
 				}
 			}
 		},
-		"declarations": {
+		"context_module_interface": {
 			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#pragma"
+				},
 				{
 					"include": "#constant_decl"
 				},
@@ -391,6 +397,22 @@
 				},
 				{
 					"include": "#instance_head"
+				}
+			]
+		},
+		"context_module_body": {
+			"patterns": [
+				{
+					"include": "#context_module_interface"
+				},
+				{
+					"include": "#instance_body"
+				},
+				{
+					"include": "#function_body"
+				},
+				{
+					"include": "#assignment"
 				}
 			]
 		},
@@ -983,7 +1005,6 @@
 						}
 					]
 				}
-
 			]
 		},
 		"function_head": {
@@ -1414,10 +1435,7 @@
 					},
 					"patterns": [
 						{
-							"include": "#pragma"
-						},
-						{
-							"include": "#declarations"
+							"include": "#context_module_interface"
 						}
 					]
 				}
@@ -1446,19 +1464,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#pragma"
-				},
-				{
-					"include": "#instance_body"
-				},
-				{
-					"include": "#function_body"
-				},
-				{
-					"include": "#declarations"
-				},
-				{
-					"include": "#assignment"
+					"include": "#context_module_body"
 				}
 			]
 		},
