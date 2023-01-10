@@ -300,9 +300,6 @@
 					"name": "punctuation.terminator.statement.austral"
 				},
 				{
-					"include": "#keywords"
-				},
-				{
 					"include": "#comment"
 				},
 				{
@@ -345,6 +342,9 @@
 					"include": "#constant_decl"
 				},
 				{
+					"include": "#keywords"
+				},
+				{
 					"include": "#assignment"
 				}
 			]
@@ -365,9 +365,6 @@
 			"patterns": [
 				{
 					"include": "#comment"
-				},
-				{
-					"include": "#keywords"
 				},
 				{
 					"include": "#pragma"
@@ -430,6 +427,9 @@
 				},
 				{
 					"include": "#instance_head"
+				},
+				{
+					"include": "#keywords"
 				}
 			]
 		},
