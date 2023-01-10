@@ -182,7 +182,7 @@
 				}
 			]
 		},
-		"context_type_param_list": {
+		"context_type_parameter_list": {
 			"name": "meta.type-paramater-list.austral",
 			"patterns": [
 				{
@@ -313,7 +313,7 @@
 						"4": {
 							"patterns": [
 								{
-									"include": "#context_type_param_list"
+									"include": "#context_type_parameter_list"
 								}
 							]
 						},
@@ -385,7 +385,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#context_type_param_list"
+					"include": "#context_type_parameter_list"
 				}
 			]
 		},
@@ -727,7 +727,7 @@
 					},
 					"patterns": [
 						{
-							"include": "#context_type_param_list"
+							"include": "#context_type_parameter_list"
 						}
 					]
 				},
@@ -806,7 +806,7 @@
 				"4": {
 					"patterns": [
 						{
-							"include": "#context_type_param_list"
+							"include": "#context_type_parameter_list"
 						}
 					]
 				},
@@ -858,7 +858,7 @@
 				"4": {
 					"patterns": [
 						{
-							"include": "#context_type_param_list"
+							"include": "#context_type_parameter_list"
 						}
 					]
 				},
@@ -1339,7 +1339,7 @@
 				"4": {
 					"patterns": [
 						{
-							"include": "#context_type_param_list"
+							"include": "#context_type_parameter_list"
 						}
 					]
 				},
