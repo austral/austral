@@ -336,13 +336,13 @@
 					"include": "#do_block"
 				},
 				{
-					"include": "#context_expression"
-				},
-				{
 					"include": "#constant_decl"
 				},
 				{
 					"include": "#keywords"
+				},
+				{
+					"include": "#context_expression"
 				},
 				{
 					"include": "#assignment"
