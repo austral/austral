@@ -371,6 +371,9 @@
 					"include": "#comment"
 				},
 				{
+					"include": "#string_triple"
+				},
+				{
 					"include": "#pragma"
 				},
 				{
