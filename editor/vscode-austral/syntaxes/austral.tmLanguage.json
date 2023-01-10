@@ -239,6 +239,13 @@
 		"context_block": {
 			"patterns": [
 				{
+					"match": ";",
+					"name": "punctuation.terminator.statement.austral"
+				},
+				{
+					"include": "#comment"
+				},
+				{
 					"include": "#let_simple"
 				},
 				{
@@ -426,9 +433,6 @@
 				}
 			},
 			"patterns": [
-				{
-					"include": "#comment"
-				},
 				{
 					"include": "#context_expression"
 				}
@@ -1040,9 +1044,6 @@
 			},
 			"patterns": [
 				{
-					"include": "#comment"
-				},
-				{
 					"include": "#context_expression"
 				}
 			]
@@ -1080,9 +1081,6 @@
 						}
 					},
 					"patterns": [
-						{
-							"include": "#comment"
-						},
 						{
 							"include": "#context_binding_list"
 						}
@@ -1138,9 +1136,6 @@
 			},
 			"patterns": [
 				{
-					"include": "#comment"
-				},
-				{
 					"include": "#when_head"
 				},
 				{
@@ -1188,6 +1183,9 @@
 		"context_binding_list": {
 			"name": "meta.bindings.austral",
 			"patterns": [
+				{
+					"include": "#comment"
+				},
 				{
 					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
 					"captures": {
