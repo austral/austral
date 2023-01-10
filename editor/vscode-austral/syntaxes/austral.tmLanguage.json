@@ -236,6 +236,38 @@
 				}
 			]
 		},
+		"context_binding_list": {
+			"name": "meta.bindings.austral",
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.type.annotation.austral"
+						},
+						"2": {
+							"name": "meta.binding-type.austral",
+							"patterns": [
+								{
+									"include": "#typespec"
+								}
+							]
+						}
+					}
+				},
+				{
+					"match": "\\b[a-zA-Z][a-zA-Z0-9_]*\\b",
+					"name": "variable.other.binding.austral"
+				},
+				{
+					"match": "\\bas\\b",
+					"name": "keyword.operator.as.austral"
+				}
+			]
+		},
 		"context_block": {
 			"patterns": [
 				{
@@ -1177,38 +1209,6 @@
 			"patterns": [
 				{
 					"include": "#context_block"
-				}
-			]
-		},
-		"context_binding_list": {
-			"name": "meta.bindings.austral",
-			"patterns": [
-				{
-					"include": "#comment"
-				},
-				{
-					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?)",
-					"captures": {
-						"1": {
-							"name": "keyword.operator.type.annotation.austral"
-						},
-						"2": {
-							"name": "meta.binding-type.austral",
-							"patterns": [
-								{
-									"include": "#typespec"
-								}
-							]
-						}
-					}
-				},
-				{
-					"match": "\\b[a-zA-Z][a-zA-Z0-9_]*\\b",
-					"name": "variable.other.binding.austral"
-				},
-				{
-					"match": "\\bas\\b",
-					"name": "keyword.operator.as.austral"
 				}
 			]
 		},
