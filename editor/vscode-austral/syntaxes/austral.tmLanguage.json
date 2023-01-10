@@ -6,41 +6,57 @@
 			"include": "#import"
 		},
 		{
-			"include": "#comment"
-		},
-		{
 			"include": "#module_body"
 		},
 		{
 			"include": "#module"
 		},
 		{
-			"include": "#keywords"
-		},
-		{
-			"include": "#constants"
-		},
-		{
-			"include": "#string"
-		},
-		{
-			"include": "#string_triple"
+			"include": "#context_block"
 		}
 	],
 	"repository": {
 		"keywords": {
 			"patterns": [
 				{
-					"name": "keyword.control.austral",
-					"match": "\\b(if|case|while|for|return)\\b"
+					"name": "keyword.control.$0.austral",
+					"match": "\\b(import|if|then|else|case|when|whiledo|of|for|return|(else\\s+if))\\b"
 				},
 				{
-					"name": "keyword.other.austral storage.type.constant.austral",
-					"match": "\\bconstant\\b"
+					"name": "keyword.control.end.$1.austral",
+					"match": "\\bend\\s+(if|case|while|for)\\b"
 				},
 				{
-					"name": "keyword.other.austral",
-					"match": "\\b(end\\s+if|end\\s+case|end\\s+while|end\\s+for|end|from|to|do|of|let|then|else|else\\s+if|is|module\\s+body|end\\s+module\\s+body|module|end\\s+module|generic|method|function|instance|pragma|record|union|typeclass|import|when)\\b"
+					"name": "storage.type.$0.austral",
+					"match": "\\b(constant|let|generic|function|method|instance|record|union|typeclass)\\b"
+				},
+				{
+					"name": "keyword.other.module.interface.austral storage.type.module.interface.austral",
+					"match": "\\bmodule\\b"
+				},
+				{
+					"name": "keyword.other.module.body.austral storage.type.module.body.austral",
+					"match": "\\bmodule\\s+body\\b"
+				},
+				{
+					"name": "keyword.other.end.module.interface.austral storage.type.module.interface.austral",
+					"match": "\\bend\\s+module\\b"
+				},
+				{
+					"name": "keyword.other.end.module.body.austral storage.type.module.body.austral",
+					"match": "\\bend\\s+module\\s+body\\b"
+				},
+				{
+					"match": "\\bsizeof\\b",
+					"name": "keyword.operator.sizeof.austral keyword.other.sizeof.austral"
+				},
+				{
+					"match": "(\\@embed)",
+					"name": "keyword.operator.embed.austral keyword.other.embed.austral"
+				},
+				{
+					"name": "keyword.other.pragma.austral",
+					"match": "\\b(pragma|is|end)\\b"
 				}
 			]
 		},
@@ -108,9 +124,6 @@
 				},
 				{
 					"include": "#operators"
-				},
-				{
-					"include": "#expression_keywords"
 				},
 				{
 					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[.*\\])?)",
@@ -287,6 +300,9 @@
 					"name": "punctuation.terminator.statement.austral"
 				},
 				{
+					"include": "#keywords"
+				},
+				{
 					"include": "#comment"
 				},
 				{
@@ -323,9 +339,6 @@
 					"include": "#do_block"
 				},
 				{
-					"include": "#statement_keywords"
-				},
-				{
 					"include": "#context_expression"
 				},
 				{
@@ -352,6 +365,9 @@
 			"patterns": [
 				{
 					"include": "#comment"
+				},
+				{
+					"include": "#keywords"
 				},
 				{
 					"include": "#pragma"
@@ -729,34 +745,6 @@
 					"comment": "arithmetic operators",
 					"match": "(\\+|-|/|\\*)",
 					"name": "keyword.operator.arithmetic.austral"
-				}
-			]
-		},
-		"expression_keywords": {
-			"patterns": [
-				{
-					"match": "\\b(if|then|else)\\b",
-					"name": "keyword.control.$1.inline.austral"
-				},
-				{
-					"match": "\\bsizeof\\b",
-					"name": "keyword.operator.sizeof.austral keyword.other.sizeof.austral"
-				},
-				{
-					"match": "(\\@embed)",
-					"name": "keyword.operator.embed.austral keyword.other.embed.austral"
-				}
-			]
-		},
-		"statement_keywords": {
-			"patterns": [
-				{
-					"name": "keyword.control.$1.austral",
-					"match": "\\b(return|case|for|while|if|then|else|skip)\\b"
-				},
-				{
-					"name": "keyword.other.end.$1.austral",
-					"match": "\\bend\\s+(for|while|if|case)\\b"
 				}
 			]
 		},
@@ -1291,7 +1279,7 @@
 			"match": "\\b(instance)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(\\()(.*)(\\))",
 			"captures": {
 				"1": {
-					"name": "keyword.other.instance.austral"
+					"name": "storage.type.instance.austral"
 				},
 				"2": {
 					"name": "entity.name.type.austral"
@@ -1369,7 +1357,7 @@
 			},
 			"endCaptures": {
 				"0": {
-					"name": "keyword.other.end.austral storage.type.union.austral"
+					"name": "keyword.other.end.typeclass.austral storage.type.typeclass.austral"
 				}
 			},
 			"patterns": [
