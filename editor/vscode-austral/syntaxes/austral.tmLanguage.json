@@ -384,7 +384,7 @@
 					"include": "#generic"
 				},
 				{
-					"include": "#function_decl"
+					"include": "#function_head"
 				},
 				{
 					"include": "#typeclass"
@@ -986,7 +986,7 @@
 
 			]
 		},
-		"function_decl": {
+		"function_head": {
 			"name": "meta.$1-decl.austral",
 			"match": "(function|method)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\()(.*)(\\)))?\\s*(?:(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?))?",
 			"captures": {
@@ -1332,7 +1332,7 @@
 					"name": "invalid.illegal.function-in-instance.austral"
 				},
 				{
-					"include": "#function_decl"
+					"include": "#function_head"
 				},
 				{
 					"include": "#function_body"
@@ -1382,7 +1382,7 @@
 					"name": "invalid.illegal.function-in-typeclass.austral"
 				},
 				{
-					"include": "#function_decl"
+					"include": "#function_head"
 				},
 				{
 					"include": "#comment"
