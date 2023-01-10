@@ -186,12 +186,7 @@
 			"name": "meta.type-paramater-list.austral",
 			"patterns": [
 				{
-					"match": "\\b(Free|Linear|Type|Region)\\b",
-					"name": "entity.name.universe.austral entity.name.type.austral"
-				},
-				{
-					"match": ":",
-					"name": "punctuation.comma.austral"
+					"include": "#region_assertion"
 				},
 				{
 					"match": "([a-zA-Z][a-zA-Z0-9_]*)",
@@ -324,6 +319,18 @@
 				}
 			]
 		},
+		"universe_assertion": {
+			"comment": "colon followed by a universe, used for ascribing a universe to a type",
+			"match": "(:)\\s+(Free|Linear|Type|Region)",
+			"captures": {
+				"1": {
+					"name": "punctuation.delimiter.region.colon.austral"
+				},
+				"2": {
+					"name": "entity.name.universe.austral entity.name.type.austral"
+				}
+			}
+		},
 		"declarations": {
 			"patterns": [
 				{
@@ -333,7 +340,10 @@
 					"include": "#record_def"
 				},
 				{
-					"include": "#union_def"
+					"include": "#union_body"
+				},
+				{
+					"include": "#union_head"
 				},
 				{
 					"comment": "type declaration",
@@ -876,44 +886,59 @@
 				}
 			]
 		},
-		"union_def": {
-			"comment": "union declaration",
+		"union_head": {
+			"comment": "top of union declaration",
 			"name": "meta.union.austral",
-			"begin": "(union)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s+(is)",
-			"end": "\\bend\\b",
+			"begin": "(union)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
+			"end": "(?=\\bis\\b)",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.declaration.union.austral storage.type.union.austral"
 				},
 				"2": {
 					"name": "entity.name.type.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comment"
 				},
-				"3": {
-					"name": "punctuation.brackets.square.austral"
-				},
-				"4": {
+				{
+					"comment": "type parameter list",
+					"begin": "\\[",
+					"end": "\\]",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.type-parameters.begin.brackets.square.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.type-parameters.end.brackets.square.austral"
+						}
+					},
 					"patterns": [
 						{
 							"include": "#context_type_parameter_list"
 						}
 					]
 				},
-				"5": {
-					"name": "punctuation.brackets.square.austral"
-				},
-				"6": {
-					"name": "punctuation.colon.austral"
-				},
-				"7": {
-					"name": "entity.name.universe.austral entity.name.type.austral"
-				},
-				"8": {
-					"name": "storage.type.union.austral keyword.other.is.austral"
+				{
+					"include": "#universe_assertion"
+				}
+			]
+		},
+		"union_body": {
+			"begin": "(?<=(union).+)(is)",
+			"end": "\\bend\\b",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.union.body.begin.austral keyword.other.is.austral"
 				}
 			},
 			"endCaptures": {
 				"0": {
-					"name": "keyword.other.end.austral storage.type.union.austral"
+					"name": "punctuation.definition.union.body.end.austral keyword.other.end.austral"
 				}
 			},
 			"patterns": [
@@ -921,31 +946,29 @@
 					"include": "#string_triple"
 				},
 				{
-					"match": "\\b(case)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(;)",
+					"include": "#comment"
+				},
+				{
+					"match": ";",
+					"name": "punctuation.delimiter.union.case.end.semicolon.austral"
+				},
+				{
+					"match": "\\b(case)(?:\\s+([a-zA-Z][a-zA-Z0-9_]*))?",
 					"captures": {
 						"1": {
 							"name": "keyword.declaration.case.austral storage.type.case.austral"
 						},
 						"2": {
 							"name": "entity.name.type.austral"
-						},
-						"3": {
-							"name": "punctuation.semicolon.austral"
 						}
 					}
 				},
 				{
-					"begin": "\\b(case)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s+(is)",
-					"end": "(?=case|end)",
+					"begin": "is",
+					"end": "(?=\\b(case|end)\\b)",
 					"beginCaptures": {
-						"1": {
-							"name": "keyword.declaration.case.austral storage.type.case.austral"
-						},
-						"2": {
-							"name": "entity.name.type.austral"
-						},
-						"3": {
-							"name": "storage.type.case.austral"
+						"0": {
+							"name": "punctuation.definition.case.body.begin.austral keyword.other.end.austral"
 						}
 					},
 					"patterns": [
@@ -959,10 +982,8 @@
 							"include": "#slot"
 						}
 					]
-				},
-				{
-					"include": "#comment"
 				}
+
 			]
 		},
 		"function_decl": {
@@ -1138,7 +1159,6 @@
 						{
 							"match": "(?=in)\\s+([a-zA-Z][a-z0-9_]*)",
 							"name": "entity.name.type.region.austral"
-		
 						},
 						{
 							"match": "\\b(as|in)\\b",
