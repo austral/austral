@@ -1165,7 +1165,7 @@
 		"case_body": {
 			"name": "meta.body.case.austral",
 			"begin": "\\bof\\b",
-			"end": "\\bend case\\b",
+			"end": "\\bend\\s+(case)\\b",
 			"beginCaptures": {
 				"0": {
 					"name": "punctuation.definition.block.begin.austral keyword.control.$0.austral"
@@ -1173,7 +1173,7 @@
 			},
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.block.end.austral keyword.control.$0.austral"
+					"name": "punctuation.definition.block.end.austral keyword.control.end.$1.austral"
 				}
 			},
 			"patterns": [
@@ -1205,15 +1205,18 @@
 			"name": "meta.if.body.austral",
 			"comment": "the body of an if/else statement",
 			"begin": "\\b(then|else)\\b",
-			"end": "\\b(?:(?=else)|(end\\s+if))\\b",
+			"end": "\\b(?:(?=(else))|(end\\s+if))\\b",
 			"beginCaptures": {
 				"0": {
-					"name": "keyword.control.$0.a.austral"
+					"name": "keyword.control.$0.austral"
 				}
 			},
 			"endCaptures": {
-				"0": {
-					"name": "keyword.other.$0.austral"
+				"1": {
+					"name": "keyword.control.else.austral"
+				},
+				"2": {
+					"name": "keyword.control.end.if.austral"
 				}
 			},
 			"patterns": [
