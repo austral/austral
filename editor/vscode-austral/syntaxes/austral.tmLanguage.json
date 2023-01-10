@@ -1315,6 +1315,12 @@
 			},
 			"patterns": [
 				{
+					"include": "#string_triple"
+				},
+				{
+					"include": "#comment"
+				},
+				{
 					"match": "\\bfunction\\b",
 					"name": "invalid.illegal.function-in-instance.austral"
 				},
