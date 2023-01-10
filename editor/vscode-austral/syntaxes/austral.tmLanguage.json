@@ -436,9 +436,6 @@
 		"context_module_body": {
 			"patterns": [
 				{
-					"include": "#context_module_interface"
-				},
-				{
 					"include": "#instance_body"
 				},
 				{
@@ -446,6 +443,9 @@
 				},
 				{
 					"include": "#assignment"
+				},
+				{
+					"include": "#context_module_interface"
 				}
 			]
 		},
