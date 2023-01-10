@@ -55,7 +55,7 @@
 					"name": "keyword.operator.embed.austral keyword.other.embed.austral"
 				},
 				{
-					"name": "keyword.other.pragma.austral",
+					"name": "keyword.other.$0.austral",
 					"match": "\\b(pragma|is|end)\\b"
 				}
 			]
