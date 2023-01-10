@@ -3,6 +3,10 @@
 	"name": "Austral",
 	"patterns": [
 		{
+			"match": "\\.",
+			"name": "punctuation.delimiter.module.end.austral"
+		},
+		{
 			"include": "#import"
 		},
 		{
@@ -1394,7 +1398,7 @@
 					"comment": "module interface",
 					"name": "meta.module.interface.austral",
 					"begin": "(module)\\s+([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s+(is)",
-					"end": "end\\s+module\\s*\\.",
+					"end": "\\bend\\s+module\\b",
 					"beginCaptures": {
 						"1": {
 							"name": "storage.type.module.austral"
@@ -1408,7 +1412,7 @@
 					},
 					"endCaptures": {
 						"0": {
-							"name": "storage.type.module.austral"
+							"name": "keyword.other.end.module.interface.austral storage.type.module.interface.austral"
 						}
 					},
 					"patterns": [
@@ -1423,7 +1427,7 @@
 			"comment": "module body",
 			"name": "meta.module.body.austral",
 			"begin": "(module\\s+body)\\s+([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s+(is)",
-			"end": "end\\s+module\\s+body\\s*\\.",
+			"end": "\\bend\\s+module\\s+body\\b",
 			"beginCaptures": {
 				"1": {
 					"name": "storage.type.module.austral"
@@ -1437,7 +1441,7 @@
 			},
 			"endCaptures": {
 				"0": {
-					"name": "storage.type.module.austral"
+					"name": "keyword.other.end.module.body.austral storage.type.module.body.austral"
 				}
 			},
 			"patterns": [
