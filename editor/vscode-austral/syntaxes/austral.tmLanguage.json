@@ -1371,14 +1371,14 @@
 					"include": "#string_triple"
 				},
 				{
-					"match": "function",
+					"include": "#comment"
+				},
+				{
+					"match": "\\bfunction\\b",
 					"name": "invalid.illegal.function-in-typeclass.austral"
 				},
 				{
 					"include": "#function_head"
-				},
-				{
-					"include": "#comment"
 				}
 			]
 		},
