@@ -263,6 +263,23 @@
 				}
 			]
 		},
+		"context_slot_list": {
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#string_triple"
+				},
+				{
+					"match": ";",
+					"name": "punctuation.delimiter.slot.end.austral"
+				},
+				{
+					"include": "#slot"
+				}
+			]
+		},
 		"context_block": {
 			"patterns": [
 				{
@@ -343,13 +360,13 @@
 					"include": "#constant_decl"
 				},
 				{
-					"include": "#record_def"
+					"include": "#record_body"
 				},
 				{
 					"include": "#union_body"
 				},
 				{
-					"include": "#union_head"
+					"include": "#union_or_record_head"
 				},
 				{
 					"comment": "type declaration",
@@ -856,66 +873,14 @@
 				}
 			}
 		},
-		"record_def": {
-			"comment": "record declaration",
-			"name": "meta.record.austral",
-			"begin": "(record)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s+(is)",
-			"end": "\\bend\\s*",
-			"beginCaptures": {
-				"1": {
-					"name": "keyword.declaration.record.austral storage.type.austral"
-				},
-				"2": {
-					"name": "entity.name.type.austral"
-				},
-				"3": {
-					"name": "punctuation.brackets.square.austral"
-				},
-				"4": {
-					"patterns": [
-						{
-							"include": "#context_type_parameter_list"
-						}
-					]
-				},
-				"5": {
-					"name": "punctuation.brackets.square.austral"
-				},
-				"6": {
-					"name": "punctuation.colon.austral"
-				},
-				"7": {
-					"name": "entity.name.universe.austral entity.name.type.austral"
-				},
-				"8": {
-					"name": "storage.type.record.austral keyword.other.is.austral"
-				}
-			},
-			"endCaptures": {
-				"0": {
-					"name": "keyword.other.end.austral storage.type.record.austral"
-				}
-			},
-			"patterns": [
-				{
-					"include": "#string_triple"
-				},
-				{
-					"include": "#slot"
-				},
-				{
-					"include": "#comment"
-				}
-			]
-		},
-		"union_head": {
-			"comment": "top of union declaration",
+		"union_or_record_head": {
+			"comment": "top of union/record declaration",
 			"name": "meta.union.austral",
-			"begin": "(union)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
+			"begin": "(union|record)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
 			"end": "(?=\\bis\\b)",
 			"beginCaptures": {
 				"1": {
-					"name": "keyword.declaration.union.austral storage.type.union.austral"
+					"name": "keyword.declaration.$1.austral storage.type.$1.austral"
 				},
 				"2": {
 					"name": "entity.name.type.austral"
@@ -950,7 +915,28 @@
 				}
 			]
 		},
+		"record_body": {
+			"name": "meta.record.body.austral",
+			"begin": "(?<=(record).+)(is)",
+			"end": "\\bend\\b",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.record.body.begin.austral keyword.other.is.austral"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.record.body.end.austral keyword.other.end.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#context_slot_list"
+				}
+			]
+		},
 		"union_body": {
+			"name": "meta.record.union.austral",
 			"begin": "(?<=(union).+)(is)",
 			"end": "\\bend\\b",
 			"beginCaptures": {
@@ -995,13 +981,7 @@
 					},
 					"patterns": [
 						{
-							"include": "#comment"
-						},
-						{
-							"include": "#string_triple"
-						},
-						{
-							"include": "#slot"
+							"include": "#context_slot_list"
 						}
 					]
 				}
