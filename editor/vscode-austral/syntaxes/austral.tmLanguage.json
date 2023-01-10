@@ -73,6 +73,278 @@
 				}
 			]
 		},
+		"context_paramater_list": {
+			"comment": "paramater lists for pragmas and method/function calls",
+			"patterns": [
+				{
+					"comment": "named paramater assignment",
+					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\s*(=>)",
+					"captures": {
+						"1": {
+							"name": "variable.parameter.function-call.austral"
+						},
+						"2": {
+							"name": "keyword.operator.assignment.named-paramater.austral"
+						}
+					}
+				},
+				{
+					"include": "#context_expression"
+				},
+				{
+					"name": "punctuation.separator.delimiter.comma.austal",
+					"match": ","
+				}
+			]
+		},
+		"context_expression": {
+			"name": "meta.expression.austral",
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#constants"
+				},
+				{
+					"include": "#operators"
+				},
+				{
+					"include": "#expression_keywords"
+				},
+				{
+					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[.*\\])?)",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.typecast.austral"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#typespec"
+								}
+							]
+						}
+					}
+				},
+				{
+					"comment": "sub-expression",
+					"begin": "\\(",
+					"end": "\\)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.expression.begin.bracket.round.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.expression.begin.bracket.round.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#context_expression"
+						}
+					]
+				},
+				{
+					"comment": "sizeof operator",
+					"begin": "\\b(sizeof)\\s*(\\()",
+					"end": "\\)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.operator.sizeof.austral"
+						},
+						"2": {
+							"name": "punctuation.section.arguments.begin.bracket.round.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.arguments.begin.bracket.round.austral"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#typespec"
+						}
+					]
+				},
+				{
+					"include": "#function_call"
+				},
+				{
+					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\b",
+					"name": "variable.other.austral"
+				},
+				{
+					"include": "#path"
+				}
+			]
+		},
+		"context_type_param_list": {
+			"name": "meta.type-paramater-list.austral",
+			"patterns": [
+				{
+					"match": "\\b(Free|Linear|Type|Region)\\b",
+					"name": "entity.name.universe.austral entity.name.type.austral"
+				},
+				{
+					"match": ":",
+					"name": "punctuation.comma.austral"
+				},
+				{
+					"match": "([a-zA-Z][a-zA-Z0-9_]*)",
+					"name": "entity.name.type.austral"
+				},
+				{
+					"include": "#comment"
+				},
+				{
+					"match": ",",
+					"name": "punctuation.comma.austral"
+				},
+				{
+					"match": "[\\(\\)]",
+					"name": "punctuation.brackets.round.austral"
+				}
+			]
+		},
+		"context_function_paramater_def": {
+			"name": "meta.function-decl.parameters.austral",
+			"patterns": [
+				{
+					"include": "#comment"
+				},
+				{
+					"match": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
+					"captures": {
+						"1": {
+							"name": "variable.parameter.austral"
+						},
+						"2": {
+							"name": "punctuation.colon.austral"
+						}
+					}
+				},
+				{
+					"include": "#typespec"
+				},
+				{
+					"name": "punctuation.brackets.round.austral",
+					"match": "[\\(\\)]"
+				}
+			]
+		},
+		"statements": {
+			"patterns": [
+				{
+					"include": "#let_simple"
+				},
+				{
+					"include": "#pragma"
+				},
+				{
+					"include": "#let_destructure"
+				},
+				{
+					"include": "#borrow_head"
+				},
+				{
+					"include": "#if_head"
+				},
+				{
+					"include": "#case_head"
+				},
+				{
+					"include": "#for_loop_head"
+				},
+				{
+					"include": "#while_loop_head"
+				},
+				{
+					"include": "#if_body"
+				},
+				{
+					"include": "#case_body"
+				},
+				{
+					"include": "#do_block"
+				},
+				{
+					"include": "#statement_keywords"
+				},
+				{
+					"include": "#context_expression"
+				},
+				{
+					"include": "#constant_decl"
+				},
+				{
+					"include": "#assignment"
+				}
+			]
+		},
+		"declarations": {
+			"patterns": [
+				{
+					"include": "#constant_decl"
+				},
+				{
+					"include": "#record_def"
+				},
+				{
+					"include": "#union_def"
+				},
+				{
+					"comment": "type declaration",
+					"name": "meta.type.austral",
+					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s*(;)",
+					"captures": {
+						"1": {
+							"name": "keyword.declaration.type.austral storage.type.austral"
+						},
+						"2": {
+							"name": "entity.name.type.austral"
+						},
+						"3": {
+							"name": "punctuation.brackets.square.austral"
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#context_type_param_list"
+								}
+							]
+						},
+						"5": {
+							"name": "punctuation.brackets.square.austral"
+						},
+						"6": {
+							"name": "punctuation.colon.austral"
+						},
+						"7": {
+							"name": "entity.name.universe.austral entity.name.type.austral"
+						},
+						"8": {
+							"name": "punctuation.semicolon.austral"
+						}
+					}
+				},
+				{
+					"include": "#generic"
+				},
+				{
+					"include": "#function_decl"
+				},
+				{
+					"include": "#typeclass"
+				},
+				{
+					"include": "#instance_head"
+				}
+			]
+		},
 		"import": {
 			"name": "meta.import.austral",
 			"begin": "\\b(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*)(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)\\s*(\\()",
@@ -158,7 +430,7 @@
 					"include": "#comment"
 				},
 				{
-					"include": "#expression"
+					"include": "#context_expression"
 				}
 			]
 		},
@@ -258,7 +530,7 @@
 					},
 					"patterns": [
 						{
-							"include": "#expression"
+							"include": "#context_expression"
 						}
 					]
 				},
@@ -277,29 +549,6 @@
 							"name": "variable.other.member.austral"
 						}
 					}
-				}
-			]
-		},
-		"context_paramater_list": {
-			"patterns": [
-				{
-					"comment": "named paramater assignment",
-					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\s*(=>)",
-					"captures": {
-						"1": {
-							"name": "variable.parameter.function-call.austral"
-						},
-						"2": {
-							"name": "keyword.operator.assignment.named-paramater.austral"
-						}
-					}
-				},
-				{
-					"include": "#expression"
-				},
-				{
-					"name": "punctuation.separator.delimiter.comma.austal",
-					"match": ","
 				}
 			]
 		},
@@ -426,90 +675,6 @@
 				}
 			]
 		},
-		"expression": {
-			"patterns": [
-				{
-					"include": "#comment"
-				},
-				{
-					"include": "#constants"
-				},
-				{
-					"include": "#operators"
-				},
-				{
-					"include": "#expression_keywords"
-				},
-				{
-					"match": "(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[.*\\])?)",
-					"captures": {
-						"1": {
-							"name": "keyword.operator.typecast.austral"
-						},
-						"2": {
-							"patterns": [
-								{
-									"include": "#typespec"
-								}
-							]
-						}
-					}
-				},
-				{
-					"comment": "sub-expression",
-					"begin": "\\(",
-					"end": "\\)",
-					"beginCaptures": {
-						"0": {
-							"name": "punctuation.section.expression.begin.bracket.round.austral"
-						}
-					},
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.section.expression.begin.bracket.round.austral"
-						}
-					},
-					"patterns": [
-						{
-							"include": "#expression"
-						}
-					]
-				},
-				{
-					"comment": "sizeof operator",
-					"begin": "\\b(sizeof)\\s*(\\()",
-					"end": "\\)",
-					"beginCaptures": {
-						"1": {
-							"name": "keyword.operator.sizeof.austral"
-						},
-						"2": {
-							"name": "punctuation.section.arguments.begin.bracket.round.austral"
-						}
-					},
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.section.arguments.begin.bracket.round.austral"
-						}
-					},
-					"patterns": [
-						{
-							"include": "#typespec"
-						}
-					]
-				},
-				{
-					"include": "#function_call"
-				},
-				{
-					"match": "\\b([a-zA-Z][a-zA-Z0-9_]*)\\b",
-					"name": "variable.other.austral"
-				},
-				{
-					"include": "#path"
-				}
-			]
-		},
 		"typespec": {
 			"name": "meta.typespec.austral",
 			"patterns": [
@@ -574,34 +739,6 @@
 				{
 					"name": "entity.name.type.austral",
 					"match": "\\b[a-zA-Z][A-Za-z0-9_]*\\b"
-				}
-			]
-		},
-		"context_type_param_list": {
-			"name": "meta.type-paramater-list.austral",
-			"patterns": [
-				{
-					"match": "\\b(Free|Linear|Type|Region)\\b",
-					"name": "entity.name.universe.austral entity.name.type.austral"
-				},
-				{
-					"match": ":",
-					"name": "punctuation.comma.austral"
-				},
-				{
-					"match": "([a-zA-Z][a-zA-Z0-9_]*)",
-					"name": "entity.name.type.austral"
-				},
-				{
-					"include": "#comment"
-				},
-				{
-					"match": ",",
-					"name": "punctuation.comma.austral"
-				},
-				{
-					"match": "[\\(\\)]",
-					"name": "punctuation.brackets.round.austral"
 				}
 			]
 		},
@@ -792,32 +929,6 @@
 				}
 			]
 		},
-		"context_function_paramater_def": {
-			"name": "meta.function-decl.parameters.austral",
-			"patterns": [
-				{
-					"include": "#comment"
-				},
-				{
-					"match": "([a-zA-Z][a-zA-Z0-9_]*)\\s*(:)",
-					"captures": {
-						"1": {
-							"name": "variable.parameter.austral"
-						},
-						"2": {
-							"name": "punctuation.colon.austral"
-						}
-					}
-				},
-				{
-					"include": "#typespec"
-				},
-				{
-					"name": "punctuation.brackets.round.austral",
-					"match": "[\\(\\)]"
-				}
-			]
-		},
 		"function_decl": {
 			"name": "meta.$1-decl.austral",
 			"match": "(function|method)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\()(.*)(\\)))?\\s*(?:(:)\\s*([a-zA-Z][a-zA-Z0-9_]*(?:\\[(.*)\\])?))?",
@@ -874,7 +985,7 @@
 					"name": "keyword.control.$0.austral"
 				},
 				{
-					"include": "#expression"
+					"include": "#context_expression"
 				}
 			]
 		},
@@ -894,7 +1005,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#expression"
+					"include": "#context_expression"
 				}
 			]
 		},
@@ -932,7 +1043,7 @@
 					"include": "#comment"
 				},
 				{
-					"include": "#expression"
+					"include": "#context_expression"
 				}
 			]
 		},
@@ -1037,55 +1148,6 @@
 				}
 			]
 		},
-		"statements": {
-			"patterns": [
-				{
-					"include": "#let_simple"
-				},
-				{
-					"include": "#pragma"
-				},
-				{
-					"include": "#let_destructure"
-				},
-				{
-					"include": "#borrow_head"
-				},
-				{
-					"include": "#if_head"
-				},
-				{
-					"include": "#case_head"
-				},
-				{
-					"include": "#for_loop_head"
-				},
-				{
-					"include": "#while_loop_head"
-				},
-				{
-					"include": "#if_body"
-				},
-				{
-					"include": "#case_body"
-				},
-				{
-					"include": "#do_block"
-				},
-				{
-					"include": "#statement_keywords"
-				},
-				{
-					"include": "#expression"
-				},
-				{
-					"include": "#constant_decl"
-				},
-				{
-					"include": "#assignment"
-				}
-			]
-		},
 		"if_head": {
 			"comment": "head of an (else) if statement",
 			"name": "meta.if.austral",
@@ -1098,7 +1160,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#expression"
+					"include": "#context_expression"
 				}
 			]
 		},
@@ -1306,66 +1368,6 @@
 				},
 				{
 					"include": "#comment"
-				}
-			]
-		},
-		"declarations": {
-			"patterns": [
-				{
-					"include": "#constant_decl"
-				},
-				{
-					"include": "#record_def"
-				},
-				{
-					"include": "#union_def"
-				},
-				{
-					"comment": "type declaration",
-					"name": "meta.type.austral",
-					"match": "(type)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\[)(.*)(\\]))?\\s*(:)\\s(Free|Linear|Type|Region)\\s*(;)",
-					"captures": {
-						"1": {
-							"name": "keyword.declaration.type.austral storage.type.austral"
-						},
-						"2": {
-							"name": "entity.name.type.austral"
-						},
-						"3": {
-							"name": "punctuation.brackets.square.austral"
-						},
-						"4": {
-							"patterns": [
-								{
-									"include": "#context_type_param_list"
-								}
-							]
-						},
-						"5": {
-							"name": "punctuation.brackets.square.austral"
-						},
-						"6": {
-							"name": "punctuation.colon.austral"
-						},
-						"7": {
-							"name": "entity.name.universe.austral entity.name.type.austral"
-						},
-						"8": {
-							"name": "punctuation.semicolon.austral"
-						}
-					}
-				},
-				{
-					"include": "#generic"
-				},
-				{
-					"include": "#function_decl"
-				},
-				{
-					"include": "#typeclass"
-				},
-				{
-					"include": "#instance_head"
 				}
 			]
 		},
