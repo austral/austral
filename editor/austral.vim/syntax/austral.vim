@@ -1,9 +1,8 @@
-" Vim syntax file
 " Language:    austral
 
 " quit when a syntax file was already loaded
 if exists("b:current_syntax")
-    finish
+	finish
 endif
 let s:keepcpo = &cpo
 set cpo&vim
@@ -11,11 +10,6 @@ set cpo&vim
 
 let b:current_syntax = "austral"
 
-syntax	case ignore
-
-" Section: Keyword {{{1
-"
-syntax keyword australKeyword and or not module is body import as end constant type function generic record union case of when typeclass instance method if then else let while for do from to borrow borrow! in return skip Free Linear Type Region pragma nil true false
 
 " Section: Operatoren {{{1
 "
@@ -27,125 +21,167 @@ syntax match   australOperator "\<or\s\+else\>"
 syntax match   australOperator "[-+*/<>&]"
 syntax keyword australOperator **
 syntax match   australOperator "[/<>]="
-syntax keyword australOperator =>
-syntax match   australOperator "\.\."
 syntax match   australOperator "="
 
-" Section: := {{{1
+
+
+" Section: Keywords {{{1
 "
-syntax match australAssignment		":="
+syntax keyword australKeyword return let nil borrow skip generic instance method
+
+" Section: Specials {{{1
+"
+syntax match australSpecial	":="
+syntax match australSpecial "=>"
+syntax match        australSpecial       "[;().,]"  
+
+
+" Section: Function 
+" 
+" function = "function" identifier "(" [ identifier { "," identifier } ] ")" [ ":" type ] [ "is" ] { statement } "end"
+"
+"syntax region australFunction start="\<function\>\s*\z(\k*\)" end="end\s*;"
+"			\ keepend extend transparent fold contains=ALL
+
+
 
 " Section: Numbers, including floating point. {{{1
 "
-syntax match   australNumber		"\<\d[0-9_]*\(\.\d[0-9_]*\)\=\([Ee][+-]\=\d[0-9_]*\)\=\>"
-syntax match   australNumber		"\<\d\d\=#\x[0-9A-Fa-f_]*\(\.\x[0-9A-Fa-f_]*\)\=#\([Ee][+-]\=\d[0-9_]*\)\="
+" digit = [0-9]
+" digits = digit, { digit | "_" };
+" integer constant = ["+", "-"], digits;
+" float constant = digits, ".", digits, ["e", ["+", "-"], integer constant];
+"
+syntax match australNumber		"\v[+-]?[0-9_]+" " integer constant
+syntax match australFloat		"\v[+-]?[0-9_]+\.[0-9_]+([eE][+-]?[0-9_]+)?" " float constant
+
 
 " Section: Boolean Constants {{{1
-" Boolean Constants.
+" 
 syntax keyword australBoolean	true false
 
-
-" Section: end {{{1
-" Unless special ("end loop", "end if", etc.), "end" marks the end of a
-" begin, package, task etc. Assigning it to australEnd.
-syntax match    australEnd	/\<end\>/
-
+" Section: Preprocessor {{{1
+"
+" https://austral-lang.org/spec/spec.html#modules 
+"
 syntax keyword  australPreproc		 pragma
+syntax keyword  australPreproc		 import
 
-syntax keyword  australRepeat	 exit for while
-syntax match    australRepeat		   "\<end\s\>"
-
-" Section: Handle Austral's record keywords. {{{1
+" Section: Structures {{{1
 "
-syntax match australStructure   "\<record\>"	contains=australRecord
-syntax match australStructure   "\<end\s\+record\>"	contains=australRecord
-syntax match australKeyword	"\<record;"me=e-1
-
-" Section: Conditionals {{{1
+" https://austral-lang.org/spec/spec.html#record-definition
 "
-syntax match    australConditional  "\<then\>"
-syntax match    australConditional	"\<else\>"
-syntax match    australConditional	"\<end\s\+if\>"
-syntax match    australConditional	"\<end\s\+case\>"
-syntax keyword  australConditional	if case
+"         \ start="\<record\>"
+"         \ end="\<end\>"
+"         \ keepend extend transparent fold contains=ALL
+syntax match australStructure "\<[A-Z][a-zA-Z0-9_]*\>"
 
 
-" Section: begin keywords {{{1
+" Section: Typedef
 "
-syntax match    australBegin	"\<function\>" contains=australFunction
-syntax match    australBegin	"\<module\>" contains=australModule
+" https://austral-lang.org/spec/spec.html#union-definition
+" https://austral-lang.org/spec/spec.html#typeclass-definition
+" 
+"syntax match australTypedef   "\<typeclass\>"
+"syntax match australTypedef   "\<union\>"
 
+
+" Section: Labels {{{1
+"
+" case = "case" expression "of" { "when" expression "do" statement } "end case"
+"
+" https://austral-lang.org/spec/spec.html#stmt-case
+"
+syntax match australLabel		"\<end\s\+case\>"
+syntax keyword australLabel		case when do of
 
 " Section: String and character constants. {{{1
 "
-syntax region  australString	contains=@Spell start=+"+ skip=+""+ end=+"+ 
-syntax match   australCharacter "'.'"
+" string constant = '"', { any character - '"' | '\"' }, '"'; 
+"
+syntax region australString start=+"+ skip=+\\"+ end=+"+ contains=@Spell
+
 
 " Section: Todo (only highlighted in comments) {{{1
 "
 syntax keyword australTodo contained TODO FIXME XXX NOTE
 
+
 " Section: Comments. {{{1
 "
+" Austral oneline comments are start with "--" and end with a newline.
+" Multiline comments are enclosed in "```\n", "\n```".
+"
+" comment = "-- ", {any character}, "\n";
+" docstring = "```\n", { any character - "```" } ,"\n```";
+"
+" Single line comments
 syntax region  australComment 
-    \ oneline 
-    \ contains=australTodo,@Spell
-    \ start="--" 
-    \ end="$"
+			\ oneline 
+			\ contains=australTodo,@Spell
+			\ start="--" 
+			\ end="$" 
+" Multiline comments
+syntax region  australComment start=+```+ end=+```+ contains=australTodo,@Spell keepend
 
-" Section: syntax folding {{{1
+
+
+" Section: Austral Regions {{{1
 "
-"	Syntax folding is very tricky - for now I still suggest to use
-"	indent folding
+syntax match australRegion "\<module\>"
+syntax match australRegion "\<module\s\+body\>"
+syntax match australRegion	"\<function\>"
+syntax match australRegion  /\<end\>/
+syntax match australRegion   "\<typeclass\>"
+syntax match australRegion   "\<is\>"
+syntax match australRegion   "\<record\>"
+syntax match australRegion   "\<union\>"
+
+
+" Section: Conditionals {{{1
 "
-if exists("g:austral_folding") && g:austral_folding[0] == 's'
-   if stridx (g:austral_folding, 'p') >= 0
-      syntax region australModule
-         \ start="\<module\>\s*\z(\k*\)"
-         \ end="end\s\+\z1\s*;"
-         \ keepend extend transparent fold contains=ALL
-   endif
-   if stridx (g:austral_folding, 'f') >= 0
-      syntax region australFunction
-         \ start="\<function\>\s*\z(\k*\)"
-         \ end="end\s\+\z1\s*;"
-         \ keepend extend transparent fold contains=ALL
-   endif
-   if stridx (g:austral_folding, 'f') >= 0
-      syntax region australRecord
-         \ start="\<is\s\+record\>"
-         \ end="\<end\s\+record\>"
-         \ keepend extend transparent fold contains=ALL
-   endif
-endif
+" https://austral-lang.org/spec/spec.html#stmt-if
+"
+syntax match australConditional		"\<if\>"
+syntax match australConditional		"\<then\>"
+syntax match australConditional		"\<else\>"
+syntax match    australConditional	"\<else\s\+if>"
+syntax match    australConditional	"\<end\s\+if\>"
+syntax match    australConditional	"\<end\s\+case\>"
+
+
+" Section: Repeat {{{1
+" 
+" while = "while", expression, "do", { statement }, "end while";
+" for = "for", identifier, "from", expression, "to" expression, "do", { statement }, "end for";
+"
+" https://austral-lang.org/spec/spec.html#stmt-while
+" https://austral-lang.org/spec/spec.html#stmt-for
+"
+syntax match australRepeat "\<while\>"
+syntax match australRepeat "\<end\s\+while\>"
+syntax match australRepeat "\<for\>"
+syntax match australRepeat "\<end\s\+for\>"
 
 
 " Section: The default methods for highlighting. Can be overridden later. {{{1
 "
 highlight def link australComment	    Comment
-highlight def link australConditional       Conditional
-highlight def link australPreproc           PreProc
-highlight def link australKeyword	    Keyword
-highlight def link australNumber	    Number
-highlight def link australOperator	    Operator
 highlight def link australString	    String
+highlight def link australNumber	    Number
+highlight def link australFloat		    Float
+highlight def link australBoolean	    Boolean
+highlight def link australRegion	    Function
+highlight def link australConditional       Conditional
+highlight def link australRepeat            Repeat
+highlight def link australLabel             Label
+highlight def link australOperator          Operator
+highlight def link australKeyword	    Keyword
+highlight def link australPreproc           PreProc
 highlight def link australStructure	    Structure
 highlight def link australTodo		    Todo
 highlight def link australTypedef	    Typedef
-highlight def link australBoolean	    Boolean
-highlight def link australAssignment        Special
-
-" Subsection: Begin, End {{{2
-"
-if exists ("austral_begin_preproc")
-   " This is the old default display:
-   highlight def link australBegin   PreProc
-   highlight def link australEnd     PreProc
-else
-   " This is the new default display:
-   highlight def link australBegin   Keyword
-   highlight def link australEnd     Keyword
-endif
+highlight def link australSpecial	    Special
 
 
 let &cpo = s:keepcpo
