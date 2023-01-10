@@ -2,7 +2,7 @@
   "name": "austral",
   "displayName": "austral",
   "description": "Austral language support for VS Code",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.74.0"
   },
