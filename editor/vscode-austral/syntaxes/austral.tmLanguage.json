@@ -1338,6 +1338,9 @@
 					"name": "invalid.illegal.function-in-instance.austral"
 				},
 				{
+					"include": "#generic"
+				},
+				{
 					"include": "#function_head"
 				},
 				{
@@ -1389,6 +1392,9 @@
 				{
 					"match": "\\bfunction\\b",
 					"name": "invalid.illegal.function-in-typeclass.austral"
+				},
+				{
+					"include": "#generic"
 				},
 				{
 					"include": "#function_head"
