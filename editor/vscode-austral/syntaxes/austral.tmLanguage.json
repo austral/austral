@@ -430,7 +430,10 @@
 					"include": "#function_head"
 				},
 				{
-					"include": "#typeclass"
+					"include": "#typeclass_head"
+				},
+				{
+					"include": "#typeclass_body"
 				},
 				{
 					"include": "#instance_head"
@@ -1348,32 +1351,51 @@
 				}
 			]
 		},
-		"typeclass": {
-			"comment": "typeclass declaration",
+		"typeclass_head": {
+			"comment": "top of typeclass declaration",
 			"name": "meta.typeclass.austral",
-			"begin": "(typeclass)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(?:(\\()(.*)(\\)))?\\s+(is)",
-			"end": "\\b(end)",
+			"begin": "(typeclass)\\s+([a-zA-Z][a-zA-Z0-9_]*)",
+			"end": "(?=\\bis\\b)",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.declaration.typeclass.austral storage.type.typeclass.austral"
 				},
 				"2": {
 					"name": "entity.name.type.austral"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comment"
 				},
-				"3": {
-					"name": "punctuation.brackets.round.austral"
-				},
-				"4": {
+				{
+					"begin": "\\(",
+					"end": "\\)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.type-parameters.begin.brackets.round.austral"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.type-parameters.end.brackets.round.austral"
+						}
+					},
 					"patterns": [
 						{
 							"include": "#context_type_parameter_list"
 						}
 					]
-				},
-				"5": {
-					"name": "punctuation.brackets.round.austral"
-				},
-				"6": {
+				}
+			]
+		},
+		"typeclass_body": {
+			"comment": "typeclass declaration",
+			"name": "meta.typeclass.body.austral",
+			"begin": "(?<=typeclass.+)(is\\b)",
+			"end": "\\bend\\b",
+			"beginCaptures": {
+				"1": {
 					"name": "storage.type.typeclass.austral keyword.other.is.austral"
 				}
 			},
