@@ -10,6 +10,7 @@ open Ast
 open Env
 open EnvTypes
 open Error
+open ErrorText
 
 let decl_type_signature (decl: decl): type_signature option =
   match decl with
@@ -255,7 +256,7 @@ and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list)
   let (TypeSignature (_, ts_params, declared_universe)) = ts in
   (* Check: the number of type parameters in the signature matches the number of
      type arguments *)
-  check_param_arity_matches ts_params args;
+  check_param_arity_matches ts_params args name;
   (* Check: the universe of each type argument matches the universe of each type
      parameter in the type signature. *)
   check_universes_match ts_params args;
@@ -263,8 +264,22 @@ and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list)
   let universe = effective_universe name ts_params declared_universe args in
   NamedType (name, args, universe)
 
-and check_param_arity_matches (params: typarams) (args: ty list): unit =
-  assert ((typarams_size params) = (List.length args))
+and check_param_arity_matches (params: typarams) (args: ty list) (ty_name: qident) : unit =
+  let expected: int = typarams_size params
+  and got: int = List.length args
+  in
+  if expected = got then
+    ()
+  else
+    austral_raise GenericError [
+        Text "The type";
+        Code (ident_string (original_name ty_name));
+        Text "expects";
+        Code (string_of_int expected);
+        Text "type arguments, but I only found";
+        Code (string_of_int got);
+        Text "arguments."
+      ]
 
 and check_universes_match (params: typarams) (args: ty list): unit =
   let _ = List.map2 check_universes_match' (typarams_as_list params) args in ()
