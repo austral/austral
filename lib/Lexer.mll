@@ -97,6 +97,7 @@ rule token = parse
   | "instance" { INSTANCE }
   | "method" { METHOD }
   | "if" { IF }
+  | "else" whitespace+ "if" { ELSE_IF }
   | "then" { THEN }
   | "else" { ELSE }
   | "let" { LET }

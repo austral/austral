@@ -1,0 +1,16 @@
+module body Test is
+    function main(): ExitCode is
+        printLn("Start");
+        for i from 0 to 2 do
+            if i = 0 then
+                printLn("0");
+            else if i = 1 then
+                printLn("1");
+            else
+                printLn("Not 0 or 1");
+            end if;
+        end for;
+        printLn("End");
+        return ExitSuccess();
+    end;
+end module body.

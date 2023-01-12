@@ -1,0 +1,5 @@
+Start
+0
+1
+Not 0 or 1
+End
