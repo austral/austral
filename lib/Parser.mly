@@ -56,6 +56,7 @@ open Span
 %token IF
 %token THEN
 %token ELSE
+%token ELSE_IF
 %token LET
 %token WHILE
 %token FOR
@@ -310,7 +311,7 @@ if_statement:
   ;
 
 else_clause:
-  | ELSE IF expression THEN block else_clause { CIf (from_loc $loc, $3, $5, $6) }
+  | ELSE_IF expression THEN block else_clause { CIf (from_loc $loc, $2, $4, $5) }
   | ELSE block END IF SEMI { $2 }
   | END IF SEMI { CSkip (from_loc $loc) }
   ;
