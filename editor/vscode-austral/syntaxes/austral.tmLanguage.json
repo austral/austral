@@ -35,7 +35,7 @@
 				},
 				{
 					"name": "storage.type.$0.austral",
-					"match": "\\b(constant|let|generic|function|method|instance|record|union|typeclass)\\b"
+					"match": "\\b(constant|let|generic|function|method|instance|record|union|type|typeclass)\\b"
 				},
 				{
 					"name": "keyword.other.module.interface.austral storage.type.module.interface.austral",
