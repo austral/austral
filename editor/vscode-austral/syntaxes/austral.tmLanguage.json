@@ -10,6 +10,9 @@
 			"include": "#import"
 		},
 		{
+			"include": "#import_simple"
+		},
+		{
 			"include": "#module_body"
 		},
 		{
@@ -455,6 +458,19 @@
 					"include": "#context_module_interface"
 				}
 			]
+		},
+		"import_simple": {
+			"comment": "initial highlighting on import without the symbol list",
+			"name": "meta.import.austral",
+			"match": "\\b(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*)",
+			"captures": {
+				"1": {
+					"name": "keyword.control.import.austral"
+				},
+				"2": {
+					"name": "entity.name.module.austral"
+				}
+			}
 		},
 		"import": {
 			"name": "meta.import.austral",
