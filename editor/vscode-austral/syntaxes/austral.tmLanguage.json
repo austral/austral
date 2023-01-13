@@ -462,7 +462,7 @@
 		"import_simple": {
 			"comment": "initial highlighting on import without the symbol list",
 			"name": "meta.import.austral",
-			"match": "\\b(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*)",
+			"match": "\\b(import)\\s+((?:[a-zA-Z][a-zA-Z0-9_]*)(?:\\.[a-zA-Z][a-zA-Z0-9_]*)*)",
 			"captures": {
 				"1": {
 					"name": "keyword.control.import.austral"
