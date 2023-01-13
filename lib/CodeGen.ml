@@ -418,7 +418,7 @@ and get_decl_name_or_die (env: env) (id: decl_id): string =
       | Some name ->
          (ident_string name)
       | None ->
-         err "decl has no name")
+         internal_err "decl has no name")
   | None ->
      internal_err "Couldn't find decl"
 
