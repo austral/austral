@@ -1116,7 +1116,10 @@ and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty
                       | NamedType (n, _, _) ->
                          n
                       | _ ->
-                         err "Not a named type") in
+                         austral_raise GenericError [
+                             Text "Case statement: case expression type is not a naed typeNot a union type:";
+                             Code (type_string ty)
+                           ]) in
   match get_decl_by_name env (qident_to_sident name) with
   | Some (Union { id; vis; name; mod_id; typarams; universe; _ }) ->
      let module_name = module_name_from_id env mod_id in
