@@ -1,0 +1,25 @@
+{
+  "name": "austral",
+  "displayName": "austral",
+  "description": "Austral language support for VS Code",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "austral",
+      "aliases": ["Austral", "austral"],
+      "extensions": [".aum",".aui"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "austral",
+      "scopeName": "source.austral",
+      "path": "./syntaxes/austral.tmLanguage.json"
+    }]
+  }
+}
