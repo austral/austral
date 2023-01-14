@@ -1,0 +1,16 @@
+Error:
+  Title: Generic Error
+  Module:
+    Test
+  Location:
+    Filename: 'test-programs/suites/010-functions/006-wrong-arity/Test.aum'
+    From: line 7, column 8
+    To: line 7, column 17
+  Description:
+    Wrong number of arguments. Expected `2` and got `1`
+  Code:
+    5 | 
+    6 |     function main(): ExitCode is
+    7 |         foo(nil);
+    8 |         return ExitSuccess();
+    9 |     end;

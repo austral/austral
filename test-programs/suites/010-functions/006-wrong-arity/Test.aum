@@ -1,0 +1,10 @@
+module body Test is
+    function foo(a: Unit, b: Unit): Unit is
+        return a;
+    end;
+
+    function main(): ExitCode is
+        foo(nil);
+        return ExitSuccess();
+    end;
+end module body.

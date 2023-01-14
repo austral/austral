@@ -1,0 +1,1 @@
+Test that wrong arity error messages are of at least passable quality.
