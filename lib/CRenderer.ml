@@ -36,6 +36,7 @@ and render_decl i d =
   | CStructForwardDeclaration (desc, name) ->
      [
        Line (i, desc_text desc);
+       Line (i, "struct " ^ name ^ ";");
        Line (i, "typedef struct " ^ name ^ " " ^ name ^ ";")
      ]
   | CTypeDefinition (desc, name, def) ->
@@ -51,7 +52,7 @@ and render_decl i d =
   | CNamedStructDefinition (desc, name, slots) ->
      [
        Line (i, desc_text desc);
-       Line (i, "typedef struct {" ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots)) ^ "} " ^ name ^ ";")
+       Line (i, "typedef struct " ^ name ^ " {" ^ (String.concat "" (List.map (fun (CSlot (n, t)) -> (render_type t) ^ " " ^ n ^ ";") slots)) ^ "} " ^ name ^ ";")
      ]
   | CEnumDefinition (desc, name, cases) ->
      List.concat [
