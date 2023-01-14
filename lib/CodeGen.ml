@@ -418,7 +418,7 @@ and get_decl_name_or_die (env: env) (id: decl_id): string =
       | Some name ->
          (ident_string name)
       | None ->
-         err "decl has no name")
+         internal_err "decl has no name")
   | None ->
      internal_err "Couldn't find decl"
 
@@ -437,11 +437,8 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      [
        CConstantDefinition (d, gen_sident mn n, gen_type ty, gen_exp mn e)
      ]
-  | MRecord (id, _, slots) ->
-     let d = Desc "Record" in
-     [
-       CNamedStructDefinition (d, gen_decl_id id, gen_slots slots)
-     ]
+  | MRecord _ ->
+     []
   | MRecordMonomorph (id, slots) ->
      let d = Desc ("Record monomorph: " ^ (mono_desc env id)) in
      [
