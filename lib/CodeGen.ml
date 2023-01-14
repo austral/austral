@@ -440,13 +440,16 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   | MRecord _ ->
      []
   | MRecordMonomorph (id, slots) ->
-     let d = Desc ("Record monomorph: " ^ (mono_desc env id)) in
+     let d = Desc ("Record monomorph: " ^ (mono_desc env id))
+     and id = gen_mono_id id in
      [
-       CNamedStructDefinition (d, gen_mono_id id, gen_slots slots)
+       CStructForwardDeclaration (d, id);
+       CNamedStructDefinition (d, id, gen_slots slots)
      ]
   | MUnion _ ->
      []
   | MUnionMonomorph (id, cases) ->
+     let mono_id = gen_mono_id id in
      let enum_d = Desc ("Union monomorph tag enum: " ^ (mono_desc env id)) in
      let union_d = Desc ("Union monomorph: " ^ (mono_desc env id)) in
      let enum_def = CEnumDefinition (
@@ -456,14 +459,18 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
                       )
      and union_def = CNamedStructDefinition (
                          union_d,
-                         gen_mono_id id,
+                         mono_id,
                          [
                            CSlot ("tag", CNamedType (local_union_tag_enum_name_from_id id));
                            CSlot ("data", CUnionType (gen_cases cases))
                          ]
                        )
      in
-     [enum_def; union_def]
+     [
+       enum_def;
+       CStructForwardDeclaration (union_d, mono_id);
+       union_def
+     ]
   | MFunction (id, _, params, rt, body) ->
      let d = Desc "Function" in
      [
