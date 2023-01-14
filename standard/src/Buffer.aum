@@ -239,16 +239,21 @@ module body Standard.Buffer is
     generic [T: Type, R: Region]
     function bump(buf: &![Buffer[T], R]): Unit is
         let new_capacity: Index := (!buf->capacity) * 2;
-        let new_array: Pointer[T] := resizeArray(!buf->array, new_capacity);
-        memcpy(
-            destination => new_array,
-            source => !buf->array,
-            count => arraySizeInBytes(sizeof(T), !buf->size)
-        );
-        buf->capacity := new_capacity;
-        buf->array := new_array;
-        -- invariants(buf : &[Buffer[T], R]);
-        return nil;
+        let new_addr: Address[T] := resizeArray(!buf->array, new_capacity);
+        case nullCheck(new_addr) of
+            when Some(value as new_array: Pointer[T]) do
+                memcpy(
+                    destination => new_array,
+                    source => !buf->array,
+                    count => arraySizeInBytes(sizeof(T), !buf->size)
+                );
+                buf->capacity := new_capacity;
+                buf->array := new_array;
+                -- invariants(buf : &[Buffer[T], R]);
+                return nil;
+            when None do
+                abort("bump: allocation failed");
+         end case;
     end;
 
     generic [T: Type, R: Region]
