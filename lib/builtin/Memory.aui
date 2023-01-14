@@ -30,7 +30,7 @@ module Austral.Memory is
     function loadWrite(ref: &![Pointer[T], R]): &![T, R];
 
     generic [T: Type]
-    function resizeArray(array: Pointer[T], size: Index): Pointer[T];
+    function resizeArray(array: Pointer[T], size: Index): Address[T];
 
     generic [T: Type, U: Type]
     function memmove(source: Pointer[T], destination: Pointer[U], count: ByteSize): Unit;
