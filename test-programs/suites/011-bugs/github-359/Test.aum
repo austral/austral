@@ -1,0 +1,13 @@
+module body Test is
+    record Foo[A: Free]: Free is
+        a: A;
+    end;
+
+    function foo(f: Foo[Int32, Int32]): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

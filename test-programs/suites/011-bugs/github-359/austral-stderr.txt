@@ -1,0 +1,10 @@
+Error:
+  Title: Generic Error
+  Module:
+    Test
+  Location:
+    [no span available]
+  Description:
+    The type `Foo` expects `1` type arguments, but I only found `2` arguments.
+  Code:
+    [no span available]
