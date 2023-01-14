@@ -1,0 +1,19 @@
+import Austral.Memory (
+    Pointer
+);
+
+module body Test is
+    pragma Unsafe_Module;
+
+    record Bar: Free is
+        fooptr: Pointer[Foo];
+    end;
+
+    record Foo: Free is
+        barptr: Pointer[Bar];
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.
