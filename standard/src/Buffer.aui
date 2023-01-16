@@ -169,6 +169,11 @@ module Standard.Buffer is
     --- Map
     ---
 
+    """
+    Iterate over each element in the buffer, transforming it through `fn`, and
+    store the result in place. Like `swapTransform` applied to the whole
+    buffer.
+    """
     generic [T: Type, R: Region]
     function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit;
 
