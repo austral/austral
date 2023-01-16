@@ -218,6 +218,22 @@ module body Standard.Buffer is
         return nil;
     end;
 
+    generic [T: Type, R: Region]
+    function swapTransform(buf: &![Buffer[T], R], pos: Index, fn: Fn[T, T]): Unit is
+        if pos >= (!buf->size) then
+            abort("swapTransform: index out of range");
+        end if;
+        -- Load the element at `pos`.
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let old: T := load(ptr);
+        -- Transform it.
+        let new: T := fn(old);
+        -- Store the new version.
+        store(ptr, new);
+        -- End.
+        return nil;
+    end;
+
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit is
         for i from 0 to (!buf->size) - 1 do
