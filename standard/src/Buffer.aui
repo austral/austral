@@ -177,6 +177,11 @@ module Standard.Buffer is
     generic [T: Type, R: Region]
     function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit;
 
+    """
+    Consumes the buffer and returns a new buffer of the same length, whose
+    elements are the result of applying `fn` to the element from `buf` with the
+    same index.
+    """
     generic [T: Type, U: Type]
     function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U];
 end module.
