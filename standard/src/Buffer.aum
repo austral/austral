@@ -144,13 +144,23 @@ module body Standard.Buffer is
         return nil;
     end;
 
+    """
+    Deallocates a non-empty, potentially linear array. This is for internal use
+    _only_. The assumption here is that the elements have already been safely
+    extracted somewhere so linearity is preserved. See the implementation of
+    for an example.
+    """
+    generic [T: Type]
+    function destroyUnsafe(buffer: Buffer[T]): Unit is
+        let { capacity: Index, size: Index, array: Pointer[T] } := buffer;
+        deallocate(array);
+        return nil;
+    end;
+
     ---
     --- Retrieve
     ---
 
-    """
-    Return the length of the buffer.
-    """
     generic [T: Type, R: Region]
     function length(buf: &[Buffer[T], R]): Index is
         return !buf->size;
@@ -170,9 +180,6 @@ module body Standard.Buffer is
     --- Update
     ---
 
-    """
-    Store `element` in the given position of `buf`.
-    """
     generic [T: Free, R: Region]
     function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
         if pos >= (!buf->size) then
@@ -215,6 +222,22 @@ module body Standard.Buffer is
         -- Store a in b.
         store(b_ptr, elem_a);
         -- invariants(buf : &[Buffer[T], R]);
+        return nil;
+    end;
+
+    generic [T: Type, R: Region]
+    function swapTransform(buf: &![Buffer[T], R], pos: Index, fn: Fn[T, T]): Unit is
+        if pos >= (!buf->size) then
+            abort("swapTransform: index out of range");
+        end if;
+        -- Load the element at `pos`.
+        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let old: T := load(ptr);
+        -- Transform it.
+        let new: T := fn(old);
+        -- Store the new version.
+        store(ptr, new);
+        -- End.
         return nil;
     end;
 
@@ -334,6 +357,7 @@ module body Standard.Buffer is
     function removeLast(buf: &![Buffer[T], R]): T is
         return remove(buf, (!buf->size) - 1);
     end;
+
     ---
     --- Reversal
     ---
@@ -348,6 +372,39 @@ module body Standard.Buffer is
         end if;
         -- invariants(buf : &[Buffer[T], R]);
         return nil;
+    end;
+
+    ---
+    --- Map
+    ---
+
+    generic [T: Type, R: Region]
+    function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit is
+        for i from 0 to (!buf->size) - 1 do
+            swapTransform(buf, i, fn);
+        end for;
+        return nil;
+    end;
+
+    generic [T: Type, U: Type]
+    function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U] is
+        let newbuf: Buffer[U] := allocateEmpty();
+        -- Iterate over everything in the buffer, transforming it and moving it
+        -- to the new buffer.
+        for i from 0 to (buf.size) - 1 do
+            -- Load the element at `pos`.
+            let ptr: Pointer[T] := positiveOffset(buf.array, i);
+            let old: T := load(ptr);
+            -- Transform it.
+            let new: U := fn(old);
+            -- Store the transformed version in the new buffer.
+            insertBack(&!newbuf, new);
+        end for;
+        -- Deallocate the old array. Every element has been transformed and
+        -- copied over, so this is safe.
+        destroyUnsafe(buf);
+        -- Return the new buffer.
+        return newbuf;
     end;
 
     ---
@@ -395,5 +452,4 @@ module body Standard.Buffer is
         );
         return nil;
     end;
-
 end module body.

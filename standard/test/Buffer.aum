@@ -16,7 +16,10 @@ import Standard.Buffer (
     remove,
     removeFirst,
     removeLast,
-    reverse
+    reverse,
+    swapTransform,
+    inPlaceMap,
+    map
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -34,6 +37,7 @@ module body Standard.Test.Buffer is
         storeTest();
         swapNthTest();
         swapIndexTest();
+        swapTransformTest();
         fillTest();
         insertFrontTest();
         insertBackTest();
@@ -41,6 +45,8 @@ module body Standard.Test.Buffer is
         removeLastTest();
         reverseEmptyTest();
         reverseNonEmptyTest();
+        inPlaceMapTest();
+        mapTest();
         return nil;
     end;
 
@@ -100,6 +106,21 @@ module body Standard.Test.Buffer is
         swapIndex(&!b, 0, 1);
         assertTrue(nth(&b, 0) = 20, "[0] = 20");
         assertTrue(nth(&b, 1) = 10, "[1] = 10");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function double(i: Int32): Int32 is
+        return 2 * i;
+    end;
+
+    function swapTransformTest(): Unit is
+        testHeading("swapTransform");
+        let b: Buffer[Int32] := initialize(1, 30);
+        assertLength(&b, 1);
+        swapTransform(&!b, 0, double);
+        assertTrue(nth(&b, 0) = 60, "[0] = 60");
         destroyFree(b);
         assertSuccess("destroyFree complete");
         return nil;
@@ -254,6 +275,70 @@ module body Standard.Test.Buffer is
         assertNth(&b, 1, 2);
         assertNth(&b, 2, 1);
         destroyFree(b);
+        return nil;
+    end;
+
+    function inPlaceMapTest(): Unit is
+        testHeading("inPlaceMap");
+        -- Create an array [1,2,3,4,5]
+        let b: Buffer[Int32] := allocateEmpty();
+        insertBack(&!b, 1);
+        insertBack(&!b, 2);
+        insertBack(&!b, 3);
+        insertBack(&!b, 4);
+        insertBack(&!b, 5);
+        -- Double each element in place.
+        inPlaceMap(&!b, double);
+        -- Assert contents.
+        assertTrue(nth(&b, 0) = 2,  "[0] = 2");
+        assertTrue(nth(&b, 1) = 4,  "[1] = 4");
+        assertTrue(nth(&b, 2) = 6,  "[2] = 6");
+        assertTrue(nth(&b, 3) = 8,  "[3] = 8");
+        assertTrue(nth(&b, 4) = 10, "[4] = 10");
+        -- End.
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    union CardinalDirection: Free is
+        case North;
+        case South;
+        case East;
+        case West;
+    end;
+
+    function directionToChar(dir: CardinalDirection): Nat8 is
+        case dir of
+            when North do
+                return 'N';
+            when South do
+                return 'S';
+            when East do
+                return 'E';
+            when West do
+                return 'W';
+        end case;
+    end;
+
+    function mapTest(): Unit is
+        testHeading("map");
+        -- Create an array [North, South, East, West]
+        let b1: Buffer[CardinalDirection] := allocateEmpty();
+        insertBack(&!b1, North());
+        insertBack(&!b1, South());
+        insertBack(&!b1, East());
+        insertBack(&!b1, West());
+        -- Map each of the cardinal directions into a character.
+        let b2: Buffer[Nat8] := map(b1, directionToChar);
+        -- Assert the contents.
+        assertTrue(nth(&b2, 0) = 'N',  "[0] = N");
+        assertTrue(nth(&b2, 1) = 'S',  "[1] = S");
+        assertTrue(nth(&b2, 2) = 'E',  "[2] = E");
+        assertTrue(nth(&b2, 3) = 'W',  "[3] = W");
+        -- End.
+        destroyFree(b2);
+        assertSuccess("destroyFree complete");
         return nil;
     end;
 

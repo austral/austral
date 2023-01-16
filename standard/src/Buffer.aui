@@ -86,8 +86,18 @@ module Standard.Buffer is
     generic [T: Type, R: Region]
     function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T;
 
+    """
+    Swap two elements in the given buffer by their indices.
+    """
     generic [T: Type, R: Region]
     function swapIndex(buf: &![Buffer[T], R], a: Index, b: Index): Unit;
+
+    """
+    Take the element at `pos`, transform it through `fn`, and store the result
+    in place.
+    """
+    generic [T: Type, R: Region]
+    function swapTransform(buf: &![Buffer[T], R], pos: Index, fn: Fn[T, T]): Unit;
 
     """
     Store `element` in every position of `buf`.
@@ -99,12 +109,27 @@ module Standard.Buffer is
     --- Insertion
     ---
 
+    """
+    Insert an element into the buffer in the given position, resizing if
+    needed. Aborts on allocation failure.
+
+    Range for `pos` is from 0 to the length of the buffer.
+    """
     generic [T: Type, R: Region]
     function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
 
+    """
+    Insert the given element at the zeroth position of the buffer, pushing
+    everything to the right and resizing if needed. Aborts on allocation
+    failure.
+    """
     generic [T: Type, R: Region]
     function insertFront(buf: &![Buffer[T], R], element: T): Unit;
 
+    """
+    Insert the given element at the end of the buffer and resizing if needed.
+    Aborts on allocation failure.
+    """
     generic [T: Type, R: Region]
     function insertBack(buf: &![Buffer[T], R], element: T): Unit;
 
@@ -112,12 +137,21 @@ module Standard.Buffer is
     --- Removal
     ---
 
+    """
+    Remove the element from the given position in the buffer, and return it.
+    """
     generic [T: Type, R: Region]
     function remove(buf: &![Buffer[T], R], pos: Index): T;
 
+    """
+    Remove the first element from the buffer and return it.
+    """
     generic [T: Type, R: Region]
     function removeFirst(buf: &![Buffer[T], R]): T;
 
+    """
+    Remove the last element from the buffer and return it.
+    """
     generic [T: Type, R: Region]
     function removeLast(buf: &![Buffer[T], R]): T;
 
@@ -125,6 +159,29 @@ module Standard.Buffer is
     --- Reversal
     ---
 
+    """
+    Reverse the buffer in place.
+    """
     generic [T: Type, R: Region]
     function reverse(buf: &![Buffer[T], R]): Unit;
+
+    ---
+    --- Map
+    ---
+
+    """
+    Iterate over each element in the buffer, transforming it through `fn`, and
+    store the result in place. Like `swapTransform` applied to the whole
+    buffer.
+    """
+    generic [T: Type, R: Region]
+    function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit;
+
+    """
+    Consumes the buffer and returns a new buffer of the same length, whose
+    elements are the result of applying `fn` to the element from `buf` with the
+    same index.
+    """
+    generic [T: Type, U: Type]
+    function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U];
 end module.
