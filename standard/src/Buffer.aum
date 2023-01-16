@@ -381,6 +381,39 @@ module body Standard.Buffer is
     end;
 
     ---
+    --- Map
+    ---
+
+    generic [T: Type, R: Region]
+    function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit is
+        for i from 0 to (!buf->size) - 1 do
+            swapTransform(buf, i, fn);
+        end for;
+        return nil;
+    end;
+
+    generic [T: Type, U: Type]
+    function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U] is
+        let newbuf: Buffer[U] := allocateEmpty();
+        -- Iterate over everything in the buffer, transforming it and moving it
+        -- to the new buffer.
+        for i from 0 to (buf.size) - 1 do
+            -- Load the element at `pos`.
+            let ptr: Pointer[T] := positiveOffset(buf.array, i);
+            let old: T := load(ptr);
+            -- Transform it.
+            let new: U := fn(old);
+            -- Store the transformed version in the new buffer.
+            insertBack(&!newbuf, new);
+        end for;
+        -- Deallocate the old array. Every element has been transformed and
+        -- copied over, so this is safe.
+        destroyUnsafe(buf);
+        -- Return the new buffer.
+        return newbuf;
+    end;
+
+    ---
     --- Utilities
     ---
 
@@ -424,38 +457,5 @@ module body Standard.Buffer is
             count => chunk_size
         );
         return nil;
-    end;
-
-    ---
-    --- Map
-    ---
-
-    generic [T: Type, R: Region]
-    function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit is
-        for i from 0 to (!buf->size) - 1 do
-            swapTransform(buf, i, fn);
-        end for;
-        return nil;
-    end;
-
-    generic [T: Type, U: Type]
-    function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U] is
-        let newbuf: Buffer[U] := allocateEmpty();
-        -- Iterate over everything in the buffer, transforming it and moving it
-        -- to the new buffer.
-        for i from 0 to (buf.size) - 1 do
-            -- Load the element at `pos`.
-            let ptr: Pointer[T] := positiveOffset(buf.array, i);
-            let old: T := load(ptr);
-            -- Transform it.
-            let new: U := fn(old);
-            -- Store the transformed version in the new buffer.
-            insertBack(&!newbuf, new);
-        end for;
-        -- Deallocate the old array. Every element has been transformed and
-        -- copied over, so this is safe.
-        destroyUnsafe(buf);
-        -- Return the new buffer.
-        return newbuf;
     end;
 end module body.
