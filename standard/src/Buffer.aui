@@ -159,6 +159,9 @@ module Standard.Buffer is
     --- Reversal
     ---
 
+    """
+    Reverse the buffer in place.
+    """
     generic [T: Type, R: Region]
     function reverse(buf: &![Buffer[T], R]): Unit;
 
