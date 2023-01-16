@@ -678,6 +678,191 @@ module body Austral.Pervasive is
     end;
 
     ---
+    --- Bitwise Operations
+    ---
+
+    instance BitwiseOperations(Nat8) is
+        method bitwiseAnd(lhs: Nat8, rhs: Nat8): Nat8 is
+            return @embed(Nat8, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Nat8, rhs: Nat8): Nat8 is
+            return @embed(Nat8, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Nat8, rhs: Nat8): Nat8 is
+            return @embed(Nat8, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Nat8): Nat8 is
+            return @embed(Nat8, "~ $1", value);
+        end;
+
+    end;
+
+    instance BitwiseOperations(Int8) is
+        method bitwiseAnd(lhs: Int8, rhs: Int8): Int8 is
+            return @embed(Int8, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Int8, rhs: Int8): Int8 is
+            return @embed(Int8, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Int8, rhs: Int8): Int8 is
+            return @embed(Int8, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Int8): Int8 is
+            return @embed(Int8, "~ $1", value);
+        end;
+    end;
+
+    instance BitwiseOperations(Nat16) is
+        method bitwiseAnd(lhs: Nat16, rhs: Nat16): Nat16 is
+            return @embed(Nat16, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Nat16, rhs: Nat16): Nat16 is
+            return @embed(Nat16, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Nat16, rhs: Nat16): Nat16 is
+            return @embed(Nat16, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Nat16): Nat16 is
+            return @embed(Nat16, "~ $1", value);
+        end;
+    end;
+
+    instance BitwiseOperations(Int16) is
+        method bitwiseAnd(lhs: Int16, rhs: Int16): Int16 is
+            return @embed(Int16, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Int16, rhs: Int16): Int16 is
+            return @embed(Int16, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Int16, rhs: Int16): Int16 is
+            return @embed(Int16, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Int16): Int16 is
+            return @embed(Int16, "~ $1", value);
+        end;
+    end;
+
+    instance BitwiseOperations(Nat32) is
+        method bitwiseAnd(lhs: Nat32, rhs: Nat32): Nat32 is
+            return @embed(Nat32, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Nat32, rhs: Nat32): Nat32 is
+            return @embed(Nat32, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Nat32, rhs: Nat32): Nat32 is
+            return @embed(Nat32, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Nat32): Nat32 is
+            return @embed(Nat32, "~ $1", value);
+        end;
+    end;
+
+    instance BitwiseOperations(Int32) is
+        method bitwiseAnd(lhs: Int32, rhs: Int32): Int32 is
+            return @embed(Int32, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Int32, rhs: Int32): Int32 is
+            return @embed(Int32, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Int32, rhs: Int32): Int32 is
+            return @embed(Int32, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Int32): Int32 is
+            return @embed(Int32, "~ $1", value);
+        end;
+    end;
+
+    instance BitwiseOperations(Nat64) is
+        method bitwiseAnd(lhs: Nat64, rhs: Nat64): Nat64 is
+            return @embed(Nat64, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Nat64, rhs: Nat64): Nat64 is
+            return @embed(Nat64, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Nat64, rhs: Nat64): Nat64 is
+            return @embed(Nat64, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Nat64): Nat64 is
+            return @embed(Nat64, "~ $1", value);
+        end;
+    end;
+
+    instance BitwiseOperations(Int64) is
+        method bitwiseAnd(lhs: Int64, rhs: Int64): Int64 is
+            return @embed(Int64, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Int64, rhs: Int64): Int64 is
+            return @embed(Int64, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Int64, rhs: Int64): Int64 is
+            return @embed(Int64, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Int64): Int64 is
+            return @embed(Int64, "~ $1", value);
+        end;
+    end;
+
+    instance BitwiseOperations(Index) is
+        method bitwiseAnd(lhs: Index, rhs: Index): Index is
+            return @embed(Index, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: Index, rhs: Index): Index is
+            return @embed(Index, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: Index, rhs: Index): Index is
+            return @embed(Index, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: Index): Index is
+            return @embed(Index, "~ $1", value);
+        end;
+    end;
+
+    instance BitwiseOperations(ByteSize) is
+        method bitwiseAnd(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            return @embed(ByteSize, "$1 & $2", lhs, rhs);
+        end;
+
+        method bitwiseOr(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            return @embed(ByteSize, "$1 | $2", lhs, rhs);
+        end;
+
+        method bitwiseXor(lhs: ByteSize, rhs: ByteSize): ByteSize is
+            return @embed(ByteSize, "$1 ^ $2", lhs, rhs);
+        end;
+
+        method bitwiseNot(value: ByteSize): ByteSize is
+            return @embed(ByteSize, "~ $1", value);
+        end;
+    end;
+
+    ---
     --- Printable
     ---
 

@@ -51,6 +51,11 @@ let pervasive_imports =
         ConcreteImport (make_ident "modularSubtract", None);
         ConcreteImport (make_ident "modularMultiply", None);
         ConcreteImport (make_ident "modularDivide", None);
+        ConcreteImport (make_ident "BitwiseOperations", None);
+        ConcreteImport (make_ident "bitwiseAnd", None);
+        ConcreteImport (make_ident "bitwiseOr", None);
+        ConcreteImport (make_ident "bitwiseXor", None);
+        ConcreteImport (make_ident "bitwiseNot", None);
         ConcreteImport (make_ident "Printable", None);
         ConcreteImport (make_ident "print", None);
         ConcreteImport (make_ident "printLn", None);
