@@ -1,0 +1,13 @@
+module body Test is
+    record R: Free is
+        x: Nat32;
+    end;
+
+    constant one: Nat32 := 1;
+
+    constant r_one: R := R(x => one);
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.
