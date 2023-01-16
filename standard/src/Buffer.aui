@@ -130,4 +130,11 @@ module Standard.Buffer is
 
     generic [T: Type, R: Region]
     function reverse(buf: &![Buffer[T], R]): Unit;
+
+    ---
+    --- Map
+    ---
+
+    generic [T: Type, R: Region]
+    function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit;
 end module.

@@ -412,4 +412,15 @@ module body Standard.Buffer is
         return nil;
     end;
 
+    ---
+    --- Map
+    ---
+
+    generic [T: Type, R: Region]
+    function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit is
+        for i from 0 to (!buf->size) - 1 do
+            swapTransform(buf, i, fn);
+        end for;
+        return nil;
+    end;
 end module body.
