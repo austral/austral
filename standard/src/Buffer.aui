@@ -143,6 +143,9 @@ module Standard.Buffer is
     generic [T: Type, R: Region]
     function remove(buf: &![Buffer[T], R], pos: Index): T;
 
+    """
+    Remove the first element from the buffer and return it.
+    """
     generic [T: Type, R: Region]
     function removeFirst(buf: &![Buffer[T], R]): T;
 
