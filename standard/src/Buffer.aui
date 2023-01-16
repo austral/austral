@@ -110,13 +110,18 @@ module Standard.Buffer is
     ---
 
     """
-    Insert an element into the buffer in the given position.
+    Insert an element into the buffer in the given position, resizing if
+    needed. Aborts on allocation failure.
 
     Range for `pos` is from 0 to the length of the buffer.
     """
     generic [T: Type, R: Region]
     function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
 
+    """
+    Insert the given element at the zeroth position of the buffer, pushing
+    everything to the right.
+    """
     generic [T: Type, R: Region]
     function insertFront(buf: &![Buffer[T], R], element: T): Unit;
 
