@@ -86,6 +86,9 @@ module Standard.Buffer is
     generic [T: Type, R: Region]
     function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T;
 
+    """
+    Swap two elements in the given buffer by their indices.
+    """
     generic [T: Type, R: Region]
     function swapIndex(buf: &![Buffer[T], R], a: Index, b: Index): Unit;
 
