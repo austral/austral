@@ -144,6 +144,19 @@ module body Standard.Buffer is
         return nil;
     end;
 
+    """
+    Deallocates a non-empty, potentially linear array. This is for internal use
+    _only_. The assumption here is that the elements have already been safely
+    extracted somewhere so linearity is preserved. See the implementation of
+    for an example.
+    """
+    generic [T: Type]
+    function destroyUnsafe(buffer: Buffer[T]): Unit is
+        let { capacity: Index, size: Index, array: Pointer[T] } := buffer;
+        deallocate(array);
+        return nil;
+    end;
+
     ---
     --- Retrieve
     ---
@@ -350,6 +363,7 @@ module body Standard.Buffer is
     function removeLast(buf: &![Buffer[T], R]): T is
         return remove(buf, (!buf->size) - 1);
     end;
+
     ---
     --- Reversal
     ---
@@ -422,5 +436,26 @@ module body Standard.Buffer is
             swapTransform(buf, i, fn);
         end for;
         return nil;
+    end;
+
+    generic [T: Type, U: Type]
+    function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U] is
+        let newbuf: Buffer[U] := allocateEmpty();
+        -- Iterate over everything in the buffer, transforming it and moving it
+        -- to the new buffer.
+        for i from 0 to (buf.size) - 1 do
+            -- Load the element at `pos`.
+            let ptr: Pointer[T] := positiveOffset(buf.array, i);
+            let old: T := load(ptr);
+            -- Transform it.
+            let new: U := fn(old);
+            -- Store the transformed version in the new buffer.
+            insertBack(&!newbuf, new);
+        end for;
+        -- Deallocate the old array. Every element has been transformed and
+        -- copied over, so this is safe.
+        destroyUnsafe(buf);
+        -- Return the new buffer.
+        return newbuf;
     end;
 end module body.

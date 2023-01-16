@@ -137,4 +137,7 @@ module Standard.Buffer is
 
     generic [T: Type, R: Region]
     function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit;
+
+    generic [T: Type, U: Type]
+    function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U];
 end module.
