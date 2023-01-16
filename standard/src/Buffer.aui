@@ -120,11 +120,16 @@ module Standard.Buffer is
 
     """
     Insert the given element at the zeroth position of the buffer, pushing
-    everything to the right.
+    everything to the right and resizing if needed. Aborts on allocation
+    failure.
     """
     generic [T: Type, R: Region]
     function insertFront(buf: &![Buffer[T], R], element: T): Unit;
 
+    """
+    Insert the given element at the end of the buffer and resizing if needed.
+    Aborts on allocation failure.
+    """
     generic [T: Type, R: Region]
     function insertBack(buf: &![Buffer[T], R], element: T): Unit;
 
