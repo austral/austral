@@ -438,9 +438,14 @@ and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
         (tbl_to_list a)
     in
     (* Ensure the states are the same. *)
-    List.iter (fun (_, state_a, state_b) ->
+    List.iter (fun (name, state_a, state_b) ->
         if state_a <> state_b then
-          err "Variable used inconsistently."
+          err ("The variable `"
+               ^ (ident_string name)
+               ^ "` is used inconsistently. "
+               ^ (show_var_state state_a)
+               ^ " verse "
+               ^ (show_var_state state_b))
         else
           ()) common
   else
@@ -477,7 +482,7 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
   match partition consumed with
   | MoreThanOne ->
      (* The variable is consumed more than once: signal an error. *)
-     err "The variable is consumed more than once."
+     err ("The variable `" ^ (ident_string name) ^ "` is consumed more than once.")
   | One ->
      (* The variable is consumed exactly once. Check that:
 
@@ -498,7 +503,9 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
          else
            err "Loop depth mismatch."
        else
-         err "Cannot consume a variable in the same expression as it is borrowed or accessed through a path."
+         err ("Cannot consume the variable `"
+              ^ (ident_string name)
+              ^ "` in the same expression as it is borrowed or accessed through a path.")
      else
        err ("Trying to consume the variable `"
             ^ (ident_string name)
@@ -510,7 +517,9 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
      (match partition write with
       | MoreThanOne ->
          (* The variable is borrowed mutably more than once. Signal an error. *)
-         err "We can't borrow mutably more than once within a single expression."
+         err ("The variable `"
+              ^ (ident_string name)
+              ^ "` is borrowed mutably more than once within a single expression.")
       | One ->
          (* The variable was borrowed mutably once. Check that:
 
@@ -523,9 +532,13 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
            else
              (* Signal an error: cannot borrow mutably while also borrowing
                 immutably or reading through a path. *)
-             err "Cannot borrow mutably while also borrowing immutably or reading."
+           err ("The variable `"
+                ^ (ident_string name)
+                ^ "` is borrowed mutably while also borrowing immutably or reading.")
          else
-           err "Variable already consumed."
+           err ("The variable `"
+                ^ (ident_string name)
+                ^ "` is already consumed.")
       | Zero ->
          (* The variable is neither consumed nor mutably borrowed, so we can
             read it (borrow read-only or access through a path) iff it is
