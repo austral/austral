@@ -92,6 +92,10 @@ module Standard.Buffer is
     generic [T: Type, R: Region]
     function swapIndex(buf: &![Buffer[T], R], a: Index, b: Index): Unit;
 
+    """
+    Take the element at `pos`, transform it through `fn`, and store the result
+    in place.
+    """
     generic [T: Type, R: Region]
     function swapTransform(buf: &![Buffer[T], R], pos: Index, fn: Fn[T, T]): Unit;
 
