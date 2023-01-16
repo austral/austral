@@ -149,6 +149,9 @@ module Standard.Buffer is
     generic [T: Type, R: Region]
     function removeFirst(buf: &![Buffer[T], R]): T;
 
+    """
+    Remove the last element from the buffer and return it.
+    """
     generic [T: Type, R: Region]
     function removeLast(buf: &![Buffer[T], R]): T;
 
