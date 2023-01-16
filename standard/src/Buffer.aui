@@ -137,6 +137,9 @@ module Standard.Buffer is
     --- Removal
     ---
 
+    """
+    Remove the element from the given position in the buffer, and return it.
+    """
     generic [T: Type, R: Region]
     function remove(buf: &![Buffer[T], R], pos: Index): T;
 
