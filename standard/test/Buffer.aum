@@ -18,7 +18,8 @@ import Standard.Buffer (
     removeLast,
     reverse,
     swapTransform,
-    inPlaceMap
+    inPlaceMap,
+    map
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -45,6 +46,7 @@ module body Standard.Test.Buffer is
         reverseEmptyTest();
         reverseNonEmptyTest();
         inPlaceMapTest();
+        mapTest();
         return nil;
     end;
 
@@ -295,6 +297,47 @@ module body Standard.Test.Buffer is
         assertTrue(nth(&b, 4) = 10, "[4] = 10");
         -- End.
         destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    union CardinalDirection: Free is
+        case North;
+        case South;
+        case East;
+        case West;
+    end;
+
+    function directionToChar(dir: CardinalDirection): Nat8 is
+        case dir of
+            when North do
+                return 'N';
+            when South do
+                return 'S';
+            when East do
+                return 'E';
+            when West do
+                return 'W';
+        end case;
+    end;
+
+    function mapTest(): Unit is
+        testHeading("map");
+        -- Create an array [North, South, East, West]
+        let b1: Buffer[CardinalDirection] := allocateEmpty();
+        insertBack(&!b1, North());
+        insertBack(&!b1, South());
+        insertBack(&!b1, East());
+        insertBack(&!b1, West());
+        -- Map each of the cardinal directions into a character.
+        let b2: Buffer[Nat8] := map(b1, directionToChar);
+        -- Assert the contents.
+        assertTrue(nth(&b2, 0) = 'N',  "[0] = N");
+        assertTrue(nth(&b2, 1) = 'S',  "[1] = S");
+        assertTrue(nth(&b2, 2) = 'E',  "[2] = E");
+        assertTrue(nth(&b2, 3) = 'W',  "[3] = W");
+        -- End.
+        destroyFree(b2);
         assertSuccess("destroyFree complete");
         return nil;
     end;
