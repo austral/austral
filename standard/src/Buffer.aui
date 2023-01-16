@@ -109,6 +109,11 @@ module Standard.Buffer is
     --- Insertion
     ---
 
+    """
+    Insert an element into the buffer in the given position.
+
+    Range for `pos` is from 0 to the length of the buffer.
+    """
     generic [T: Type, R: Region]
     function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit;
 
