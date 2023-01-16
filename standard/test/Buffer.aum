@@ -17,7 +17,8 @@ import Standard.Buffer (
     removeFirst,
     removeLast,
     reverse,
-    swapTransform
+    swapTransform,
+    inPlaceMap
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -43,6 +44,7 @@ module body Standard.Test.Buffer is
         removeLastTest();
         reverseEmptyTest();
         reverseNonEmptyTest();
+        inPlaceMapTest();
         return nil;
     end;
 
@@ -271,6 +273,29 @@ module body Standard.Test.Buffer is
         assertNth(&b, 1, 2);
         assertNth(&b, 2, 1);
         destroyFree(b);
+        return nil;
+    end;
+
+    function inPlaceMapTest(): Unit is
+        testHeading("inPlaceMap");
+        -- Create an array [1,2,3,4,5]
+        let b: Buffer[Int32] := allocateEmpty();
+        insertBack(&!b, 1);
+        insertBack(&!b, 2);
+        insertBack(&!b, 3);
+        insertBack(&!b, 4);
+        insertBack(&!b, 5);
+        -- Double each element in place.
+        inPlaceMap(&!b, double);
+        -- Assert contents.
+        assertTrue(nth(&b, 0) = 2,  "[0] = 2");
+        assertTrue(nth(&b, 1) = 4,  "[1] = 4");
+        assertTrue(nth(&b, 2) = 6,  "[2] = 6");
+        assertTrue(nth(&b, 3) = 8,  "[3] = 8");
+        assertTrue(nth(&b, 4) = 10, "[4] = 10");
+        -- End.
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
         return nil;
     end;
 
