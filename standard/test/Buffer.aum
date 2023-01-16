@@ -16,7 +16,8 @@ import Standard.Buffer (
     remove,
     removeFirst,
     removeLast,
-    reverse
+    reverse,
+    swapTransform
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -34,6 +35,7 @@ module body Standard.Test.Buffer is
         storeTest();
         swapNthTest();
         swapIndexTest();
+        swapTransformTest();
         fillTest();
         insertFrontTest();
         insertBackTest();
@@ -100,6 +102,21 @@ module body Standard.Test.Buffer is
         swapIndex(&!b, 0, 1);
         assertTrue(nth(&b, 0) = 20, "[0] = 20");
         assertTrue(nth(&b, 1) = 10, "[1] = 10");
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+
+    function double(i: Int32): Int32 is
+        return 2 * i;
+    end;
+
+    function swapTransformTest(): Unit is
+        testHeading("swapTransform");
+        let b: Buffer[Int32] := initialize(1, 30);
+        assertLength(&b, 1);
+        swapTransform(&!b, 0, double);
+        assertTrue(nth(&b, 0) = 60, "[0] = 60");
         destroyFree(b);
         assertSuccess("destroyFree complete");
         return nil;
