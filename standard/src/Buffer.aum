@@ -161,9 +161,6 @@ module body Standard.Buffer is
     --- Retrieve
     ---
 
-    """
-    Return the length of the buffer.
-    """
     generic [T: Type, R: Region]
     function length(buf: &[Buffer[T], R]): Index is
         return !buf->size;
