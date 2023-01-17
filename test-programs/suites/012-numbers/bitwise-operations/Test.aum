@@ -1,0 +1,38 @@
+module body Test is
+
+    generic[T: Free(BitwiseOperations, Printable)]
+    function assertEqual(expected: T, actual: T, description: FixedArray[Nat8]): Unit is
+        if expected /= actual then
+            printLn(description);
+            print("EXPCTED "); print(expected); print(" ACTUAL "); printLn(actual);
+        end if;
+        return nil;
+    end;
+
+    generic[T: Free(BitwiseOperations)]
+    function test(placeholder: T): Unit is
+        let a: T := 3; -- bits 0011
+        let b: T := 5; -- bits 0101
+        assertEqual(1, bitwiseAnd(a, b), "FAILED bitwiseAnd");
+        assertEqual(7, bitwiseOr(a, b), "FAILED bitwiseOr");
+        assertEqual(6, bitwiseXor(a, b), "FAILED bitwiseXor");
+        assertEqual(12, bitwiseAnd(15, bitwiseNot(a)), "FAILED bitwiseNot");
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        printLn("Start");
+        test(0 : Nat8);
+        test(0 : Int8);
+        test(0 : Nat16);
+        test(0 : Int16);
+        test(0 : Nat32);
+        test(0 : Int32);
+        test(0 : Nat64);
+        test(0 : Int64);
+        test(0 : Index);
+        test(0 : ByteSize);
+        printLn("End");
+        return ExitSuccess();
+    end;
+end module body.

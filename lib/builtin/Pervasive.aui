@@ -74,6 +74,13 @@ module Austral.Pervasive is
         method modularDivide(lhs: T, rhs: T): T;
     end;
 
+    typeclass BitwiseOperations(T: Type) is
+        method bitwiseAnd(lhs: T, rhs: T): T;
+        method bitwiseOr(lhs: T, rhs: T): T;
+        method bitwiseXor(lhs: T, rhs: T): T;
+        method bitwiseNot(value: T): T;
+    end;
+
     instance TrappingArithmetic(Nat8);
     instance TrappingArithmetic(Int8);
     instance TrappingArithmetic(Nat16);
@@ -96,6 +103,17 @@ module Austral.Pervasive is
     instance ModularArithmetic(Int64);
     instance ModularArithmetic(Index);
     instance ModularArithmetic(ByteSize);
+
+    instance BitwiseOperations(Nat8);
+    instance BitwiseOperations(Int8);
+    instance BitwiseOperations(Nat16);
+    instance BitwiseOperations(Int16);
+    instance BitwiseOperations(Nat32);
+    instance BitwiseOperations(Int32);
+    instance BitwiseOperations(Nat64);
+    instance BitwiseOperations(Int64);
+    instance BitwiseOperations(Index);
+    instance BitwiseOperations(ByteSize);
 
     typeclass Printable(A: Free) is
         method print(value: A): Unit;
