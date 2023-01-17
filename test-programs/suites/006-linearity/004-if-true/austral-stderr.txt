@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    Variable used inconsistently.
+    The variable `r` is used inconsistently. LinearityCheck.Consumed verse LinearityCheck.Unconsumed
   Code:
     [no span available]
