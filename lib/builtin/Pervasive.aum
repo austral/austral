@@ -1,14 +1,4 @@
 module body Austral.Pervasive is
-    generic [T: Free, R: Region]
-    function deref(ref: &[T, R]): T is
-        return @embed(T, "*$1", ref);
-    end;
-
-    generic [T: Free, R: Region]
-    function derefWrite(ref: &![T, R]): T is
-        return @embed(T, "*$1", ref);
-    end;
-
     generic [T: Type]
     function fixedArraySize(arr: FixedArray[T]): Index is
         return @embed(Index, "$1.size", arr);
