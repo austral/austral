@@ -297,18 +297,18 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      (* Iterate over the bidings, for each that is linear, add an entry to the
         table. Also, keep track of the names of the linear variables. *)
      let linear_names: identifier list =
-       List.filter_map (fun (TypedBinding { name; ty; _ }) ->
+       List.filter_map (fun (TypedBinding { rename; ty; _ }) ->
            if universe_linear_ish (type_universe ty) then
-             Some name
+             Some rename
            else
              None)
          bindings
      in
      let tbl: state_tbl =
        Util.iter_with_context
-         (fun tbl (TypedBinding { name; ty; _ }) ->
+         (fun tbl (TypedBinding { rename; ty; _ }) ->
            if universe_linear_ish (type_universe ty) then
-             add_entry tbl name depth
+             add_entry tbl rename depth
            else
              tbl)
          tbl
