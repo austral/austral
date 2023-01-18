@@ -432,10 +432,11 @@ and render_mono (env: env) (id: decl_id) (tyargs: mono_type_bindings): string =
 
 let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   match decl with
-  | MConstant (_, n, ty, e) ->
+  | MConstant (_, n, _, e) ->
      let d = Desc "Constant" in
      [
-       CConstantDefinition (d, gen_sident mn n, gen_type ty, gen_exp mn e)
+       (* CConstantDefinition (d, gen_sident mn n, gen_type ty, gen_exp mn e) *)
+       CMacro (d, gen_sident mn n, gen_exp mn e)
      ]
   | MRecord _ ->
      []
@@ -609,6 +610,8 @@ let decl_order = function
   | CTypeDefinition _ ->
      4
   | CConstantDefinition _ ->
+     5
+  | CMacro _ ->
      5
   | CFunctionDeclaration _ ->
      6
