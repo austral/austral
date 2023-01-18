@@ -1,0 +1,15 @@
+module body Test is
+    record B : Linear is
+        x : Int32;
+    end;
+    record A : Linear is
+        b: B;
+    end;
+
+    function main(): ExitCode is
+        let a: A := A(b => B(x => 5));
+        let { b as b1: B } := a;
+        let { x as x1: Int32 } := b1;
+        return ExitSuccess();
+    end;
+end module body.
