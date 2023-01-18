@@ -28,6 +28,11 @@ let rec render_unit (CUnit (name, decls)): string =
 
 and render_decl i d =
   match d with
+  | CMacro (desc, name, value) ->
+     [
+       Line (i, desc_text desc);
+       Line (i, "#define " ^ name ^ " " ^ (e value))
+     ]
   | CConstantDefinition (desc, name, ty, value) ->
      [
        Line (i, desc_text desc);
