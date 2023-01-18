@@ -62,6 +62,7 @@ and c_switch_case =
 type desc = Desc of string
 
 type c_decl =
+  | CMacro of desc * string * c_expr
   | CConstantDefinition of desc * string * c_ty * c_expr
   | CStructForwardDeclaration of desc * string
   | CTypeDefinition of desc * string * c_ty
