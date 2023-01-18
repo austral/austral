@@ -12,12 +12,6 @@ module Austral.Pervasive is
             right: R;
     end;
 
-    generic [T: Free, R: Region]
-    function deref(ref: &[T, R]): T;
-
-    generic [T: Free, R: Region]
-    function derefWrite(ref: &![T, R]): T;
-
     generic [T: Type]
     function fixedArraySize(arr: FixedArray[T]): Index;
 
