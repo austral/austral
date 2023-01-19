@@ -9,6 +9,7 @@ type error_kind =
   | GenericError
   | ParseError
   | TypeError
+  | LinearityError
   | DeclarationError
   | EntrypointError
   | InternalError
@@ -82,6 +83,7 @@ let error_title (kind: error_kind): string =
   | GenericError -> "Generic Error"
   | ParseError -> "Parse Error"
   | TypeError -> "Type Error"
+  | LinearityError -> "Linearity Error"
   | DeclarationError -> "Declaration Error"
   | EntrypointError -> "Entrypoint Definition Error"
   | InternalError -> "Internal Error"

@@ -12,6 +12,8 @@ type error_kind =
   (** A parse error. *)
   | TypeError
   (** A type error. *)
+  | LinearityError
+  (** Signalled when code breaks the linearity rules. *)
   | DeclarationError
   (** An error in the structure of a declaration. *)
   | EntrypointError
