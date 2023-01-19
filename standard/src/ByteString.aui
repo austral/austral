@@ -1,0 +1,58 @@
+"""
+This module implements the ByteString type, a linear, heap-allocated byte string
+type.
+"""
+module Standard.ByteString is
+    type ByteString: Linear;
+
+    ---
+    --- Lifecycle
+    ---
+
+    """
+    Allocate and return an empty bytestring.
+    """
+    function makeEmpty(): ByteString;
+
+    """
+    Allocate and return a byte string with the given size, where all bytes have
+    the value of `initial`.
+    """
+    function makeByteString(size: Index, initial: Nat8): ByteString;
+
+    """
+    Deallocate a byte string.
+    """
+    function destroyByteString(str: ByteString): Unit;
+
+    """
+    Allocate and return a byte string from a string literal.
+    """
+    function fromLiteral(arr: FixedArray[Nat8]): ByteString;
+
+    ---
+    --- Retrieve
+    ---
+
+    """
+    Return the length of the string.
+    """
+    generic [R: Region]
+    function length(string: &[ByteString, R]): Index;
+
+    """
+    Return the nth byte of the string.
+    """
+    generic [R: Region]
+    function nth(string: &[ByteString, R], pos: Index): Nat8;
+
+    ---
+    --- Update
+    ---
+
+    """
+    Write a byte to the given position in the string.
+    """
+    generic [R: Region]
+    function storeNth(string: &![ByteString, R], pos: Index, byte: Nat8): Unit;
+end module.
