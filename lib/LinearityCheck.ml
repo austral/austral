@@ -252,7 +252,7 @@ let partition (n: int): partitions =
       if n = 0 then
         Zero
       else
-        err "Impossible"
+        internal_err "Impossible"
 
 let rec linearity_check (params: value_parameter list) (body: tstmt): unit =
   (* Initialize the loop depth to zero, *)
