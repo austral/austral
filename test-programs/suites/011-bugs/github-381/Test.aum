@@ -1,0 +1,23 @@
+module body Test is
+      record Other: Linear is
+          y: Nat32;
+      end;
+
+      record Mut: Linear is
+          x: Other;
+      end;
+
+      generic [R: Region]
+      function mangle(thing: &![Mut, R]): Unit is
+          thing->x.y := "this shouldn't work";
+          return nil;
+      end;
+
+      function main(): ExitCode is
+          let foo: Mut := Mut(x => Other(y => 5));
+          mangle(&!foo);
+          let { x: Other } := foo;
+          let { y: Nat32 } := x;
+          return ExitSuccess();
+      end;
+end module body.
