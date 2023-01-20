@@ -932,6 +932,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      let value = augment_expr module_name env rm typarams lexenv None value in
                      let universe = type_universe (get_type value) in
                      if universe = FreeUniverse then
+                       let _ = match_type_with_value (env, module_name) var_ty value in
                        TAssign (span, TypedLValue (var, []), value)
                      else
                        err "L-values must end in the free universe"
