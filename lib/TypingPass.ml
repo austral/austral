@@ -928,19 +928,24 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
               | Some (var_ty, _) ->
                  (match elems with
                   | [] ->
+                     (* Assigning to a variable. *)
                      let value = augment_expr module_name env rm typarams lexenv None value in
                      let universe = type_universe (get_type value) in
                      if universe = FreeUniverse then
+                       let _ = match_type_with_value (env, module_name) var_ty value in
                        TAssign (span, TypedLValue (var, []), value)
                      else
                        err "L-values must end in the free universe"
                   | elems ->
+                     (* Assigning to a path. *)
                      let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
                      let value = augment_expr module_name env rm typarams lexenv None value in
+                     let ty = get_path_ty_from_elems elems in
+                     let _ = match_type_with_value (env, module_name) ty value in
                      let path = TPath {
                                     head = value;
                                     elems = elems;
-                                    ty = get_path_ty_from_elems elems
+                                    ty = ty
                                   }
                      in
                      let universe = type_universe (get_type path) in
