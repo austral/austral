@@ -400,7 +400,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
           | Some (TypeClassMethod { id; _ }) ->
              id
           | _ ->
-             err "No method with this name.")
+             err ("No method with this name: " ^ (ident_string name)))
        in
        ({
            instance_id = instance_id;
