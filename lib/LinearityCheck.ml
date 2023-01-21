@@ -43,6 +43,8 @@ let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl
   | None ->
      (name, depth, Unconsumed) :: tbl
   | Some _ ->
+     (* The justification for this being an internal error is that the compiler
+        should already have caught a duplicate variable. *)
      internal_err "An entry exists in the state table with this name."
 
 let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl =
