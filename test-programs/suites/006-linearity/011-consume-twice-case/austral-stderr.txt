@@ -1,10 +1,10 @@
 Error:
-  Title: Generic Error
+  Title: Linearity Error
   Module:
     Test
   Location:
     [no span available]
   Description:
-    Trying to consume the variable `value`, which is consumed.
+    Trying to consume the variable `value` which is already consumed
   Code:
     [no span available]

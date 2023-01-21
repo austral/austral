@@ -538,11 +538,12 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              Text "in the same expression as it is borrowed or accessed through a path."
            ]
      else
-       err ("Trying to consume the variable `"
-            ^ (ident_string name)
-            ^ "`, which is "
-            ^ (humanize_state (get_state tbl name))
-            ^ ".")
+       austral_raise LinearityError [
+           Text "Trying to consume the variable";
+           Code (ident_string name);
+           Text "which is already";
+           Text (humanize_state (get_state tbl name))
+         ]
   | Zero ->
      (* The variable is not consumed. *)
      (match partition write with
