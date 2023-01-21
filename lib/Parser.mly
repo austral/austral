@@ -389,6 +389,7 @@ atomic_expression:
   | SIZEOF LPAREN typespec RPAREN { CSizeOf (from_loc $loc, $3) }
   | BORROW_READ identifier { CBorrowExpr (from_loc $loc, ReadBorrow, $2) }
   | BORROW_WRITE identifier { CBorrowExpr (from_loc $loc, WriteBorrow, $2) }
+  | DEREF atomic_expression { CDeref (from_loc $loc, $2) }
   ;
 
 int_constant:
@@ -449,7 +450,6 @@ compound_expression:
   | atomic_expression AND atomic_expression { CConjunction (from_loc $loc, $1, $3) }
   | atomic_expression OR atomic_expression { CDisjunction (from_loc $loc, $1, $3) }
   | NOT atomic_expression { CNegation (from_loc $loc, $2) }
-  | DEREF atomic_expression { CDeref (from_loc $loc, $2) }
   | arith_expr { $1 }
   | IF expression THEN expression ELSE expression { CIfExpression (from_loc $loc, $2, $4, $6) }
   | atomic_expression COLON typespec { CTypecast (from_loc $loc, $1, $3) }
