@@ -1270,7 +1270,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
       | LFunction (decl_id, vis, name, typarams, params, rt, body, doc, pragmas) ->
          ps ("Kind", "Function");
          pi ("Name", name);
-         let rm = region_map_from_typarams typarams in
+         let rm = empty_region_map in
          (match pragmas with
           | [ForeignImportPragma s] ->
              if typarams_size typarams = 0 then
@@ -1292,13 +1292,13 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
              err "Invalid pragmas")
       | LTypeclass (decl_id, vis, name, typaram, methods, doc) ->
          ps ("Kind", "Typeclass");
-         let rm = region_map_from_typarams (typarams_from_list [typaram]) in
+         let rm = empty_region_map in
          TTypeClass (decl_id, vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)
       | LInstance (decl_id, vis, name, typarams, arg, methods, doc) ->
          ps ("Kind", "Instance");
          (* TODO: the universe of the type parameter matches the universe of the type argument *)
          (* TODO: Check the methods in the instance match the methods in the class *)
-         let rm = region_map_from_typarams typarams in
+         let rm = empty_region_map in
          TInstance (decl_id, vis, name, typarams, arg, List.map (augment_method_def module_name env rm typarams) methods, doc))
 
 and lexenv_from_params (params: value_parameter list): lexenv =
