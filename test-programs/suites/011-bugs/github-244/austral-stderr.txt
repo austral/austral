@@ -1,0 +1,10 @@
+Error:
+  Title: Declaration Error
+  Module:
+    Test
+  Location:
+    [no span available]
+  Description:
+    The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is `A`
+  Code:
+    [no span available]
