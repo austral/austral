@@ -564,9 +564,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
                  Code "is borrowed mutably, while also being either read or read mutably."
                ]
          else
-           err ("The variable `"
-                ^ (ident_string name)
-                ^ "` is already consumed.")
+           austral_raise LinearityError [
+               Text "Trying to mutably borrow the variable ";
+               Code (ident_string name);
+               Text "which is already consumed."
+             ]
       | Zero ->
          (* The variable is neither consumed nor mutably borrowed, so we can
             read it (borrow read-only or access through a path) iff it is
@@ -577,7 +579,12 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              (* Everything checks out. *)
              tbl
            else
-             err "Cannot borrow a variable: state mismatch."
+             austral_raise LinearityError [
+                 Text "Trying to borrow the variable";
+                 Code (ident_string name);
+                 Text "as a read reference, but the variable is already";
+                 Text (humanize_state (get_state tbl name))
+               ]
          else
            if path > 0 then
              (* If the variable is accessed through a path, ensure it is unconsumed. *)
