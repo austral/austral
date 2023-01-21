@@ -503,9 +503,9 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
   | MoreThanOne ->
      (* The variable is consumed more than once: signal an error. *)
      austral_raise LinearityError [
-         Text "The variable `";
+         Text "The variable";
          Code (ident_string name);
-         Text "` is consumed more than once."
+         Text "is consumed more than once."
        ]
   | One ->
      (* The variable is consumed exactly once. Check that:
