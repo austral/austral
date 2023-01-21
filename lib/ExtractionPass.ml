@@ -159,17 +159,15 @@ and extract_definitions (env: env) (mod_id: mod_id) (mn: module_name) (local_typ
     local type signatures, and a combined definition, add all relevant decls to
     the environment, and return a linked definition. *)
 and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_types: type_signature list) (def: combined_definition): (env * linked_definition)  =
+  let rm = empty_region_map in
   let parse' = parse_type env local_types in
   let rec parse_slot (typarams: typarams) (QualifiedSlot (n, ts)): typed_slot =
-    let rm = empty_region_map in
     TypedSlot (n, parse' rm typarams ts)
   and parse_param (typarams: typarams) (QualifiedParameter (n, ts)): value_parameter =
-    let rm = empty_region_map in
     ValueParameter (n, parse' rm typarams ts)
   in
   match def with
   | CConstant (vis, name, typespec, def, docstring) ->
-     let rm = empty_region_map in
      let ty = parse' rm empty_typarams typespec in
      let (env, decl_id) = add_constant env { mod_id; vis; name; ty; docstring } in
      let decl = LConstant (decl_id, vis, name, ty, def, docstring) in
@@ -259,7 +257,6 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let decl = LUnion (union_id, vis, name, typarams, universe, linked_cases, docstring) in
      (env, decl)
   | CFunction (vis, name, typarams, params, rt, body, docstring, pragmas) ->
-     let rm = empty_region_map in
      let value_params = List.map (parse_param typarams) params
      and rt = parse' rm typarams rt
      and external_name: string option =
@@ -333,7 +330,6 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let typarams = typarams_from_list [typaram] in
      let method_map (CMethodDecl (name, method_typarams, params, rt, docstring)): type_class_method_input =
        let effective_typarams: typarams = merge_typarams typarams method_typarams in
-       let rm = empty_region_map in
        let value_params = List.map (parse_param effective_typarams) params
        and rt = parse' rm effective_typarams rt in
        {
@@ -355,7 +351,6 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      (env, decl)
   | CInstance (vis, name, typarams, argument, methods, docstring) ->
      (* First add the instance to the env, then the methods. *)
-     let rm = empty_region_map in
      let argument = parse' rm typarams argument in
      (* Find typeclass info. *)
      let (typeclass_id, typeclass_mod_id, typeclass_param_name, universe): decl_id * mod_id * identifier * universe =
@@ -396,7 +391,6 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      (* Convert the list of methods into a list of instance_method_input records *)
      let method_map (CMethodDef (name, method_typarams, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
        let effective_typarams: typarams = merge_typarams typarams method_typarams in
-       let rm = empty_region_map in
        let value_params = List.map (parse_param effective_typarams) params
        and rt = parse' rm effective_typarams rt
        and method_id: decl_id =
