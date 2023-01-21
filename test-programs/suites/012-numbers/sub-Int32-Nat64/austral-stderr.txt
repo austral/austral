@@ -8,7 +8,7 @@ Error:
     From: line 5, column 8
     To: line 5, column 33
   Description:
-    Both operands to an arithmetic expression must be compatible types. The LHS has type `Int32` but the RHS has type `Nat64`
+    Both operands to an arithmetic expression must be compatible types. The LHS has type `Int32` but the RHS has type `Nat64`.
   Code:
     3 |         let a: Int32    := 10;
     4 |         let b: Nat64    := 20;

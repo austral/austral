@@ -7,7 +7,7 @@ Error:
     From: line 12, column 10
     To: line 12, column 46
   Description:
-    Expected a value of type `Nat32` , but got a value of type `FixedArray[Nat8]: Free`
+    Expected a value of type `Nat32`, but got a value of type `FixedArray[Nat8]: Free`.
   Code:
     10 |       generic [R: Region]
     11 |       function mangle(thing: &![Mut, R]): Unit is

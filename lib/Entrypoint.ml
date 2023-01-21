@@ -36,8 +36,9 @@ let rec check_entrypoint_validity (env: env) (name: qident): decl_id * entrypoin
                   (id, EmptyEntrypoint)
                 else
                   entrypoint_err [
-                      Text "The return type of the entrypoint function must be `ExitCode`, but I got";
-                      Code (type_string rt)
+                      Text "The return type of the entrypoint function must be `ExitCode`, but I got ";
+                      Code (type_string rt);
+                      Text "."
                     ]
              | [ValueParameter (_, pt)] ->
                 (* Single parameter case: the `root` parameter. *)
@@ -46,13 +47,15 @@ let rec check_entrypoint_validity (env: env) (name: qident): decl_id * entrypoin
                     (id, RootCapEntrypoint)
                   else
                     entrypoint_err [
-                        Text "The return type of the entrypoint function must be `ExitCode`, but I got";
-                        Code (type_string rt)
+                        Text "The return type of the entrypoint function must be `ExitCode`, but I got ";
+                        Code (type_string rt);
+                        Text "."
                       ]
                 else
                   entrypoint_err [
-                      Text "The parameter to the entrypoint function must be of type RootCapability, but I got";
-                      Code (type_string pt)
+                      Text "The parameter to the entrypoint function must be of type RootCapability, but I got ";
+                      Code (type_string pt);
+                      Text "."
                     ]
              | _ ->
                 entrypoint_err [Text "Entrypoint function must take a single parameter of type RootCapability, or zero parameters, but I got a different parameter list."]
@@ -64,9 +67,9 @@ let rec check_entrypoint_validity (env: env) (name: qident): decl_id * entrypoin
          entrypoint_err [Text "Entrypoint is not a function."])
   | None ->
      entrypoint_err [
-         Text "Entrypoint function";
+         Text "Entrypoint function ";
          Code (ident_string (original_name name));
-         Text "does not exist in the module name";
+         Text " does not exist in the module name ";
          Code (mod_name_string (source_module_name name));
        ]
 

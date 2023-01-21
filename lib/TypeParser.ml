@@ -272,13 +272,13 @@ and check_param_arity_matches (params: typarams) (args: ty list) (ty_name: qiden
     ()
   else
     austral_raise GenericError [
-        Text "The type";
+        Text "The type ";
         Code (ident_string (original_name ty_name));
-        Text "expects";
+        Text " expects ";
         Code (string_of_int expected);
-        Text "type arguments, but I only found";
+        Text " type arguments, but I only found ";
         Code (string_of_int got);
-        Text "arguments."
+        Text " arguments."
       ]
 
 and check_universes_match (params: typarams) (args: ty list): unit =

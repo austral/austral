@@ -51,9 +51,9 @@ let ensure_no_mod_with_name (env: env) (name: module_name): unit =
   match get_module_by_name env name with
   | Some _ ->
      austral_raise DeclarationError [
-         Text "A module with the name";
+         Text "A module with the name ";
          Code (mod_name_string name);
-         Text "already exists.";
+         Text " already exists.";
        ]
   | None ->
      ()
@@ -120,10 +120,11 @@ let ensure_no_decl_with_name (env: env) (mod_id: mod_id) (name: identifier): uni
   match get_decl_by_name env ident with
   | Some _ ->
      austral_raise DeclarationError [
-         Text "A declaration with the name";
+         Text "A declaration with the name ";
          Code (ident_string name);
-         Text "already exists in the module";
+         Text " already exists in the module ";
          Code (mod_name_string mn);
+         Text "."
        ]
   | None ->
      ()
