@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    Cannot borrow the variable `foo` because it is already borrowed as a read reference.
+    Cannot borrow the variable `foo` because it is already borrowed (read-only)
   Code:
     [no span available]

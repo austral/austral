@@ -371,18 +371,12 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
        let tbl: state_tbl = update_tbl tbl original Unconsumed in
        tbl
      else
-       let state_string: string =
-         match get_state tbl original with
-         | Unconsumed -> internal_err "Logic error in the linearity checker: the state table thinks a variable is simultaneously consumed and unconsumed"
-         | BorrowedRead -> "borrowed as a read reference."
-         | BorrowedWrite -> "borrowed as a write reference."
-         | Consumed -> "consumed."
-       in
+       let state: var_state = get_state tbl original in
        austral_raise LinearityError [
            Text "Cannot borrow the variable";
            Code (ident_string original);
            Text "because it is already";
-           Text state_string
+           Text (humanize_state state)
          ]
   | TBlock (_, a, b) ->
      let tbl: state_tbl = check_stmt tbl depth a in
