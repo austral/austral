@@ -541,9 +541,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
      (match partition write with
       | MoreThanOne ->
          (* The variable is borrowed mutably more than once. Signal an error. *)
-         err ("The variable `"
-              ^ (ident_string name)
-              ^ "` is borrowed mutably more than once within a single expression.")
+         austral_raise LinearityError [
+             Text "The variable";
+             Code (ident_string name);
+             Text "is borrowed mutably more than once within a single expression."
+           ]
       | One ->
          (* The variable was borrowed mutably once. Check that:
 
