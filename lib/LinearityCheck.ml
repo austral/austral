@@ -43,7 +43,7 @@ let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl
   | None ->
      (name, depth, Unconsumed) :: tbl
   | Some _ ->
-     err "An entry exists in the state table with this name."
+     internal_err "An entry exists in the state table with this name."
 
 let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl =
   match get_entry tbl name with
