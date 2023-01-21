@@ -558,9 +558,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
            else
              (* Signal an error: cannot borrow mutably while also borrowing
                 immutably or reading through a path. *)
-           err ("The variable `"
-                ^ (ident_string name)
-                ^ "` is borrowed mutably while also borrowing immutably or reading.")
+             austral_raise LinearityError [
+                 Text "The variable";
+                 Code (ident_string name);
+                 Code "is borrowed mutably, while also being either read or read mutably."
+               ]
          else
            err ("The variable `"
                 ^ (ident_string name)
