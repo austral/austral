@@ -10,6 +10,8 @@ type error_kind =
   (** A generic error. This should be gradually phased out. *)
   | ParseError
   (** A parse error. *)
+  | CliError
+  (** An error with the user's command line arguments. *)
   | TypeError
   (** A type error. *)
   | LinearityError

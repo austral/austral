@@ -61,7 +61,16 @@ let parse_executable_target (arglist: arglist): (arglist * target) =
       | None ->
          err "--output argument not provided.")
   | None ->
-     err "--entrypoint argument not provided."
+     (match pop_bool_flag arglist "--no-entrypoint" with
+      | Some _ ->
+         austral_raise CliError [
+             Code "--no-entrypoint";
+             Text " requires ";
+             Code "--target-type=c";
+             Text ", because otherwise the compiler will try to build the generated C code, and will fail because there is no entrypoint function."
+           ]
+      | None ->
+         err "--entrypoint argument not provided.")
 
 let get_output (arglist: arglist): (arglist * string) =
   match pop_value_flag arglist "output" with
