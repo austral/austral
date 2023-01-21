@@ -8,6 +8,7 @@ open ErrorText
 type error_kind =
   | GenericError
   | ParseError
+  | CliError
   | TypeError
   | LinearityError
   | DeclarationError
@@ -82,6 +83,7 @@ let error_title (kind: error_kind): string =
   match kind with
   | GenericError -> "Generic Error"
   | ParseError -> "Parse Error"
+  | CliError -> "Command Line Arguments Error"
   | TypeError -> "Type Error"
   | LinearityError -> "Linearity Error"
   | DeclarationError -> "Declaration Error"
