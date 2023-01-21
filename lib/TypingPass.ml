@@ -112,10 +112,11 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
          in
          let arith_error _ =
            austral_raise TypeError [
-               Text "Both operands to an arithmetic expression must be compatible types. The LHS has type";
+               Text "Both operands to an arithmetic expression must be compatible types. The LHS has type ";
                Code (type_string lhs_ty);
-               Text "but the RHS has type";
-               Code (type_string rhs_ty)
+               Text " but the RHS has type ";
+               Code (type_string rhs_ty);
+               Text "."
              ]
          in
          (* Are the types the same? *)
@@ -1122,8 +1123,9 @@ and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty
                          n
                       | _ ->
                          austral_raise GenericError [
-                             Text "Case statement: case expression type is not a naed typeNot a union type:";
-                             Code (type_string ty)
+                             Text "Case statement: case expression type is not a union type: ";
+                             Code (type_string ty);
+                             Text "."
                            ]) in
   match get_decl_by_name env (qident_to_sident name) with
   | Some (Union { id; vis; name; mod_id; typarams; universe; _ }) ->

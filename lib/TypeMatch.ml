@@ -16,10 +16,11 @@ open Error
 let type_mismatch _ a b =
   austral_raise TypeError
     [
-      Text "Expected a value of type";
+      Text "Expected a value of type ";
       Code (type_string a);
-      Text ", but got a value of type";
+      Text ", but got a value of type ";
       Code (type_string b);
+      Text "."
     ]
 
 type ctx = env * module_name

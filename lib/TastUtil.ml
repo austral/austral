@@ -21,10 +21,11 @@ let rec arglist_to_positional (args, names): texpr list =
   else
     austral_raise GenericError
       [
-        Text "Wrong number of arguments. Expected";
+        Text "Wrong number of arguments. Expected ";
         Code (string_of_int expected);
-        Text "and got";
-        Code (string_of_int actual)
+        Text " and got ";
+        Code (string_of_int actual);
+        Text "."
       ]
 
 and names_match arglist names =

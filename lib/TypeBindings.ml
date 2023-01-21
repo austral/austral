@@ -91,12 +91,13 @@ let add_binding (TypeBindings m) (tp: type_parameter) ty =
        TypeBindings m
      else
        austral_raise GenericError [
-           Text "Incompatible type bindings. The parameter";
+           Text "Incompatible type bindings. The parameter ";
            Code (ident_string (typaram_name tp));
-           Text "is bound to";
+           Text " is bound to ";
            Code (type_string ty');
-           Text "but now we're trying to bind it to";
+           Text " but now we're trying to bind it to";
            Code (type_string ty);
+           Text "."
          ]
   | None ->
      if universe_compatible (typaram_universe tp) (type_universe ty) then

@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    Trying to consume the variable `left` which is already consumed
+    Trying to consume the variable `left` which is already consumed.
   Code:
     [no span available]

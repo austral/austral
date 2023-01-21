@@ -361,6 +361,8 @@ def _run_success_test(test: Test):
     os.remove("test-programs/output.c")
     os.remove("test-programs/testbin")
 
+def trim_lines(text):
+    return "\n".join([line if line.strip() else "" for line in text.strip().split("\n")])
 
 def _run_failure_test(test: TestFailure):
     suite_name: str = test.suite_name
@@ -390,8 +392,8 @@ def _run_failure_test(test: TestFailure):
             ],
         )
     # Compilation failed. Does the actual stderr match expected?
-    stderr: str = result.stderr.decode("utf-8").strip()
-    if stderr != test.expected_compiler_error:
+    stderr: str = trim_lines(result.stderr.decode("utf-8"))
+    if stderr != trim_lines(test.expected_compiler_error):
         report(
             properties=[
                 ("Suite", suite_name),

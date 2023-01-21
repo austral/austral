@@ -76,8 +76,9 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
        others
      else
        austral_raise LinearityError [
-           Text "Forgot to consume a linear variable:";
-           Code (ident_string name)
+           Text "Forgot to consume a linear variable: ";
+           Code (ident_string name);
+           Text "."
          ]
 
 let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
@@ -373,10 +374,11 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      else
        let state: var_state = get_state tbl original in
        austral_raise LinearityError [
-           Text "Cannot borrow the variable";
+           Text "Cannot borrow the variable ";
            Code (ident_string original);
-           Text "because it is already";
-           Text (humanize_state state)
+           Text " because it is already ";
+           Text (humanize_state state);
+           Text "."
          ]
   | TBlock (_, a, b) ->
      let tbl: state_tbl = check_stmt tbl depth a in
@@ -394,9 +396,9 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
              ()
            else
              austral_raise LinearityError [
-                 Text "The variable";
+                 Text "The variable ";
                  Code (ident_string name);
-                 Text "is not consumed by the time of the return statement. Did you forget to call a destructure, or destructure the contents?"
+                 Text " is not consumed by the time of the return statement. Did you forget to call a destructure, or destructure the contents?"
                ])
          (tbl_to_list tbl)
      in
@@ -459,14 +461,15 @@ and tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): uni
     List.iter (fun (name, state_a, state_b) ->
         if state_a <> state_b then
           austral_raise LinearityError [
-              Text "The variable";
+              Text "The variable ";
               Code (ident_string name);
-              Text "is used inconsistently in the branches of";
+              Text " is used inconsistently in the branches of ";
               Text stmt_name;
-              Text "statement. In one branch it is";
+              Text " statement. In one branch it is ";
               Text (humanize_state state_a);
-              Text "while in the other it is";
-              Text (humanize_state state_b)
+              Text " while in the other it is ";
+              Text (humanize_state state_b);
+              Text "."
             ]
         else
           ()) common
@@ -506,9 +509,9 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
   | MoreThanOne ->
      (* The variable is consumed more than once: signal an error. *)
      austral_raise LinearityError [
-         Text "The variable";
+         Text "The variable ";
          Code (ident_string name);
-         Text "is consumed more than once."
+         Text " is consumed more than once."
        ]
   | One ->
      (* The variable is consumed exactly once. Check that:
@@ -529,24 +532,25 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
            tbl
          else
            austral_raise LinearityError [
-               Text "The variable";
+               Text "The variable ";
                Code (ident_string name);
-               Text "was defined outside a loop, but you're trying to consume it inside a loop.";
+               Text " was defined outside a loop, but you're trying to consume it inside a loop.";
                Break;
                Text "This is not allowed because it could be consumed zero times or more than once."
              ]
        else
          austral_raise LinearityError [
-             Text "Cannot consume the variable";
+             Text "Cannot consume the variable ";
              Code (ident_string name);
-             Text "in the same expression as it is borrowed or accessed through a path."
+             Text " in the same expression as it is borrowed or accessed through a path."
            ]
      else
        austral_raise LinearityError [
-           Text "Trying to consume the variable";
+           Text "Trying to consume the variable ";
            Code (ident_string name);
-           Text "which is already";
-           Text (humanize_state (get_state tbl name))
+           Text " which is already ";
+           Text (humanize_state (get_state tbl name));
+           Text "."
          ]
   | Zero ->
      (* The variable is not consumed. *)
@@ -554,9 +558,9 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
       | MoreThanOne ->
          (* The variable is borrowed mutably more than once. Signal an error. *)
          austral_raise LinearityError [
-             Text "The variable";
+             Text "The variable ";
              Code (ident_string name);
-             Text "is borrowed mutably more than once within a single expression."
+             Text " is borrowed mutably more than once within a single expression."
            ]
       | One ->
          (* The variable was borrowed mutably once. Check that:
@@ -571,15 +575,15 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              (* Signal an error: cannot borrow mutably while also borrowing
                 immutably or reading through a path. *)
              austral_raise LinearityError [
-                 Text "The variable";
+                 Text "The variable ";
                  Code (ident_string name);
-                 Code "is borrowed mutably, while also being either read or read mutably."
+                 Code " is borrowed mutably, while also being either read or read mutably."
                ]
          else
            austral_raise LinearityError [
                Text "Trying to mutably borrow the variable ";
                Code (ident_string name);
-               Text "which is already consumed."
+               Text " which is already consumed."
              ]
       | Zero ->
          (* The variable is neither consumed nor mutably borrowed, so we can
@@ -592,10 +596,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              tbl
            else
              austral_raise LinearityError [
-                 Text "Trying to borrow the variable";
+                 Text "Trying to borrow the variable ";
                  Code (ident_string name);
-                 Text "as a read reference, but the variable is already";
-                 Text (humanize_state (get_state tbl name))
+                 Text " as a read reference, but the variable is already ";
+                 Text (humanize_state (get_state tbl name));
+                 Text "."
                ]
          else
            if path > 0 then
@@ -605,10 +610,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
                tbl
              else
                austral_raise LinearityError [
-                   Text "Trying to use the variable";
+                   Text "Trying to use the variable ";
                    Code (ident_string name);
-                   Text "as the head of a path, but the variable is already";
-                   Text (humanize_state (get_state tbl name))
+                   Text " as the head of a path, but the variable is already ";
+                   Text (humanize_state (get_state tbl name));
+                   Text "."
                  ]
            else
              (* The variable is not used in this expression. *)

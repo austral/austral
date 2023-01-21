@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    The variable `r` is used inconsistently in the branches of an if statement. In one branch it is consumed while in the other it is not yet consumed
+    The variable `r` is used inconsistently in the branches of an if statement. In one branch it is consumed while in the other it is not yet consumed.
   Code:
     [no span available]

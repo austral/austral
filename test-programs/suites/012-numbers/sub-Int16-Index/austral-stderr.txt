@@ -8,7 +8,7 @@ Error:
     From: line 5, column 8
     To: line 5, column 33
   Description:
-    Both operands to an arithmetic expression must be compatible types. The LHS has type `Int16` but the RHS has type `Index`
+    Both operands to an arithmetic expression must be compatible types. The LHS has type `Int16` but the RHS has type `Index`.
   Code:
     3 |         let a: Int16    := 10;
     4 |         let b: Index    := 20;

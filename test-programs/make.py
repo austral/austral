@@ -45,7 +45,7 @@ Error:
     From: line 5, column 8
     To: line 5, column 33
   Description:
-    Both operands to an arithmetic expression must be compatible types. The LHS has type `{a}` but the RHS has type `{b}`
+    Both operands to an arithmetic expression must be compatible types. The LHS has type `{a}` but the RHS has type `{b}`.
   Code:
     3 |         let a: {a: <8} := 10;
     4 |         let b: {b: <8} := 20;
