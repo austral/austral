@@ -200,3 +200,14 @@ and is_type_local (env: env) (mod_id: mod_id) (ty: ty): bool =
   | MonoTy _ ->
      (* Not applicable. *)
      false
+
+let check_disjoint_typarams (name: identifier) (typarams: typarams): unit =
+  match get_typaram typarams name with
+  | Some _ ->
+     austral_raise DeclarationError [
+         Text "The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is";
+         Code (ident_string name)
+       ]
+  | None ->
+     (* No collision *)
+     ()
