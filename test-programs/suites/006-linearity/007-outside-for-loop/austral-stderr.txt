@@ -1,10 +1,12 @@
 Error:
-  Title: Generic Error
+  Title: Linearity Error
   Module:
     Test
   Location:
     [no span available]
   Description:
-    Loop depth mismatch.
+    The variable `r` was defined outside a loop, but you're trying to consume it inside a loop. 
+    
+     This is not allowed because it could be consumed zero times or more than once.
   Code:
     [no span available]

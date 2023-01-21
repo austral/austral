@@ -519,7 +519,13 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
            let tbl = update_tbl tbl name Consumed in
            tbl
          else
-           err "Loop depth mismatch."
+           austral_raise LinearityError [
+               Text "The variable";
+               Code (ident_string name);
+               Text "was defined outside a loop, but you're trying to consume it inside a loop.";
+               Break;
+               Text "This is not allowed because it could be consumed zero times or more than once."
+             ]
        else
          err ("Cannot consume the variable `"
               ^ (ident_string name)
