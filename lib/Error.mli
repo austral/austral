@@ -57,7 +57,7 @@ val adorn_error_with_span : span -> (unit -> 'a) -> 'a
 (** Render an error kind to a title. *)
 val error_title : error_kind -> string
 
-(** Render an error to plain text. *)
+(** Render an error to plain text, for display to the terminal. *)
 val render_error_to_plain : austral_error -> string
 
 (** Utility: raise a generic error. *)
