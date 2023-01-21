@@ -592,7 +592,12 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
                (* Everything checks out. *)
                tbl
              else
-               err "Cannot use variable as the head of a path: state mismatch."
+               austral_raise LinearityError [
+                   Text "Trying to use the variable";
+                   Code (ident_string name);
+                   Text "as the head of a path, but the variable is already";
+                   Text (humanize_state (get_state tbl name))
+                 ]
            else
              (* The variable is not used in this expression. *)
              tbl)
