@@ -618,11 +618,51 @@ let decl_order = function
   | CFunctionDefinition _ ->
      7
 
+let rec slot_depth decls (slot: c_slot) =
+  match slot with
+  | CSlot (_, CNamedType name) -> name_depth name decls 
+  | CSlot (_, CStructType (CStruct (_,slots))) -> slots_depth slots decls 
+  | CSlot (_, CUnionType slots) -> slots_depth slots decls 
+  | _ -> 0
+and get_slots name decl =
+  match decl with
+  | CNamedStructDefinition (_, decl_name, slots) -> 
+      if name = decl_name then
+        Some slots
+      else
+        None
+  | _ -> None
+and name_depth name decls =
+  let slots =
+      match (List.filter_map (get_slots name) decls) with
+      | hd :: _ -> hd
+      | _ -> [] in 
+  slots_depth slots decls
+and slots_depth slots decls =
+  let deps = List.map (slot_depth decls) slots in
+  let dep_depth = List.fold_left max 0 deps in
+  let depth = 1 + dep_depth in
+  depth
+
+and decl_depth decl decls =
+  match decl with
+  | CNamedStructDefinition (_, _, slots) -> 
+     let depth = slots_depth slots decls in
+     depth
+  | _ -> 0
+
+let detail_compare decls a b =
+  match (a, b) with 
+  | (CNamedStructDefinition (_, _, s1), CNamedStructDefinition (_, _, s2)) ->
+    (slots_depth s1 decls) - (slots_depth s2 decls)
+  | _ ->
+    compare (decl_order a) (decl_order b)
+
 let gen_module (env: env) (MonoModule (name, decls)) =
   let type_decls = gen_type_decls decls
   and fun_decls = List.concat (gen_fun_decls name decls)
   and decls = List.concat (List.map (gen_decl env name) decls) in
   let decls = List.concat [type_decls; fun_decls; decls] in
-  let sorter a b = compare (decl_order a) (decl_order b) in
-  let sorted_decls = List.sort sorter decls in
+  let _ = List.map (fun x -> decl_depth x decls) decls in
+  let sorted_decls = List.sort (detail_compare decls) decls in
   CUnit (mod_name_string name, sorted_decls)
