@@ -9,7 +9,6 @@ let arglist_size = function
   | (TNamedArglist l) -> List.length l
 
 let rec arglist_to_positional (args, names): texpr list =
-  (* TODO: better error reporting *)
   let expected = List.length names
   and actual = arglist_size args
   in
