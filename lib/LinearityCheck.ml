@@ -532,9 +532,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
                Text "This is not allowed because it could be consumed zero times or more than once."
              ]
        else
-         err ("Cannot consume the variable `"
-              ^ (ident_string name)
-              ^ "` in the same expression as it is borrowed or accessed through a path.")
+         austral_raise LinearityError [
+             Text "Cannot consume the variable";
+             Code (ident_string name);
+             Text "in the same expression as it is borrowed or accessed through a path."
+           ]
      else
        err ("Trying to consume the variable `"
             ^ (ident_string name)
