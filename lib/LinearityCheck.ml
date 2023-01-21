@@ -75,7 +75,10 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
        in
        others
      else
-       err "Forgot to consume a linear variable."
+       austral_raise LinearityError [
+           Text "Forgot to consume a linear variable:";
+           Code (ident_string name)
+         ]
 
 let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   match names with
