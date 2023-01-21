@@ -1,0 +1,10 @@
+Error:
+  Title: Linearity Error
+  Module:
+    Test
+  Location:
+    [no span available]
+  Description:
+    The variable `r` is consumed more than once.
+  Code:
+    [no span available]

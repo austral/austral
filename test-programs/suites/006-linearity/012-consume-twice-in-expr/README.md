@@ -1,0 +1,1 @@
+Try consuming a linear variable twice in the same expression.
