@@ -467,10 +467,11 @@ and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
         else
           ()) common
   else
-    err ("Tables are inconsistent:\n\n"
-         ^ (show_state_tbl a)
-         ^ "\n\n"
-         ^ (show_state_tbl b))
+    (* I *think* this is an internal error. *)
+    internal_err ("Consumption state tables are inconsistent. This is likely a bug in the linearity checker. Table contents:\n\n"
+                  ^ (show_state_tbl a)
+                  ^ "\n\n"
+                  ^ (show_state_tbl b))
 
 and table_list_is_consistent (lst: state_tbl list): unit =
   match lst with
