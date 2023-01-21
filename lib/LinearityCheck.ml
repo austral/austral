@@ -43,15 +43,19 @@ let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl
   | None ->
      (name, depth, Unconsumed) :: tbl
   | Some _ ->
-     err "An entry exists in the state table with this name."
+     (* The justification for this being an internal error is that the compiler
+        should already have caught a duplicate variable. *)
+     internal_err "An entry exists in the state table with this name."
 
 let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl =
   match get_entry tbl name with
   | None ->
-     err ("Tried to update the state of the variable `"
-          ^ (ident_string name)
-          ^ "`, but no such variable exists in the state table. Table contents: \n\n"
-          ^ (show_state_tbl tbl))
+     (* The justification for this being an internal error is the compiler
+        should have caught a use of a variable that doesn't exist. *)
+     internal_err ("Tried to update the state of the variable `"
+                   ^ (ident_string name)
+                   ^ "`, but no such variable exists in the state table. Table contents: \n\n"
+                   ^ (show_state_tbl tbl))
   | Some (depth, _) ->
      let other_entries = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
      in
@@ -60,17 +64,21 @@ let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl
 let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
   match get_entry tbl name with
   | None ->
-     err ("Tried to update the state of the variable `"
-          ^ (ident_string name)
-          ^ "`, but no such variable exists in the state table. Table contents: \n\n"
-          ^ (show_state_tbl tbl))
+     (* Internal because it should have been caught by the compiler. *)
+     internal_err ("Tried to update the state of the variable `"
+                   ^ (ident_string name)
+                   ^ "`, but no such variable exists in the state table. Table contents: \n\n"
+                   ^ (show_state_tbl tbl))
   | Some (_, state) ->
      if state = Consumed then
        let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
        in
        others
      else
-       err "Forgot to consume a linear variable."
+       austral_raise LinearityError [
+           Text "Forgot to consume a linear variable:";
+           Code (ident_string name)
+         ]
 
 let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   match names with
@@ -326,7 +334,7 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      let tbl: state_tbl = check_expr tbl depth cond in
      let true_tbl: state_tbl = check_stmt tbl depth tb in
      let false_tbl: state_tbl = check_stmt tbl depth fb in
-     let _ = tables_are_consistent true_tbl false_tbl in
+     let _ = tables_are_consistent "an if" true_tbl false_tbl in
      true_tbl
   | TCase (_, expr, whens) ->
      let tbl: state_tbl = check_expr tbl depth expr in
@@ -363,7 +371,13 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
        let tbl: state_tbl = update_tbl tbl original Unconsumed in
        tbl
      else
-       err "Cannot borrow."
+       let state: var_state = get_state tbl original in
+       austral_raise LinearityError [
+           Text "Cannot borrow the variable";
+           Code (ident_string original);
+           Text "because it is already";
+           Text (humanize_state state)
+         ]
   | TBlock (_, a, b) ->
      let tbl: state_tbl = check_stmt tbl depth a in
      let tbl: state_tbl = check_stmt tbl depth b in
@@ -379,7 +393,11 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
            if state = Consumed then
              ()
            else
-             err ("Variable `" ^ (ident_string name) ^ "` not consumed at return statement."))
+             austral_raise LinearityError [
+                 Text "The variable";
+                 Code (ident_string name);
+                 Text "is not consumed by the time of the return statement. Did you forget to call a destructure, or destructure the contents?"
+               ])
          (tbl_to_list tbl)
      in
      tbl
@@ -420,7 +438,7 @@ and check_lvalue (tbl: state_tbl) (depth: loop_depth) (lvalue: typed_lvalue): st
   let _ = (depth, lvalue) in
   tbl
 
-and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
+and tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
   (* Tables should have the same set of variable names. *)
   let names_a: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list a)
   and names_b: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list b)
@@ -440,24 +458,29 @@ and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
     (* Ensure the states are the same. *)
     List.iter (fun (name, state_a, state_b) ->
         if state_a <> state_b then
-          err ("The variable `"
-               ^ (ident_string name)
-               ^ "` is used inconsistently. "
-               ^ (show_var_state state_a)
-               ^ " verse "
-               ^ (show_var_state state_b))
+          austral_raise LinearityError [
+              Text "The variable";
+              Code (ident_string name);
+              Text "is used inconsistently in the branches of";
+              Text stmt_name;
+              Text "statement. In one branch it is";
+              Text (humanize_state state_a);
+              Text "while in the other it is";
+              Text (humanize_state state_b)
+            ]
         else
           ()) common
   else
-    err ("Tables are inconsistent:\n\n"
-         ^ (show_state_tbl a)
-         ^ "\n\n"
-         ^ (show_state_tbl b))
+    (* I *think* this is an internal error. *)
+    internal_err ("Consumption state tables are inconsistent. This is likely a bug in the linearity checker. Table contents:\n\n"
+                  ^ (show_state_tbl a)
+                  ^ "\n\n"
+                  ^ (show_state_tbl b))
 
 and table_list_is_consistent (lst: state_tbl list): unit =
   match lst with
   | a::b::rest ->
-     let _ = tables_are_consistent a b in
+     let _ = tables_are_consistent "a case" a b in
      table_list_is_consistent rest
   | [a] ->
      let _ = a in
@@ -482,7 +505,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
   match partition consumed with
   | MoreThanOne ->
      (* The variable is consumed more than once: signal an error. *)
-     err ("The variable `" ^ (ident_string name) ^ "` is consumed more than once.")
+     austral_raise LinearityError [
+         Text "The variable";
+         Code (ident_string name);
+         Text "is consumed more than once."
+       ]
   | One ->
      (* The variable is consumed exactly once. Check that:
 
@@ -501,25 +528,36 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
            let tbl = update_tbl tbl name Consumed in
            tbl
          else
-           err "Loop depth mismatch."
+           austral_raise LinearityError [
+               Text "The variable";
+               Code (ident_string name);
+               Text "was defined outside a loop, but you're trying to consume it inside a loop.";
+               Break;
+               Text "This is not allowed because it could be consumed zero times or more than once."
+             ]
        else
-         err ("Cannot consume the variable `"
-              ^ (ident_string name)
-              ^ "` in the same expression as it is borrowed or accessed through a path.")
+         austral_raise LinearityError [
+             Text "Cannot consume the variable";
+             Code (ident_string name);
+             Text "in the same expression as it is borrowed or accessed through a path."
+           ]
      else
-       err ("Trying to consume the variable `"
-            ^ (ident_string name)
-            ^ "`, which is "
-            ^ (humanize_state (get_state tbl name))
-            ^ ".")
+       austral_raise LinearityError [
+           Text "Trying to consume the variable";
+           Code (ident_string name);
+           Text "which is already";
+           Text (humanize_state (get_state tbl name))
+         ]
   | Zero ->
      (* The variable is not consumed. *)
      (match partition write with
       | MoreThanOne ->
          (* The variable is borrowed mutably more than once. Signal an error. *)
-         err ("The variable `"
-              ^ (ident_string name)
-              ^ "` is borrowed mutably more than once within a single expression.")
+         austral_raise LinearityError [
+             Text "The variable";
+             Code (ident_string name);
+             Text "is borrowed mutably more than once within a single expression."
+           ]
       | One ->
          (* The variable was borrowed mutably once. Check that:
 
@@ -532,13 +570,17 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
            else
              (* Signal an error: cannot borrow mutably while also borrowing
                 immutably or reading through a path. *)
-           err ("The variable `"
-                ^ (ident_string name)
-                ^ "` is borrowed mutably while also borrowing immutably or reading.")
+             austral_raise LinearityError [
+                 Text "The variable";
+                 Code (ident_string name);
+                 Code "is borrowed mutably, while also being either read or read mutably."
+               ]
          else
-           err ("The variable `"
-                ^ (ident_string name)
-                ^ "` is already consumed.")
+           austral_raise LinearityError [
+               Text "Trying to mutably borrow the variable ";
+               Code (ident_string name);
+               Text "which is already consumed."
+             ]
       | Zero ->
          (* The variable is neither consumed nor mutably borrowed, so we can
             read it (borrow read-only or access through a path) iff it is
@@ -549,7 +591,12 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              (* Everything checks out. *)
              tbl
            else
-             err "Cannot borrow a variable: state mismatch."
+             austral_raise LinearityError [
+                 Text "Trying to borrow the variable";
+                 Code (ident_string name);
+                 Text "as a read reference, but the variable is already";
+                 Text (humanize_state (get_state tbl name))
+               ]
          else
            if path > 0 then
              (* If the variable is accessed through a path, ensure it is unconsumed. *)
@@ -557,7 +604,12 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
                (* Everything checks out. *)
                tbl
              else
-               err "Cannot use variable as the head of a path: state mismatch."
+               austral_raise LinearityError [
+                   Text "Trying to use the variable";
+                   Code (ident_string name);
+                   Text "as the head of a path, but the variable is already";
+                   Text (humanize_state (get_state tbl name))
+                 ]
            else
              (* The variable is not used in this expression. *)
              tbl)
