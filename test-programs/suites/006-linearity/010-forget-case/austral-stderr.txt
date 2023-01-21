@@ -1,5 +1,5 @@
 Error:
-  Title: Generic Error
+  Title: Linearity Error
   Module:
     Test
   Location:
