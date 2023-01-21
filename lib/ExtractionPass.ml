@@ -357,12 +357,12 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let rm = region_map_from_typarams typarams in
      let argument = parse' rm typarams argument in
      (* Find typeclass info. *)
-     let (typeclass_id, typeclass_mod_id, universe): decl_id * mod_id * universe =
+     let (typeclass_id, typeclass_mod_id, typeclass_param_name, universe): decl_id * mod_id * identifier * universe =
        match get_decl_by_name env (qident_to_sident name) with
        | Some decl ->
           (match decl with
            | TypeClass { id; mod_id; param; _ } ->
-              (id, mod_id, typaram_universe param)
+              (id, mod_id, typaram_name param, typaram_universe param)
            | _ ->
               err "Type class name refers to something that is not a type class.")
        | None ->
@@ -372,6 +372,9 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let _ = check_instance_argument_has_right_universe universe argument in
      (* Check the argument has the right shape. *)
      let _ = check_instance_argument_has_right_shape typarams argument in
+     (* Check that the non of the type parameters in the generic instance
+        collide with the type parameter of the typeclass. *)
+     let _ = check_disjoint_typarams typeclass_param_name typarams in
      (* Local uniqueness: does this instance collide with other instances in this module? *)
      let _ =
        let other_instances: decl list =

@@ -7,9 +7,9 @@ module body Example.GenericTypeclass is
         method To_Integer(x: T): Int32;
     end;
 
-    generic [T: Free]
-    instance Numerical(Address[T]) is
-        method To_Integer(x: Address[T]): Int32 is
+    generic [U: Free]
+    instance Numerical(Address[U]) is
+        method To_Integer(x: Address[U]): Int32 is
             return 0;
         end;
     end;

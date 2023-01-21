@@ -1,5 +1,6 @@
 (** This module implements the checking of various typeclass rules. *)
 open Id
+open Identifier
 open Type
 open TypeParameters
 open Env
@@ -46,3 +47,12 @@ val check_instance_locally_unique : decl list -> ty -> unit
         4. Foreign typeclass and foreign type = bad
 *)
 val check_instance_orphan_rules : env -> mod_id -> mod_id -> ty -> unit
+
+(** We don't allow any of the type parameters of a generic instance to have the
+    same name as the type parameter of the corresponding typeclass.
+
+  This is a hack to get around: https://github.com/austral/austral/issues/244
+
+  But this might, I suspect, become part of the language because it reduces
+  confusion. *)
+val check_disjoint_typarams : identifier -> typarams -> unit

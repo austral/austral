@@ -1,0 +1,13 @@
+Error:
+  Title: Declaration Error
+  Module:
+    Test
+  Location:
+    [no span available]
+  Description:
+    The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is `A` 
+    
+     This is, regrettably, a load-bearing hack for https://github.com/austral/austral/issues/244. Fixing this properly would require rewriting large parts of the frontend.
+  Code:
+    [no span available]
+

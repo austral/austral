@@ -3,10 +3,10 @@ module body Test is
         method foo(x: T): Unit;
     end;
 
-    generic [T: Type]
+    generic [U: Type]
     instance Foo(Nat8) is
-        generic [T: Type]
-        method foo(x: T): Unit is
+        generic [U: Type]
+        method foo(x: U): Unit is
             return nil;
         end;
     end;
