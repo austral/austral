@@ -1,7 +1,5 @@
 open Type
 open TypeVarSet
-open TypeParameters
-open Region
 open Error
 
 let type_universe = function
@@ -90,21 +88,6 @@ let rec type_variables = function
   | MonoTy _ ->
     TypeVarSet.empty
 
-let region_map_from_typarams (typarams: typarams): region_map =
-  let _ = typarams in
-  empty_region_map
-
-(* TODO: why does this not work? *)
-(*let region_map_from_typarams (typarams: typarams): region_map =
-  let folder (rm: region_map) (typaram: type_parameter): region_map =
-    let (TypeParameter (name, u, _)) = typaram in
-    if u = RegionUniverse then
-      add_region rm name (fresh_region name)
-    else
-      rm
-  in
-  List.fold_left folder empty_region_map (typarams_as_list typarams)
- *)
 let rec is_concrete = function
   | Unit -> true
   | Boolean -> true
