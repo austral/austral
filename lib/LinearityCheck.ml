@@ -64,10 +64,11 @@ let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl
 let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
   match get_entry tbl name with
   | None ->
-     err ("Tried to update the state of the variable `"
-          ^ (ident_string name)
-          ^ "`, but no such variable exists in the state table. Table contents: \n\n"
-          ^ (show_state_tbl tbl))
+     (* Internal because it should have been caught by the compiler. *)
+     internal_err ("Tried to update the state of the variable `"
+                   ^ (ident_string name)
+                   ^ "`, but no such variable exists in the state table. Table contents: \n\n"
+                   ^ (show_state_tbl tbl))
   | Some (_, state) ->
      if state = Consumed then
        let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
