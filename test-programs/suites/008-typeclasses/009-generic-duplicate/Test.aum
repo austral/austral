@@ -6,17 +6,17 @@ module body Test is
     record Bar[T: Type]: Type is
     end;
 
-    generic [T: Linear]
-    instance Foo(Bar[T]) is
-        method Accept(x: Bar[T]): Unit is
+    generic [U: Linear]
+    instance Foo(Bar[U]) is
+        method Accept(x: Bar[U]): Unit is
             let {} := x;
             return nil;
         end;
     end;
 
-    generic [T: Free]
-    instance Foo(Bar[T]) is
-        method Accept(x: Bar[T]): Unit is
+    generic [U: Free]
+    instance Foo(Bar[U]) is
+        method Accept(x: Bar[U]): Unit is
             return nil;
         end;
     end;

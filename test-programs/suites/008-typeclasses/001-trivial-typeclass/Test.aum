@@ -30,9 +30,9 @@ module body Test is
         end;
     end;
 
-    generic [T: Type, R: Region]
-    instance PrintFree(&[T, R]) is
-        method PrintF(x: &[T, R]): Unit is
+    generic [U: Type, R: Region]
+    instance PrintFree(&[U, R]) is
+        method PrintF(x: &[U, R]): Unit is
             Put_String("REF");
             return nil;
         end;
