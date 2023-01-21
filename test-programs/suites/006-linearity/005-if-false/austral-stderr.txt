@@ -1,10 +1,10 @@
 Error:
-  Title: Generic Error
+  Title: Linearity Error
   Module:
     Test
   Location:
     [no span available]
   Description:
-    The variable `r` is used inconsistently. LinearityCheck.Unconsumed verse LinearityCheck.Consumed
+    The variable `r` is used inconsistently in the branches of an if statement. In one branch it is not yet consumed while in the other it is consumed
   Code:
     [no span available]

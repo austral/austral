@@ -334,7 +334,7 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      let tbl: state_tbl = check_expr tbl depth cond in
      let true_tbl: state_tbl = check_stmt tbl depth tb in
      let false_tbl: state_tbl = check_stmt tbl depth fb in
-     let _ = tables_are_consistent true_tbl false_tbl in
+     let _ = tables_are_consistent "an if" true_tbl false_tbl in
      true_tbl
   | TCase (_, expr, whens) ->
      let tbl: state_tbl = check_expr tbl depth expr in
@@ -438,7 +438,7 @@ and check_lvalue (tbl: state_tbl) (depth: loop_depth) (lvalue: typed_lvalue): st
   let _ = (depth, lvalue) in
   tbl
 
-and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
+and tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
   (* Tables should have the same set of variable names. *)
   let names_a: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list a)
   and names_b: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list b)
@@ -458,12 +458,16 @@ and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
     (* Ensure the states are the same. *)
     List.iter (fun (name, state_a, state_b) ->
         if state_a <> state_b then
-          err ("The variable `"
-               ^ (ident_string name)
-               ^ "` is used inconsistently. "
-               ^ (show_var_state state_a)
-               ^ " verse "
-               ^ (show_var_state state_b))
+          austral_raise LinearityError [
+              Text "The variable";
+              Code (ident_string name);
+              Text "is used inconsistently in the branches of";
+              Text stmt_name;
+              Text "statement. In one branch it is";
+              Text (humanize_state state_a);
+              Text "while in the other it is";
+              Text (humanize_state state_b)
+            ]
         else
           ()) common
   else
@@ -476,7 +480,7 @@ and tables_are_consistent (a: state_tbl) (b: state_tbl): unit =
 and table_list_is_consistent (lst: state_tbl list): unit =
   match lst with
   | a::b::rest ->
-     let _ = tables_are_consistent a b in
+     let _ = tables_are_consistent "a case" a b in
      table_list_is_consistent rest
   | [a] ->
      let _ = a in

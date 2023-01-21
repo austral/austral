@@ -64,8 +64,11 @@ val check_expr : state_tbl -> loop_depth -> texpr -> state_tbl
 
     1. Both have the same set of variables.
 
-    2. The state of each variable is the same in both tables. *)
-val tables_are_consistent : state_tbl -> state_tbl -> unit
+    2. The state of each variable is the same in both tables.
+
+The first argument is the string to show in the error message describing what
+kind of statement this is, with the article, so either `an if` or `a case`. *)
+val tables_are_consistent : string -> state_tbl -> state_tbl -> unit
 
 (** Like {!tables_are_consistent} but for a list of tables. If the list is empty
     or the singleton list, does nothing. *)
