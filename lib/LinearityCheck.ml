@@ -502,7 +502,11 @@ and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
   match partition consumed with
   | MoreThanOne ->
      (* The variable is consumed more than once: signal an error. *)
-     err ("The variable `" ^ (ident_string name) ^ "` is consumed more than once.")
+     austral_raise LinearityError [
+         Text "The variable `";
+         Code (ident_string name);
+         Text "` is consumed more than once."
+       ]
   | One ->
      (* The variable is consumed exactly once. Check that:
 
