@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    Forgot to consume a linear variable.
+    Forgot to consume a linear variable: `value`
   Code:
     [no span available]
