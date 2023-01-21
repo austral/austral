@@ -393,7 +393,11 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
            if state = Consumed then
              ()
            else
-             err ("Variable `" ^ (ident_string name) ^ "` not consumed at return statement."))
+             austral_raise LinearityError [
+                 Text "The variable";
+                 Code (ident_string name);
+                 Text "is not consumed by the time of the return statement. Did you forget to call a destructure, or destructure the contents?"
+               ])
          (tbl_to_list tbl)
      in
      tbl
