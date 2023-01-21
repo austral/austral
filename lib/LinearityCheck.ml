@@ -50,6 +50,8 @@ let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl
 let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl =
   match get_entry tbl name with
   | None ->
+     (* The justification for this being an internal error is the compiler
+        should have caught a use of a variable that doesn't exist. *)
      internal_err ("Tried to update the state of the variable `"
                    ^ (ident_string name)
                    ^ "`, but no such variable exists in the state table. Table contents: \n\n"
