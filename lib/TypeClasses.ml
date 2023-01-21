@@ -206,7 +206,9 @@ let check_disjoint_typarams (name: identifier) (typarams: typarams): unit =
   | Some _ ->
      austral_raise DeclarationError [
          Text "The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is";
-         Code (ident_string name)
+         Code (ident_string name);
+         Break;
+         Text "This is, regrettably, a load-bearing hack for https://github.com/austral/austral/issues/244. Fixing this properly would require rewriting large parts of the frontend."
        ]
   | None ->
      (* No collision *)
