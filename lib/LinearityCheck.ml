@@ -244,7 +244,33 @@ and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
   | TArrayIndex (e, _) ->
      count name e
 
-(* Linearity checking *)
+(* Utilities *)
+
+let get_state (tbl: state_tbl) (name: identifier): var_state =
+  let (_, state) = get_entry_or_fail tbl name in
+  state
+
+let get_loop_depth (tbl: state_tbl) (name: identifier): loop_depth =
+  let (depth, _) = get_entry_or_fail tbl name in
+  depth
+
+let is_unconsumed (tbl: state_tbl) (name: identifier): bool =
+  let state = get_state tbl name in
+  match state with
+  | Unconsumed -> true
+  | _ -> false
+
+let universe_linear_ish = function
+  | LinearUniverse -> true
+  | TypeUniverse -> true
+  | _ -> false
+
+let humanize_state (state: var_state): string =
+  match state with
+  | Unconsumed -> "not yet consumed"
+  | BorrowedRead -> "borrowed (read-only)"
+  | BorrowedWrite -> "borrowed (read-write)"
+  | Consumed -> "consumed"
 
 type partitions =
   | Zero
@@ -263,18 +289,193 @@ let partition (n: int): partitions =
       else
         internal_err "Impossible"
 
-let rec linearity_check (params: value_parameter list) (body: tstmt): unit =
-  (* Initialize the loop depth to zero, *)
-  let depth: int = 0 in
-  (* Initialize the state table to the empty table. *)
-  let tbl: state_tbl = empty_tbl in
-  (* Populate the table with the linear parameters. *)
-  let tbl: state_tbl = init_tbl tbl params in
-  (* Traverse the code in execution order. *)
-  let _ = check_stmt tbl depth body in
-  ()
+(* Table consistency *)
 
-and init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
+let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
+  (* Tables should have the same set of variable names. *)
+  let names_a: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list a)
+  and names_b: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list b)
+  in
+  if List.equal equal_identifier names_a names_b then
+    (* Make a list of triples with the variable name, its state in A, and its
+       state in B. *)
+    let common: (identifier * var_state * var_state) list =
+      List.filter_map (fun (name, _, state_a) ->
+          match get_entry b name with
+          | Some (_, state_b) ->
+             Some (name, state_a, state_b)
+          | None ->
+             None)
+        (tbl_to_list a)
+    in
+    (* Ensure the states are the same. *)
+    List.iter (fun (name, state_a, state_b) ->
+        if state_a <> state_b then
+          austral_raise LinearityError [
+              Text "The variable ";
+              Code (ident_string name);
+              Text " is used inconsistently in the branches of ";
+              Text stmt_name;
+              Text " statement. In one branch it is ";
+              Text (humanize_state state_a);
+              Text " while in the other it is ";
+              Text (humanize_state state_b);
+              Text "."
+            ]
+        else
+          ()) common
+  else
+    (* I *think* this is an internal error. *)
+    internal_err ("Consumption state tables are inconsistent. This is likely a bug in the linearity checker. Table contents:\n\n"
+                  ^ (show_state_tbl a)
+                  ^ "\n\n"
+                  ^ (show_state_tbl b))
+
+let rec table_list_is_consistent (lst: state_tbl list): unit =
+  match lst with
+  | a::b::rest ->
+     let _ = tables_are_consistent "a case" a b in
+     table_list_is_consistent rest
+  | [a] ->
+     let _ = a in
+     ()
+  | [] ->
+     ()
+
+(* Linearity checking in expressions *)
+
+let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
+  (* Count the appearances of the variable in the expression. *)
+  let apps: appearances = count name expr in
+  let { consumed: int; read: int; write: int; path: int } = apps in
+  (* Perform the checks *)
+  match partition consumed with
+  | MoreThanOne ->
+     (* The variable is consumed more than once: signal an error. *)
+     austral_raise LinearityError [
+         Text "The variable ";
+         Code (ident_string name);
+         Text " is consumed more than once."
+       ]
+  | One ->
+     (* The variable is consumed exactly once. Check that:
+
+        1. x is Unconsumed.
+
+        2. `read`, `write`, and `path` are zero.
+
+        3. the current loop depth is the same as the depth where the
+        variable is defined.
+
+      *)
+     if (is_unconsumed tbl name) then
+       if ((read = 0) && (path = 0)) then
+         if depth = (get_loop_depth tbl name) then
+           (* Everything checks out. Mark the variable as consumed. *)
+           let tbl = update_tbl tbl name Consumed in
+           tbl
+         else
+           austral_raise LinearityError [
+               Text "The variable ";
+               Code (ident_string name);
+               Text " was defined outside a loop, but you're trying to consume it inside a loop.";
+               Break;
+               Text "This is not allowed because it could be consumed zero times or more than once."
+             ]
+       else
+         austral_raise LinearityError [
+             Text "Cannot consume the variable ";
+             Code (ident_string name);
+             Text " in the same expression as it is borrowed or accessed through a path."
+           ]
+     else
+       austral_raise LinearityError [
+           Text "Trying to consume the variable ";
+           Code (ident_string name);
+           Text " which is already ";
+           Text (humanize_state (get_state tbl name));
+           Text "."
+         ]
+  | Zero ->
+     (* The variable is not consumed. *)
+     (match partition write with
+      | MoreThanOne ->
+         (* The variable is borrowed mutably more than once. Signal an error. *)
+         austral_raise LinearityError [
+             Text "The variable ";
+             Code (ident_string name);
+             Text " is borrowed mutably more than once within a single expression."
+           ]
+      | One ->
+         (* The variable was borrowed mutably once. Check that:
+
+            1. It is unconsumed.
+            2. `read`, `path` are zero. *)
+         if is_unconsumed tbl name then
+           if ((read = 0) && (path = 0)) then
+             (* Everything checks out. *)
+             tbl
+           else
+             (* Signal an error: cannot borrow mutably while also borrowing
+                immutably or reading through a path. *)
+             austral_raise LinearityError [
+                 Text "The variable ";
+                 Code (ident_string name);
+                 Code " is borrowed mutably, while also being either read or read mutably."
+               ]
+         else
+           austral_raise LinearityError [
+               Text "Trying to mutably borrow the variable ";
+               Code (ident_string name);
+               Text " which is already consumed."
+             ]
+      | Zero ->
+         (* The variable is neither consumed nor mutably borrowed, so we can
+            read it (borrow read-only or access through a path) iff it is
+            unconsumed. *)
+         if read > 0 then
+           (* If the variable is borrowed read-only, ensure it is unconsumed. *)
+           if is_unconsumed tbl name then
+             (* Everything checks out. *)
+             tbl
+           else
+             austral_raise LinearityError [
+                 Text "Trying to borrow the variable ";
+                 Code (ident_string name);
+                 Text " as a read reference, but the variable is already ";
+                 Text (humanize_state (get_state tbl name));
+                 Text "."
+               ]
+         else
+           if path > 0 then
+             (* If the variable is accessed through a path, ensure it is unconsumed. *)
+             if is_unconsumed tbl name then
+               (* Everything checks out. *)
+               tbl
+             else
+               austral_raise LinearityError [
+                   Text "Trying to use the variable ";
+                   Code (ident_string name);
+                   Text " as the head of a path, but the variable is already ";
+                   Text (humanize_state (get_state tbl name));
+                   Text "."
+                 ]
+           else
+             (* The variable is not used in this expression. *)
+             tbl)
+
+let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
+  (* For each variable in the table, check if the variable is used correctly in
+     the expression. *)
+  let names: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list tbl) in
+  let f (tbl: state_tbl) (name: identifier): state_tbl =
+    check_var_in_expr tbl depth name expr
+  in
+  Util.iter_with_context f tbl names
+
+(* Linearity checking *)
+
+let init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
   let f (tbl: state_tbl) (ValueParameter (name, ty)): state_tbl =
     if universe_linear_ish (type_universe ty) then
       (* Add this parameter to the list at depth zero. *)
@@ -284,7 +485,7 @@ and init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
   in
   Util.iter_with_context f tbl params
 
-and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
+let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
   match stmt with
   | TSkip _ ->
      tbl
@@ -438,211 +639,16 @@ and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl
   let tbl: state_tbl = remove_entries tbl linear_names in
   tbl
 
-and tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
-  (* Tables should have the same set of variable names. *)
-  let names_a: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list a)
-  and names_b: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list b)
-  in
-  if List.equal equal_identifier names_a names_b then
-    (* Make a list of triples with the variable name, its state in A, and its
-       state in B. *)
-    let common: (identifier * var_state * var_state) list =
-      List.filter_map (fun (name, _, state_a) ->
-          match get_entry b name with
-          | Some (_, state_b) ->
-             Some (name, state_a, state_b)
-          | None ->
-             None)
-        (tbl_to_list a)
-    in
-    (* Ensure the states are the same. *)
-    List.iter (fun (name, state_a, state_b) ->
-        if state_a <> state_b then
-          austral_raise LinearityError [
-              Text "The variable ";
-              Code (ident_string name);
-              Text " is used inconsistently in the branches of ";
-              Text stmt_name;
-              Text " statement. In one branch it is ";
-              Text (humanize_state state_a);
-              Text " while in the other it is ";
-              Text (humanize_state state_b);
-              Text "."
-            ]
-        else
-          ()) common
-  else
-    (* I *think* this is an internal error. *)
-    internal_err ("Consumption state tables are inconsistent. This is likely a bug in the linearity checker. Table contents:\n\n"
-                  ^ (show_state_tbl a)
-                  ^ "\n\n"
-                  ^ (show_state_tbl b))
-
-and table_list_is_consistent (lst: state_tbl list): unit =
-  match lst with
-  | a::b::rest ->
-     let _ = tables_are_consistent "a case" a b in
-     table_list_is_consistent rest
-  | [a] ->
-     let _ = a in
-     ()
-  | [] ->
-     ()
-
-and check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
-  (* For each variable in the table, check if the variable is used correctly in
-     the expression. *)
-  let names: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list tbl) in
-  let f (tbl: state_tbl) (name: identifier): state_tbl =
-    check_var_in_expr tbl depth name expr
-  in
-  Util.iter_with_context f tbl names
-
-and check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
-  (* Count the appearances of the variable in the expression. *)
-  let apps: appearances = count name expr in
-  let { consumed: int; read: int; write: int; path: int } = apps in
-  (* Perform the checks *)
-  match partition consumed with
-  | MoreThanOne ->
-     (* The variable is consumed more than once: signal an error. *)
-     austral_raise LinearityError [
-         Text "The variable ";
-         Code (ident_string name);
-         Text " is consumed more than once."
-       ]
-  | One ->
-     (* The variable is consumed exactly once. Check that:
-
-        1. x is Unconsumed.
-
-        2. `read`, `write`, and `path` are zero.
-
-        3. the current loop depth is the same as the depth where the
-        variable is defined.
-
-      *)
-     if (is_unconsumed tbl name) then
-       if ((read = 0) && (path = 0)) then
-         if depth = (get_loop_depth tbl name) then
-           (* Everything checks out. Mark the variable as consumed. *)
-           let tbl = update_tbl tbl name Consumed in
-           tbl
-         else
-           austral_raise LinearityError [
-               Text "The variable ";
-               Code (ident_string name);
-               Text " was defined outside a loop, but you're trying to consume it inside a loop.";
-               Break;
-               Text "This is not allowed because it could be consumed zero times or more than once."
-             ]
-       else
-         austral_raise LinearityError [
-             Text "Cannot consume the variable ";
-             Code (ident_string name);
-             Text " in the same expression as it is borrowed or accessed through a path."
-           ]
-     else
-       austral_raise LinearityError [
-           Text "Trying to consume the variable ";
-           Code (ident_string name);
-           Text " which is already ";
-           Text (humanize_state (get_state tbl name));
-           Text "."
-         ]
-  | Zero ->
-     (* The variable is not consumed. *)
-     (match partition write with
-      | MoreThanOne ->
-         (* The variable is borrowed mutably more than once. Signal an error. *)
-         austral_raise LinearityError [
-             Text "The variable ";
-             Code (ident_string name);
-             Text " is borrowed mutably more than once within a single expression."
-           ]
-      | One ->
-         (* The variable was borrowed mutably once. Check that:
-
-            1. It is unconsumed.
-            2. `read`, `path` are zero. *)
-         if is_unconsumed tbl name then
-           if ((read = 0) && (path = 0)) then
-             (* Everything checks out. *)
-             tbl
-           else
-             (* Signal an error: cannot borrow mutably while also borrowing
-                immutably or reading through a path. *)
-             austral_raise LinearityError [
-                 Text "The variable ";
-                 Code (ident_string name);
-                 Code " is borrowed mutably, while also being either read or read mutably."
-               ]
-         else
-           austral_raise LinearityError [
-               Text "Trying to mutably borrow the variable ";
-               Code (ident_string name);
-               Text " which is already consumed."
-             ]
-      | Zero ->
-         (* The variable is neither consumed nor mutably borrowed, so we can
-            read it (borrow read-only or access through a path) iff it is
-            unconsumed. *)
-         if read > 0 then
-           (* If the variable is borrowed read-only, ensure it is unconsumed. *)
-           if is_unconsumed tbl name then
-             (* Everything checks out. *)
-             tbl
-           else
-             austral_raise LinearityError [
-                 Text "Trying to borrow the variable ";
-                 Code (ident_string name);
-                 Text " as a read reference, but the variable is already ";
-                 Text (humanize_state (get_state tbl name));
-                 Text "."
-               ]
-         else
-           if path > 0 then
-             (* If the variable is accessed through a path, ensure it is unconsumed. *)
-             if is_unconsumed tbl name then
-               (* Everything checks out. *)
-               tbl
-             else
-               austral_raise LinearityError [
-                   Text "Trying to use the variable ";
-                   Code (ident_string name);
-                   Text " as the head of a path, but the variable is already ";
-                   Text (humanize_state (get_state tbl name));
-                   Text "."
-                 ]
-           else
-             (* The variable is not used in this expression. *)
-             tbl)
-
-and get_state (tbl: state_tbl) (name: identifier): var_state =
-  let (_, state) = get_entry_or_fail tbl name in
-  state
-
-and get_loop_depth (tbl: state_tbl) (name: identifier): loop_depth =
-  let (depth, _) = get_entry_or_fail tbl name in
-  depth
-
-and is_unconsumed (tbl: state_tbl) (name: identifier): bool =
-  let state = get_state tbl name in
-  match state with
-  | Unconsumed -> true
-  | _ -> false
-
-and universe_linear_ish = function
-  | LinearUniverse -> true
-  | TypeUniverse -> true
-  | _ -> false
-
-and humanize_state (state: var_state): string =
-  match state with
-  | Unconsumed -> "not yet consumed"
-  | BorrowedRead -> "borrowed (read-only)"
-  | BorrowedWrite -> "borrowed (read-write)"
-  | Consumed -> "consumed"
+let linearity_check (params: value_parameter list) (body: tstmt): unit =
+  (* Initialize the loop depth to zero, *)
+  let depth: int = 0 in
+  (* Initialize the state table to the empty table. *)
+  let tbl: state_tbl = empty_tbl in
+  (* Populate the table with the linear parameters. *)
+  let tbl: state_tbl = init_tbl tbl params in
+  (* Traverse the code in execution order. *)
+  let _ = check_stmt tbl depth body in
+  ()
 
 (* Linearity checking of whole modules *)
 
