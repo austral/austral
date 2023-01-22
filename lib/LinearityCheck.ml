@@ -347,7 +347,7 @@ let rec table_list_is_consistent (lst: state_tbl list): unit =
 
 (* Linearity checking in expressions *)
 
-let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (read: int) (path: int): state_tbl =
+let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (read: int) (write: int) (path: int): state_tbl =
   (* The variable is consumed exactly once. Check that:
 
      1. x is Unconsumed.
@@ -370,7 +370,7 @@ let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier)
   and _ =
     (* If the variable is being read or accessed through a path in this expression, we can't also consume it. Signal an error.
 *)
-    if ((read <> 0) || (path <> 0)) then
+    if ((read <> 0) || (write <> 0) || (path <> 0)) then
       austral_raise LinearityError [
           Text "Cannot consume the variable ";
           Code (ident_string name);
@@ -409,7 +409,7 @@ let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
        ]
   | One ->
      (* Handle the case where the variable is consumed once. *)
-     handle_consumed_once tbl depth name read path
+     handle_consumed_once tbl depth name read write path
   | Zero ->
      (* The variable is not consumed. *)
      (match partition write with
