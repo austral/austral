@@ -12,14 +12,6 @@ import subprocess
 # The `test-programs/` directory.
 DIR: str = "test-programs/"
 
-#
-# Utilities
-#
-
-
-def indent(text: str) -> str:
-    return "\n".join(["\t" + line for line in text.split("\n")])
-
 
 #
 # Error Reporting
@@ -36,9 +28,9 @@ def report(properties, outputs):
     for (name, value) in properties:
         print(f"{name}: {value}")
     for (name, value) in outputs:
-        print(f"\t--- BEGIN {name} ---")
-        print(indent(value))
-        print(f"\t--- END {name} ---\n")
+        print(f"--- BEGIN {name} ---")
+        print(value)
+        print(f"--- END {name} ---\n")
     print("--- END ERROR ---")
     exit(-1)
 
