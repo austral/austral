@@ -214,3 +214,16 @@ au_array_t au_get_nth_arg(size_t n) {
   au_array_t arg_array = ((au_array_t){ .data = (void*)arg, .size = size });
   return arg_array;
 }
+
+au_unit_t au_swap(void* a, void* b, size_t size) {
+  char* c = a;
+  char* d = b;
+  char* e = c + size;
+  while (c < e) {
+    char t = *c;
+    *c = *d;
+    *d = t;
+    c++;
+    d++;
+  }
+}
