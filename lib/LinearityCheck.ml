@@ -394,6 +394,74 @@ let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier)
   let tbl = update_tbl tbl name Consumed in
   tbl
 
+let handle_consumed_zero (tbl: state_tbl) (name: identifier) (read: int) (write: int) (path: int): state_tbl =
+  (* The variable is not consumed. *)
+  match partition write with
+  | MoreThanOne ->
+     (* The variable is borrowed mutably more than once. Signal an error. *)
+     austral_raise LinearityError [
+         Text "The variable ";
+         Code (ident_string name);
+         Text " is borrowed mutably more than once within a single expression."
+       ]
+  | One ->
+     (* The variable was borrowed mutably once. Check that:
+
+        1. It is unconsumed.
+        2. `read`, `path` are zero. *)
+     if is_unconsumed tbl name then
+       if ((read = 0) && (path = 0)) then
+         (* Everything checks out. *)
+         tbl
+       else
+         (* Signal an error: cannot borrow mutably while also borrowing
+            immutably or reading through a path. *)
+         austral_raise LinearityError [
+             Text "The variable ";
+             Code (ident_string name);
+             Code " is borrowed mutably, while also being either read or read mutably."
+           ]
+     else
+       austral_raise LinearityError [
+           Text "Trying to mutably borrow the variable ";
+           Code (ident_string name);
+           Text " which is already consumed."
+         ]
+  | Zero ->
+     (* The variable is neither consumed nor mutably borrowed, so we can
+        read it (borrow read-only or access through a path) iff it is
+        unconsumed. *)
+     if read > 0 then
+       (* If the variable is borrowed read-only, ensure it is unconsumed. *)
+       if is_unconsumed tbl name then
+         (* Everything checks out. *)
+         tbl
+       else
+         austral_raise LinearityError [
+             Text "Trying to borrow the variable ";
+             Code (ident_string name);
+             Text " as a read reference, but the variable is already ";
+             Text (humanize_state (get_state tbl name));
+             Text "."
+           ]
+     else
+       if path > 0 then
+         (* If the variable is accessed through a path, ensure it is unconsumed. *)
+         if is_unconsumed tbl name then
+           (* Everything checks out. *)
+           tbl
+         else
+           austral_raise LinearityError [
+               Text "Trying to use the variable ";
+               Code (ident_string name);
+               Text " as the head of a path, but the variable is already ";
+               Text (humanize_state (get_state tbl name));
+               Text "."
+             ]
+       else
+         (* The variable is not used in this expression. *)
+         tbl
+
 let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
@@ -411,72 +479,8 @@ let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
      (* Handle the case where the variable is consumed once. *)
      handle_consumed_once tbl depth name read write path
   | Zero ->
-     (* The variable is not consumed. *)
-     (match partition write with
-      | MoreThanOne ->
-         (* The variable is borrowed mutably more than once. Signal an error. *)
-         austral_raise LinearityError [
-             Text "The variable ";
-             Code (ident_string name);
-             Text " is borrowed mutably more than once within a single expression."
-           ]
-      | One ->
-         (* The variable was borrowed mutably once. Check that:
-
-            1. It is unconsumed.
-            2. `read`, `path` are zero. *)
-         if is_unconsumed tbl name then
-           if ((read = 0) && (path = 0)) then
-             (* Everything checks out. *)
-             tbl
-           else
-             (* Signal an error: cannot borrow mutably while also borrowing
-                immutably or reading through a path. *)
-             austral_raise LinearityError [
-                 Text "The variable ";
-                 Code (ident_string name);
-                 Code " is borrowed mutably, while also being either read or read mutably."
-               ]
-         else
-           austral_raise LinearityError [
-               Text "Trying to mutably borrow the variable ";
-               Code (ident_string name);
-               Text " which is already consumed."
-             ]
-      | Zero ->
-         (* The variable is neither consumed nor mutably borrowed, so we can
-            read it (borrow read-only or access through a path) iff it is
-            unconsumed. *)
-         if read > 0 then
-           (* If the variable is borrowed read-only, ensure it is unconsumed. *)
-           if is_unconsumed tbl name then
-             (* Everything checks out. *)
-             tbl
-           else
-             austral_raise LinearityError [
-                 Text "Trying to borrow the variable ";
-                 Code (ident_string name);
-                 Text " as a read reference, but the variable is already ";
-                 Text (humanize_state (get_state tbl name));
-                 Text "."
-               ]
-         else
-           if path > 0 then
-             (* If the variable is accessed through a path, ensure it is unconsumed. *)
-             if is_unconsumed tbl name then
-               (* Everything checks out. *)
-               tbl
-             else
-               austral_raise LinearityError [
-                   Text "Trying to use the variable ";
-                   Code (ident_string name);
-                   Text " as the head of a path, but the variable is already ";
-                   Text (humanize_state (get_state tbl name));
-                   Text "."
-                 ]
-           else
-             (* The variable is not used in this expression. *)
-             tbl)
+     (* Handle the case where the variable is consumed zero times. *)
+     handle_consumed_zero tbl name read write path
 
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
