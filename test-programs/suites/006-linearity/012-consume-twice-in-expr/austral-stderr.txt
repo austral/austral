@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    The variable `r` is consumed more than once.
+    The variable `r` is consumed multiple times within the same expression.
   Code:
     [no span available]
