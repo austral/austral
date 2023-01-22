@@ -459,16 +459,6 @@ let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
 
 (* Linearity checking *)
 
-let init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
-  let f (tbl: state_tbl) (ValueParameter (name, ty)): state_tbl =
-    if universe_linear_ish (type_universe ty) then
-      (* Add this parameter to the list at depth zero. *)
-      add_entry tbl name 0
-    else
-      tbl
-  in
-  Util.iter_with_context f tbl params
-
 let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
   match stmt with
   | TSkip _ ->
@@ -622,6 +612,16 @@ and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl
   (* Once we leave the scope, remove the linear variables we added. *)
   let tbl: state_tbl = remove_entries tbl linear_names in
   tbl
+
+let init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
+  let f (tbl: state_tbl) (ValueParameter (name, ty)): state_tbl =
+    if universe_linear_ish (type_universe ty) then
+      (* Add this parameter to the list at depth zero. *)
+      add_entry tbl name 0
+    else
+      tbl
+  in
+  Util.iter_with_context f tbl params
 
 let linearity_check (params: value_parameter list) (body: tstmt): unit =
   (* Initialize the loop depth to zero. *)
