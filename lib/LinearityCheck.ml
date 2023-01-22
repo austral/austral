@@ -364,8 +364,8 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
      error_borrowed_mutably_and_used name
   | (     Unconsumed,         Zero,  MoreThanOne,           _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
      error_borrowed_mutably_more_than_once name
-  | (     Unconsumed,          One,         Zero,        Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. *)
-     consume_once tbl name
+  | (     Unconsumed,          One,         Zero,        Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid IF the loop depth matches. *)
+     consume_once tbl depth name
   | (     Unconsumed,          One,            _,           _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
      error_consumed_and_something_else name
   | (     Unconsumed,  MoreThanOne,            _,           _,           _) -> (* Not yet consumed, consumed more than once. *)
@@ -383,29 +383,70 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
   | (       Consumed,            _,            _,           _,           _) -> (* Already consumed, and used in some way. *)
      error_already_consumed name
 
-and consume_once (tbl: state_tbl) (name: identifier): state_tbl =
-   err "Derp"
+and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier): state_tbl =
+   if depth = get_loop_depth tbl name then
+      update_tbl tbl name Consumed
+   else
+      austral_raise LinearityError [
+         Text "The variable ";
+         Code (ident_string name);
+         Text " was defined outside a loop, but you're trying to consume it inside a loop.";
+         Break;
+         Text "This is not allowed because it could be consumed zero times or more than once."
+       ]
 
 and error_borrowed_mutably_and_used (name: identifier) =
-   err "Derp"
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code " is borrowed mutably, while also being either borrowed or used through a path.";
+      Break;
+      Text "Mutable borrows cannot appear in the same expression where the variable is used elsewhere."
+   ]
 
 and error_borrowed_mutably_more_than_once (name: identifier) =
-   err "Derp"
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code " is borrowed mutably multiple times in the same expression."
+   ]
 
 and error_consumed_and_something_else (name: identifier) =
-   err "Derp"
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code " is consumed in the same expression where it is used in some other way.";
+      Break;
+      Text "A linear variable cannot appear multiple times in the expression that consumes it.";
+   ]
 
 and error_consumed_more_than_once (name: identifier) =
-   err "Derp"
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code " is consumed multiple times within the same expression.";
+   ]
 
 and error_read_borrowed_and_something_else (name: identifier) =
-   err "Derp"
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code " cannot be consumed or borrowed again while it is borrowed (immutably).";
+   ]
 
 and error_write_borrowed_and_something_else (name: identifier) =
-   err "Derp"
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code "cannot be used in any way while it is vorrowed (mutably).";
+   ]
 
 and error_already_consumed (name: identifier) =
-   err "Derp"
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code "has already been consumed.";
+   ]
 
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
