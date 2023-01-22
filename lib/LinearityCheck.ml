@@ -327,8 +327,11 @@ and check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl =
      (* Once we leave the scope, remove the linear variables we added. *)
      let tbl: state_tbl = remove_entries tbl linear_names in
      tbl
-  | TAssign (_, lvalue, expr) ->
-     let tbl: state_tbl = check_lvalue tbl depth lvalue in
+  | TAssign (_, _, expr) ->
+     (* Linear values can't be consumed in an L-value, because the only place
+        where they could appear is as the index value to an array indexing
+        operator (e.g. `[foo(x)]`) and that wouldn't typecheck in the first
+        place. *)
      let tbl: state_tbl = check_expr tbl depth expr in
      tbl
   | TIf (_, cond, tb, fb) ->
@@ -433,11 +436,6 @@ and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl
   let tbl: state_tbl = check_stmt tbl depth body in
   (* Once we leave the scope, remove the linear variables we added. *)
   let tbl: state_tbl = remove_entries tbl linear_names in
-  tbl
-
-and check_lvalue (tbl: state_tbl) (depth: loop_depth) (lvalue: typed_lvalue): state_tbl =
-  (* TODO: lvalue semantics should be better defined. *)
-  let _ = (depth, lvalue) in
   tbl
 
 and tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
