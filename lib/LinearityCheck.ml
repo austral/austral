@@ -260,9 +260,6 @@ let is_unconsumed (tbl: state_tbl) (name: identifier): bool =
   | Unconsumed -> true
   | _ -> false
 
-let is_consumed  (tbl: state_tbl) (name: identifier): bool =
-  not (is_unconsumed tbl name)
-
 let universe_linear_ish = function
   | LinearUniverse -> true
   | TypeUniverse -> true
@@ -347,144 +344,18 @@ let rec table_list_is_consistent (lst: state_tbl list): unit =
 
 (* Linearity checking in expressions *)
 
-let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (read: int) (write: int) (path: int): state_tbl =
-  (* The variable is consumed exactly once. Check that:
-
-     1. The variable is `Unconsumed.`
-
-     2. `read`, `write`, and `path` are zero.
-
-     3. The current loop depth is the same as the depth where the variable is
-        defined. *)
-  let _ =
-    (* If the variable is already consumed, signal an error. *)
-    if is_consumed tbl name then
-      austral_raise LinearityError [
-          Text "Trying to consume the variable ";
-          Code (ident_string name);
-          Text " which is already ";
-          Text (humanize_state (get_state tbl name));
-          Text "."
-        ]
-    else ()
-  and _ =
-    (* If the variable is being read or accessed through a path in this
-       expression, we can't also consume it. Signal an error. *)
-    if ((read <> 0) || (write <> 0) || (path <> 0)) then
-      austral_raise LinearityError [
-          Text "Cannot consume the variable ";
-          Code (ident_string name);
-          Text " in the same expression as it is borrowed or accessed through a path."
-        ]
-    else ()
-  and _ =
-    (* If the current loop depth is not the same as the loop depth where the
-       variable was defined, signal an error. *)
-    if depth <> (get_loop_depth tbl name) then
-      austral_raise LinearityError [
-          Text "The variable ";
-          Code (ident_string name);
-          Text " was defined outside a loop, but you're trying to consume it inside a loop.";
-          Break;
-          Text "This is not allowed because it could be consumed zero times or more than once."
-        ]
-    else ()
-  in
-  (* Everything checks out. Mark the variable as consumed. *)
-  let tbl = update_tbl tbl name Consumed in
-  tbl
-
-let handle_consumed_zero (tbl: state_tbl) (name: identifier) (read: int) (write: int) (path: int): state_tbl =
-  (* The variable is consumed zero times. *)
-  match partition write with
-  | MoreThanOne ->
-     (* The variable is borrowed mutably more than once. Signal an error. *)
-     austral_raise LinearityError [
-         Text "The variable ";
-         Code (ident_string name);
-         Text " is borrowed mutably more than once within a single expression."
-       ]
-  | One ->
-     (* The variable was borrowed mutably once. Check that:
-
-        1. It is unconsumed.
-        2. `read`, `path` are zero. *)
-     let _ =
-       if is_consumed tbl name then
-         austral_raise LinearityError [
-             Text "Trying to mutably borrow the variable ";
-             Code (ident_string name);
-             Text " which is already consumed."
-           ]
-       else
-         ()
-     and _ =
-       if ((read <> 0) || (path <> 0)) then
-         (* Signal an error: cannot borrow mutably while also borrowing
-            immutably or reading through a path. *)
-         austral_raise LinearityError [
-             Text "The variable ";
-             Code (ident_string name);
-             Code " is borrowed mutably, while also being either read or read mutably."
-           ]
-       else ()
-     in
-     (* Everything checks out. *)
-     tbl
-  | Zero ->
-     (* The variable is neither consumed nor mutably borrowed, so we can
-        read it (borrow read-only or access through a path) iff it is
-        unconsumed. *)
-     if read > 0 then
-       (* If the variable is borrowed read-only, ensure it is unconsumed. *)
-       if is_unconsumed tbl name then
-         (* Everything checks out. *)
-         tbl
-       else
-         austral_raise LinearityError [
-             Text "Trying to borrow the variable ";
-             Code (ident_string name);
-             Text " as a read reference, but the variable is already ";
-             Text (humanize_state (get_state tbl name));
-             Text "."
-           ]
-     else
-       if path > 0 then
-         (* If the variable is accessed through a path, ensure it is unconsumed. *)
-         if is_unconsumed tbl name then
-           (* Everything checks out. *)
-           tbl
-         else
-           austral_raise LinearityError [
-               Text "Trying to use the variable ";
-               Code (ident_string name);
-               Text " as the head of a path, but the variable is already ";
-               Text (humanize_state (get_state tbl name));
-               Text "."
-             ]
-       else
-         (* The variable is not used in this expression. *)
-         tbl
-
 let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
-  let { consumed: int; read: int; write: int; path: int } = apps in
-  (* Perform the checks *)
-  match partition consumed with
-  | MoreThanOne ->
-     (* The variable is consumed more than once: signal an error. *)
-     austral_raise LinearityError [
-         Text "The variable ";
-         Code (ident_string name);
-         Text " is consumed more than once."
-       ]
-  | One ->
-     (* Handle the case where the variable is consumed once. *)
-     handle_consumed_once tbl depth name read write path
-  | Zero ->
-     (* Handle the case where the variable is consumed zero times. *)
-     handle_consumed_zero tbl name read write path
+  (* Destructure apps. *)
+  let { consumed: int; write: int; read: int; path: int } = apps in
+  (* What is the current state of this variable? *)
+  let state: var_state = get_state tbl name in
+  (* Make a tuple with the variable's state, and the partitioned appearances. *)
+  let tup = (state, partition consumed, partition write, partition read, partition path) in
+  | ( Unconsumed,        Zero,        Zero,        Zero,        Zero) ->
+  | _ ->
+     err "Derp"
 
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
