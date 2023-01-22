@@ -368,8 +368,8 @@ let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier)
         ]
     else ()
   and _ =
-    (* If the variable is being read or accessed through a path in this expression, we can't also consume it. Signal an error.
-*)
+    (* If the variable is being read or accessed through a path in this
+       expression, we can't also consume it. Signal an error. *)
     if ((read <> 0) || (write <> 0) || (path <> 0)) then
       austral_raise LinearityError [
           Text "Cannot consume the variable ";
