@@ -344,7 +344,7 @@ let rec table_list_is_consistent (lst: state_tbl list): unit =
 
 (* Linearity checking in expressions *)
 
-let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
+let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
   (* Destructure apps. *)
@@ -353,9 +353,59 @@ let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
   let state: var_state = get_state tbl name in
   (* Make a tuple with the variable's state, and the partitioned appearances. *)
   let tup = (state, partition consumed, partition write, partition read, partition path) in
-  | ( Unconsumed,        Zero,        Zero,        Zero,        Zero) ->
-  | _ ->
-     err "Derp"
+  match tup with
+  (*       State        Consumed      WBorrow       RBorrow      Path    *)
+  (* ---------------|-------------|-------------|------------|---------- *)
+  | (     Unconsumed,         Zero,         Zero,           _,           _) -> (* Not yet consumed, and at most used through immutable borrows or path reads. *)
+     tbl
+  | (     Unconsumed,         Zero,          One,        Zero,        Zero) -> (* Not yet consumed, borrowed mutably once, and nothing else. *)
+     tbl
+  | (     Unconsumed,         Zero,          One,           _,           _) -> (* Not yet consumed, borrowed mutably, then either borrowed immutably or accessed through a path. *)
+     error_borrowed_mutably_and_used name
+  | (     Unconsumed,         Zero,  MoreThanOne,           _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
+     error_borrowed_mutably_more_than_once name
+  | (     Unconsumed,          One,         Zero,        Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. *)
+     consume_once tbl name
+  | (     Unconsumed,          One,            _,           _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
+     error_consumed_and_something_else name
+  | (     Unconsumed,  MoreThanOne,            _,           _,           _) -> (* Not yet consumed, consumed more than once. *)
+     error_consumed_more_than_once name
+  | (   BorrowedRead,         Zero,         Zero,        Zero,           _) -> (* Read borrowed, and at most accessed through a path. *)
+     tbl
+  | (   BorrowedRead,            _,            _,           _,           _) -> (* Read borrowed, and either consumed or borrowed again. *)
+     error_read_borrowed_and_something_else name
+  | (  BorrowedWrite,         Zero,         Zero,        Zero,        Zero) -> (* Write borrowed, unused. *)
+     tbl
+  | (  BorrowedWrite,            _,            _,           _,           _) -> (* Write borrowed, used in some way. *)
+     error_write_borrowed_and_something_else name
+  | (       Consumed,         Zero,         Zero,        Zero,        Zero) -> (* Already consumed, and unused. *)
+     tbl
+  | (       Consumed,            _,            _,           _,           _) -> (* Already consumed, and used in some way. *)
+     error_already_consumed name
+
+and consume_once (tbl: state_tbl) (name: identifier): state_tbl =
+   err "Derp"
+
+and error_borrowed_mutably_and_used (name: identifier) =
+   err "Derp"
+
+and error_borrowed_mutably_more_than_once (name: identifier) =
+   err "Derp"
+
+and error_consumed_and_something_else (name: identifier) =
+   err "Derp"
+
+and error_consumed_more_than_once (name: identifier) =
+   err "Derp"
+
+and error_read_borrowed_and_something_else (name: identifier) =
+   err "Derp"
+
+and error_write_borrowed_and_something_else (name: identifier) =
+   err "Derp"
+
+and error_already_consumed (name: identifier) =
+   err "Derp"
 
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
