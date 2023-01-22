@@ -1,0 +1,16 @@
+Error:
+  Title: Type Error
+  Module:
+    Test
+  Location:
+    Filename: 'test-programs/suites/005-fixed-string/003-assign/Test.aum'
+    From: line 4, column 8
+    To: line 4, column 20
+  Description:
+    The array index operator doesn't work in lvalues.
+  Code:
+    2 |     function main(): ExitCode is
+    3 |         let s: FixedArray[Nat8] := "Hello, world!";
+    4 |         s[0] := 'J';
+    5 |         return ExitSuccess();
+    6 |     end;

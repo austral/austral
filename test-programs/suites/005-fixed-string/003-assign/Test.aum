@@ -1,0 +1,7 @@
+module body Test is
+    function main(): ExitCode is
+        let s: FixedArray[Nat8] := "Hello, world!";
+        s[0] := 'J';
+        return ExitSuccess();
+    end;
+end module body.

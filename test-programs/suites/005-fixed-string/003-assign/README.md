@@ -1,0 +1,1 @@
+Test we can't assign to a fixed array.
