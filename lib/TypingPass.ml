@@ -955,7 +955,11 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      else
                        err "L-values must end in the free universe")
               | None ->
-                 err "No var with this name."))
+                 austral_raise GenericError [
+                     Text "I can't find a variable named ";
+                     Code (ident_string var);
+                     Text "."
+           ]))
       | AIf (span, c, t, f) ->
          adorn_error_with_span span
            (fun _ ->
