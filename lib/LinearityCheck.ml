@@ -399,7 +399,7 @@ and error_borrowed_mutably_and_used (name: identifier) =
    austral_raise LinearityError [
       Text "The variable ";
       Code (ident_string name);
-      Code " is borrowed mutably, while also being either borrowed or used through a path.";
+      Text " is borrowed mutably, while also being either borrowed or used through a path.";
       Break;
       Text "Mutable borrows cannot appear in the same expression where the variable is used elsewhere."
    ]
@@ -424,28 +424,28 @@ and error_consumed_more_than_once (name: identifier) =
    austral_raise LinearityError [
       Text "The variable ";
       Code (ident_string name);
-      Code " is consumed multiple times within the same expression.";
+      Text " is consumed multiple times within the same expression.";
    ]
 
 and error_read_borrowed_and_something_else (name: identifier) =
    austral_raise LinearityError [
       Text "The variable ";
       Code (ident_string name);
-      Code " cannot be consumed or borrowed again while it is borrowed (immutably).";
+      Text " cannot be consumed or borrowed again while it is borrowed (immutably).";
    ]
 
 and error_write_borrowed_and_something_else (name: identifier) =
    austral_raise LinearityError [
       Text "The variable ";
       Code (ident_string name);
-      Code "cannot be used in any way while it is vorrowed (mutably).";
+      Text "cannot be used in any way while it is vorrowed (mutably).";
    ]
 
 and error_already_consumed (name: identifier) =
    austral_raise LinearityError [
       Text "The variable ";
       Code (ident_string name);
-      Code "has already been consumed.";
+      Text " has already been consumed.";
    ]
 
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
