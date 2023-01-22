@@ -409,23 +409,26 @@ let handle_consumed_zero (tbl: state_tbl) (name: identifier) (read: int) (write:
 
         1. It is unconsumed.
         2. `read`, `path` are zero. *)
-     if is_unconsumed tbl name then
-       if ((read = 0) && (path = 0)) then
-         (* Everything checks out. *)
-         tbl
-       else
-         (* Signal an error: cannot borrow mutably while also borrowing
-            immutably or reading through a path. *)
+     let _ =
+       if is_consumed tbl name then
          austral_raise LinearityError [
-             Text "The variable ";
+             Text "Trying to mutably borrow the variable ";
              Code (ident_string name);
-             Code " is borrowed mutably, while also being either read or read mutably."
+             Text " which is already consumed."
            ]
+       else
+         ()
+     in
+     if ((read = 0) && (path = 0)) then
+       (* Everything checks out. *)
+       tbl
      else
+       (* Signal an error: cannot borrow mutably while also borrowing
+          immutably or reading through a path. *)
        austral_raise LinearityError [
-           Text "Trying to mutably borrow the variable ";
+           Text "The variable ";
            Code (ident_string name);
-           Text " which is already consumed."
+           Code " is borrowed mutably, while also being either read or read mutably."
          ]
   | Zero ->
      (* The variable is neither consumed nor mutably borrowed, so we can
