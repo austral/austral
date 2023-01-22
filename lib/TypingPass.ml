@@ -1116,14 +1116,9 @@ and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_m
      let ie' = augment_expr module_name env rm typarams lexenv None ie in
      let _ = ie' in
      (match head_ty with
-      | WriteRef (ref_ty, _) ->
-         (match ref_ty with
-          | _ ->
-             err ("Can't index this type: " ^ (type_string ref_ty)))
       | _ ->
          austral_raise TypeError [
-             Text "The array index operator doesn't work for this type: ";
-             Code (type_string head_ty);
+             Text "The array index operator doesn't work in lvalues."
            ])
 
 
