@@ -624,7 +624,7 @@ and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl
   tbl
 
 let linearity_check (params: value_parameter list) (body: tstmt): unit =
-  (* Initialize the loop depth to zero, *)
+  (* Initialize the loop depth to zero. *)
   let depth: int = 0 in
   (* Initialize the state table to the empty table. *)
   let tbl: state_tbl = empty_tbl in
