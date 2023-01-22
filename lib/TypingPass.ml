@@ -380,7 +380,10 @@ and augment_path_elem (env: env) (module_name: module_name) (rm: region_map) (ty
       | StaticArray elem_ty ->
          TArrayIndex (ie', elem_ty)
       | _ ->
-         err "Array index operator doesn't work for this type.")
+         austral_raise TypeError [
+             Text "The array indexing operator doesn't work for this type: ";
+             Code (type_string head_ty);
+     ])
 
 and augment_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
   (* Check: e' is a public record type *)
