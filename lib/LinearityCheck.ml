@@ -347,6 +347,53 @@ let rec table_list_is_consistent (lst: state_tbl list): unit =
 
 (* Linearity checking in expressions *)
 
+let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (read: int) (path: int): state_tbl =
+  (* The variable is consumed exactly once. Check that:
+
+     1. x is Unconsumed.
+
+     2. `read`, `write`, and `path` are zero.
+
+     3. the current loop depth is the same as the depth where the
+     variable is defined. *)
+  let _ =
+    (* If the variable is already consumed, signal an error. *)
+    if is_consumed tbl name then
+      austral_raise LinearityError [
+          Text "Trying to consume the variable ";
+          Code (ident_string name);
+          Text " which is already ";
+          Text (humanize_state (get_state tbl name));
+          Text "."
+        ]
+    else ()
+  and _ =
+    (* If the variable is being read or accessed through a path in this expression, we can't also consume it. Signal an error.
+*)
+    if ((read <> 0) || (path <> 0)) then
+      austral_raise LinearityError [
+          Text "Cannot consume the variable ";
+          Code (ident_string name);
+          Text " in the same expression as it is borrowed or accessed through a path."
+        ]
+    else ()
+  and _ =
+    (* If the current loop depth is not the same as the loop depth where the
+       variable was defined, signal an error. *)
+    if depth <> (get_loop_depth tbl name) then
+      austral_raise LinearityError [
+          Text "The variable ";
+          Code (ident_string name);
+          Text " was defined outside a loop, but you're trying to consume it inside a loop.";
+          Break;
+          Text "This is not allowed because it could be consumed zero times or more than once."
+        ]
+    else ()
+  in
+  (* Everything checks out. Mark the variable as consumed. *)
+  let tbl = update_tbl tbl name Consumed in
+  tbl
+
 let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
@@ -361,48 +408,8 @@ let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
          Text " is consumed more than once."
        ]
   | One ->
-     (* The variable is consumed exactly once. Check that:
-
-        1. x is Unconsumed.
-
-        2. `read`, `write`, and `path` are zero.
-
-        3. the current loop depth is the same as the depth where the
-        variable is defined.
-
-      *)
-     let _ =
-       if is_consumed tbl name then
-         austral_raise LinearityError [
-             Text "Trying to consume the variable ";
-             Code (ident_string name);
-             Text " which is already ";
-             Text (humanize_state (get_state tbl name));
-             Text "."
-           ]
-       else ()
-     and _ =
-       if ((read <> 0) || (path <> 0)) then
-         austral_raise LinearityError [
-             Text "Cannot consume the variable ";
-             Code (ident_string name);
-             Text " in the same expression as it is borrowed or accessed through a path."
-           ]
-       else ()
-     and _ =
-       if depth <> (get_loop_depth tbl name) then
-         austral_raise LinearityError [
-             Text "The variable ";
-             Code (ident_string name);
-             Text " was defined outside a loop, but you're trying to consume it inside a loop.";
-             Break;
-             Text "This is not allowed because it could be consumed zero times or more than once."
-           ]
-       else ()
-     in
-     (* Everything checks out. Mark the variable as consumed. *)
-     let tbl = update_tbl tbl name Consumed in
-     tbl
+     (* Handle the case where the variable is consumed once. *)
+     handle_consumed_once tbl depth name read path
   | Zero ->
      (* The variable is not consumed. *)
      (match partition write with
