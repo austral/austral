@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    Trying to consume the variable `value` which is already consumed.
+    The variable `value` has already been consumed.
   Code:
     [no span available]

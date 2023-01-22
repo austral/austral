@@ -260,9 +260,6 @@ let is_unconsumed (tbl: state_tbl) (name: identifier): bool =
   | Unconsumed -> true
   | _ -> false
 
-let is_consumed  (tbl: state_tbl) (name: identifier): bool =
-  not (is_unconsumed tbl name)
-
 let universe_linear_ish = function
   | LinearUniverse -> true
   | TypeUniverse -> true
@@ -347,144 +344,109 @@ let rec table_list_is_consistent (lst: state_tbl list): unit =
 
 (* Linearity checking in expressions *)
 
-let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (read: int) (write: int) (path: int): state_tbl =
-  (* The variable is consumed exactly once. Check that:
-
-     1. The variable is `Unconsumed.`
-
-     2. `read`, `write`, and `path` are zero.
-
-     3. The current loop depth is the same as the depth where the variable is
-        defined. *)
-  let _ =
-    (* If the variable is already consumed, signal an error. *)
-    if is_consumed tbl name then
-      austral_raise LinearityError [
-          Text "Trying to consume the variable ";
-          Code (ident_string name);
-          Text " which is already ";
-          Text (humanize_state (get_state tbl name));
-          Text "."
-        ]
-    else ()
-  and _ =
-    (* If the variable is being read or accessed through a path in this
-       expression, we can't also consume it. Signal an error. *)
-    if ((read <> 0) || (write <> 0) || (path <> 0)) then
-      austral_raise LinearityError [
-          Text "Cannot consume the variable ";
-          Code (ident_string name);
-          Text " in the same expression as it is borrowed or accessed through a path."
-        ]
-    else ()
-  and _ =
-    (* If the current loop depth is not the same as the loop depth where the
-       variable was defined, signal an error. *)
-    if depth <> (get_loop_depth tbl name) then
-      austral_raise LinearityError [
-          Text "The variable ";
-          Code (ident_string name);
-          Text " was defined outside a loop, but you're trying to consume it inside a loop.";
-          Break;
-          Text "This is not allowed because it could be consumed zero times or more than once."
-        ]
-    else ()
-  in
-  (* Everything checks out. Mark the variable as consumed. *)
-  let tbl = update_tbl tbl name Consumed in
-  tbl
-
-let handle_consumed_zero (tbl: state_tbl) (name: identifier) (read: int) (write: int) (path: int): state_tbl =
-  (* The variable is consumed zero times. *)
-  match partition write with
-  | MoreThanOne ->
-     (* The variable is borrowed mutably more than once. Signal an error. *)
-     austral_raise LinearityError [
-         Text "The variable ";
-         Code (ident_string name);
-         Text " is borrowed mutably more than once within a single expression."
-       ]
-  | One ->
-     (* The variable was borrowed mutably once. Check that:
-
-        1. It is unconsumed.
-        2. `read`, `path` are zero. *)
-     let _ =
-       if is_consumed tbl name then
-         austral_raise LinearityError [
-             Text "Trying to mutably borrow the variable ";
-             Code (ident_string name);
-             Text " which is already consumed."
-           ]
-       else
-         ()
-     and _ =
-       if ((read <> 0) || (path <> 0)) then
-         (* Signal an error: cannot borrow mutably while also borrowing
-            immutably or reading through a path. *)
-         austral_raise LinearityError [
-             Text "The variable ";
-             Code (ident_string name);
-             Code " is borrowed mutably, while also being either read or read mutably."
-           ]
-       else ()
-     in
-     (* Everything checks out. *)
-     tbl
-  | Zero ->
-     (* The variable is neither consumed nor mutably borrowed, so we can
-        read it (borrow read-only or access through a path) iff it is
-        unconsumed. *)
-     if read > 0 then
-       (* If the variable is borrowed read-only, ensure it is unconsumed. *)
-       if is_unconsumed tbl name then
-         (* Everything checks out. *)
-         tbl
-       else
-         austral_raise LinearityError [
-             Text "Trying to borrow the variable ";
-             Code (ident_string name);
-             Text " as a read reference, but the variable is already ";
-             Text (humanize_state (get_state tbl name));
-             Text "."
-           ]
-     else
-       if path > 0 then
-         (* If the variable is accessed through a path, ensure it is unconsumed. *)
-         if is_unconsumed tbl name then
-           (* Everything checks out. *)
-           tbl
-         else
-           austral_raise LinearityError [
-               Text "Trying to use the variable ";
-               Code (ident_string name);
-               Text " as the head of a path, but the variable is already ";
-               Text (humanize_state (get_state tbl name));
-               Text "."
-             ]
-       else
-         (* The variable is not used in this expression. *)
-         tbl
-
-let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
+let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
-  let { consumed: int; read: int; write: int; path: int } = apps in
-  (* Perform the checks *)
-  match partition consumed with
-  | MoreThanOne ->
-     (* The variable is consumed more than once: signal an error. *)
-     austral_raise LinearityError [
+  (* Destructure apps. *)
+  let { consumed: int; write: int; read: int; path: int } = apps in
+  (* What is the current state of this variable? *)
+  let state: var_state = get_state tbl name in
+  (* Make a tuple with the variable's state, and the partitioned appearances. *)
+  let tup = (state, partition consumed, partition write, partition read, partition path) in
+  match tup with
+  (*       State        Consumed      WBorrow       RBorrow      Path    *)
+  (* ---------------|-------------|-------------|------------|---------- *)
+  | (     Unconsumed,         Zero,         Zero,           _,           _) -> (* Not yet consumed, and at most used through immutable borrows or path reads. *)
+     tbl
+  | (     Unconsumed,         Zero,          One,        Zero,        Zero) -> (* Not yet consumed, borrowed mutably once, and nothing else. *)
+     tbl
+  | (     Unconsumed,         Zero,          One,           _,           _) -> (* Not yet consumed, borrowed mutably, then either borrowed immutably or accessed through a path. *)
+     error_borrowed_mutably_and_used name
+  | (     Unconsumed,         Zero,  MoreThanOne,           _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
+     error_borrowed_mutably_more_than_once name
+  | (     Unconsumed,          One,         Zero,        Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid IF the loop depth matches. *)
+     consume_once tbl depth name
+  | (     Unconsumed,          One,            _,           _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
+     error_consumed_and_something_else name
+  | (     Unconsumed,  MoreThanOne,            _,           _,           _) -> (* Not yet consumed, consumed more than once. *)
+     error_consumed_more_than_once name
+  | (   BorrowedRead,         Zero,         Zero,        Zero,           _) -> (* Read borrowed, and at most accessed through a path. *)
+     tbl
+  | (   BorrowedRead,            _,            _,           _,           _) -> (* Read borrowed, and either consumed or borrowed again. *)
+     error_read_borrowed_and_something_else name
+  | (  BorrowedWrite,         Zero,         Zero,        Zero,        Zero) -> (* Write borrowed, unused. *)
+     tbl
+  | (  BorrowedWrite,            _,            _,           _,           _) -> (* Write borrowed, used in some way. *)
+     error_write_borrowed_and_something_else name
+  | (       Consumed,         Zero,         Zero,        Zero,        Zero) -> (* Already consumed, and unused. *)
+     tbl
+  | (       Consumed,            _,            _,           _,           _) -> (* Already consumed, and used in some way. *)
+     error_already_consumed name
+
+and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier): state_tbl =
+   if depth = get_loop_depth tbl name then
+      update_tbl tbl name Consumed
+   else
+      austral_raise LinearityError [
          Text "The variable ";
          Code (ident_string name);
-         Text " is consumed more than once."
+         Text " was defined outside a loop, but you're trying to consume it inside a loop.";
+         Break;
+         Text "This is not allowed because it could be consumed zero times or more than once."
        ]
-  | One ->
-     (* Handle the case where the variable is consumed once. *)
-     handle_consumed_once tbl depth name read write path
-  | Zero ->
-     (* Handle the case where the variable is consumed zero times. *)
-     handle_consumed_zero tbl name read write path
+
+and error_borrowed_mutably_and_used (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Text " is borrowed mutably, while also being either borrowed or used through a path.";
+      Break;
+      Text "Mutable borrows cannot appear in the same expression where the variable is used elsewhere."
+   ]
+
+and error_borrowed_mutably_more_than_once (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code " is borrowed mutably multiple times in the same expression."
+   ]
+
+and error_consumed_and_something_else (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Code " is consumed in the same expression where it is used in some other way.";
+      Break;
+      Text "A linear variable cannot appear multiple times in the expression that consumes it.";
+   ]
+
+and error_consumed_more_than_once (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Text " is consumed multiple times within the same expression.";
+   ]
+
+and error_read_borrowed_and_something_else (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Text " cannot be consumed or borrowed again while it is borrowed (immutably).";
+   ]
+
+and error_write_borrowed_and_something_else (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Text "cannot be used in any way while it is vorrowed (mutably).";
+   ]
+
+and error_already_consumed (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Text " has already been consumed.";
+   ]
 
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
