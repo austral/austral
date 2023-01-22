@@ -380,15 +380,17 @@ let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              Text (humanize_state (get_state tbl name));
              Text "."
            ]
-       else
-         ()
-     in
-     if ((read = 0) && (path = 0)) then
-       if depth = (get_loop_depth tbl name) then
-         (* Everything checks out. Mark the variable as consumed. *)
-         let tbl = update_tbl tbl name Consumed in
-         tbl
-       else
+       else ()
+     and _ =
+       if ((read <> 0) && (path <> 0)) then
+         austral_raise LinearityError [
+             Text "Cannot consume the variable ";
+             Code (ident_string name);
+             Text " in the same expression as it is borrowed or accessed through a path."
+           ]
+       else ()
+     and _ =
+       if depth <> (get_loop_depth tbl name) then
          austral_raise LinearityError [
              Text "The variable ";
              Code (ident_string name);
@@ -396,12 +398,11 @@ let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
              Break;
              Text "This is not allowed because it could be consumed zero times or more than once."
            ]
-     else
-       austral_raise LinearityError [
-           Text "Cannot consume the variable ";
-           Code (ident_string name);
-           Text " in the same expression as it is borrowed or accessed through a path."
-         ]
+       else ()
+     in
+     (* Everything checks out. Mark the variable as consumed. *)
+     let tbl = update_tbl tbl name Consumed in
+     tbl
   | Zero ->
      (* The variable is not consumed. *)
      (match partition write with
