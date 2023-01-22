@@ -395,7 +395,7 @@ let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier)
   tbl
 
 let handle_consumed_zero (tbl: state_tbl) (name: identifier) (read: int) (write: int) (path: int): state_tbl =
-  (* The variable is not consumed. *)
+  (* The variable is consumed zero times. *)
   match partition write with
   | MoreThanOne ->
      (* The variable is borrowed mutably more than once. Signal an error. *)
