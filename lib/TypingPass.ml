@@ -1121,7 +1121,10 @@ and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_m
           | _ ->
              err ("Can't index this type: " ^ (type_string ref_ty)))
       | _ ->
-         err "Array index operator doesn't work for this type.")
+         austral_raise TypeError [
+             Text "The array index operator doesn't work for this type: ";
+             Code (type_string head_ty);
+           ])
 
 
 and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty): (ty * decl list) =
