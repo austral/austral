@@ -1,0 +1,1 @@
+Test that we can't assign to a constant.

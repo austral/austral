@@ -1,0 +1,8 @@
+module body Test is
+    constant pi: Float64 := 3.14;
+
+    function main(): ExitCode is
+        pi := 3.0;
+        return ExitSuccess();
+    end;
+end module body.

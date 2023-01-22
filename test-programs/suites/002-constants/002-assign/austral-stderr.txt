@@ -1,0 +1,16 @@
+Error:
+  Title: Generic Error
+  Module:
+    Test
+  Location:
+    Filename: 'test-programs/suites/002-constants/002-assign/Test.aum'
+    From: line 5, column 8
+    To: line 5, column 18
+  Description:
+    I can't find a variable named `pi`.
+  Code:
+    3 | 
+    4 |     function main(): ExitCode is
+    5 |         pi := 3.0;
+    6 |         return ExitSuccess();
+    7 |     end;
