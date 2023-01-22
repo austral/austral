@@ -382,7 +382,7 @@ let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
            ]
        else ()
      and _ =
-       if ((read <> 0) && (path <> 0)) then
+       if ((read <> 0) || (path <> 0)) then
          austral_raise LinearityError [
              Text "Cannot consume the variable ";
              Code (ident_string name);
