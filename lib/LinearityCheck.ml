@@ -260,6 +260,9 @@ let is_unconsumed (tbl: state_tbl) (name: identifier): bool =
   | Unconsumed -> true
   | _ -> false
 
+let is_consumed  (tbl: state_tbl) (name: identifier): bool =
+  not (is_unconsumed tbl name)
+
 let universe_linear_ish = function
   | LinearUniverse -> true
   | TypeUniverse -> true
@@ -368,33 +371,36 @@ let check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (e
         variable is defined.
 
       *)
-     if (is_unconsumed tbl name) then
-       if ((read = 0) && (path = 0)) then
-         if depth = (get_loop_depth tbl name) then
-           (* Everything checks out. Mark the variable as consumed. *)
-           let tbl = update_tbl tbl name Consumed in
-           tbl
-         else
-           austral_raise LinearityError [
-               Text "The variable ";
-               Code (ident_string name);
-               Text " was defined outside a loop, but you're trying to consume it inside a loop.";
-               Break;
-               Text "This is not allowed because it could be consumed zero times or more than once."
-             ]
+     let _ =
+       if is_consumed tbl name then
+         austral_raise LinearityError [
+             Text "Trying to consume the variable ";
+             Code (ident_string name);
+             Text " which is already ";
+             Text (humanize_state (get_state tbl name));
+             Text "."
+           ]
+       else
+         ()
+     in
+     if ((read = 0) && (path = 0)) then
+       if depth = (get_loop_depth tbl name) then
+         (* Everything checks out. Mark the variable as consumed. *)
+         let tbl = update_tbl tbl name Consumed in
+         tbl
        else
          austral_raise LinearityError [
-             Text "Cannot consume the variable ";
+             Text "The variable ";
              Code (ident_string name);
-             Text " in the same expression as it is borrowed or accessed through a path."
+             Text " was defined outside a loop, but you're trying to consume it inside a loop.";
+             Break;
+             Text "This is not allowed because it could be consumed zero times or more than once."
            ]
      else
        austral_raise LinearityError [
-           Text "Trying to consume the variable ";
+           Text "Cannot consume the variable ";
            Code (ident_string name);
-           Text " which is already ";
-           Text (humanize_state (get_state tbl name));
-           Text "."
+           Text " in the same expression as it is borrowed or accessed through a path."
          ]
   | Zero ->
      (* The variable is not consumed. *)
