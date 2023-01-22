@@ -350,12 +350,12 @@ let rec table_list_is_consistent (lst: state_tbl list): unit =
 let handle_consumed_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (read: int) (write: int) (path: int): state_tbl =
   (* The variable is consumed exactly once. Check that:
 
-     1. x is Unconsumed.
+     1. The variable is `Unconsumed.`
 
      2. `read`, `write`, and `path` are zero.
 
-     3. the current loop depth is the same as the depth where the
-     variable is defined. *)
+     3. The current loop depth is the same as the depth where the variable is
+        defined. *)
   let _ =
     (* If the variable is already consumed, signal an error. *)
     if is_consumed tbl name then
