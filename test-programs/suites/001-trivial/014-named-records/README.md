@@ -1,0 +1,1 @@
+Test of that records referencing each other can compile

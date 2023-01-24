@@ -1,0 +1,21 @@
+module body Test is
+
+    record PollMap: Linear is
+        b: B;
+    end;
+
+    record C[X: Type]: Type is
+       x : X;
+    end;
+
+    record B: Linear is
+        xs: C[Nat32];
+    end;
+    
+    function main(): ExitCode is
+        printLn("Start");
+        -- if it compiles, then this test is a success
+        printLn("End");
+        return ExitSuccess();
+    end;
+end module body.
