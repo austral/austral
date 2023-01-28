@@ -624,6 +624,7 @@ let rec slot_depth decls (slot: c_slot) =
   | CSlot (_, CStructType (CStruct (_,slots))) -> slots_depth slots decls
   | CSlot (_, CUnionType slots) -> slots_depth slots decls
   | _ -> 0
+
 and get_slots name decl =
   match decl with
   | CNamedStructDefinition (_, decl_name, slots) ->
@@ -632,12 +633,14 @@ and get_slots name decl =
       else
         None
   | _ -> None
+
 and name_depth name decls =
   let slots =
       match (List.filter_map (get_slots name) decls) with
       | hd :: _ -> hd
       | _ -> [] in
   slots_depth slots decls
+
 and slots_depth slots decls =
   let deps = List.map (slot_depth decls) slots in
   let dep_depth = List.fold_left max 0 deps in
