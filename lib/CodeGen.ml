@@ -620,13 +620,13 @@ let decl_order = function
 
 let rec slot_depth decls (slot: c_slot) =
   match slot with
-  | CSlot (_, CNamedType name) -> name_depth name decls 
-  | CSlot (_, CStructType (CStruct (_,slots))) -> slots_depth slots decls 
-  | CSlot (_, CUnionType slots) -> slots_depth slots decls 
+  | CSlot (_, CNamedType name) -> name_depth name decls
+  | CSlot (_, CStructType (CStruct (_,slots))) -> slots_depth slots decls
+  | CSlot (_, CUnionType slots) -> slots_depth slots decls
   | _ -> 0
 and get_slots name decl =
   match decl with
-  | CNamedStructDefinition (_, decl_name, slots) -> 
+  | CNamedStructDefinition (_, decl_name, slots) ->
       if name = decl_name then
         Some slots
       else
@@ -636,7 +636,7 @@ and name_depth name decls =
   let slots =
       match (List.filter_map (get_slots name) decls) with
       | hd :: _ -> hd
-      | _ -> [] in 
+      | _ -> [] in
   slots_depth slots decls
 and slots_depth slots decls =
   let deps = List.map (slot_depth decls) slots in
@@ -646,13 +646,13 @@ and slots_depth slots decls =
 
 and decl_depth decl decls =
   match decl with
-  | CNamedStructDefinition (_, _, slots) -> 
+  | CNamedStructDefinition (_, _, slots) ->
      let depth = slots_depth slots decls in
      depth
   | _ -> 0
 
 let detail_compare decls a b =
-  match (a, b) with 
+  match (a, b) with
   | (CNamedStructDefinition (_, _, s1), CNamedStructDefinition (_, _, s2)) ->
     (slots_depth s1 decls) - (slots_depth s2 decls)
   | _ ->
