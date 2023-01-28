@@ -650,13 +650,6 @@ and slots_depth slots decls =
   let depth = 1 + dep_depth in
   depth
 
-and decl_depth decl decls =
-  match decl with
-  | CNamedStructDefinition (_, _, slots) ->
-     let depth = slots_depth slots decls in
-     depth
-  | _ -> 0
-
 let detail_compare decls a b =
   match (a, b) with
   | (CNamedStructDefinition (_, _, s1), CNamedStructDefinition (_, _, s2)) ->
@@ -671,6 +664,5 @@ let gen_module (env: env) (MonoModule (name, decls)) =
   and fun_decls = List.concat (gen_fun_decls name decls)
   and decls = List.concat (List.map (gen_decl env name) decls) in
   let decls = List.concat [type_decls; fun_decls; decls] in
-  let _ = List.map (fun x -> decl_depth x decls) decls in
   let sorted_decls = List.sort (detail_compare decls) decls in
   CUnit (mod_name_string name, sorted_decls)
