@@ -6,19 +6,19 @@
  * Austral types
  */
 
-typedef unsigned char  au_unit_t;
-typedef unsigned char  au_bool_t;
-typedef unsigned char  au_nat8_t;
-typedef signed   char  au_int8_t;
-typedef unsigned short au_nat16_t;
-typedef signed   short au_int16_t;
-typedef unsigned int   au_nat32_t;
-typedef signed   int   au_int32_t;
-typedef unsigned long  au_nat64_t;
-typedef signed   long  au_int64_t;
-typedef size_t         au_index_t;
-typedef void*          au_fnptr_t;
-typedef unsigned char  au_region_t;
+typedef uint8_t   au_unit_t;
+typedef uint8_t   au_bool_t;
+typedef uint8_t   au_nat8_t;
+typedef int8_t    au_int8_t;
+typedef uint16_t  au_nat16_t;
+typedef int16_t   au_int16_t;
+typedef uint32_t  au_nat32_t;
+typedef int32_t   au_int32_t;
+typedef uint64_t  au_nat64_t;
+typedef int64_t   au_int64_t;
+typedef size_t    au_index_t;
+typedef void*     au_fnptr_t;
+typedef uint8_t   au_region_t;
 
 #define nil   0
 #define false 0
