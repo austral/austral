@@ -618,6 +618,9 @@ let decl_order = function
   | CFunctionDefinition _ ->
      7
 
+(* the following code is used to sort declarations in dependency order, so that
+   the C compiler doesn't complain about types being incomplete *)
+
 let rec slot_depth decls (slot: c_slot) =
   match slot with
   | CSlot (_, CNamedType name) -> name_depth name decls
@@ -659,7 +662,9 @@ let detail_compare decls a b =
   | (CNamedStructDefinition (_, _, s1), CNamedStructDefinition (_, _, s2)) ->
     (slots_depth s1 decls) - (slots_depth s2 decls)
   | _ ->
-    compare (decl_order a) (decl_order b)
+     compare (decl_order a) (decl_order b)
+
+(* end declaration sorting code *)
 
 let gen_module (env: env) (MonoModule (name, decls)) =
   let type_decls = gen_type_decls decls
