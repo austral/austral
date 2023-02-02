@@ -64,6 +64,10 @@
 				{
 					"name": "keyword.other.$0.austral",
 					"match": "\\b(pragma|is|end)\\b"
+				},
+				{
+					"name": "keyword.other.borrow.austral",
+					"match": "\\bborrow\\!?\\b"
 				}
 			]
 		},
@@ -1156,15 +1160,12 @@
 		},
 		"borrow_head": {
 			"name": "meta.borrow.austral",
-			"match": "(?:(\\&\\!)|(\\&))(.*)(?=do)",
+			"match": "(borrow\\!?)(.*)(?=do)",
 			"captures": {
 				"1": {
-					"name": "keyword.operator.borrow.read.austral"
+					"name": "keyword.other.borrow.austral"
 				},
 				"2": {
-					"name": "keyword.operator.borrow.write.austral"
-				},
-				"3": {
 					"patterns": [
 						{
 							"include": "#comment"
