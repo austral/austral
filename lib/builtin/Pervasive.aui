@@ -12,6 +12,9 @@ module Austral.Pervasive is
             right: R;
     end;
 
+    generic [T: Type, R1: Region, R2: Region]
+    function swap(a: &![T, R1], b: &![T, R2]): Unit;
+
     generic [T: Type]
     function fixedArraySize(arr: FixedArray[T]): Index;
 
