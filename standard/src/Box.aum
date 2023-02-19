@@ -58,7 +58,7 @@ module body Standard.Box is
     end;
 
     generic [T: Type, R: Region]
-    function swap(boxref: &![Box[T], R], new: T): T is
+    function boxSwap(boxref: &![Box[T], R], new: T): T is
         let ptr: Pointer[T] := !(boxref->pointer);
         let old: T := load(ptr);
         store(ptr, new);

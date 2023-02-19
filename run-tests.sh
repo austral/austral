@@ -11,6 +11,7 @@ python3 test-programs/runner.py
 # Run the examples.
 ./run-examples.sh
 # Build the stdlib tests.
+make -C standard clean
 make -C standard
 # Run the stdlib tests.
 ./standard/test_bin

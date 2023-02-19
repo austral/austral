@@ -40,7 +40,7 @@ module Standard.Box is
     Store a new value in the box, returning the old one.
     """
     generic [T: Type, R: Region]
-    function swap(boxref: &![Box[T], R], new: T): T;
+    function boxSwap(boxref: &![Box[T], R], new: T): T;
 
     """
     Given a reference to a box, return a reference to its contents.
