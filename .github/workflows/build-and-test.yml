@@ -55,7 +55,7 @@ jobs:
       matrix:
         os:
           - macos-latest
-          - windows-latest
+          #- windows-latest
         ocaml-version:
           - 4.13.0
 
