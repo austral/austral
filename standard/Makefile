@@ -23,5 +23,6 @@ all: $(TEST_BIN)
 $(TEST_BIN): src/*.aui src/*.aum test/*.aui test/*.aum
 	../austral compile $(MODULES) --entrypoint=Standard.Test:Main --output=$(TEST_BIN)
 
+.PHONY: clean
 clean:
-	rm $(TEST_BIN)
+	-test -f $(TEST_BIN) && rm $(TEST_BIN)
