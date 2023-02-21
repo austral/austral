@@ -1,8 +1,23 @@
 open Identifier
 open TypeParameter
 open Error
+open ErrorText
 open Sexplib
 open Std
+
+module Errors = struct
+  let duplicate_type_parameter param =
+    let text = match param with 
+    | Some param -> [
+        Text "Duplicate type parameter ";
+        Code (typaram_name param |> ident_string)
+      ]
+    | None -> [
+        Text "Multiple type parameters have the same name";
+      ]
+    in
+    austral_raise DeclarationError text
+end
 
 type typarams = TyParams of type_parameter list
 [@@deriving (show, sexp)]
@@ -23,7 +38,7 @@ let get_typaram (typarams: typarams) (name: identifier): type_parameter option =
 let add_typaram (typarams: typarams) (typaram: type_parameter): typarams =
   match get_typaram typarams (typaram_name typaram) with
   | Some _ ->
-     err "Duplicate type parameter."
+    Errors.duplicate_type_parameter (Some typaram)
   | None ->
     let (TyParams lst) = typarams in
     let lst = List.rev lst in
@@ -49,7 +64,7 @@ let merge_typarams (a: typarams) (b: typarams): typarams =
   let _ =
     List.map (fun tp ->
         if List.exists (fun tp' -> equal_identifier (typaram_name tp) (typaram_name tp')) al then
-          err "Multiple type parameters have the same name."
+          Errors.duplicate_type_parameter None
         else
           ()) bl
   in

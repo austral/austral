@@ -7,6 +7,15 @@ open CodeGen
 open CRepr
 open Identifier
 
+module Errors = struct
+  let disallowed_type ty =
+    austral_raise TypeError [
+      Text "The type ";
+      Code ty;
+      Text " is not allowed in the signature of an exported function."
+    ]
+end
+
 (** Get the monomorph for an exported function. *)
 let get_export_monomorph (env: env) (id: decl_id): mono_id =
   match get_decl_by_id env id with
@@ -29,7 +38,7 @@ let get_export_data (env: env) (id: decl_id): (value_parameter list * ty) =
 let rec transform_ty (ty: ty): c_ty =
   match ty with
   | Unit ->
-     err "Not allowed"
+     Errors.disallowed_type "Unit"
   | Boolean ->
      CNamedType "au_bool_t"
   | Integer (s, w) ->
@@ -52,18 +61,18 @@ let rec transform_ty (ty: ty): c_ty =
      CNamedType "float"
   | DoubleFloat ->
      CNamedType "double"
-  | NamedType _ ->
-     err "Not allowed"
+  | NamedType (name, _, _) ->
+     Errors.disallowed_type (qident_to_sident name |> sident_name |> ident_string)
   | StaticArray (Integer (Unsigned, Width8)) ->
      c_string_type
   | StaticArray _ ->
-     err "Not allowed"
+     Errors.disallowed_type "FixedArray"
   | RegionTy _ ->
      err "Not allowed"
   | ReadRef _ ->
-     err "Not allowed"
+     Errors.disallowed_type "Reference"
   | WriteRef _ ->
-     err "Not allowed"
+     Errors.disallowed_type "WriteReference"
   | TyVar _ ->
      err "Not allowed"
   | Address t ->

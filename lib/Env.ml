@@ -11,6 +11,24 @@ open EnvTypes
 open EnvUtils
 open Error
 
+module Errors = struct
+  let declaration_already_exists ~name ~module_name =
+    austral_raise DeclarationError [
+      Text "A declaration with the name ";
+      Code (ident_string name);
+      Text " already exists in the module ";
+      Code (mod_name_string module_name);
+      Text "."
+    ]
+
+  let unknown_module name =
+    austral_raise DeclarationError [
+      Text "Unknown module ";
+      Code (mod_name_string name);
+      Text "."
+    ]
+end
+
 (** The file environment stores the contents of files for error reporting. *)
 type file_env = file_rec list
 
@@ -112,20 +130,14 @@ let get_decl_by_name (env: env) (name: sident): decl option =
      in
      List.find_opt (fun d -> pred d) decls
   | None ->
-     err "No such module."
+     Errors.unknown_module (sident_module_name name)
 
 let ensure_no_decl_with_name (env: env) (mod_id: mod_id) (name: identifier): unit =
   let mn: module_name = module_name_from_id env mod_id in
   let ident: sident = make_sident mn name in
   match get_decl_by_name env ident with
   | Some _ ->
-     austral_raise DeclarationError [
-         Text "A declaration with the name ";
-         Code (ident_string name);
-         Text " already exists in the module ";
-         Code (mod_name_string mn);
-         Text "."
-       ]
+     Errors.declaration_already_exists ~name ~module_name:mn
   | None ->
      ()
 

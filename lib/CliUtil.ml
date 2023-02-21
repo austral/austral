@@ -1,5 +1,39 @@
 open Error
 
+module Errors = struct
+  let duplicate_flags name =
+    austral_raise CliError [
+      Text "The argument ";
+      Code name;
+      Text " was given multiple times"
+    ]
+
+  let empty_args () =
+    austral_raise CliError [
+      Text "Argument list must have at least one element in it, the path to the binary. Was the compiler invoked through a system call?"
+    ]
+
+  let expected_bool_flag name =
+    austral_raise CliError [
+      Text "Expected ";
+      Code name;
+      Text " to be a boolean flag, but it was given as a value flag."
+    ]
+
+  let expected_value_flag name =
+    austral_raise CliError [
+      Text "Expected ";
+      Code name;
+      Text " to be a value flag, but it was given as a boolean flag."
+    ]
+
+  let unknown_flag_type flag =
+    austral_raise CliError [
+      Text "Invalid flag argument ";
+      Code flag
+    ]
+end
+
 type arg =
   | BoolFlag of string
   | ValueFlag of string * string
@@ -25,7 +59,7 @@ let parse_arg (arg: string): arg =
        (* It's a value flag, e.g. --foo=bar *)
        ValueFlag (trim_flag name, value)
     | _ ->
-       err ("Invalid flag argument: '" ^ arg ^ "'")
+       Errors.unknown_flag_type arg
   else
     (* It's a positional flag. *)
     PositionalArg arg
@@ -33,7 +67,7 @@ let parse_arg (arg: string): arg =
 let parse_args (args: string list): arglist =
   (** At least one argument, the name of the binary. *)
   if ((List.length args) < 1) then
-    err "Argument list must have at least one element in it, the path to the binary. Was the compiler invoked through a system call?"
+    Errors.empty_args ()
   else
     ArgList (List.map parse_arg (List.tl args))
 
@@ -69,7 +103,7 @@ let pop_flag (arglist: arglist) (name: string): (arglist * arg) option =
      Some (args_rest, flag)
   | _::_ ->
      (* Multiple flags with the name. *)
-     err "Duplicate flag."
+     Errors.duplicate_flags name
   | [] ->
      (* No such flag. *)
      None
@@ -81,7 +115,7 @@ let pop_bool_flag (arglist: arglist) (name: string): arglist option =
       | BoolFlag _ ->
          Some arglist
       | _ ->
-         err "Expected bool flag, got value flag.")
+         Errors.expected_bool_flag name)
   | None ->
      None
 
@@ -92,7 +126,7 @@ let pop_value_flag (arglist: arglist) (name: string): (arglist * string) option 
       | ValueFlag (_, value) ->
          Some (arglist, value)
       | _ ->
-         err "Expected value flag, got boolean flag.")
+         Errors.expected_value_flag name)
   | None ->
      None
 

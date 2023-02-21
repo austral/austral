@@ -2,6 +2,22 @@ open Identifier
 open Common
 open Cst
 open Error
+open ErrorText
+
+module Errors = struct
+  let pragma_argument_error ~pragma_name ~argument = 
+    let text = Text ("Invalid " ^ pragma_name ^ " pragma.") :: match argument with
+    | Some argument -> [Break; Text "This pragma takes exactly one argument, "; Code argument]
+    | None -> [Break; Text "This pragma takes no arguments."]
+    in
+    austral_raise DeclarationError text
+
+  let unknown_pragma name =
+    austral_raise DeclarationError [
+      Text "Unknown pragma ";
+      Code name
+    ]
+end
 
 let make_module_body (name: module_name) (imports: concrete_import_list list) (pragmas: pragma list) (defs: concrete_def list) (docstring: docstring) =
   let is_unsafe_module p =
@@ -77,33 +93,48 @@ let get_instance_def (ConcreteModuleBody (_, _, _, _, defs)) (name: identifier) 
 let make_pragma name args =
   let s = ident_string name in
   if s = "Foreign_Import" then
+    let raise_err () =
+      Errors.pragma_argument_error
+        ~pragma_name:"Foreign_Import"
+        ~argument:(Some "External_Name")
+    in
     match args with
     | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
        if equal_identifier a (make_ident "External_Name") then
          ForeignImportPragma f
        else
-         err "Invalid foreign import pragma"
-    | _ ->
-       err "Invalid foreign import pragma"
+         raise_err ()
+    | _ -> 
+       raise_err ()
   else
     if s = "Foreign_Export" then
+      let raise_err () =
+        Errors.pragma_argument_error
+          ~pragma_name:"Foreign_Export"
+          ~argument:(Some "External_Name")
+      in
       match args with
       | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
          if equal_identifier a (make_ident "External_Name") then
            ForeignExportPragma f
          else
-           err "Invalid foreign export pragma"
+           raise_err ()
       | _ ->
-         err "Invalid foreign export pragma"
+         raise_err ()
     else
       if s = "Unsafe_Module" then
+        let raise_err () =
+          Errors.pragma_argument_error
+            ~pragma_name:"Unsafe_Module"
+            ~argument:None
+        in
         match args with
         | ConcretePositionalArgs [] ->
            UnsafeModulePragma
         | _ ->
-           err "Unsafe_Module pragma takes no arguments."
+           raise_err ()
       else
-        err ("Unknown pragma: " ^ s)
+        Errors.unknown_pragma s
 
 let mod_int_name (inter: concrete_module_interface): module_name =
   let (ConcreteModuleInterface (name, _, _, _)) = inter in

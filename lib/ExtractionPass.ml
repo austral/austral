@@ -22,13 +22,96 @@ open BuiltIn
 open Util
 open Error
 
-type type_kind = RecordKind | UnionKind
+module Errors = struct
+  let export_generic name =
+    austral_raise DeclarationError [
+      Text "The function ";
+      Code (ident_string name);
+      Text " cannot be exported because it is generic."
+    ]
 
-let type_kind_string = function
-  | RecordKind -> "Record"
-  | UnionKind -> "Union"
+  let foreign_import_export name =
+    austral_raise DeclarationError [
+      Text "The function ";
+      Code (ident_string name);
+      Text " cannot have both the ";
+      Code "Foreign_Import";
+      Text " and ";
+      Code "Foreign_Export";
+      Text " pragmas simultaneously."
+    ]
 
-let check_slots_are_free (type_kind: type_kind) (slots: typed_slot list): unit =
+  let free_contains_linear ~name ~universe ~parameter =
+    austral_raise DeclarationError [
+      Code (ident_string name);
+      Text " was declared to belong to the ";
+      Code "Free";
+      Text " universe, but ";
+      Text (if parameter then "has a type parameter" else "contains a field");
+      Text " that belongs to the ";
+      Code universe;
+      Text " universe."
+    ]
+
+  let instance_for_non_typeclass name =
+    austral_raise DeclarationError [
+      Text "Cannot create an instance for ";
+      Code (ident_string name);
+      Text " because it is not a typeclass."
+    ]
+
+  let typeclass_no_method ~typeclass ~method_name =
+    austral_raise DeclarationError [
+      Text "The typeclass ";
+      Code (ident_string typeclass);
+      Text " has no method named ";
+      Code (ident_string method_name)
+    ]
+
+  let typeclass_param_not_region name =
+    austral_raise DeclarationError [
+      Text "The parameter for the typeclass ";
+      Code (ident_string name);
+      Text " cannot be declared to be in the ";
+      Code "Region";
+      Text " universe, because regions are distinct from types.";
+      Break;
+      Text "Consider using one of ";
+      Code "Type";
+      Text ", ";
+      Code "Linear";
+      Text ", or ";
+      Code "Free";
+      Text " instead.";
+    ]
+
+  let types_are_not_regions ~name ~declaration =
+    austral_raise DeclarationError [
+      Text "The ";
+      Text declaration;
+      Text " ";
+      Code (ident_string name);
+      Text " was declared to belong to the ";
+      Code "Region";
+      Text " universe, but regions are distinct from types.";
+      Break;
+      Text "Consider using one of ";
+      Code "Type";
+      Text ", ";
+      Code "Linear";
+      Text ", or ";
+      Code "Free";
+      Text " instead.";
+    ]
+
+  let unknown_typeclass name =
+    austral_raise DeclarationError [
+      Text "Cannot find typeclass with the name ";
+      Code (ident_string name)
+    ]
+end
+
+let check_slots_are_free (name: identifier) (slots: typed_slot list): unit =
   let check_slot_is_free (slot: typed_slot): unit =
     let (TypedSlot (_, ty)) = slot in
     match type_universe ty with
@@ -37,22 +120,20 @@ let check_slots_are_free (type_kind: type_kind) (slots: typed_slot list): unit =
     | RegionUniverse ->
        ()
     | LinearUniverse ->
-       err ((type_kind_string type_kind)
-            ^ " was declared to belong to the Free universe, but it contains a type that beloings to the Linear universe.")
+        Errors.free_contains_linear ~name ~universe:"Linear" ~parameter:false
     | TypeUniverse ->
-        err ((type_kind_string type_kind)
-             ^ " was declared to belong to the Free universe, but it contains a type that beloings to the Type universe.")
+        Errors.free_contains_linear ~name ~universe:"Type" ~parameter:false
   in
   List.iter check_slot_is_free slots
 
 let check_cases_are_free (cases: typed_case list): unit =
   let check_case_is_free (case: typed_case): unit =
-    let (TypedCase (_, slots)) = case in
-    check_slots_are_free UnionKind slots
+    let (TypedCase (name, slots)) = case in
+    check_slots_are_free name slots
   in
   List.iter check_case_is_free cases
 
-let check_typarams_are_free (typarams: typarams): unit =
+let check_typarams_are_free (name: identifier) (typarams: typarams): unit =
   let check_universe (u: universe) =
     match u with
     | FreeUniverse ->
@@ -60,9 +141,9 @@ let check_typarams_are_free (typarams: typarams): unit =
     | RegionUniverse ->
        ()
     | LinearUniverse ->
-       err "This type was declared to be in the Free universe, but it has a type parameter in the Linear universe."
+       Errors.free_contains_linear ~name ~universe:"Linear" ~parameter:true
     | TypeUniverse ->
-       err "This type was declared to be in the Free universe, but it has a type parameter in the Type universe."
+       Errors.free_contains_linear ~name ~universe:"Type" ~parameter:true
   in
   List.iter (fun tp -> check_universe (typaram_universe tp)) (typarams_as_list typarams)
 
@@ -177,7 +258,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      (* If the universe is `Free`, check that there are no slots with types in the `Type` or `Linear` universes. *)
      let _ =
        if universe = FreeUniverse then
-         check_slots_are_free RecordKind slots
+         check_slots_are_free name slots
        else
          ()
      in
@@ -186,18 +267,18 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let _ =
        if universe = FreeUniverse then
          (* Unless it is `Address` or `Pointer` *)
-         let name = make_qident (mn, name, name) in
-         if (is_address_type name) || (is_pointer_type name) then
+         let qname = make_qident (mn, name, name) in
+         if (is_address_type qname) || (is_pointer_type qname) then
            ()
          else
-           check_typarams_are_free typarams
+           check_typarams_are_free name typarams
        else
          ()
      in
      (* If the universe is `Region`, fail. *)
      let _ =
        if universe = RegionUniverse then
-         err "Trying to define a record in the Region universe. Regions are distinct from types."
+         Errors.types_are_not_regions ~name ~declaration:"record"
        else
          ()
      in
@@ -218,14 +299,14 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
         the `Linear` or `Type` universes. *)
      let _ =
        if universe = FreeUniverse then
-         check_typarams_are_free typarams
+         check_typarams_are_free name typarams
        else
          ()
      in
      (* If the universe is `Region`, fail. *)
      let _ =
        if universe = RegionUniverse then
-         err "Trying to define a union in the Region universe. Regions are distinct from types."
+         Errors.types_are_not_regions ~name ~declaration:"union"
        else
          ()
      in
@@ -276,7 +357,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
        (* Check: if we have both an export name and an external name, raise an error. *)
        match (external_name, export_name) with
        | (Some _, Some _) ->
-          err "A function can't have the Foreign_Import and Foreign_Export pragmas simultaneously."
+          Errors.foreign_import_export name
        | _ ->
           ()
      in
@@ -285,7 +366,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
        match export_name with
        | Some _ ->
           if typarams_size typarams > 0 then
-            err "You can't export generic functions."
+            Errors.export_generic name
           else
             ()
        | None ->
@@ -322,7 +403,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
        | LinearUniverse -> ()
        | FreeUniverse -> ()
        | RegionUniverse ->
-          err "The type class parameter must have a universe in {Type, Linear, Free}."
+          Errors.typeclass_param_not_region name
      in
      (* Add the typeclass itself to the env *)
      let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
@@ -350,6 +431,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
      let decl = LTypeclass (typeclass_id, vis, name, typaram, linked_methods, docstring) in
      (env, decl)
   | CInstance (vis, name, typarams, argument, methods, docstring) ->
+     let typeclass_name = qident_to_sident name |> sident_name in
      (* First add the instance to the env, then the methods. *)
      let argument = parse' rm typarams argument in
      (* Find typeclass info. *)
@@ -360,9 +442,9 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            | TypeClass { id; mod_id; param; _ } ->
               (id, mod_id, typaram_name param, typaram_universe param)
            | _ ->
-              err "Type class name refers to something that is not a type class.")
+              Errors.instance_for_non_typeclass typeclass_name)
        | None ->
-          err "Type class with this name does not exist."
+          Errors.unknown_typeclass typeclass_name
      in
      (* Check the argument has the right universe for the typeclass. *)
      let _ = check_instance_argument_has_right_universe universe argument in
@@ -398,7 +480,9 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
           | Some (TypeClassMethod { id; _ }) ->
              id
           | _ ->
-             err ("No method with this name: " ^ (ident_string name)))
+             Errors.typeclass_no_method
+               ~typeclass:typeclass_name
+               ~method_name:name)
        in
        ({
            instance_id = instance_id;

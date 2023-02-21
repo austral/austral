@@ -12,6 +12,75 @@ open ImportResolution
 open Reporter
 open Error
 
+module Errors = struct
+  let declaration_kind_mismatch ~name ~expected =
+    austral_raise DeclarationError [
+      Text "The interface requires ";
+      Code (ident_string name);
+      Text " to be a ";
+      Text expected
+    ]
+
+  let function_mismatch ~name ~typarams ~params ~rt =
+    let message = match typarams, params, rt with
+    | true, false, false -> "have different type parameters."
+    | false, true, false -> "have different parameters."
+    | false, false, true -> "have different return types"
+    | _ -> "are different."
+    in
+    austral_raise DeclarationError [
+      Text "The interface declaration for ";
+      Code (ident_string name);
+      Text " and its implementation ";
+      Text message
+    ]
+
+  let missing_body_definition ~name ~declaration =
+    match declaration with
+    | Some declaration -> 
+       austral_raise DeclarationError [
+         Text "The ";
+         Text declaration;
+         Text " ";
+         Code (ident_string name);
+         Text " has no corresponding body implementation."
+       ]
+    | None -> 
+       austral_raise DeclarationError [
+         Code (ident_string name);
+         Text " has no corresponding body implementation."
+       ]
+
+  let module_name_mismatch ~interface ~body =
+    austral_raise DeclarationError [
+      Text "Module interface and body have different names: ";
+      Code (mod_name_string interface);
+      Text " and ";
+      Code (mod_name_string body)
+    ]
+
+  let multiarg_typeclass name =
+    austral_raise DeclarationError [
+      Text "The typeclass ";
+      Code (ident_string name);
+      Text " has multiple parameters, which is unsupported."
+    ]
+
+  let type_mismatch name =
+    austral_raise DeclarationError [
+      Text "The interface declaration for ";
+      Code (ident_string name);
+      Text " and its implementation have different types."
+    ]
+
+  let universe_mismatch name =
+    austral_raise DeclarationError [
+      Text "The interface declaration for ";
+      Code (ident_string name);
+      Text " and its implementation have different universes."
+    ]
+end
+
 let parse_slots (imports: import_map) (slots: concrete_slot list): qslot list =
   List.map
     (fun (ConcreteSlot (n, t)) -> QualifiedSlot (n, qualify_typespec imports t))
@@ -68,9 +137,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
          if (name = name') && (ty = ty') then
            CConstant (VisPublic, name, qualify_typespec ii ty, abs_expr bi value, docstring)
          else
-           err "Mismatch"
+           Errors.type_mismatch name
       | _ ->
-         err "Not a constant")
+         Errors.declaration_kind_mismatch ~name ~expected:"constant")
   | ConcreteOpaqueTypeDecl (name, typarams, universe, docstring) ->
      (match def with
       | ConcreteRecordDef (ConcreteRecord (name', typarams', universe', slots, _)) ->
@@ -83,7 +152,10 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                     parse_slots bi slots,
                     docstring)
          else
-           err "Mismatch"
+           if universe != universe' then
+             Errors.universe_mismatch name
+           else
+             Errors.type_mismatch name
       | ConcreteUnionDef (ConcreteUnion (name', typarams', universe', cases, _)) ->
          if (name = name') && (typarams = typarams') && (universe = universe') then
            let qname = make_qname name' in
@@ -94,9 +166,12 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                    parse_cases bi cases,
                    docstring)
          else
-           err "Mismatch"
+           if universe <> universe' then
+             Errors.universe_mismatch name
+           else
+             Errors.type_mismatch name
       | _ ->
-         err "Not a type")
+         Errors.declaration_kind_mismatch ~name ~expected:"type")
   | ConcreteFunctionDecl (name, typarams, params, rt, docstring) ->
      (match def with
       | ConcreteFunctionDef (name', typarams', params', rt', body, _, pragmas) ->
@@ -111,9 +186,13 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                       docstring,
                       pragmas)
          else
-           err "Function declaration does not match definition"
+           Errors.function_mismatch
+             ~name
+             ~typarams:(typarams = typarams')
+             ~params:(params = params')
+             ~rt:(rt = rt')
       | _ ->
-         err "Not a function")
+         Errors.declaration_kind_mismatch ~name ~expected:"function")
   | ConcreteInstanceDecl (name, typarams, argument, docstring) ->
      (match def with
       | ConcreteInstanceDef (ConcreteInstance (name', typarams', argument', methods, _)) ->
@@ -131,9 +210,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                       parse_method_defs module_name bi methods,
                       docstring)
          else
-           err "Mismatch"
+           Errors.type_mismatch name
       | _ ->
-         err "Not an instance")
+         Errors.declaration_kind_mismatch ~name ~expected:"instance")
   | _ ->
      err "Invalid decl in this context"
 
@@ -182,7 +261,7 @@ let private_def module_name im def =
                   | [tp] ->
                      tp
                   | _ ->
-                     err "typeclass has more than one parameter"),
+                     Errors.multiarg_typeclass name),
                  parse_method_decls module_name im methods,
                  docstring)
   | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
@@ -206,10 +285,7 @@ let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_modul
       in
       ps ("Module name", (mod_name_string mn));
       if mn <> mn' then
-        err ("Interface and body have mismatching names: "
-             ^ (mod_name_string mn)
-             ^ " and "
-             ^ (mod_name_string mn'))
+        Errors.module_name_mismatch ~interface:mn ~body:mn'
       else
         let im = resolve mn kind env interface_imports
         and bm = resolve mn kind env body_imports
@@ -259,7 +335,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
                   | [tp] ->
                      tp
                   | _ ->
-                     err "typeclass has more than one parameter"),
+                     Errors.multiarg_typeclass name),
                      parse_method_decls module_name im methods,
                      docstring)
       | _ ->
@@ -268,7 +344,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
           | (Some def) ->
              match_decls module_name im bm decl def
           | None ->
-             err "Interface declaration has no corresponding body declaration"))
+             Errors.missing_body_definition ~name ~declaration:None))
   | None ->
      (match decl with
       | ConcreteInstanceDecl (name, typarams, argument, _) ->
@@ -277,7 +353,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
           | (Some def) ->
              match_decls module_name im bm decl (ConcreteInstanceDef def)
           | None ->
-             err "Interface declaration has no corresponding body declaration")
+             Errors.missing_body_definition ~name ~declaration:(Some "instance"))
       | _ ->
          internal_err "Couldn't parse declaration declaration")
 

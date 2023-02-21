@@ -9,6 +9,43 @@ open Env
 open EnvTypes
 open EnvUtils
 
+module Errors = struct
+  let double_import name =
+    austral_raise DeclarationError [
+      Text "Colliding imports: a declaration with name ";
+      Code (ident_string name);
+      Text " has already been imported.";
+      Break;
+      Text "Consider giving it a different nickname using ";
+      Code "as";
+      Text "."
+    ]
+
+  let import_memory_in_safe_module () =
+    austral_raise DeclarationError [
+      Text "Cannot import from the ";
+      Code "Austral.Memory";
+      Text " module in a safe module.";
+      Break;
+      Text "Consider using a safe wrapper or adding ";
+      Code "pragma Unsafe_Module;"
+    ]
+
+  let privacy_error name =
+    austral_raise DeclarationError [
+      Code (ident_string name);
+      Text " is private and cannot be imported."
+    ]
+
+  let unresolved ~name ~module_name =
+    austral_raise DeclarationError [
+      Text "No declaration with the name ";
+      Code (ident_string name);
+      Text " in the module ";
+      Code (mod_name_string module_name)
+    ]
+end
+
 (** Represents an Austral import declaration, that is, in some code like:
 
     {import Foo.Bar (A as D, B, C);}
@@ -42,21 +79,16 @@ let resolve_import (env: env) (kind: module_kind) (imports: import_map) (idecl: 
   | Some decl ->
      if is_importable decl then
        match get_symbol imports nickname with
-       | Some _ ->
-          err "Colliding imports"
+       | Some _ -> Errors.double_import name
        | None ->
           if (equal_module_name module_name memory_module_name) && (kind = SafeModule) then
-            err "Cannot import from the Austral.Memory module in a safe module."
+            Errors.import_memory_in_safe_module ()
           else
             add_symbol imports (make_qident (module_name, name, nickname))
      else
-       err "Declaration is not importable"
+       Errors.privacy_error name
   | None ->
-     err ("No declaration with the name '"
-          ^ (ident_string name)
-          ^ "' in the module '"
-          ^ (mod_name_string module_name)
-          ^ "'")
+     Errors.unresolved ~name ~module_name
 
 let rec resolve' (env: env) (kind: module_kind) (imports: import_map) (list: import_decl list): import_map =
   match list with
