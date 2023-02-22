@@ -24,6 +24,8 @@ open Reporter
 open BuiltIn
 open Error
 
+module Errors = TypeErrors
+
 (* Since the extraction pass has already happened, we can simplify the call to
    `parse_type` by passing an empty list of local type signatures. *)
 let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypespec): ty =
@@ -59,7 +61,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                    let effective_fn_ty: ty = FnPtr (arg_tys, rt) in
                    TFunVar (id, effective_fn_ty, bindings)
                 | None ->
-                   err "Function is generic, but no asserted type found.")
+                   Errors.unconstrained_generic_function (original_name name))
              else
                (* Function is concrete. *)
                TFunVar (id, fn_ty, empty_bindings)
@@ -74,7 +76,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                   | VarLocal ->
                      TLocalVar ((original_name name), ty))
               | None ->
-                 err ("I can't find the variable named " ^ (ident_string (original_name name)))))
+                 Errors.unknown_variable (original_name name)))
       | FunctionCall (name, args) ->
          augment_call module_name env lexenv asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
       | ArithmeticExpression (op, lhs, rhs) ->
@@ -110,22 +112,13 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
            in
            augment_call module_name env lexenv asserted_ty op_qname args
          in
-         let arith_error _ =
-           austral_raise TypeError [
-               Text "Both operands to an arithmetic expression must be compatible types. The LHS has type ";
-               Code (type_string lhs_ty);
-               Text " but the RHS has type ";
-               Code (type_string rhs_ty);
-               Text "."
-             ]
-         in
          (* Are the types the same? *)
          if lhs_ty = rhs_ty then
            (* If the types are the same type, check it is a numeric type. *)
            if (is_numeric lhs_ty) then
              augment_arithmetic_call ()
            else
-             arith_error ()
+             Errors.arithmetic_not_numeric lhs_ty
          else
            (* If the types are different, check if at least one operator is a constant.*)
            let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
@@ -134,7 +127,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
              (* If either operand is a constant, let it pass *)
              augment_arithmetic_call ()
            else
-             arith_error ()
+             Errors.arithmetic_incompatible_types ~lhs:lhs_ty ~rhs:rhs_ty
       | Comparison (op, lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
@@ -146,20 +139,26 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
          if ((is_bool lhs') && (is_bool rhs')) then
            TConjunction (lhs', rhs')
          else
-           err "Both operands to a logical expression must be boolean-typed expressions."
+           Errors.logical_operands_not_boolean
+             ~operator:"conjunction"
+             ~types:[get_type lhs'; get_type rhs']
       | Disjunction (lhs, rhs) ->
          let lhs' = aug lhs
          and rhs' = aug rhs in
          if ((is_bool lhs') && (is_bool rhs')) then
            TDisjunction (lhs', rhs')
          else
-           err "Both operands to a logical expression must be boolean-typed expressions."
+           Errors.logical_operands_not_boolean
+             ~operator:"disjunction"
+             ~types:[get_type lhs'; get_type rhs']
       | Negation e ->
          let e' = aug e in
          if is_bool e' then
            TNegation e'
          else
-           err "The operand to the negation operator must be an expression of boolean type."
+           Errors.logical_operands_not_boolean
+             ~operator:"negation"
+             ~types:[get_type e']
       | IfExpression (c, t, f) ->
          let c' = aug c
          and t' = aug t
@@ -168,9 +167,14 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
            if (get_type t') = (get_type f') then
              TIfExpression (c', t', f')
            else
-             err "Both branches of an if expression must be the same type."
+             Errors.if_inequal
+               ~lhs:(get_type t')
+               ~rhs:(get_type f')
          else
-           err "The type of the condition in an if expression must be a boolean."
+           Errors.condition_not_boolean
+             ~kind:"if"
+             ~form:"expression"
+             ~ty:(get_type c')
       | Path (e, elems) ->
          (* Path rules:
 
@@ -209,7 +213,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                ty = path_ty
              }
          else
-           err ("Paths must end in the free universe: " ^ (show_ty path_ty))
+           Errors.path_not_free path_ty
       | Embed (ty, expr, args) ->
          TEmbed (
              parse_typespec env rm typarams ty,
@@ -227,7 +231,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
           | WriteRef _ ->
              TDeref expr'
           | _ ->
-             err "The dereference operator must be applied to an expression of a reference type.")
+             Errors.dereference_non_reference ty)
       | Typecast (expr, ty) ->
          (* The typecast operator has four uses:
 
@@ -277,15 +281,19 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                      if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
                        TCast (expr', target_type)
                      else
-                       err "Cannot convert because the references have different underlying types or regions."
+                       Errors.cast_different_references
+                         ~different_types:(not (equal_ty underlying_ty underlying_ty'))
+                         ~different_regions:(not (equal_ty region region'))
                   | _ ->
-                     err "Bad conversion.")
+                     Errors.cast_write_ref_to_non_ref ())
               | _ ->
                  (try
                     let _ = match_type (env, module_name) target_type (get_type expr') in
                     expr'
                   with Austral_error _ ->
-                    err "Bad conversion"))
+                    Errors.cast_invalid
+                      ~target:target_type
+                      ~source:(get_type expr')))
       | SizeOf ty ->
          TSizeOf (parse_typespec env rm typarams ty)
       | BorrowExpr (mode, name) ->
@@ -294,7 +302,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
              (* TODO: check if `ty` is linear? *)
              (match src with
               | VarConstant ->
-                 err "Constants cannot be borrowed"
+                 Errors.borrow_constant ()
               | VarParam ->
                  let name: identifier = original_name name
                  and reg: region = fresh_region ()
@@ -306,7 +314,7 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                  in
                  TBorrowExpr (mode, name, reg, ty))
           | None ->
-             err ("I can't find the variable named " ^ (ident_string (original_name name)))))
+             Errors.unknown_variable (original_name name)))
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
@@ -354,7 +362,7 @@ and augment_path_elem (env: env) (module_name: module_name) (rm: region_map) (ty
       | NamedType (name, args, _) ->
          augment_slot_accessor_elem env module_name slot_name name args
       | _ ->
-         err "Not a record type")
+         Errors.path_not_record (type_string head_ty))
   | PointerSlotAccessor slot_name ->
      (match head_ty with
       | Pointer pointed_to ->
@@ -365,37 +373,36 @@ and augment_path_elem (env: env) (module_name: module_name) (rm: region_map) (ty
           | NamedType (name, args, _) ->
              augment_reference_slot_accessor_elem env module_name slot_name name args
           | _ ->
-             err "Not a record type")
+             Errors.path_not_record (type_string ty))
       | WriteRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
              augment_reference_slot_accessor_elem env module_name slot_name name args
           | _ ->
-             err "Not a record type")
+             Errors.path_not_record (type_string ty))
       | _ ->
-         err "Not a record type")
+         Errors.path_not_record (type_string head_ty))
   | ArrayIndex ie ->
      let ie' = augment_expr module_name env rm typarams lexenv None ie in
      (match head_ty with
       | StaticArray elem_ty ->
          TArrayIndex (ie', elem_ty)
       | _ ->
-         austral_raise TypeError [
-             Text "The array indexing operator doesn't work for this type: ";
-             Code (type_string head_ty);
-     ])
+         Errors.array_indexing_disallowed head_ty)
 
 and augment_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
   (* Check: e' is a public record type *)
   let (source_module, vis, typarams, slots) = get_record_definition env type_name in
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
-    let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
+    let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
     let bindings = match_typarams (env, module_name) typarams type_args in
     let slot_ty' = replace_variables bindings slot_ty in
     TSlotAccessor (slot_name, slot_ty')
   else
-    err "Trying to read a slot from a non-public record"
+    Errors.path_not_public
+      ~type_name:(original_name type_name)
+      ~slot_name
 
 and augment_pointer_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (pointed_to: ty): typed_path_elem =
   match pointed_to with
@@ -404,39 +411,48 @@ and augment_pointer_slot_accessor_elem (env: env) (module_name: module_name) (sl
      let (source_module, vis, typarams, slots) = get_record_definition env type_name in
      if (vis = TypeVisPublic) || (module_name = source_module) then
        (* Check: the given slot name must exist in this record type. *)
-       let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
+       let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
        let bindings = match_typarams (env, module_name) typarams type_args in
        let slot_ty' = replace_variables bindings slot_ty in
        TPointerSlotAccessor (slot_name, slot_ty')
      else
-       err "Trying to read a slot from a pointer to a non-public record"
+       Errors.path_not_public
+         ~type_name:(original_name type_name)
+         ~slot_name
   | _ ->
-     err "Pointer does not point to a record type."
+     Errors.path_not_record (type_string pointed_to)
 
 and augment_reference_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
   (* Check: e' is a public record type *)
   let (source_module, vis, typarams, slots) = get_record_definition env type_name in
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
-    let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
+    let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
     let bindings = match_typarams (env, module_name) typarams type_args in
     let slot_ty' = replace_variables bindings slot_ty in
     TPointerSlotAccessor (slot_name, slot_ty')
   else
-    err "Trying to read a slot from a reference to a non-public record"
+    Errors.path_not_public
+      ~type_name:(original_name type_name)
+      ~slot_name
 
 and get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
   match get_decl_by_name env (qident_to_sident name) with
   | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
      let mod_name: module_name = module_name_from_id env mod_id in
      (mod_name, vis, typarams, slots)
-  | _ ->
+  | Some _ ->
+     Errors.path_not_record (original_name name |> ident_string)
+  | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
-and get_slot_with_name slots slot_name =
+and get_slot_with_name type_name slots slot_name =
   match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
   | Some s -> s
-  | None -> err ("No slot with this name: " ^ (ident_string slot_name))
+  | None -> 
+     Errors.no_such_slot
+       ~type_name:(original_name type_name)
+       ~slot_name
 
 and augment_call (module_name: module_name) (env: env) (lexenv: lexenv) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
   (* First, check if the callable name is a variable. *)
@@ -449,7 +465,7 @@ and augment_call (module_name: module_name) (env: env) (lexenv: lexenv) (asserte
       | Some callable ->
          augment_callable module_name env name callable asserted_ty args
       | None ->
-         err ("No callable with this name: " ^ (qident_debug_name name)))
+         Errors.unknown_callable (original_name name))
 
 and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
   (* Because function pointers don't preserve value parameter names, we can't
@@ -458,21 +474,21 @@ and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (
     match args with
     | TPositionalArglist args -> args
     | TNamedArglist _ ->
-       err "You can't call a function pointer with a named argument list, because function pointers don't preserve parameter names, so we wouldn't know how to assign arguments to parameters."
+       Errors.fun_pointer_named_args ()
   in
   (* We extract the parameter types and return type from the function pointer
      type. *)
   let (paramtys, rt): (ty list * ty) =
     match fn_ptr_ty with
     | FnPtr (paramtys, rt) -> (paramtys, rt)
-    | _ -> err "Trying to call something that isn't a function pointer type."
+    | _ -> Errors.call_non_callable fn_ptr_ty
   in
   (* Then, we synthesize a parameter list from the function pointer type. The
      parameter names are fake, but this is so we can reuse the arity-checking,
      value parameter list-checking infrastructure we use elsewhere. *)
   let params: value_parameter list = List.map (fun paramty -> ValueParameter (make_ident "fake", paramty)) paramtys in
   (* Check synthetic parameter list against argument list. *)
-  let bindings = check_argument_list env module_name params args in
+  let bindings = check_argument_list env module_name name params args in
   (* Use the bindings to get the effective return type *)
   let rt' = replace_variables bindings rt in
   let (bindings', rt'') = handle_return_type_polymorphism env module_name name params rt' asserted_ty bindings in
@@ -514,7 +530,7 @@ and augment_function_call (env: env) (module_name: module_name) (id: decl_id) na
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
       let arguments: texpr list = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
-      let bindings = check_argument_list env module_name params arguments in
+      let bindings = check_argument_list env module_name (original_name name) params arguments in
       (* Use the bindings to get the effective return type *)
       let rt' = replace_variables bindings rt in
       let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
@@ -534,20 +550,20 @@ and augment_record_constructor (env: env) (module_name: module_name) (name: qide
                   if l = [] then
                     []
                   else
-                    err "Arguments to a record constructor must be named"
+                    Errors.constructor_not_named "record"
                | TNamedArglist a ->
                   a) in
   (* Check: the set of slots matches the set of param names *)
   let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
   let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
   if not (ident_set_eq slot_names argument_names) then
-    err "Slot names don't match argument names"
+    Errors.constructor_wrong_args "record"
   else
     (* Convert args to positional *)
     let arguments = arglist_to_positional (args, slot_names) in
     (* Check the list of params against the list of arguments *)
     let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
-    let bindings = check_argument_list env module_name params arguments in
+    let bindings = check_argument_list env module_name (original_name name) params arguments in
     (* Use the bindings to get the effective return type *)
     let rt = NamedType (name,
                         List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
@@ -572,7 +588,7 @@ and augment_union_constructor (env: env) (module_name: module_name) (type_name: 
                       if l = [] then
                         []
                       else
-                        err "Arguments to a union constructor must be named"
+                        Errors.constructor_not_named "union"
                    | TNamedArglist a ->
                       a) in
       (* Check: the set of slots matches the set of param names *)
@@ -581,7 +597,7 @@ and augment_union_constructor (env: env) (module_name: module_name) (type_name: 
       let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
       let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
       if not (ident_set_eq slot_names argument_names) then
-        err "Slot names don't match argument names"
+        Errors.constructor_wrong_args "union"
       else
         (* Convert args to positional *)
         let arguments = arglist_to_positional (args, slot_names) in
@@ -589,7 +605,7 @@ and augment_union_constructor (env: env) (module_name: module_name) (type_name: 
         let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
         ps ("Params", String.concat "\n" (List.map (fun (ValueParameter (n, t)) -> (ident_string n) ^ ": " ^ (type_string t)) params));
         ps ("Arguments", String.concat "\n" (List.map show_texpr arguments));
-        let bindings = check_argument_list env module_name params arguments in
+        let bindings = check_argument_list env module_name case_name params arguments in
         (* Use the bindings to get the effective return type *)
         let rt = NamedType (type_name,
                             List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
@@ -622,7 +638,7 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
       let arguments: texpr list = arglist_to_positional (args, param_names) in
       (* Check the list of params against the list of arguments *)
-      let bindings = check_argument_list env source_module_name params arguments in
+      let bindings = check_argument_list env source_module_name (original_name callable_name) params arguments in
       (* Use the bindings to get the effective return type *)
       let rt' = replace_variables bindings rt in
       let (bindings', rt'') = handle_return_type_polymorphism env source_module_name (local_name callable_name) params rt' asserted_ty bindings in
@@ -635,7 +651,7 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
          pt ("Dispatch Type", dispatch_ty);
          (* Is the dispatch type a type variable? *)
          (match dispatch_ty with
-          | TyVar (TypeVariable (_, _, _, constraints)) ->
+          | TyVar (TypeVariable (typaram, _, _, constraints)) ->
              (* If so, check if the constraints say that it implements the typeclass. *)
              let tc_name: sident = get_decl_sident_or_die env typeclass_id in
              if List.exists (fun c -> equal_sident tc_name c) constraints then
@@ -655,15 +671,19 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
                  }
              else
                (* If it doesn't, that's an error *)
-               err "Type parameter does not implement typeclass."
+               Errors.unconstrained_type_parameter
+                 ~typeclass:(sident_name tc_name)
+                 ~typaram
           | _ ->
              (* If it's not a type variable, continue normal instance resolution. *)
              let (instance, instance_bindings): decl * type_bindings =
                (match get_instance env source_module_name dispatch_ty typeclass_id with
                 | Some (i, b) -> (i, b)
                 | None ->
-                   err ("Typeclass resolution failed. Dispatch type: "
-                        ^ (type_string dispatch_ty)))
+                   let tc_name: sident = get_decl_sident_or_die env typeclass_id in
+                   Errors.no_suitable_instance
+                     ~typeclass:(sident_name tc_name)
+                     ~ty:dispatch_ty)
              in
              ps ("Instance bindings", show_bindings instance_bindings);
              let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
@@ -689,24 +709,20 @@ and augment_method_call (env: env) (source_module_name: module_name) (typeclass_
 (* Given a list of type parameters, and a list of arguments, check that the
    lists have the same length and each argument satisfies each corresponding
    parameter. Return the resulting set of type bindings. *)
-and check_argument_list (env: env) (module_name: module_name) (params: value_parameter list) (args: texpr list): type_bindings =
+and check_argument_list (env: env) (module_name: module_name) (name: identifier) (params: value_parameter list) (args: texpr list): type_bindings =
   (* Check that the number of parameters is the same as the number of
      arguments. *)
-  check_arity params args;
+  check_arity name params args;
   (* Check arguments against parameters *)
   check_argument_list' env module_name empty_bindings params args
 
-and check_arity (params: value_parameter list) (args: texpr list): unit =
+and check_arity (name: identifier) (params: value_parameter list) (args: texpr list): unit =
   let nparams = List.length params
   and nargs = List.length args in
   if nparams = nargs then
     ()
   else
-    err ("The function expects "
-         ^ (string_of_int nparams)
-         ^ " arguments, but was called with "
-         ^ (string_of_int nargs)
-         ^ ".")
+    Errors.call_wrong_arity ~name ~expected:nparams ~actual:nargs
 
 (* Precondition: both lists have the same length. *)
 and check_argument_list' (env: env) (module_name: module_name) (bindings: type_bindings) (params: value_parameter list) (args: texpr list): type_bindings =
@@ -764,9 +780,7 @@ and handle_return_type_polymorphism (env: env) (module_name: module_name) (name:
        let bindings'' = merge_bindings bindings bindings' in
        (bindings'', replace_variables bindings'' rt)
     | None ->
-       err ("Callable '"
-            ^ (ident_string name)
-            ^ "' is polymorphic in the return type but has no asserted type.")
+       Errors.unconstrained_generic_function name
   else
     (empty_bindings, replace_variables bindings rt)
 
@@ -920,11 +934,11 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                          body'
                        )
                    else
-                     err "Destructuring a record: not the same set of bindings and slots"
+                     Errors.destructure_wrong_slots rec_ty
                  else
-                   err "Not a public record"
+                   Errors.destructure_not_public rec_ty
               | _ ->
-                 err "Not a record type"))
+                 Errors.destructure_non_record rec_ty))
       | AAssign (span, LValue (var, elems), value) ->
          adorn_error_with_span span
            (fun _ ->
@@ -939,7 +953,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                        let _ = match_type_with_value (env, module_name) var_ty value in
                        TAssign (span, TypedLValue (var, []), value)
                      else
-                       err "L-values must end in the free universe"
+                       Errors.lvalue_not_free ()
                   | elems ->
                      (* Assigning to a path. *)
                      let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
@@ -956,13 +970,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      if universe = FreeUniverse then
                        TAssign (span, TypedLValue (var, elems), value)
                      else
-                       err "L-values must end in the free universe")
+                       Errors.lvalue_not_free ())
               | None ->
-                 austral_raise GenericError [
-                     Text "I can't find a variable named ";
-                     Code (ident_string var);
-                     Text "."
-           ]))
+                 Errors.unknown_variable var))
       | AIf (span, c, t, f) ->
          adorn_error_with_span span
            (fun _ ->
@@ -970,7 +980,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              if is_boolean (get_type c') then
                TIf (span, c', augment_stmt ctx t, augment_stmt ctx f)
              else
-               err "The type of the condition in an if statement must be a boolean.")
+               Errors.condition_not_boolean
+                 ~kind:"if"
+                 ~form:"statement"
+                 ~ty:(get_type c'))
       | AWhen (span, c, t) ->
          adorn_error_with_span span
            (fun _ ->
@@ -978,7 +991,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              if is_boolean (get_type c) then
                TIf (span, c, augment_stmt ctx t, TSkip span)
              else
-               err "The type of the condition in an if statement must be a boolean.")
+               Errors.condition_not_boolean
+                 ~kind:"if"
+                 ~form:"statement"
+                 ~ty:(get_type c))
       | ACase (span, expr, whens) ->
          (* Type checking a case statement:
 
@@ -1002,7 +1018,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
                TCase (span, expr', whens'')
              else
-               err "Non-exhaustive case statement.")
+               Errors.case_non_exhaustive ())
       | AWhile (span, c, body) ->
          adorn_error_with_span span
            (fun _ ->
@@ -1010,7 +1026,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              if is_boolean (get_type c') then
                TWhile (span, c', augment_stmt ctx body)
              else
-               err "The type of the condition in a while loop must be a boolean")
+               Errors.condition_not_boolean
+                 ~kind:"while"
+                 ~form:"statement"
+                 ~ty:(get_type c'))
       | AFor { span; name; initial; final; body; } ->
          adorn_error_with_span span
            (fun _ ->
@@ -1022,9 +1041,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let b' = augment_stmt (update_lexenv ctx lexenv') body in
                  TFor (span, name, i', f', b')
                else
-                 err "The type of the final value in a for loop must be an integer type."
+                 Errors.for_bounds_non_integral ~bound:"final" ~ty:(get_type f')
              else
-               err "The type of the initial value in a for loop must be an integer type.")
+               Errors.for_bounds_non_integral ~bound:"initial" ~ty:(get_type i'))
       | ABorrow { span; original; rename; region; body; mode; } ->
          adorn_error_with_span span
            (fun _ ->
@@ -1055,9 +1074,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                        mode=mode
                      }
                  else
-                   err "Cannot borrow a non-linear type."
+                   Errors.borrow_non_linear orig_ty
               | None ->
-                 err "No variable with this name."))
+                 Errors.unknown_variable original))
       | ABlock (span, f, r) ->
          let a = augment_stmt ctx f in
          let b = augment_stmt ctx r in
@@ -1069,7 +1088,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              ps ("Expression", show_texpr e');
              let u = type_universe (get_type e') in
              if ((u = LinearUniverse) || (u = TypeUniverse)) then
-               err "Discarding a linear value"
+               Errors.discard_linear u
              else
                TDiscarding (span, e'))
       | AReturn (span, e) ->
@@ -1098,7 +1117,7 @@ and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_m
       | NamedType (name, args, _) ->
          augment_slot_accessor_elem env module_name slot_name name args
       | _ ->
-         err "Not a record type")
+         Errors.path_not_record (type_string head_ty))
   | PointerSlotAccessor slot_name ->
      (match head_ty with
       | Pointer pointed_to ->
@@ -1109,17 +1128,15 @@ and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_m
           | NamedType (name, args, _) ->
              augment_reference_slot_accessor_elem env module_name slot_name name args
           | _ ->
-             err "Not a record type")
+             Errors.path_not_record (type_string ty))
       | _ ->
-         err "Not a record type")
+         Errors.path_not_record (type_string head_ty))
   | ArrayIndex ie ->
      let ie' = augment_expr module_name env rm typarams lexenv None ie in
      let _ = ie' in
      (match head_ty with
       | _ ->
-         austral_raise TypeError [
-             Text "The array index operator doesn't work in lvalues."
-           ])
+         Errors.lvalue_index ())
 
 
 and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty): (ty * decl list) =
@@ -1127,11 +1144,7 @@ and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty
                       | NamedType (n, _, _) ->
                          n
                       | _ ->
-                         austral_raise GenericError [
-                             Text "Case statement: case expression type is not a union type: ";
-                             Code (type_string ty);
-                             Text "."
-                           ]) in
+                         Errors.case_non_union ty) in
   match get_decl_by_name env (qident_to_sident name) with
   | Some (Union { id; vis; name; mod_id; typarams; universe; _ }) ->
      let module_name = module_name_from_id env mod_id in
@@ -1143,9 +1156,9 @@ and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty
        and cases = get_union_cases env id in
        (ty, cases)
      else
-       err "Union must be public or from the same module to be used in a case statement."
+       Errors.case_non_public ()
   | _ ->
-     err "Not a union type"
+     Errors.case_non_union ty
 
 and group_cases_whens (cases: decl list) (whens: abstract_when list): (typed_case * abstract_when) list =
   List.map (fun (TypedCase (n, s)) -> (TypedCase (n, s), List.find (fun (AbstractWhen (n', _, _)) -> n = n') whens))
@@ -1180,19 +1193,22 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
                             pt ("Binding type",  ty);
                             (rename, ty, VarLocal)
                           else
-                            err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
+                            Errors.slot_wrong_type
+                              ~name:rename
+                              ~expected:actual
+                              ~actual:ty)
                         bindings'' in
         let lexenv' = push_vars lexenv newvars in
         let body' = augment_stmt (update_lexenv ctx lexenv') body in
         TypedWhen (name, List.map (fun (name, _, ty, rename) -> TypedBinding { name; ty; rename}) bindings'', body')
       else
-        err "The set of slots in the case statement doesn't match the set of slots in the union definition.")
+        Errors.case_wrong_slots ())
 
 let rec validate_constant_expression (expr: texpr): unit =
   if is_constant expr then
     ()
   else
-    err ("The value of this constant is not a valid constant expression.")
+    Errors.expression_not_constant ()
 
 and is_constant = function
   | TNilConstant ->
@@ -1282,9 +1298,9 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
                if kind = UnsafeModule then
                  TForeignFunction (decl_id, vis, name, params, rt, s, doc)
                else
-                 err "Can't declare a foreign function in a safe module."
+                 Errors.foreign_in_safe_module ()
              else
-               err "Foreign functions can't have type parameters."
+               Errors.foreign_type_parameters ()
           | [ForeignExportPragma _] ->
              let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
              let body' = augment_stmt ctx body in
@@ -1294,7 +1310,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
              let body' = augment_stmt ctx body in
              TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
           | _ ->
-             err "Invalid pragmas")
+             Errors.fun_invalid_pragmas ())
       | LTypeclass (decl_id, vis, name, typaram, methods, doc) ->
          ps ("Kind", "Typeclass");
          TTypeClass (decl_id, vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)
