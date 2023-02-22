@@ -1,0 +1,6 @@
+module body Test is
+    function main(): ExitCode is
+        let x: Float32 := 3.14;
+        return ExitSuccess();
+    end;
+end module body.
