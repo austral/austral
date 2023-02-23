@@ -259,5 +259,17 @@ let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
          empty_bindings
       | _ ->
          match_type ctx ty (get_type expr))
+  | SingleFloat ->
+     (match expr with
+      | TFloatConstant _ ->
+         empty_bindings
+      | _ ->
+         match_type ctx ty (get_type expr))
+  | DoubleFloat ->
+     (match expr with
+      | TFloatConstant _ ->
+         empty_bindings
+      | _ ->
+         match_type ctx ty (get_type expr))
   | _ ->
      match_type ctx ty (get_type expr)
