@@ -76,7 +76,9 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                   | VarLocal ->
                      TLocalVar ((original_name name), ty))
               | None ->
-                 Errors.unknown_variable (original_name name)))
+                 Errors.unknown_name
+                   ~kind:"variable"
+                   ~name:(original_name name)))
       | FunctionCall (name, args) ->
          augment_call module_name env lexenv asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
       | ArithmeticExpression (op, lhs, rhs) ->
@@ -314,7 +316,9 @@ let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typ
                  in
                  TBorrowExpr (mode, name, reg, ty))
           | None ->
-             Errors.unknown_variable (original_name name)))
+             Errors.unknown_name
+               ~kind:"variable"
+               ~name:(original_name name)))
 
 and get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
@@ -465,7 +469,9 @@ and augment_call (module_name: module_name) (env: env) (lexenv: lexenv) (asserte
       | Some callable ->
          augment_callable module_name env name callable asserted_ty args
       | None ->
-         Errors.unknown_callable (original_name name))
+         Errors.unknown_name
+           ~kind:"callable"
+           ~name:(original_name name))
 
 and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
   (* Because function pointers don't preserve value parameter names, we can't
@@ -972,7 +978,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      else
                        Errors.lvalue_not_free ())
               | None ->
-                 Errors.unknown_variable var))
+                 Errors.unknown_name ~kind:"variable" ~name:var))
       | AIf (span, c, t, f) ->
          adorn_error_with_span span
            (fun _ ->
@@ -1076,7 +1082,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  else
                    Errors.borrow_non_linear orig_ty
               | None ->
-                 Errors.unknown_variable original))
+                 Errors.unknown_name ~kind:"variable" ~name:original))
       | ABlock (span, f, r) ->
          let a = augment_stmt ctx f in
          let b = augment_stmt ctx r in

@@ -240,7 +240,11 @@ let lvalue_not_free () =
   austral_raise TypeError [
     Text "Only values in the ";
     Code "Free";
-    Text " universe can be assigned to."
+    Text " universe can be assigned to.";
+    Break;
+    Text "Consider using the ";
+    Code "swap";
+    Text " function."
   ]
 
 let no_such_slot ~type_name ~slot_name =
@@ -312,18 +316,11 @@ let unconstrained_type_parameter ~typeclass ~typaram =
     Text "Consider adding a constraint to the type parameter."
   ]
 
-let unknown_callable name =
+let unknown_name ~kind ~name =
   austral_raise TypeError [
-    Text "The function or method ";
-    Code (ident_string name);
-    Text " cannot be found.";
-    Break;
-    Text "Consider importing it if it is defined in another module."
-  ]
-
-let unknown_variable name =
-  austral_raise TypeError [
-    Text "The variable ";
+    Text "The ";
+    Text kind;
+    Text " ";
     Code (ident_string name);
     Text " cannot be found.";
     Break;

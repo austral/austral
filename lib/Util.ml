@@ -2,6 +2,47 @@ open Identifier
 open Unix
 open Error
 
+module Errors = struct
+  let c_compiler_error ~command ~exit_code ~stdout ~stderr =
+    austral_raise CliError [
+      Text "Failed to run C compiler.";
+      Break;
+      Text "Command: ";
+      Code command;
+      Break;
+      Text "Exit code: ";
+      Text (string_of_int exit_code);
+      Break;
+      Text "Standard output:\n";
+      Text stdout;
+      Break;
+      Text "Standard error:\n";
+      Text stderr
+    ]
+
+  let long_character lit =
+    austral_raise ParseError [
+      Text "Character literal '";
+      Code lit;
+      Text " is more than one character."
+    ]
+
+  let write_error ~path ~error = match error with
+  | Sys_error msg ->
+      austral_raise CliError [
+        Text "Failed to write to file ";
+        Code path;
+        Text ": ";
+        Break;
+        Text msg
+      ]
+  | _ ->
+      austral_raise CliError [
+        Text "Failed to write to file ";
+        Code path
+      ]
+end
+
 let string_explode (s: string): char list =
   List.init (String.length s) (String.get s)
 
@@ -30,9 +71,9 @@ let write_string_to_file (path: string) (contents: string): unit =
     Printf.fprintf stream "%s" contents;
     close_out stream;
     ()
-  with _ ->
+  with error ->
     close_out_noerr stream;
-    err ("Failed to write to file: " ^ path)
+    Errors.write_error ~path ~error
 
 let remove_char (s: string) (c: char)  =
   string_implode (List.filter (fun c' -> c <> c') (string_explode s))
@@ -80,7 +121,7 @@ let parse_ascii_char (s: string): int =
       | [c] ->
          Char.code c
       | _ ->
-         err "Character literal too long.")
+         Errors.long_character s)
 
 let rec count_leading_whitespace (s: string): int =
   let chars = string_explode s in
@@ -156,7 +197,7 @@ let compile_c_code (source_path: string) (output_path: string): command_output =
   let o = run_command cmd in
   let (CommandOutput { command; code; stdout; stderr }) = o in
   if code <> 0 then
-    err ("Error when running C compiler.\n  Command: " ^ command ^ "\n  Exit code: " ^ (string_of_int code) ^ "\n  Standard output:\n" ^ stdout ^ "\n  Standard error:\n" ^ stderr ^ "\n")
+    Errors.c_compiler_error ~command ~exit_code:code ~stdout ~stderr
   else
     o
 

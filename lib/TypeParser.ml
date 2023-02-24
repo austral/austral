@@ -37,7 +37,7 @@ module Errors = struct
   let unresolved_type name =
     austral_raise TypeError [
       Text "Unable to find a type with the name ";
-      Code (original_name name |> ident_string);
+      Code (ident_string name);
       Text ".";
       Break;
       Text "Consider importing it if it is defined in another module."
@@ -311,7 +311,7 @@ and parse_user_defined_type (env: env) (sigs: type_signature list) (name: qident
   | Some ts ->
      parse_user_defined_type' ts name args
   | None ->
-     Errors.unresolved_type name
+     Errors.unresolved_type (original_name name)
 
 and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list): ty =
   let (TypeSignature (_, ts_params, declared_universe)) = ts in

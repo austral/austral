@@ -21,6 +21,13 @@ module Errors = struct
       Text "."
     ]
 
+  let module_exists name =
+    austral_raise DeclarationError [
+      Text "A module with the name ";
+      Code (mod_name_string name);
+      Text " already exists."
+    ]
+
   let unknown_module name =
     austral_raise DeclarationError [
       Text "Unknown module ";
@@ -68,11 +75,7 @@ let get_module_by_name (env: env) (mod_name: module_name): mod_rec option =
 let ensure_no_mod_with_name (env: env) (name: module_name): unit =
   match get_module_by_name env name with
   | Some _ ->
-     austral_raise DeclarationError [
-         Text "A module with the name ";
-         Code (mod_name_string name);
-         Text " already exists.";
-       ]
+      Errors.module_exists name
   | None ->
      ()
 

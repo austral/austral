@@ -11,7 +11,7 @@ module Errors = struct
   let disallowed_type ty =
     austral_raise TypeError [
       Text "The type ";
-      Code ty;
+      Code (type_string ty);
       Text " is not allowed in the signature of an exported function."
     ]
 end
@@ -38,7 +38,7 @@ let get_export_data (env: env) (id: decl_id): (value_parameter list * ty) =
 let rec transform_ty (ty: ty): c_ty =
   match ty with
   | Unit ->
-     Errors.disallowed_type "Unit"
+     Errors.disallowed_type ty
   | Boolean ->
      CNamedType "au_bool_t"
   | Integer (s, w) ->
@@ -61,28 +61,28 @@ let rec transform_ty (ty: ty): c_ty =
      CNamedType "float"
   | DoubleFloat ->
      CNamedType "double"
-  | NamedType (name, _, _) ->
-     Errors.disallowed_type (qident_to_sident name |> sident_name |> ident_string)
+  | NamedType _ ->
+     Errors.disallowed_type ty
   | StaticArray (Integer (Unsigned, Width8)) ->
      c_string_type
   | StaticArray _ ->
-     Errors.disallowed_type "FixedArray"
+     Errors.disallowed_type ty
   | RegionTy _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | ReadRef _ ->
-     Errors.disallowed_type "Reference"
+     Errors.disallowed_type ty
   | WriteRef _ ->
-     Errors.disallowed_type "WriteReference"
+     Errors.disallowed_type ty
   | TyVar _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | Address t ->
      CPointer (transform_ty t)
   | Pointer _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | FnPtr _ ->
      fn_type
   | MonoTy _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
 
 let transform_param (ValueParameter (name, ty)): c_param =
   CValueParam (gen_ident name, transform_ty ty)
