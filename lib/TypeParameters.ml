@@ -13,10 +13,10 @@ module Errors = struct
         Code (typaram_name param |> ident_string)
       ]
     | None -> [
-        Text "Multiple type parameters have the same name";
+        Text "Multiple type parameters have the same name.";
       ]
     in
-    austral_raise DeclarationError text
+    austral_raise GenericError text
 end
 
 type typarams = TyParams of type_parameter list

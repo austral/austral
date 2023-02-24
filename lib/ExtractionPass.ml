@@ -42,12 +42,12 @@ module Errors = struct
     ]
 
   let free_contains_linear ~name ~universe ~parameter =
-    austral_raise DeclarationError [
+    austral_raise LinearityError [
       Code (ident_string name);
       Text " was declared to belong to the ";
       Code "Free";
-      Text " universe, but ";
-      Text (if parameter then "has a type parameter" else "contains a field");
+      Text " universe, but it ";
+      Text (if parameter then "has a type parameter" else "contains a type");
       Text " that belongs to the ";
       Code universe;
       Text " universe."

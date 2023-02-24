@@ -48,20 +48,19 @@ module Errors = struct
       Text "The type ";
       Code typename;
       Text " expects ";
-      Text (string_of_int expected);
-      Text " type argument";
-      Text (if expected = 1 then "" else "s")
+      Code (string_of_int expected);
+      Text " type arguments";
     ]
     in
     let text = text @ match actual with
     | Some actual -> [
-        Text ", but was given ";
-        Text (string_of_int actual);
-        Text "."
+        Text ", but I only found ";
+        Code (string_of_int actual);
+        Text " arguments."
       ]
     | None -> [Text "."]
     in
-    austral_raise TypeError text
+    austral_raise GenericError text
 end
 
 let decl_type_signature (decl: decl): type_signature option =

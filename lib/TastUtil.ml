@@ -6,11 +6,12 @@ open Error
 
 module Errors = struct
   let arity_error ~expected ~actual =
-    austral_raise TypeError [
+    austral_raise GenericError [
       Text "Wrong number of arguments. Expected ";
-      Text (string_of_int expected);
-      Text " but got ";
-      Text (string_of_int actual)
+      Code (string_of_int expected);
+      Text " and got ";
+      Code (string_of_int actual);
+      Text "."
     ]
 end
 

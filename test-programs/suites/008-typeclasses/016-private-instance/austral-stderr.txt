@@ -1,5 +1,5 @@
 Error:
-  Title: Generic Error
+  Title: Type Error
   Module:
     Test
   Location:
@@ -7,7 +7,7 @@ Error:
     From: line 5, column 8
     To: line 5, column 33
   Description:
-    Typeclass resolution failed. Dispatch type: Bool
+    The typeclass `Foo` has no instance which matches for `Bool`
   Code:
     3 | module body Test is
     4 |     function main(): ExitCode is

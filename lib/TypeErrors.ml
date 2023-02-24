@@ -233,18 +233,18 @@ let logical_operands_not_boolean ~operator ~types = match types with
 
 let lvalue_index () =
   austral_raise TypeError [
-    Text "The array index operator cannot be assigned to."
+    Text "The array index operator doesn't work in lvalues."
   ]
 
 let lvalue_not_free () =
-  austral_raise TypeError [
+  austral_raise LinearityError [
     Text "Only values in the ";
     Code "Free";
     Text " universe can be assigned to.";
     Break;
     Text "Consider using the ";
     Code "swap";
-    Text " function."
+    Text " function instead."
   ]
 
 let no_such_slot ~type_name ~slot_name =
@@ -317,12 +317,10 @@ let unconstrained_type_parameter ~typeclass ~typaram =
   ]
 
 let unknown_name ~kind ~name =
-  austral_raise TypeError [
-    Text "The ";
+  austral_raise GenericError [
+    Text "I can't find a ";
     Text kind;
-    Text " ";
+    Text " named ";
     Code (ident_string name);
-    Text " cannot be found.";
-    Break;
-    Text "Consider importing it if it is defined in another module."
+    Text "."
   ]

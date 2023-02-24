@@ -13,13 +13,13 @@ open Error
 
 module Errors = struct
   let broken_orphan_rule () =
-    austral_raise DeclarationError [
+    austral_raise GenericError [
       Text "Orphan rule broken: typeclass and type are both foreign."
     ]
 
   let duplicate_tyvars () =
     austral_raise DeclarationError [
-      Text "Generic instances can only use the type parameters once in the argument."
+      Text "Generic instances can only use each type parameter once in the argument."
     ]
 
   let leftovers () =
@@ -43,8 +43,8 @@ module Errors = struct
     ]
 
   let overlapping_instances () =
-    austral_raise DeclarationError [
-      Text "Instance overlap."
+    austral_raise GenericError [
+      Text "Instance overlaps."
     ]
 
   let region_arg () =
@@ -65,10 +65,11 @@ module Errors = struct
     austral_raise TypeError [
       Text "Cannot define an instance with argument ";
       Code (type_string ty);
-      Text " because it needs to be ";
+      Text " because it should belong to the ";
       Code (universe_string expected);
-      Text " but it is ";
-      Code (universe_string actual)
+      Text " universe, but it is actually in the ";
+      Code (universe_string actual);
+      Text " universe."
     ]
 end
 

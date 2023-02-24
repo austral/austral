@@ -1,10 +1,12 @@
 Error:
-  Title: Generic Error
+  Title: Declaration Error
   Module:
     Test
   Location:
     [no span available]
   Description:
-    Trying to define a record in the Region universe. Regions are distinct from types.
+    The record `Foo` was declared to belong to the `Region` universe, but regions are distinct from types.
+
+    Consider using one of `Type`, `Linear`, or `Free` instead.
   Code:
     [no span available]
