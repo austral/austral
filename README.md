@@ -204,9 +204,13 @@ Near-future work:
 
 Copyright 2018–2023 [Fernando Borretti][fernando].
 
-Licensed under the GPLv3 license. See the COPYING file for details.
+Licensed under the [Apache 2.0 license][apache] with the [LLVM exception][llvmex]. See the [LICENSE file][license] for details.
 
 [opam]: https://opam.ocaml.org/doc/Install.html
 [cap]: https://en.wikipedia.org/wiki/Capability-based_security
 [sca]: https://en.wikipedia.org/wiki/Supply_chain_attack
 [fernando]: https://borretti.me/
+
+[apache]: https://www.apache.org/licenses/LICENSE-2.0
+[llvmex]: https://spdx.org/licenses/LLVM-exception.html
+[license]: https://github.com/austral/austral/blob/master/LICENSE
