@@ -1,3 +1,9 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
 module body Standard.Order is
     generic [T: Type(TotalOrder), R: Region, S: Region]
     function equal(a: &[T, R], b: &[T, S]): Bool is
