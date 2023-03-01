@@ -41,7 +41,7 @@ let exponent = 'e' | 'E'
 let sign = '+' | '-'
 let period = '.'
 
-let comment = "--" [^ '\r' '\n']* (newline)
+let comment = "--" [^ '\r' '\n']* newline?
 
 (* Token regexes *)
 
