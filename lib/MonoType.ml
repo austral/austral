@@ -5,7 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
-(** An alternative implementation of the monomorphic type system. *)
+(** The monomorphic type system. *)
 open Id
 open Identifier
 open Type
