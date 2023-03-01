@@ -19,6 +19,57 @@ open EnvTypes
 open Error
 open ErrorText
 
+module Errors = struct
+  let function_pointer_no_args () =
+    austral_raise ParseError [
+      Text "Function pointer type specifier must have at least one argument."
+    ]
+
+  let not_a_region typename =
+    austral_raise TypeError [
+      Code typename;
+      Text " takes as second argument a region, but was given a type."
+    ]
+
+  let typaram_wrong_universe ~param ~expected ~actual =
+    austral_raise TypeError [
+      Text "The type parameter ";
+      Code (typaram_name param |> ident_string);
+      Text " is expected to be ";
+      Code (universe_string expected);
+      Text " but the supplied argument is ";
+      Code (universe_string actual)
+    ]
+
+  let unresolved_type name =
+    austral_raise TypeError [
+      Text "Unable to find a type with the name ";
+      Code (ident_string name);
+      Text ".";
+      Break;
+      Text "Consider importing it if it is defined in another module."
+    ]
+
+  let wrong_arity ~typename ~expected ~actual =
+    let text = [
+      Text "The type ";
+      Code typename;
+      Text " expects ";
+      Code (string_of_int expected);
+      Text " type arguments";
+    ]
+    in
+    let text = text @ match actual with
+    | Some actual -> [
+        Text ", but I only found ";
+        Code (string_of_int actual);
+        Text " arguments."
+      ]
+    | None -> [Text "."]
+    in
+    austral_raise GenericError text
+end
+
 let decl_type_signature (decl: decl): type_signature option =
   match decl with
   | Constant _ ->
@@ -41,7 +92,7 @@ let decl_type_signature (decl: decl): type_signature option =
 let parse_function_pointer (args: ty list): ty =
   match args with
   | [] ->
-     err "Function pointer type specifier must have at least one argument."
+     Errors.function_pointer_no_args ()
   | [r] ->
      FnPtr ([], r)
   | _ ->
@@ -55,14 +106,14 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
     | [ty] ->
        Some (Address ty)
     | _ ->
-       err "Invalid Address type specifier."
+       Errors.wrong_arity ~typename:"Address" ~expected:1 ~actual:None
   else
     if is_pointer_type name then
       match args with
       | [ty] ->
          Some (Pointer ty)
       | _ ->
-         err "Invalid Pointer type specifier."
+         Errors.wrong_arity ~typename:"Pointer" ~expected:1 ~actual:None
     else
       let name_str: string = ident_string (original_name name) in
       match name_str with
@@ -101,7 +152,10 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
           | [ty] ->
              Some (StaticArray ty)
           | _ ->
-             err "Invalid FixedArray type specifier.")
+             Errors.wrong_arity
+               ~typename:"FixedArray"
+               ~expected:1
+               ~actual:None)
       | "Reference" ->
          (match args with
           | [ty; ty'] ->
@@ -109,9 +163,12 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
              if (u = RegionUniverse) then
                Some (ReadRef (ty, ty'))
              else
-               err "Reference error: Not a region"
+               Errors.not_a_region "Reference"
           | _ ->
-             err "Invalid Reference type specifier.")
+             Errors.wrong_arity
+               ~typename:"Reference"
+               ~expected:2
+               ~actual:None)
       | "WriteReference" ->
          (match args with
           | [ty; ty'] ->
@@ -119,9 +176,12 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
              if (u' = RegionUniverse) then
                Some (WriteRef (ty, ty'))
              else
-               err "WriteReference error: Not a region"
+               Errors.not_a_region "WriteReference"
           | _ ->
-             err "Invalid WriteReference type specifier.")
+             Errors.wrong_arity
+               ~typename:"WriteReference"
+               ~expected:2
+               ~actual:None)
       | "Fn" ->
          Some (parse_function_pointer args)
       | _ ->
@@ -257,7 +317,7 @@ and parse_user_defined_type (env: env) (sigs: type_signature list) (name: qident
   | Some ts ->
      parse_user_defined_type' ts name args
   | None ->
-     err ("No user defined type with name: " ^ (qident_debug_name name))
+     Errors.unresolved_type (original_name name)
 
 and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list): ty =
   let (TypeSignature (_, ts_params, declared_universe)) = ts in
@@ -278,15 +338,10 @@ and check_param_arity_matches (params: typarams) (args: ty list) (ty_name: qiden
   if expected = got then
     ()
   else
-    austral_raise GenericError [
-        Text "The type ";
-        Code (ident_string (original_name ty_name));
-        Text " expects ";
-        Code (string_of_int expected);
-        Text " type arguments, but I only found ";
-        Code (string_of_int got);
-        Text " arguments."
-      ]
+    Errors.wrong_arity
+      ~typename:(original_name ty_name |> ident_string)
+      ~expected
+      ~actual:(Some got)
 
 and check_universes_match (params: typarams) (args: ty list): unit =
   let _ = List.map2 check_universes_match' (typarams_as_list params) args in ()
@@ -297,10 +352,7 @@ and check_universes_match' (tp: type_parameter) (arg: ty): unit =
   if universe_compatible param_u arg_u then
     ()
   else
-    err ("Type parser: Universe mismatch: parameter universe is "
-         ^ (universe_string param_u)
-         ^ ", argument universe is "
-         ^ (universe_string arg_u))
+    Errors.typaram_wrong_universe ~param:tp ~expected:param_u ~actual:arg_u
 
 and universe_compatible param arg =
   (* The check here is:

@@ -67,6 +67,13 @@ open Error
 
 *)
 
+module Errors = struct
+  let foreign_returns_array () =
+    austral_raise DeclarationError [
+      Text "Foreign functions cannot return arrays."
+    ]
+end
+
 (* Name generation *)
 
 let counter = ref 0
@@ -529,7 +536,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      let return_type_to_c_type t =
        match t with
        | MonoStaticArray _ ->
-          err "Foreign functions cannot return arrays."
+          Errors.foreign_returns_array ()
        | _ ->
           param_type_to_c_type t
      in

@@ -13,6 +13,15 @@ open CodeGen
 open CRepr
 open Identifier
 
+module Errors = struct
+  let disallowed_type ty =
+    austral_raise TypeError [
+      Text "The type ";
+      Code (type_string ty);
+      Text " is not allowed in the signature of an exported function."
+    ]
+end
+
 (** Get the monomorph for an exported function. *)
 let get_export_monomorph (env: env) (id: decl_id): mono_id =
   match get_decl_by_id env id with
@@ -35,7 +44,7 @@ let get_export_data (env: env) (id: decl_id): (value_parameter list * ty) =
 let rec transform_ty (ty: ty): c_ty =
   match ty with
   | Unit ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | Boolean ->
      CNamedType "au_bool_t"
   | Integer (s, w) ->
@@ -59,27 +68,27 @@ let rec transform_ty (ty: ty): c_ty =
   | DoubleFloat ->
      CNamedType "double"
   | NamedType _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | StaticArray (Integer (Unsigned, Width8)) ->
      c_string_type
   | StaticArray _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | RegionTy _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | ReadRef _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | WriteRef _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | TyVar _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | Address t ->
      CPointer (transform_ty t)
   | Pointer _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
   | FnPtr _ ->
      fn_type
   | MonoTy _ ->
-     err "Not allowed"
+     Errors.disallowed_type ty
 
 let transform_param (ValueParameter (name, ty)): c_param =
   CValueParam (gen_ident name, transform_ty ty)

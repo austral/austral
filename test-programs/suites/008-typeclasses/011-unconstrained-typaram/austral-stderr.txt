@@ -1,5 +1,5 @@
 Error:
-  Title: Generic Error
+  Title: Type Error
   Module:
     Test
   Location:
@@ -7,7 +7,9 @@ Error:
     From: line 14, column 8
     To: line 14, column 22
   Description:
-    Type parameter does not implement typeclass.
+    The type parameter `T` does not implement the type class `Acceptable`
+
+    Consider adding a constraint to the type parameter.
   Code:
     12 |     generic [T: Free]
     13 |     function Foo(value: T): Unit is

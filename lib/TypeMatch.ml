@@ -20,15 +20,21 @@ open EnvExtras
 open Reporter
 open Error
 
-let type_mismatch _ a b =
-  austral_raise TypeError
-    [
+module Errors = struct
+  let type_mismatch a b =
+    austral_raise TypeError [
       Text "Expected a value of type ";
       Code (type_string a);
       Text ", but got a value of type ";
       Code (type_string b);
       Text "."
     ]
+
+  let unsatisfied_constraint () =
+    austral_raise TypeError [
+      Text "Type constraint not satisfied."
+    ]
+end
 
 type ctx = env * module_name
 
@@ -45,34 +51,34 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
       | Unit ->
          empty_bindings
       | _ ->
-         type_mismatch "Expected Unit, but got another type." a b)
+         Errors.type_mismatch a b)
   | Boolean ->
      (match b with
       | Boolean ->
          empty_bindings
       | _ ->
-         type_mismatch "Expected Boolean, but got another type." a b)
+         Errors.type_mismatch a b)
   | Integer (s, w) ->
      (match b with
       | Integer (s', w') ->
          if (s = s') && (w = w') then
            empty_bindings
          else
-           type_mismatch "Integer types don't match" a b
+           Errors.type_mismatch a b
       | _ ->
-         type_mismatch "Expected an integer, but got another type." a b)
+         Errors.type_mismatch a b)
   | SingleFloat ->
      (match b with
       | SingleFloat ->
          empty_bindings
       | _ ->
-         type_mismatch "Expected SingleFloat, but got another type." a b)
+         Errors.type_mismatch a b)
   | DoubleFloat ->
      (match b with
       | DoubleFloat ->
          empty_bindings
       | _ ->
-         type_mismatch "Expected DoubleFloat, but got another type." a b)
+         Errors.type_mismatch a b)
   | NamedType (n, args, _) ->
      (match b with
       | NamedType (n', args', _) ->
@@ -80,24 +86,24 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          if n = n' then
            match_type_list ctx args args'
          else
-           type_mismatch "Type mismatch" a b
+           Errors.type_mismatch a b
       | _ ->
-         type_mismatch "Expected a named type, but got something else." a b)
+         Errors.type_mismatch a b)
   | StaticArray t ->
      (match b with
       | StaticArray t' ->
          match_type ctx t t'
       | _ ->
-         type_mismatch "Expected an array, but got another type." a b)
+         Errors.type_mismatch a b)
   | RegionTy r ->
      (match b with
       | RegionTy r' ->
          if r = r' then
            empty_bindings
          else
-           type_mismatch "Region type mismatch" a b
+           Errors.type_mismatch a b
       | _ ->
-         type_mismatch "Expected a region, but got another type." a b)
+         Errors.type_mismatch a b)
   | ReadRef (t, r) ->
      (match b with
       | ReadRef (t', r') ->
@@ -105,7 +111,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
-         type_mismatch "Expected a read reference, but got another type." a b)
+         Errors.type_mismatch a b)
   | WriteRef (t, r) ->
      (match b with
       | WriteRef (t', r') ->
@@ -113,7 +119,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
-         type_mismatch "Expected a write reference, but got another type." a b)
+         Errors.type_mismatch a b)
   | TyVar tyvar ->
      match_type_var ctx tyvar b
   | Address t ->
@@ -121,19 +127,19 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
       | Address t' ->
          match_type ctx t t'
       | _ ->
-         type_mismatch "Expected an Address, but got another type." a b)
+         Errors.type_mismatch a b)
   | Pointer t ->
      (match b with
       | Pointer t' ->
          match_type ctx t t'
       | _ ->
-         type_mismatch "Expected a Pointer, but got another type." a b)
+         Errors.type_mismatch a b)
   | FnPtr (args, rt) ->
      (match b with
       | FnPtr (args', rt') ->
          match_type_list ctx (rt :: args) (rt' :: args')
       | _ ->
-         type_mismatch "Expected a function pointer, but got another type." a b)
+         Errors.type_mismatch a b)
   | MonoTy _ ->
      err "match_type called with MonoTy argument"
 
@@ -194,7 +200,7 @@ and try_constraint (ctx: ctx) (ty: ty) (typeclass_name: sident): unit =
       | Some _ ->
          ()
       | None ->
-         err "Type constraint not satisfied.")
+         Errors.unsatisfied_constraint ())
   | Some _ ->
      internal_err "Type parameter constraint refers to a declaration which is not a typeclass."
   | None ->

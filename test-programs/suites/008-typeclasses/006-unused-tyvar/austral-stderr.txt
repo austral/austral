@@ -1,5 +1,5 @@
 Error:
-  Title: Generic Error
+  Title: Declaration Error
   Module:
     Test
   Location:

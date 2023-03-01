@@ -11,6 +11,17 @@ open Combined
 open Reporter
 open Error
 
+module Errors = struct
+  let missing_return ~name ~declaration =
+    austral_raise DeclarationError [
+      Text "The ";
+      Text declaration;
+      Text " ";
+      Code (ident_string name);
+      Text " does not end in a return statement."
+    ]
+end
+
 let is_abort (name: qident): bool =
   let mn: module_name = source_module_name name
   and orig: identifier = original_name name
@@ -52,18 +63,16 @@ let rec ends_in_return (stmt: astmt): bool =
   | AReturn _ ->
      true
 
-let check_ends_in_return (CombinedModule { name=mn; decls; _ }): unit =
+let check_ends_in_return (CombinedModule { decls; _ }): unit =
   with_frame "Return check"
     (fun _ ->
       let check_method_ends_in_return (CMethodDef (name, _, _, _, _, body)): unit =
         if ends_in_return body then
           ()
         else
-          err ("Method "
-               ^ (ident_string name)
-               ^ " in module "
-               ^ (mod_name_string mn)
-               ^ " doesn't end in a return statement.")
+          Errors.missing_return
+            ~name:name
+            ~declaration:"method"
       in
       let check_decl_ends_in_return (decl: combined_definition): unit =
         match decl with
@@ -80,11 +89,9 @@ let check_ends_in_return (CombinedModule { name=mn; decls; _ }): unit =
                if ends_in_return body then
                  ()
                else
-                 err ("Function "
-                      ^ (ident_string name)
-                      ^ " in module "
-                      ^ (mod_name_string mn)
-                      ^ " doesn't end in a return statement.")
+                 Errors.missing_return
+                   ~name
+                   ~declaration:"function"
             | _ ->
                (* Yes pragmas: foreign function, ignore the body. *)
                ())
