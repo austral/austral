@@ -47,7 +47,7 @@ module Errors = struct
       Code (ident_string name);
       Text ".";
       Break;
-      Text "Consider importing it if it is defined in another module."
+      Text "Consider importing it, if it is defined in another module."
     ]
 
   let wrong_arity ~typename ~expected ~actual =
