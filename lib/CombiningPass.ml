@@ -25,14 +25,20 @@ module Errors = struct
       Code (ident_string name);
       Text " to be a ";
       Text expected
-    ]
+      ]
 
-  let function_mismatch ~name ~typarams ~params ~rt =
-    let message = match typarams, params, rt with
-    | true, false, false -> "have different type parameters."
-    | false, true, false -> "have different parameters."
-    | false, false, true -> "have different return types"
-    | _ -> "are different."
+  type func_mismatch_msg =
+    | DifferentTypeParameters
+    | DifferentValueParameters
+    | DifferentReturnTypes
+    | Else
+
+  let function_mismatch ~name ~msg =
+    let message = match msg with
+    | DifferentTypeParameters -> "have different type parameters."
+    | DifferentValueParameters -> "have different parameters."
+    | DifferentReturnTypes -> "have different return types"
+    | Else -> "are different."
     in
     austral_raise DeclarationError [
       Text "The interface declaration for ";
@@ -43,7 +49,7 @@ module Errors = struct
 
   let missing_body_definition ~name ~declaration =
     match declaration with
-    | Some declaration -> 
+    | Some declaration ->
        austral_raise DeclarationError [
          Text "The ";
          Text declaration;
@@ -51,7 +57,7 @@ module Errors = struct
          Code (ident_string name);
          Text " has no corresponding body implementation."
        ]
-    | None -> 
+    | None ->
        austral_raise DeclarationError [
          Code (ident_string name);
          Text " has no corresponding body implementation."
@@ -69,7 +75,7 @@ module Errors = struct
     austral_raise DeclarationError [
       Text "The typeclass ";
       Code (ident_string name);
-      Text " has multiple parameters, which is unsupported."
+      Text " has multiple type parameters, which is unsupported."
     ]
 
   let type_mismatch name =
@@ -192,11 +198,19 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                       docstring,
                       pragmas)
          else
+           let msg =
+             if typarams <> typarams' then
+               Errors.DifferentTypeParameters
+             else if params <> params' then
+               Errors.DifferentValueParameters
+             else if rt <> rt' then
+               Errors.DifferentReturnTypes
+             else
+               Errors.Else
+           in
            Errors.function_mismatch
              ~name
-             ~typarams:(typarams = typarams')
-             ~params:(params = params')
-             ~rt:(rt = rt')
+             ~msg:msg
       | _ ->
          Errors.declaration_kind_mismatch ~name ~expected:"function")
   | ConcreteInstanceDecl (name, typarams, argument, docstring) ->
