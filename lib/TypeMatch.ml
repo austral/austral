@@ -36,7 +36,7 @@ module Errors = struct
         Text "Type constraint not satisfied: the type ";
         Code (type_string ty);
         Text " does not implement the typeclass ";
-        Code (show_sident constraint_typeclass_name);
+        Code (ident_string (sident_name constraint_typeclass_name));
         Break;
         Text "This constraint is for the type variable ";
         Code (ident_string tv_name);
