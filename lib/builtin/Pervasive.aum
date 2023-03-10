@@ -1836,4 +1836,72 @@ module body Austral.Pervasive is
             return Some(value => value);
         end;
     end;
+
+    -- ToFloat64
+
+    instance ToFloat64(Nat8) is
+        method toFloat64(value: Nat8): Option[Float64] is
+            return Some(value => @embed(Float64, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Nat16) is
+        method toFloat64(value: Nat16): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Nat32) is
+        method toFloat64(value: Nat32): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Nat64) is
+        method toFloat64(value: Nat64): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Int8) is
+        method toFloat64(value: Int8): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Int16) is
+        method toFloat64(value: Int16): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Int32) is
+        method toFloat64(value: Int32): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Int64) is
+        method toFloat64(value: Int64): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Index) is
+        method toFloat64(value: Index): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Float32) is
+        method toFloat64(value: Float32): Option[Float64] is
+            return Some(value => @embed(Float64, "((double)($1))", value));
+        end;
+    end;
+
+    instance ToFloat64(Float64) is
+        method toFloat64(value: Float64): Option[Float64] is
+            return Some(value => value);
+        end;
+    end;
 end module body.
