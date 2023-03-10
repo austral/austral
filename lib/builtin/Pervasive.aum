@@ -1236,6 +1236,18 @@ module body Austral.Pervasive is
         end;
     end;
 
+    instance ToNat16(Float32) is
+        method toNat16(value: Float32): Option[Nat16] is
+            return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+        end;
+    end;
+
+    instance ToNat16(Float64) is
+        method toNat16(value: Float64): Option[Nat16] is
+            return Some(value => @embed(Nat16, "((au_nat16_t)($1))", value));
+        end;
+    end;
+
     -- ToNat32
 
     instance ToNat32(Nat8) is

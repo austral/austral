@@ -173,6 +173,8 @@ module Austral.Pervasive is
     instance ToNat16(Int32);
     instance ToNat16(Int64);
     instance ToNat16(Index);
+    instance ToNat16(Float32);
+    instance ToNat16(Float64);
 
     typeclass ToNat32(T: Type) is
         method toNat32(value: T): Option[Nat32];
