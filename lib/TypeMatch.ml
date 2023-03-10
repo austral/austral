@@ -30,9 +30,16 @@ module Errors = struct
       Text "."
     ]
 
-  let unsatisfied_constraint () =
+  let unsatisfied_constraint (tv: type_var) (ty: ty) (constraint_typeclass_name: sident) =
+    let (TypeVariable (tv_name, _, _, _)) = tv in
     austral_raise TypeError [
-      Text "Type constraint not satisfied."
+        Text "Type constraint not satisfied: the type ";
+        Code (type_string ty);
+        Text " does not implement the typeclass ";
+        Code (show_sident constraint_typeclass_name);
+        Break;
+        Text "This constraint is for the type variable ";
+        Code (ident_string tv_name);
     ]
 end
 
@@ -166,7 +173,7 @@ and match_type_var (ctx: ctx) (tv: type_var) (ty: ty): type_bindings =
        add_binding empty_bindings (tyvar_to_typaram tv) ty
   | _ ->
      (* Check that the type implements the type variable's constraints, if any. *)
-     check_type_implements_constraints ctx ty constraints;
+     check_type_implements_constraints ctx tv ty constraints;
      (* If the constraints are satisfied, add a straightforward binding. *)
      add_binding empty_bindings (tyvar_to_typaram tv) ty
 
@@ -177,7 +184,7 @@ and check_tyvar_implements_constraints (param: sident list) (arg: sident list): 
   in
   SIdentSet.subset param arg
 
-and check_type_implements_constraints (ctx: ctx) (ty: ty) (constraints: sident list): unit =
+and check_type_implements_constraints (ctx: ctx) (tv: type_var) (ty: ty) (constraints: sident list): unit =
   with_frame "Check type implements constraints"
     (fun _ ->
       pt ("Type", ty);
@@ -189,9 +196,9 @@ and check_type_implements_constraints (ctx: ctx) (ty: ty) (constraints: sident l
         (* If there are constraints, make them into a set. *)
         let constraints: SIdentSet.t = SIdentSet.of_list constraints in
         (* Try to find an instance for this type for each of the constraints. *)
-        List.iter (try_constraint ctx ty) (List.of_seq (SIdentSet.to_seq constraints)))
+        List.iter (try_constraint ctx tv ty) (List.of_seq (SIdentSet.to_seq constraints)))
 
-and try_constraint (ctx: ctx) (ty: ty) (typeclass_name: sident): unit =
+and try_constraint (ctx: ctx) (tv: type_var) (ty: ty) (typeclass_name: sident): unit =
   (* Find the typeclass. *)
   match get_decl_by_name (ctx_env ctx) typeclass_name with
   | Some (TypeClass { id; _ }) ->
@@ -200,7 +207,7 @@ and try_constraint (ctx: ctx) (ty: ty) (typeclass_name: sident): unit =
       | Some _ ->
          ()
       | None ->
-         Errors.unsatisfied_constraint ())
+         Errors.unsatisfied_constraint tv ty typeclass_name)
   | Some _ ->
      internal_err "Type parameter constraint refers to a declaration which is not a typeclass."
   | None ->
