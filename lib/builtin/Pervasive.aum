@@ -1516,6 +1516,18 @@ module body Austral.Pervasive is
         end;
     end;
 
+    instance ToInt8(Float32) is
+        method toInt8(value: Float32): Option[Int8] is
+            return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt8(Float64) is
+        method toInt8(value: Float64): Option[Int8] is
+            return Some(value => @embed(Int8, "((au_int8_t)($1))", value));
+        end;
+    end;
+
     -- ToInt16
 
     instance ToInt16(Nat8) is
