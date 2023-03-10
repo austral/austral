@@ -253,6 +253,8 @@ module Austral.Pervasive is
     instance ToInt32(Int32);
     instance ToInt32(Int64);
     instance ToInt32(Index);
+    instance ToInt32(Float32);
+    instance ToInt32(Float64);
 
     typeclass ToInt64(T: Type) is
         method toInt64(value: T): Option[Int64];
