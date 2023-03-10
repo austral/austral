@@ -157,6 +157,8 @@ module Austral.Pervasive is
     instance ToNat8(Int32);
     instance ToNat8(Int64);
     instance ToNat8(Index);
+    instance ToNat8(Float32);
+    instance ToNat8(Float64);
 
     typeclass ToNat16(T: Type) is
         method toNat16(value: T): Option[Nat16];
@@ -171,6 +173,8 @@ module Austral.Pervasive is
     instance ToNat16(Int32);
     instance ToNat16(Int64);
     instance ToNat16(Index);
+    instance ToNat16(Float32);
+    instance ToNat16(Float64);
 
     typeclass ToNat32(T: Type) is
         method toNat32(value: T): Option[Nat32];
@@ -185,6 +189,8 @@ module Austral.Pervasive is
     instance ToNat32(Int32);
     instance ToNat32(Int64);
     instance ToNat32(Index);
+    instance ToNat32(Float32);
+    instance ToNat32(Float64);
 
     typeclass ToNat64(T: Type) is
         method toNat64(value: T): Option[Nat64];
@@ -199,6 +205,8 @@ module Austral.Pervasive is
     instance ToNat64(Int32);
     instance ToNat64(Int64);
     instance ToNat64(Index);
+    instance ToNat64(Float32);
+    instance ToNat64(Float64);
 
     typeclass ToInt8(T: Type) is
         method toInt8(value: T): Option[Int8];
@@ -213,6 +221,8 @@ module Austral.Pervasive is
     instance ToInt8(Int32);
     instance ToInt8(Int64);
     instance ToInt8(Index);
+    instance ToInt8(Float32);
+    instance ToInt8(Float64);
 
     typeclass ToInt16(T: Type) is
         method toInt16(value: T): Option[Int16];
@@ -227,6 +237,8 @@ module Austral.Pervasive is
     instance ToInt16(Int32);
     instance ToInt16(Int64);
     instance ToInt16(Index);
+    instance ToInt16(Float32);
+    instance ToInt16(Float64);
 
     typeclass ToInt32(T: Type) is
         method toInt32(value: T): Option[Int32];
@@ -241,6 +253,8 @@ module Austral.Pervasive is
     instance ToInt32(Int32);
     instance ToInt32(Int64);
     instance ToInt32(Index);
+    instance ToInt32(Float32);
+    instance ToInt32(Float64);
 
     typeclass ToInt64(T: Type) is
         method toInt64(value: T): Option[Int64];
@@ -255,6 +269,8 @@ module Austral.Pervasive is
     instance ToInt64(Int32);
     instance ToInt64(Int64);
     instance ToInt64(Index);
+    instance ToInt64(Float32);
+    instance ToInt64(Float64);
 
     typeclass ToIndex(T: Type) is
         method toIndex(value: T): Option[Index];
@@ -269,4 +285,38 @@ module Austral.Pervasive is
     instance ToIndex(Int32);
     instance ToIndex(Int64);
     instance ToIndex(Index);
+    instance ToIndex(Float32);
+    instance ToIndex(Float64);
+
+    typeclass ToFloat32(T: Type) is
+        method toFloat32(value: T): Option[Float32];
+    end;
+
+    instance ToFloat32(Nat8);
+    instance ToFloat32(Nat16);
+    instance ToFloat32(Nat32);
+    instance ToFloat32(Nat64);
+    instance ToFloat32(Int8);
+    instance ToFloat32(Int16);
+    instance ToFloat32(Int32);
+    instance ToFloat32(Int64);
+    instance ToFloat32(Index);
+    instance ToFloat32(Float32);
+    instance ToFloat32(Float64);
+
+    typeclass ToFloat64(T: Type) is
+        method toFloat64(value: T): Option[Float64];
+    end;
+
+    instance ToFloat64(Nat8);
+    instance ToFloat64(Nat16);
+    instance ToFloat64(Nat32);
+    instance ToFloat64(Nat64);
+    instance ToFloat64(Int8);
+    instance ToFloat64(Int16);
+    instance ToFloat64(Int32);
+    instance ToFloat64(Int64);
+    instance ToFloat64(Index);
+    instance ToFloat64(Float32);
+    instance ToFloat64(Float64);
 end module.
