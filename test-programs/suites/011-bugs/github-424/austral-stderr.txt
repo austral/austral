@@ -1,0 +1,10 @@
+Error:
+  Title: Declaration Error
+  Module:
+    Test
+  Location:
+    [no span available]
+  Description:
+    The type parameter `T` does not appear anywhere in the signature of the function.
+  Code:
+    [no span available]
