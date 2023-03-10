@@ -1,0 +1,17 @@
+module body Test is
+    union Foo: Linear is
+        case Value is
+            value: Int32;
+    end;
+
+    function main(): ExitCode is
+        let u: Foo := Value(value => 10);
+        borrow u as uref in R do
+            case uref of
+                when Value(value: &[Int32, R]) do
+                    skip;
+            end case;
+        end;
+        return ExitSuccess();
+    end;
+end module body.
