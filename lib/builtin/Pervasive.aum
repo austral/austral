@@ -10,7 +10,7 @@ module body Austral.Pervasive is
     function swap(a: &![T, R1], b: &![T, R2]): Unit is
         return @embed(Unit, "au_swap($1, $2, sizeof(*a))", a, b);
     end;
-    
+
     generic [T: Type]
     function fixedArraySize(arr: FixedArray[T]): Index is
         return @embed(Index, "$1.size", arr);
@@ -1771,6 +1771,68 @@ module body Austral.Pervasive is
 
     instance ToIndex(Index) is
         method toIndex(value: Index): Option[Index] is
+            return Some(value => value);
+        end;
+    end;
+
+    -- ToFloat32
+
+    instance ToFloat32(Nat8) is
+        method toFloat32(value: Nat8): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Nat16) is
+        method toFloat32(value: Nat16): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Nat32) is
+        method toFloat32(value: Nat32): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Nat64) is
+        method toFloat32(value: Nat64): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Int8) is
+        method toFloat32(value: Int8): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Int16) is
+        method toFloat32(value: Int16): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Int32) is
+        method toFloat32(value: Int32): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Int64) is
+        method toFloat32(value: Int64): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Index) is
+        method toFloat32(value: Index): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+    instance ToFloat32(Float32) is
+        method toFloat32(value: Float32): Option[Float32] is
             return Some(value => value);
         end;
     end;

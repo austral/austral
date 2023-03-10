@@ -269,4 +269,18 @@ module Austral.Pervasive is
     instance ToIndex(Int32);
     instance ToIndex(Int64);
     instance ToIndex(Index);
+
+    typeclass ToFloat32(T: Type) is
+        method toFloat32(value: T): Option[Float32];
+    end;
+
+    instance ToFloat32(Nat8);
+    instance ToFloat32(Nat16);
+    instance ToFloat32(Nat32);
+    instance ToFloat32(Nat64);
+    instance ToFloat32(Int8);
+    instance ToFloat32(Int16);
+    instance ToFloat32(Int32);
+    instance ToFloat32(Int64);
+    instance ToFloat32(Index);
 end module.
