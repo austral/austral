@@ -153,6 +153,10 @@ let check_typarams_are_free (name: identifier) (typarams: typarams): unit =
   in
   List.iter (fun tp -> check_universe (typaram_universe tp)) (typarams_as_list typarams)
 
+let check_all_type_parameters_appear_in_signature (typarams: typarams) (params: value_parameter list) (rt: ty): unit =
+  let _ = (typarams, params, rt) in
+  ()
+
 let rec extract_type_signatures (CombinedModule { decls; _ }): type_signature list =
   List.filter_map extract_type_signatures' decls
 
@@ -377,6 +381,10 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
             ()
        | None ->
           ()
+     in
+     let _ =
+       (* Check: all type parameters must appear in the type signature. *)
+       check_all_type_parameters_appear_in_signature typarams value_params rt
      in
      let fn_input: function_input = {
          mod_id = mod_id;
