@@ -1871,6 +1871,18 @@ module body Austral.Pervasive is
         end;
     end;
 
+    instance ToIndex(Float32) is
+        method toIndex(value: Float32): Option[Index] is
+            return Some(value => @embed(Index, "((au_index_t)($1))", value));
+        end;
+    end;
+
+    instance ToIndex(Float64) is
+        method toIndex(value: Float64): Option[Index] is
+            return Some(value => @embed(Index, "((au_index_t)($1))", value));
+        end;
+    end;
+
     -- ToFloat32
 
     instance ToFloat32(Nat8) is
