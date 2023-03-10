@@ -37,9 +37,11 @@ module Errors = struct
         Code (type_string ty);
         Text " does not implement the typeclass ";
         Code (ident_string (sident_name constraint_typeclass_name));
+        Text ".";
         Break;
         Text "This constraint is for the type variable ";
         Code (ident_string tv_name);
+        Text "."
     ]
 end
 
