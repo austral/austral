@@ -1774,6 +1774,18 @@ module body Austral.Pervasive is
         end;
     end;
 
+    instance ToInt64(Float32) is
+        method toInt64(value: Float32): Option[Int64] is
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
+    instance ToInt64(Float64) is
+        method toInt64(value: Float64): Option[Int64] is
+            return Some(value => @embed(Int64, "((au_int64_t)($1))", value));
+        end;
+    end;
+
     -- ToIndex
 
     instance ToIndex(Nat8) is
