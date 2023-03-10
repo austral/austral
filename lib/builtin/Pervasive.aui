@@ -283,4 +283,5 @@ module Austral.Pervasive is
     instance ToFloat32(Int32);
     instance ToFloat32(Int64);
     instance ToFloat32(Index);
+    instance ToFloat32(Float32);
 end module.
