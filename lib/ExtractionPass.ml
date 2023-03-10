@@ -25,6 +25,7 @@ open TypeParameters
 open TypeClasses
 open Region
 open BuiltIn
+open TypeVarSet
 open Util
 open Error
 
@@ -114,7 +115,14 @@ module Errors = struct
     austral_raise DeclarationError [
       Text "Cannot find typeclass with the name ";
       Code (ident_string name)
-    ]
+      ]
+
+  let typaram_not_in_signature (tp: type_parameter) =
+    austral_raise DeclarationError [
+        Text "The type parameter ";
+        Code (ident_string (typaram_name tp));
+        Text " does not appear anywhere in the signature of the function."
+      ]
 end
 
 let check_slots_are_free (name: identifier) (slots: typed_slot list): unit =
@@ -152,6 +160,24 @@ let check_typarams_are_free (name: identifier) (typarams: typarams): unit =
        Errors.free_contains_linear ~name ~universe:"Type" ~parameter:true
   in
   List.iter (fun tp -> check_universe (typaram_universe tp)) (typarams_as_list typarams)
+
+let check_all_type_parameters_appear_in_signature (typarams: typarams) (params: value_parameter list) (rt: ty): unit =
+  (* Get the type variables from the value parameter list. *)
+  let param_tyvars: TypeVarSet.t list = List.map (fun (ValueParameter (_, ty)) -> type_variables ty) params in
+  let param_tyvars: TypeVarSet.t = List.fold_left TypeVarSet.union TypeVarSet.empty param_tyvars in
+  (* Get the type variables from the return type. *)
+  let rt_tyvars: TypeVarSet.t = type_variables rt in
+  (* Merge them to get the type variables in the signature. *)
+  let signature_tyvars: TypeVarSet.t = TypeVarSet.union param_tyvars rt_tyvars in
+  (* Go through each of the type parameters, and assert that it is in `singature_tyvars`. *)
+  let check_typaram (tp: type_parameter): unit =
+    let tv: type_var = typaram_to_tyvar tp in
+    if TypeVarSet.mem tv signature_tyvars then
+      ()
+    else
+      Errors.typaram_not_in_signature tp
+  in
+  List.iter check_typaram (typarams_as_list typarams)
 
 let rec extract_type_signatures (CombinedModule { decls; _ }): type_signature list =
   List.filter_map extract_type_signatures' decls
@@ -377,6 +403,10 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
             ()
        | None ->
           ()
+     in
+     let _ =
+       (* Check: all type parameters must appear in the type signature. *)
+       check_all_type_parameters_appear_in_signature typarams value_params rt
      in
      let fn_input: function_input = {
          mod_id = mod_id;
