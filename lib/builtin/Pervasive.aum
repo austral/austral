@@ -1945,6 +1945,13 @@ module body Austral.Pervasive is
         end;
     end;
 
+    instance ToFloat32(Float64) is
+        method toFloat32(value: Float64): Option[Float32] is
+            return Some(value => @embed(Float32, "((float)($1))", value));
+        end;
+    end;
+
+
     -- ToFloat64
 
     instance ToFloat64(Nat8) is
