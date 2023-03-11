@@ -168,6 +168,10 @@ let c_string_type = CPointer (CNamedType "uint8_t")
 let union_type_id = function
   | MonoNamedType id ->
      id
+  | MonoReadRef (MonoNamedType id, _) ->
+     id
+  | MonoWriteRef (MonoNamedType id, _) ->
+     id
   | _ ->
      internal_err "Union is not a named type?"
 
