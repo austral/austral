@@ -5,6 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  *)
 open Identifier
+open Common
 open BuiltIn
 open Env
 open Region
@@ -92,6 +93,24 @@ let is_float_constant (e: aexpr): bool =
    `parse_type` by passing an empty list of local type signatures. *)
 let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypespec): ty =
   parse_type env [] rm typarams ty
+
+and get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
+  match get_decl_by_name env (qident_to_sident name) with
+  | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
+     let mod_name: module_name = module_name_from_id env mod_id in
+     (mod_name, vis, typarams, slots)
+  | Some _ ->
+     Errors.path_not_record (original_name name |> ident_string)
+  | None ->
+     err ("No record with this name: " ^ (ident_string (original_name name)))
+
+and get_slot_with_name type_name slots slot_name =
+  match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
+  | Some s -> s
+  | None ->
+     Errors.no_such_slot
+       ~type_name:(original_name type_name)
+       ~slot_name
 
 (* Interface *)
 
