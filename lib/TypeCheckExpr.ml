@@ -8,6 +8,7 @@ open Identifier
 open Env
 open Region
 open Type
+open TypeParser
 open Ast
 open Tast
 open TypeParameters
@@ -32,6 +33,11 @@ type expr_ctx =
     }
 
 (* Utilities *)
+
+(* Since the extraction pass has already happened, we can simplify the call to
+   `parse_type` by passing an empty list of local type signatures. *)
+let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypespec): ty =
+  parse_type env [] rm typarams ty
 
 (* Type checking expressions *)
 
