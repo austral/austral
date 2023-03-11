@@ -161,6 +161,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_deref ctx expr
   | Typecast (expr, ty) ->
      augment_typecast ctx expr ty
+  | SizeOf ty ->
+     TSizeOf (parse_typespec ctx ty)
   | _ ->
      internal_err "Not implemented yet"
 
