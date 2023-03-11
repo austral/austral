@@ -11,24 +11,20 @@ open Type
 open TypeSystem
 open TypeBindings
 open TypeMatch
-open TypeVarSet
 open TypeParser
 open TypeParameter
 open TypeParameters
 open Region
-open Id
 open LexEnv
 open Env
 open EnvTypes
 open EnvUtils
-open EnvExtras
 open Ast
 open Tast
 open TastUtil
 open Linked
 open Util
 open Reporter
-open BuiltIn
 open Error
 
 module Errors = TypeErrors
@@ -334,22 +330,23 @@ and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (
      err "Path is empty"
 
 and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
+  let ctx: TypeCheckExpr.expr_ctx = TypeCheckExpr.make_ctx module_name env rm typarams lexenv in
   match elem with
   | SlotAccessor slot_name ->
      (match head_ty with
       | NamedType (name, args, _) ->
-         augment_slot_accessor_elem env module_name slot_name name args
+         TypeCheckExpr.augment_slot_accessor_elem ctx slot_name name args
       | _ ->
          Errors.path_not_record (type_string head_ty))
   | PointerSlotAccessor slot_name ->
      (match head_ty with
       | Pointer pointed_to ->
          (* TODO: addresses should not be indexable *)
-         augment_pointer_slot_accessor_elem env module_name slot_name pointed_to
+         TypeCheckExpr.augment_pointer_slot_accessor_elem ctx slot_name pointed_to
       | WriteRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem env module_name slot_name name args
+             TypeCheckExpr.augment_reference_slot_accessor_elem ctx slot_name name args
           | _ ->
              Errors.path_not_record (type_string ty))
       | _ ->

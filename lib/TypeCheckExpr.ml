@@ -745,7 +745,7 @@ and augment_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: path_elem): typed_pat
       | _ ->
          Errors.array_indexing_disallowed head_ty)
 
-and augment_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
+and augment_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list): typed_path_elem =
   let module_name: module_name = ctx_module_name ctx in
   (* Check: e' is a public record type *)
   let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
