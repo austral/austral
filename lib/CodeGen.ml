@@ -361,7 +361,7 @@ and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: c
      variable assignments for those bindings from the generated variable. *)
   let ty = get_type e
   and var = new_variable () in
-  let cases = List.map (when_to_case mn ty var) whens in
+  let cases = List.map (when_to_case mn ty var case_ref) whens in
   let accessor =
     match case_ref with
     | CasePlain ->
@@ -375,14 +375,28 @@ and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: c
       switch
     ]
 
-and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, bindings, body)) =
+and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (case_ref: case_ref) (MTypedWhen (n, bindings, body)): c_switch_case =
   let case_name = gen_ident n
   and tag_value = union_tag_value ty n
   in
   let get_binding binding_name =
-    CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+    match case_ref with
+    | CasePlain ->
+       CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+    | CaseRef ->
+       CStructAccessor (CStructAccessor (CPointerStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
   in
-  let bindings' = List.map (fun (MonoBinding { name; ty; rename; }) -> CLet (gen_ident rename, gen_type ty, get_binding name)) bindings in
+  let f (MonoBinding { name; ty; rename; }) =
+    let ty =
+      match case_ref with
+      | CasePlain ->
+         gen_type ty
+      | CaseRef ->
+         CPointer (gen_type ty)
+    in
+    CLet (gen_ident rename, ty, get_binding name)
+  in
+  let bindings' = List.map f bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 
