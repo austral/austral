@@ -355,6 +355,12 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
                 Code (type_string ty)
         ])
       in
+      let case_ref: case_ref =
+        (match mode with
+         | NormalCaseMode -> CasePlain
+         | ReadRefCaseMode _ -> CaseRef
+         | WriteRefCaseMode _ -> CaseRef)
+      in
       pt ("Case type", ty);
       let (union_ty, cases) = get_union_type_definition module_name env ty in
       let typebindings = match_type (env, module_name) union_ty ty in
@@ -364,7 +370,7 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
         (* Group the cases and whens *)
         let whens' = group_cases_whens cases whens in
         let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c mode) whens' in
-        TCase (span, expr', whens'')
+        TCase (span, expr', whens'', case_ref)
       else
         Errors.case_non_exhaustive ())
 

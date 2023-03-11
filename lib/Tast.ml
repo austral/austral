@@ -25,13 +25,18 @@ type typed_binding =
     }
 [@@deriving (show, sexp)]
 
+type case_ref =
+  | CasePlain
+  | CaseRef
+[@@deriving (show, sexp)]
+
 type tstmt =
   | TSkip of span
   | TLet of span * identifier * ty * texpr * tstmt
   | TDestructure of span * typed_binding list * texpr * tstmt
   | TAssign of span * typed_lvalue * texpr
   | TIf of span * texpr * tstmt * tstmt
-  | TCase of span * texpr * typed_when list
+  | TCase of span * texpr * typed_when list * case_ref
   | TWhile of span * texpr * tstmt
   | TFor of span * identifier * texpr * texpr * tstmt
   | TBorrow of {

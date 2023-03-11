@@ -316,8 +316,8 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CAssign (gen_lvalue mn lvalue, ge v)
   | MIf (c, tb, fb) ->
      CIf (ge c, gs tb, gs fb)
-  | MCase (e, whens) ->
-     gen_case mn e whens
+  | MCase (e, whens, case_ref) ->
+     gen_case mn e whens case_ref
   | MWhile (c, b) ->
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
@@ -349,7 +349,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
 and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
   gen_path mn (CVar (gen_ident name)) elems
 
-and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
+and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: Tast.case_ref): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
      being pattern-matched to that variable. Generate a switch statement over
      the tag enum. Each when statement that has bindings needs to generate some

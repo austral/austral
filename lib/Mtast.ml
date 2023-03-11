@@ -43,7 +43,7 @@ and mstmt =
   | MDestructure of mono_binding list * mexpr * mstmt
   | MAssign of mtyped_lvalue * mexpr
   | MIf of mexpr * mstmt * mstmt
-  | MCase of mexpr * mtyped_when list
+  | MCase of mexpr * mtyped_when list * Tast.case_ref
   | MWhile of mexpr * mstmt
   | MFor of identifier * mexpr * mexpr * mstmt
   | MBorrow of {
