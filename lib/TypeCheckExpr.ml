@@ -15,7 +15,11 @@ open Tast
 open TastUtil
 open TypeParameters
 open LexEnv
+open TypeBindings
+open TypeMatch
 open Error
+
+module Errors = TypeErrors
 
 (* Expression Context *)
 
@@ -34,7 +38,24 @@ type expr_ctx =
       (** The lexical environment. *)
     }
 
+let ctx_module_name (ctx: expr_ctx): module_name =
+  let (ExpressionContext { module_name; _ }) = ctx in
+  module_name
+
+let ctx_env (ctx: expr_ctx): env =
+  let (ExpressionContext { env; _ }) = ctx in
+  env
+
+let ctx_lexenv (ctx: expr_ctx): lexenv =
+  let (ExpressionContext { lexenv; _ }) = ctx in
+  lexenv
+
 (* Utilities *)
+
+let match_type_ctx (ctx: expr_ctx) (expected: ty) (actual: ty): type_bindings =
+  let env: env = ctx_env ctx
+  and module_name: module_name = ctx_module_name ctx in
+  match_type (env, module_name) expected actual
 
 let get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
@@ -61,8 +82,6 @@ let is_float_constant (e: aexpr): bool =
 let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypespec): ty =
   parse_type env [] rm typarams ty
 
-(* Type checking expressions *)
-
 (* Interface *)
 
 let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
@@ -81,5 +100,43 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      TFloatConstant f
   | StringConstant s ->
      TStringConstant s
+  | Variable name ->
+     augment_variable ctx name asserted_ty
   | _ ->
      internal_err "Not implemented yet"
+
+and augment_variable (ctx: expr_ctx) (name: qident) (asserted_ty: ty option): texpr =
+  let env = ctx_env ctx in
+  (* Does this name a declaration? *)
+  match get_decl_by_name env (qident_to_sident name) with
+  | Some (Function { id; typarams; value_params; rt; _ }) ->
+     let arg_tys: ty list = List.map (fun (ValueParameter (_, ty)) -> ty) value_params in
+     let fn_ty: ty = FnPtr (arg_tys, rt) in
+     if (typarams_size typarams > 0) then
+       (* Function is generic, need an asserted type. *)
+       (match asserted_ty with
+        | Some asserted_ty ->
+           let bindings: type_bindings = match_type_ctx ctx fn_ty asserted_ty in
+           let rt: ty = replace_variables bindings rt
+           and arg_tys: ty list = List.map (replace_variables bindings) arg_tys in
+           let effective_fn_ty: ty = FnPtr (arg_tys, rt) in
+           TFunVar (id, effective_fn_ty, bindings)
+        | None ->
+           Errors.unconstrained_generic_function (original_name name))
+     else
+       (* Function is concrete. *)
+       TFunVar (id, fn_ty, empty_bindings)
+  | _ ->
+     (match get_variable (ctx_env ctx) (ctx_lexenv ctx) name with
+      | Some (ty, src) ->
+         (match src with
+          | VarConstant ->
+             TConstVar (name, ty)
+          | VarParam ->
+             TParamVar ((original_name name), ty)
+          | VarLocal ->
+             TLocalVar ((original_name name), ty))
+      | None ->
+         Errors.unknown_name
+           ~kind:"variable"
+           ~name:(original_name name))
