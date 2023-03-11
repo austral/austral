@@ -367,7 +367,7 @@ and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: c
     | CasePlain ->
        CStructAccessor (CVar var, "tag")
     | CaseRef ->
-       CDeref (CPointerStructAccessor (CVar var, "tag"))
+       CPointerStructAccessor (CVar var, "tag")
   in
   let switch = CSwitch (accessor, cases) in
   CBlock [
