@@ -19,7 +19,6 @@ open TypeParameter
 open TypeParameters
 open TypeMatch
 open Tast
-open TypingPass
 open Mtast
 open Linked
 open Id
@@ -207,7 +206,7 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
                 ^ (type_string dispatch_ty)))
      in
      let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
-     let arguments' = cast_arguments instance_bindings params' args in
+     let arguments' = TypeCheckExpr.cast_arguments instance_bindings params' args in
      let typarams = (match instance with
                      | Instance { typarams; _ } -> typarams
                      | _ -> internal_err ("Couldn't find instance for var method call `"
