@@ -48,6 +48,14 @@ let ctx_env (ctx: expr_ctx): env =
   let (ExpressionContext { env; _ }) = ctx in
   env
 
+let ctx_region_map (ctx: expr_ctx): region_map =
+  let (ExpressionContext { rm; _ }) = ctx in
+  rm
+
+let ctx_typarams (ctx: expr_ctx): typarams =
+  let (ExpressionContext { typarams; _ }) = ctx in
+  typarams
+
 let ctx_lexenv (ctx: expr_ctx): lexenv =
   let (ExpressionContext { lexenv; _ }) = ctx in
   lexenv
@@ -95,8 +103,8 @@ let is_float_constant (e: aexpr): bool =
 
 (* Since the extraction pass has already happened, we can simplify the call to
    `parse_type` by passing an empty list of local type signatures. *)
-let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypespec): ty =
-  parse_type env [] rm typarams ty
+let parse_typespec (ctx: expr_ctx) (ty: qtypespec): ty =
+  parse_type (ctx_env ctx) [] (ctx_region_map ctx) (ctx_typarams ctx) ty
 
 let get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
   match get_decl_by_name env (qident_to_sident name) with
