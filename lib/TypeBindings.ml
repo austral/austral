@@ -103,7 +103,12 @@ let add_binding (TypeBindings m) (tp: type_parameter) ty =
      if universe_compatible (typaram_universe tp) (type_universe ty) then
        TypeBindings (BindingsMap.add tp ty m)
      else
-       err ("Trying to add a binding to a bindings map whose universes don't match. The type parameter is `" ^ (show_type_parameter tp) ^ "` while the type is `" ^ (show_ty ty) ^ "`.")
+       (* Special case! Allow `MonoTy`. See #399. *)
+       (match ty with
+        | MonoTy _ ->
+           TypeBindings (BindingsMap.add tp ty m)
+        | _ ->
+           err ("Trying to add a binding to a bindings map whose universes don't match. The type parameter is `" ^ (show_type_parameter tp) ^ "` while the type is `" ^ (show_ty ty) ^ "`."))
 
 (* Add multiple bindings to a bindings map. *)
 let rec add_bindings bs pairs =
