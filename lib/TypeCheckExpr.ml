@@ -8,9 +8,11 @@ open Identifier
 open Env
 open Region
 open Type
+open TypeSystem
 open TypeParser
 open Ast
 open Tast
+open TastUtil
 open TypeParameters
 open LexEnv
 open Error
@@ -33,6 +35,26 @@ type expr_ctx =
     }
 
 (* Utilities *)
+
+let get_path_ty_from_elems (elems: typed_path_elem list): ty =
+  assert ((List.length elems) > 0);
+  let last = List.nth elems ((List.length elems) - 1) in
+  path_elem_type last
+
+let is_bool e =
+  match get_type e with
+  | Boolean -> true
+  | _ -> false
+
+let is_int_constant e =
+  match e with
+  | IntConstant _ -> true
+  | _ -> false
+
+let is_float_constant e =
+  match e with
+  | FloatConstant _ -> true
+  | _ -> false
 
 (* Since the extraction pass has already happened, we can simplify the call to
    `parse_type` by passing an empty list of local type signatures. *)
