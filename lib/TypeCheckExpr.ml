@@ -141,7 +141,9 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      TStringConstant s
   | Variable name ->
      augment_variable ctx name asserted_ty
-  | FunctionCall _ ->
+  | FunctionCall (name, args) ->
+     let arglist = augment_arglist ctx args in
+     let _ = (name, arglist) in
      internal_err "Not implemented yet"
   | ArithmeticExpression _ ->
      internal_err "Not implemented yet"
@@ -491,6 +493,13 @@ and augment_borrow_expr (ctx: expr_ctx) (mode: borrowing_mode) (name: qident): t
       Errors.unknown_name
         ~kind:"variable"
         ~name:(original_name name))
+
+and augment_arglist (ctx: expr_ctx) (args: abstract_arglist): typed_arglist =
+  match args with
+  | Positional args' ->
+     TPositionalArglist (List.map (fun a -> aug ctx a) args')
+  | Named pairs ->
+     TNamedArglist (List.map (fun (n, v) -> (n, aug ctx v)) pairs)
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)
