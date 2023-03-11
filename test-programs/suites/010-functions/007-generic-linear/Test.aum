@@ -1,0 +1,14 @@
+module body Test is
+    generic [T: Linear]
+    function linearIdentity(x: T): T is
+        return x;
+    end;
+
+    record Foo: Linear is end;
+
+    function main(): ExitCode is
+        let foo: Foo := Foo();
+        let {} := linearIdentity(foo);
+        return ExitSuccess();
+    end;
+end module body.
