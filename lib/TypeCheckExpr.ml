@@ -124,6 +124,128 @@ let get_slot_with_name type_name slots slot_name =
        ~type_name:(original_name type_name)
        ~slot_name
 
+(* Argument List Checking *)
+
+(* Given a list of type parameters, and a list of arguments, check that the
+   lists have the same length and each argument satisfies each corresponding
+   parameter. Return the resulting set of type bindings. *)
+let rec check_argument_list (ctx: expr_ctx) (name: identifier) (params: value_parameter list) (args: texpr list): type_bindings =
+  (* Check that the number of parameters is the same as the number of
+     arguments. *)
+  check_arity name params args;
+  (* Check arguments against parameters *)
+  check_argument_list' ctx empty_bindings params args
+
+and check_arity (name: identifier) (params: value_parameter list) (args: texpr list): unit =
+  let nparams = List.length params
+  and nargs = List.length args in
+  if nparams = nargs then
+    ()
+  else
+    Errors.call_wrong_arity ~name ~expected:nparams ~actual:nargs
+
+(* Precondition: both lists have the same length. *)
+and check_argument_list' (ctx: expr_ctx) (bindings: type_bindings) (params: value_parameter list) (args: texpr list): type_bindings =
+  match (params, args) with
+  | ((first_param::rest_params), (first_arg::rest_args)) ->
+     let bindings' = merge_bindings bindings (match_parameter ctx first_param first_arg) in
+     check_argument_list' ctx bindings' rest_params rest_args
+  | ([], []) ->
+     bindings
+  | _ ->
+     internal_err ("couldn't check argument list in module `"
+                   ^ (mod_name_string (ctx_module_name ctx))
+                   ^ "` with bindings: "
+                   ^ (show_type_bindings bindings)
+                   ^ ",\n params: `{ "
+                   ^ (String.concat ", " (List.map show_value_parameter params))
+                   ^ " }`,\n and args: `{ "
+                   ^ (String.concat ", " (List.map show_texpr args))
+                   ^ "}`")
+
+and match_parameter (ctx: expr_ctx) (param: value_parameter) (arg: texpr): type_bindings =
+  let (ValueParameter (_, ty)) = param in
+  match_type_with_value_ctx ctx ty arg
+
+(* Type Checking: Function Calls *)
+
+let rec augment_call (ctx: expr_ctx) (name: qident) (args: typed_arglist) (asserted_ty: ty option): texpr =
+  (* First, check if the callable name is a variable. *)
+  match get_var (ctx_lexenv ctx) (local_name name) with
+  | Some (ty, _) ->
+     augment_fptr_call ctx (local_name name) ty asserted_ty args
+  | None ->
+     (* Otherwise, find a callable from the environment. *)
+     (match get_callable (ctx_env ctx) (ctx_module_name ctx) (qident_to_sident name) with
+      | Some callable ->
+         augment_callable ctx callable asserted_ty args
+      | None ->
+         Errors.unknown_name
+           ~kind:"callable"
+           ~name:(original_name name))
+
+and augment_fptr_call (ctx: expr_ctx) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
+  (* Because function pointers don't preserve value parameter names, we can't
+     accept named argument lists. *)
+  let args: texpr list =
+    match args with
+    | TPositionalArglist args -> args
+    | TNamedArglist _ ->
+       Errors.fun_pointer_named_args ()
+  in
+  (* We extract the parameter types and return type from the function pointer
+     type. *)
+  let (paramtys, rt): (ty list * ty) =
+    match fn_ptr_ty with
+    | FnPtr (paramtys, rt) -> (paramtys, rt)
+    | _ -> Errors.call_non_callable fn_ptr_ty
+  in
+  (* Then, we synthesize a parameter list from the function pointer type. The
+     parameter names are fake, but this is so we can reuse the arity-checking,
+     value parameter list-checking infrastructure we use elsewhere. *)
+  let params: value_parameter list = List.map (fun paramty -> ValueParameter (make_ident "fake", paramty)) paramtys in
+  (* Check synthetic parameter list against argument list. *)
+  let bindings = check_argument_list ctx name params args in
+  (* Use the bindings to get the effective return type *)
+  let rt' = replace_variables bindings rt in
+  let (bindings', rt'') = handle_return_type_polymorphism ctx name params rt' asserted_ty bindings in
+  let arguments = cast_arguments bindings' params args in
+  TFptrCall (name, arguments, rt'')
+
+and handle_return_type_polymorphism (ctx: expr_ctx) (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
+  if is_return_type_polymorphic params rt then
+    match asserted_ty with
+    | (Some asserted_ty') ->
+       let bindings' = match_type_ctx ctx rt asserted_ty' in
+       let bindings'' = merge_bindings bindings bindings' in
+       (bindings'', replace_variables bindings'' rt)
+    | None ->
+       Errors.unconstrained_generic_function name
+  else
+    (empty_bindings, replace_variables bindings rt)
+
+(* Given a function's parameter list and return type, check if the return type
+   of a function is polymorphic. *)
+and is_return_type_polymorphic (params: value_parameter list) (rt: ty): bool =
+  (* Find the set of type variables in the return type. *)
+  let rt_type_vars: TypeVarSet.t = type_variables rt in
+  (* Find the set of type variables in each of the parameters. *)
+  let param_type_vars: TypeVarSet.t list = List.map (fun (ValueParameter (_, ty)) -> type_variables ty) params in
+  (* Union the type variables of the parameters into one set of all type
+     variables in the parameter list. *)
+  let param_type_vars: TypeVarSet.t = List.fold_left TypeVarSet.union TypeVarSet.empty param_type_vars in
+  (* Find the set of type variables that are in the return type set but not in
+     the parameter set. *)
+  let vars_not_params: TypeVarSet.t =
+    let param_ty_vars: type_var list = TypeVarSet.elements param_type_vars
+    in
+    let var_name_in_typarams (n: identifier): bool =
+      List.exists (fun (TypeVariable (n', _, _, _)) -> equal_identifier n n') param_ty_vars
+    in
+    TypeVarSet.of_list (List.filter (fun (TypeVariable (n, _, _, _)) -> not (var_name_in_typarams n)) (TypeVarSet.elements rt_type_vars))
+  in
+  (TypeVarSet.cardinal vars_not_params) > 0
+
 (* Type Checking: Interface *)
 
 let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
@@ -142,9 +264,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   | Variable name ->
      augment_variable ctx name asserted_ty
   | FunctionCall (name, args) ->
-     let arglist = augment_arglist ctx args in
-     let _ = (name, arglist) in
-     internal_err "Not implemented yet"
+     let arglist: typed_arglist = augment_arglist ctx args in
+     augment_call ctx name arglist asserted_ty
   | ArithmeticExpression _ ->
      internal_err "Not implemented yet"
   | Comparison (op, lhs, rhs) ->
