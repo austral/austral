@@ -73,5 +73,13 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   match expr with
   | NilConstant ->
      TNilConstant
+  | BoolConstant b ->
+     TBoolConstant b
+  | IntConstant i ->
+     TIntConstant i
+  | FloatConstant f ->
+     TFloatConstant f
+  | StringConstant s ->
+     TStringConstant s
   | _ ->
      internal_err "Not implemented yet"
