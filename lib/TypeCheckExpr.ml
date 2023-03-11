@@ -65,6 +65,8 @@ let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypesp
 
 (* Interface *)
 
-let augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
+let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
+  (* `aug` is a shortmhand for `augment_expr` with `None` as the asserted type. *)
+  let aug = augment_expr ctx None in
   let _ = (ctx, asserted_ty, expr) in
   internal_err "Not implemented yet"
