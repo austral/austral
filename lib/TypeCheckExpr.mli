@@ -8,6 +8,11 @@
 open Ast
 open Tast
 open Type
+open Identifier
+open Env
+open Region
+open TypeParameters
+open LexEnv
 
 (** The type checking context. *)
 type expr_ctx
