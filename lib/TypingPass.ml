@@ -485,8 +485,8 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
                           else
                             Errors.slot_wrong_type
                               ~name:rename
-                              ~expected:actual
-                              ~actual:ty)
+                              ~expected:ty
+                              ~actual:actual)
                         bindings'' in
         let lexenv' = push_vars lexenv newvars in
         let body' = augment_stmt (update_lexenv ctx lexenv') body in
