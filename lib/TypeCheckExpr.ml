@@ -557,6 +557,12 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_if_expr ctx c t f
   | Path (e, elems) ->
      augment_path_expr ctx e elems
+  | Embed (ty, expr, args) ->
+     TEmbed (
+         parse_typespec ctx ty,
+         expr,
+         List.map (fun e -> aug ctx e) args
+       )
   | Deref expr ->
      augment_deref ctx expr
   | Typecast (expr, ty) ->
@@ -565,8 +571,6 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      TSizeOf (parse_typespec ctx ty)
   | BorrowExpr (mode, name) ->
      augment_borrow_expr ctx mode name
-  | _ ->
-     internal_err "Not implemented yet"
 
 (* Type Checking: Internals *)
 
