@@ -6,6 +6,7 @@
 *)
 
 open Identifier
+open Span
 open Common
 open Type
 open TypeSystem
@@ -241,29 +242,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  ~form:"statement"
                  ~ty:(get_type c))
       | ACase (span, expr, whens) ->
-         (* Type checking a case statement:
-
-            1. Ensure the value is of a union type.
-            2. Ensure the union type is public or it is defined in this module.
-            3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
-            4. Iterate over the cases, and ensure the bindings are correct.
-          *)
-         adorn_error_with_span span
-           (fun _ ->
-             let expr' = augment_expr module_name env rm typarams lexenv None expr in
-             let ty = get_type expr' in
-             pt ("Case type", ty);
-             let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
-             let typebindings = match_type (env, module_name) union_ty ty in
-             let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
-             let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
-             if ident_set_eq case_names when_names then
-               (* Group the cases and whens *)
-               let whens' = group_cases_whens cases whens in
-               let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
-               TCase (span, expr', whens'')
-             else
-               Errors.case_non_exhaustive ())
+         augment_case ctx span expr whens
       | AWhile (span, c, body) ->
          adorn_error_with_span span
            (fun _ ->
@@ -343,6 +322,32 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              pt ("Type", get_type e');
              let _ = match_type_with_value (env, module_name) rt e' in
              TReturn (span, e')))
+
+and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_when list): tstmt =
+  let (StmtCtx (module_name, env, rm, typarams, lexenv, _)) = ctx in
+  (* Type checking a case statement:
+
+     1. Ensure the value is of a union type.
+     2. Ensure the union type is public or it is defined in this module.
+     3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
+     4. Iterate over the cases, and ensure the bindings are correct.
+   *)
+  adorn_error_with_span span
+    (fun _ ->
+      let expr' = augment_expr module_name env rm typarams lexenv None expr in
+      let ty = get_type expr' in
+      pt ("Case type", ty);
+      let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
+      let typebindings = match_type (env, module_name) union_ty ty in
+      let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
+      let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
+      if ident_set_eq case_names when_names then
+        (* Group the cases and whens *)
+        let whens' = group_cases_whens cases whens in
+        let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
+        TCase (span, expr', whens'')
+      else
+        Errors.case_non_exhaustive ())
 
 and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
