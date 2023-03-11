@@ -14,6 +14,7 @@ open Tast
 open TypeBindings
 open Type
 
+(** The context for statement checking. *)
 type stmt_ctx
 
 val augment_stmt: stmt_ctx -> astmt -> tstmt
