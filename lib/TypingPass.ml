@@ -460,7 +460,7 @@ and get_record_definition (env: env) (name: qident): (module_name * type_vis * t
 and get_slot_with_name type_name slots slot_name =
   match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
   | Some s -> s
-  | None -> 
+  | None ->
      Errors.no_such_slot
        ~type_name:(original_name type_name)
        ~slot_name
