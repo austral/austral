@@ -1,3 +1,9 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
 import Austral.Memory (
     Pointer,
     Address,
@@ -58,7 +64,7 @@ module body Standard.Box is
     end;
 
     generic [T: Type, R: Region]
-    function swap(boxref: &![Box[T], R], new: T): T is
+    function boxSwap(boxref: &![Box[T], R], new: T): T is
         let ptr: Pointer[T] := !(boxref->pointer);
         let old: T := load(ptr);
         store(ptr, new);

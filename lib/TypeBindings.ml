@@ -1,3 +1,10 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 open Identifier
 open Type
 open TypeParameter
@@ -5,6 +12,30 @@ open TypeSystem
 open Sexplib
 open Std
 open Error
+
+module Errors = struct
+  let typaram_redefinition ~param ~was ~redef =
+    austral_raise TypeError [
+      Text "The type parameter ";
+      Code (typaram_name param |> ident_string);
+      Text " cannot be bound to both ";
+      Code (type_string was);
+      Text " and ";
+      Code (type_string redef)
+    ]
+
+  let typaram_wrong_universe ~param ~ty ~expected ~actual =
+    austral_raise TypeError [
+      Text "The type parameter ";
+      Code (typaram_name param |> ident_string);
+      Text " must be ";
+      Code (universe_string expected);
+      Text " but ";
+      Code (type_string ty);
+      Text " is ";
+      Code (universe_string actual)
+    ]
+end
 
 let universe_compatible param arg =
   (* The check here is:
@@ -90,15 +121,10 @@ let add_binding (TypeBindings m) (tp: type_parameter) ty =
      if equal_ty ty ty' then
        TypeBindings m
      else
-       austral_raise GenericError [
-           Text "Incompatible type bindings. The parameter ";
-           Code (ident_string (typaram_name tp));
-           Text " is bound to ";
-           Code (type_string ty');
-           Text " but now we're trying to bind it to";
-           Code (type_string ty);
-           Text "."
-         ]
+       Errors.typaram_redefinition
+         ~param:tp
+         ~was:ty'
+         ~redef:ty
   | None ->
      if universe_compatible (typaram_universe tp) (type_universe ty) then
        TypeBindings (BindingsMap.add tp ty m)
@@ -108,7 +134,11 @@ let add_binding (TypeBindings m) (tp: type_parameter) ty =
         | MonoTy _ ->
            TypeBindings (BindingsMap.add tp ty m)
         | _ ->
-           err ("Trying to add a binding to a bindings map whose universes don't match. The type parameter is `" ^ (show_type_parameter tp) ^ "` while the type is `" ^ (show_ty ty) ^ "`."))
+           Errors.typaram_wrong_universe
+             ~param:tp
+             ~ty
+             ~expected:(typaram_universe tp)
+             ~actual:(type_universe ty))
 
 (* Add multiple bindings to a bindings map. *)
 let rec add_bindings bs pairs =

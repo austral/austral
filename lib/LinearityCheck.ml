@@ -1,3 +1,9 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
 open Identifier
 open Tast
 open Type
@@ -515,7 +521,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
      let false_tbl: state_tbl = check_stmt tbl depth fb in
      let _ = tables_are_consistent "an if" true_tbl false_tbl in
      true_tbl
-  | TCase (_, expr, whens) ->
+  | TCase (_, expr, whens, _) ->
      let tbl: state_tbl = check_expr tbl depth expr in
      let tbls: state_tbl list = check_whens tbl depth whens in
      let _ = table_list_is_consistent tbls in

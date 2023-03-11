@@ -1,3 +1,10 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 (** This module implements an ordered set of type parameters. This is used to
     store the type parameter list in declarations. *)
 open Identifier

@@ -1,3 +1,10 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 open Id
 open Identifier
 open IdentifierSet
@@ -11,11 +18,76 @@ open EnvExtras
 open EnvUtils
 open Error
 
+module Errors = struct
+  let broken_orphan_rule () =
+    austral_raise GenericError [
+      Text "Orphan rule broken: typeclass and type are both foreign."
+    ]
+
+  let duplicate_tyvars () =
+    austral_raise DeclarationError [
+      Text "Generic instances can only use each type parameter once in the argument."
+    ]
+
+  let leftovers () =
+    austral_raise DeclarationError [
+      Text "The number of type parameters in the instance declaration must be the same as the number of type variables applied to the argument."
+    ]
+
+  let lone_tyvar () =
+    austral_raise DeclarationError [
+      Text "Typeclass arguments cannot be lone type parameters."
+    ]
+
+  let not_a_tyvar ty =
+    austral_raise DeclarationError [
+      Text "The type ";
+      Code (type_string ty);
+      Text " is not a type parameter, but generic instances must use either all type parameters or none of them in the argument.";
+      Break;
+      Text "Consider adding another generic parameter with universe ";
+      Code (type_universe ty |> universe_string)
+    ]
+
+  let overlapping_instances () =
+    austral_raise GenericError [
+      Text "Instance overlaps."
+    ]
+
+  let region_arg () =
+    austral_raise DeclarationError [
+      Text "Typeclass arguments cannot be regions."
+    ]
+
+  let shadowing_typeclass_param name =
+    austral_raise DeclarationError [
+      Text "The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is ";
+      Code (ident_string name);
+      Text ".";
+      Break;
+      Text "This is, regrettably, a load-bearing hack for https://github.com/austral/austral/issues/244. Fixing this properly would require rewriting large parts of the frontend."
+    ]
+
+  let wrong_universe ~ty ~expected ~actual =
+    austral_raise TypeError [
+      Text "Cannot define an instance with argument ";
+      Code (type_string ty);
+      Text " because it should belong to the ";
+      Code (universe_string expected);
+      Text " universe, but it is actually in the ";
+      Code (universe_string actual);
+      Text " universe."
+    ]
+end
+
 let check_instance_argument_has_right_universe (universe: universe) (arg: ty): unit =
   if universe_compatible universe (type_universe arg) then
     ()
   else
-    err "While trying to define this instance, the instance's argument belongs to a universe that is not compatible with the typeclass's universe."
+    Errors.wrong_universe
+      ~ty:arg
+      ~expected:universe
+      ~actual:(type_universe arg)
 
 let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit =
   let is_tyvar (ty: ty): type_var =
@@ -23,20 +95,20 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
     | TyVar tv ->
        tv
     | _ ->
-       err "Not a tyvar"
+       Errors.not_a_tyvar ty
   and all_distinct (tyvars: type_var list): unit =
     let names: identifier list = List.map (fun (TypeVariable (name, _, _, _)) -> name) tyvars in
     let set: IdentifierSet.t = IdentifierSet.of_list names in
     if List.length tyvars = IdentifierSet.cardinal set then
       ()
     else
-      err "All tyvars must be distinct"
+      Errors.duplicate_tyvars ()
   (* Assert the number of type parameters *)
   and no_leftovers (n: int): unit =
     if (typarams_size typarams) = n then
       ()
     else
-      err "The number of type parameters in the instance declaration must be the same as the number of type variables applied to the argument."
+      Errors.leftovers ()
   in
   match arg with
   | Unit -> ()
@@ -53,7 +125,7 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = no_leftovers 1 in
      ()
   | RegionTy _ ->
-     err "Not a type variable."
+     Errors.region_arg ()
   | ReadRef (ty, r) ->
      let _ = all_distinct [is_tyvar ty; is_tyvar r] in
      let _ = no_leftovers 2 in
@@ -63,7 +135,7 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = no_leftovers 2 in
      ()
   | TyVar _ ->
-     err "Bad shape"
+     Errors.lone_tyvar ()
   | Address ty ->
      let _ = is_tyvar ty in
      let _ = no_leftovers 1 in
@@ -151,7 +223,7 @@ let check_instance_locally_unique (instances: decl list) (argument: ty): unit =
        false
   in
   if List.exists pred instances then
-    err "Instance overlaps."
+    Errors.overlapping_instances ()
   else
     ()
 
@@ -160,7 +232,7 @@ let rec check_instance_orphan_rules (env: env) (mod_id: mod_id) (typeclass_mod_i
   and ty_local: bool = is_type_local env mod_id ty
   in
   if (not tc_local) && (not ty_local) then
-    err "Orphan rule broken: typeclass and type are both foreign."
+    Errors.broken_orphan_rule ()
   else
     ()
 
@@ -204,13 +276,7 @@ and is_type_local (env: env) (mod_id: mod_id) (ty: ty): bool =
 let check_disjoint_typarams (name: identifier) (typarams: typarams): unit =
   match get_typaram typarams name with
   | Some _ ->
-     austral_raise DeclarationError [
-         Text "The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is ";
-         Code (ident_string name);
-         Text ".";
-         Break;
-         Text "This is, regrettably, a load-bearing hack for https://github.com/austral/austral/issues/244. Fixing this properly would require rewriting large parts of the frontend."
-       ]
+     Errors.shadowing_typeclass_param name    
   | None ->
      (* No collision *)
      ()

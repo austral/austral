@@ -1,3 +1,9 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
 open Identifier
 open Type
 open Error
@@ -28,9 +34,3 @@ let rec push_vars env l =
      push_vars (push_var env n t s) rest
   | [] ->
      env
-
-let pop_var = function
-  | (_::rest) ->
-     rest
-  | [] ->
-     err "pop_var called with empty lexenv"

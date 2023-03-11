@@ -1,3 +1,10 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 open Identifier
 open Env
 open EnvTypes
@@ -12,7 +19,6 @@ open TypeParameter
 open TypeParameters
 open TypeMatch
 open Tast
-open TypingPass
 open Mtast
 open Linked
 open Id
@@ -200,7 +206,7 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
                 ^ (type_string dispatch_ty)))
      in
      let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
-     let arguments' = cast_arguments instance_bindings params' args in
+     let arguments' = TypeCheckExpr.cast_arguments instance_bindings params' args in
      let typarams = (match instance with
                      | Instance { typarams; _ } -> typarams
                      | _ -> internal_err ("Couldn't find instance for var method call `"
@@ -346,10 +352,10 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
      let (t, env) = monomorphize_stmt env t in
      let (f, env) = monomorphize_stmt env f in
      (MIf (c, t, f), env)
-  | TCase (_, value, whens) ->
+  | TCase (_, value, whens, case_ref) ->
      let (value, env) = monomorphize_expr env value in
      let (whens, env) = monomorphize_whens env whens in
-     (MCase (value, whens), env)
+     (MCase (value, whens, case_ref), env)
   | TWhile (_, value, body) ->
      let (value, env) = monomorphize_expr env value in
      let (body, env) = monomorphize_stmt env body in

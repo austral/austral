@@ -1,3 +1,9 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
 (** This module contains opaque types for IDs used by the environment.
 
 The reason this is defined outside the `Env` module is to avoid a cyclic

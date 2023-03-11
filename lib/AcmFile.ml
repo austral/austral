@@ -1,3 +1,9 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
 (** Types for representing Austral Compiled Module (.acm) files. *)
 open Identifier
 open Id
@@ -27,7 +33,7 @@ type ser_stmt =
   | SDestructure of span * typed_binding list * ser_expr * ser_stmt
   | SAssign of span * ser_lvalue * ser_expr
   | SIf of span * ser_expr * ser_stmt * ser_stmt
-  | SCase of span * ser_expr * ser_when list
+  | SCase of span * ser_expr * ser_when list * case_ref
   | SWhile of span * ser_expr * ser_stmt
   | SFor of span * identifier * ser_expr * ser_expr * ser_stmt
   | SBorrow of {

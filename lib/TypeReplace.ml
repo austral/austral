@@ -1,3 +1,10 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 open Tast
 open TypeBindings
 
@@ -134,10 +141,10 @@ let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
      and t = replace_tyvars_stmt bindings t
      and f = replace_tyvars_stmt bindings f in
      TIf (span, c, t, f)
-  | TCase (span, value, whens) ->
+  | TCase (span, value, whens, mode) ->
      let value = replace_tyvars_expr bindings value
      and whens = List.map (replace_tyvars_when bindings) whens in
-     TCase (span, value, whens)
+     TCase (span, value, whens, mode)
   | TWhile (span, value, body) ->
       let value = replace_tyvars_expr bindings value
       and body = replace_tyvars_stmt bindings body in

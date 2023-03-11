@@ -1,10 +1,16 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
 import Standard.Box (
     Box,
     makeBox,
     unbox,
     readFree,
     storeFree,
-    swap,
+    boxSwap,
     unboxReadRef
 );
 import Standard.Test.Unit (
@@ -66,11 +72,11 @@ module body Standard.Test.Box is
     end;
 
     function swapTest(): Unit is
-        testHeading("swap");
+        testHeading("boxSwap");
         let e: Either[Box[Int32], Int32] := makeBox(10);
         case e of
             when Left(left as box: Box[Int32]) do
-                 let old: Int32 := swap(&!box, 20);
+                 let old: Int32 := boxSwap(&!box, 20);
                  assertTrue(old = 10, "old box contents equal 10");
                  assertTrue(unbox(box) = 20, "box contents equal 20");
             when Right(right: Int32) do

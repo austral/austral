@@ -1,3 +1,10 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 open Id
 open Identifier
 open IdentifierSet
@@ -13,15 +20,30 @@ open EnvExtras
 open Reporter
 open Error
 
-let type_mismatch _ a b =
-  austral_raise TypeError
-    [
+module Errors = struct
+  let type_mismatch a b =
+    austral_raise TypeError [
       Text "Expected a value of type ";
       Code (type_string a);
       Text ", but got a value of type ";
       Code (type_string b);
       Text "."
     ]
+
+  let unsatisfied_constraint (tv: type_var) (ty: ty) (constraint_typeclass_name: sident) =
+    let (TypeVariable (tv_name, _, _, _)) = tv in
+    austral_raise TypeError [
+        Text "Type constraint not satisfied: the type ";
+        Code (type_string ty);
+        Text " does not implement the typeclass ";
+        Code (ident_string (sident_name constraint_typeclass_name));
+        Text ".";
+        Break;
+        Text "This constraint is for the type variable ";
+        Code (ident_string tv_name);
+        Text "."
+    ]
+end
 
 type ctx = env * module_name
 
@@ -38,34 +60,34 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
       | Unit ->
          empty_bindings
       | _ ->
-         type_mismatch "Expected Unit, but got another type." a b)
+         Errors.type_mismatch a b)
   | Boolean ->
      (match b with
       | Boolean ->
          empty_bindings
       | _ ->
-         type_mismatch "Expected Boolean, but got another type." a b)
+         Errors.type_mismatch a b)
   | Integer (s, w) ->
      (match b with
       | Integer (s', w') ->
          if (s = s') && (w = w') then
            empty_bindings
          else
-           type_mismatch "Integer types don't match" a b
+           Errors.type_mismatch a b
       | _ ->
-         type_mismatch "Expected an integer, but got another type." a b)
+         Errors.type_mismatch a b)
   | SingleFloat ->
      (match b with
       | SingleFloat ->
          empty_bindings
       | _ ->
-         type_mismatch "Expected SingleFloat, but got another type." a b)
+         Errors.type_mismatch a b)
   | DoubleFloat ->
      (match b with
       | DoubleFloat ->
          empty_bindings
       | _ ->
-         type_mismatch "Expected DoubleFloat, but got another type." a b)
+         Errors.type_mismatch a b)
   | NamedType (n, args, _) ->
      (match b with
       | NamedType (n', args', _) ->
@@ -73,24 +95,24 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          if n = n' then
            match_type_list ctx args args'
          else
-           type_mismatch "Type mismatch" a b
+           Errors.type_mismatch a b
       | _ ->
-         type_mismatch "Expected a named type, but got something else." a b)
+         Errors.type_mismatch a b)
   | StaticArray t ->
      (match b with
       | StaticArray t' ->
          match_type ctx t t'
       | _ ->
-         type_mismatch "Expected an array, but got another type." a b)
+         Errors.type_mismatch a b)
   | RegionTy r ->
      (match b with
       | RegionTy r' ->
          if r = r' then
            empty_bindings
          else
-           type_mismatch "Region type mismatch" a b
+           Errors.type_mismatch a b
       | _ ->
-         type_mismatch "Expected a region, but got another type." a b)
+         Errors.type_mismatch a b)
   | ReadRef (t, r) ->
      (match b with
       | ReadRef (t', r') ->
@@ -98,7 +120,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
-         type_mismatch "Expected a read reference, but got another type." a b)
+         Errors.type_mismatch a b)
   | WriteRef (t, r) ->
      (match b with
       | WriteRef (t', r') ->
@@ -106,7 +128,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
-         type_mismatch "Expected a write reference, but got another type." a b)
+         Errors.type_mismatch a b)
   | TyVar tyvar ->
      match_type_var ctx tyvar b
   | Address t ->
@@ -114,19 +136,19 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
       | Address t' ->
          match_type ctx t t'
       | _ ->
-         type_mismatch "Expected an Address, but got another type." a b)
+         Errors.type_mismatch a b)
   | Pointer t ->
      (match b with
       | Pointer t' ->
          match_type ctx t t'
       | _ ->
-         type_mismatch "Expected a Pointer, but got another type." a b)
+         Errors.type_mismatch a b)
   | FnPtr (args, rt) ->
      (match b with
       | FnPtr (args', rt') ->
          match_type_list ctx (rt :: args) (rt' :: args')
       | _ ->
-         type_mismatch "Expected a function pointer, but got another type." a b)
+         Errors.type_mismatch a b)
   | MonoTy _ ->
      err "match_type called with MonoTy argument"
 
@@ -153,7 +175,7 @@ and match_type_var (ctx: ctx) (tv: type_var) (ty: ty): type_bindings =
        add_binding empty_bindings (tyvar_to_typaram tv) ty
   | _ ->
      (* Check that the type implements the type variable's constraints, if any. *)
-     check_type_implements_constraints ctx ty constraints;
+     check_type_implements_constraints ctx tv ty constraints;
      (* If the constraints are satisfied, add a straightforward binding. *)
      add_binding empty_bindings (tyvar_to_typaram tv) ty
 
@@ -164,7 +186,7 @@ and check_tyvar_implements_constraints (param: sident list) (arg: sident list): 
   in
   SIdentSet.subset param arg
 
-and check_type_implements_constraints (ctx: ctx) (ty: ty) (constraints: sident list): unit =
+and check_type_implements_constraints (ctx: ctx) (tv: type_var) (ty: ty) (constraints: sident list): unit =
   with_frame "Check type implements constraints"
     (fun _ ->
       pt ("Type", ty);
@@ -176,9 +198,9 @@ and check_type_implements_constraints (ctx: ctx) (ty: ty) (constraints: sident l
         (* If there are constraints, make them into a set. *)
         let constraints: SIdentSet.t = SIdentSet.of_list constraints in
         (* Try to find an instance for this type for each of the constraints. *)
-        List.iter (try_constraint ctx ty) (List.of_seq (SIdentSet.to_seq constraints)))
+        List.iter (try_constraint ctx tv ty) (List.of_seq (SIdentSet.to_seq constraints)))
 
-and try_constraint (ctx: ctx) (ty: ty) (typeclass_name: sident): unit =
+and try_constraint (ctx: ctx) (tv: type_var) (ty: ty) (typeclass_name: sident): unit =
   (* Find the typeclass. *)
   match get_decl_by_name (ctx_env ctx) typeclass_name with
   | Some (TypeClass { id; _ }) ->
@@ -187,7 +209,7 @@ and try_constraint (ctx: ctx) (ty: ty) (typeclass_name: sident): unit =
       | Some _ ->
          ()
       | None ->
-         err "Type constraint not satisfied.")
+         Errors.unsatisfied_constraint tv ty typeclass_name)
   | Some _ ->
      internal_err "Type parameter constraint refers to a declaration which is not a typeclass."
   | None ->
@@ -250,6 +272,18 @@ let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
       | TIntConstant _ ->
          (* TODO: check sign against signedness *)
          (* TODO: check value against width *)
+         empty_bindings
+      | _ ->
+         match_type ctx ty (get_type expr))
+  | SingleFloat ->
+     (match expr with
+      | TFloatConstant _ ->
+         empty_bindings
+      | _ ->
+         match_type ctx ty (get_type expr))
+  | DoubleFloat ->
+     (match expr with
+      | TFloatConstant _ ->
          empty_bindings
       | _ ->
          match_type ctx ty (get_type expr))

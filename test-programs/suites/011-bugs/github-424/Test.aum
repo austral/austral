@@ -1,0 +1,11 @@
+module body Test is
+    generic [T: Free] -- spurious
+    function mutate_int(var: Int32): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        mutate_int(5);
+        return ExitSuccess();
+    end;
+end module body.

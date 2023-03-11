@@ -1,10 +1,10 @@
 Error:
-  Title: Generic Error
+  Title: Type Error
   Module:
     Test
   Location:
     [no span available]
   Description:
-    While trying to define this instance, the instance's argument belongs to a universe that is not compatible with the typeclass's universe.
+    Cannot define an instance with argument `Test::Foo: Linear` because it should belong to the `Free` universe, but it is actually in the `Linear` universe.
   Code:
     [no span available]

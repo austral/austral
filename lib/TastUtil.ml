@@ -1,8 +1,26 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 open Type
 open Tast
 open Identifier
 open StringSet
 open Error
+
+module Errors = struct
+  let arity_error ~expected ~actual =
+    austral_raise GenericError [
+      Text "Wrong number of arguments. Expected ";
+      Code (string_of_int expected);
+      Text " and got ";
+      Code (string_of_int actual);
+      Text "."
+    ]
+end
 
 let arglist_size = function
   | (TPositionalArglist l) -> List.length l
@@ -18,14 +36,7 @@ let rec arglist_to_positional (args, names): texpr list =
     | (TPositionalArglist l) -> l
     | (TNamedArglist l) -> reorder_arglist l names
   else
-    austral_raise GenericError
-      [
-        Text "Wrong number of arguments. Expected ";
-        Code (string_of_int expected);
-        Text " and got ";
-        Code (string_of_int actual);
-        Text "."
-      ]
+    Errors.arity_error ~expected ~actual
 
 and names_match arglist names =
   match arglist with

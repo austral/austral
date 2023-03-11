@@ -1,5 +1,5 @@
 Error:
-  Title: Generic Error
+  Title: Linearity Error
   Module:
     Test
   Location:
@@ -7,7 +7,9 @@ Error:
     From: line 6, column 8
     To: line 6, column 21
   Description:
-    L-values must end in the free universe
+    Only values in the `Free` universe can be assigned to.
+
+    Consider using the `swap` function instead.
   Code:
     4 |     function main(): ExitCode is
     5 |         let foo: Foo := Foo();

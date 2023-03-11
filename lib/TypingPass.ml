@@ -1,836 +1,34 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 open Identifier
+open Span
 open Common
 open Type
 open TypeSystem
 open TypeBindings
 open TypeMatch
-open TypeVarSet
 open TypeParser
 open TypeParameter
 open TypeParameters
 open Region
-open Id
 open LexEnv
 open Env
 open EnvTypes
 open EnvUtils
-open EnvExtras
 open Ast
 open Tast
 open TastUtil
 open Linked
 open Util
 open Reporter
-open BuiltIn
 open Error
 
-(* Since the extraction pass has already happened, we can simplify the call to
-   `parse_type` by passing an empty list of local type signatures. *)
-let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypespec): ty =
-  parse_type env [] rm typarams ty
-
-let rec augment_expr (module_name: module_name) (env: env) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
-  with_frame ("Augment expression: " ^ (expr_kind expr))
-    (fun _ ->
-      let aug = augment_expr module_name env rm typarams lexenv None in
-      match expr with
-      | NilConstant ->
-         TNilConstant
-      | BoolConstant b ->
-         TBoolConstant b
-      | IntConstant i ->
-         TIntConstant i
-      | FloatConstant f ->
-         TFloatConstant f
-      | StringConstant s ->
-         TStringConstant s
-      | Variable name ->
-         (match get_decl_by_name env (qident_to_sident name) with
-          | Some (Function { id; typarams; value_params; rt; _ }) ->
-             let arg_tys: ty list = List.map (fun (ValueParameter (_, ty)) -> ty) value_params in
-             let fn_ty: ty = FnPtr (arg_tys, rt) in
-             if (typarams_size typarams > 0) then
-               (* Function is generic, need an asserted type. *)
-               (match asserted_ty with
-                | Some asserted_ty ->
-                   let bindings: type_bindings = match_type (env, module_name) fn_ty asserted_ty in
-                   let rt: ty = replace_variables bindings rt
-                   and arg_tys: ty list = List.map (replace_variables bindings) arg_tys in
-                   let effective_fn_ty: ty = FnPtr (arg_tys, rt) in
-                   TFunVar (id, effective_fn_ty, bindings)
-                | None ->
-                   err "Function is generic, but no asserted type found.")
-             else
-               (* Function is concrete. *)
-               TFunVar (id, fn_ty, empty_bindings)
-          | _ ->
-             (match get_variable env lexenv name with
-              | Some (ty, src) ->
-                 (match src with
-                  | VarConstant ->
-                     TConstVar (name, ty)
-                  | VarParam ->
-                     TParamVar ((original_name name), ty)
-                  | VarLocal ->
-                     TLocalVar ((original_name name), ty))
-              | None ->
-                 err ("I can't find the variable named " ^ (ident_string (original_name name)))))
-      | FunctionCall (name, args) ->
-         augment_call module_name env lexenv asserted_ty name (augment_arglist module_name env rm typarams lexenv None args)
-      | ArithmeticExpression (op, lhs, rhs) ->
-         (* Augment operands. *)
-         let lhs' = aug lhs
-         and rhs' = aug rhs in
-         (* Get the types. *)
-         let lhs_ty = get_type lhs'
-         and rhs_ty = get_type rhs'
-         in
-         let augment_arithmetic_call _ =
-             (* Because method calls don't implement the lenient type checking
-                rules for arithmetic, we have to cast the arguments to their
-                expected types, so that constants are allowed to be used as
-                arguments. This means we have to transform a `ty` into a type
-                specifier. *)
-           let op_name =
-             match op with
-             | Add ->
-                "trappingAdd"
-             | Subtract ->
-                "trappingSubtract"
-             | Multiply ->
-                "trappingMultiply"
-             | Divide ->
-                "trappingDivide"
-           in
-           let op_qname = make_qident (pervasive_module_name, make_ident op_name, make_ident op_name) in
-           let args: typed_arglist = TPositionalArglist [
-                          TCast (lhs', lhs_ty);
-                          TCast (rhs', lhs_ty);
-                        ]
-           in
-           augment_call module_name env lexenv asserted_ty op_qname args
-         in
-         let arith_error _ =
-           austral_raise TypeError [
-               Text "Both operands to an arithmetic expression must be compatible types. The LHS has type ";
-               Code (type_string lhs_ty);
-               Text " but the RHS has type ";
-               Code (type_string rhs_ty);
-               Text "."
-             ]
-         in
-         (* Are the types the same? *)
-         if lhs_ty = rhs_ty then
-           (* If the types are the same type, check it is a numeric type. *)
-           if (is_numeric lhs_ty) then
-             augment_arithmetic_call ()
-           else
-             arith_error ()
-         else
-           (* If the types are different, check if at least one operator is a constant.*)
-           let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
-           and are_float_constants = (is_float_constant lhs) || (is_float_constant rhs) in
-           if (are_int_constants || are_float_constants) then
-             (* If either operand is a constant, let it pass *)
-             augment_arithmetic_call ()
-           else
-             arith_error ()
-      | Comparison (op, lhs, rhs) ->
-         let lhs' = aug lhs
-         and rhs' = aug rhs in
-         let _ = match_type_with_value (env, module_name) (get_type lhs') rhs' in
-         TComparison (op, lhs', rhs')
-      | Conjunction (lhs, rhs) ->
-         let lhs' = aug lhs
-         and rhs' = aug rhs in
-         if ((is_bool lhs') && (is_bool rhs')) then
-           TConjunction (lhs', rhs')
-         else
-           err "Both operands to a logical expression must be boolean-typed expressions."
-      | Disjunction (lhs, rhs) ->
-         let lhs' = aug lhs
-         and rhs' = aug rhs in
-         if ((is_bool lhs') && (is_bool rhs')) then
-           TDisjunction (lhs', rhs')
-         else
-           err "Both operands to a logical expression must be boolean-typed expressions."
-      | Negation e ->
-         let e' = aug e in
-         if is_bool e' then
-           TNegation e'
-         else
-           err "The operand to the negation operator must be an expression of boolean type."
-      | IfExpression (c, t, f) ->
-         let c' = aug c
-         and t' = aug t
-         and f' = aug f in
-         if is_bool c' then
-           if (get_type t') = (get_type f') then
-             TIfExpression (c', t', f')
-           else
-             err "Both branches of an if expression must be the same type."
-         else
-           err "The type of the condition in an if expression must be a boolean."
-      | Path (e, elems) ->
-         (* Path rules:
-
-            1. Path that begins in a reference ends in a reference.
-            2. All paths end in a type in the free universe.
-          *)
-         let e' = aug e in
-         (* Is the initial expression of a path a read reference or write reference or no reference? *)
-         let (is_read, region): (bool * ty option) =
-           (match (get_type e') with
-            | ReadRef (_, r) ->
-               (true, Some r)
-            | WriteRef (_, r) ->
-               (false, Some r)
-            | _ ->
-               (false, None))
-         in
-         let elems' = augment_path env module_name rm typarams lexenv (get_type e') elems in
-         let path_ty: ty = get_path_ty_from_elems elems' in
-         let path_ty: ty =
-           (* If the path starts in a reference it should end in one. *)
-           (match region with
-            | Some reg ->
-               if is_read then
-                 ReadRef (path_ty, reg)
-               else
-                 WriteRef (path_ty, reg)
-            | None ->
-               path_ty)
-         in
-         let universe = type_universe path_ty in
-         if universe = FreeUniverse then
-           TPath {
-               head = e';
-               elems = elems';
-               ty = path_ty
-             }
-         else
-           err ("Paths must end in the free universe: " ^ (show_ty path_ty))
-      | Embed (ty, expr, args) ->
-         TEmbed (
-             parse_typespec env rm typarams ty,
-             expr,
-             List.map aug args
-           )
-      | Deref expr ->
-         (* The type of the expression being dereferenced must be either a read-only
-            reference or a write reference. *)
-         let expr' = aug expr in
-         let ty = get_type expr' in
-         (match ty with
-          | ReadRef _ ->
-             TDeref expr'
-          | WriteRef _ ->
-             TDeref expr'
-          | _ ->
-             err "The dereference operator must be applied to an expression of a reference type.")
-      | Typecast (expr, ty) ->
-         (* The typecast operator has four uses:
-
-            1. Clarifying the type of integer and floating point literals.
-
-            2. Converting write references to read references.
-
-            3. Clarifying the type of return type polymorphic functions.
-
-          *)
-         let is_int_expr = function
-           | TIntConstant _ -> true
-           | _ -> false
-         and is_float_expr = function
-           | TFloatConstant _ -> true
-           | _ -> false
-
-         and is_int_type = function
-           | Integer _ -> true
-           | _ -> false
-
-         and is_float_type = function
-           | SingleFloat -> true
-           | DoubleFloat -> true
-           | _ -> false
-         in
-         let target_type = parse_typespec env rm typarams ty in
-         (* By passing target_type as the asserted type we're doing point 3. *)
-         let expr' = augment_expr module_name env rm typarams lexenv (Some target_type) expr in
-         (* For 1: if the expression is an int literal and the target type is an
-            int type, do the conversion. Similarly, if the expression is a float
-            constant and the target type is a float, do the conversion. *)
-         if (is_int_expr expr') && (is_int_type target_type) then
-           TCast (expr', target_type)
-         else
-           if (is_float_expr expr') && (is_float_type target_type) then
-             TCast (expr', target_type)
-           else
-             (* Otherwise, if the expression has a mutable reference type and the
-                target type is a read reference, and they point to the same underlying
-                type and underlying region, just convert it to a read ref. This does
-                point 2. *)
-             (match (get_type expr') with
-              | WriteRef (underlying_ty, region) ->
-                 (match target_type with
-                  | ReadRef (underlying_ty', region') ->
-                     if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
-                       TCast (expr', target_type)
-                     else
-                       err "Cannot convert because the references have different underlying types or regions."
-                  | _ ->
-                     err "Bad conversion.")
-              | _ ->
-                 (try
-                    let _ = match_type (env, module_name) target_type (get_type expr') in
-                    expr'
-                  with Austral_error _ ->
-                    err "Bad conversion"))
-      | SizeOf ty ->
-         TSizeOf (parse_typespec env rm typarams ty)
-      | BorrowExpr (mode, name) ->
-         (match get_variable env lexenv name with
-          | Some (ty, src) ->
-             (* TODO: check if `ty` is linear? *)
-             (match src with
-              | VarConstant ->
-                 err "Constants cannot be borrowed"
-              | VarParam ->
-                 let name: identifier = original_name name
-                 and reg: region = fresh_region ()
-                 in
-                 TBorrowExpr (mode, name, reg, ty)
-              | VarLocal ->
-                 let name: identifier = original_name name
-                 and reg: region = fresh_region ()
-                 in
-                 TBorrowExpr (mode, name, reg, ty))
-          | None ->
-             err ("I can't find the variable named " ^ (ident_string (original_name name)))))
-
-and get_path_ty_from_elems (elems: typed_path_elem list): ty =
-  assert ((List.length elems) > 0);
-  let last = List.nth elems ((List.length elems) - 1) in
-  path_elem_type last
-
-and is_bool e =
-  match get_type e with
-  | Boolean -> true
-  | _ -> false
-
-and is_int_constant e =
-  match e with
-  | IntConstant _ -> true
-  | _ -> false
-
-and is_float_constant e =
-  match e with
-  | FloatConstant _ -> true
-  | _ -> false
-
-and augment_arglist (module_name: module_name) (env: env) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (asserted_ty: ty option) (args: abstract_arglist): typed_arglist =
-  let aug = augment_expr module_name env rm typarams lexenv asserted_ty in
-  match args with
-  | Positional args' ->
-     TPositionalArglist (List.map aug args')
-  | Named pairs ->
-     TNamedArglist (List.map (fun (n, v) -> (n, aug v)) pairs)
-
-and augment_path (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
-  match elems with
-  | [elem] ->
-     [augment_path_elem env module_name rm typarams lexenv head_ty elem]
-  | elem::rest ->
-     let elem' = augment_path_elem env module_name rm typarams lexenv head_ty elem in
-     let rest' = augment_path env module_name rm typarams lexenv (path_elem_type elem') rest in
-     elem' :: rest'
-  | [] ->
-     err "Path is empty"
-
-and augment_path_elem (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
-  match elem with
-  | SlotAccessor slot_name ->
-     (match head_ty with
-      | NamedType (name, args, _) ->
-         augment_slot_accessor_elem env module_name slot_name name args
-      | _ ->
-         err "Not a record type")
-  | PointerSlotAccessor slot_name ->
-     (match head_ty with
-      | Pointer pointed_to ->
-         (* TODO: Addresses should not be indexable. *)
-         augment_pointer_slot_accessor_elem env module_name slot_name pointed_to
-      | ReadRef (ty, _) ->
-         (match ty with
-          | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem env module_name slot_name name args
-          | _ ->
-             err "Not a record type")
-      | WriteRef (ty, _) ->
-         (match ty with
-          | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem env module_name slot_name name args
-          | _ ->
-             err "Not a record type")
-      | _ ->
-         err "Not a record type")
-  | ArrayIndex ie ->
-     let ie' = augment_expr module_name env rm typarams lexenv None ie in
-     (match head_ty with
-      | StaticArray elem_ty ->
-         TArrayIndex (ie', elem_ty)
-      | _ ->
-         austral_raise TypeError [
-             Text "The array indexing operator doesn't work for this type: ";
-             Code (type_string head_ty);
-     ])
-
-and augment_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
-  (* Check: e' is a public record type *)
-  let (source_module, vis, typarams, slots) = get_record_definition env type_name in
-  if (vis = TypeVisPublic) || (module_name = source_module) then
-    (* Check: the given slot name must exist in this record type. *)
-    let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-    let bindings = match_typarams (env, module_name) typarams type_args in
-    let slot_ty' = replace_variables bindings slot_ty in
-    TSlotAccessor (slot_name, slot_ty')
-  else
-    err "Trying to read a slot from a non-public record"
-
-and augment_pointer_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (pointed_to: ty): typed_path_elem =
-  match pointed_to with
-  | NamedType (type_name, type_args, _) ->
-     (* Check arg is a public record *)
-     let (source_module, vis, typarams, slots) = get_record_definition env type_name in
-     if (vis = TypeVisPublic) || (module_name = source_module) then
-       (* Check: the given slot name must exist in this record type. *)
-       let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-       let bindings = match_typarams (env, module_name) typarams type_args in
-       let slot_ty' = replace_variables bindings slot_ty in
-       TPointerSlotAccessor (slot_name, slot_ty')
-     else
-       err "Trying to read a slot from a pointer to a non-public record"
-  | _ ->
-     err "Pointer does not point to a record type."
-
-and augment_reference_slot_accessor_elem (env: env) (module_name: module_name) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
-  (* Check: e' is a public record type *)
-  let (source_module, vis, typarams, slots) = get_record_definition env type_name in
-  if (vis = TypeVisPublic) || (module_name = source_module) then
-    (* Check: the given slot name must exist in this record type. *)
-    let (TypedSlot (_, slot_ty)) = get_slot_with_name slots slot_name in
-    let bindings = match_typarams (env, module_name) typarams type_args in
-    let slot_ty' = replace_variables bindings slot_ty in
-    TPointerSlotAccessor (slot_name, slot_ty')
-  else
-    err "Trying to read a slot from a reference to a non-public record"
-
-and get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
-  match get_decl_by_name env (qident_to_sident name) with
-  | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
-     let mod_name: module_name = module_name_from_id env mod_id in
-     (mod_name, vis, typarams, slots)
-  | _ ->
-     err ("No record with this name: " ^ (ident_string (original_name name)))
-
-and get_slot_with_name slots slot_name =
-  match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
-  | Some s -> s
-  | None -> err ("No slot with this name: " ^ (ident_string slot_name))
-
-and augment_call (module_name: module_name) (env: env) (lexenv: lexenv) (asserted_ty: ty option) (name: qident) (args: typed_arglist): texpr =
-  (* First, check if the callable name is a variable. *)
-  match get_var lexenv (local_name name) with
-  | Some (ty, _) ->
-     augment_fptr_call module_name env (local_name name) ty asserted_ty args
-  | None ->
-     (* Otherwise, find a callable from the environment. *)
-     (match get_callable env module_name (qident_to_sident name) with
-      | Some callable ->
-         augment_callable module_name env name callable asserted_ty args
-      | None ->
-         err ("No callable with this name: " ^ (qident_debug_name name)))
-
-and augment_fptr_call (module_name: module_name) (env: env) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
-  (* Because function pointers don't preserve value parameter names, we can't
-     accept named argument lists. *)
-  let args: texpr list =
-    match args with
-    | TPositionalArglist args -> args
-    | TNamedArglist _ ->
-       err "You can't call a function pointer with a named argument list, because function pointers don't preserve parameter names, so we wouldn't know how to assign arguments to parameters."
-  in
-  (* We extract the parameter types and return type from the function pointer
-     type. *)
-  let (paramtys, rt): (ty list * ty) =
-    match fn_ptr_ty with
-    | FnPtr (paramtys, rt) -> (paramtys, rt)
-    | _ -> err "Trying to call something that isn't a function pointer type."
-  in
-  (* Then, we synthesize a parameter list from the function pointer type. The
-     parameter names are fake, but this is so we can reuse the arity-checking,
-     value parameter list-checking infrastructure we use elsewhere. *)
-  let params: value_parameter list = List.map (fun paramty -> ValueParameter (make_ident "fake", paramty)) paramtys in
-  (* Check synthetic parameter list against argument list. *)
-  let bindings = check_argument_list env module_name params args in
-  (* Use the bindings to get the effective return type *)
-  let rt' = replace_variables bindings rt in
-  let (bindings', rt'') = handle_return_type_polymorphism env module_name name params rt' asserted_ty bindings in
-  let arguments = cast_arguments bindings' params args in
-  TFptrCall (name, arguments, rt'')
-
-and augment_callable (module_name: module_name) (env: env) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
-  with_frame "Augment callable"
-    (fun _ ->
-      match callable with
-      | FunctionCallable (id, typarams, params, rt) ->
-         augment_function_call env module_name id name typarams params rt asserted_ty args
-      | RecordConstructor (_, typarams, universe, slots) ->
-         augment_record_constructor env module_name name typarams universe slots asserted_ty args
-      | UnionConstructor { union_id; type_params; universe; case } ->
-         let type_name: qident = (match get_decl_by_id env union_id with
-                                  | Some (Union { name; mod_id; _ }) ->
-                                     (* TODO: constructing a fake qident *)
-                                     make_qident (module_name_from_id env mod_id, name, name)
-                                  | _ ->
-                                     internal_err ("no type name found for ID `" ^ (show_decl_id union_id) ^ "`"))
-         in
-         augment_union_constructor env module_name type_name type_params universe case asserted_ty args
-      | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
-         let param = (match get_decl_by_id env typeclass_id with
-                      | Some (TypeClass { param; _ }) ->
-                         param
-                      | _ ->
-                         internal_err ("no type parameter found for ID `" ^ (show_decl_id typeclass_id) ^ "`"))
-         in
-         augment_method_call env module_name typeclass_id param name value_parameters return_type asserted_ty args)
-
-and augment_function_call (env: env) (module_name: module_name) (id: decl_id) name typarams params rt asserted_ty args =
-  with_frame "Augment function call"
-    (fun _ ->
-      pqi ("Name", name);
-      (* For simplicity, and to reduce duplication of code, we convert the argument
-         list to a positional list. *)
-      let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-      let arguments: texpr list = arglist_to_positional (args, param_names) in
-      (* Check the list of params against the list of arguments *)
-      let bindings = check_argument_list env module_name params arguments in
-      (* Use the bindings to get the effective return type *)
-      let rt' = replace_variables bindings rt in
-      let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
-      (* Check: the set of bindings equals the set of type parameters *)
-      let bindings'' = merge_bindings bindings bindings' in
-      check_bindings typarams bindings'';
-      let arguments' = cast_arguments bindings'' params arguments in
-      let substs = make_substs bindings'' typarams in
-      ps ("Bindings", show_bindings bindings'');
-      pt ("Return type", rt'');
-      TFuncall (id, name, arguments', rt'', substs))
-
-and augment_record_constructor (env: env) (module_name: module_name) (name: qident) (typarams: typarams) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
-  (* Check: the argument list must be named *)
-  let args' = (match args with
-               | TPositionalArglist l ->
-                  if l = [] then
-                    []
-                  else
-                    err "Arguments to a record constructor must be named"
-               | TNamedArglist a ->
-                  a) in
-  (* Check: the set of slots matches the set of param names *)
-  let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
-  let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
-  if not (ident_set_eq slot_names argument_names) then
-    err "Slot names don't match argument names"
-  else
-    (* Convert args to positional *)
-    let arguments = arglist_to_positional (args, slot_names) in
-    (* Check the list of params against the list of arguments *)
-    let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
-    let bindings = check_argument_list env module_name params arguments in
-    (* Use the bindings to get the effective return type *)
-    let rt = NamedType (name,
-                        List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
-                        universe)
-    in
-    let rt' = replace_variables bindings rt in
-    let (bindings', rt'') = handle_return_type_polymorphism env module_name (local_name name) params rt' asserted_ty bindings in
-    (* Check: the set of bindings equals the set of type parameters *)
-    check_bindings typarams (merge_bindings bindings bindings');
-    (* Check the resulting type is in the correct universe *)
-    if universe_compatible universe (type_universe rt'') then
-      TRecordConstructor (rt'', List.map2 (fun a b -> (a, b)) slot_names arguments)
-    else
-      err "Universe mismatch"
-
-and augment_union_constructor (env: env) (module_name: module_name) (type_name: qident) (typarams: typarams) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
-  with_frame "Augment union constructor"
-    (fun _ ->
-      pqi ("Type name", type_name);
-      let args' = (match args with
-                   | TPositionalArglist l ->
-                      if l = [] then
-                        []
-                      else
-                        err "Arguments to a union constructor must be named"
-                   | TNamedArglist a ->
-                      a) in
-      (* Check: the set of slots matches the set of param names *)
-      let (TypedCase (case_name, slots)) = case in
-      pi ("Case name", case_name);
-      let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
-      let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
-      if not (ident_set_eq slot_names argument_names) then
-        err "Slot names don't match argument names"
-      else
-        (* Convert args to positional *)
-        let arguments = arglist_to_positional (args, slot_names) in
-        (* Check the list of params against the list of arguments *)
-        let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
-        ps ("Params", String.concat "\n" (List.map (fun (ValueParameter (n, t)) -> (ident_string n) ^ ": " ^ (type_string t)) params));
-        ps ("Arguments", String.concat "\n" (List.map show_texpr arguments));
-        let bindings = check_argument_list env module_name params arguments in
-        (* Use the bindings to get the effective return type *)
-        let rt = NamedType (type_name,
-                            List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
-                            universe)
-        in
-        pt ("Type", rt);
-        ps ("Bindings", show_bindings bindings);
-        let rt' = replace_variables bindings rt in
-        pt ("Type'", rt');
-        let (bindings', rt'') = handle_return_type_polymorphism env module_name case_name params rt' asserted_ty bindings in
-        (* Check: the set of bindings equals the set of type parameters *)
-        check_bindings typarams (merge_bindings bindings bindings');
-        (* Check the resulting type is in the correct universe *)
-        if universe_compatible universe (type_universe rt'') then
-          let _ = pt ("Type''", rt'')
-          in
-          TUnionConstructor (rt'', case_name, List.map2 (fun a b -> (a, b)) slot_names arguments)
-        else
-          err "Universe mismatch")
-
-and augment_method_call (env: env) (source_module_name: module_name) (typeclass_id: decl_id) (typaram: type_parameter) (callable_name: qident) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
-  with_frame "Augmenting method call"
-    (fun _ ->
-      pqi ("Callable name", callable_name);
-      (* At this point, we know the method's name and the typeclass it belongs
-         to. We pull the parameter list from the typeclass, and compare that against
-         the argument list. *)
-      (* For simplicity, and to reduce duplication of code, we convert the argument
-         list to a positional list. *)
-      let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
-      let arguments: texpr list = arglist_to_positional (args, param_names) in
-      (* Check the list of params against the list of arguments *)
-      let bindings = check_argument_list env source_module_name params arguments in
-      (* Use the bindings to get the effective return type *)
-      let rt' = replace_variables bindings rt in
-      let (bindings', rt'') = handle_return_type_polymorphism env source_module_name (local_name callable_name) params rt' asserted_ty bindings in
-      let bindings'' = merge_bindings bindings bindings' in
-      ps ("Bindings", show_bindings bindings'');
-      (* Check: the set of bindings equals the set of type parameters *)
-      check_bindings (typarams_from_list [typaram]) bindings'';
-      match get_binding bindings'' typaram with
-      | (Some dispatch_ty) ->
-         pt ("Dispatch Type", dispatch_ty);
-         (* Is the dispatch type a type variable? *)
-         (match dispatch_ty with
-          | TyVar (TypeVariable (_, _, _, constraints)) ->
-             (* If so, check if the constraints say that it implements the typeclass. *)
-             let tc_name: sident = get_decl_sident_or_die env typeclass_id in
-             if List.exists (fun c -> equal_sident tc_name c) constraints then
-               (* If it's a tyvar that implements the typeclass, we have to
-                  proceed differently. Essentially we can't go on with instance
-                  resolution, because we don't have a type to resolve an
-                  instance for. So we have to freeze the process. *)
-               TVarMethodCall {
-                   source_module_name = source_module_name;
-                   typeclass_id = typeclass_id;
-                   params = params;
-                   method_name = callable_name;
-                   args = arguments;
-                   dispatch_ty = dispatch_ty;
-                   rt = rt'';
-                   bindings = bindings'';
-                 }
-             else
-               (* If it doesn't, that's an error *)
-               err "Type parameter does not implement typeclass."
-          | _ ->
-             (* If it's not a type variable, continue normal instance resolution. *)
-             let (instance, instance_bindings): decl * type_bindings =
-               (match get_instance env source_module_name dispatch_ty typeclass_id with
-                | Some (i, b) -> (i, b)
-                | None ->
-                   err ("Typeclass resolution failed. Dispatch type: "
-                        ^ (type_string dispatch_ty)))
-             in
-             ps ("Instance bindings", show_bindings instance_bindings);
-             let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
-             let arguments' = cast_arguments instance_bindings params' arguments in
-             let typarams = (match instance with
-                             | Instance { typarams; _ } -> typarams
-                             | _ -> internal_err "Couldn't get instance while getting type parameters")
-             in
-             let instance_id: decl_id = decl_id instance in
-             let meth_id: ins_meth_id =
-               (match get_instance_method_from_instance_id_and_method_name env instance_id (original_name callable_name) with
-                | Some (InsMethRec { id; _ }) -> id
-                | None -> internal_err ("Couldn't get instance method for `"
-                                        ^ (ident_string (original_name callable_name))
-                                        ^ "`"))
-             in
-             ps ("Bindings", show_bindings bindings'');
-             let substs = make_substs instance_bindings typarams in
-             TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs))
-      | None ->
-         internal_err "couldn't extract dispatch type.")
-
-(* Given a list of type parameters, and a list of arguments, check that the
-   lists have the same length and each argument satisfies each corresponding
-   parameter. Return the resulting set of type bindings. *)
-and check_argument_list (env: env) (module_name: module_name) (params: value_parameter list) (args: texpr list): type_bindings =
-  (* Check that the number of parameters is the same as the number of
-     arguments. *)
-  check_arity params args;
-  (* Check arguments against parameters *)
-  check_argument_list' env module_name empty_bindings params args
-
-and check_arity (params: value_parameter list) (args: texpr list): unit =
-  let nparams = List.length params
-  and nargs = List.length args in
-  if nparams = nargs then
-    ()
-  else
-    err ("The function expects "
-         ^ (string_of_int nparams)
-         ^ " arguments, but was called with "
-         ^ (string_of_int nargs)
-         ^ ".")
-
-(* Precondition: both lists have the same length. *)
-and check_argument_list' (env: env) (module_name: module_name) (bindings: type_bindings) (params: value_parameter list) (args: texpr list): type_bindings =
-  match (params, args) with
-  | ((first_param::rest_params), (first_arg::rest_args)) ->
-     let bindings' = merge_bindings bindings (match_parameter env module_name first_param first_arg) in
-     check_argument_list' env module_name bindings' rest_params rest_args
-  | ([], []) ->
-     bindings
-  | _ ->
-     internal_err ("couldn't check argument list in module `"
-                   ^ (mod_name_string module_name)
-                   ^ "` with bindings: "
-                   ^ (show_type_bindings bindings)
-                   ^ ",\n params: `{ "
-                   ^ (String.concat ", " (List.map show_value_parameter params))
-                   ^ " }`,\n and args: `{ "
-                   ^ (String.concat ", " (List.map show_texpr args))
-                   ^ "}`")
-
-and match_parameter (env: env) (module_name: module_name) (param: value_parameter) (arg: texpr): type_bindings =
-  let (ValueParameter (_, ty)) = param in
-  match_type_with_value (env, module_name) ty arg
-
-and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arguments: texpr list): texpr list =
-  let f (ValueParameter (_, expected)) value =
-    let expected' = replace_variables bindings expected in
-    match expected' with
-    | Integer _ ->
-       (* Cast integer types *)
-       TCast (value, expected')
-    | _ ->
-       value
-  in
-  List.map2 f params arguments
-
-and make_substs (bindings: type_bindings) (typarams: typarams): type_bindings =
-  let f (tp: type_parameter): (type_parameter * ty) option =
-    if (typaram_universe tp) = RegionUniverse then
-      Some (tp, RegionTy static_region)
-    else
-      match get_binding bindings tp with
-      | Some ty ->
-         Some (tp, ty)
-      | None ->
-         None
-  in
-  bindings_from_list (List.filter_map f (typarams_as_list typarams))
-
-and handle_return_type_polymorphism (env: env) (module_name: module_name) (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
-  if is_return_type_polymorphic params rt then
-    match asserted_ty with
-    | (Some asserted_ty') ->
-       let bindings' = match_type (env, module_name) rt asserted_ty' in
-       let bindings'' = merge_bindings bindings bindings' in
-       (bindings'', replace_variables bindings'' rt)
-    | None ->
-       err ("Callable '"
-            ^ (ident_string name)
-            ^ "' is polymorphic in the return type but has no asserted type.")
-  else
-    (empty_bindings, replace_variables bindings rt)
-
-(* Given a function's parameter list and return type, check if the return type
-   of a function is polymorphic. *)
-and is_return_type_polymorphic (params: value_parameter list) (rt: ty): bool =
-  (* Find the set of type variables in the return type. *)
-  let rt_type_vars: TypeVarSet.t = type_variables rt in
-  (* Find the set of type variables in each of the parameters. *)
-  let param_type_vars: TypeVarSet.t list = List.map (fun (ValueParameter (_, ty)) -> type_variables ty) params in
-  (* Union the type variables of the parameters into one set of all type
-     variables in the parameter list. *)
-  let param_type_vars: TypeVarSet.t = List.fold_left TypeVarSet.union TypeVarSet.empty param_type_vars in
-  (* Find the set of type variables that are in the return type set but not in
-     the parameter set. *)
-  let vars_not_params: TypeVarSet.t =
-    let param_ty_vars: type_var list = TypeVarSet.elements param_type_vars
-    in
-    let var_name_in_typarams (n: identifier): bool =
-      List.exists (fun (TypeVariable (n', _, _, _)) -> equal_identifier n n') param_ty_vars
-    in
-    TypeVarSet.of_list (List.filter (fun (TypeVariable (n, _, _, _)) -> not (var_name_in_typarams n)) (TypeVarSet.elements rt_type_vars))
-  in
-  (TypeVarSet.cardinal vars_not_params) > 0
-
-(* Check that there are as many bindings as there are type parameters, and that
-   every type parameter is satisfied. *)
-and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
-  if (typarams_size typarams) = (binding_count bindings) then
-    let check (tp: type_parameter): unit =
-      let n = typaram_name tp
-      and u = typaram_universe tp
-      in
-      (match get_binding bindings tp with
-       | Some ty ->
-          if universe_compatible u (type_universe ty) then
-            ()
-          else
-            err ("Mismatched universes: expected "
-                 ^ (show_universe u)
-                 ^ " and got "
-                 ^ (show_universe (type_universe ty)))
-       | None ->
-          err ("No binding for this parameter: " ^ (ident_string n)))
-    in
-    let _ = List.map check (typarams_as_list typarams) in
-    ()
-  else
-    (* I think this should not be an error *)
-    (*err ("Not the same number of bindings and parameters. Bindings: "
-      ^ (show_bindings bindings)
-      ^ ". Parameters: "
-      ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))*)
-    ()
-
-let is_boolean = function
-  | Boolean -> true
-  | _ -> false
-
-let is_compatible_with_index_type = function
-  | TIntConstant _ ->
-     true
-  | e ->
-     (get_type e) = index_type
+module Errors = TypeErrors
 
 type stmt_ctx = StmtCtx of module_name * env * region_map * typarams * lexenv * ty
 
@@ -839,6 +37,32 @@ let update_lexenv (StmtCtx (mn, menv, rm, typarams, _, rt)) (lexenv: lexenv): st
 
 let update_rm (StmtCtx (mn, menv, _, typarams, lexenv, rt)) (rm: region_map): stmt_ctx =
   StmtCtx (mn, menv, rm, typarams, lexenv, rt)
+
+(* Since the extraction pass has already happened, we can simplify the call to
+   `parse_type` by passing an empty list of local type signatures. *)
+let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypespec): ty =
+  parse_type env [] rm typarams ty
+
+let augment_expr (module_name: module_name) (env: env) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (asserted_ty: ty option) (expr: aexpr): texpr =
+  let ctx: TypeCheckExpr.expr_ctx = TypeCheckExpr.make_ctx module_name env rm typarams lexenv in
+  TypeCheckExpr.augment_expr ctx asserted_ty expr
+
+(** Copied from TypeCheckExpr *)
+let get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
+  match get_decl_by_name env (qident_to_sident name) with
+  | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
+     let mod_name: module_name = module_name_from_id env mod_id in
+     (mod_name, vis, typarams, slots)
+  | Some _ ->
+     Errors.path_not_record (original_name name |> ident_string)
+  | None ->
+     err ("No record with this name: " ^ (ident_string (original_name name)))
+
+(** Copied from TypeCheckExpr *)
+let get_path_ty_from_elems (elems: typed_path_elem list): ty =
+  assert ((List.length elems) > 0);
+  let last = List.nth elems ((List.length elems) - 1) in
+  path_elem_type last
 
 let stmt_kind (stmt: astmt): string =
   match stmt with
@@ -855,6 +79,30 @@ let stmt_kind (stmt: astmt): string =
   | ABlock _ -> "block"
   | ADiscarding _ -> "discard"
   | AReturn _ -> "return"
+
+let is_boolean = function
+  | Boolean -> true
+  | _ -> false
+
+let is_compatible_with_index_type = function
+  | TIntConstant _ ->
+     true
+  | e ->
+     (get_type e) = index_type
+
+let goes_through_parameter (elems: path_elem list): bool =
+  let pred (elem: path_elem): bool =
+    match elem with
+    | SlotAccessor _ -> false
+    | PointerSlotAccessor _ -> true
+    | ArrayIndex _ -> false
+  in
+  List.exists pred elems
+
+type case_mode =
+  | NormalCaseMode
+  | ReadRefCaseMode of ty
+  | WriteRefCaseMode of ty
 
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   with_frame ("Augment statement: " ^ (stmt_kind stmt))
@@ -920,16 +168,33 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                          body'
                        )
                    else
-                     err "Destructuring a record: not the same set of bindings and slots"
+                     Errors.destructure_wrong_slots rec_ty
                  else
-                   err "Not a public record"
+                   Errors.destructure_not_public rec_ty
               | _ ->
-                 err "Not a record type"))
+                 Errors.destructure_non_record rec_ty))
       | AAssign (span, LValue (var, elems), value) ->
          adorn_error_with_span span
            (fun _ ->
              (match get_var lexenv var with
-              | Some (var_ty, _) ->
+              | Some (var_ty, source) ->
+                 (* Check: can we write to this variable? *)
+                 let _ =
+                   match source with
+                   (* All good. *)
+                   | VarLocal -> ()
+                   | VarConstant ->
+                      Errors.cannot_assign_to_constant ()
+                   | VarParam ->
+                      (* We can only assign to a parameter if we're going through a reference at some point. *)
+                      (match elems with
+                       | [] ->    Errors.cannot_assign_to_parameter ()
+                       | elems ->
+                          if goes_through_parameter elems then
+                            ()
+                          else
+                            Errors.cannot_assign_to_parameter ())
+                 in
                  (match elems with
                   | [] ->
                      (* Assigning to a variable. *)
@@ -939,7 +204,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                        let _ = match_type_with_value (env, module_name) var_ty value in
                        TAssign (span, TypedLValue (var, []), value)
                      else
-                       err "L-values must end in the free universe"
+                       Errors.lvalue_not_free ()
                   | elems ->
                      (* Assigning to a path. *)
                      let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
@@ -956,13 +221,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      if universe = FreeUniverse then
                        TAssign (span, TypedLValue (var, elems), value)
                      else
-                       err "L-values must end in the free universe")
+                       Errors.lvalue_not_free ())
               | None ->
-                 austral_raise GenericError [
-                     Text "I can't find a variable named ";
-                     Code (ident_string var);
-                     Text "."
-           ]))
+                 Errors.unknown_name ~kind:"variable" ~name:var))
       | AIf (span, c, t, f) ->
          adorn_error_with_span span
            (fun _ ->
@@ -970,7 +231,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              if is_boolean (get_type c') then
                TIf (span, c', augment_stmt ctx t, augment_stmt ctx f)
              else
-               err "The type of the condition in an if statement must be a boolean.")
+               Errors.condition_not_boolean
+                 ~kind:"if"
+                 ~form:"statement"
+                 ~ty:(get_type c'))
       | AWhen (span, c, t) ->
          adorn_error_with_span span
            (fun _ ->
@@ -978,31 +242,12 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              if is_boolean (get_type c) then
                TIf (span, c, augment_stmt ctx t, TSkip span)
              else
-               err "The type of the condition in an if statement must be a boolean.")
+               Errors.condition_not_boolean
+                 ~kind:"if"
+                 ~form:"statement"
+                 ~ty:(get_type c))
       | ACase (span, expr, whens) ->
-         (* Type checking a case statement:
-
-            1. Ensure the value is of a union type.
-            2. Ensure the union type is public or it is defined in this module.
-            3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
-            4. Iterate over the cases, and ensure the bindings are correct.
-          *)
-         adorn_error_with_span span
-           (fun _ ->
-             let expr' = augment_expr module_name env rm typarams lexenv None expr in
-             let ty = get_type expr' in
-             pt ("Case type", ty);
-             let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
-             let typebindings = match_type (env, module_name) union_ty ty in
-             let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
-             let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
-             if ident_set_eq case_names when_names then
-               (* Group the cases and whens *)
-               let whens' = group_cases_whens cases whens in
-               let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
-               TCase (span, expr', whens'')
-             else
-               err "Non-exhaustive case statement.")
+         augment_case ctx span expr whens
       | AWhile (span, c, body) ->
          adorn_error_with_span span
            (fun _ ->
@@ -1010,7 +255,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              if is_boolean (get_type c') then
                TWhile (span, c', augment_stmt ctx body)
              else
-               err "The type of the condition in a while loop must be a boolean")
+               Errors.condition_not_boolean
+                 ~kind:"while"
+                 ~form:"statement"
+                 ~ty:(get_type c'))
       | AFor { span; name; initial; final; body; } ->
          adorn_error_with_span span
            (fun _ ->
@@ -1022,9 +270,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let b' = augment_stmt (update_lexenv ctx lexenv') body in
                  TFor (span, name, i', f', b')
                else
-                 err "The type of the final value in a for loop must be an integer type."
+                 Errors.for_bounds_non_integral ~bound:"final" ~ty:(get_type f')
              else
-               err "The type of the initial value in a for loop must be an integer type.")
+               Errors.for_bounds_non_integral ~bound:"initial" ~ty:(get_type i'))
       | ABorrow { span; original; rename; region; body; mode; } ->
          adorn_error_with_span span
            (fun _ ->
@@ -1055,9 +303,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                        mode=mode
                      }
                  else
-                   err "Cannot borrow a non-linear type."
+                   Errors.borrow_non_linear orig_ty
               | None ->
-                 err "No variable with this name."))
+                 Errors.unknown_name ~kind:"variable" ~name:original))
       | ABlock (span, f, r) ->
          let a = augment_stmt ctx f in
          let b = augment_stmt ctx r in
@@ -1069,7 +317,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              ps ("Expression", show_texpr e');
              let u = type_universe (get_type e') in
              if ((u = LinearUniverse) || (u = TypeUniverse)) then
-               err "Discarding a linear value"
+               Errors.discard_linear u
              else
                TDiscarding (span, e'))
       | AReturn (span, e) ->
@@ -1079,6 +327,52 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              pt ("Type", get_type e');
              let _ = match_type_with_value (env, module_name) rt e' in
              TReturn (span, e')))
+
+and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_when list): tstmt =
+  let (StmtCtx (module_name, env, rm, typarams, lexenv, _)) = ctx in
+  (* Type checking a case statement:
+
+     1. Ensure the value is of a union type (or reference to a union).
+     2. Ensure the union type is public or it is defined in this module.
+     3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
+     4. Iterate over the cases, and ensure the bindings are correct.
+   *)
+  adorn_error_with_span span
+    (fun _ ->
+      let expr' = augment_expr module_name env rm typarams lexenv None expr in
+      let ty = get_type expr' in
+      let ty, mode =
+        (match ty with
+         | NamedType _ ->
+            (ty, NormalCaseMode)
+         | ReadRef (ty, r) ->
+            (ty, ReadRefCaseMode r)
+         | WriteRef (ty, r) ->
+            (ty, WriteRefCaseMode r)
+         | _ ->
+            austral_raise TypeError [
+                Text "The type for the expression in a case statement must be a union or a reference to a union, but I got ";
+                Code (type_string ty)
+        ])
+      in
+      let case_ref: case_ref =
+        (match mode with
+         | NormalCaseMode -> CasePlain
+         | ReadRefCaseMode _ -> CaseRef
+         | WriteRefCaseMode _ -> CaseRef)
+      in
+      pt ("Case type", ty);
+      let (union_ty, cases) = get_union_type_definition module_name env ty in
+      let typebindings = match_type (env, module_name) union_ty ty in
+      let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
+      let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
+      if ident_set_eq case_names when_names then
+        (* Group the cases and whens *)
+        let whens' = group_cases_whens cases whens in
+        let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c mode) whens' in
+        TCase (span, expr', whens'', case_ref)
+      else
+        Errors.case_non_exhaustive ())
 
 and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
@@ -1092,34 +386,33 @@ and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (
      err "Path is empty"
 
 and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
+  let ctx: TypeCheckExpr.expr_ctx = TypeCheckExpr.make_ctx module_name env rm typarams lexenv in
   match elem with
   | SlotAccessor slot_name ->
      (match head_ty with
       | NamedType (name, args, _) ->
-         augment_slot_accessor_elem env module_name slot_name name args
+         TypeCheckExpr.augment_slot_accessor_elem ctx slot_name name args
       | _ ->
-         err "Not a record type")
+         Errors.path_not_record (type_string head_ty))
   | PointerSlotAccessor slot_name ->
      (match head_ty with
       | Pointer pointed_to ->
          (* TODO: addresses should not be indexable *)
-         augment_pointer_slot_accessor_elem env module_name slot_name pointed_to
+         TypeCheckExpr.augment_pointer_slot_accessor_elem ctx slot_name pointed_to
       | WriteRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem env module_name slot_name name args
+             TypeCheckExpr.augment_reference_slot_accessor_elem ctx slot_name name args
           | _ ->
-             err "Not a record type")
+             Errors.path_not_record (type_string ty))
       | _ ->
-         err "Not a record type")
+         Errors.path_not_record (type_string head_ty))
   | ArrayIndex ie ->
      let ie' = augment_expr module_name env rm typarams lexenv None ie in
      let _ = ie' in
      (match head_ty with
       | _ ->
-         austral_raise TypeError [
-             Text "The array index operator doesn't work in lvalues."
-           ])
+         Errors.lvalue_index ())
 
 
 and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty): (ty * decl list) =
@@ -1127,11 +420,7 @@ and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty
                       | NamedType (n, _, _) ->
                          n
                       | _ ->
-                         austral_raise GenericError [
-                             Text "Case statement: case expression type is not a union type: ";
-                             Code (type_string ty);
-                             Text "."
-                           ]) in
+                         Errors.case_non_union ty) in
   match get_decl_by_name env (qident_to_sident name) with
   | Some (Union { id; vis; name; mod_id; typarams; universe; _ }) ->
      let module_name = module_name_from_id env mod_id in
@@ -1143,9 +432,9 @@ and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty
        and cases = get_union_cases env id in
        (ty, cases)
      else
-       err "Union must be public or from the same module to be used in a case statement."
+       Errors.case_non_public ()
   | _ ->
-     err "Not a union type"
+     Errors.case_non_union ty
 
 and group_cases_whens (cases: decl list) (whens: abstract_when list): (typed_case * abstract_when) list =
   List.map (fun (TypedCase (n, s)) -> (TypedCase (n, s), List.find (fun (AbstractWhen (n', _, _)) -> n = n') whens))
@@ -1159,7 +448,7 @@ and group_bindings_slots (bindings: qbinding list) (slots: typed_slot list): (id
   in
   List.map f bindings
 
-and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case): typed_when =
+and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case) (mode: case_mode): typed_when =
   with_frame "Augment when"
     (fun _ ->
       let (StmtCtx (_, menv, rm, typarams, lexenv, _)) = ctx in
@@ -1173,26 +462,49 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
         (* Check the type of each binding matches the type of the slot *)
         let bindings' = group_bindings_slots bindings slots in
         let bindings'' = List.map (fun (n, ty, actual, rename) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual, rename)) bindings' in
-        let newvars = List.map (fun (_, ty, actual, rename) ->
-                          if equal_ty ty actual then
+        let newvars = List.map (fun (_, user_ty, decl_ty, rename) ->
+                          (* Depending on what 'mode' of case statement this is,
+                             we may have to modify the slot type. If we're just
+                             accessing a union by value, we don't have to do
+                             anything, but if we're accessing a union by
+                             reference, we don't have access to the slot
+                             _values_, we instead get _references_ to those
+                             values. Just like when doing `val->x` with `val`
+                             having a reference-to-record type gives us a
+                             reference to the field `x`, case statements on
+                             references give us references to their interior
+                             values. *)
+                          let decl_ty =
+                            (match mode with
+                             | NormalCaseMode ->
+                                decl_ty
+                             | ReadRefCaseMode r ->
+                                ReadRef (decl_ty, r)
+                             | WriteRefCaseMode r ->
+                                WriteRef (decl_ty, r))
+                          in
+                          if equal_ty decl_ty user_ty then
                             let _ = pi ("Binding name", rename)
                             in
-                            pt ("Binding type",  ty);
-                            (rename, ty, VarLocal)
+                            pt ("Binding type",  decl_ty);
+                            (rename, decl_ty, VarLocal)
                           else
-                            err ("Slot type mismatch: expected \n\n" ^ (type_string ty) ^ "\n\nbut got:\n\n" ^ (type_string actual)))
+                            Errors.slot_wrong_type
+                              ~name:rename
+                              ~expected:decl_ty
+                              ~actual:user_ty)
                         bindings'' in
         let lexenv' = push_vars lexenv newvars in
         let body' = augment_stmt (update_lexenv ctx lexenv') body in
         TypedWhen (name, List.map (fun (name, _, ty, rename) -> TypedBinding { name; ty; rename}) bindings'', body')
       else
-        err "The set of slots in the case statement doesn't match the set of slots in the union definition.")
+        Errors.case_wrong_slots ())
 
 let rec validate_constant_expression (expr: texpr): unit =
   if is_constant expr then
     ()
   else
-    err ("The value of this constant is not a valid constant expression.")
+    Errors.expression_not_constant ()
 
 and is_constant = function
   | TNilConstant ->
@@ -1282,9 +594,9 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
                if kind = UnsafeModule then
                  TForeignFunction (decl_id, vis, name, params, rt, s, doc)
                else
-                 err "Can't declare a foreign function in a safe module."
+                 Errors.foreign_in_safe_module ()
              else
-               err "Foreign functions can't have type parameters."
+               Errors.foreign_type_parameters ()
           | [ForeignExportPragma _] ->
              let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
              let body' = augment_stmt ctx body in
@@ -1294,7 +606,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
              let body' = augment_stmt ctx body in
              TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
           | _ ->
-             err "Invalid pragmas")
+             Errors.fun_invalid_pragmas ())
       | LTypeclass (decl_id, vis, name, typaram, methods, doc) ->
          ps ("Kind", "Typeclass");
          TTypeClass (decl_id, vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)

@@ -1,3 +1,10 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+
 open Id
 open Identifier
 open Common
@@ -36,7 +43,7 @@ and mstmt =
   | MDestructure of mono_binding list * mexpr * mstmt
   | MAssign of mtyped_lvalue * mexpr
   | MIf of mexpr * mstmt * mstmt
-  | MCase of mexpr * mtyped_when list
+  | MCase of mexpr * mtyped_when list * Tast.case_ref
   | MWhile of mexpr * mstmt
   | MFor of identifier * mexpr * mexpr * mstmt
   | MBorrow of {

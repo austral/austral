@@ -1,3 +1,9 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
 open Id
 open Identifier
 open Type
@@ -6,6 +12,7 @@ open Env
 open EnvUtils
 open MonoType
 open MonoTypeBindings
+open Tast
 open Mtast
 open CRepr
 open Util
@@ -60,6 +67,13 @@ open Error
        }
 
 *)
+
+module Errors = struct
+  let foreign_returns_array () =
+    austral_raise DeclarationError [
+      Text "Foreign functions cannot return arrays."
+    ]
+end
 
 (* Name generation *)
 
@@ -153,6 +167,10 @@ let c_string_type = CPointer (CNamedType "uint8_t")
 
 let union_type_id = function
   | MonoNamedType id ->
+     id
+  | MonoReadRef (MonoNamedType id, _) ->
+     id
+  | MonoWriteRef (MonoNamedType id, _) ->
      id
   | _ ->
      internal_err "Union is not a named type?"
@@ -303,8 +321,8 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CAssign (gen_lvalue mn lvalue, ge v)
   | MIf (c, tb, fb) ->
      CIf (ge c, gs tb, gs fb)
-  | MCase (e, whens) ->
-     gen_case mn e whens
+  | MCase (e, whens, case_ref) ->
+     gen_case mn e whens case_ref
   | MWhile (c, b) ->
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
@@ -336,28 +354,49 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
 and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
   gen_path mn (CVar (gen_ident name)) elems
 
-and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
+and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: case_ref): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
      being pattern-matched to that variable. Generate a switch statement over
      the tag enum. Each when statement that has bindings needs to generate some
      variable assignments for those bindings from the generated variable. *)
   let ty = get_type e
   and var = new_variable () in
-  let cases = List.map (when_to_case mn ty var) whens in
-  let switch = CSwitch (CStructAccessor (CVar var, "tag"), cases) in
+  let cases = List.map (when_to_case mn ty var case_ref) whens in
+  let accessor =
+    match case_ref with
+    | CasePlain ->
+       CStructAccessor (CVar var, "tag")
+    | CaseRef ->
+       CPointerStructAccessor (CVar var, "tag")
+  in
+  let switch = CSwitch (accessor, cases) in
   CBlock [
       CLet (var, gen_type ty, gen_exp mn e);
       switch
     ]
 
-and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, bindings, body)) =
+and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (case_ref: case_ref) (MTypedWhen (n, bindings, body)): c_switch_case =
   let case_name = gen_ident n
   and tag_value = union_tag_value ty n
   in
   let get_binding binding_name =
-    CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+    match case_ref with
+    | CasePlain ->
+       CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+    | CaseRef ->
+       CAddressOf (CStructAccessor (CStructAccessor (CStructAccessor (CDeref (CVar var), "data"), case_name), gen_ident binding_name))
   in
-  let bindings' = List.map (fun (MonoBinding { name; ty; rename; }) -> CLet (gen_ident rename, gen_type ty, get_binding name)) bindings in
+  let f (MonoBinding { name; ty; rename; }) =
+    let ty =
+      match case_ref with
+      | CasePlain ->
+         gen_type ty
+      | CaseRef ->
+         CPointer (gen_type ty)
+    in
+    CLet (gen_ident rename, ty, get_binding name)
+  in
+  let bindings' = List.map f bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 
@@ -523,7 +562,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      let return_type_to_c_type t =
        match t with
        | MonoStaticArray _ ->
-          err "Foreign functions cannot return arrays."
+          Errors.foreign_returns_array ()
        | _ ->
           param_type_to_c_type t
      in
@@ -618,51 +657,51 @@ let decl_order = function
   | CFunctionDefinition _ ->
      7
 
+(* the following code is used to sort declarations in dependency order, so that
+   the C compiler doesn't complain about types being incomplete *)
+
 let rec slot_depth decls (slot: c_slot) =
   match slot with
-  | CSlot (_, CNamedType name) -> name_depth name decls 
-  | CSlot (_, CStructType (CStruct (_,slots))) -> slots_depth slots decls 
-  | CSlot (_, CUnionType slots) -> slots_depth slots decls 
+  | CSlot (_, CNamedType name) -> name_depth name decls
+  | CSlot (_, CStructType (CStruct (_,slots))) -> slots_depth slots decls
+  | CSlot (_, CUnionType slots) -> slots_depth slots decls
   | _ -> 0
+
 and get_slots name decl =
   match decl with
-  | CNamedStructDefinition (_, decl_name, slots) -> 
-      if name = decl_name then
-        Some slots
-      else
-        None
+  | CNamedStructDefinition (_, decl_name, slots) ->
+     if name = decl_name then
+       Some slots
+     else
+       None
   | _ -> None
+
 and name_depth name decls =
   let slots =
-      match (List.filter_map (get_slots name) decls) with
-      | hd :: _ -> hd
-      | _ -> [] in 
+    match (List.filter_map (get_slots name) decls) with
+    | hd :: _ -> hd
+    | _ -> [] in
   slots_depth slots decls
+
 and slots_depth slots decls =
   let deps = List.map (slot_depth decls) slots in
   let dep_depth = List.fold_left max 0 deps in
   let depth = 1 + dep_depth in
   depth
 
-and decl_depth decl decls =
-  match decl with
-  | CNamedStructDefinition (_, _, slots) -> 
-     let depth = slots_depth slots decls in
-     depth
-  | _ -> 0
-
 let detail_compare decls a b =
-  match (a, b) with 
+  match (a, b) with
   | (CNamedStructDefinition (_, _, s1), CNamedStructDefinition (_, _, s2)) ->
-    (slots_depth s1 decls) - (slots_depth s2 decls)
+     (slots_depth s1 decls) - (slots_depth s2 decls)
   | _ ->
-    compare (decl_order a) (decl_order b)
+     compare (decl_order a) (decl_order b)
+
+(* end declaration sorting code *)
 
 let gen_module (env: env) (MonoModule (name, decls)) =
   let type_decls = gen_type_decls decls
   and fun_decls = List.concat (gen_fun_decls name decls)
   and decls = List.concat (List.map (gen_decl env name) decls) in
   let decls = List.concat [type_decls; fun_decls; decls] in
-  let _ = List.map (fun x -> decl_depth x decls) decls in
   let sorted_decls = List.sort (detail_compare decls) decls in
   CUnit (mod_name_string name, sorted_decls)

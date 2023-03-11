@@ -1,0 +1,41 @@
+module body Test is
+    record InnerLinear : Linear is
+       value: Nat32;
+    end;
+    record WrapLinear : Linear is
+        inner : InnerLinear; 
+    end;
+
+    function destroyInner(inner: InnerLinear): Unit is
+        let { value: Nat32 } := inner;
+        return nil;
+    end;
+
+    function destroyWrap(wrap: WrapLinear): Unit is
+        let { inner: InnerLinear } := wrap;
+        destroyInner(inner);
+        return nil;
+    end;
+
+    generic[R: Region]
+    function update(wrapper:&![WrapLinear, R], new_value: Nat32): Unit is
+        let replace: InnerLinear := InnerLinear(value => 2);
+        swap(wrapper->inner, &!replace);
+        destroyInner(replace);
+        return nil;
+    end;
+
+    generic[R: Region]
+    function printWrap(wrap: &[WrapLinear, R]): Unit is
+        printLn(!((wrap->inner)->value));
+        return nil;
+    end;
+    
+    function main(): ExitCode is
+        let a: WrapLinear := WrapLinear(inner => InnerLinear(value => 1));
+        update(&!a, 2);
+        printWrap(&a);
+        destroyWrap(a);
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,3 +1,9 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
 open Identifier
 open Cst
 open Names
@@ -16,6 +22,7 @@ let pervasive_imports =
         ConcreteImport (make_ident "Either", None);
         ConcreteImport (make_ident "Left", None);
         ConcreteImport (make_ident "Right", None);
+        ConcreteImport (make_ident "swap", None);
         ConcreteImport (make_ident "fixedArraySize", None);
         ConcreteImport (make_ident "abort", None);
         ConcreteImport (make_ident "RootCapability", None);

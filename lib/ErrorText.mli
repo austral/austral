@@ -1,3 +1,9 @@
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
 (** This module provides a representation-independent way of writing the text in
     error messages. Rather than concatenating strings, we use a more structured
     representation, which can then be rendered to both plain text and HTML. *)
