@@ -34,9 +34,3 @@ let rec push_vars env l =
      push_vars (push_var env n t s) rest
   | [] ->
      env
-
-let pop_var = function
-  | (_::rest) ->
-     rest
-  | [] ->
-     err "pop_var called with empty lexenv"

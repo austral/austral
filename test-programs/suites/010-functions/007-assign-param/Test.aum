@@ -1,0 +1,11 @@
+module body Test is
+    function foo(x: Int32): Unit is
+        x := 10;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        foo(10);
+        return ExitSuccess();
+    end;
+end module body.

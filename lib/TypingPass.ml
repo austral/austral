@@ -89,6 +89,15 @@ let is_compatible_with_index_type = function
   | e ->
      (get_type e) = index_type
 
+let goes_through_parameter (elems: path_elem list): bool =
+  let pred (elem: path_elem): bool =
+    match elem with
+    | SlotAccessor _ -> false
+    | PointerSlotAccessor _ -> true
+    | ArrayIndex _ -> false
+  in
+  List.exists pred elems
+
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   with_frame ("Augment statement: " ^ (stmt_kind stmt))
     (fun _ ->
@@ -162,7 +171,24 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          adorn_error_with_span span
            (fun _ ->
              (match get_var lexenv var with
-              | Some (var_ty, _) ->
+              | Some (var_ty, source) ->
+                 (* Check: can we write to this variable? *)
+                 let _ =
+                   match source with
+                   (* All good. *)
+                   | VarLocal -> ()
+                   | VarConstant ->
+                      Errors.cannot_assign_to_constant ()
+                   | VarParam ->
+                      (* We can only assign to a parameter if we're going through a reference at some point. *)
+                      (match elems with
+                       | [] ->    Errors.cannot_assign_to_parameter ()
+                       | elems ->
+                          if goes_through_parameter elems then
+                            ()
+                          else
+                            Errors.cannot_assign_to_parameter ())
+                 in
                  (match elems with
                   | [] ->
                      (* Assigning to a variable. *)
