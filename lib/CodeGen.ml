@@ -12,6 +12,7 @@ open Env
 open EnvUtils
 open MonoType
 open MonoTypeBindings
+open Tast
 open Mtast
 open CRepr
 open Util
@@ -349,7 +350,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
 and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
   gen_path mn (CVar (gen_ident name)) elems
 
-and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: Tast.case_ref): c_stmt =
+and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: case_ref): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
      being pattern-matched to that variable. Generate a switch statement over
      the tag enum. Each when statement that has bindings needs to generate some
@@ -357,7 +358,14 @@ and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: T
   let ty = get_type e
   and var = new_variable () in
   let cases = List.map (when_to_case mn ty var) whens in
-  let switch = CSwitch (CStructAccessor (CVar var, "tag"), cases) in
+  let accessor =
+    match case_ref with
+    | CasePlain ->
+       CStructAccessor (CVar var, "tag")
+    | CaseRef ->
+       CDeref (CStructAccessor (CVar var, "tag"))
+  in
+  let switch = CSwitch (accessor, cases) in
   CBlock [
       CLet (var, gen_type ty, gen_exp mn e);
       switch
