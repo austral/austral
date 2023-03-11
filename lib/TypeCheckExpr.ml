@@ -96,9 +96,6 @@ let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypesp
 (* Interface *)
 
 let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
-  let _ = (ctx, asserted_ty, expr) in
-  (* `aug` is a shorthand for `augment_expr` with `None` as the asserted type. *)
-  let aug = augment_expr ctx None in
   (* Dispatch on the AST *)
   match expr with
   | NilConstant ->
@@ -118,36 +115,13 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   | ArithmeticExpression _ ->
      internal_err "Not implemented yet"
   | Comparison (op, lhs, rhs) ->
-     let lhs' = aug lhs
-     and rhs' = aug rhs in
-     let _ = match_type_with_value_ctx ctx (get_type lhs') rhs' in
-     TComparison (op, lhs', rhs')
+     augment_comparison ctx op lhs rhs
   | Conjunction (lhs, rhs) ->
-     let lhs' = aug lhs
-     and rhs' = aug rhs in
-     if ((is_bool lhs') && (is_bool rhs')) then
-       TConjunction (lhs', rhs')
-     else
-       Errors.logical_operands_not_boolean
-         ~operator:"conjunction"
-         ~types:[get_type lhs'; get_type rhs']
+     augment_conjunction ctx lhs rhs
   | Disjunction (lhs, rhs) ->
-     let lhs' = aug lhs
-     and rhs' = aug rhs in
-     if ((is_bool lhs') && (is_bool rhs')) then
-       TDisjunction (lhs', rhs')
-     else
-       Errors.logical_operands_not_boolean
-         ~operator:"disjunction"
-         ~types:[get_type lhs'; get_type rhs']
+     augment_disjunction ctx lhs rhs
   | Negation e ->
-     let e' = aug e in
-     if is_bool e' then
-       TNegation e'
-     else
-       Errors.logical_operands_not_boolean
-         ~operator:"negation"
-         ~types:[get_type e']
+     augment_negation ctx e
   | _ ->
      internal_err "Not implemented yet"
 
@@ -186,3 +160,45 @@ and augment_variable (ctx: expr_ctx) (name: qident) (asserted_ty: ty option): te
          Errors.unknown_name
            ~kind:"variable"
            ~name:(original_name name))
+
+and augment_comparison ctx op lhs rhs =
+  let lhs' = aug ctx lhs
+  and rhs' = aug ctx rhs in
+  let _ = match_type_with_value_ctx ctx (get_type lhs') rhs' in
+  TComparison (op, lhs', rhs')
+
+and augment_conjunction ctx lhs rhs =
+  let lhs': texpr = aug ctx lhs
+  and rhs': texpr = aug ctx rhs in
+  if ((is_bool lhs') && (is_bool rhs')) then
+    TConjunction (lhs', rhs')
+  else
+    Errors.logical_operands_not_boolean
+      ~operator:"conjunction"
+      ~types:[get_type lhs'; get_type rhs']
+
+and augment_disjunction ctx lhs rhs =
+  let lhs': texpr = aug ctx lhs
+  and rhs': texpr = aug ctx rhs in
+  if ((is_bool lhs') && (is_bool rhs')) then
+    TDisjunction (lhs', rhs')
+  else
+    Errors.logical_operands_not_boolean
+      ~operator:"disjunction"
+      ~types:[get_type lhs'; get_type rhs']
+
+and augment_negation ctx e =
+  let e' = aug ctx e in
+  if is_bool e' then
+    TNegation e'
+  else
+    Errors.logical_operands_not_boolean
+      ~operator:"negation"
+      ~types:[get_type e']
+
+(* Further utilities, these have to be defined here because of `let rec and`
+   bullshit. *)
+
+(** `aug` is a shorthand for `augment_expr` with `None` as the asserted type. *)
+and aug (ctx: expr_ctx) (expr: aexpr): texpr =
+  augment_expr ctx None expr
