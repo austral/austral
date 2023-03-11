@@ -53,10 +53,17 @@ let ctx_lexenv (ctx: expr_ctx): lexenv =
 
 (* Utilities *)
 
+(** Wrapper around match_type. *)
 let match_type_ctx (ctx: expr_ctx) (expected: ty) (actual: ty): type_bindings =
   let env: env = ctx_env ctx
   and module_name: module_name = ctx_module_name ctx in
   match_type (env, module_name) expected actual
+
+(** Wrapper around match_type_with_value. *)
+let match_type_with_value_ctx (ctx: expr_ctx) (expected: ty) (actual: ty): type_bindings =
+  let env: env = ctx_env ctx
+  and module_name: module_name = ctx_module_name ctx in
+  match_type_with_value (env, module_name) expected actual
 
 let get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
@@ -107,6 +114,37 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      internal_err "Not implemented yet"
   | ArithmeticExpression _ ->
      internal_err "Not implemented yet"
+  | Comparison (op, lhs, rhs) ->
+     let lhs' = aug lhs
+     and rhs' = aug rhs in
+     let _ = match_type_with_value_ctx ctx (get_type lhs') rhs' in
+     TComparison (op, lhs', rhs')
+  | Conjunction (lhs, rhs) ->
+     let lhs' = aug lhs
+     and rhs' = aug rhs in
+     if ((is_bool lhs') && (is_bool rhs')) then
+       TConjunction (lhs', rhs')
+     else
+       Errors.logical_operands_not_boolean
+         ~operator:"conjunction"
+         ~types:[get_type lhs'; get_type rhs']
+  | Disjunction (lhs, rhs) ->
+     let lhs' = aug lhs
+     and rhs' = aug rhs in
+     if ((is_bool lhs') && (is_bool rhs')) then
+       TDisjunction (lhs', rhs')
+     else
+       Errors.logical_operands_not_boolean
+         ~operator:"disjunction"
+         ~types:[get_type lhs'; get_type rhs']
+  | Negation e ->
+     let e' = aug e in
+     if is_bool e' then
+       TNegation e'
+     else
+       Errors.logical_operands_not_boolean
+         ~operator:"negation"
+         ~types:[get_type e']
   | _ ->
      internal_err "Not implemented yet"
 
