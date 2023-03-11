@@ -13,11 +13,12 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        let u: Foo := Value(value => 10);
+        let u: Foo := Value(value => 123);
         borrow u as uref in R do
             case uref of
                 when Value(value: &[Int32, R]) do
-                    skip;
+                    let i: Int32 := !value;
+                    printLn(i);
             end case;
         end;
         consume(u);
