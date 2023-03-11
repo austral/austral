@@ -27,8 +27,5 @@ val push_var : lexenv -> identifier -> ty -> var_source -> lexenv
 (** Add a list of variables. *)
 val push_vars : lexenv -> (identifier * ty * var_source) list -> lexenv
 
-(** Remove the last variable added. *)
-val pop_var : lexenv -> lexenv
-
 (** Retrieve a variable by name. *)
 val get_var : lexenv -> identifier -> (ty * var_source) option
