@@ -66,6 +66,10 @@ let match_type_with_value_ctx (ctx: expr_ctx) (expected: ty) (value: texpr): typ
   and module_name: module_name = ctx_module_name ctx in
   match_type_with_value (env, module_name) expected value
 
+(** Wrapper around match_typarams_ctx. *)
+let match_typarams_ctx (ctx: expr_ctx) (typarams: typarams) (type_args: ty list): type_bindings =
+  match_typarams (ctx_env ctx, ctx_module_name ctx) typarams type_args
+
 let get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
   let last = List.nth elems ((List.length elems) - 1) in
@@ -111,7 +115,6 @@ let get_slot_with_name type_name slots slot_name =
      Errors.no_such_slot
        ~type_name:(original_name type_name)
        ~slot_name
-
 
 (* Type Checking *)
 
