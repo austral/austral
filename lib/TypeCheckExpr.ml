@@ -5,6 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  *)
 open Identifier
+open BuiltIn
 open Env
 open Region
 open Type
@@ -86,7 +87,7 @@ let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypesp
 
 let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
   let _ = (ctx, asserted_ty, expr) in
-  (* `aug` is a shortmhand for `augment_expr` with `None` as the asserted type. *)
+  (* `aug` is a shorthand for `augment_expr` with `None` as the asserted type. *)
   let aug = augment_expr ctx None in
   (* Dispatch on the AST *)
   match expr with
@@ -102,6 +103,10 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      TStringConstant s
   | Variable name ->
      augment_variable ctx name asserted_ty
+  | FunctionCall _ ->
+     internal_err "Not implemented yet"
+  | ArithmeticExpression _ ->
+     internal_err "Not implemented yet"
   | _ ->
      internal_err "Not implemented yet"
 
