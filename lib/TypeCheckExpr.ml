@@ -70,16 +70,19 @@ let get_path_ty_from_elems (elems: typed_path_elem list): ty =
   let last = List.nth elems ((List.length elems) - 1) in
   path_elem_type last
 
+(** Is this expression of boolean type? *)
 let is_bool (e: texpr): bool =
   match get_type e with
   | Boolean -> true
   | _ -> false
 
+(** Is this expression an integer constant? *)
 let is_int_constant (e: aexpr): bool =
   match e with
   | IntConstant _ -> true
   | _ -> false
 
+(** Is this expression a float constant? *)
 let is_float_constant (e: aexpr): bool =
   match e with
   | FloatConstant _ -> true
