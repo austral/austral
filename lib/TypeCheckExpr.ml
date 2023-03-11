@@ -7,7 +7,11 @@
 open Identifier
 open Common
 open BuiltIn
+open Id
 open Env
+open EnvTypes
+open EnvUtils
+open EnvExtras
 open Region
 open Type
 open TypeSystem
@@ -15,11 +19,15 @@ open TypeParser
 open Ast
 open Tast
 open TastUtil
+open TypeParameter
 open TypeParameters
+open TypeVarSet
 open LexEnv
 open TypeBindings
 open TypeMatch
+open Reporter
 open Error
+open Util
 
 module Errors = TypeErrors
 
@@ -124,6 +132,36 @@ let get_slot_with_name type_name slots slot_name =
        ~type_name:(original_name type_name)
        ~slot_name
 
+(* Check that there are as many bindings as there are type parameters, and that
+   every type parameter is satisfied. *)
+and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
+  if (typarams_size typarams) = (binding_count bindings) then
+    let check (tp: type_parameter): unit =
+      let n = typaram_name tp
+      and u = typaram_universe tp
+      in
+      (match get_binding bindings tp with
+       | Some ty ->
+          if universe_compatible u (type_universe ty) then
+            ()
+          else
+            err ("Mismatched universes: expected "
+                 ^ (show_universe u)
+                 ^ " and got "
+                 ^ (show_universe (type_universe ty)))
+       | None ->
+          err ("No binding for this parameter: " ^ (ident_string n)))
+    in
+    let _ = List.map check (typarams_as_list typarams) in
+    ()
+  else
+    (* I think this should not be an error *)
+    (*err ("Not the same number of bindings and parameters. Bindings: "
+      ^ (show_bindings bindings)
+      ^ ". Parameters: "
+      ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))*)
+    ()
+
 (* Argument List Checking *)
 
 (* Given a list of type parameters, and a list of arguments, check that the
@@ -167,6 +205,19 @@ and match_parameter (ctx: expr_ctx) (param: value_parameter) (arg: texpr): type_
   let (ValueParameter (_, ty)) = param in
   match_type_with_value_ctx ctx ty arg
 
+let make_substs (bindings: type_bindings) (typarams: typarams): type_bindings =
+  let f (tp: type_parameter): (type_parameter * ty) option =
+    if (typaram_universe tp) = RegionUniverse then
+      Some (tp, RegionTy static_region)
+    else
+      match get_binding bindings tp with
+      | Some ty ->
+         Some (tp, ty)
+      | None ->
+         None
+  in
+  bindings_from_list (List.filter_map f (typarams_as_list typarams))
+
 (* Type Checking: Function Calls *)
 
 let rec augment_call (ctx: expr_ctx) (name: qident) (args: typed_arglist) (asserted_ty: ty option): texpr =
@@ -178,7 +229,7 @@ let rec augment_call (ctx: expr_ctx) (name: qident) (args: typed_arglist) (asser
      (* Otherwise, find a callable from the environment. *)
      (match get_callable (ctx_env ctx) (ctx_module_name ctx) (qident_to_sident name) with
       | Some callable ->
-         augment_callable ctx callable asserted_ty args
+         augment_callable ctx name callable asserted_ty args
       | None ->
          Errors.unknown_name
            ~kind:"callable"
@@ -211,6 +262,229 @@ and augment_fptr_call (ctx: expr_ctx) (name: identifier) (fn_ptr_ty: ty) (assert
   let (bindings', rt'') = handle_return_type_polymorphism ctx name params rt' asserted_ty bindings in
   let arguments = cast_arguments bindings' params args in
   TFptrCall (name, arguments, rt'')
+
+and augment_callable (ctx: expr_ctx) (name: qident) (callable: callable) (asserted_ty: ty option) (args: typed_arglist) =
+  with_frame "Augment callable"
+    (fun _ ->
+      match callable with
+      | FunctionCallable (id, typarams, params, rt) ->
+         augment_function_call ctx id name typarams params rt asserted_ty args
+      | RecordConstructor (_, typarams, universe, slots) ->
+         augment_record_constructor ctx name typarams universe slots asserted_ty args
+      | UnionConstructor { union_id; type_params; universe; case } ->
+         let type_name: qident = (match get_decl_by_id (ctx_env ctx) union_id with
+                                  | Some (Union { name; mod_id; _ }) ->
+                                     (* TODO: constructing a fake qident *)
+                                     make_qident (module_name_from_id (ctx_env ctx) mod_id, name, name)
+                                  | _ ->
+                                     internal_err ("no type name found for ID `" ^ (show_decl_id union_id) ^ "`"))
+         in
+         augment_union_constructor ctx type_name type_params universe case asserted_ty args
+      | MethodCallable { typeclass_id; value_parameters; return_type; _ } ->
+         let param = (match get_decl_by_id (ctx_env ctx) typeclass_id with
+                      | Some (TypeClass { param; _ }) ->
+                         param
+                      | _ ->
+                         internal_err ("no type parameter found for ID `" ^ (show_decl_id typeclass_id) ^ "`"))
+         in
+         augment_method_call ctx typeclass_id param name value_parameters return_type asserted_ty args)
+
+and augment_function_call (ctx: expr_ctx) (id: decl_id) name typarams params rt asserted_ty args =
+  with_frame "Augment function call"
+    (fun _ ->
+      pqi ("Name", name);
+      (* For simplicity, and to reduce duplication of code, we convert the argument
+         list to a positional list. *)
+      let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
+      let arguments: texpr list = arglist_to_positional (args, param_names) in
+      (* Check the list of params against the list of arguments *)
+      let bindings = check_argument_list ctx (original_name name) params arguments in
+      (* Use the bindings to get the effective return type *)
+      let rt' = replace_variables bindings rt in
+      let (bindings', rt'') = handle_return_type_polymorphism ctx (local_name name) params rt' asserted_ty bindings in
+      (* Check: the set of bindings equals the set of type parameters *)
+      let bindings'' = merge_bindings bindings bindings' in
+      check_bindings typarams bindings'';
+      let arguments' = cast_arguments bindings'' params arguments in
+      let substs = make_substs bindings'' typarams in
+      ps ("Bindings", show_bindings bindings'');
+      pt ("Return type", rt'');
+      TFuncall (id, name, arguments', rt'', substs))
+
+and augment_record_constructor (ctx: expr_ctx) (name: qident) (typarams: typarams) (universe: universe) (slots: typed_slot list) (asserted_ty: ty option) (args: typed_arglist) =
+  (* Check: the argument list must be named *)
+  let args' = (match args with
+               | TPositionalArglist l ->
+                  if l = [] then
+                    []
+                  else
+                    Errors.constructor_not_named "record"
+               | TNamedArglist a ->
+                  a) in
+  (* Check: the set of slots matches the set of param names *)
+  let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
+  let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
+  if not (ident_set_eq slot_names argument_names) then
+    Errors.constructor_wrong_args "record"
+  else
+    (* Convert args to positional *)
+    let arguments = arglist_to_positional (args, slot_names) in
+    (* Check the list of params against the list of arguments *)
+    let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
+    let bindings = check_argument_list ctx (original_name name) params arguments in
+    (* Use the bindings to get the effective return type *)
+    let rt = NamedType (name,
+                        List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
+                        universe)
+    in
+    let rt' = replace_variables bindings rt in
+    let (bindings', rt'') = handle_return_type_polymorphism ctx (local_name name) params rt' asserted_ty bindings in
+    (* Check: the set of bindings equals the set of type parameters *)
+    check_bindings typarams (merge_bindings bindings bindings');
+    (* Check the resulting type is in the correct universe *)
+    if universe_compatible universe (type_universe rt'') then
+      TRecordConstructor (rt'', List.map2 (fun a b -> (a, b)) slot_names arguments)
+    else
+      err "Universe mismatch"
+
+and augment_union_constructor (ctx: expr_ctx) (type_name: qident) (typarams: typarams) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
+  with_frame "Augment union constructor"
+    (fun _ ->
+      pqi ("Type name", type_name);
+      let args' = (match args with
+                   | TPositionalArglist l ->
+                      if l = [] then
+                        []
+                      else
+                        Errors.constructor_not_named "union"
+                   | TNamedArglist a ->
+                      a) in
+      (* Check: the set of slots matches the set of param names *)
+      let (TypedCase (case_name, slots)) = case in
+      pi ("Case name", case_name);
+      let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
+      let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
+      if not (ident_set_eq slot_names argument_names) then
+        Errors.constructor_wrong_args "union"
+      else
+        (* Convert args to positional *)
+        let arguments = arglist_to_positional (args, slot_names) in
+        (* Check the list of params against the list of arguments *)
+        let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
+        ps ("Params", String.concat "\n" (List.map (fun (ValueParameter (n, t)) -> (ident_string n) ^ ": " ^ (type_string t)) params));
+        ps ("Arguments", String.concat "\n" (List.map show_texpr arguments));
+        let bindings = check_argument_list ctx case_name params arguments in
+        (* Use the bindings to get the effective return type *)
+        let rt = NamedType (type_name,
+                            List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams),
+                            universe)
+        in
+        pt ("Type", rt);
+        ps ("Bindings", show_bindings bindings);
+        let rt' = replace_variables bindings rt in
+        pt ("Type'", rt');
+        let (bindings', rt'') = handle_return_type_polymorphism ctx case_name params rt' asserted_ty bindings in
+        (* Check: the set of bindings equals the set of type parameters *)
+        check_bindings typarams (merge_bindings bindings bindings');
+        (* Check the resulting type is in the correct universe *)
+        if universe_compatible universe (type_universe rt'') then
+          let _ = pt ("Type''", rt'')
+          in
+          TUnionConstructor (rt'', case_name, List.map2 (fun a b -> (a, b)) slot_names arguments)
+        else
+          err "Universe mismatch")
+
+and augment_method_call (ctx: expr_ctx) (typeclass_id: decl_id) (typaram: type_parameter) (callable_name: qident) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
+  with_frame "Augmenting method call"
+    (fun _ ->
+      pqi ("Callable name", callable_name);
+      (* At this point, we know the method's name and the typeclass it belongs
+         to. We pull the parameter list from the typeclass, and compare that against
+         the argument list. *)
+      (* For simplicity, and to reduce duplication of code, we convert the argument
+         list to a positional list. *)
+      let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
+      let arguments: texpr list = arglist_to_positional (args, param_names) in
+      (* Check the list of params against the list of arguments *)
+      let bindings = check_argument_list ctx (original_name callable_name) params arguments in
+      (* Use the bindings to get the effective return type *)
+      let rt' = replace_variables bindings rt in
+      let (bindings', rt'') = handle_return_type_polymorphism ctx (local_name callable_name) params rt' asserted_ty bindings in
+      let bindings'' = merge_bindings bindings bindings' in
+      ps ("Bindings", show_bindings bindings'');
+      (* Check: the set of bindings equals the set of type parameters *)
+      check_bindings (typarams_from_list [typaram]) bindings'';
+      match get_binding bindings'' typaram with
+      | (Some dispatch_ty) ->
+         pt ("Dispatch Type", dispatch_ty);
+         (* Is the dispatch type a type variable? *)
+         (match dispatch_ty with
+          | TyVar (TypeVariable (typaram, _, _, constraints)) ->
+             (* If so, check if the constraints say that it implements the typeclass. *)
+             let tc_name: sident = get_decl_sident_or_die (ctx_env ctx) typeclass_id in
+             if List.exists (fun c -> equal_sident tc_name c) constraints then
+               (* If it's a tyvar that implements the typeclass, we have to
+                  proceed differently. Essentially we can't go on with instance
+                  resolution, because we don't have a type to resolve an
+                  instance for. So we have to freeze the process. *)
+               TVarMethodCall {
+                   source_module_name = (ctx_module_name ctx);
+                   typeclass_id = typeclass_id;
+                   params = params;
+                   method_name = callable_name;
+                   args = arguments;
+                   dispatch_ty = dispatch_ty;
+                   rt = rt'';
+                   bindings = bindings'';
+                 }
+             else
+               (* If it doesn't, that's an error *)
+               Errors.unconstrained_type_parameter
+                 ~typeclass:(sident_name tc_name)
+                 ~typaram
+          | _ ->
+             (* If it's not a type variable, continue normal instance resolution. *)
+             let (instance, instance_bindings): decl * type_bindings =
+               (match get_instance (ctx_env ctx) (ctx_module_name ctx) dispatch_ty typeclass_id with
+                | Some (i, b) -> (i, b)
+                | None ->
+                   let tc_name: sident = get_decl_sident_or_die (ctx_env ctx) typeclass_id in
+                   Errors.no_suitable_instance
+                     ~typeclass:(sident_name tc_name)
+                     ~ty:dispatch_ty)
+             in
+             ps ("Instance bindings", show_bindings instance_bindings);
+             let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
+             let arguments' = cast_arguments instance_bindings params' arguments in
+             let typarams = (match instance with
+                             | Instance { typarams; _ } -> typarams
+                             | _ -> internal_err "Couldn't get instance while getting type parameters")
+             in
+             let instance_id: decl_id = decl_id instance in
+             let meth_id: ins_meth_id =
+               (match get_instance_method_from_instance_id_and_method_name (ctx_env ctx) instance_id (original_name callable_name) with
+                | Some (InsMethRec { id; _ }) -> id
+                | None -> internal_err ("Couldn't get instance method for `"
+                                        ^ (ident_string (original_name callable_name))
+                                        ^ "`"))
+             in
+             ps ("Bindings", show_bindings bindings'');
+             let substs = make_substs instance_bindings typarams in
+             TMethodCall (meth_id, callable_name, typarams, arguments', rt'', substs))
+      | None ->
+         internal_err "couldn't extract dispatch type.")
+
+and cast_arguments (bindings: type_bindings) (params: value_parameter list) (arguments: texpr list): texpr list =
+  let f (ValueParameter (_, expected)) value =
+    let expected' = replace_variables bindings expected in
+    match expected' with
+    | Integer _ ->
+       (* Cast integer types *)
+       TCast (value, expected')
+    | _ ->
+       value
+  in
+  List.map2 f params arguments
 
 and handle_return_type_polymorphism (ctx: expr_ctx) (name: identifier) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (bindings: type_bindings): (type_bindings * ty) =
   if is_return_type_polymorphic params rt then
