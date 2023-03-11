@@ -4,6 +4,14 @@ module body Test is
             value: Int32;
     end;
 
+    function consume(foo: Foo): Unit is
+        case foo of
+            when Value(value: Int32) do
+                skip;
+        end case;
+        return nil;
+    end;
+
     function main(): ExitCode is
         let u: Foo := Value(value => 10);
         borrow u as uref in R do
@@ -12,6 +20,7 @@ module body Test is
                     skip;
             end case;
         end;
+        consume(u);
         return ExitSuccess();
     end;
 end module body.
