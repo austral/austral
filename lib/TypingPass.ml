@@ -99,6 +99,11 @@ let goes_through_parameter (elems: path_elem list): bool =
   in
   List.exists pred elems
 
+type case_mode =
+  | NormalCaseMode
+  | ReadRefCaseMode of ty
+  | WriteRefCaseMode of ty
+
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   with_frame ("Augment statement: " ^ (stmt_kind stmt))
     (fun _ ->
@@ -327,7 +332,7 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
   let (StmtCtx (module_name, env, rm, typarams, lexenv, _)) = ctx in
   (* Type checking a case statement:
 
-     1. Ensure the value is of a union type.
+     1. Ensure the value is of a union type (or reference to a union).
      2. Ensure the union type is public or it is defined in this module.
      3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
      4. Iterate over the cases, and ensure the bindings are correct.
@@ -336,6 +341,20 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
     (fun _ ->
       let expr' = augment_expr module_name env rm typarams lexenv None expr in
       let ty = get_type expr' in
+      let ty, mode =
+        (match ty with
+         | NamedType _ ->
+            (ty, NormalCaseMode)
+         | ReadRef (ty, r) ->
+            (ty, ReadRefCaseMode r)
+         | WriteRef (ty, r) ->
+            (ty, WriteRefCaseMode r)
+         | _ ->
+            austral_raise TypeError [
+                Text "The type for the expression in a case statement must be a union or a reference to a union, but I got ";
+                Code (type_string ty)
+        ])
+      in
       pt ("Case type", ty);
       let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
       let typebindings = match_type (env, module_name) union_ty ty in
