@@ -457,6 +457,26 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
         let bindings' = group_bindings_slots bindings slots in
         let bindings'' = List.map (fun (n, ty, actual, rename) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual, rename)) bindings' in
         let newvars = List.map (fun (_, ty, actual, rename) ->
+                          (* Depending on what 'mode' of case statement this is,
+                             we may have to modify the slot type. If we're just
+                             accessing a union by value, we don't have to do
+                             anything, but if we're accessing a union by
+                             reference, we don't have access to the slot
+                             _values_, we instead get _references_ to those
+                             values. Just like when doing `val->x` with `val`
+                             having a reference-to-record type gives us a
+                             reference to the field `x`, case statements on
+                             references give us references to their interior
+                             values. *)
+                          let ty =
+                            (match mode with
+                             | NormalCaseMode ->
+                                ty
+                             | ReadRefCaseMode r ->
+                                ReadRef (ty, r)
+                             | WriteRefCaseMode r ->
+                                WriteRef (ty, r))
+                          in
                           if equal_ty ty actual then
                             let _ = pi ("Binding name", rename)
                             in
