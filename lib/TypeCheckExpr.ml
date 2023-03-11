@@ -60,10 +60,10 @@ let match_type_ctx (ctx: expr_ctx) (expected: ty) (actual: ty): type_bindings =
   match_type (env, module_name) expected actual
 
 (** Wrapper around match_type_with_value. *)
-let match_type_with_value_ctx (ctx: expr_ctx) (expected: ty) (actual: ty): type_bindings =
+let match_type_with_value_ctx (ctx: expr_ctx) (expected: ty) (value: texpr): type_bindings =
   let env: env = ctx_env ctx
   and module_name: module_name = ctx_module_name ctx in
-  match_type_with_value (env, module_name) expected actual
+  match_type_with_value (env, module_name) expected value
 
 let get_path_ty_from_elems (elems: typed_path_elem list): ty =
   assert ((List.length elems) > 0);
