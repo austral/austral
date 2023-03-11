@@ -12,6 +12,8 @@ open Type
 (** The type checking context. *)
 type expr_ctx
 
+val make_ctx : module_name -> env -> region_map -> typarams -> lexenv -> expr_ctx
+
 (** Type check an expression. The second argument is the asserted type of the
     expression, this is used when type-checking `let` statements or `cast`
     expressions. *)

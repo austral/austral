@@ -48,6 +48,9 @@ type expr_ctx =
       (** The lexical environment. *)
     }
 
+let make_ctx (module_name: module_name) (env: env) (rm: region_map) (typarams: typarams) (lexenv: lexenv): expr_ctx =
+  ExpressionContext { module_name; env; rm; typarams; lexenv }
+
 let ctx_module_name (ctx: expr_ctx): module_name =
   let (ExpressionContext { module_name; _ }) = ctx in
   module_name
@@ -540,8 +543,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   | FunctionCall (name, args) ->
      let arglist: typed_arglist = augment_arglist ctx args in
      augment_call ctx name arglist asserted_ty
-  | ArithmeticExpression _ ->
-     internal_err "Not implemented yet"
+  | ArithmeticExpression (op, lhs, rhs) ->
+     augment_arithmetic ctx op lhs rhs asserted_ty
   | Comparison (op, lhs, rhs) ->
      augment_comparison ctx op lhs rhs
   | Conjunction (lhs, rhs) ->
@@ -895,6 +898,56 @@ and augment_arglist (ctx: expr_ctx) (args: abstract_arglist): typed_arglist =
      TPositionalArglist (List.map (fun a -> aug ctx a) args')
   | Named pairs ->
      TNamedArglist (List.map (fun (n, v) -> (n, aug ctx v)) pairs)
+
+and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (rhs: aexpr) (asserted_ty: ty option): texpr =
+  (* Augment operands. *)
+  let lhs' = aug ctx lhs
+  and rhs' = aug ctx rhs in
+  (* Get the types. *)
+  let lhs_ty = get_type lhs'
+  and rhs_ty = get_type rhs'
+  in
+  let augment_arithmetic_call _ =
+    (* Because method calls don't implement the lenient type checking
+       rules for arithmetic, we have to cast the arguments to their
+       expected types, so that constants are allowed to be used as
+       arguments. This means we have to transform a `ty` into a type
+       specifier. *)
+    let op_name =
+      match op with
+      | Add ->
+         "trappingAdd"
+      | Subtract ->
+         "trappingSubtract"
+      | Multiply ->
+         "trappingMultiply"
+      | Divide ->
+         "trappingDivide"
+    in
+    let op_qname = make_qident (pervasive_module_name, make_ident op_name, make_ident op_name) in
+    let args: typed_arglist = TPositionalArglist [
+                                  TCast (lhs', lhs_ty);
+                                  TCast (rhs', lhs_ty);
+                                ]
+    in
+    augment_call ctx op_qname args asserted_ty
+  in
+  (* Are the types the same? *)
+  if lhs_ty = rhs_ty then
+    (* If the types are the same type, check it is a numeric type. *)
+    if (is_numeric lhs_ty) then
+      augment_arithmetic_call ()
+    else
+      Errors.arithmetic_not_numeric lhs_ty
+  else
+    (* If the types are different, check if at least one operator is a constant.*)
+    let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
+    and are_float_constants = (is_float_constant lhs) || (is_float_constant rhs) in
+    if (are_int_constants || are_float_constants) then
+      (* If either operand is a constant, let it pass *)
+      augment_arithmetic_call ()
+    else
+      Errors.arithmetic_incompatible_types ~lhs:lhs_ty ~rhs:rhs_ty
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)
