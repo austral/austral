@@ -163,6 +163,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_typecast ctx expr ty
   | SizeOf ty ->
      TSizeOf (parse_typespec ctx ty)
+  | BorrowExpr (mode, name) ->
+     augment_borrow_expr ctx mode name
   | _ ->
      internal_err "Not implemented yet"
 
@@ -465,6 +467,29 @@ and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
              Errors.cast_invalid
                ~target:target_type
                ~source:(get_type expr')))
+
+and augment_borrow_expr (ctx: expr_ctx) (mode: borrowing_mode) (name: qident): texpr =
+  (match get_variable (ctx_env ctx) (ctx_lexenv ctx) name with
+   | Some (ty, src) ->
+      (* TODO: check if `ty` is linear? *)
+      (match src with
+       | VarConstant ->
+          Errors.borrow_constant ()
+       | VarParam ->
+          let name: identifier = original_name name
+          and reg: region = fresh_region ()
+          in
+          TBorrowExpr (mode, name, reg, ty)
+       | VarLocal ->
+          let name: identifier = original_name name
+          and reg: region = fresh_region ()
+          in
+          TBorrowExpr (mode, name, reg, ty))
+   | None ->
+      Errors.unknown_name
+        ~kind:"variable"
+        ~name:(original_name name))
+
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)
