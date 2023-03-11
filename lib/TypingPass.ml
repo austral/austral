@@ -456,7 +456,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
         (* Check the type of each binding matches the type of the slot *)
         let bindings' = group_bindings_slots bindings slots in
         let bindings'' = List.map (fun (n, ty, actual, rename) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual, rename)) bindings' in
-        let newvars = List.map (fun (_, ty, actual, rename) ->
+        let newvars = List.map (fun (_, user_ty, decl_ty, rename) ->
                           (* Depending on what 'mode' of case statement this is,
                              we may have to modify the slot type. If we're just
                              accessing a union by value, we don't have to do
@@ -468,25 +468,25 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
                              reference to the field `x`, case statements on
                              references give us references to their interior
                              values. *)
-                          let ty =
+                          let decl_ty =
                             (match mode with
                              | NormalCaseMode ->
-                                ty
+                                decl_ty
                              | ReadRefCaseMode r ->
-                                ReadRef (ty, r)
+                                ReadRef (decl_ty, r)
                              | WriteRefCaseMode r ->
-                                WriteRef (ty, r))
+                                WriteRef (decl_ty, r))
                           in
-                          if equal_ty ty actual then
+                          if equal_ty decl_ty user_ty then
                             let _ = pi ("Binding name", rename)
                             in
-                            pt ("Binding type",  ty);
-                            (rename, ty, VarLocal)
+                            pt ("Binding type",  decl_ty);
+                            (rename, decl_ty, VarLocal)
                           else
                             Errors.slot_wrong_type
                               ~name:rename
-                              ~expected:ty
-                              ~actual:actual)
+                              ~expected:decl_ty
+                              ~actual:user_ty)
                         bindings'' in
         let lexenv' = push_vars lexenv newvars in
         let body' = augment_stmt (update_lexenv ctx lexenv') body in
