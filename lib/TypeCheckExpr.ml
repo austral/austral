@@ -124,7 +124,7 @@ let get_slot_with_name type_name slots slot_name =
        ~type_name:(original_name type_name)
        ~slot_name
 
-(* Type Checking *)
+(* Type Checking: Interface *)
 
 let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
   (* Dispatch on the AST *)
@@ -167,6 +167,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_borrow_expr ctx mode name
   | _ ->
      internal_err "Not implemented yet"
+
+(* Type Checking: Internals *)
 
 and augment_variable (ctx: expr_ctx) (name: qident) (asserted_ty: ty option): texpr =
   let env = ctx_env ctx in
@@ -489,7 +491,6 @@ and augment_borrow_expr (ctx: expr_ctx) (mode: borrowing_mode) (name: qident): t
       Errors.unknown_name
         ~kind:"variable"
         ~name:(original_name name))
-
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)
