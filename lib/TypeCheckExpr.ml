@@ -124,6 +124,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_negation ctx e
   | IfExpression (c, t, f) ->
      augment_if_expr ctx c t f
+  | Path (e, elems) ->
+     augment_path_expr ctx e elems
   | _ ->
      internal_err "Not implemented yet"
 
@@ -214,6 +216,139 @@ and augment_if_expr ctx c t f =
       ~kind:"if"
       ~form:"expression"
       ~ty:(get_type c')
+
+and augment_path_expr (ctx: expr_ctx) (e: texpr) (elems: path_elem list): texpr =
+  (* Path rules:
+
+     1. Path that begins in a reference ends in a reference.
+     2. All paths end in a type in the free universe.
+   *)
+  let e' = aug ctx e in
+  (* Is the initial expression of a path a read reference or write reference or
+     no reference? *)
+  let (is_read, region): (bool * ty option) =
+    (match (get_type e') with
+     | ReadRef (_, r) ->
+        (true, Some r)
+     | WriteRef (_, r) ->
+        (false, Some r)
+     | _ ->
+        (false, None))
+  in
+  let elems' = augment_path ctx (get_type e') elems in
+  let path_ty: ty = get_path_ty_from_elems elems' in
+  let path_ty: ty =
+    (* If the path starts in a reference it should end in one. *)
+    (match region with
+     | Some reg ->
+        if is_read then
+          ReadRef (path_ty, reg)
+        else
+          WriteRef (path_ty, reg)
+     | None ->
+        path_ty)
+  in
+  let universe = type_universe path_ty in
+  if universe = FreeUniverse then
+    TPath {
+        head = e';
+        elems = elems';
+        ty = path_ty
+      }
+  else
+    Errors.path_not_free path_ty
+
+and augment_path (ctx: expr_ctx) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
+  match elems with
+  | [elem] ->
+     [augment_path_elem ctx head_ty elem]
+  | elem::rest ->
+     let elem' = augment_path_elem ctx head_ty elem in
+     let rest' = augment_path ctx (path_elem_type elem') rest in
+     elem' :: rest'
+  | [] ->
+     err "Path is empty"
+
+and augment_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: path_elem): typed_path_elem =
+  match elem with
+  | SlotAccessor slot_name ->
+     (match head_ty with
+      | NamedType (name, args, _) ->
+         augment_slot_accessor_elem ctxslot_name name args
+      | _ ->
+         Errors.path_not_record (type_string head_ty))
+  | PointerSlotAccessor slot_name ->
+     (match head_ty with
+      | Pointer pointed_to ->
+         (* TODO: Addresses should not be indexable. *)
+         augment_pointer_slot_accessor_elem ctx slot_name pointed_to
+      | ReadRef (ty, _) ->
+         (match ty with
+          | NamedType (name, args, _) ->
+             augment_reference_slot_accessor_elem ctx slot_name name args
+          | _ ->
+             Errors.path_not_record (type_string ty))
+      | WriteRef (ty, _) ->
+         (match ty with
+          | NamedType (name, args, _) ->
+             augment_reference_slot_accessor_elem ctx slot_name name args
+          | _ ->
+             Errors.path_not_record (type_string ty))
+      | _ ->
+         Errors.path_not_record (type_string head_ty))
+  | ArrayIndex ie ->
+     let ie' = aug ctx ie in
+     (match head_ty with
+      | StaticArray elem_ty ->
+         TArrayIndex (ie', elem_ty)
+      | _ ->
+         Errors.array_indexing_disallowed head_ty)
+
+and augment_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
+  (* Check: e' is a public record type *)
+  let (source_module, vis, typarams, slots) = get_record_definition env type_name in
+  if (vis = TypeVisPublic) || (module_name = source_module) then
+    (* Check: the given slot name must exist in this record type. *)
+    let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
+    let bindings = match_typarams (env, module_name) typarams type_args in
+    let slot_ty' = replace_variables bindings slot_ty in
+    TSlotAccessor (slot_name, slot_ty')
+  else
+    Errors.path_not_public
+      ~type_name:(original_name type_name)
+      ~slot_name
+
+and augment_pointer_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (pointed_to: ty): typed_path_elem =
+  match pointed_to with
+  | NamedType (type_name, type_args, _) ->
+     (* Check arg is a public record *)
+     let (source_module, vis, typarams, slots) = get_record_definition env type_name in
+     if (vis = TypeVisPublic) || (module_name = source_module) then
+       (* Check: the given slot name must exist in this record type. *)
+       let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
+       let bindings = match_typarams (env, module_name) typarams type_args in
+       let slot_ty' = replace_variables bindings slot_ty in
+       TPointerSlotAccessor (slot_name, slot_ty')
+     else
+       Errors.path_not_public
+         ~type_name:(original_name type_name)
+         ~slot_name
+  | _ ->
+     Errors.path_not_record (type_string pointed_to)
+
+and augment_reference_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
+  (* Check: e' is a public record type *)
+  let (source_module, vis, typarams, slots) = get_record_definition env type_name in
+  if (vis = TypeVisPublic) || (module_name = source_module) then
+    (* Check: the given slot name must exist in this record type. *)
+    let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
+    let bindings = match_typarams (env, module_name) typarams type_args in
+    let slot_ty' = replace_variables bindings slot_ty in
+    TPointerSlotAccessor (slot_name, slot_ty')
+  else
+    Errors.path_not_public
+      ~type_name:(original_name type_name)
+      ~slot_name
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)
