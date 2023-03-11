@@ -4,7 +4,7 @@
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
-
+(** The type checker. *)
 open Identifier
 open Common
 open Env
