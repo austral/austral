@@ -94,7 +94,7 @@ let is_float_constant (e: aexpr): bool =
 let parse_typespec (env: env) (rm: region_map) (typarams: typarams) (ty: qtypespec): ty =
   parse_type env [] rm typarams ty
 
-and get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
+let get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
   match get_decl_by_name env (qident_to_sident name) with
   | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
      let mod_name: module_name = module_name_from_id env mod_id in
@@ -104,7 +104,7 @@ and get_record_definition (env: env) (name: qident): (module_name * type_vis * t
   | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
-and get_slot_with_name type_name slots slot_name =
+let get_slot_with_name type_name slots slot_name =
   match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
   | Some s -> s
   | None ->
@@ -112,7 +112,8 @@ and get_slot_with_name type_name slots slot_name =
        ~type_name:(original_name type_name)
        ~slot_name
 
-(* Interface *)
+
+(* Type Checking *)
 
 let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
   (* Dispatch on the AST *)
