@@ -363,7 +363,7 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
       if ident_set_eq case_names when_names then
         (* Group the cases and whens *)
         let whens' = group_cases_whens cases whens in
-        let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
+        let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c mode) whens' in
         TCase (span, expr', whens'')
       else
         Errors.case_non_exhaustive ())
@@ -442,7 +442,7 @@ and group_bindings_slots (bindings: qbinding list) (slots: typed_slot list): (id
   in
   List.map f bindings
 
-and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case): typed_when =
+and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case) (mode: case_mode): typed_when =
   with_frame "Augment when"
     (fun _ ->
       let (StmtCtx (_, menv, rm, typarams, lexenv, _)) = ctx in
