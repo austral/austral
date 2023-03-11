@@ -7,8 +7,12 @@
 open Identifier
 open Env
 open Region
+open Type
+open Ast
+open Tast
 open TypeParameters
 open LexEnv
+open Error
 
 (* Expression Context *)
 
@@ -32,3 +36,7 @@ type expr_ctx =
 (* Type checking expressions *)
 
 (* Interface *)
+
+let augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): texpr =
+  let _ = (ctx, asserted_ty, expr) in
+  internal_err "Not implemented yet"
