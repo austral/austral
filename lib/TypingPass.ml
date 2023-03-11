@@ -356,7 +356,7 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
         ])
       in
       pt ("Case type", ty);
-      let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
+      let (union_ty, cases) = get_union_type_definition module_name env ty in
       let typebindings = match_type (env, module_name) union_ty ty in
       let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
       let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
