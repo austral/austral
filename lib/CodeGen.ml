@@ -384,7 +384,7 @@ and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (case_ref: case_r
     | CasePlain ->
        CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
     | CaseRef ->
-       CStructAccessor (CStructAccessor (CPointerStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+       CAddressOf (CStructAccessor (CStructAccessor (CStructAccessor (CDeref (CVar var), "data"), case_name), gen_ident binding_name))
   in
   let f (MonoBinding { name; ty; rename; }) =
     let ty =
