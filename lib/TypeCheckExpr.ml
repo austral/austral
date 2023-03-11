@@ -122,6 +122,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_disjunction ctx lhs rhs
   | Negation e ->
      augment_negation ctx e
+  | IfExpression (c, t, f) ->
+     augment_if_expr ctx c t f
   | _ ->
      internal_err "Not implemented yet"
 
@@ -195,6 +197,23 @@ and augment_negation ctx e =
     Errors.logical_operands_not_boolean
       ~operator:"negation"
       ~types:[get_type e']
+
+and augment_if_expr ctx c t f =
+  let c' = aug ctx c
+  and t' = aug ctx t
+  and f' = aug ctx f in
+  if is_bool c' then
+    if (get_type t') = (get_type f') then
+      TIfExpression (c', t', f')
+    else
+      Errors.if_inequal
+        ~lhs:(get_type t')
+        ~rhs:(get_type f')
+  else
+    Errors.condition_not_boolean
+      ~kind:"if"
+      ~form:"expression"
+      ~ty:(get_type c')
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)
