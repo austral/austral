@@ -236,13 +236,13 @@ and augment_if_expr ctx c t f =
       ~form:"expression"
       ~ty:(get_type c')
 
-and augment_path_expr (ctx: expr_ctx) (e: texpr) (elems: path_elem list): texpr =
+and augment_path_expr (ctx: expr_ctx) (e: aexpr) (elems: path_elem list): texpr =
   (* Path rules:
 
      1. Path that begins in a reference ends in a reference.
      2. All paths end in a type in the free universe.
    *)
-  let e' = aug ctx e in
+  let e': texpr = aug ctx e in
   (* Is the initial expression of a path a read reference or write reference or
      no reference? *)
   let (is_read, region): (bool * ty option) =
@@ -293,7 +293,7 @@ and augment_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: path_elem): typed_pat
   | SlotAccessor slot_name ->
      (match head_ty with
       | NamedType (name, args, _) ->
-         augment_slot_accessor_elem ctxslot_name name args
+         augment_slot_accessor_elem ctx slot_name name args
       | _ ->
          Errors.path_not_record (type_string head_ty))
   | PointerSlotAccessor slot_name ->
@@ -324,8 +324,9 @@ and augment_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: path_elem): typed_pat
          Errors.array_indexing_disallowed head_ty)
 
 and augment_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
+  let module_name: module_name = ctx_module_name ctx in
   (* Check: e' is a public record type *)
-  let (source_module, vis, typarams, slots) = get_record_definition env type_name in
+  let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
