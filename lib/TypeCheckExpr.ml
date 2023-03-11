@@ -159,6 +159,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_path_expr ctx e elems
   | Deref expr ->
      augment_deref ctx expr
+  | Typecast (expr, ty) ->
+     augment_typecast ctx expr ty
   | _ ->
      internal_err "Not implemented yet"
 
@@ -398,6 +400,69 @@ and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
       TDeref expr'
    | _ ->
       Errors.dereference_non_reference ty)
+
+and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
+  (* The typecast operator has four uses:
+
+     1. Clarifying the type of integer and floating point literals.
+
+     2. Converting write references to read references.
+
+     3. Clarifying the type of return type polymorphic functions.
+
+   *)
+  let is_int_expr = function
+    | TIntConstant _ -> true
+    | _ -> false
+  and is_float_expr = function
+    | TFloatConstant _ -> true
+    | _ -> false
+
+  and is_int_type = function
+    | Integer _ -> true
+    | _ -> false
+
+  and is_float_type = function
+    | SingleFloat -> true
+    | DoubleFloat -> true
+    | _ -> false
+  in
+  let target_type = parse_typespec ctx ty in
+  (* By passing target_type as the asserted type we're doing point 3. *)
+  let expr' = augment_expr ctx (Some target_type) expr in
+  (* For 1: if the expression is an int literal and the target type is an
+     int type, do the conversion. Similarly, if the expression is a float
+     constant and the target type is a float, do the conversion. *)
+  if (is_int_expr expr') && (is_int_type target_type) then
+    TCast (expr', target_type)
+  else
+    if (is_float_expr expr') && (is_float_type target_type) then
+      TCast (expr', target_type)
+    else
+      (* Otherwise, if the expression has a mutable reference type and the
+         target type is a read reference, and they point to the same underlying
+         type and underlying region, just convert it to a read ref. This does
+         point 2. *)
+      (match (get_type expr') with
+       | WriteRef (underlying_ty, region) ->
+          (match target_type with
+           | ReadRef (underlying_ty', region') ->
+              if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
+                TCast (expr', target_type)
+              else
+                Errors.cast_different_references
+                  ~different_types:(not (equal_ty underlying_ty underlying_ty'))
+                  ~different_regions:(not (equal_ty region region'))
+           | _ ->
+              Errors.cast_write_ref_to_non_ref ())
+       | _ ->
+          (try
+             let _ = match_type_ctx ctx target_type (get_type expr') in
+             expr'
+           with Austral_error _ ->
+             Errors.cast_invalid
+               ~target:target_type
+               ~source:(get_type expr')))
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)
