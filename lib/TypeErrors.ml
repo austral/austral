@@ -324,3 +324,13 @@ let unknown_name ~kind ~name =
     Code (ident_string name);
     Text "."
   ]
+
+let cannot_assign_to_constant _ =
+  austral_raise GenericError [
+      Text "Cannot assign a value to a constant."
+    ]
+
+let cannot_assign_to_parameter _ =
+  austral_raise GenericError [
+      Text "Cannot assign a value to a function parameter."
+    ]
