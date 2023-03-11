@@ -149,6 +149,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_if_expr ctx c t f
   | Path (e, elems) ->
      augment_path_expr ctx e elems
+  | Deref expr ->
+     augment_deref ctx expr
   | _ ->
      internal_err "Not implemented yet"
 
@@ -375,6 +377,19 @@ and augment_reference_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier)
     Errors.path_not_public
       ~type_name:(original_name type_name)
       ~slot_name
+
+and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
+  (* The type of the expression being dereferenced must be either a read-only
+     reference or a write reference. *)
+  let expr' = aug ctx expr in
+  let ty = get_type expr' in
+  (match ty with
+   | ReadRef _ ->
+      TDeref expr'
+   | WriteRef _ ->
+      TDeref expr'
+   | _ ->
+      Errors.dereference_non_reference ty)
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)
