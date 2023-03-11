@@ -352,10 +352,10 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
      let (t, env) = monomorphize_stmt env t in
      let (f, env) = monomorphize_stmt env f in
      (MIf (c, t, f), env)
-  | TCase (_, value, whens) ->
+  | TCase (_, value, whens, case_ref) ->
      let (value, env) = monomorphize_expr env value in
      let (whens, env) = monomorphize_whens env whens in
-     (MCase (value, whens), env)
+     (MCase (value, whens, case_ref), env)
   | TWhile (_, value, body) ->
      let (value, env) = monomorphize_expr env value in
      let (body, env) = monomorphize_stmt env body in

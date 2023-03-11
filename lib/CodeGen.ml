@@ -12,6 +12,7 @@ open Env
 open EnvUtils
 open MonoType
 open MonoTypeBindings
+open Tast
 open Mtast
 open CRepr
 open Util
@@ -167,6 +168,10 @@ let c_string_type = CPointer (CNamedType "uint8_t")
 let union_type_id = function
   | MonoNamedType id ->
      id
+  | MonoReadRef (MonoNamedType id, _) ->
+     id
+  | MonoWriteRef (MonoNamedType id, _) ->
+     id
   | _ ->
      internal_err "Union is not a named type?"
 
@@ -316,8 +321,8 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CAssign (gen_lvalue mn lvalue, ge v)
   | MIf (c, tb, fb) ->
      CIf (ge c, gs tb, gs fb)
-  | MCase (e, whens) ->
-     gen_case mn e whens
+  | MCase (e, whens, case_ref) ->
+     gen_case mn e whens case_ref
   | MWhile (c, b) ->
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
@@ -349,28 +354,49 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
 and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
   gen_path mn (CVar (gen_ident name)) elems
 
-and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list): c_stmt =
+and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: case_ref): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
      being pattern-matched to that variable. Generate a switch statement over
      the tag enum. Each when statement that has bindings needs to generate some
      variable assignments for those bindings from the generated variable. *)
   let ty = get_type e
   and var = new_variable () in
-  let cases = List.map (when_to_case mn ty var) whens in
-  let switch = CSwitch (CStructAccessor (CVar var, "tag"), cases) in
+  let cases = List.map (when_to_case mn ty var case_ref) whens in
+  let accessor =
+    match case_ref with
+    | CasePlain ->
+       CStructAccessor (CVar var, "tag")
+    | CaseRef ->
+       CPointerStructAccessor (CVar var, "tag")
+  in
+  let switch = CSwitch (accessor, cases) in
   CBlock [
       CLet (var, gen_type ty, gen_exp mn e);
       switch
     ]
 
-and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (MTypedWhen (n, bindings, body)) =
+and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (case_ref: case_ref) (MTypedWhen (n, bindings, body)): c_switch_case =
   let case_name = gen_ident n
   and tag_value = union_tag_value ty n
   in
   let get_binding binding_name =
-    CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+    match case_ref with
+    | CasePlain ->
+       CStructAccessor (CStructAccessor (CStructAccessor (CVar var, "data"), case_name), gen_ident binding_name)
+    | CaseRef ->
+       CAddressOf (CStructAccessor (CStructAccessor (CStructAccessor (CDeref (CVar var), "data"), case_name), gen_ident binding_name))
   in
-  let bindings' = List.map (fun (MonoBinding { name; ty; rename; }) -> CLet (gen_ident rename, gen_type ty, get_binding name)) bindings in
+  let f (MonoBinding { name; ty; rename; }) =
+    let ty =
+      match case_ref with
+      | CasePlain ->
+         gen_type ty
+      | CaseRef ->
+         CPointer (gen_type ty)
+    in
+    CLet (gen_ident rename, ty, get_binding name)
+  in
+  let bindings' = List.map f bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in
   CSwitchCase (tag_value, body'')
 

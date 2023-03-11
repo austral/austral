@@ -6,6 +6,7 @@
 *)
 
 open Identifier
+open Span
 open Common
 open Type
 open TypeSystem
@@ -97,6 +98,11 @@ let goes_through_parameter (elems: path_elem list): bool =
     | ArrayIndex _ -> false
   in
   List.exists pred elems
+
+type case_mode =
+  | NormalCaseMode
+  | ReadRefCaseMode of ty
+  | WriteRefCaseMode of ty
 
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   with_frame ("Augment statement: " ^ (stmt_kind stmt))
@@ -241,29 +247,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  ~form:"statement"
                  ~ty:(get_type c))
       | ACase (span, expr, whens) ->
-         (* Type checking a case statement:
-
-            1. Ensure the value is of a union type.
-            2. Ensure the union type is public or it is defined in this module.
-            3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
-            4. Iterate over the cases, and ensure the bindings are correct.
-          *)
-         adorn_error_with_span span
-           (fun _ ->
-             let expr' = augment_expr module_name env rm typarams lexenv None expr in
-             let ty = get_type expr' in
-             pt ("Case type", ty);
-             let (union_ty, cases) = get_union_type_definition module_name env (get_type expr') in
-             let typebindings = match_type (env, module_name) union_ty ty in
-             let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
-             let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
-             if ident_set_eq case_names when_names then
-               (* Group the cases and whens *)
-               let whens' = group_cases_whens cases whens in
-               let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c) whens' in
-               TCase (span, expr', whens'')
-             else
-               Errors.case_non_exhaustive ())
+         augment_case ctx span expr whens
       | AWhile (span, c, body) ->
          adorn_error_with_span span
            (fun _ ->
@@ -344,6 +328,52 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let _ = match_type_with_value (env, module_name) rt e' in
              TReturn (span, e')))
 
+and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_when list): tstmt =
+  let (StmtCtx (module_name, env, rm, typarams, lexenv, _)) = ctx in
+  (* Type checking a case statement:
+
+     1. Ensure the value is of a union type (or reference to a union).
+     2. Ensure the union type is public or it is defined in this module.
+     3. Ensure the set of case names in the case statement equals the set of cases in the union definition.
+     4. Iterate over the cases, and ensure the bindings are correct.
+   *)
+  adorn_error_with_span span
+    (fun _ ->
+      let expr' = augment_expr module_name env rm typarams lexenv None expr in
+      let ty = get_type expr' in
+      let ty, mode =
+        (match ty with
+         | NamedType _ ->
+            (ty, NormalCaseMode)
+         | ReadRef (ty, r) ->
+            (ty, ReadRefCaseMode r)
+         | WriteRef (ty, r) ->
+            (ty, WriteRefCaseMode r)
+         | _ ->
+            austral_raise TypeError [
+                Text "The type for the expression in a case statement must be a union or a reference to a union, but I got ";
+                Code (type_string ty)
+        ])
+      in
+      let case_ref: case_ref =
+        (match mode with
+         | NormalCaseMode -> CasePlain
+         | ReadRefCaseMode _ -> CaseRef
+         | WriteRefCaseMode _ -> CaseRef)
+      in
+      pt ("Case type", ty);
+      let (union_ty, cases) = get_union_type_definition module_name env ty in
+      let typebindings = match_type (env, module_name) union_ty ty in
+      let case_names = List.map (fun (TypedCase (n, _)) -> n) (List.map union_case_to_typed_case cases) in
+      let when_names = List.map (fun (AbstractWhen (n, _, _)) -> n) whens in
+      if ident_set_eq case_names when_names then
+        (* Group the cases and whens *)
+        let whens' = group_cases_whens cases whens in
+        let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c mode) whens' in
+        TCase (span, expr', whens'', case_ref)
+      else
+        Errors.case_non_exhaustive ())
+
 and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
   match elems with
   | [elem] ->
@@ -418,7 +448,7 @@ and group_bindings_slots (bindings: qbinding list) (slots: typed_slot list): (id
   in
   List.map f bindings
 
-and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case): typed_when =
+and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when) (c: typed_case) (mode: case_mode): typed_when =
   with_frame "Augment when"
     (fun _ ->
       let (StmtCtx (_, menv, rm, typarams, lexenv, _)) = ctx in
@@ -432,17 +462,37 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
         (* Check the type of each binding matches the type of the slot *)
         let bindings' = group_bindings_slots bindings slots in
         let bindings'' = List.map (fun (n, ty, actual, rename) -> (n, parse_typespec menv rm typarams ty, replace_variables typebindings actual, rename)) bindings' in
-        let newvars = List.map (fun (_, ty, actual, rename) ->
-                          if equal_ty ty actual then
+        let newvars = List.map (fun (_, user_ty, decl_ty, rename) ->
+                          (* Depending on what 'mode' of case statement this is,
+                             we may have to modify the slot type. If we're just
+                             accessing a union by value, we don't have to do
+                             anything, but if we're accessing a union by
+                             reference, we don't have access to the slot
+                             _values_, we instead get _references_ to those
+                             values. Just like when doing `val->x` with `val`
+                             having a reference-to-record type gives us a
+                             reference to the field `x`, case statements on
+                             references give us references to their interior
+                             values. *)
+                          let decl_ty =
+                            (match mode with
+                             | NormalCaseMode ->
+                                decl_ty
+                             | ReadRefCaseMode r ->
+                                ReadRef (decl_ty, r)
+                             | WriteRefCaseMode r ->
+                                WriteRef (decl_ty, r))
+                          in
+                          if equal_ty decl_ty user_ty then
                             let _ = pi ("Binding name", rename)
                             in
-                            pt ("Binding type",  ty);
-                            (rename, ty, VarLocal)
+                            pt ("Binding type",  decl_ty);
+                            (rename, decl_ty, VarLocal)
                           else
                             Errors.slot_wrong_type
                               ~name:rename
-                              ~expected:actual
-                              ~actual:ty)
+                              ~expected:decl_ty
+                              ~actual:user_ty)
                         bindings'' in
         let lexenv' = push_vars lexenv newvars in
         let body' = augment_stmt (update_lexenv ctx lexenv') body in

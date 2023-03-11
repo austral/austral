@@ -133,8 +133,8 @@ let rec ser_stmt (env: env) (stmt: tstmt): ser_stmt =
      SAssign (span, ser_lvalue env lvalue, se value)
   | TIf (span, cond, tb, fb) ->
      SIf (span, se cond, ss tb, ss fb)
-  | TCase (case, value, cases) ->
-     SCase (case, se value, List.map (ser_when env) cases)
+  | TCase (case, value, cases, mode) ->
+     SCase (case, se value, List.map (ser_when env) cases, mode)
   | TWhile (span, cond, body) ->
      SWhile (span, se cond, ss body)
   | TFor (span, name, initial, final, body) ->
