@@ -24,46 +24,105 @@ let push_event (event: event): unit =
 
 let prefix: string = "<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <title>Austral Compiler Call Tree</title>
-  </head>
-  <body>
-<h1>Compiler Call Tree</h1>
+    <head>
+        <meta charset='utf-8'>
+        <title>Austral Compiler Call Tree</title>
+    </head>
+    <body>
+
+
+    <h1>Compiler Call Tree</h1>
+    <button onclick='openAll()'>Open All</button>
+    <button onclick='closeAll()'>Close All</button>
+
+<div class=tree>
 <ul>\n"
 
 let suffix: string = "</ul>
-    <style>
-      .multi-line {
-        display: flex;
-        flex-direction: row;
-      }
-
-      .frame-contents {
-        display: none;
-      }
-
-      .frame-contents.show {
-        display: block;
-      }
-    </style>
+    </div>
     <script>
-      const triggers = Array.from(document.querySelectorAll('[data-toggle]'));
-
-      window.addEventListener('click', (ev) => {
-        const elm = ev.target;
-        if (triggers.includes(elm)) {
-          const frameId = elm.getAttribute('data-toggle');
-          collapse(frameId);
+        function openAll() {
+            trees = document.getElementsByClassName('tree');
+            for (const tree of trees) {
+                for (const det of tree.getElementsByTagName('details')) {
+                    det.open = true;
+                }
+            }
         }
-      }, false);
 
-      const collapse = (frameId) => {
-        const target = document.querySelector('#' + frameId);
-        target.classList.toggle('show');
-      }
+        function closeAll() {
+            trees = document.getElementsByClassName('tree');
+            for (const tree of trees) {
+                for (const det of tree.getElementsByTagName('details')) {
+                    det.removeAttribute('open');
+                }
+            }
+        }
     </script>
-  </body>
+    <style>
+        .tree {
+            --step: 25px;
+            --height: 16px;
+            --wire-width: 2px;
+            --tree-color: #999;
+        }
+        .tree ul {
+            padding-left: 0;
+        }
+        .tree ul li {
+            padding-left: calc(var(--step));
+            border: none;
+            display: block; /* remove bullets */
+            position: relative;
+            margin-right: none;
+        }
+
+        .tree ul li::before, .tree ul li::after{
+            content: '';
+            display: block;
+            position: absolute;
+            left: calc(0px - var(--wire-width));
+            top: calc(0px - var(--height)/2);
+            width: calc(var(--step));
+            height: calc(var(--height));
+            border: calc(var(--wire-width)) solid var(--tree-color);
+            border-top: transparent;
+            border-right: transparent;
+        }
+
+        .tree ul li::after {
+            border-top: transparent;
+            height: 100%;
+            width: 0px;
+        }
+
+        .tree ul li:last-child::after {
+            border-left: transparent;
+        }
+
+        .tree summary {
+            display : block;
+            margin-left: calc(var(--height));
+        }
+        .tree summary::before {
+            content: '+';
+            display: block;
+            position: absolute;
+            left: calc(var(--step) - var(--height)/2);
+            width: calc(var(--height));
+            height: calc(var(--height));
+            border: none;
+            border-radius: 100%;
+            background-color: var(--tree-color);
+            z-index: 2;
+            color: white;
+            text-align: center;
+        }
+        .tree details[open] > summary::before {
+            content: '-';
+        }
+    </style>
+ </body>
 </html>"
 
 (** Used to match frame titles with frame contents for toggling. *)
@@ -85,10 +144,12 @@ and render_event (event: event): string =
   | EnterFrame name ->
      let id: string = string_of_int (fresh_toggle_id ()) in
      "<li class='frame'>
-<div class='frame-title' data-toggle='frame-" ^ id ^ "'>" ^ name ^ "</div>
-<ul class='frame-contents' id='frame-" ^ id ^ "'>\n"
+<details>
+<summary frame-id=" ^ id ^ "'>" ^ name ^ "</summary>
+<ul class='frame-contents' data-toggle='frame-" ^ id ^ "'>\n"
   | LeaveFrame ->
-     "</ul>
+"</ul>
+</details>
 </li>\n"
   | PrintValue (label, value) ->
      (match String.index_opt value '\n' with
