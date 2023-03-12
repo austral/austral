@@ -129,11 +129,16 @@ let add_binding (TypeBindings m) (tp: type_parameter) ty =
      if universe_compatible (typaram_universe tp) (type_universe ty) then
        TypeBindings (BindingsMap.add tp ty m)
      else
-       Errors.typaram_wrong_universe
-         ~param:tp
-         ~ty
-         ~expected:(typaram_universe tp)
-         ~actual:(type_universe ty)
+       (* Special case! Allow `MonoTy`. See #399. *)
+       (match ty with
+        | MonoTy _ ->
+           TypeBindings (BindingsMap.add tp ty m)
+        | _ ->
+           Errors.typaram_wrong_universe
+             ~param:tp
+             ~ty
+             ~expected:(typaram_universe tp)
+             ~actual:(type_universe ty))
 
 (* Add multiple bindings to a bindings map. *)
 let rec add_bindings bs pairs =
