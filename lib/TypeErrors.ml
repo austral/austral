@@ -138,6 +138,12 @@ let dereference_non_reference ty =
     Text " is not."
   ]
 
+let dereference_non_free ty =
+  austral_raise LinearityError [
+    Text "Cannot dereference non-free type ";
+    Code (type_string ty)
+  ]
+
 let destructure_non_record ty =
   austral_raise TypeError [
     Text "The type ";

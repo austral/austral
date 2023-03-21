@@ -1,0 +1,16 @@
+module body Test is
+    record Foo: Linear is
+        inner: Int64;
+    end;
+
+    function main(): ExitCode is
+        let foo: Foo := Foo(inner => 5);
+        borrow foo as ref in R do
+            let value: Int64 := !(ref->inner);
+            print("value = ");
+            printLn(value);
+        end;
+        let { inner: Int64 } := foo;
+        return ExitSuccess();
+    end;
+end module body.

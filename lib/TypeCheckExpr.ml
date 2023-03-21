@@ -804,10 +804,16 @@ and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
   let expr' = aug ctx expr in
   let ty = get_type expr' in
   (match ty with
-   | ReadRef _ ->
-      TDeref expr'
-   | WriteRef _ ->
-      TDeref expr'
+   | ReadRef (ty', _) ->
+      if type_universe ty' = FreeUniverse then
+        TDeref expr'
+      else
+        Errors.dereference_non_free ty'
+   | WriteRef (ty', _) ->
+      if type_universe ty' = FreeUniverse then
+        TDeref expr'
+      else
+        Errors.dereference_non_free ty'
    | _ ->
       Errors.dereference_non_reference ty)
 
