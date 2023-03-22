@@ -1,0 +1,1 @@
+Test that a linear type cannot be dereferenced.
