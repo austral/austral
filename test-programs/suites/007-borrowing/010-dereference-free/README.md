@@ -1,0 +1,1 @@
+Test that references to free types can be dereferenced.
