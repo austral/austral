@@ -23,3 +23,14 @@ and text_elem_to_plain (elem: text_elem): string =
      "`" ^ c ^ "`"
   | Break ->
      "\n\n"
+ 
+let rec error_text_to_html (txt: err_text): string =
+    String.concat "" (List.map (fun (elem: text_elem) ->
+                match elem with
+                | Text s ->
+                    s
+                | Code c ->
+                    "<code>" ^ c ^ "</code>"
+                | Break ->
+                    "<br><br>"
+                ) txt)

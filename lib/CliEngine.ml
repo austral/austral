@@ -9,6 +9,7 @@ open Version
 open Compiler
 open Util
 open Error
+open HtmlError
 open SourceContext
 
 (* Source map stuff *)
@@ -106,7 +107,7 @@ and print_compile_usage _: unit =
   print_endline "    --target-type   One of `bin`, `tc`, `c`. Default is `bin`.";
   print_endline "    --output        Path to the output file.";
   print_endline "    --entrypoint    The name of the entrypoint function, in the";
-  print_endline "                    format `<module nae>:<function name>`.";
+  print_endline "                    format `<module name>:<function name>`.";
   print_endline "    --no-entrypoint  Don't compile an entrypoint. Incompatible with";
   print_endline "                    `bin` target.";
   print_endline "";
@@ -125,6 +126,7 @@ and exec_compile (modules: mod_source list) (target: target): unit =
     (* Print errors *)
     let error: austral_error = try_adding_source_ctx error source_map in
     Printf.eprintf "%s" (render_error_to_plain error);
+    html_error_dump error;
     dump_and_die ()
 
 and dump_and_die _: unit =
