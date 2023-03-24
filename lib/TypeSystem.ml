@@ -19,7 +19,7 @@ let type_universe = function
   | StaticArray _ -> FreeUniverse
   | RegionTy _ -> RegionUniverse
   | ReadRef _ -> FreeUniverse
-  | WriteRef _ -> FreeUniverse
+  | WriteRef _ -> LinearUniverse
   | TyVar (TypeVariable (_, u, _, _)) -> u
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
