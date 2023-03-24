@@ -1,1 +1,0 @@
-Regression test for [GitHub issue #437](https://github.com/austral/austral/issues/437).
