@@ -688,15 +688,21 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
      let tbl: state_tbl = check_expr tbl depth expr in
      (* Ensure that all variables are Consumed. *)
      let _ =
-       List.map (fun (name, _, _, state) ->
+       List.map (fun (name, ty, _, state) ->
            if state = Consumed then
              ()
            else
-             austral_raise LinearityError [
-               Text "The variable ";
-               Code (ident_string name);
-               Text " is not consumed by the time of the return statement. Did you forget to call a destructor, or destructure the contents?"
-             ])
+             (* Is the type of this variable a write reference? *)
+             (match ty with
+              | WriteRef _ ->
+                 (* Write references can be dropped implicitly. *)
+                 ()
+              | _ ->
+                 austral_raise LinearityError [
+                     Text "The variable ";
+                     Code (ident_string name);
+                     Text " is not consumed by the time of the return statement. Did you forget to call a destructor, or destructure the contents?"
+             ]))
          (tbl_to_list tbl)
      in
      tbl
