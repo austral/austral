@@ -1,0 +1,74 @@
+import Austral.Memory (
+    Pointer,
+    Address,
+    allocate,
+    nullCheck,
+    store,
+    load,
+    deallocate,
+    loadRead
+);
+
+module body Test is
+    --- Preliminary stuff, largely unrelated.
+
+    pragma Unsafe_Module;
+
+    record Box[T: Free]: Linear is
+        pointer: Pointer[T];
+    end;
+
+    generic [T: Free]
+    function makeBox(val: T): Box[T] is
+        let addr: Address[T] := allocate();
+        case nullCheck(addr) of
+            when Some(value: Pointer[T]) do
+                store(value, val);
+                let box: Box[T] := Box(pointer => value);
+                return box;
+            when None do
+                abort("Allocation failed.");
+        end case;
+    end;
+
+    generic [T: Free]
+    function unbox(box: Box[T]): T is
+        let { pointer: Pointer[T] } := box;
+        let value: T := load(pointer);
+        deallocate(pointer);
+        return value;
+    end;
+
+    generic [T: Free, R: Region]
+    function unboxReadRef(ref: &[Box[T], R]): &[T, R] is
+        return loadRead(ref->pointer);
+    end;
+    
+    -- Core of the test.
+
+    function main(): ExitCode is
+        -- The steps here are:
+        --
+        --     1. Make a box `a` holding 1.
+        --     2. Borrow `a` mutably:
+        --         1. Get a read reference to the contents of `a`.
+        --         2. Create a box `b` holding 2.
+        --         3. Swap the mutable reference to `a` with a mutable reference to `b`.
+        --            Now `aref` points to `b`.
+        --         4. Unbox `b` (really `a`).
+        --         5. The read reference to the contents of `a` points to garbage.
+        --     3. Unbox `a`, consuming it.
+        --
+        let a: Box[Int32] := makeBox(1);
+        borrow! a as aref in R do
+            let ainner: &[Int32, R] := unboxReadRef(aref: &[Box[Int32], R]);
+            let b: Box[Int32] := makeBox(2);
+            swap(&!b, aref);
+            printLn(!ainner);
+            unbox(b);
+            printLn(!ainner);
+        end;
+        unbox(a);
+        return ExitSuccess();
+    end;
+end module body.
