@@ -86,11 +86,21 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      let ty = replace_variables bindings ty
      and args = List.map (fun (n, e) -> (n, replace_tyvars_expr bindings e)) args in
      TUnionConstructor (ty, case_name, args)
-  | TPath { head; elems; ty } ->
+  | TSlotAccess (head, name, ty) ->
      let head = replace_tyvars_expr bindings head
-     and elems = List.map (replace_tyvars_path bindings) elems
-     and ty = replace_variables bindings ty in
-    TPath { head = head; elems = elems; ty = ty }
+     and ty = replace_variables bindings ty
+     in
+     TSlotAccess (head, name, ty)
+  | TPointerSlotAccess (head, name, ty) ->
+     let head = replace_tyvars_expr bindings head
+     and ty = replace_variables bindings ty
+     in
+     TPointerSlotAccess (head, name, ty)
+  | TArrayAccess (head, idx, elem_ty) ->
+     let head = replace_tyvars_expr bindings head
+     and idx = replace_tyvars_expr bindings idx
+     and elem_ty = replace_variables bindings elem_ty
+     in TArrayAccess (head, idx, elem_ty)
   | TEmbed (ty, fmt, args) ->
      let ty = replace_variables bindings ty
      and args = List.map (replace_tyvars_expr bindings) args in
