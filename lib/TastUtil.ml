@@ -96,7 +96,11 @@ let rec get_type = function
      ty
   | TUnionConstructor (ty, _, _) ->
      ty
-  | TPath { ty; _ } ->
+  | TSlotAccess (_, _, ty) ->
+     ty
+  | TPointerSlotAccess (_, _, ty) ->
+     ty
+  | TArrayAccess (_, _, ty) ->
      ty
   | TEmbed (ty, _, _) ->
      ty
