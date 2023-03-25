@@ -87,11 +87,9 @@ and mexpr =
   | MIfExpression of mexpr * mexpr * mexpr
   | MRecordConstructor of mono_ty * (identifier * mexpr) list
   | MUnionConstructor of mono_ty * identifier * (identifier * mexpr) list
-  | MPath of {
-      head: mexpr;
-      elems: mtyped_path_elem list;
-      ty: mono_ty
-    }
+  | MSlotAccess of mexpr * identifier * mono_ty
+  | MPointerSlotAccess of mexpr * identifier * mono_ty
+  | MArrayAccess of mexpr * mexpr * mono_ty
   | MEmbed of mono_ty * string * mexpr list
   | MDeref of mexpr
   | MTypecast of mexpr * mono_ty
@@ -168,7 +166,11 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MUnionConstructor (ty, _, _) ->
      ty
-  | MPath { ty; _ } ->
+  | MSlotAccess (_, _, ty) ->
+     ty
+  | MPointerSlotAccess (_, _, ty) ->
+     ty
+  | MArrayAccess (_, _, ty) ->
      ty
   | MEmbed (ty, _, _) ->
      ty
