@@ -294,6 +294,13 @@ let path_not_record ty =
     Text " because it is not a record."
   ]
 
+let no_access_to_linear_record ty =
+  austral_raise TypeError [
+    Text "Cannot access a slot in the type ";
+    Code ty;
+    Text " because it is a linear record and it is not a variable."
+  ]
+
 let slot_wrong_type ~name ~expected ~actual =
   austral_raise TypeError [
     Text "The slot ";
