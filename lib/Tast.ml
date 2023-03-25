@@ -88,7 +88,7 @@ and texpr =
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
   | TSlotAccess of texpr * identifier * ty
   | TPointerSlotAccess of texpr * identifier * ty
-  | TArrayAccess of texpr * texpr
+  | TArrayAccess of texpr * texpr * ty
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
