@@ -22,3 +22,5 @@ and text_elem =
 
 (** Render error text to plain text for disply in the terminal. *)
 val error_text_to_plain : err_text -> string
+
+val error_text_to_html  : err_text -> string

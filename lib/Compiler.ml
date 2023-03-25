@@ -30,6 +30,7 @@ open LinearityCheck
 open Reporter
 open Entrypoint
 open ExportInstantiation
+open HtmlError
 
 let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import_list): concrete_module_interface =
   let (ConcreteModuleInterface (mn, docstring, imports, decls)) = ci in
@@ -152,6 +153,7 @@ let empty_compiler: compiler =
           compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
         with Austral_error error ->
           Printf.eprintf "%s" (render_error_to_plain error);
+          html_error_dump error;
           dump_and_die ()
       in
       let c =
@@ -159,6 +161,7 @@ let empty_compiler: compiler =
           compile_mod c (fake_mod_source memory_interface_source memory_body_source)
         with Austral_error error ->
           Printf.eprintf "%s" (render_error_to_plain error);
+          html_error_dump error;
           dump_and_die ()
       in
       c)

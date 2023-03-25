@@ -7,6 +7,7 @@
 open CliUtil
 open CliParser
 open CliEngine
+open HtmlError
 open Error
 
 let rec main (args: string list): unit =
@@ -15,6 +16,7 @@ let rec main (args: string list): unit =
     exit 0
   with Austral_error error ->
     Printf.eprintf "%s" (render_error_to_plain error);
+    html_error_dump error;
     dump_and_die ()
 
 and main' (args: string list): unit =
