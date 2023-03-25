@@ -204,7 +204,7 @@ let rec count (name: identifier) (expr: texpr): appearances =
      merge_list (List.map (fun (_, e) -> c e) args)
   | TUnionConstructor (_, _, args) ->
      merge_list (List.map (fun (_, e) -> c e) args)
-  | TPath { head; elems; _ } ->
+  | TSlotAccess (head, _, _) ->
      let head_apps: appearances =
        (* If the head of the path is a variable, check if it is the one we are
           looking for. If it is, count that as a path appearance. *)
@@ -222,9 +222,30 @@ let rec count (name: identifier) (expr: texpr): appearances =
         | _ ->
            (* Otherwise, just count the appearances inside the expression. *)
            c head)
-     and path_apps: appearances = merge_list (List.map (count_path_elem name) elems)
      in
-     merge head_apps path_apps
+     head_apps
+  | TPointerSlotAccess (head, _, _) ->
+     let head_apps: appearances =
+       (* If the head of the path is a variable, check if it is the one we are
+          looking for. If it is, count that as a path appearance. *)
+       (match head with
+        | TParamVar (name', _) ->
+           if equal_identifier name name' then
+             path_once
+           else
+             zero_appearances
+        | TLocalVar (name', _) ->
+           if equal_identifier name name' then
+             path_once
+           else
+             zero_appearances
+        | _ ->
+           (* Otherwise, just count the appearances inside the expression. *)
+           c head)
+     in
+     head_apps
+  | TArrayAccess (head, arr, _) ->
+     merge (c head) (c arr)
   | TEmbed (_, _, args) ->
      merge_list (List.map c args)
   | TDeref e ->
@@ -240,15 +261,6 @@ let rec count (name: identifier) (expr: texpr): appearances =
            write_once)
      else
        zero_appearances
-
-and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
-  match elem with
-  | TSlotAccessor _ ->
-     zero_appearances
-  | TPointerSlotAccessor _ ->
-     zero_appearances
-  | TArrayIndex (e, _) ->
-     count name e
 
 (* Utilities *)
 
