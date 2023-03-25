@@ -64,7 +64,9 @@ and aexpr =
   | Disjunction of aexpr * aexpr
   | Negation of aexpr
   | IfExpression of aexpr * aexpr * aexpr
-  | Path of aexpr * path_elem list
+  | SlotAccess of aexpr * identifier
+  | PointerSlotAccess of aexpr * identifier
+  | ArrayAccess of aexpr * aexpr
   | Embed of qtypespec * string * aexpr list
   | Deref of aexpr
   | Typecast of aexpr * qtypespec
