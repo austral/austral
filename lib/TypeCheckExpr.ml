@@ -138,32 +138,25 @@ let get_slot_with_name type_name slots slot_name =
 (* Check that there are as many bindings as there are type parameters, and that
    every type parameter is satisfied. *)
 and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
-  if (typarams_size typarams) = (binding_count bindings) then
-    let check (tp: type_parameter): unit =
-      let n = typaram_name tp
-      and u = typaram_universe tp
-      in
-      (match get_binding bindings tp with
-       | Some ty ->
-          if universe_compatible u (type_universe ty) then
-            ()
-          else
-            err ("Mismatched universes: expected "
-                 ^ (show_universe u)
-                 ^ " and got "
-                 ^ (show_universe (type_universe ty)))
-       | None ->
-          err ("No binding for this parameter: " ^ (ident_string n)))
+  let check (tp: type_parameter): unit =
+    let n = typaram_name tp
+    and u = typaram_universe tp
     in
-    let _ = List.map check (typarams_as_list typarams) in
-    ()
-  else
-    (* I think this should not be an error *)
-    (*err ("Not the same number of bindings and parameters. Bindings: "
-      ^ (show_bindings bindings)
-      ^ ". Parameters: "
-      ^ (String.concat ", " (List.map (fun (TypeParameter (n, u)) -> (ident_string n) ^ " : " ^ (universe_string u)) typarams)))*)
-    ()
+    (match get_binding bindings tp with
+     | Some ty ->
+        if universe_compatible u (type_universe ty) then
+          ()
+        else
+          err ("Mismatched universes: expected "
+               ^ (show_universe u)
+               ^ " and got "
+               ^ (show_universe (type_universe ty)))
+     | None ->
+        err ("No binding for this parameter: " ^ (ident_string n)))
+  in
+  let _ = List.map check (typarams_as_list typarams) in
+  ()
+
 
 (* Argument List Checking *)
 
