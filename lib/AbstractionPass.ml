@@ -80,7 +80,8 @@ and abs_expr im expr =
   | CIfExpression (_, c, t, f) ->
      IfExpression (abs_expr im c, abs_expr im t, abs_expr im f)
   | CPath (_, e, es) ->
-     Path (abs_expr im e, List.map (abs_path_elem im) es)
+     let e = abs_expr im e in
+     abs_path im e es
   | CEmbed (_, ty, expr, args) ->
      Embed (qualify_typespec im ty, expr, List.map (abs_expr im) args)
   | CDeref (_, e) ->
@@ -103,6 +104,23 @@ and abs_arglist im args =
      Positional (List.map (abs_expr im) l)
   | ConcreteNamedArgs l ->
      Named (List.map (fun (n, v) -> (n, abs_expr im v)) l)
+
+and abs_path (im: import_map) (head: aexpr) (elems: concrete_path_elem list): aexpr =
+  match elems with
+  | [] ->
+    head
+  | first::rest ->
+     (match first with
+      | CSlotAccessor name ->
+         let head = SlotAccess (head, name) in
+         abs_path im head rest
+      | CPointerSlotAccessor name ->
+         let head = PointerSlotAccess (head, name) in
+         abs_path im head rest
+      | CArrayIndex idx ->
+         let idx = abs_expr im idx in
+         let head = ArrayAccess (head, idx) in
+         abs_path im head rest)
 
 and abs_path_elem im elem =
   match elem with
