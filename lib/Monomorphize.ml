@@ -265,11 +265,19 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      let (ty, env) = strip_and_mono env ty in
      let (args, env) = monomorphize_named_expr_list env args in
      (MUnionConstructor (ty, case_name, args), env)
-  | TPath { head; elems; ty } ->
-     let (ty, env) = strip_and_mono env ty in
+  | TSlotAccess (head, name, ty) ->
      let (head, env) = monomorphize_expr env head in
-     let (elems, env) = monomorphize_path_elems env elems in
-     (MPath { head = head; elems = elems; ty = ty }, env)
+     let (ty, env) = strip_and_mono env ty in
+     (MSlotAccess (head, name, ty), env)
+  | TPointerSlotAccess (head, name, ty) ->
+     let (head, env) = monomorphize_expr env head in
+     let (ty, env) = strip_and_mono env ty in
+     (MPointerSlotAccess (head, name, ty), env)
+  | TArrayAccess (arr, idx, elem_ty) ->
+     let (arr, env) = monomorphize_expr env arr in
+     let (idx, env) = monomorphize_expr env idx in
+     let (elem_ty, env) = strip_and_mono env elem_ty in
+     (MArrayAccess (arr, idx, elem_ty), env)
   | TEmbed (ty, fmt, args) ->
      let (ty, env) = strip_and_mono env ty in
      let (args, env) = monomorphize_expr_list env args in
