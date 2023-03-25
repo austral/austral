@@ -86,11 +86,9 @@ and texpr =
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
-  | TPath of {
-      head: texpr;
-      elems: typed_path_elem list;
-      ty: ty
-    }
+  | TSlotAccess of texpr * identifier * ty
+  | TPointerSlotAccess of texpr * identifier * ty
+  | TArrayAccess of texpr * texpr
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
