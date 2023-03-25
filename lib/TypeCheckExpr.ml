@@ -89,11 +89,6 @@ let match_type_with_value_ctx (ctx: expr_ctx) (expected: ty) (value: texpr): typ
 let match_typarams_ctx (ctx: expr_ctx) (typarams: typarams) (type_args: ty list): type_bindings =
   match_typarams (ctx_env ctx, ctx_module_name ctx) typarams type_args
 
-let get_path_ty_from_elems (elems: typed_path_elem list): ty =
-  assert ((List.length elems) > 0);
-  let last = List.nth elems ((List.length elems) - 1) in
-  path_elem_type last
-
 (** Is this expression of boolean type? *)
 let is_bool (e: texpr): bool =
   match get_type e with
@@ -548,8 +543,16 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_negation ctx e
   | IfExpression (c, t, f) ->
      augment_if_expr ctx c t f
-  | Path (e, elems) ->
-     augment_path_expr ctx e elems
+  | SlotAccess (head, name) ->
+     let head = augment_expr ctx None head in
+     augment_slot_access ctx head name
+  | PointerSlotAccess (head, name) ->
+     let head = augment_expr ctx None head in
+     augment_pointer_slot_access ctx head name
+  | ArrayAccess (head, idx) ->
+     let head = augment_expr ctx None head in
+     let idx = augment_expr ctx None idx in
+     augment_array_access head idx
   | Embed (ty, expr, args) ->
      TEmbed (
          parse_typespec ctx ty,
@@ -655,141 +658,127 @@ and augment_if_expr ctx c t f =
       ~form:"expression"
       ~ty:(get_type c')
 
-and augment_path_expr (ctx: expr_ctx) (e: aexpr) (elems: path_elem list): texpr =
-  (* Path rules:
-
-     1. Path that begins in a reference ends in a reference.
-     2. All paths end in a type in the free universe.
-   *)
-  let e': texpr = aug ctx e in
-  (* Is the initial expression of a path a read reference or write reference or
-     no reference? *)
-  let (is_read, region): (bool * ty option) =
-    (match (get_type e') with
-     | ReadRef (_, r) ->
-        (true, Some r)
-     | WriteRef (_, r) ->
-        (false, Some r)
-     | _ ->
-        (false, None))
+and augment_slot_access (ctx: expr_ctx) (head: texpr) (slot_name: identifier): texpr =
+  (* Make sure the type we're trying to access is a named type. *)
+  let head_ty: ty = get_type head in
+  let (type_name, type_args, universe) =
+    match head_ty with
+    | NamedType (type_name, type_args, universe) ->
+       (type_name, type_args, universe)
+    | _ ->
+       Errors.path_not_record (type_string head_ty)
   in
-  let elems' = augment_path ctx (get_type e') elems in
-  let path_ty: ty = get_path_ty_from_elems elems' in
-  let path_ty: ty =
-    (* If the path starts in a reference it should end in one. *)
-    (match region with
-     | Some reg ->
-        if is_read then
-          ReadRef (path_ty, reg)
-        else
-          WriteRef (path_ty, reg)
-     | None ->
-        path_ty)
-  in
-  let universe = type_universe path_ty in
-  if universe = FreeUniverse then
-    TPath {
-        head = e';
-        elems = elems';
-        ty = path_ty
-      }
-  else
-    Errors.path_not_free path_ty
-
-and augment_path (ctx: expr_ctx) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
-  match elems with
-  | [elem] ->
-     [augment_path_elem ctx head_ty elem]
-  | elem::rest ->
-     let elem' = augment_path_elem ctx head_ty elem in
-     let rest' = augment_path ctx (path_elem_type elem') rest in
-     elem' :: rest'
-  | [] ->
-     err "Path is empty"
-
-and augment_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: path_elem): typed_path_elem =
-  match elem with
-  | SlotAccessor slot_name ->
-     (match head_ty with
-      | NamedType (name, args, _) ->
-         augment_slot_accessor_elem ctx slot_name name args
-      | _ ->
-         Errors.path_not_record (type_string head_ty))
-  | PointerSlotAccessor slot_name ->
-     (match head_ty with
-      | Pointer pointed_to ->
-         (* TODO: Addresses should not be indexable. *)
-         augment_pointer_slot_accessor_elem ctx slot_name pointed_to
-      | ReadRef (ty, _) ->
-         (match ty with
-          | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem ctx slot_name name args
-          | _ ->
-             Errors.path_not_record (type_string ty))
-      | WriteRef (ty, _) ->
-         (match ty with
-          | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem ctx slot_name name args
-          | _ ->
-             Errors.path_not_record (type_string ty))
-      | _ ->
-         Errors.path_not_record (type_string head_ty))
-  | ArrayIndex ie ->
-     let ie' = aug ctx ie in
-     (match head_ty with
-      | StaticArray elem_ty ->
-         TArrayIndex (ie', elem_ty)
-      | _ ->
-         Errors.array_indexing_disallowed head_ty)
-
-and augment_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list): typed_path_elem =
-  let module_name: module_name = ctx_module_name ctx in
-  (* Check: e' is a public record type *)
+  (* Load record information, and in the process ensure it is a record. *)
   let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
-  if (vis = TypeVisPublic) || (module_name = source_module) then
-    (* Check: the given slot name must exist in this record type. *)
-    let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
-    let bindings = match_typarams_ctx ctx typarams type_args in
-    let slot_ty' = replace_variables bindings slot_ty in
-    TSlotAccessor (slot_name, slot_ty')
-  else
-    Errors.path_not_public
+  (* We can't read from a linear record, unless it is a variable. *)
+  let _ =
+    if universe <> FreeUniverse then
+      (match head with
+       | TConstVar _ ->
+          ()
+       | TParamVar _ ->
+          ()
+       | TLocalVar _ ->
+          ()
+       | _ ->
+          Errors.no_access_to_linear_record (type_string head_ty))
+    else
+      ()
+  in
+  (* Check it's a public record, or it's defined in this module and thus we can
+     access it. *)
+  let _ =
+    let module_name: module_name = ctx_module_name ctx in
+    if (vis = TypeVisPublic) || (module_name = source_module) then
+      ()
+    else
+      Errors.path_not_public
       ~type_name:(original_name type_name)
       ~slot_name
+  in
+  (* Construct the type *)
+  let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
+  let bindings: type_bindings = match_typarams_ctx ctx typarams type_args in
+  let slot_ty: ty = replace_variables bindings slot_ty in
+  (* Check the s;pt type is Free *)
+  let _ =
+    if (type_universe slot_ty) <> FreeUniverse then
+      Errors.path_not_free slot_ty
+    else
+      ()
+  in
+  (* Construct the node *)
+  TSlotAccess (head, slot_name, slot_ty)
 
-and augment_pointer_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (pointed_to: ty): typed_path_elem =
-  let module_name: module_name = ctx_module_name ctx in
-  match pointed_to with
-  | NamedType (type_name, type_args, _) ->
-     (* Check arg is a public record *)
-     let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
-     if (vis = TypeVisPublic) || (module_name = source_module) then
-       (* Check: the given slot name must exist in this record type. *)
-       let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
-       let bindings = match_typarams_ctx ctx typarams type_args in
-       let slot_ty' = replace_variables bindings slot_ty in
-       TPointerSlotAccessor (slot_name, slot_ty')
-     else
-       Errors.path_not_public
-         ~type_name:(original_name type_name)
-         ~slot_name
-  | _ ->
-     Errors.path_not_record (type_string pointed_to)
-
-and augment_reference_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
-  let module_name: module_name = ctx_module_name ctx in
-  (* Check: e' is a public record type *)
+and augment_pointer_slot_access (ctx: expr_ctx) (head: texpr) (slot_name: identifier): texpr =
+  (* Make sure the type we're trying to access is a read or write reference type. *)
+  let head_ty: ty = get_type head in
+  let rec_ty: ty =
+    match head_ty with
+    | ReadRef (ty, _) ->
+       ty
+    | WriteRef (ty, _) ->
+       ty
+    | _ ->
+       Errors.path_not_reference_to_record (type_string head_ty)
+  in
+  let (type_name, type_args) =
+    match rec_ty with
+    | NamedType (type_name, type_args, _) ->
+       (type_name, type_args)
+    | _ ->
+       Errors.path_not_record (type_string rec_ty)
+  in
+  (* Load record information, and in the process ensure it is a record. *)
   let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
-  if (vis = TypeVisPublic) || (module_name = source_module) then
-    (* Check: the given slot name must exist in this record type. *)
-    let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
-    let bindings = match_typarams_ctx ctx typarams type_args in
-    let slot_ty' = replace_variables bindings slot_ty in
-    TPointerSlotAccessor (slot_name, slot_ty')
-  else
-    Errors.path_not_public
+  (* Check it's a public record, or it's defined in this module and thus we can
+     access it. *)
+  let _ =
+    let module_name: module_name = ctx_module_name ctx in
+    if (vis = TypeVisPublic) || (module_name = source_module) then
+      ()
+    else
+      Errors.path_not_public
       ~type_name:(original_name type_name)
       ~slot_name
+  in
+  (* Construct the type *)
+  let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
+  let bindings: type_bindings = match_typarams_ctx ctx typarams type_args in
+  let slot_ty: ty = replace_variables bindings slot_ty in
+  (* Check the s;pt type is Free *)
+  let _ =
+    if (type_universe slot_ty) <> FreeUniverse then
+      Errors.path_not_free slot_ty
+    else
+      ()
+  in
+  (* Construct the node *)
+  TPointerSlotAccess (head, slot_name, slot_ty)
+
+and augment_array_access (head: texpr) (idx: texpr): texpr =
+  (* Check the head is an array. *)
+  let head_ty: ty = get_type head in
+  let elem_ty: ty=
+    match head_ty with
+    | StaticArray elem_ty ->
+       elem_ty
+    | _ ->
+       Errors.array_indexing_disallowed head_ty
+  in
+  (* Check the element type is Free *)
+  let _ =
+    if (type_universe elem_ty) <> FreeUniverse then
+      Errors.path_not_free elem_ty
+    else
+      ()
+  in
+  (* Check the index is of Index type *)
+  let idx_ty: ty = get_type idx in
+  if idx_ty = index_type then
+    TArrayAccess (head, idx, elem_ty)
+  else
+    Errors.array_index_must_be_index_type (type_string idx_ty)
 
 and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
   (* The type of the expression being dereferenced must be either a read-only

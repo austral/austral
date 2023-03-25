@@ -242,6 +242,12 @@ let lvalue_index () =
     Text "The array index operator doesn't work in lvalues."
   ]
 
+let array_index_must_be_index_type (ty: string) =
+  austral_raise TypeError [
+      Text "The array index operator takes indices of type Index, but you gave it an expression of type ";
+      Code ty
+  ]
+
 let lvalue_not_free () =
   austral_raise LinearityError [
     Text "Only values in the ";
@@ -293,6 +299,14 @@ let path_not_record ty =
     Code ty;
     Text " because it is not a record."
   ]
+
+let path_not_reference_to_record ty =
+  austral_raise TypeError [
+    Text "Cannot take a path of the type ";
+    Code ty;
+    Text " because it is not a reference to a record."
+  ]
+
 
 let no_access_to_linear_record ty =
   austral_raise TypeError [
