@@ -248,20 +248,12 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
                 ("tag", union_tag_value ty case_name);
                 ("data", CStructInitializer [(gen_ident case_name, args)])
               ], gen_type ty)
-  | MPath { head; elems; _ } ->
-     let p = gen_path mn (g head) (List.rev elems) in
-     (match (get_type head) with
-      (* References get wrapped in the address-of operator '&' to match C
-         semantics. A path of the form `x.y`, where `x` is a reference, if
-         compiled straight to C would evaluate to the type of `y`, rather than
-         the type reference-to-`y`. So we turn it into `&x.y` so evaluates to
-         reference-to-`y`. *)
-      | MonoReadRef _ ->
-         CAddressOf p
-      | MonoWriteRef _ ->
-         CAddressOf p
-      | _ ->
-         p)
+  | MSlotAccess (head, slot_name, _) ->
+     CStructAccessor (gen_exp mn head, gen_ident slot_name)
+  | MPointerSlotAccess (head, slot_name, _) ->
+     CPointerStructAccessor (gen_exp mn head, gen_ident slot_name)
+  | MArrayAccess (arr, idx, _) ->
+     CIndex (gen_exp mn arr, gen_exp mn idx)
   | MEmbed (ty, expr, args) ->
      CEmbed (gen_type ty, expr, List.map g args)
   | MDeref e ->
