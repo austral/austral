@@ -89,6 +89,7 @@ and texpr =
   | TSlotAccess of texpr * identifier * ty
   | TPointerSlotAccess of texpr * identifier * ty
   | TArrayAccess of texpr * texpr * ty
+  | TRefSlotAccess of texpr * identifier * ty
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
