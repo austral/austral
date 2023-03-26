@@ -1,0 +1,7 @@
+module body Test is
+    function main(): ExitCode is
+        let value: Unit := nil;
+        &(value->foo);
+        return ExitSuccess();
+    end;
+end module body.

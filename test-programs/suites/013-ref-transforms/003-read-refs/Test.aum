@@ -1,0 +1,37 @@
+module body Test is
+    record Foo: Linear is
+        bar: Bar;
+    end;
+
+    record Bar: Linear is
+        baz: Baz;
+    end;
+
+    record Baz: Linear is
+        i: Int32;
+    end;
+
+    function main(): ExitCode is
+        -- Construct.
+        let baz: Baz := Baz(i => 10);
+        let bar: Bar := Bar(baz => baz);
+        let foo: Foo := Foo(bar => bar);
+        -- Borrow.
+        borrow foo as fooref in R do
+            -- Direct.
+            let a: &[Bar, R] := &(fooref->bar);
+            let b: &[Baz, R] := &(fooref->bar->baz);
+            let c: &[Int32, R] := &(fooref->bar->baz->i);
+            printLn(!c);
+            -- Indirect.
+            let d: &[Baz, R] := &(a->baz);
+            let e: &[Int32, R] := &(d->i);
+            printLn(!e);
+        end;
+        -- Destructure.
+        let { bar as bar2: Bar } := foo;
+        let { baz as baz2: Baz } := bar2;
+        let { i: Int32 } := baz2;
+        return ExitSuccess();
+    end;
+end module body.
