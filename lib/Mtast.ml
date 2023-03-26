@@ -173,6 +173,8 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MArrayAccess (_, _, ty) ->
      ty
+  | MRefSlotAccess (_, _, ty) ->
+     ty
   | MEmbed (ty, _, _) ->
      ty
   | MDeref e ->
