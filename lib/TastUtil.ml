@@ -98,6 +98,8 @@ let rec get_type = function
      ty
   | TPath { ty; _ } ->
      ty
+  | TRefPath (_, _, ty) ->
+     ty
   | TEmbed (ty, _, _) ->
      ty
   | TDeref e ->
