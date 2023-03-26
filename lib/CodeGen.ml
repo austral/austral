@@ -252,6 +252,8 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CStructAccessor (gen_exp mn head, gen_ident slot_name)
   | MPointerSlotAccess (head, slot_name, _) ->
      CPointerStructAccessor (gen_exp mn head, gen_ident slot_name)
+  | MRefSlotAccess (head, slot_name, _) ->
+     CAddressOf (CPointerStructAccessor (gen_exp mn head, gen_ident slot_name))
   | MArrayAccess (arr, idx, _) ->
      CIndex (gen_exp mn arr, gen_exp mn idx)
   | MEmbed (ty, expr, args) ->
