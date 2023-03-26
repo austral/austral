@@ -1,0 +1,1 @@
+Try getting a reference to a slot on a type that's not a record.

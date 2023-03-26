@@ -91,6 +91,11 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      and elems = List.map (replace_tyvars_path bindings) elems
      and ty = replace_variables bindings ty in
     TPath { head = head; elems = elems; ty = ty }
+  | TRefPath (head, elems, ty) ->
+     let head = replace_tyvars_expr bindings head
+     and elems = List.map (replace_tyvars_ref_path bindings) elems
+     and ty = replace_variables bindings ty in
+    TRefPath (head, elems, ty)
   | TEmbed (ty, fmt, args) ->
      let ty = replace_variables bindings ty
      and args = List.map (replace_tyvars_expr bindings) args in
@@ -117,6 +122,12 @@ and replace_tyvars_path (bindings: type_bindings) (elem: typed_path_elem): typed
      let idx = replace_tyvars_expr bindings idx
      and ty = replace_variables bindings ty in
      TArrayIndex (idx, ty)
+
+and replace_tyvars_ref_path (bindings: type_bindings) (elem: typed_ref_path_elem): typed_ref_path_elem =
+  match elem with
+  | TRefSlotAccessor (name, ty) ->
+     let ty = replace_variables bindings ty in
+     TRefSlotAccessor (name, ty)
 
 let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
   match stmt with

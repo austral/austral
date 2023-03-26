@@ -91,6 +91,7 @@ and texpr =
       elems: typed_path_elem list;
       ty: ty
     }
+  | TRefPath of texpr * typed_ref_path_elem list * ty
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
@@ -105,6 +106,10 @@ and typed_path_elem =
   | TSlotAccessor of identifier * ty
   | TPointerSlotAccessor of identifier * ty
   | TArrayIndex of texpr * ty
+[@@deriving show]
+
+and typed_ref_path_elem =
+  | TRefSlotAccessor of identifier * ty
 [@@deriving show]
 
 and typed_lvalue =

@@ -94,6 +94,11 @@ let get_path_ty_from_elems (elems: typed_path_elem list): ty =
   let last = List.nth elems ((List.length elems) - 1) in
   path_elem_type last
 
+let get_ref_path_ty_from_elems (elems: typed_ref_path_elem list): ty =
+  assert ((List.length elems) > 0);
+  let last = List.nth elems ((List.length elems) - 1) in
+  ref_path_elem_type last
+
 (** Is this expression of boolean type? *)
 let is_bool (e: texpr): bool =
   match get_type e with
@@ -550,6 +555,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_if_expr ctx c t f
   | Path (e, elems) ->
      augment_path_expr ctx e elems
+  | RefPath (e, elems) ->
+     augment_ref_path_expr ctx e elems
   | Embed (ty, expr, args) ->
      TEmbed (
          parse_typespec ctx ty,
@@ -790,6 +797,70 @@ and augment_reference_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier)
     Errors.path_not_public
       ~type_name:(original_name type_name)
       ~slot_name
+
+and augment_ref_path_expr (ctx: expr_ctx) (e: aexpr) (elems: ref_path_elem list): texpr =
+  let e': texpr = aug ctx e in
+  (* Is the initial expression of a path a read reference or write reference or
+     no reference? *)
+  let _ =
+    match (get_type e') with
+    | ReadRef _ ->
+       ()
+    | WriteRef _ ->
+       ()
+    | _ ->
+       Errors.ref_transform_needs_ref (get_type e')
+  in
+  let elems' = augment_ref_path ctx (get_type e') elems in
+  let path_ty: ty = get_ref_path_ty_from_elems elems' in
+  TRefPath (e', elems', path_ty)
+
+and augment_ref_path (ctx: expr_ctx) (head_ty: ty) (elems: ref_path_elem list): typed_ref_path_elem list =
+  match elems with
+  | [elem] ->
+     [augment_ref_path_elem ctx head_ty elem]
+  | elem::rest ->
+     let elem' = augment_ref_path_elem ctx head_ty elem in
+     let rest' = augment_ref_path ctx (ref_path_elem_type elem') rest in
+     elem' :: rest'
+  | [] ->
+     err "Path is empty"
+
+and augment_ref_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: ref_path_elem): typed_ref_path_elem =
+  match elem with
+  | RefSlotAccessor slot_name ->
+     (match head_ty with
+      | ReadRef (pointed_to, region) ->
+         augment_ref_slot_access_inner ctx pointed_to true region slot_name
+      | WriteRef (pointed_to, region) ->
+         augment_ref_slot_access_inner ctx pointed_to false region slot_name
+      | _ ->
+         Errors.ref_transform_needs_ref head_ty)
+
+and augment_ref_slot_access_inner (ctx: expr_ctx) (pointed_to: ty) (is_read: bool) (region: ty) (slot_name: identifier): typed_ref_path_elem =
+  match pointed_to with
+  | NamedType (type_name, type_args, _) ->
+     let module_name: module_name = ctx_module_name ctx in
+     (* Check: e' is a public record type *)
+     let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
+     if (vis = TypeVisPublic) || (module_name = source_module) then
+       (* Check: the given slot name must exist in this record type. *)
+       let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
+       let bindings = match_typarams_ctx ctx typarams type_args in
+       let slot_ty = replace_variables bindings slot_ty in
+       let slot_ty =
+         if is_read then
+           ReadRef (slot_ty, region)
+         else
+           WriteRef (slot_ty, region)
+       in
+       TRefSlotAccessor (slot_name, slot_ty)
+     else
+       Errors.path_not_public
+         ~type_name:(original_name type_name)
+         ~slot_name
+  | _ ->
+     Errors.ref_transform_not_record pointed_to
 
 and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
   (* The type of the expression being dereferenced must be either a read-only

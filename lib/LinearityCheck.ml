@@ -225,6 +225,28 @@ let rec count (name: identifier) (expr: texpr): appearances =
      and path_apps: appearances = merge_list (List.map (count_path_elem name) elems)
      in
      merge head_apps path_apps
+  | TRefPath (head, elems, _) ->
+     let head_apps: appearances =
+       (* If the head of the path is a variable, check if it is the one we are
+          looking for. If it is, count that as an appearance, because
+          transforming a mutable reference consumes it. *)
+       (match head with
+        | TParamVar (name', _) ->
+           if equal_identifier name name' then
+             consumed_once
+           else
+             zero_appearances
+        | TLocalVar (name', _) ->
+           if equal_identifier name name' then
+             consumed_once
+           else
+             zero_appearances
+        | _ ->
+           (* Otherwise, just count the appearances inside the expression. *)
+           c head)
+     and path_apps: appearances = merge_list (List.map count_ref_path_elem elems)
+     in
+     merge head_apps path_apps
   | TEmbed (_, _, args) ->
      merge_list (List.map c args)
   | TDeref e ->
@@ -249,6 +271,11 @@ and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
      zero_appearances
   | TArrayIndex (e, _) ->
      count name e
+
+and count_ref_path_elem (elem: typed_ref_path_elem): appearances =
+  match elem with
+  | TRefSlotAccessor _ ->
+     zero_appearances
 
 (* Utilities *)
 

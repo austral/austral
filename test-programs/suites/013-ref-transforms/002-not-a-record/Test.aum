@@ -1,0 +1,17 @@
+module body Test is
+    union Foo: Linear is
+        case Blank;
+    end;
+
+    function main(): ExitCode is
+        let foo: Foo := Blank();
+        borrow foo as fooref in R do
+            &(fooref->foo);
+        end;
+        case foo of
+            when Blank do
+                skip;
+        end case;
+        return ExitSuccess();
+    end;
+end module body.
