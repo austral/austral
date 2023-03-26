@@ -174,6 +174,8 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MPath { ty; _ } ->
      ty
+  | MRefPath (_, _, ty) ->
+     ty
   | MEmbed (ty, _, _) ->
      ty
   | MDeref e ->
