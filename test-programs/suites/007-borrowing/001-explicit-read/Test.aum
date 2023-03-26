@@ -15,7 +15,7 @@ module body Test is
         -- Borrow it.
         borrow foo as fooref in rho do
             -- Extract a free value from the reference.
-            let subref: &[Nat8, rho] := fooref->bar;
+            let subref: &[Nat8, rho] := &(fooref->bar);
             let b: Nat8 := !subref;
             -- Print it.
             Put_Character(b);
