@@ -551,6 +551,8 @@ and is_constant = function
      List.for_all (fun (_, v) -> is_constant v) values
   | TPath { head; elems; _ } ->
      (is_constant head) && (List.for_all is_path_elem_constant elems)
+  | TRefPath (head, elems, _) ->
+     (is_constant head) && (List.for_all is_ref_path_elem_constant elems)
   | TEmbed _ ->
      true
   | TDeref _ ->
@@ -567,6 +569,10 @@ and is_path_elem_constant = function
      true
   | TArrayIndex (e, _) ->
      is_constant e
+
+and is_ref_path_elem_constant = function
+  | TRefSlotAccessor _ ->
+     true
 
 let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: linked_definition): typed_decl =
   with_frame "Augment declaration"
