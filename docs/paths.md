@@ -83,6 +83,7 @@ Why one or more? Because `&(foo)` would be a no-op.
    head is a read reference, and a write reference if the head is a write
    reference.
 1. **Rule RT3:** transforming a write reference consumes it.
+1. **Rule RT4:** you can't take a mutable reference into a static array.
 
 The type-checking rules are:
 
