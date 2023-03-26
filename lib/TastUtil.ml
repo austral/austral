@@ -102,6 +102,8 @@ let rec get_type = function
      ty
   | TArrayAccess (_, _, ty) ->
      ty
+  | TRefSlotAccess (_, _, ty) ->
+     ty
   | TEmbed (ty, _, _) ->
      ty
   | TDeref e ->
