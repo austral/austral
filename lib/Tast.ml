@@ -109,7 +109,7 @@ and typed_path_elem =
 [@@deriving show]
 
 and typed_ref_path_elem =
-  | TReflotAccessor of identifier * ty
+  | TRefSlotAccessor of identifier * ty
 [@@deriving show]
 
 and typed_lvalue =
