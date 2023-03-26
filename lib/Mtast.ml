@@ -90,6 +90,7 @@ and mexpr =
   | MSlotAccess of mexpr * identifier * mono_ty
   | MPointerSlotAccess of mexpr * identifier * mono_ty
   | MArrayAccess of mexpr * mexpr * mono_ty
+  | MRefSlotAccess of mexpr * identifier * mono_ty
   | MEmbed of mono_ty * string * mexpr list
   | MDeref of mexpr
   | MTypecast of mexpr * mono_ty
