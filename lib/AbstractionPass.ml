@@ -81,6 +81,8 @@ and abs_expr im expr =
      IfExpression (abs_expr im c, abs_expr im t, abs_expr im f)
   | CPath (_, e, es) ->
      Path (abs_expr im e, List.map (abs_path_elem im) es)
+  | CRefPath (_, e, es) ->
+     RefPath (abs_expr im e, List.map abs_ref_path_elem es)
   | CEmbed (_, ty, expr, args) ->
      Embed (qualify_typespec im ty, expr, List.map (abs_expr im) args)
   | CDeref (_, e) ->
@@ -112,6 +114,11 @@ and abs_path_elem im elem =
      PointerSlotAccessor i
   | CArrayIndex ie ->
      ArrayIndex (abs_expr im ie)
+
+and abs_ref_path_elem elem =
+  match elem with
+  | CRefPointerSlotAccessor i ->
+     RefSlotAccessor i
 
 (* Given a list of statements, find the first let statement, if any, and put the
    remainder of the list under its body. Then call let_reshape on that
