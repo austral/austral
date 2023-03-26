@@ -278,6 +278,10 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      let (idx, env) = monomorphize_expr env idx in
      let (elem_ty, env) = strip_and_mono env elem_ty in
      (MArrayAccess (arr, idx, elem_ty), env)
+  | TRefSlotAccess (head, name, ty) ->
+     let (head, env) = monomorphize_expr env head in
+     let (ty, env) = strip_and_mono env ty in
+     (MRefSlotAccess (head, name, ty), env)
   | TEmbed (ty, fmt, args) ->
      let (ty, env) = strip_and_mono env ty in
      let (args, env) = monomorphize_expr_list env args in
