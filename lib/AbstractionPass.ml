@@ -82,6 +82,9 @@ and abs_expr im expr =
   | CPath (_, e, es) ->
      let e = abs_expr im e in
      abs_path im e es
+  | CRefPath (_, e, elems) ->
+     let e = abs_expr im e in
+     abs_ref_path im e elems
   | CEmbed (_, ty, expr, args) ->
      Embed (qualify_typespec im ty, expr, List.map (abs_expr im) args)
   | CDeref (_, e) ->
@@ -121,6 +124,16 @@ and abs_path (im: import_map) (head: aexpr) (elems: concrete_path_elem list): ae
          let idx = abs_expr im idx in
          let head = ArrayAccess (head, idx) in
          abs_path im head rest)
+
+and abs_ref_path (im: import_map) (head: aexpr) (elems: concrete_ref_path_elem list): aexpr =
+  match elems with
+  | [] ->
+    head
+  | first::rest ->
+     (match first with
+      | CRefPointerSlotAccessor name ->
+         let head = RefSlotAccess (head, name) in
+         abs_ref_path im head rest)
 
 and abs_path_elem im elem =
   match elem with
