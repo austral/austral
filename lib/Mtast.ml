@@ -92,7 +92,7 @@ and mexpr =
       elems: mtyped_path_elem list;
       ty: mono_ty
     }
-  | MRefPath of mexpr * mtyped_ref_path_elem list * ty
+  | MRefPath of mexpr * mtyped_ref_path_elem list * mono_ty
   | MEmbed of mono_ty * string * mexpr list
   | MDeref of mexpr
   | MTypecast of mexpr * mono_ty
