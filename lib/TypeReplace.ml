@@ -101,6 +101,11 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      and idx = replace_tyvars_expr bindings idx
      and elem_ty = replace_variables bindings elem_ty
      in TArrayAccess (head, idx, elem_ty)
+  | TRefSlotAccess (head, name, ty) ->
+     let head = replace_tyvars_expr bindings head
+     and ty = replace_variables bindings ty
+     in
+     TRefSlotAccess (head, name, ty)
   | TEmbed (ty, fmt, args) ->
      let ty = replace_variables bindings ty
      and args = List.map (replace_tyvars_expr bindings) args in
