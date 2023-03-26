@@ -306,11 +306,11 @@ and gen_ref_path (mn: module_name) (expr: c_expr) (elems: mtyped_ref_path_elem l
      gen_ref_path_elem mn expr elem
   | elem::rest ->
      let expr' = gen_ref_path_elem mn expr elem in
-     gen_path mn expr' rest
+     gen_ref_path mn expr' rest
   | [] ->
      expr
 
-and gen_ref_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_ref_path_elem_path_elem): c_expr =
+and gen_ref_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_ref_path_elem): c_expr =
   match elem with
   | MRefSlotAccessor (n, _) ->
      CPointerStructAccessor (expr, gen_ident n)
