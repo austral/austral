@@ -303,6 +303,5 @@ let render_error_to_html (error: austral_error): string =
 
 let html_error_dump (error: austral_error): unit =
     let filename: string = "error.html" in
-    Printf.eprintf "Wrote error to %s\n" filename;
     write_string_to_file filename (render_error_to_html error)
 
