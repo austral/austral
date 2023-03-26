@@ -240,7 +240,14 @@ and render_expr = function
   | CIndex (arr, idx) ->
      (e arr) ^ "[" ^ (e idx) ^ "]"
   | CAddressOf exp ->
-     "&" ^ (e exp)
+     "&(" ^ (e exp) ^ ")"
+  | CPath (head, elems) ->
+     let f (elem: c_path_elem): string =
+       match elem with
+       | CPathSlot name -> "." ^ name
+       | CPathPointer name -> "->" ^ name
+     in
+     (render_expr head) ^ (String.concat "" (List.map f elems))
   | CEmbed (ty, expr, args) ->
      let strs = List.map render_expr args in
      (* the `expr` has a format like "derp $1 $2", so iterate over the list of

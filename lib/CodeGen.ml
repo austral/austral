@@ -263,7 +263,7 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
       | _ ->
          p)
   | MRefPath (head, elems, _) ->
-     CAddressOf (gen_ref_path (g head) (List.rev elems))
+     CAddressOf (gen_ref_path (g head) elems)
   | MEmbed (ty, expr, args) ->
      CEmbed (gen_type ty, expr, List.map g args)
   | MDeref e ->
@@ -300,20 +300,18 @@ and gen_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_path_elem): c_e
                       ]),
                     CPointer (gen_type t)))
 
-and gen_ref_path (expr: c_expr) (elems: mtyped_ref_path_elem list): c_expr =
-  match elems with
-  | [elem] ->
-     gen_ref_path_elem expr elem
-  | elem::rest ->
-     let expr' = gen_ref_path_elem expr elem in
-     gen_ref_path expr' rest
-  | [] ->
-     expr
+and gen_ref_path (head: c_expr) (elems: mtyped_ref_path_elem list): c_expr =
+  let elems: c_path_elem list = List.mapi gen_ref_path_elem elems
+  in
+  CPath (head, elems)
 
-and gen_ref_path_elem (expr: c_expr) (elem: mtyped_ref_path_elem): c_expr =
+and gen_ref_path_elem (i: int) (elem: mtyped_ref_path_elem): c_path_elem =
   match elem with
   | MRefSlotAccessor (n, _) ->
-     CPointerStructAccessor (expr, gen_ident n)
+     if i = 0 then
+       CPathPointer (gen_ident n)
+     else
+       CPathSlot (gen_ident n)
 
 (* Statements *)
 

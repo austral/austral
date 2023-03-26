@@ -44,9 +44,14 @@ type c_expr =
   | CPointerStructAccessor of c_expr * string
   | CIndex of c_expr * c_expr
   | CAddressOf of c_expr
+  | CPath of c_expr * c_path_elem list
   | CEmbed of c_ty * string * c_expr list
   | CDeref of c_expr
   | CSizeOf of c_ty
+
+and c_path_elem =
+  | CPathSlot of string
+  | CPathPointer of string
 
 type c_stmt =
   | CLet of string * c_ty * c_expr
