@@ -67,6 +67,7 @@ and aexpr =
   | SlotAccess of aexpr * identifier
   | PointerSlotAccess of aexpr * identifier
   | ArrayAccess of aexpr * aexpr
+  | RefSlotAccess of aexpr * identifier
   | Embed of qtypespec * string * aexpr list
   | Deref of aexpr
   | Typecast of aexpr * qtypespec
