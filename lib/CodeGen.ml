@@ -262,6 +262,8 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
          CAddressOf p
       | _ ->
          p)
+  | MRefPath (head, elems, _) ->
+     CAddressOf (gen_ref_path mn (g head) (List.rev elems))
   | MEmbed (ty, expr, args) ->
      CEmbed (gen_type ty, expr, List.map g args)
   | MDeref e ->
@@ -297,6 +299,21 @@ and gen_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_path_elem): c_e
                                 CSizeOf (gen_type t);
                       ]),
                     CPointer (gen_type t)))
+
+and gen_ref_path (mn: module_name) (expr: c_expr) (elems: mtyped_ref_path_elem list): c_expr =
+  match elems with
+  | [elem] ->
+     gen_ref_path_elem mn expr elem
+  | elem::rest ->
+     let expr' = gen_ref_path_elem mn expr elem in
+     gen_path mn expr' rest
+  | [] ->
+     expr
+
+and gen_ref_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_ref_path_elem_path_elem): c_expr =
+  match elem with
+  | MRefSlotAccessor (n, _) ->
+     CPointerStructAccessor (expr, gen_ident n)
 
 (* Statements *)
 
