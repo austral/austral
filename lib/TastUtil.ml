@@ -126,3 +126,7 @@ and path_elem_type = function
      t
   | TArrayIndex (_, t) ->
      t
+
+and ref_path_elem_type = function
+  | TRefSlotAccessor (_, ty) ->
+     ty

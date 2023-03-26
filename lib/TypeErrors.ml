@@ -340,3 +340,16 @@ let cannot_assign_to_parameter _ =
   austral_raise GenericError [
       Text "Cannot assign a value to a function parameter."
     ]
+
+let ref_transform_needs_ref ty =
+  austral_raise GenericError [
+      Text "The head of a reference transform expression must be of a reference type, but I got ";
+      Code (type_string ty)
+    ]
+
+let ref_transform_not_record ty =
+  austral_raise GenericError [
+      Text "Tried to transform a reference to a record into a reference into a slot, but the type ";
+      Code (type_string ty);
+      Text " is not a record"
+    ]
