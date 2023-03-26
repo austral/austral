@@ -41,6 +41,7 @@ open Span
 /* Borrowing */
 %token BORROW_WRITE
 %token BORROW_READ
+%token REF_TRANSFORM
 /* Keywords */
 %token MODULE
 %token IS
@@ -486,7 +487,7 @@ array_index:
   ;
 
 ref_path:
-  | initial=atomic_expression elems=ref_path_rest+ { CRefPath (from_loc $loc, initial, elems) }
+  | REF_TRANSFORM initial=identifier elems=ref_path_rest+ RPAREN { CRefPath (from_loc $loc, CVariable (from_loc $loc, initial), elems) }
   ;
 
 ref_path_rest:

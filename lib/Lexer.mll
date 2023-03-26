@@ -119,6 +119,7 @@ rule token = parse
   | "not" { NOT }
   (* Borrowing *)
   | "&!" { BORROW_WRITE }
+  | "&(" { REF_TRANSFORM }
   | "&" { BORROW_READ }
   (* Keywords *)
   | "module" { MODULE }
