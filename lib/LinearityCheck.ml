@@ -244,6 +244,24 @@ let rec count (name: identifier) (expr: texpr): appearances =
            c head)
      in
      head_apps
+  | TRefSlotAccess (head, _, _) ->
+     let head_apps: appearances =
+       (match head with
+        | TParamVar (name', _) ->
+           if equal_identifier name name' then
+             consumed_once
+           else
+             zero_appearances
+        | TLocalVar (name', _) ->
+           if equal_identifier name name' then
+             consumed_once
+           else
+             zero_appearances
+        | _ ->
+           (* Otherwise, just count the appearances inside the expression. *)
+           c head)
+     in
+     head_apps
   | TArrayAccess (head, arr, _) ->
      merge (c head) (c arr)
   | TEmbed (_, _, args) ->
