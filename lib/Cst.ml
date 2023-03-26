@@ -84,6 +84,7 @@ and cexpr =
   | CNegation of span * cexpr
   | CIfExpression of span * cexpr * cexpr * cexpr
   | CPath of span * cexpr * concrete_path_elem list
+  | CRefPath of span * cexpr * concrete_ref_path_elem list
   | CEmbed of span * typespec * string * cexpr list
   | CDeref of span * cexpr
   | CTypecast of span * cexpr * typespec
@@ -138,6 +139,9 @@ and concrete_path_elem =
   | CSlotAccessor of identifier
   | CPointerSlotAccessor of identifier
   | CArrayIndex of cexpr
+
+and concrete_ref_path_elem =
+  | CRefPointerSlotAccessor of identifier
 
 and concrete_lvalue =
   ConcreteLValue of identifier * concrete_path_elem list
