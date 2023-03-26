@@ -54,11 +54,11 @@ module body Standard.Buffer is
     function invariants(buf: &[Buffer[T], R]): Unit is
         -- Size is always strictly less than the capacity. When resizing, if
         -- the size matches the capacity, we bump up.
-        if !buf->size >= !buf->capacity then
+        if buf->size >= buf->size then
             abort("Buffer size >= capacity");
         end if;
         -- Capacity is always non-zero.
-        if !buf->capacity = 0 then
+        if buf->size = 0 then
             abort("Buffer capacity = 0");
         end if;
         return nil;
@@ -169,15 +169,15 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function length(buf: &[Buffer[T], R]): Index is
-        return !buf->size;
+        return buf->size;
     end;
 
     generic [T: Free, R: Region]
     function nth(buf: &[Buffer[T], R], pos: Index): T is
-        if pos >= !buf->size then
+        if pos >= buf->size then
             abort("nth: index out of range");
         end if;
-        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
         let elem: T := load(ptr);
         return elem;
     end;
@@ -188,10 +188,10 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function storeNth(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
-        if pos >= !buf->size then
+        if pos >= buf->size then
             abort("storeNth: index out of range");
         end if;
-        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
         store(ptr, element);
         -- invariants(buf : &[Buffer[T], R]);
         return nil;
@@ -200,10 +200,10 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function swapNth(buf: &![Buffer[T], R], pos: Index, element: T): T is
-        if pos >= !buf->size then
+        if pos >= buf->size then
             abort("swapNth: index out of range");
         end if;
-        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
         let previous: T := load(ptr);
         store(ptr, element);
         -- invariants(buf : &[Buffer[T], R]);
@@ -212,15 +212,15 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function swapIndex(buf: &![Buffer[T], R], a: Index, b: Index): Unit is
-        if a >= !buf->size then
+        if a >= buf->size then
             abort("swapIndex: first index out of range");
         end if;
-        if b >= !buf->size then
+        if b >= buf->size then
             abort("swapIndex: second index out of range");
         end if;
         -- Load a and b.
-        let a_ptr: Pointer[T] := positiveOffset(!buf->array, a);
-        let b_ptr: Pointer[T] := positiveOffset(!buf->array, b);
+        let a_ptr: Pointer[T] := positiveOffset(buf->array, a);
+        let b_ptr: Pointer[T] := positiveOffset(buf->array, b);
         let elem_a: T := load(a_ptr);
         let elem_b: T := load(b_ptr);
         -- Store b in a.
@@ -233,11 +233,11 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function swapTransform(buf: &![Buffer[T], R], pos: Index, fn: Fn[T, T]): Unit is
-        if pos >= !buf->size then
+        if pos >= buf->size then
             abort("swapTransform: index out of range");
         end if;
         -- Load the element at `pos`.
-        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
         let old: T := load(ptr);
         -- Transform it.
         let new: T := fn(old);
@@ -249,7 +249,7 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit is
-        for i from 0 to !buf->size - 1 do
+        for i from 0 to buf->size - 1 do
             storeNth(buf, i, element);
         end for;
         -- invariants(buf : &[Buffer[T], R]);
@@ -267,14 +267,14 @@ module body Standard.Buffer is
     """
     generic [T: Type, R: Region]
     function bump(buf: &![Buffer[T], R]): Unit is
-        let new_capacity: Index := !buf->capacity * 2;
-        let new_addr: Address[T] := resizeArray(!buf->array, new_capacity);
+        let new_capacity: Index := buf->size * 2;
+        let new_addr: Address[T] := resizeArray(buf->array, new_capacity);
         case nullCheck(new_addr) of
             when Some(value as new_array: Pointer[T]) do
                 memcpy(
                     destination => new_array,
-                    source => !buf->array,
-                    count => arraySizeInBytes(sizeof(T), !buf->size)
+                    source => buf->array,
+                    count => arraySizeInBytes(sizeof(T), buf->size)
                 );
                 buf->capacity := new_capacity;
                 buf->array := new_array;
@@ -288,28 +288,28 @@ module body Standard.Buffer is
     generic [T: Type, R: Region]
     function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
         -- Check `pos` is in bounds.
-        if pos > !buf->size then
+        if pos > buf->size then
             abort("insert: index out of range");
         end if;
         -- If insertion would increase make `size` match `capacity`, resize
         -- the array.
-        if (!buf->size + 1) = !buf->capacity then
+        if (buf->size + 1) = buf->size then
             bump(buf);
         end if;
         -- If the array is non-empty, we have to move everything to the right of
         -- the position one step to the right.
-        if !buf->size > 0 then
+        if buf->size > 0 then
            shiftRight(
-               ptr => !buf->array,
+               ptr => buf->array,
                chunk_start => pos,
-               chunk_length => !buf->size - pos,
+               chunk_length => buf->size - pos,
                count => 1
            );
         end if;
         -- Insert.
-        let index_ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let index_ptr: Pointer[T] := positiveOffset(buf->array, pos);
         store(index_ptr, element);
-        buf->size := !buf->size + 1;
+        buf->size := buf->size + 1;
         -- invariants(buf : &[Buffer[T], R]);
         return nil;
     end;
@@ -321,7 +321,7 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function insertBack(buf: &![Buffer[T], R], element: T): Unit is
-        return insert(buf, !buf->size, element);
+        return insert(buf, buf->size, element);
     end;
 
     ---
@@ -331,25 +331,25 @@ module body Standard.Buffer is
     generic [T: Type, R: Region]
     function remove(buf: &![Buffer[T], R], pos: Index): T is
         -- Check array is non-empty.
-        if !buf->size = 0 then
+        if buf->size = 0 then
             abort("remove: array is empty");
         end if;
         -- Check position is in bounds.
-        if pos >= !buf->size then
+        if pos >= buf->size then
             abort("insert: index out of range");
         end if;
-        let ptr: Pointer[T] := positiveOffset(!buf->array, pos);
+        let ptr: Pointer[T] := positiveOffset(buf->array, pos);
         let elem: T := load(ptr);
         -- Move all elements right form `pos` one step to the left, unless this is the last index of the array.
-        if pos < (!buf->size - 1) then
+        if pos < (buf->size - 1) then
             shiftLeft(
-                ptr => !buf->array,
+                ptr => buf->array,
                 chunk_start => pos + 1,
-                chunk_length => (!buf->size - 1) - pos,
+                chunk_length => (buf->size - 1) - pos,
                 count => 1
             );
         end if;
-        buf->size := !buf->size - 1;
+        buf->size := buf->size - 1;
         -- invariants(buf : &[Buffer[T], R]);
         return elem;
     end;
@@ -361,7 +361,7 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function removeLast(buf: &![Buffer[T], R]): T is
-        return remove(buf, !buf->size - 1);
+        return remove(buf, buf->size - 1);
     end;
 
     ---
@@ -370,9 +370,9 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function reverse(buf: &![Buffer[T], R]): Unit is
-        if !buf->size > 0 then
-            for i from 0 to !buf->size / 2 do
-                let j: Index := (!buf->size - i) - 1;
+        if buf->size > 0 then
+            for i from 0 to buf->size / 2 do
+                let j: Index := (buf->size - i) - 1;
                 swapIndex(buf, i, j);
             end for;
         end if;
@@ -386,7 +386,7 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit is
-        for i from 0 to !buf->size - 1 do
+        for i from 0 to buf->size - 1 do
             swapTransform(buf, i, fn);
         end for;
         return nil;
