@@ -59,12 +59,12 @@ module body Standard.ByteString is
 
     generic [R: Region]
     function length(string: &[ByteString, R]): Index is
-        return bufLength(string->buf);
+        return bufLength(&(string->buf));
     end;
 
     generic [R: Region]
     function nth(string: &[ByteString, R], pos: Index): Nat8 is
-        return bufNth(string->buf, pos);
+        return bufNth(&(string->buf), pos);
     end;
 
     ---
@@ -76,6 +76,6 @@ module body Standard.ByteString is
     """
     generic [R: Region]
     function storeNth(string: &![ByteString, R], pos: Index, byte: Nat8): Unit is
-        return bufStoreNth(string->buf, pos, byte);
+        return bufStoreNth(&(string->buf), pos, byte);
     end;
 end module body. 

@@ -50,22 +50,20 @@ module body Standard.Box is
 
     generic [T: Free, R: Region]
     function readFree(boxref: &[Box[T], R]): T is
-        let ptrref: &[Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := !ptrref;
+        let ptr: Pointer[T] := boxref->pointer;
         return load(ptr);
     end;
 
     generic [T: Free, R: Region]
     function storeFree(boxref: &![Box[T], R], value: T): Unit is
-        let ptrref: &![Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := !(ptrref);
+        let ptr: Pointer[T] := boxref->pointer;
         store(ptr, value);
         return nil;
     end;
 
     generic [T: Type, R: Region]
     function boxSwap(boxref: &![Box[T], R], new: T): T is
-        let ptr: Pointer[T] := !(boxref->pointer);
+        let ptr: Pointer[T] := boxref->pointer;
         let old: T := load(ptr);
         store(ptr, new);
         return old;
@@ -73,6 +71,6 @@ module body Standard.Box is
 
     generic [T: Type, R: Region]
     function unboxReadRef(ref: &[Box[T], R]): &[T, R] is
-        return loadRead(ref->pointer);
+        return loadRead(&(ref->pointer));
     end;
 end module body.

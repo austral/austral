@@ -56,29 +56,27 @@ module body Example.Box is
 
     generic [T: Free, R: Region]
     function Read_Free(boxref: &[Box[T], R]): T is
-        let ptrref: &[Pointer[T], R] := boxref->pointer;
+        let ptrref: &[Pointer[T], R] := &(boxref->pointer);
         let ptr: Pointer[T] := !ptrref;
         return load(ptr);
     end;
 
     generic [T: Free, R: Region]
     function Store_Free(boxref: &![Box[T], R], value: T): Unit is
-        let ptrref: &![Pointer[T], R] := boxref->pointer;
-        let ptr: Pointer[T] := !(ptrref);
+        let ptr: Pointer[T] := boxref->pointer;
         store(ptr, value);
         return nil;
     end;
 
     generic [T: Type, R: Region]
     function Get_Value_Ref(boxref: &[Box[T], R]): &[T, R] is
-        let ptrref: &[Pointer[T], R] := boxref->pointer;
-        let ref: &[T, R] := loadRead(ptrref);
+        let ref: &[T, R] := loadRead(&(boxref->pointer));
         return ref;
     end;
 
     generic [T: Free, R: Region]
     function Swap_Mut(boxref: &![Box[T], R], value: T): T is
-        let ptr: Pointer[T] := !(boxref->pointer);
+        let ptr: Pointer[T] := boxref->pointer;
         let old_value: T := load(ptr);
         store(ptr, value);
         return old_value;

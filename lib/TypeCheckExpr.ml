@@ -665,34 +665,11 @@ and augment_if_expr ctx c t f =
 and augment_path_expr (ctx: expr_ctx) (e: aexpr) (elems: path_elem list): texpr =
   (* Path rules:
 
-     1. Path that begins in a reference ends in a reference.
-     2. All paths end in a type in the free universe.
+     1. All paths end in a type in the free universe.
    *)
   let e': texpr = aug ctx e in
-  (* Is the initial expression of a path a read reference or write reference or
-     no reference? *)
-  let (is_read, region): (bool * ty option) =
-    (match (get_type e') with
-     | ReadRef (_, r) ->
-        (true, Some r)
-     | WriteRef (_, r) ->
-        (false, Some r)
-     | _ ->
-        (false, None))
-  in
   let elems' = augment_path ctx (get_type e') elems in
   let path_ty: ty = get_path_ty_from_elems elems' in
-  let path_ty: ty =
-    (* If the path starts in a reference it should end in one. *)
-    (match region with
-     | Some reg ->
-        if is_read then
-          ReadRef (path_ty, reg)
-        else
-          WriteRef (path_ty, reg)
-     | None ->
-        path_ty)
-  in
   let universe = type_universe path_ty in
   if universe = FreeUniverse then
     TPath {
