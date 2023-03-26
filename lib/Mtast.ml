@@ -92,6 +92,7 @@ and mexpr =
       elems: mtyped_path_elem list;
       ty: mono_ty
     }
+  | MRefPath of mexpr * mtyped_ref_path_elem list * ty
   | MEmbed of mono_ty * string * mexpr list
   | MDeref of mexpr
   | MTypecast of mexpr * mono_ty
@@ -105,6 +106,9 @@ and mtyped_path_elem =
   | MSlotAccessor of identifier * mono_ty
   | MPointerSlotAccessor of identifier * mono_ty
   | MArrayIndex of mexpr * mono_ty
+
+and mtyped_ref_path_elem =
+  | MRefSlotAccessor of identifier * mono_ty
 
 and mtyped_lvalue =
   MTypedLValue of identifier * mtyped_path_elem list
