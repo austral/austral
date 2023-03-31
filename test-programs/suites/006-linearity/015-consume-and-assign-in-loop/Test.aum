@@ -8,6 +8,7 @@ module body Test is
             let {} := foo;
             foo := Foo();
         end for;
+        let {} := foo;
         return ExitSuccess();
     end;
 end module body.
