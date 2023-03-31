@@ -1,0 +1,1 @@
+Allow dropping a mutable reference without explicitly consuming it.
