@@ -535,13 +535,35 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
      (* Once we leave the scope, remove the linear variables we added. *)
      let tbl: state_tbl = remove_entries tbl linear_names in
      tbl
-  | TAssign (_, _, expr) ->
+  | TAssign (_, lvalue, expr) ->
      (* Linear values can't be consumed in an L-value, because the only place
         where they could appear is as the index value to an array indexing
         operator (e.g. `[foo(x)]`) and that wouldn't typecheck in the first
-        place. *)
-     let tbl: state_tbl = check_expr tbl depth expr in
-     tbl
+        place. If the lvalue is a variable we can assign to it however, if it's been
+        consumed. *)
+     let (TypedLValue (var_name, path_elems)) = lvalue in
+     (match get_entry tbl var_name with
+      | Some (_, state) ->
+         (match path_elems with
+          | [] ->
+             (* Assigning to a variable. *)
+             (match state with
+              | Unconsumed | BorrowedRead | BorrowedWrite ->
+                 austral_raise LinearityError [
+                     Text "Cannot assign to the variable ";
+                     Code (ident_string var_name);
+                     Text " because it is not yet consumed."
+                   ]
+              | Consumed ->
+                 let tbl: state_tbl = update_tbl tbl var_name Unconsumed
+                 in
+                 tbl)
+          | _ ->
+             (* Assigning to a path. *)
+             let tbl: state_tbl = check_expr tbl depth expr in
+             tbl)
+      | None ->
+         tbl)
   | TIf (_, cond, tb, fb) ->
      let tbl: state_tbl = check_expr tbl depth cond in
      let true_tbl: state_tbl = check_stmt tbl depth tb in
