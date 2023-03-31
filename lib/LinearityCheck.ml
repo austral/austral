@@ -23,23 +23,23 @@ type var_state =
   | Consumed
 [@@deriving show]
 
-type state_tbl = StateTable of (identifier * loop_depth * var_state) list * identifier list
+type state_tbl = StateTable of (identifier * ty * loop_depth * var_state) list * identifier list
 [@@deriving show]
 
 let empty_tbl: state_tbl = StateTable ([], [])
 
-let table_rows (tbl: state_tbl): (identifier * loop_depth * var_state) list =
+let table_rows (tbl: state_tbl): (identifier * ty * loop_depth * var_state) list =
   let (StateTable (rows, _)) = tbl in
   rows
 
-let get_entry (tbl: state_tbl) (name: identifier): (loop_depth * var_state) option =
-  match (List.find_opt (fun (n, _,_) -> equal_identifier name n) (table_rows tbl)) with
-  | Some (_, depth, state) ->
-     Some (depth, state)
+let get_entry (tbl: state_tbl) (name: identifier): (ty * loop_depth * var_state) option =
+  match (List.find_opt (fun (n, _, _,_) -> equal_identifier name n) (table_rows tbl)) with
+  | Some (_, ty, depth, state) ->
+     Some (ty, depth, state)
   | None ->
      None
 
-let get_entry_or_fail (tbl: state_tbl) (name: identifier): (loop_depth * var_state) =
+let get_entry_or_fail (tbl: state_tbl) (name: identifier): (ty * loop_depth * var_state) =
   match get_entry tbl name with
   | Some p -> p
   | None ->
@@ -48,11 +48,11 @@ let get_entry_or_fail (tbl: state_tbl) (name: identifier): (loop_depth * var_sta
           ^ "` not in state table. Table contents: \n\n"
           ^ (show_state_tbl tbl))
 
-let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl =
+let add_entry (tbl: state_tbl) (name: identifier) (ty: ty) (depth: loop_depth): state_tbl =
   let (StateTable (rows, pending)) = tbl in
   match get_entry tbl name with
   | None ->
-     StateTable ((name, depth, Unconsumed) :: rows, pending)
+     StateTable ((name, ty, depth, Unconsumed) :: rows, pending)
   | Some _ ->
      (* The justification for this being an internal error is that the compiler
         should already have caught a duplicate variable. *)
@@ -67,11 +67,11 @@ let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl
                    ^ (ident_string name)
                    ^ "`, but no such variable exists in the state table. Table contents: \n\n"
                    ^ (show_state_tbl tbl))
-  | Some (depth, _) ->
+  | Some (ty, depth, _) ->
      let (StateTable (rows, pending)) = tbl in
-     let other_entries = List.filter (fun (n, _,_) -> not (equal_identifier name n)) rows
+     let other_entries = List.filter (fun (n, _, _,_) -> not (equal_identifier name n)) rows
      in
-     StateTable ((name, depth, state) :: other_entries, pending)
+     StateTable ((name, ty, depth, state) :: other_entries, pending)
 
 let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
   match get_entry tbl name with
@@ -81,10 +81,10 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
                    ^ (ident_string name)
                    ^ "`, but no such variable exists in the state table. Table contents: \n\n"
                    ^ (show_state_tbl tbl))
-  | Some (_, state) ->
+  | Some (_, _, state) ->
      if state = Consumed then
        let (StateTable (rows, pending)) = tbl in
-       let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) rows in
+       let others = List.filter (fun (n, _, _, _) -> not (equal_identifier name n)) rows in
        StateTable (others, pending)
      else
        austral_raise LinearityError [
@@ -100,7 +100,7 @@ let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   | [] ->
      tbl
 
-let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
+let tbl_to_list (tbl: state_tbl): (identifier * ty * loop_depth * var_state) list =
   table_rows tbl
 
 let get_pending (tbl: state_tbl): identifier list =
@@ -331,11 +331,11 @@ and count_ref_path_elem (elem: typed_ref_path_elem): appearances =
 (* Utilities *)
 
 let get_state (tbl: state_tbl) (name: identifier): var_state =
-  let (_, state) = get_entry_or_fail tbl name in
+  let (_, _, state) = get_entry_or_fail tbl name in
   state
 
 let get_loop_depth (tbl: state_tbl) (name: identifier): loop_depth =
-  let (depth, _) = get_entry_or_fail tbl name in
+  let (_, depth, _) = get_entry_or_fail tbl name in
   depth
 
 let is_unconsumed (tbl: state_tbl) (name: identifier): bool =
@@ -377,16 +377,16 @@ let partition (n: int): partitions =
 
 let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
   (* Tables should have the same set of variable names. *)
-  let names_a: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list a)
-  and names_b: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list b)
+  let names_a: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list a)
+  and names_b: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list b)
   in
   if List.equal equal_identifier names_a names_b then
     (* Make a list of triples with the variable name, its state in A, and its
        state in B. *)
     let common: (identifier * var_state * var_state) list =
-      List.filter_map (fun (name, _, state_a) ->
+      List.filter_map (fun (name, _, _, state_a) ->
           match get_entry b name with
-          | Some (_, state_b) ->
+          | Some (_, _, state_b) ->
              Some (name, state_a, state_b)
           | None ->
              None)
@@ -532,7 +532,7 @@ and error_already_consumed (name: identifier) =
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
      the expression. *)
-  let names: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list tbl) in
+  let names: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list tbl) in
   let f (tbl: state_tbl) (name: identifier): state_tbl =
     check_var_in_expr tbl depth name expr
   in
@@ -549,7 +549,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
      let tbl: state_tbl = check_expr tbl depth expr in
      (* If the type is linear, add an entry to the table. *)
      if universe_linear_ish (type_universe ty) then
-       let tbl: state_tbl = add_entry tbl name depth in
+       let tbl: state_tbl = add_entry tbl name ty depth in
        let tbl: state_tbl = check_stmt tbl depth body in
        (* Once we leave the scope, remove the variable we added. *)
        let tbl: state_tbl = remove_entry tbl name in
@@ -573,7 +573,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
        Util.iter_with_context
          (fun tbl (TypedBinding { rename; ty; _ }) ->
            if universe_linear_ish (type_universe ty) then
-             add_entry tbl rename depth
+             add_entry tbl rename ty depth
            else
              tbl)
          tbl
@@ -592,7 +592,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
      let (TypedLValue (var_name, path_elems)) = lvalue in
      let tbl: state_tbl = check_expr tbl depth expr in
      (match get_entry tbl var_name with
-      | Some (_, state) ->
+      | Some (_, _, state) ->
          (match path_elems with
           | [] ->
              (* Assigning to a variable. *)
@@ -688,15 +688,15 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
      let tbl: state_tbl = check_expr tbl depth expr in
      (* Ensure that all variables are Consumed. *)
      let _ =
-       List.map (fun (name, _, state) ->
+       List.map (fun (name, _, _, state) ->
            if state = Consumed then
              ()
            else
              austral_raise LinearityError [
-                 Text "The variable ";
-                 Code (ident_string name);
-                 Text " is not consumed by the time of the return statement. Did you forget to call a destructure, or destructure the contents?"
-               ])
+               Text "The variable ";
+               Code (ident_string name);
+               Text " is not consumed by the time of the return statement. Did you forget to call a destructure, or destructure the contents?"
+             ])
          (tbl_to_list tbl)
      in
      tbl
@@ -720,7 +720,7 @@ and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl
     Util.iter_with_context
       (fun tbl (TypedBinding { rename; ty; _ }) ->
         if universe_linear_ish (type_universe ty) then
-          add_entry tbl rename depth
+          add_entry tbl rename ty depth
         else
           tbl)
       tbl
@@ -736,7 +736,7 @@ let init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
   let f (tbl: state_tbl) (ValueParameter (name, ty)): state_tbl =
     if universe_linear_ish (type_universe ty) then
       (* Add this parameter to the list at depth zero. *)
-      add_entry tbl name 0
+      add_entry tbl name ty 0
     else
       tbl
   in
