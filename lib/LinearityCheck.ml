@@ -100,6 +100,13 @@ let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   | [] ->
      tbl
 
+let mark_owed (tbl: state_tbl) (name: identifier): state_tbl =
+  let (StateTable (rows, owed)) = tbl in
+  if List.exists (fun elem -> equal_identifier name elem) owed then
+    internal_err "Identifier twice marked owed."
+  else
+    StateTable (rows, owed)
+
 let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
   table_rows tbl
 
