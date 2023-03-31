@@ -5,8 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    The variable `r` was defined outside a loop, but you're trying to consume it inside a loop.
-
-    This is not allowed because it could be consumed zero times or more than once.
+    The  variable `r` was consumed in the loop, without afterwards being reassigned.
   Code:
     [no span available]
