@@ -1,0 +1,1 @@
+Test we can consume a linear value in a loop as long as we put it back later.
