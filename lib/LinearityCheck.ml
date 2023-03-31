@@ -23,13 +23,17 @@ type var_state =
   | Consumed
 [@@deriving show]
 
-type state_tbl = (identifier * loop_depth * var_state) list
+type state_tbl = StateTable of (identifier * loop_depth * var_state) list * identifier list
 [@@deriving show]
 
-let empty_tbl: state_tbl = []
+let empty_tbl: state_tbl = StateTable ([], [])
+
+let table_rows (tbl: state_tbl): (identifier * loop_depth * var_state) list =
+  let (StateTable (rows, _)) = tbl in
+  rows
 
 let get_entry (tbl: state_tbl) (name: identifier): (loop_depth * var_state) option =
-  match (List.find_opt (fun (n, _,_) -> equal_identifier name n) tbl) with
+  match (List.find_opt (fun (n, _,_) -> equal_identifier name n) (table_rows tbl)) with
   | Some (_, depth, state) ->
      Some (depth, state)
   | None ->
@@ -45,9 +49,10 @@ let get_entry_or_fail (tbl: state_tbl) (name: identifier): (loop_depth * var_sta
           ^ (show_state_tbl tbl))
 
 let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl =
+  let (StateTable (rows, owed)) = tbl in
   match get_entry tbl name with
   | None ->
-     (name, depth, Unconsumed) :: tbl
+     StateTable ((name, depth, Unconsumed) :: rows, owed)
   | Some _ ->
      (* The justification for this being an internal error is that the compiler
         should already have caught a duplicate variable. *)
@@ -63,9 +68,10 @@ let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl
                    ^ "`, but no such variable exists in the state table. Table contents: \n\n"
                    ^ (show_state_tbl tbl))
   | Some (depth, _) ->
-     let other_entries = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
+     let (StateTable (rows, owed)) = tbl in
+     let other_entries = List.filter (fun (n, _,_) -> not (equal_identifier name n)) rows
      in
-     (name, depth, state) :: other_entries
+     StateTable ((name, depth, state) :: other_entries, owed)
 
 let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
   match get_entry tbl name with
@@ -77,9 +83,9 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
                    ^ (show_state_tbl tbl))
   | Some (_, state) ->
      if state = Consumed then
-       let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) tbl
-       in
-       others
+       let (StateTable (rows, owed)) = tbl in
+       let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) rows in
+       StateTable (others, owed)
      else
        austral_raise LinearityError [
            Text "Forgot to consume a linear variable: ";
@@ -95,7 +101,7 @@ let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
      tbl
 
 let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
-  tbl
+  table_rows tbl
 
 type appearances = {
     consumed: int;
