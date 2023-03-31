@@ -100,27 +100,53 @@ let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   | [] ->
      tbl
 
-let mark_pending (tbl: state_tbl) (name: identifier): state_tbl =
-  let (StateTable (rows, pending)) = tbl in
-  if List.exists (fun elem -> equal_identifier name elem) pending then
-    internal_err "Identifier twice marked pending."
-  else
-    StateTable (rows, pending)
-
-let remove_pending (tbl: state_tbl) (name: identifier): state_tbl =
-  let (StateTable (rows, pending)) = tbl in
-  let pending' = List.filter (fun elem -> not (equal_identifier name elem)) pending in
-  if (List.length pending') = (List.length pending) then
-    internal_err "Tried to remove_pending an identifier not on the list of pending variables."
-  else
-    StateTable (rows, pending')
-
 let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
   table_rows tbl
 
 let get_pending (tbl: state_tbl): identifier list =
   let (StateTable (_, pending)) = tbl in
   pending
+
+let is_pending (tbl: state_tbl) (name: identifier): bool =
+  List.exists (fun elem -> equal_identifier name elem) (get_pending tbl)
+
+let mark_pending (tbl: state_tbl) (name: identifier): state_tbl =
+  let (StateTable (rows, pending)) = tbl in
+  if is_pending tbl name then
+    internal_err "Identifier twice marked pending."
+  else
+    StateTable (rows, pending)
+
+let remove_pending (tbl: state_tbl) (name: identifier): state_tbl =
+  if not (is_pending tbl name) then
+    internal_err "Tried to remove_pending an identifier not on the list of pending variables."
+  else
+    let (StateTable (rows, pending)) = tbl in
+    let pending' = List.filter (fun elem -> not (equal_identifier name elem)) pending in
+    StateTable (rows, pending')
+
+let subtract (a: identifier list) (b: identifier list): identifier list =
+  (* elements that are in a and not in b *)
+  let is_in (name: identifier) (l: identifier list): bool =
+    List.exists (fun elem -> equal_identifier name elem) l
+  in
+  List.filter (fun elem -> not (is_in elem b)) a
+
+let pending_error (names: identifier list) =
+  let c: int = List.length names in
+  austral_raise LinearityError [
+      Text "The ";
+      if (c = 1) then
+        Text " variable "
+      else
+        Text " variables ";
+      Code (String.concat ", " (List.map ident_string names));
+      if (c = 1) then
+        Text " was "
+      else
+        Text " were ";
+      Text "consumed in the loop, without afterwards being reassigned."
+    ]
 
 type appearances = {
     consumed: int;
@@ -602,14 +628,28 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
       | [] ->
          tbl)
   | TWhile (_, cond, body) ->
+     let pending_before: identifier list = get_pending tbl in
      let tbl: state_tbl = check_expr tbl depth cond in
      let tbl: state_tbl = check_stmt tbl (depth + 1) body in
-     tbl
+     let pending_after: identifier list = get_pending tbl in
+     (* pending_after - pending_before = variables consumed in the loop and not
+        assigned to *)
+     let new_pending: identifier list = subtract pending_after pending_before in
+     if (List.length new_pending) > 0 then
+       pending_error new_pending
+     else
+       tbl
   | TFor (_, _, start, final, body) ->
      let tbl: state_tbl = check_expr tbl depth start in
      let tbl: state_tbl = check_expr tbl depth final in
+     let pending_before: identifier list = get_pending tbl in
      let tbl: state_tbl = check_stmt tbl (depth + 1) body in
-     tbl
+     let pending_after: identifier list = get_pending tbl in
+     let new_pending: identifier list = subtract pending_after pending_before in
+     if (List.length new_pending) > 0 then
+       pending_error new_pending
+     else
+       tbl
   | TBorrow { original; mode; body; _ } ->
      (* Ensure the original variable is unconsumed to be borrowed. *)
      if is_unconsumed tbl original then
