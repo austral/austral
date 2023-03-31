@@ -3,8 +3,9 @@ module body Test is
 
     function main(): ExitCode is
         let foo: Foo := Foo();
-        foo := Foo();
-        let {} := foo;
+        let {} := foo;  -- Consume
+        foo := Foo();   -- Assign
+        let {} := foo;  -- Consume
         return ExitSuccess();
     end;
 end module body.
