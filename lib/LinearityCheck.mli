@@ -43,8 +43,8 @@ val remove_entry : state_tbl -> identifier -> state_tbl
 (** Remove a set of variables from the table. If any of them are not consumed, throws an error. *)
 val remove_entries : state_tbl -> identifier list -> state_tbl
 
-(** When a variable defined outside a loop is consumed inside a loop, it is marked as owed. *)
-val mark_owed : state_tbl -> identifier -> state_tbl
+(** When a variable defined outside a loop is consumed inside a loop, it is marked as pending. *)
+val mark_pending : state_tbl -> identifier -> state_tbl
 
 (** Return all entries as a list. *)
 val tbl_to_list : state_tbl -> (identifier * loop_depth * var_state) list

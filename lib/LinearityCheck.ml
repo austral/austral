@@ -49,10 +49,10 @@ let get_entry_or_fail (tbl: state_tbl) (name: identifier): (loop_depth * var_sta
           ^ (show_state_tbl tbl))
 
 let add_entry (tbl: state_tbl) (name: identifier) (depth: loop_depth): state_tbl =
-  let (StateTable (rows, owed)) = tbl in
+  let (StateTable (rows, pending)) = tbl in
   match get_entry tbl name with
   | None ->
-     StateTable ((name, depth, Unconsumed) :: rows, owed)
+     StateTable ((name, depth, Unconsumed) :: rows, pending)
   | Some _ ->
      (* The justification for this being an internal error is that the compiler
         should already have caught a duplicate variable. *)
@@ -68,10 +68,10 @@ let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl
                    ^ "`, but no such variable exists in the state table. Table contents: \n\n"
                    ^ (show_state_tbl tbl))
   | Some (depth, _) ->
-     let (StateTable (rows, owed)) = tbl in
+     let (StateTable (rows, pending)) = tbl in
      let other_entries = List.filter (fun (n, _,_) -> not (equal_identifier name n)) rows
      in
-     StateTable ((name, depth, state) :: other_entries, owed)
+     StateTable ((name, depth, state) :: other_entries, pending)
 
 let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
   match get_entry tbl name with
@@ -83,9 +83,9 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
                    ^ (show_state_tbl tbl))
   | Some (_, state) ->
      if state = Consumed then
-       let (StateTable (rows, owed)) = tbl in
+       let (StateTable (rows, pending)) = tbl in
        let others = List.filter (fun (n, _,_) -> not (equal_identifier name n)) rows in
-       StateTable (others, owed)
+       StateTable (others, pending)
      else
        austral_raise LinearityError [
            Text "Forgot to consume a linear variable: ";
@@ -100,12 +100,12 @@ let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   | [] ->
      tbl
 
-let mark_owed (tbl: state_tbl) (name: identifier): state_tbl =
-  let (StateTable (rows, owed)) = tbl in
-  if List.exists (fun elem -> equal_identifier name elem) owed then
-    internal_err "Identifier twice marked owed."
+let mark_pending (tbl: state_tbl) (name: identifier): state_tbl =
+  let (StateTable (rows, pending)) = tbl in
+  if List.exists (fun elem -> equal_identifier name elem) pending then
+    internal_err "Identifier twice marked pending."
   else
-    StateTable (rows, owed)
+    StateTable (rows, pending)
 
 let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
   table_rows tbl
