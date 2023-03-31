@@ -1,0 +1,1 @@
+Test we can assign to a linear variable after it has been consumed on the right side of the assignment.
