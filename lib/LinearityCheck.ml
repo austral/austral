@@ -555,8 +555,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
                      Text " because it is not yet consumed."
                    ]
               | Consumed ->
-                 let tbl: state_tbl = update_tbl tbl var_name Unconsumed
-                 in
+                 let tbl: state_tbl = update_tbl tbl var_name Unconsumed in
                  tbl)
           | _ ->
              (* Assigning to a path. *)
