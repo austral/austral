@@ -46,6 +46,9 @@ val remove_entries : state_tbl -> identifier list -> state_tbl
 (** When a variable defined outside a loop is consumed inside a loop, it is marked as pending. *)
 val mark_pending : state_tbl -> identifier -> state_tbl
 
+(** When a pending variable is assigned to, it is removed from the pending list. *)
+val remove_pending : state_tbl -> identifier -> state_tbl
+
 (** Return all entries as a list. *)
 val tbl_to_list : state_tbl -> (identifier * loop_depth * var_state) list
 

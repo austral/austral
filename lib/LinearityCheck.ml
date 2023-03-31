@@ -107,6 +107,14 @@ let mark_pending (tbl: state_tbl) (name: identifier): state_tbl =
   else
     StateTable (rows, pending)
 
+let remove_pending (tbl: state_tbl) (name: identifier): state_tbl =
+  let (StateTable (rows, pending)) = tbl in
+  let pending' = List.filter (fun elem -> not (equal_identifier name elem)) pending in
+  if (List.length pending') = (List.length pending) then
+    internal_err "Tried to remove_pending an identifier not on the list of pending variables."
+  else
+    StateTable (rows, pending')
+
 let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
   table_rows tbl
 
