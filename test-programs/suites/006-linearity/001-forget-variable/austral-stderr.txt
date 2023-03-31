@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    The variable `r` is not consumed by the time of the return statement. Did you forget to call a destructure, or destructure the contents?
+    The variable `r` is not consumed by the time of the return statement. Did you forget to call a destructor, or destructure the contents?
   Code:
     [no span available]
