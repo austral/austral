@@ -590,6 +590,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
         place. If the lvalue is a variable we can assign to it however, if it's been
         consumed. *)
      let (TypedLValue (var_name, path_elems)) = lvalue in
+     let tbl: state_tbl = check_expr tbl depth expr in
      (match get_entry tbl var_name with
       | Some (_, state) ->
          (match path_elems with
@@ -610,7 +611,6 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
                    tbl)
           | _ ->
              (* Assigning to a path. *)
-             let tbl: state_tbl = check_expr tbl depth expr in
              tbl)
       | None ->
          tbl)
