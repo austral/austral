@@ -1,1 +1,1 @@
-Test a linear value create inside a for loop cannot be consumed inside that loop.
+Test a linear value create inside a for loop cannot be consumed inside that loop without putting it back in.
