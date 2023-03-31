@@ -242,17 +242,6 @@ let lvalue_index () =
     Text "The array index operator doesn't work in lvalues."
   ]
 
-let lvalue_not_free () =
-  austral_raise LinearityError [
-    Text "Only values in the ";
-    Code "Free";
-    Text " universe can be assigned to.";
-    Break;
-    Text "Consider using the ";
-    Code "swap";
-    Text " function instead."
-  ]
-
 let no_such_slot ~type_name ~slot_name =
   austral_raise TypeError [
     Text "The type ";
