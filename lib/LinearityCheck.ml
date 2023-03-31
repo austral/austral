@@ -604,7 +604,10 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
                    ]
               | Consumed ->
                  let tbl: state_tbl = update_tbl tbl var_name Unconsumed in
-                 tbl)
+                 if is_pending tbl var_name then
+                   remove_pending tbl var_name
+                 else
+                   tbl)
           | _ ->
              (* Assigning to a path. *)
              let tbl: state_tbl = check_expr tbl depth expr in
