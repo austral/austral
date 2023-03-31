@@ -115,7 +115,7 @@ let mark_pending (tbl: state_tbl) (name: identifier): state_tbl =
   if is_pending tbl name then
     internal_err "Identifier twice marked pending."
   else
-    StateTable (rows, pending)
+    StateTable (rows, name :: pending)
 
 let remove_pending (tbl: state_tbl) (name: identifier): state_tbl =
   if not (is_pending tbl name) then
