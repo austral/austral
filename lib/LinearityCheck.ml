@@ -442,16 +442,13 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
      error_already_consumed name
 
 and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier): state_tbl =
-   if depth = get_loop_depth tbl name then
-      update_tbl tbl name Consumed
-   else
-      austral_raise LinearityError [
-         Text "The variable ";
-         Code (ident_string name);
-         Text " was defined outside a loop, but you're trying to consume it inside a loop.";
-         Break;
-         Text "This is not allowed because it could be consumed zero times or more than once."
-       ]
+  let tbl: state_tbl = update_tbl tbl name Consumed in
+  if depth <> get_loop_depth tbl name then
+    (* Consumed inside a loop, so mark it as pending. *)
+    mark_pending tbl name
+  else
+    (* Nothing else to do. *)
+    tbl
 
 and error_borrowed_mutably_and_used (name: identifier) =
    austral_raise LinearityError [
