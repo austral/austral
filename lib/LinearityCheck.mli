@@ -52,6 +52,9 @@ val remove_pending : state_tbl -> identifier -> state_tbl
 (** Return all entries as a list. *)
 val tbl_to_list : state_tbl -> (identifier * loop_depth * var_state) list
 
+(** Get the list of pending variables. *)
+val get_pending : state_tbl -> identifier list
+
 (** Represents the number of times a given variable appears in an expression in different ways. *)
 type appearances
 

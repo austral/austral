@@ -118,6 +118,10 @@ let remove_pending (tbl: state_tbl) (name: identifier): state_tbl =
 let tbl_to_list (tbl: state_tbl): (identifier * loop_depth * var_state) list =
   table_rows tbl
 
+let get_pending (tbl: state_tbl): identifier list =
+  let (StateTable (_, pending)) = tbl in
+  pending
+
 type appearances = {
     consumed: int;
     read: int;
