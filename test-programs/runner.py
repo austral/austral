@@ -544,6 +544,9 @@ def _run_program_failure_test(test: Test):
 def run_all_tests(suites: list, suite_pattern: str = "", name_pattern: str = ""):
     """
     Run the given suites.
+
+    If suite_pattern is given, only tests in suites containing the given string are considered.
+    If name_pattern is given, only tests that have names containing the given string are run.
     An empty pattern means match all.
     """
     for suite in suites:
