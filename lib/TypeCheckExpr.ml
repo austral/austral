@@ -571,6 +571,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      TSizeOf (parse_typespec ctx ty)
   | BorrowExpr (mode, name) ->
      augment_borrow_expr ctx mode name
+  | Reborrow name ->
+     augment_reborrow ctx name
 
 (* Type Checking: Internals *)
 
@@ -942,6 +944,41 @@ and augment_borrow_expr (ctx: expr_ctx) (mode: borrowing_mode) (name: qident): t
       Errors.unknown_name
         ~kind:"variable"
         ~name:(original_name name))
+
+and augment_reborrow (ctx: expr_ctx) (name: qident): texpr =
+  (* Find the variable's type and source. *)
+  let (ty, src): ty * var_source =
+    (match get_variable (ctx_env ctx) (ctx_lexenv ctx) name with
+     | Some (ty, src) ->
+        (ty, src)
+     | None ->
+        Errors.unknown_name
+          ~kind:"variable"
+          ~name:(original_name name))
+  in
+  (* Check it's either a local variable or a function parameter. *)
+  let _ =
+    (match src with
+     | VarParam -> ()
+     | VarLocal -> ()
+     | VarConstant ->
+        Errors.reborrow_constant ())
+  in
+  (* Check the type is a mutable reference, get the pointed-to type. *)
+  let pointed_to: ty =
+    (match ty with
+     | WriteRef (ty, _) ->
+        ty
+     | _ ->
+        Errors.reborrow_wrong_type ty)
+  in
+  (* Create a fresh region. *)
+  let reg: region = fresh_region () in
+  (* Construct the type of the new reference: same pointed-to type but change the
+     region. *)
+  let ty: ty = WriteRef (pointed_to, RegionTy reg) in
+  (* Construct the expression. *)
+  TReborrow (original_name name, ty, reg)
 
 and augment_arglist (ctx: expr_ctx) (args: abstract_arglist): typed_arglist =
   match args with
