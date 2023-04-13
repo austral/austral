@@ -532,7 +532,7 @@ and error_already_consumed (name: identifier) =
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
      the expression. *)
-  let names: identifier list = List.map (fun (name, _, _) -> name) (tbl_to_list tbl) in
+  let names: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list tbl) in
   let f (tbl: state_tbl) (name: identifier): state_tbl =
     check_var_in_expr tbl depth name expr
   in
