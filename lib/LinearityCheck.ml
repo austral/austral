@@ -468,21 +468,25 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
      error_borrowed_mutably_and_used name
   | (     Unconsumed,         Zero,  MoreThanOne,           _,          _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
      error_borrowed_mutably_more_than_once name
-  | (     Unconsumed,          One,         Zero,           _,       Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid IF the loop depth matches. *)
+  | (     Unconsumed,          One,         Zero,        Zero,       Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid (but owed if the loop depth doesn't match). *)
      consume_once tbl depth name
   | (     Unconsumed,          One,            _,           _,          _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
      error_consumed_and_something_else name
   | (     Unconsumed,  MoreThanOne,            _,           _,          _,           _) -> (* Not yet consumed, consumed more than once. *)
      error_consumed_more_than_once name
-  | (   BorrowedRead,         Zero,         Zero,           _,       Zero,           _) -> (* Read borrowed, and at most accessed through a path. *)
+  | (     Unconsumed,            _,            _,         One,          _,           _) -> (* Not yet consumed, reborrowed once. *)
      tbl
-  | (   BorrowedRead,            _,            _,           _,          _,           _) -> (* Read borrowed, and either consumed or borrowed again. *)
+  | (     Unconsumed,            _,            _, MoreThanOne,          _,           _) -> (* Not yet consumed, reborrowed more than once. *)
+     error_reborrowed_more_than_once name
+  | (   BorrowedRead,         Zero,         Zero,        Zero,       Zero,           _) -> (* Read borrowed, and at most accessed through a path. *)
+     tbl
+  | (   BorrowedRead,            _,            _,           _,          _,           _) -> (* Read borrowed, and either consumed, reborrowed or borrowed again. *)
      error_read_borrowed_and_something_else name
-  | (  BorrowedWrite,         Zero,         Zero,           _,       Zero,        Zero) -> (* Write borrowed, unused. *)
+  | (  BorrowedWrite,         Zero,         Zero,        Zero,       Zero,        Zero) -> (* Write borrowed, unused. *)
      tbl
   | (  BorrowedWrite,            _,            _,           _,          _,           _) -> (* Write borrowed, used in some way. *)
      error_write_borrowed_and_something_else name
-  | (       Consumed,         Zero,         Zero,           _,       Zero,        Zero) -> (* Already consumed, and unused. *)
+  | (       Consumed,         Zero,         Zero,        Zero,       Zero,        Zero) -> (* Already consumed, and unused. *)
      tbl
   | (       Consumed,            _,            _,           _,          _,           _) -> (* Already consumed, and used in some way. *)
      error_already_consumed name
@@ -548,6 +552,14 @@ and error_already_consumed (name: identifier) =
       Code (ident_string name);
       Text " has already been consumed.";
    ]
+
+and error_reborrowed_more_than_once (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Text " is reborrowed multiple times in the same expression.";
+   ]
+
 
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
