@@ -460,11 +460,11 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
   match tup with
   (*       State        Consumed      WBorrow      Reborrow     RBorrow      Path    *)
   (* ---------------|-------------|-------------|------------|-----------|---------- *)
-  | (     Unconsumed,         Zero,         Zero,           _,          _,           _) -> (* Not yet consumed, and at most used through immutable borrows or path reads. *)
+  | (     Unconsumed,         Zero,         Zero,        Zero,          _,           _) -> (* Not yet consumed, and at most used through immutable borrows or path reads. *)
      tbl
-  | (     Unconsumed,         Zero,          One,           _,       Zero,        Zero) -> (* Not yet consumed, borrowed mutably once, and nothing else. *)
+  | (     Unconsumed,         Zero,          One,        Zero,       Zero,        Zero) -> (* Not yet consumed, borrowed mutably once, and nothing else. *)
      tbl
-  | (     Unconsumed,         Zero,          One,           _,          _,           _) -> (* Not yet consumed, borrowed mutably, then either borrowed immutably or accessed through a path. *)
+  | (     Unconsumed,         Zero,          One,           _,          _,           _) -> (* Not yet consumed, borrowed mutably, then either reborrowed, borrowed immutably or accessed through a path. *)
      error_borrowed_mutably_and_used name
   | (     Unconsumed,         Zero,  MoreThanOne,           _,          _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
      error_borrowed_mutably_more_than_once name
