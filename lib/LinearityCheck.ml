@@ -453,7 +453,7 @@ let rec table_list_is_consistent (lst: state_tbl list): unit =
 
 (* Linearity checking in expressions *)
 
-let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
+let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (ty: ty) (expr: texpr): state_tbl =
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
   (* Destructure apps. *)
@@ -475,6 +475,8 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
      error_borrowed_mutably_more_than_once name
   | (     Unconsumed,          One,         Zero,        Zero,       Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid (but owed if the loop depth doesn't match). *)
      consume_once tbl depth name
+  | (     Unconsumed,          One,         Zero,        Zero,       Zero,           _) -> (* Not yet consumed, consumed once, accessed through a path. Valid if it's a mutable reference. *)
+     let _ = maybe_error_consumed_and_accessed_through_path name ty in tbl
   | (     Unconsumed,          One,            _,           _,          _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
      error_consumed_and_something_else name
   | (     Unconsumed,  MoreThanOne,            _,           _,          _,           _) -> (* Not yet consumed, consumed more than once. *)
@@ -537,6 +539,17 @@ and error_consumed_more_than_once (name: identifier) =
       Text " is consumed multiple times within the same expression.";
    ]
 
+and maybe_error_consumed_and_accessed_through_path (name: identifier) (ty: ty) =
+   match ty with
+   | WriteRef _ ->
+     ()
+   | _ ->
+      austral_raise LinearityError [
+         Text "The variable ";
+         Code (ident_string name);
+         Text " cannot be consumed and also accessed through a path in the same expression.";
+      ]
+
 and error_read_borrowed_and_something_else (name: identifier) =
    austral_raise LinearityError [
       Text "The variable ";
@@ -569,11 +582,11 @@ and error_reborrowed_more_than_once (name: identifier) =
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
      the expression. *)
-  let names: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list tbl) in
-  let f (tbl: state_tbl) (name: identifier): state_tbl =
-    check_var_in_expr tbl depth name expr
+  let vars: (identifier * ty) list = List.map (fun (name, ty, _, _) -> (name, ty)) (tbl_to_list tbl) in
+  let f (tbl: state_tbl) (name, ty): state_tbl =
+    check_var_in_expr tbl depth name ty expr
   in
-  Util.iter_with_context f tbl names
+  Util.iter_with_context f tbl vars
 
 (* Linearity checking *)
 
