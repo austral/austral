@@ -1,0 +1,18 @@
+module body Test is
+    record Foo: Linear is
+    end;
+    
+    generic [R: Region, S: Region]
+    function bar(a: &![Foo, R], b: &![Foo, S]): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        let foo: Foo := Foo();
+        borrow! foo as fooref in R do
+            bar(reborrow(fooref), reborrow(fooref));
+        end;
+        let {} := foo;
+        return ExitSuccess();
+    end;
+end module body.

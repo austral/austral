@@ -93,6 +93,8 @@ and abs_expr im expr =
      SizeOf (qualify_typespec im ty)
   | CBorrowExpr (_, mode, var) ->
      BorrowExpr (mode, qualify_identifier im var)
+  | CReborrow (_, name) ->
+     Reborrow (qualify_identifier im name)
 
 and abs_when im (ConcreteWhen (name, bindings, body)) =
   AbstractWhen (name,

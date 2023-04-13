@@ -81,8 +81,9 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
                    ^ (ident_string name)
                    ^ "`, but no such variable exists in the state table. Table contents: \n\n"
                    ^ (show_state_tbl tbl))
-  | Some (_, _, state) ->
-     if state = Consumed then
+  | Some (ty, _, state) ->
+     let is_write_ref: bool = match ty with WriteRef _ -> true | _ -> false in
+     if (state = Consumed) || is_write_ref then
        let (StateTable (rows, pending)) = tbl in
        let others = List.filter (fun (n, _, _, _) -> not (equal_identifier name n)) rows in
        StateTable (others, pending)
@@ -153,6 +154,7 @@ type appearances = {
     read: int;
     write: int;
     path: int;
+    reborrow: int;
   }
 
 let zero_appearances: appearances = {
@@ -160,6 +162,7 @@ let zero_appearances: appearances = {
     read = 0;
     write = 0;
     path = 0;
+    reborrow = 0;
   }
 
 let consumed_once: appearances = {
@@ -167,6 +170,7 @@ let consumed_once: appearances = {
     read = 0;
     write = 0;
     path = 0;
+    reborrow = 0;
   }
 
 let read_once: appearances = {
@@ -174,6 +178,7 @@ let read_once: appearances = {
     read = 1;
     write = 0;
     path = 0;
+    reborrow = 0;
   }
 
 let write_once: appearances = {
@@ -181,6 +186,7 @@ let write_once: appearances = {
     read = 0;
     write = 1;
     path = 0;
+    reborrow = 0;
   }
 
 let path_once: appearances = {
@@ -188,6 +194,15 @@ let path_once: appearances = {
     read = 0;
     write = 0;
     path = 1;
+    reborrow = 0;
+  }
+
+let reborrow_once: appearances = {
+    consumed = 0;
+    read = 0;
+    write = 0;
+    path = 0;
+    reborrow = 1;
   }
 
 let merge (a: appearances) (b: appearances): appearances =
@@ -196,6 +211,7 @@ let merge (a: appearances) (b: appearances): appearances =
     read = a.read + b.read;
     write = a.write + b.write;
     path = a.path + b.path;
+    reborrow = a.reborrow + b.reborrow;
   }
 
 let merge_list (l: appearances list): appearances =
@@ -313,6 +329,11 @@ let rec count (name: identifier) (expr: texpr): appearances =
            write_once)
      else
        zero_appearances
+  | TReborrow (name', _, _) ->
+     if equal_identifier name name' then
+       reborrow_once
+     else
+       zero_appearances
 
 and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
   match elem with
@@ -377,8 +398,12 @@ let partition (n: int): partitions =
 
 let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
   (* Tables should have the same set of variable names. *)
-  let names_a: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list a)
-  and names_b: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list b)
+  let state_table_names (tbl: state_tbl): identifier list =
+    let l: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list tbl) in
+    List.sort (fun a b -> String.compare (ident_string a) (ident_string b)) l
+  in
+  let names_a: identifier list = state_table_names a
+  and names_b: identifier list = state_table_names b
   in
   if List.equal equal_identifier names_a names_b then
     (* Make a list of triples with the variable name, its state in A, and its
@@ -428,43 +453,49 @@ let rec table_list_is_consistent (lst: state_tbl list): unit =
 
 (* Linearity checking in expressions *)
 
-let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (expr: texpr): state_tbl =
+let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier) (ty: ty) (expr: texpr): state_tbl =
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
   (* Destructure apps. *)
-  let { consumed: int; write: int; read: int; path: int } = apps in
+  let { consumed: int; write: int; read: int; path: int; reborrow: int } = apps in
   (* What is the current state of this variable? *)
   let state: var_state = get_state tbl name in
   (* Make a tuple with the variable's state, and the partitioned appearances. *)
-  let tup = (state, partition consumed, partition write, partition read, partition path) in
+  let tup = (state, partition consumed, partition write, partition reborrow, partition read, partition path) in
   match tup with
-  (*       State        Consumed      WBorrow       RBorrow      Path    *)
-  (* ---------------|-------------|-------------|------------|---------- *)
-  | (     Unconsumed,         Zero,         Zero,           _,           _) -> (* Not yet consumed, and at most used through immutable borrows or path reads. *)
+  (*       State        Consumed      WBorrow      Reborrow     RBorrow      Path    *)
+  (* ---------------|-------------|-------------|------------|-----------|---------- *)
+  | (     Unconsumed,         Zero,         Zero,        Zero,          _,           _) -> (* Not yet consumed, and at most used through immutable borrows or path reads. *)
      tbl
-  | (     Unconsumed,         Zero,          One,        Zero,        Zero) -> (* Not yet consumed, borrowed mutably once, and nothing else. *)
+  | (     Unconsumed,         Zero,          One,        Zero,       Zero,        Zero) -> (* Not yet consumed, borrowed mutably once, and nothing else. *)
      tbl
-  | (     Unconsumed,         Zero,          One,           _,           _) -> (* Not yet consumed, borrowed mutably, then either borrowed immutably or accessed through a path. *)
+  | (     Unconsumed,         Zero,          One,           _,          _,           _) -> (* Not yet consumed, borrowed mutably, then either reborrowed, borrowed immutably or accessed through a path. *)
      error_borrowed_mutably_and_used name
-  | (     Unconsumed,         Zero,  MoreThanOne,           _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
+  | (     Unconsumed,         Zero,  MoreThanOne,           _,          _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
      error_borrowed_mutably_more_than_once name
-  | (     Unconsumed,          One,         Zero,        Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid IF the loop depth matches. *)
+  | (     Unconsumed,          One,         Zero,        Zero,       Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid (but owed if the loop depth doesn't match). *)
      consume_once tbl depth name
-  | (     Unconsumed,          One,            _,           _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
+  | (     Unconsumed,          One,         Zero,        Zero,       Zero,           _) -> (* Not yet consumed, consumed once, accessed through a path. Valid if it's a mutable reference. *)
+     let _ = maybe_error_consumed_and_accessed_through_path name ty in tbl
+  | (     Unconsumed,          One,            _,           _,          _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
      error_consumed_and_something_else name
-  | (     Unconsumed,  MoreThanOne,            _,           _,           _) -> (* Not yet consumed, consumed more than once. *)
+  | (     Unconsumed,  MoreThanOne,            _,           _,          _,           _) -> (* Not yet consumed, consumed more than once. *)
      error_consumed_more_than_once name
-  | (   BorrowedRead,         Zero,         Zero,        Zero,           _) -> (* Read borrowed, and at most accessed through a path. *)
+  | (     Unconsumed,            _,            _,         One,          _,           _) -> (* Not yet consumed, reborrowed once. *)
      tbl
-  | (   BorrowedRead,            _,            _,           _,           _) -> (* Read borrowed, and either consumed or borrowed again. *)
+  | (     Unconsumed,            _,            _, MoreThanOne,          _,           _) -> (* Not yet consumed, reborrowed more than once. *)
+     error_reborrowed_more_than_once name
+  | (   BorrowedRead,         Zero,         Zero,        Zero,       Zero,           _) -> (* Read borrowed, and at most accessed through a path. *)
+     tbl
+  | (   BorrowedRead,            _,            _,           _,          _,           _) -> (* Read borrowed, and either consumed, reborrowed or borrowed again. *)
      error_read_borrowed_and_something_else name
-  | (  BorrowedWrite,         Zero,         Zero,        Zero,        Zero) -> (* Write borrowed, unused. *)
+  | (  BorrowedWrite,         Zero,         Zero,        Zero,       Zero,        Zero) -> (* Write borrowed, unused. *)
      tbl
-  | (  BorrowedWrite,            _,            _,           _,           _) -> (* Write borrowed, used in some way. *)
+  | (  BorrowedWrite,            _,            _,           _,          _,           _) -> (* Write borrowed, used in some way. *)
      error_write_borrowed_and_something_else name
-  | (       Consumed,         Zero,         Zero,        Zero,        Zero) -> (* Already consumed, and unused. *)
+  | (       Consumed,         Zero,         Zero,        Zero,       Zero,        Zero) -> (* Already consumed, and unused. *)
      tbl
-  | (       Consumed,            _,            _,           _,           _) -> (* Already consumed, and used in some way. *)
+  | (       Consumed,            _,            _,           _,          _,           _) -> (* Already consumed, and used in some way. *)
      error_already_consumed name
 
 and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier): state_tbl =
@@ -496,7 +527,7 @@ and error_consumed_and_something_else (name: identifier) =
    austral_raise LinearityError [
       Text "The variable ";
       Code (ident_string name);
-      Code " is consumed in the same expression where it is used in some other way.";
+      Text " is consumed in the same expression where it is used in some other way.";
       Break;
       Text "A linear variable cannot appear multiple times in the expression that consumes it.";
    ]
@@ -507,6 +538,17 @@ and error_consumed_more_than_once (name: identifier) =
       Code (ident_string name);
       Text " is consumed multiple times within the same expression.";
    ]
+
+and maybe_error_consumed_and_accessed_through_path (name: identifier) (ty: ty) =
+   match ty with
+   | WriteRef _ ->
+     ()
+   | _ ->
+      austral_raise LinearityError [
+         Text "The variable ";
+         Code (ident_string name);
+         Text " cannot be consumed and also accessed through a path in the same expression.";
+      ]
 
 and error_read_borrowed_and_something_else (name: identifier) =
    austral_raise LinearityError [
@@ -529,14 +571,22 @@ and error_already_consumed (name: identifier) =
       Text " has already been consumed.";
    ]
 
+and error_reborrowed_more_than_once (name: identifier) =
+   austral_raise LinearityError [
+      Text "The variable ";
+      Code (ident_string name);
+      Text " is reborrowed multiple times in the same expression.";
+   ]
+
+
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
      the expression. *)
-  let names: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list tbl) in
-  let f (tbl: state_tbl) (name: identifier): state_tbl =
-    check_var_in_expr tbl depth name expr
+  let vars: (identifier * ty) list = List.map (fun (name, ty, _, _) -> (name, ty)) (tbl_to_list tbl) in
+  let f (tbl: state_tbl) (name, ty): state_tbl =
+    check_var_in_expr tbl depth name ty expr
   in
-  Util.iter_with_context f tbl names
+  Util.iter_with_context f tbl vars
 
 (* Linearity checking *)
 
@@ -653,7 +703,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
        pending_error new_pending
      else
        tbl
-  | TBorrow { original; mode; body; _ } ->
+  | TBorrow { original; mode; body; rename; ref_type; _ } ->
      (* Ensure the original variable is unconsumed to be borrowed. *)
      if is_unconsumed tbl original then
        let tbl: state_tbl =
@@ -663,10 +713,26 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          | WriteBorrow ->
             update_tbl tbl original BorrowedWrite
        in
+       (* If it's a mutable borrow, add the reference variable. *)
+       let tbl: state_tbl =
+         match mode with
+         | WriteBorrow ->
+           add_entry tbl rename ref_type depth
+         | ReadBorrow ->
+            tbl
+       in
        (* Traverse the body. *)
        let tbl: state_tbl = check_stmt tbl depth body in
        (* After the body, unborrow the variable. *)
        let tbl: state_tbl = update_tbl tbl original Unconsumed in
+       (* If it's a mutable borrow, remove the reference from the state table. *)
+       let tbl: state_tbl =
+         match mode with
+         | ReadBorrow ->
+            tbl
+         | WriteBorrow ->
+            remove_entry tbl rename
+       in
        tbl
      else
        let state: var_state = get_state tbl original in

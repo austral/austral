@@ -98,6 +98,7 @@ and mexpr =
   | MTypecast of mexpr * mono_ty
   | MSizeOf of mono_ty
   | MBorrowExpr of borrowing_mode * identifier * region * mono_ty
+  | MReborrow of identifier * mono_ty * region
 
 and mtyped_when =
   MTypedWhen of identifier * mono_binding list * mstmt
@@ -196,3 +197,5 @@ let rec get_type (e: mexpr): mono_ty =
          MonoReadRef (ty, MonoRegionTy region)
       | WriteBorrow ->
          MonoWriteRef (ty, MonoRegionTy region))
+  | MReborrow (_, ty, region) ->
+     MonoWriteRef (ty, MonoRegionTy region)

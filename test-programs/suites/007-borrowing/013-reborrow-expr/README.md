@@ -1,0 +1,1 @@
+Test that reborrowing works as expected.
