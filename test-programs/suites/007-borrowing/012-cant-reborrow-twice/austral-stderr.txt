@@ -1,0 +1,10 @@
+Error:
+  Title: Linearity Error
+  Module:
+    Test
+  Location:
+    [no span available]
+  Description:
+    The variable `fooref` is reborrowed multiple times in the same expression.
+  Code:
+    [no span available]
