@@ -685,7 +685,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
        pending_error new_pending
      else
        tbl
-  | TBorrow { original; mode; body; _ } ->
+  | TBorrow { original; mode; body; rename; ref_type; _ } ->
      (* Ensure the original variable is unconsumed to be borrowed. *)
      if is_unconsumed tbl original then
        let tbl: state_tbl =
@@ -694,6 +694,14 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
             update_tbl tbl original BorrowedRead
          | WriteBorrow ->
             update_tbl tbl original BorrowedWrite
+       in
+       (* If it's a mutable borrow, add the reference variable. *)
+       let tbl: state_tbl =
+         match mode with
+         | WriteBorrow ->
+           add_entry tbl rename ref_type depth
+         | ReadBorrow ->
+            tbl
        in
        (* Traverse the body. *)
        let tbl: state_tbl = check_stmt tbl depth body in
