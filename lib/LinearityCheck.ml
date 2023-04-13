@@ -153,6 +153,7 @@ type appearances = {
     read: int;
     write: int;
     path: int;
+    reborrow: int;
   }
 
 let zero_appearances: appearances = {
