@@ -525,7 +525,7 @@ and error_consumed_and_something_else (name: identifier) =
    austral_raise LinearityError [
       Text "The variable ";
       Code (ident_string name);
-      Code " is consumed in the same expression where it is used in some other way.";
+      Text " is consumed in the same expression where it is used in some other way.";
       Break;
       Text "A linear variable cannot appear multiple times in the expression that consumes it.";
    ]
