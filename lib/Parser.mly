@@ -41,6 +41,7 @@ open Span
 /* Borrowing */
 %token BORROW_WRITE
 %token BORROW_READ
+%token REBORROW
 %token REF_TRANSFORM
 /* Keywords */
 %token MODULE
