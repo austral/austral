@@ -196,6 +196,14 @@ let path_once: appearances = {
     reborrow = 0;
   }
 
+let reborrow_once: appearances = {
+    consumed = 0;
+    read = 0;
+    write = 0;
+    path = 0;
+    reborrow = 1;
+  }
+
 let merge (a: appearances) (b: appearances): appearances =
   {
     consumed = a.consumed + b.consumed;
