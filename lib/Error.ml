@@ -168,7 +168,7 @@ let internal_err (message: string) =
         module_name = None;
         kind = InternalError;
         text = [
-            Text "Internal compiler error:";
+            Text "Internal compiler error: ";
             Text message;
             Break;
             Text "This is a bug in the compiler, please open an issue here: ";
