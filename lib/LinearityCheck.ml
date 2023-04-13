@@ -81,8 +81,9 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
                    ^ (ident_string name)
                    ^ "`, but no such variable exists in the state table. Table contents: \n\n"
                    ^ (show_state_tbl tbl))
-  | Some (_, _, state) ->
-     if state = Consumed then
+  | Some (ty, _, state) ->
+     let is_write_ref: bool = match ty with WriteRef _ -> true | _ -> false in
+     if (state = Consumed) || is_write_ref then
        let (StateTable (rows, pending)) = tbl in
        let others = List.filter (fun (n, _, _, _) -> not (equal_identifier name n)) rows in
        StateTable (others, pending)
@@ -707,6 +708,14 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
        let tbl: state_tbl = check_stmt tbl depth body in
        (* After the body, unborrow the variable. *)
        let tbl: state_tbl = update_tbl tbl original Unconsumed in
+       (* If it's a mutable borrow, remove the reference from the state table. *)
+       let tbl: state_tbl =
+         match mode with
+         | ReadBorrow ->
+            tbl
+         | WriteBorrow ->
+            remove_entry tbl rename
+       in
        tbl
      else
        let state: var_state = get_state tbl original in
