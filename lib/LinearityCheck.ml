@@ -210,6 +210,7 @@ let merge (a: appearances) (b: appearances): appearances =
     read = a.read + b.read;
     write = a.write + b.write;
     path = a.path + b.path;
+    reborrow = a.reborrow + b.reborrow;
   }
 
 let merge_list (l: appearances list): appearances =
