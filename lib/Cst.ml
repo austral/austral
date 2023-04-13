@@ -90,6 +90,7 @@ and cexpr =
   | CTypecast of span * cexpr * typespec
   | CSizeOf of span * typespec
   | CBorrowExpr of span * borrowing_mode * identifier
+  | CReborrow of span * identifier
 
 and cstmt =
   | CSkip of span
