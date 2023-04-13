@@ -197,3 +197,5 @@ let rec get_type (e: mexpr): mono_ty =
          MonoReadRef (ty, MonoRegionTy region)
       | WriteBorrow ->
          MonoWriteRef (ty, MonoRegionTy region))
+  | MReborrow (_, ty, region) ->
+     MonoWriteRef (ty, MonoRegionTy region)
