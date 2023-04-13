@@ -161,6 +161,7 @@ let zero_appearances: appearances = {
     read = 0;
     write = 0;
     path = 0;
+    reborrow = 0;
   }
 
 let consumed_once: appearances = {
@@ -168,6 +169,7 @@ let consumed_once: appearances = {
     read = 0;
     write = 0;
     path = 0;
+    reborrow = 0;
   }
 
 let read_once: appearances = {
@@ -175,6 +177,7 @@ let read_once: appearances = {
     read = 1;
     write = 0;
     path = 0;
+    reborrow = 0;
   }
 
 let write_once: appearances = {
@@ -182,6 +185,7 @@ let write_once: appearances = {
     read = 0;
     write = 1;
     path = 0;
+    reborrow = 0;
   }
 
 let path_once: appearances = {
@@ -189,6 +193,7 @@ let path_once: appearances = {
     read = 0;
     write = 0;
     path = 1;
+    reborrow = 0;
   }
 
 let merge (a: appearances) (b: appearances): appearances =
