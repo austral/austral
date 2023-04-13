@@ -974,11 +974,8 @@ and augment_reborrow (ctx: expr_ctx) (name: qident): texpr =
   in
   (* Create a fresh region. *)
   let reg: region = fresh_region () in
-  (* Construct the type of the new reference: same pointed-to type but change the
-     region. *)
-  let ty: ty = WriteRef (pointed_to, RegionTy reg) in
   (* Construct the expression. *)
-  TReborrow (original_name name, ty, reg)
+  TReborrow (original_name name, pointed_to, reg)
 
 and augment_arglist (ctx: expr_ctx) (args: abstract_arglist): typed_arglist =
   match args with
