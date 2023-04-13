@@ -452,39 +452,39 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
   (* Destructure apps. *)
-  let { consumed: int; write: int; read: int; path: int } = apps in
+  let { consumed: int; write: int; read: int; path: int; reborrow: int } = apps in
   (* What is the current state of this variable? *)
   let state: var_state = get_state tbl name in
   (* Make a tuple with the variable's state, and the partitioned appearances. *)
-  let tup = (state, partition consumed, partition write, partition read, partition path) in
+  let tup = (state, partition consumed, partition write, partition reborrow, partition read, partition path) in
   match tup with
-  (*       State        Consumed      WBorrow       RBorrow      Path    *)
-  (* ---------------|-------------|-------------|------------|---------- *)
-  | (     Unconsumed,         Zero,         Zero,           _,           _) -> (* Not yet consumed, and at most used through immutable borrows or path reads. *)
+  (*       State        Consumed      WBorrow      Reborrow     RBorrow      Path    *)
+  (* ---------------|-------------|-------------|------------|-----------|---------- *)
+  | (     Unconsumed,         Zero,         Zero,           _,          _,           _) -> (* Not yet consumed, and at most used through immutable borrows or path reads. *)
      tbl
-  | (     Unconsumed,         Zero,          One,        Zero,        Zero) -> (* Not yet consumed, borrowed mutably once, and nothing else. *)
+  | (     Unconsumed,         Zero,          One,           _,       Zero,        Zero) -> (* Not yet consumed, borrowed mutably once, and nothing else. *)
      tbl
-  | (     Unconsumed,         Zero,          One,           _,           _) -> (* Not yet consumed, borrowed mutably, then either borrowed immutably or accessed through a path. *)
+  | (     Unconsumed,         Zero,          One,           _,          _,           _) -> (* Not yet consumed, borrowed mutably, then either borrowed immutably or accessed through a path. *)
      error_borrowed_mutably_and_used name
-  | (     Unconsumed,         Zero,  MoreThanOne,           _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
+  | (     Unconsumed,         Zero,  MoreThanOne,           _,          _,           _) -> (* Not yet consumed, borrowed mutably more than once. *)
      error_borrowed_mutably_more_than_once name
-  | (     Unconsumed,          One,         Zero,        Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid IF the loop depth matches. *)
+  | (     Unconsumed,          One,         Zero,           _,       Zero,        Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid IF the loop depth matches. *)
      consume_once tbl depth name
-  | (     Unconsumed,          One,            _,           _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
+  | (     Unconsumed,          One,            _,           _,          _,           _) -> (* Not yet consumed, consumed once, then either borrowed or accessed through a path. *)
      error_consumed_and_something_else name
-  | (     Unconsumed,  MoreThanOne,            _,           _,           _) -> (* Not yet consumed, consumed more than once. *)
+  | (     Unconsumed,  MoreThanOne,            _,           _,          _,           _) -> (* Not yet consumed, consumed more than once. *)
      error_consumed_more_than_once name
-  | (   BorrowedRead,         Zero,         Zero,        Zero,           _) -> (* Read borrowed, and at most accessed through a path. *)
+  | (   BorrowedRead,         Zero,         Zero,           _,       Zero,           _) -> (* Read borrowed, and at most accessed through a path. *)
      tbl
-  | (   BorrowedRead,            _,            _,           _,           _) -> (* Read borrowed, and either consumed or borrowed again. *)
+  | (   BorrowedRead,            _,            _,           _,          _,           _) -> (* Read borrowed, and either consumed or borrowed again. *)
      error_read_borrowed_and_something_else name
-  | (  BorrowedWrite,         Zero,         Zero,        Zero,        Zero) -> (* Write borrowed, unused. *)
+  | (  BorrowedWrite,         Zero,         Zero,           _,       Zero,        Zero) -> (* Write borrowed, unused. *)
      tbl
-  | (  BorrowedWrite,            _,            _,           _,           _) -> (* Write borrowed, used in some way. *)
+  | (  BorrowedWrite,            _,            _,           _,          _,           _) -> (* Write borrowed, used in some way. *)
      error_write_borrowed_and_something_else name
-  | (       Consumed,         Zero,         Zero,        Zero,        Zero) -> (* Already consumed, and unused. *)
+  | (       Consumed,         Zero,         Zero,           _,       Zero,        Zero) -> (* Already consumed, and unused. *)
      tbl
-  | (       Consumed,            _,            _,           _,           _) -> (* Already consumed, and used in some way. *)
+  | (       Consumed,            _,            _,           _,          _,           _) -> (* Already consumed, and used in some way. *)
      error_already_consumed name
 
 and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier): state_tbl =
