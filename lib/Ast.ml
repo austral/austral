@@ -71,6 +71,7 @@ and aexpr =
   | Typecast of aexpr * qtypespec
   | SizeOf of qtypespec
   | BorrowExpr of borrowing_mode * qident
+  | Reborrow of qident
 
 and abstract_when =
   | AbstractWhen of identifier * qbinding list * astmt
