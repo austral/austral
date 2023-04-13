@@ -328,6 +328,11 @@ let rec count (name: identifier) (expr: texpr): appearances =
            write_once)
      else
        zero_appearances
+  | TReborrow (name', _, _) ->
+     if equal_identifier name name' then
+       reborrow_once
+     else
+       zero_appearances
 
 and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
   match elem with
