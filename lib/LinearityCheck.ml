@@ -398,8 +398,12 @@ let partition (n: int): partitions =
 
 let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
   (* Tables should have the same set of variable names. *)
-  let names_a: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list a)
-  and names_b: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list b)
+  let state_table_names (tbl: state_tbl): identifier list =
+    let l: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list tbl) in
+    List.sort (fun a b -> String.compare (ident_string a) (ident_string b)) l
+  in
+  let names_a: identifier list = state_table_names a
+  and names_b: identifier list = state_table_names b
   in
   if List.equal equal_identifier names_a names_b then
     (* Make a list of triples with the variable name, its state in A, and its
