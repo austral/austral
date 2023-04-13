@@ -41,6 +41,7 @@ open Span
 /* Borrowing */
 %token BORROW_WRITE
 %token BORROW_READ
+%token REBORROW
 %token REF_TRANSFORM
 /* Keywords */
 %token MODULE
@@ -398,6 +399,7 @@ atomic_expression:
   | SIZEOF LPAREN typespec RPAREN { CSizeOf (from_loc $loc, $3) }
   | BORROW_READ identifier { CBorrowExpr (from_loc $loc, ReadBorrow, $2) }
   | BORROW_WRITE identifier { CBorrowExpr (from_loc $loc, WriteBorrow, $2) }
+  | REBORROW LPAREN identifier RPAREN { CReborrow (from_loc $loc, $3) }
   | DEREF atomic_expression { CDeref (from_loc $loc, $2) }
   ;
 

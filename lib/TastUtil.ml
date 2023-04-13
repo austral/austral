@@ -118,6 +118,8 @@ let rec get_type = function
          ReadRef (ty, RegionTy region)
       | WriteBorrow ->
          WriteRef (ty, RegionTy region))
+  | TReborrow (_, ty, region) ->
+     WriteRef (ty, RegionTy region)
 
 and path_elem_type = function
   | TSlotAccessor (_, t) ->

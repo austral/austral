@@ -53,7 +53,7 @@ let advance_line lexbuf =
     pos_lnum = pos.pos_lnum + 1
   } in
   lexbuf.lex_curr_p <- pos'
-  
+
 let string_acc: Buffer.t = Buffer.create 64
 
 let triple_string_acc: Buffer.t = Buffer.create 64
@@ -121,6 +121,7 @@ rule token = parse
   | "&!" { BORROW_WRITE }
   | "&(" { REF_TRANSFORM }
   | "&" { BORROW_READ }
+  | "reborrow" { REBORROW }
   (* Keywords *)
   | "module" { MODULE }
   | "is" { IS }

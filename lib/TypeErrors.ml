@@ -30,6 +30,17 @@ let borrow_constant () =
     Text "Constants cannot be borrowed."
   ]
 
+let reborrow_constant () =
+  austral_raise TypeError [
+    Text "Constants cannot be borrowed."
+  ]
+
+let reborrow_wrong_type (ty: ty) =
+  austral_raise TypeError [
+      Text "Reborrow expressions take a variable of mutable reference type, but the expression has type ";
+      Code (type_string ty)
+  ]
+
 let borrow_non_linear ty =
   austral_raise TypeError [
     Text "Cannot borrow ";

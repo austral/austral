@@ -1,0 +1,1 @@
+Test we can't reborrow a mutable reference twice in an expression.
