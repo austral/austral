@@ -1,0 +1,6 @@
+module body Test is
+    function main(): ExitCode is
+        let n: Nat64 := 18'446'744'073'709'551'616;
+        return ExitSuccess();
+    end;
+end module body.
