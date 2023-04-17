@@ -94,20 +94,6 @@ let show_bindings (TypeBindings m) =
   in
   "TypeBindings {" ^ (String.concat ", " (List.map show_binding (BindingsMap.bindings m))) ^ "}"
 
-  (*
-let binding_conflict name from ty ty' =
-  let str = "Conflicting type variables: the variable "
-            ^ ident_string name
-            ^ " (from "
-            ^ (qident_debug_name from)
-            ^ ") has values "
-            ^ type_string ty
-            ^ " and "
-            ^ type_string ty'
-            ^ "."
-  in
-  err str
-   *)
 let get_binding (TypeBindings m) tp =
   BindingsMap.find_opt tp m
 
