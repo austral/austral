@@ -77,7 +77,7 @@ module body Standard.Test.Buffer is
         return nil;
     end;
     
-	function initializeEmptyTest(): Unit is
+    function initializeEmptyTest(): Unit is
         testHeading("initializeEmpty");
         let b: Buffer[Int32] := initialize(0, 10);
         assertLength(&b, 0);
