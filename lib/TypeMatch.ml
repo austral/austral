@@ -290,7 +290,6 @@ let fits (signed : signedness) (width : integer_width) (n : Z.t) : bool =
   Z.compare min_bound n <= 0 && Z.compare n max_bound <= 0
 
 let match_int_type_with_value (signedness: signedness) (width: integer_width) (value: string): type_bindings =
-   let _ = (signedness, width, value) in
    (* Parse the constant as a big integer. *)
    let i: Z.t = parse_bigint value in
    (* Check that it fits *)
