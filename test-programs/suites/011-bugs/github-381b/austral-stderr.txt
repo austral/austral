@@ -7,7 +7,7 @@ Error:
     From: line 4, column 8
     To: line 4, column 36
   Description:
-    Expected a value of type `Int32`, but got a value of type `FixedArray[Nat8]: Free`.
+    Expected a value of type `Int32`, but got a value of type `FixedArray[Nat8]`.
   Code:
     2 |     function main(): ExitCode is
     3 |         let x: Int32 := 10;

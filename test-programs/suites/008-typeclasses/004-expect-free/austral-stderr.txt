@@ -5,6 +5,6 @@ Error:
   Location:
     [no span available]
   Description:
-    Cannot define an instance with argument `Test::Foo: Linear` because it should belong to the `Free` universe, but it is actually in the `Linear` universe.
+    Cannot define an instance with argument `Foo` because it should belong to the `Free` universe, but it is actually in the `Linear` universe.
   Code:
     [no span available]

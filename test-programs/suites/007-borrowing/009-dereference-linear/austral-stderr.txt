@@ -7,7 +7,7 @@ Error:
     From: line 7, column 12
     To: line 7, column 27
   Description:
-    Cannot dereference non-free type `Test::Foo: Linear`
+    Cannot dereference non-free type `Foo`
   Code:
     5 |         let foo: Foo := Foo();
     6 |         borrow foo as ref in R do
