@@ -1,0 +1,1 @@
+Test we can't assign a negative value to a `Nat32`.
