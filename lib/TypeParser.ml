@@ -13,6 +13,7 @@ open TypeParameter
 open TypeParameters
 open TypeSystem
 open Region
+open RegionMap
 open Ast
 open Env
 open EnvTypes

@@ -13,6 +13,7 @@ open EnvTypes
 open EnvUtils
 open EnvExtras
 open Region
+open RegionMap
 open Type
 open TypeSystem
 open TypeParser
