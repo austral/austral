@@ -91,26 +91,18 @@ let rec type_string = function
      single_float_name
   | DoubleFloat ->
      double_float_name
-  | NamedType (n, args, u) ->
-     (qident_debug_name n) ^ args_string args ^ ": " ^ (universe_string u)
+  | NamedType (n, args, _) ->
+     (ident_string (local_name n)) ^ args_string args
   | StaticArray t ->
-     "FixedArray[" ^ (type_string t) ^ "]: Free"
+     "FixedArray[" ^ (type_string t) ^ "]"
   | RegionTy r ->
      "Region<" ^ (string_of_int (region_id r)) ^ ">"
   | ReadRef (t, r) ->
-     read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Free"
+     read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | WriteRef (t, r) ->
-     write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]: Linear"
-  | TyVar (TypeVariable (n, u, from, constraints)) ->
-     let sident_string si =
-       (mod_name_string (sident_module_name si)) ^ "::" ^ (ident_string (sident_name si))
-     in
-     (ident_string n)
-     ^ "("
-     ^ (qident_debug_name from)
-     ^ "): "
-     ^ (universe_string u)
-     ^ (if constraints = [] then "" else ("(" ^ (String.concat ", " (List.map sident_string constraints)) ^ ")"))
+     write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+  | TyVar (TypeVariable (n, _, _, _)) ->
+     ident_string n
   | Address ty ->
      address_name ^ "[" ^ (type_string ty) ^ "]"
   | Pointer ty ->
@@ -119,13 +111,13 @@ let rec type_string = function
      (match args with
       | [] ->
          (* No arguments case. *)
-         ("Fn[" ^ (type_string rt) ^ "]: Free")
+         ("Fn[" ^ (type_string rt) ^ "]")
       | _ ->
          (* Some arguments case. *)
          let args': string = String.concat ", " (List.map type_string args) in
-         ("Fn[" ^ args' ^ ", " ^ (type_string rt) ^ "]: Free"))
+         ("Fn[" ^ args' ^ ", " ^ (type_string rt) ^ "]"))
   | MonoTy _ ->
-     "MonoTy"
+     "MonoTy)"
 
 and args_string = function
   | (first::rest) -> "[" ^ (String.concat ", " (List.map type_string (first::rest))) ^ "]"

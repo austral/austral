@@ -65,7 +65,7 @@ type value_parameter = ValueParameter of identifier * ty
 
 val universe_string : universe -> string
 
-(* A string representation of a type, for debugging *)
+(* A string representation of a type, for showing to the user. *)
 val type_string : ty -> string
 
 (* The type of array sizes and indices *)
