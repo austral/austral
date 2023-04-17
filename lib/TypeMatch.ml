@@ -300,8 +300,9 @@ let match_int_type_with_value (signedness: signedness) (width: integer_width) (v
       austral_raise TypeError [
          Text "The integer ";
          Code value;
-         Text" does not fit the tyoe ";
-         Type (Integer (signedness, width))
+         Text" does not fit the type ";
+         Type (Integer (signedness, width));
+         Text "."
       ]
 
 let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
