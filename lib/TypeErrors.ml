@@ -6,23 +6,23 @@ open Type
 let arithmetic_incompatible_types ~lhs ~rhs =
   austral_raise TypeError [
     Text "Both operands to an arithmetic expression must be compatible types. The LHS has type ";
-    Code (type_string lhs);
+    Type lhs;
     Text " but the RHS has type ";
-    Code (type_string rhs);
+    Type rhs;
     Text "."
   ]
 
 let arithmetic_not_numeric ty =
   austral_raise TypeError [
     Text "Both operands of an arithmetic operator must be numeric types, but ";
-    Code (type_string ty);
+    Type ty;
     Text " is not."
   ]
 
 let array_indexing_disallowed ty =
   austral_raise TypeError [
     Text "The array indexing operator is not allowed for the type ";
-    Code (type_string ty)
+    Type ty
   ]
 
 let borrow_constant () =
@@ -38,20 +38,20 @@ let reborrow_constant () =
 let reborrow_wrong_type (ty: ty) =
   austral_raise TypeError [
       Text "Reborrow expressions take a variable of mutable reference type, but the expression has type ";
-      Code (type_string ty)
+      Type ty
   ]
 
 let borrow_non_linear ty =
   austral_raise TypeError [
     Text "Cannot borrow ";
-    Code (type_string ty);
+    Type ty;
     Text " because it is not a linear type."
   ]
 
 let call_non_callable ty =
   austral_raise TypeError [
     Text "The type ";
-    Code (type_string ty);
+    Type ty;
     Text " is neither a function, method or function pointer, and cannot be called."
   ]
 
@@ -82,7 +82,7 @@ let case_non_public () =
 let case_non_union ty =
   austral_raise TypeError [
     Text "The case expression has type ";
-    Code (type_string ty);
+    Type ty;
     Text " which is not a union type."
   ]
 
@@ -108,9 +108,9 @@ let cast_different_references ~different_types ~different_regions =
 let cast_invalid ~target ~source =
   austral_raise TypeError [
     Text "Cannot cast to ";
-    Code (type_string target);
+    Type target;
     Text " from ";
-    Code (type_string source)
+    Type source
   ]
 
 let cast_write_ref_to_non_ref () =
@@ -125,7 +125,7 @@ let condition_not_boolean ~kind ~form ~ty =
     Text "-";
     Text form;
     Text "s should be a boolean type, but is ";
-    Code (type_string ty)
+    Type ty
   ]
 
 let constructor_not_named declaration =
@@ -145,34 +145,34 @@ let constructor_wrong_args declaration =
 let dereference_non_reference ty =
   austral_raise TypeError [
     Text "Only references can be dereferenced, but ";
-    Code (type_string ty);
+    Type ty;
     Text " is not."
   ]
 
 let dereference_non_free ty =
   austral_raise LinearityError [
     Text "Cannot dereference non-free type ";
-    Code (type_string ty)
+    Type ty
   ]
 
 let destructure_non_record ty =
   austral_raise TypeError [
     Text "The type ";
-    Code (type_string ty);
+    Type ty;
     Text " cannot be destructured because it is not a record."
   ]
 
 let destructure_not_public ty =
   austral_raise TypeError [
     Text "The type ";
-    Code (type_string ty);
+    Type ty;
     Text " is not a public record and so cannot be destructured."
   ]
 
 let destructure_wrong_slots ty =
   austral_raise TypeError [
     Text "The set of slots mentioned differs from the set of slots in ";
-    Code (type_string ty);
+    Type ty;
   ]
 
 let discard_linear universe =
@@ -192,7 +192,7 @@ let for_bounds_non_integral ~bound ~ty =
     Text "The type of the ";
     Text bound;
     Text " value in the loop range is ";
-    Code (type_string ty);
+    Type ty;
     Text " which is not an integer type."
   ]
 
@@ -221,9 +221,9 @@ let if_inequal ~lhs ~rhs =
     Text "The branches of the ";
     Code "if";
     Text "-expression have different types: ";
-    Code (type_string lhs);
+    Type lhs;
     Text " and ";
-    Code (type_string rhs)
+    Type rhs
   ]
 
 let logical_operands_not_boolean ~operator ~types = match types with
@@ -232,16 +232,16 @@ let logical_operands_not_boolean ~operator ~types = match types with
       Text "The operand of a ";
       Text operator;
       Text " operator must be a boolean expression, but it has the type ";
-      Code (type_string ty)
+      Type ty
     ]
 | [first; second] ->
     austral_raise TypeError [
       Text "Both operands of a ";
       Text operator;
       Text " operator must be boolean expressions, but they have types ";
-      Code (type_string first);
+      Type first;
       Text " and ";
-      Code (type_string second)
+      Type second
     ]
   | _ ->
     austral_raise TypeError [
@@ -266,13 +266,13 @@ let no_suitable_instance ~typeclass ~ty =
     Text "The typeclass ";
     Code (ident_string typeclass);
     Text " has no instance which matches for ";
-    Code (type_string ty)
+    Type ty
   ]
 
 let path_not_free ty =
   austral_raise TypeError [
     Text "The path ends with the type ";
-    Code (type_string ty);
+    Type ty;
     Text " which is not in the ";
     Code "Free";
     Text " universe."
@@ -290,7 +290,7 @@ let path_not_public ~type_name ~slot_name =
 let path_not_record ty =
   austral_raise TypeError [
     Text "Cannot take a path of the type ";
-    Code ty;
+    Type ty;
     Text " because it is not a record."
   ]
 
@@ -299,9 +299,9 @@ let slot_wrong_type ~name ~expected ~actual =
     Text "The slot ";
     Code (ident_string name);
     Text " should have type ";
-    Code (type_string expected);
+    Type expected;
     Text " but is declared to have type ";
-    Code (type_string actual)
+    Type actual
   ]
 
 let unconstrained_generic_function name =
@@ -344,12 +344,12 @@ let cannot_assign_to_parameter _ =
 let ref_transform_needs_ref ty =
   austral_raise GenericError [
       Text "The head of a reference transform expression must be of a reference type, but I got ";
-      Code (type_string ty)
+      Type ty
     ]
 
 let ref_transform_not_record ty =
   austral_raise GenericError [
       Text "Tried to transform a reference to a record into a reference into a slot, but the type ";
-      Code (type_string ty);
+      Type ty;
       Text " is not a record"
     ]

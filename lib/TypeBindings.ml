@@ -19,9 +19,9 @@ module Errors = struct
       Text "The type parameter ";
       Code (typaram_name param |> ident_string);
       Text " cannot be bound to both ";
-      Code (type_string was);
+      Type was;
       Text " and ";
-      Code (type_string redef)
+      Type redef;
     ]
 
   let typaram_wrong_universe ~param ~ty ~expected ~actual =
@@ -31,7 +31,7 @@ module Errors = struct
       Text " must be ";
       Code (universe_string expected);
       Text " but ";
-      Code (type_string ty);
+      Type ty;
       Text " is ";
       Code (universe_string actual)
     ]

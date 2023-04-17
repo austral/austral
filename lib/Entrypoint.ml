@@ -54,7 +54,7 @@ module Errors = struct
       Text "The type of the entrypoint argument must be ";
       Code "RootCapability";
       Text " but it is ";
-      Code (type_string ty)
+      Type ty
     ]
 
   let wrong_return_type ty =
@@ -62,7 +62,7 @@ module Errors = struct
       Text "The type of the entrypoint function must be ";
       Code "ExitCode";
       Text " but it is ";
-      Code (type_string ty)
+      Type ty
     ]
 end
 

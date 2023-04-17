@@ -7,7 +7,7 @@ Error:
     From: line 9, column 12
     To: line 9, column 27
   Description:
-    Cannot take a path of the type `Foo` because it is not a record.
+    Cannot take a path of the type `Test::Foo: Linear` because it is not a record.
   Code:
      7 |         let foo: Foo := Blank();
      8 |         borrow foo as fooref in R do

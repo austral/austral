@@ -7,6 +7,7 @@
 (** This module provides a representation-independent way of writing the text in
     error messages. Rather than concatenating strings, we use a more structured
     representation, which can then be rendered to both plain text and HTML. *)
+open Type
 
 (** The contents of an error message. *)
 type err_text = text_elem list
@@ -17,6 +18,8 @@ and text_elem =
   (** Human-readable prose. *)
   | Code of string
   (** Austral text, like the name of an identifier or a type. *)
+  | Type of ty
+  (** An Austral type. *)
   | Break
   (** A paragraph break. *)
 
