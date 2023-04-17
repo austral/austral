@@ -40,6 +40,7 @@ module body Standard.Test.Buffer is
         suiteHeading("Standard.Buffer");
         basicLifecycleTest();
         initializeTest();
+        initializeEmptyTest();
         storeTest();
         swapNthTest();
         swapIndexTest();
@@ -75,7 +76,16 @@ module body Standard.Test.Buffer is
         assertSuccess("destroyFree complete");
         return nil;
     end;
-
+    
+    function initializeEmptyTest(): Unit is
+        testHeading("initializeEmpty");
+        let b: Buffer[Int32] := initialize(0, 10);
+        assertLength(&b, 0);
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+    
     function storeTest(): Unit is
         testHeading("storeNth");
         let b: Buffer[Int32] := initialize(1, 10);

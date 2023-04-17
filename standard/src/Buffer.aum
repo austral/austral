@@ -108,6 +108,9 @@ module body Standard.Buffer is
 
     generic [T: Free]
     function safeInitialize(size: Index, initialElement: T): Option[Buffer[T]] is
+        if size = 0 then
+            return safeAllocateEmpty();
+        end if;
         let capacity: Index := max(size, minimum_capacity);
         let addr: Address[T] := allocateBuffer(capacity);
         case nullCheck(addr) of
