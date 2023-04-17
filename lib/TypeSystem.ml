@@ -24,7 +24,7 @@ let type_universe = function
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
   | FnPtr _ -> FreeUniverse
-  | MonoTy _ -> FreeUniverse (* TODO: arguably this should error, but the compiler crashes if it errors *)
+  | MonoTy _ -> internal_err "You shouldn't be asking for the type_universe of a MonoTy"
 
 let is_numeric = function
   | Unit -> false
