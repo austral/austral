@@ -1,1 +1,16 @@
-This should fail.
+Error:
+  Title: Type Error
+  Module:
+    Test
+  Location:
+    Filename: 'test-programs/suites/014-int-constants/006-nat16-overflow/Test.aum'
+    From: line 3, column 8
+    To: line 3, column 31
+  Description:
+    The integer `65536` does not fit the type `Nat16`.
+  Code:
+    1 | module body Test is
+    2 |     function main(): ExitCode is
+    3 |         let n: Nat16 := 65'536;
+    4 |         return ExitSuccess();
+    5 |     end;
