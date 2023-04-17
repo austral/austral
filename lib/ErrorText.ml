@@ -29,14 +29,15 @@ and text_elem_to_plain (elem: text_elem): string =
      "\n\n"
  
 let rec error_text_to_html (txt: err_text): string =
-    String.concat "" (List.map (fun (elem: text_elem) ->
-                match elem with
-                | Text s ->
-                    s
-                | Code c ->
-                    "<code>" ^ c ^ "</code>"
-                | Type ty ->
-                    "<code>" ^ (type_string ty) ^ "</code>"
-                | Break ->
-                    "<br><br>"
-                ) txt)
+    String.concat "" (List.map text_elem_to_html txt)
+
+and text_elem_to_html (elem: text_elem): string =
+  match elem with
+  | Text s ->
+      s
+  | Code c ->
+      "<code>" ^ c ^ "</code>"
+  | Type ty ->
+      "<code>" ^ (type_string ty) ^ "</code>"
+  | Break ->
+      "<br><br>"
