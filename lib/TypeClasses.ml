@@ -42,7 +42,7 @@ module Errors = struct
   let not_a_tyvar ty =
     austral_raise DeclarationError [
       Text "The type ";
-      Code (type_string ty);
+      Type ty;
       Text " is not a type parameter, but generic instances must use either all type parameters or none of them in the argument.";
       Break;
       Text "Consider adding another generic parameter with universe ";
@@ -71,7 +71,7 @@ module Errors = struct
   let wrong_universe ~ty ~expected ~actual =
     austral_raise TypeError [
       Text "Cannot define an instance with argument ";
-      Code (type_string ty);
+      Type ty;
       Text " because it should belong to the ";
       Code (universe_string expected);
       Text " universe, but it is actually in the ";

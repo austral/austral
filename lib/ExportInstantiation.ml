@@ -17,7 +17,7 @@ module Errors = struct
   let disallowed_type ty =
     austral_raise TypeError [
       Text "The type ";
-      Code (type_string ty);
+      Type ty;
       Text " is not allowed in the signature of an exported function."
     ]
 end

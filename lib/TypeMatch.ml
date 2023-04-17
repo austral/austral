@@ -24,9 +24,9 @@ module Errors = struct
   let type_mismatch a b =
     austral_raise TypeError [
       Text "Expected a value of type ";
-      Code (type_string a);
+      Type a;
       Text ", but got a value of type ";
-      Code (type_string b);
+      Type b;
       Text "."
     ]
 
@@ -34,7 +34,7 @@ module Errors = struct
     let (TypeVariable (tv_name, _, _, _)) = tv in
     austral_raise TypeError [
         Text "Type constraint not satisfied: the type ";
-        Code (type_string ty);
+        Type ty;
         Text " does not implement the typeclass ";
         Code (ident_string (sident_name constraint_typeclass_name));
         Text ".";

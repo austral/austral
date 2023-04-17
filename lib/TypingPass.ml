@@ -339,7 +339,7 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
          | _ ->
             austral_raise TypeError [
                 Text "The type for the expression in a case statement must be a union or a reference to a union, but I got ";
-                Code (type_string ty)
+                Type ty
         ])
       in
       let case_ref: case_ref =
