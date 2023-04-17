@@ -271,12 +271,38 @@ let parse_bigint (s: string): Z.t =
     | Invalid_argument _ ->
       internal_err ("Failed to parse '" ^ s ^ "' as a big int. This is a bug in the parser.")
 
+(* Check the given value fits in the given type. *)
+let fits (signed : signedness) (width : integer_width) (n : Z.t) : bool =
+  let min_bound, max_bound = match signed, width with
+    | Unsigned, Width8        -> (Z.zero, Z.of_string "255")
+    | Unsigned, Width16       -> (Z.zero, Z.of_string "65535")
+    | Unsigned, Width32       -> (Z.zero, Z.of_string "4294967295")
+    | Unsigned, Width64       -> (Z.zero, Z.of_string "18446744073709551615")
+    | Unsigned, WidthByteSize -> (Z.zero, Z.of_string "255")
+    | Unsigned, WidthIndex    -> (Z.zero, Z.of_string "18446744073709551615") (* TODO: Assuming 64-bit size_t *)
+    | Signed, Width8          -> (Z.of_string "-128", Z.of_string "127")
+    | Signed, Width16         -> (Z.of_string "-32768", Z.of_string "32767")
+    | Signed, Width32         -> (Z.of_string "-2147483648", Z.of_string "2147483647")
+    | Signed, Width64         -> (Z.of_string "-9223372036854775808", Z.of_string "9223372036854775807")
+    | Signed, WidthByteSize   -> (Z.of_string "-128", Z.of_string "127")
+    | Signed, WidthIndex      -> (Z.of_string "-9223372036854775808", Z.of_string "9223372036854775807") (* TODO: Assuming 64-bit ssize_t *)
+  in
+  Z.compare min_bound n <= 0 && Z.compare n max_bound <= 0
+
 let match_int_type_with_value (signedness: signedness) (width: integer_width) (value: string): type_bindings =
    let _ = (signedness, width, value) in
    (* Parse the constant as a big integer. *)
    let i: Z.t = parse_bigint value in
-   let _ = i in
-   empty_bindings
+   (* Check that it fits *)
+   if fits signedness width i then
+      empty_bindings
+   else
+      austral_raise TypeError [
+         Text "The integer ";
+         Code value;
+         Text" does not fit the tyoe ";
+         Type (Integer (signedness, width))
+      ]
 
 let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
   (* Like type_match, but gentler with integer constants. *)
