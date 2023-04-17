@@ -1,0 +1,16 @@
+Error:
+  Title: Type Error
+  Module:
+    Test
+  Location:
+    Filename: 'test-programs/suites/014-int-constants/005-nat8-overflow/Test.aum'
+    From: line 3, column 8
+    To: line 3, column 27
+  Description:
+    The integer `256` does not fit the type `Nat8`.
+  Code:
+    1 | module body Test is
+    2 |     function main(): ExitCode is
+    3 |         let n: Nat8 := 256;
+    4 |         return ExitSuccess();
+    5 |     end;

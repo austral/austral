@@ -264,15 +264,53 @@ let match_typarams (ctx: ctx) (typarams: typarams) (args: ty list): type_binding
   let typarams' = List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams) in
   match_type_list ctx typarams' args
 
+let parse_bigint (s: string): Z.t =
+  try
+    Z.of_string s
+  with
+    | Invalid_argument _ ->
+      internal_err ("Failed to parse '" ^ s ^ "' as a big int. This is a bug in the parser.")
+
+(* Check the given value fits in the given type. *)
+let fits (signed : signedness) (width : integer_width) (n : Z.t) : bool =
+  let min_bound, max_bound = match signed, width with
+    | Unsigned, Width8        -> (Z.zero, Z.of_string "255")
+    | Unsigned, Width16       -> (Z.zero, Z.of_string "65535")
+    | Unsigned, Width32       -> (Z.zero, Z.of_string "4294967295")
+    | Unsigned, Width64       -> (Z.zero, Z.of_string "18446744073709551615")
+    | Unsigned, WidthByteSize -> (Z.zero, Z.of_string "255")
+    | Unsigned, WidthIndex    -> (Z.zero, Z.of_string "18446744073709551615") (* TODO: Assuming 64-bit size_t *)
+    | Signed, Width8          -> (Z.of_string "-128", Z.of_string "127")
+    | Signed, Width16         -> (Z.of_string "-32768", Z.of_string "32767")
+    | Signed, Width32         -> (Z.of_string "-2147483648", Z.of_string "2147483647")
+    | Signed, Width64         -> (Z.of_string "-9223372036854775808", Z.of_string "9223372036854775807")
+    | Signed, WidthByteSize   -> (Z.of_string "-128", Z.of_string "127")
+    | Signed, WidthIndex      -> (Z.of_string "-9223372036854775808", Z.of_string "9223372036854775807") (* TODO: Assuming 64-bit ssize_t *)
+  in
+  Z.compare min_bound n <= 0 && Z.compare n max_bound <= 0
+
+let match_int_type_with_value (signedness: signedness) (width: integer_width) (value: string): type_bindings =
+   (* Parse the constant as a big integer. *)
+   let i: Z.t = parse_bigint value in
+   (* Check that it fits *)
+   if fits signedness width i then
+      empty_bindings
+   else
+      austral_raise TypeError [
+         Text "The integer ";
+         Code value;
+         Text" does not fit the type ";
+         Type (Integer (signedness, width));
+         Text "."
+      ]
+
 let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
   (* Like type_match, but gentler with integer constants. *)
   match ty with
-  | Integer _ ->
+  | Integer (signedness, width) ->
      (match expr with
-      | TIntConstant _ ->
-         (* TODO: check sign against signedness *)
-         (* TODO: check value against width *)
-         empty_bindings
+      | TIntConstant value ->
+         match_int_type_with_value signedness width value
       | _ ->
          match_type ctx ty (get_type expr))
   | SingleFloat ->

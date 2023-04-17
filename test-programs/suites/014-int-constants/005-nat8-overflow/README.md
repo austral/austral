@@ -1,0 +1,1 @@
+Test we can't assign to a `Nat8` an integer too large to fit.
