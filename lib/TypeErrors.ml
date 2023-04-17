@@ -290,7 +290,7 @@ let path_not_public ~type_name ~slot_name =
 let path_not_record ty =
   austral_raise TypeError [
     Text "Cannot take a path of the type ";
-    Code ty;
+    Type ty;
     Text " because it is not a record."
   ]
 

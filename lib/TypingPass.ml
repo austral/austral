@@ -49,13 +49,13 @@ let augment_expr (module_name: module_name) (env: env) (rm: region_map) (typaram
   TypeCheckExpr.augment_expr ctx asserted_ty expr
 
 (** Copied from TypeCheckExpr *)
-let get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
+let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * type_vis * typarams * typed_slot list) =
   match get_decl_by_name env (qident_to_sident name) with
   | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
      let mod_name: module_name = module_name_from_id env mod_id in
      (mod_name, vis, typarams, slots)
   | Some _ ->
-     Errors.path_not_record (original_name name |> ident_string)
+     Errors.path_not_record ty
   | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
@@ -135,7 +135,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let rec_ty = get_type value' in
              (match rec_ty with
               | (NamedType (name, _, u)) ->
-                 let (source_module, vis, record_typarams, slots) = get_record_definition env name in
+                 let (source_module, vis, record_typarams, slots) = get_record_definition env name rec_ty in
                  let orig_type = NamedType (
                                      make_qident (source_module, original_name name, original_name name),
                                      List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list record_typarams),
@@ -378,9 +378,9 @@ and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_m
   | SlotAccessor slot_name ->
      (match head_ty with
       | NamedType (name, args, _) ->
-         TypeCheckExpr.augment_slot_accessor_elem ctx slot_name name args
+         TypeCheckExpr.augment_slot_accessor_elem ctx slot_name name args head_ty
       | _ ->
-         Errors.path_not_record (type_string head_ty))
+         Errors.path_not_record head_ty)
   | PointerSlotAccessor slot_name ->
      (match head_ty with
       | Pointer pointed_to ->
@@ -389,11 +389,11 @@ and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_m
       | WriteRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
-             TypeCheckExpr.augment_reference_slot_accessor_elem ctx slot_name name args
+             TypeCheckExpr.augment_reference_slot_accessor_elem ctx slot_name name args ty
           | _ ->
-             Errors.path_not_record (type_string ty))
+             Errors.path_not_record ty)
       | _ ->
-         Errors.path_not_record (type_string head_ty))
+         Errors.path_not_record head_ty)
   | ArrayIndex ie ->
      let ie' = augment_expr module_name env rm typarams lexenv None ie in
      let _ = ie' in

@@ -123,13 +123,13 @@ let is_float_constant (e: aexpr): bool =
 let parse_typespec (ctx: expr_ctx) (ty: qtypespec): ty =
   parse_type (ctx_env ctx) [] (ctx_region_map ctx) (ctx_typarams ctx) ty
 
-let get_record_definition (env: env) (name: qident): (module_name * type_vis * typarams * typed_slot list) =
+let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * type_vis * typarams * typed_slot list) =
   match get_decl_by_name env (qident_to_sident name) with
   | (Some (Record { mod_id; vis; typarams; slots; _ })) ->
      let mod_name: module_name = module_name_from_id env mod_id in
      (mod_name, vis, typarams, slots)
   | Some _ ->
-     Errors.path_not_record (original_name name |> ident_string)
+     Errors.path_not_record ty
   | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
@@ -699,9 +699,9 @@ and augment_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: path_elem): typed_pat
   | SlotAccessor slot_name ->
      (match head_ty with
       | NamedType (name, args, _) ->
-         augment_slot_accessor_elem ctx slot_name name args
+         augment_slot_accessor_elem ctx slot_name name args head_ty
       | _ ->
-         Errors.path_not_record (type_string head_ty))
+         Errors.path_not_record head_ty)
   | PointerSlotAccessor slot_name ->
      (match head_ty with
       | Pointer pointed_to ->
@@ -710,17 +710,17 @@ and augment_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: path_elem): typed_pat
       | ReadRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem ctx slot_name name args
+             augment_reference_slot_accessor_elem ctx slot_name name args ty
           | _ ->
-             Errors.path_not_record (type_string ty))
+             Errors.path_not_record ty)
       | WriteRef (ty, _) ->
          (match ty with
           | NamedType (name, args, _) ->
-             augment_reference_slot_accessor_elem ctx slot_name name args
+             augment_reference_slot_accessor_elem ctx slot_name name args ty
           | _ ->
-             Errors.path_not_record (type_string ty))
+             Errors.path_not_record ty)
       | _ ->
-         Errors.path_not_record (type_string head_ty))
+         Errors.path_not_record head_ty)
   | ArrayIndex ie ->
      let ie' = aug ctx ie in
      (match head_ty with
@@ -729,10 +729,10 @@ and augment_path_elem (ctx: expr_ctx) (head_ty: ty) (elem: path_elem): typed_pat
       | _ ->
          Errors.array_indexing_disallowed head_ty)
 
-and augment_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list): typed_path_elem =
+and augment_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list) (ty: ty): typed_path_elem =
   let module_name: module_name = ctx_module_name ctx in
   (* Check: e' is a public record type *)
-  let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
+  let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name ty in
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
@@ -749,7 +749,7 @@ and augment_pointer_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (
   match pointed_to with
   | NamedType (type_name, type_args, _) ->
      (* Check arg is a public record *)
-     let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
+     let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name pointed_to in
      if (vis = TypeVisPublic) || (module_name = source_module) then
        (* Check: the given slot name must exist in this record type. *)
        let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
@@ -761,12 +761,12 @@ and augment_pointer_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (
          ~type_name:(original_name type_name)
          ~slot_name
   | _ ->
-     Errors.path_not_record (type_string pointed_to)
+     Errors.path_not_record pointed_to
 
-and augment_reference_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list) =
+and augment_reference_slot_accessor_elem (ctx: expr_ctx) (slot_name: identifier) (type_name: qident) (type_args: ty list) (ty: ty) =
   let module_name: module_name = ctx_module_name ctx in
   (* Check: e' is a public record type *)
-  let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
+  let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name ty in
   if (vis = TypeVisPublic) || (module_name = source_module) then
     (* Check: the given slot name must exist in this record type. *)
     let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
@@ -822,7 +822,7 @@ and augment_ref_slot_access_inner (ctx: expr_ctx) (pointed_to: ty) (is_read: boo
   | NamedType (type_name, type_args, _) ->
      let module_name: module_name = ctx_module_name ctx in
      (* Check: e' is a public record type *)
-     let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name in
+     let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name pointed_to in
      if (vis = TypeVisPublic) || (module_name = source_module) then
        (* Check: the given slot name must exist in this record type. *)
        let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
