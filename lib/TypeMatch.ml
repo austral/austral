@@ -264,8 +264,18 @@ let match_typarams (ctx: ctx) (typarams: typarams) (args: ty list): type_binding
   let typarams' = List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams) in
   match_type_list ctx typarams' args
 
+let parse_bigint (s: string): Z.t =
+  try
+    Z.of_string s
+  with
+    | Invalid_argument _ ->
+      internal_err ("Failed to parse '" ^ s ^ "' as a big int. This is a bug in the parser.")
+
 let match_int_type_with_value (signedness: signedness) (width: integer_width) (value: string): type_bindings =
    let _ = (signedness, width, value) in
+   (* Parse the constant as a big integer. *)
+   let i: Z.t = parse_bigint value in
+   let _ = i in
    empty_bindings
 
 let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
