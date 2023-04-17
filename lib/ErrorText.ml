@@ -4,12 +4,14 @@
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
+open Type
 
 type err_text = text_elem list
 
 and text_elem =
   | Text of string
   | Code of string
+  | Type of ty
   | Break
 
 let rec error_text_to_plain (txt: err_text): string =
@@ -21,6 +23,8 @@ and text_elem_to_plain (elem: text_elem): string =
      s
   | Code c ->
      "`" ^ c ^ "`"
+  | Type ty ->
+     "`" ^ (type_string ty) ^ "`"
   | Break ->
      "\n\n"
  
@@ -31,6 +35,8 @@ let rec error_text_to_html (txt: err_text): string =
                     s
                 | Code c ->
                     "<code>" ^ c ^ "</code>"
+                | Type ty ->
+                    "<code>" ^ (type_string ty) ^ "</code>"
                 | Break ->
                     "<br><br>"
                 ) txt)
