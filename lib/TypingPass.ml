@@ -16,6 +16,7 @@ open TypeParser
 open TypeParameter
 open TypeParameters
 open Region
+open RegionMap
 open LexEnv
 open Env
 open EnvTypes

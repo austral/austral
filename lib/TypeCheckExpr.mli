@@ -10,7 +10,7 @@ open Tast
 open Type
 open Identifier
 open Env
-open Region
+open RegionMap
 open TypeParameters
 open LexEnv
 open TypeBindings

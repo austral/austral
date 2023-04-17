@@ -23,7 +23,7 @@ open TypeSignature
 open TypeParameter
 open TypeParameters
 open TypeClasses
-open Region
+open RegionMap
 open BuiltIn
 open TypeVarSet
 open Util

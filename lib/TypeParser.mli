@@ -9,7 +9,7 @@ open Identifier
 open Type
 open TypeSignature
 open TypeParameters
-open Region
+open RegionMap
 open Ast
 open Env
 
