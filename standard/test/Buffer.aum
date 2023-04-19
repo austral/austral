@@ -53,7 +53,9 @@ module body Standard.Test.Buffer is
         reverseEmptyTest();
         reverseNonEmptyTest();
         inPlaceMapTest();
+        inPlaceMapEmptyTest();
         mapTest();
+        mapEmptyTest();
         return nil;
     end;
 
@@ -317,6 +319,18 @@ module body Standard.Test.Buffer is
         return nil;
     end;
 
+    function inPlaceMapEmptyTest(): Unit is
+        testHeading("inPlaceMapEmpty");
+
+        let b: Buffer[Int32] := allocateEmpty();
+        inPlaceMap(&!b, double);
+        assertLength(&b, 0);
+ 
+        destroyFree(b);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
+    
     union CardinalDirection: Free is
         case North;
         case South;
@@ -358,6 +372,18 @@ module body Standard.Test.Buffer is
         return nil;
     end;
 
+    function mapEmptyTest(): Unit is
+        testHeading("mapEmpty");
+
+        let b1: Buffer[CardinalDirection] := allocateEmpty();
+        let b2: Buffer[Nat8] := map(b1, directionToChar);
+        
+        assertLength(&b2, 0);
+        
+        destroyFree(b2);
+        assertSuccess("destroyFree complete");
+        return nil;
+    end;
     ---
     --- Utilities
     ---
