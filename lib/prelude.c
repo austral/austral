@@ -49,6 +49,11 @@ au_array_t au_make_array_from_string(const char* data, size_t size) {
   return (au_array_t){ .data = (void*) data, .size = size };
 }
 
+void* au_stdout() {
+  extern void* stdout;
+  return stdout;
+}
+
 void* au_stderr() {
 #if defined(__APPLE__)
   extern void* __stderrp;
@@ -63,6 +68,11 @@ void* au_stderr() {
   extern void* stderr;
   return stderr;
 #endif
+}
+
+extern void* au_stdin() {
+  extern void* stdin;
+  return stdin;
 }
 
 au_unit_t au_abort_internal(const char* message) {
