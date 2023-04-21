@@ -1,5 +1,5 @@
 """
-Capabilities for input/output.
+Capabilities and type classes for input/output.
 """
 module Standard.IO is
     """
@@ -17,4 +17,14 @@ module Standard.IO is
     Release the terminal capability.
     """
     function releaseTerminal(term: TerminalCapability): Unit;
+
+    typeclass ByteOutputStream(T: Type) is
+        generic [R: Region]
+        method writeByte(stream: &![T, R], byte: Nat8): Unit;
+    end;
+
+    typeclass ByteInputStream(T: Type) is
+        generic [R: Region]
+        method readByte(stream: &![T, R]): Nat8;
+    end;
 end module.
