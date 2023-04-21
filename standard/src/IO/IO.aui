@@ -6,4 +6,10 @@ module Standard.IO is
     Terminal access capability.
     """
     type TerminalCapability: Linear;
+
+    """
+    Acquire a terminal capability from the root capability.
+    """
+    generic [R: Region]
+    function acquireTerminal(root: &![RootCapability, R]): TerminalCapability;
 end module.

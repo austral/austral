@@ -1,4 +1,9 @@
 module body Standard.IO is
     record TerminalCapability: Linear is
     end;
+
+    generic [R: Region]
+    function acquireTerminal(root: &![RootCapability, R]): TerminalCapability is
+        return TerminalCapability();
+    end;
 end module body.
