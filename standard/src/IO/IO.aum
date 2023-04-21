@@ -1,0 +1,20 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
+module body Standard.IO is
+    record TerminalCapability: Linear is
+    end;
+
+    generic [R: Region]
+    function acquireTerminal(root: &![RootCapability, R]): TerminalCapability is
+        return TerminalCapability();
+    end;
+
+    function releaseTerminal(term: TerminalCapability): Unit is
+        let {} := term;
+        return nil;
+    end;
+end module body.

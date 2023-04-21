@@ -1,0 +1,45 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
+"""
+Terminal input/output.
+"""
+import Standard.IO (
+    TerminalCapability,
+    ByteOutputStream,
+    writeByte,
+    ByteInputStream,
+    readByte
+);
+
+module Standard.IO.Terminal is
+    type StandardOutput: Linear;
+    
+    type StandardError: Linear;
+    
+    type StandardInput: Linear;
+
+    generic [R: Region]
+    function acquireOutput(term: &![TerminalCapability, R]): StandardOutput;
+
+    generic [R: Region]
+    function acquireError(term: &![TerminalCapability, R]): StandardError;
+
+    generic [R: Region]
+    function acquireInput(term: &![TerminalCapability, R]): StandardInput;
+
+    function releaseOutput(stream: StandardOutput): Unit;
+
+    function releaseError(stream: StandardError): Unit;
+
+    function releaseInput(stream: StandardInput): Unit;
+    
+    instance ByteOutputStream(StandardOutput);
+
+    instance ByteOutputStream(StandardError);
+
+    instance ByteInputStream(StandardInput);
+end module.

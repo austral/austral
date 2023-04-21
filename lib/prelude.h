@@ -49,6 +49,12 @@ extern void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_
 
 extern au_array_t au_make_array_from_string(const char* data, size_t size);
 
+extern void* au_stdout();
+
+extern void* au_stderr();
+
+extern void* au_stdin();
+
 extern au_unit_t au_abort(au_array_t message);
 
 extern au_unit_t au_printf(const char* format, ...);

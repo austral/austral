@@ -1,0 +1,36 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
+"""
+Capabilities and type classes for input/output.
+"""
+module Standard.IO is
+    """
+    Terminal access capability.
+    """
+    type TerminalCapability: Linear;
+
+    """
+    Acquire a terminal capability from the root capability.
+    """
+    generic [R: Region]
+    function acquireTerminal(root: &![RootCapability, R]): TerminalCapability;
+
+    """
+    Release the terminal capability.
+    """
+    function releaseTerminal(term: TerminalCapability): Unit;
+
+    typeclass ByteOutputStream(T: Type) is
+        generic [R: Region]
+        method writeByte(stream: &![T, R], byte: Nat8): Unit;
+    end;
+
+    typeclass ByteInputStream(T: Type) is
+        generic [R: Region]
+        method readByte(stream: &![T, R]): Option[Nat8];
+    end;
+end module.

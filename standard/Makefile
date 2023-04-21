@@ -6,6 +6,8 @@ MODULES := \
 		src/Box.aui,src/Box.aum \
 		src/Buffer.aui,src/Buffer.aum \
 		src/ByteString.aui,src/ByteString.aum \
+		src/IO/IO.aui,src/IO/IO.aum \
+		src/IO/Terminal.aui,src/IO/Terminal.aum \
 		test/Unit.aui,test/Unit.aum \
 		test/Tuples.aui,test/Tuples.aum \
 		test/Bounded.aui,test/Bounded.aum \
@@ -14,13 +16,14 @@ MODULES := \
 		test/Box.aui,test/Box.aum \
 		test/Buffer.aui,test/Buffer.aum \
 		test/ByteString.aui,test/ByteString.aum \
+		test/IO/Terminal.aui,test/IO/Terminal.aum \
 		test/Main.aui,test/Main.aum
 TEST_BIN := test_bin
 
 .DEFAULT: all
 all: $(TEST_BIN)
 
-$(TEST_BIN): src/*.aui src/*.aum test/*.aui test/*.aum
+$(TEST_BIN): src/*.aui src/*.aum src/*/*.aui src/*/*.aum test/*.aui test/*.aum test/*/*.aui test/*/*.aum
 	../austral compile $(MODULES) --entrypoint=Standard.Test:Main --output=$(TEST_BIN)
 
 .PHONY: clean
