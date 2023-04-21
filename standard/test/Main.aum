@@ -11,6 +11,7 @@ import Standard.Test.Order (orderTestSuite);
 import Standard.Test.Box (boxTestSuite);
 import Standard.Test.Buffer (bufferTestSuite);
 import Standard.Test.ByteString (byteStringTestSuite);
+import Standard.Test.IO.Terminal (terminalTestSuite);
 
 module body Standard.Test is
     function Main(root: RootCapability): ExitCode is
@@ -22,6 +23,7 @@ module body Standard.Test is
         boxTestSuite();
         bufferTestSuite();
         byteStringTestSuite();
+        terminalTestSuite();
         return ExitSuccess();
     end;
 end module body.

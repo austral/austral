@@ -1,0 +1,19 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
+import Standard.Test.Unit (
+    suiteHeading,
+    testHeading,
+    assertTrue,
+    assertFalse
+);
+
+module body Standard.Test.IO.Terminal is
+    function terminalTestSuite(): Unit is
+        suiteHeading("Standard.IO.Terminal");
+        return nil;
+    end;
+end module body.
