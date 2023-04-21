@@ -7,13 +7,43 @@
 import Standard.Test.Unit (
     suiteHeading,
     testHeading,
-    assertTrue,
-    assertFalse
+    assertSuccess
+);
+import Standard.IO (
+    TerminalCapability,
+    acquireTerminal,
+    releaseTerminal,
+    writeByte
+);
+import Standard.IO.Terminal (
+    StandardOutput,
+    StandardError,
+    StandardInput,
+    acquireOutput,
+    acquireError,
+    acquireInput,
+    releaseOutput,
+    releaseError,
+    releaseInput
 );
 
 module body Standard.Test.IO.Terminal is
-    function terminalTestSuite(): Unit is
+    generic [R: Region]
+    function terminalTestSuite(root: &![RootCapability, R]): Unit is
         suiteHeading("Standard.IO.Terminal");
+        let termcap: TerminalCapability := acquireTerminal(root);
+        stdoutWriteByteTest(&!termcap);
+        releaseTerminal(termcap);
+        return nil;
+    end;
+
+    generic [R: Region]
+    function stdoutWriteByteTest(term: &![TerminalCapability, R]): Unit is
+        testHeading("stdout: writeByte");
+        let stdout: StandardOutput := acquireOutput(reborrow(term));
+        writeByte(&!stdout, 'a');
+        releaseOutput(stdout);
+        assertSuccess("writeByte completed");
         return nil;
     end;
 end module body.

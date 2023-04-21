@@ -15,7 +15,6 @@ import Standard.Test.IO.Terminal (terminalTestSuite);
 
 module body Standard.Test is
     function Main(root: RootCapability): ExitCode is
-        surrenderRoot(root);
         tuplesTestSuite();
         boundedTestSuite();
         equalityTestSuite();
@@ -23,7 +22,8 @@ module body Standard.Test is
         boxTestSuite();
         bufferTestSuite();
         byteStringTestSuite();
-        terminalTestSuite();
+        terminalTestSuite(&!root);
+        surrenderRoot(root);
         return ExitSuccess();
     end;
 end module body.

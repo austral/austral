@@ -23,7 +23,7 @@ TEST_BIN := test_bin
 .DEFAULT: all
 all: $(TEST_BIN)
 
-$(TEST_BIN): src/*.aui src/*.aum src/*/*.aui src/*/*.aum test/*.aui test/*.aum
+$(TEST_BIN): src/*.aui src/*.aum src/*/*.aui src/*/*.aum test/*.aui test/*.aum test/*/*.aui test/*/*.aum
 	../austral compile $(MODULES) --entrypoint=Standard.Test:Main --output=$(TEST_BIN)
 
 .PHONY: clean
