@@ -6,4 +6,9 @@ module body Standard.IO is
     function acquireTerminal(root: &![RootCapability, R]): TerminalCapability is
         return TerminalCapability();
     end;
+
+    function releaseTerminal(term: TerminalCapability): Unit is
+        let {} := term;
+        return nil;
+    end;
 end module body.

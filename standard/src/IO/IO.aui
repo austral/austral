@@ -12,4 +12,9 @@ module Standard.IO is
     """
     generic [R: Region]
     function acquireTerminal(root: &![RootCapability, R]): TerminalCapability;
+
+    """
+    Release the terminal capability.
+    """
+    function releaseTerminal(term: TerminalCapability): Unit;
 end module.
