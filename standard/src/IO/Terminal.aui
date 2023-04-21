@@ -2,5 +2,9 @@
 Terminal input/output.
 """
 module Standard.IO.Terminal is
-
+    type StandardOutput: Linear;
+    
+    type StandardError: Linear;
+    
+    type StandardInput: Linear;
 end module.

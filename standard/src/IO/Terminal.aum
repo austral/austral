@@ -1,3 +1,10 @@
 module body Standard.IO.Terminal is
+    record StandardOutput: Linear is
+    end;
 
+    record StandardError: Linear is
+    end;
+
+    record StandardInput: Linear is
+    end;
 end module body.
