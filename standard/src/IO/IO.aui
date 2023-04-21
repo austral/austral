@@ -2,5 +2,8 @@
 Capabilities for input/output.
 """
 module Standard.IO is
-
+    """
+    Terminal access capability.
+    """
+    type TerminalCapability: Linear;
 end module.

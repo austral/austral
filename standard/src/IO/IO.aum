@@ -1,3 +1,4 @@
 module body Standard.IO is
-
+    record TerminalCapability: Linear is
+    end;
 end module body.
