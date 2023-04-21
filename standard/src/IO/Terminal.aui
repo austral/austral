@@ -1,0 +1,6 @@
+"""
+Terminal input/output.
+"""
+module Standard.IO.Terminal is
+
+end module.
