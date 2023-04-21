@@ -7,4 +7,34 @@ module body Standard.IO.Terminal is
 
     record StandardInput: Linear is
     end;
+
+    generic [R: Region]
+    function acquireOutput(term: &![TerminalCapability, R]): StandardOutput is
+        return StandardOutput();
+    end;
+
+    generic [R: Region]
+    function acquireError(term: &![TerminalCapability, R]): StandardError is
+        return StandardError();
+    end;
+
+    generic [R: Region]
+    function acquireInput(term: &![TerminalCapability, R]): StandardInput is
+        return StandardInput();
+    end;
+
+    function releaseOutput(stream: StandardOutput): Unit is
+        let {} := stream;
+        return nil;
+    end;
+
+    function releaseError(stream: StandardError): Unit is
+        let {} := stream;
+        return nil;
+    end;
+
+    function releaseInput(stream: StandardInput): Unit is
+        let {} := stream;
+        return nil;
+    end;
 end module body.
