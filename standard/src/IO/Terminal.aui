@@ -2,7 +2,11 @@
 Terminal input/output.
 """
 import Standard.IO (
-    TerminalCapability
+    TerminalCapability,
+    ByteOutputStream,
+    writeByte,
+    ByteInputStream,
+    readByte
 );
 
 module Standard.IO.Terminal is
@@ -26,4 +30,10 @@ module Standard.IO.Terminal is
     function releaseError(stream: StandardError): Unit;
 
     function releaseInput(stream: StandardInput): Unit;
+    
+    instance ByteOutputStream(StandardOutput);
+
+    instance ByteOutputStream(StandardError);
+
+    instance ByteInputStream(StandardInput);
 end module.

@@ -25,6 +25,6 @@ module Standard.IO is
 
     typeclass ByteInputStream(T: Type) is
         generic [R: Region]
-        method readByte(stream: &![T, R]): Nat8;
+        method readByte(stream: &![T, R]): Option[Nat8];
     end;
 end module.

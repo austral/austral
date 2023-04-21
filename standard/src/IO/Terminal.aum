@@ -1,4 +1,17 @@
+import Austral.Memory (
+    Address
+);
+import Standard.IO (
+    TerminalCapability,
+    ByteOutputStream,
+    writeByte,
+    ByteInputStream,
+    readByte
+);
+
 module body Standard.IO.Terminal is
+    pragma Unsafe_Module;
+
     record StandardOutput: Linear is
     end;
 
@@ -36,5 +49,72 @@ module body Standard.IO.Terminal is
     function releaseInput(stream: StandardInput): Unit is
         let {} := stream;
         return nil;
+    end;
+
+    instance ByteOutputStream(StandardOutput) is
+        generic [R: Region]
+        method writeByte(stream: &![StandardOutput, R], byte: Nat8): Unit is
+            let stdout: Address[Nat8] := getStdout();
+            case toInt32(byte) of
+                when Some(value as c: Int32) do
+                    fputc(c, stdout);
+                when None do
+                    skip;
+            end case;
+            return nil;
+        end;
+    end;
+
+    instance ByteOutputStream(StandardError) is
+        generic [R: Region]
+        method writeByte(stream: &![StandardOutput, R], byte: Nat8): Unit is
+            let stderr: Address[Nat8] := getStderr();
+            case toInt32(byte) of
+                when Some(value as c: Int32) do
+                    fputc(c, stderr);
+                when None do
+                    skip;
+            end case;
+            return nil;
+        end;
+    end;
+
+    instance ByteInputStream(StandardInput) is
+        generic [R: Region]
+        method readByte(stream: &![StandardOutput, R]): Option[Nat8] is
+            let stdin: Address[Nat8] := getStdin();
+            let res: Int32 := fgetc(stdin);
+            if res = EOF then
+                return None();
+            else
+                return toNat8(res);
+            end if;
+        end;
+    end;
+
+    --
+    -- Internal foreign bindings.
+    --
+
+    constant EOF: Int32 := -1;
+
+    function getStdout(): Address[Nat8] is
+        return @embed(Address[Nat8], "au_stdout()");
+    end;
+
+    function getStderr(): Address[Nat8] is
+        return @embed(Address[Nat8], "au_stderr()");
+    end;
+
+    function getStdin(): Address[Nat8] is
+        return @embed(Address[Nat8], "au_stdin()");
+    end;
+
+    function fputc(c: Int32, stream: Address[Nat8]): Int32 is
+        pragma Foreign_Import(External_Name => "fputc");
+    end;
+
+    function fgetc(stream: Address[Nat8]): Int32 is
+        pragma Foreign_Import(External_Name => "fgetc");
     end;
 end module body.
