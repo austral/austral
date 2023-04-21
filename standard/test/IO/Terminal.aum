@@ -33,6 +33,7 @@ module body Standard.Test.IO.Terminal is
         suiteHeading("Standard.IO.Terminal");
         let termcap: TerminalCapability := acquireTerminal(root);
         stdoutWriteByteTest(&!termcap);
+        stderrWriteByteTest(&!termcap);
         releaseTerminal(termcap);
         return nil;
     end;
@@ -43,6 +44,16 @@ module body Standard.Test.IO.Terminal is
         let stdout: StandardOutput := acquireOutput(reborrow(term));
         writeByte(&!stdout, 'a');
         releaseOutput(stdout);
+        assertSuccess("writeByte completed");
+        return nil;
+    end;
+
+    generic [R: Region]
+    function stderrWriteByteTest(term: &![TerminalCapability, R]): Unit is
+        testHeading("stderr: writeByte");
+        let stderr: StandardError := acquireError(reborrow(term));
+        writeByte(&!stderr, 'a');
+        releaseError(stderr);
         assertSuccess("writeByte completed");
         return nil;
     end;
