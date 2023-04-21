@@ -1,0 +1,6 @@
+"""
+Capabilities for input/output.
+"""
+module Standard.IO is
+
+end module.

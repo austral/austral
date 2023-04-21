@@ -6,6 +6,7 @@ MODULES := \
 		src/Box.aui,src/Box.aum \
 		src/Buffer.aui,src/Buffer.aum \
 		src/ByteString.aui,src/ByteString.aum \
+		src/IO/IO.aui,src/IO/IO.aum \
 		test/Unit.aui,test/Unit.aum \
 		test/Tuples.aui,test/Tuples.aum \
 		test/Bounded.aui,test/Bounded.aum \
