@@ -106,6 +106,13 @@ To run the tests:
 $ ./run-tests.sh
 ```
 
+To build the standard library:
+
+```bash
+$ cd standard
+$ make
+```
+
 ## Usage
 
 Suppose you have a program with modules `A`, `B`, and `C`, in the following
