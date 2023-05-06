@@ -3,8 +3,14 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/006-linearity/008-consume-twice/Test.aum'
+    From: line 14, column 8
+    To: line 14, column 19
   Description:
     The variable `r` has already been consumed.
   Code:
-    [no span available]
+    12 |         let r: R := R(x => 32);
+    13 |         Consume(r);
+    14 |         Consume(r);
+    15 |         return ExitSuccess();
+    16 |     end;

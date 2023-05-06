@@ -3,8 +3,18 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/006-linearity/004-if-true/Test.aum'
+    From: line 8, column 8
+    To: line 12, column 15
   Description:
     The variable `r` is used inconsistently in the branches of an if statement. In one branch it is consumed while in the other it is not yet consumed.
   Code:
-    [no span available]
+     6 |     function main(): ExitCode is
+     7 |         let r: R := R(x => 32);
+     8 |         if true then
+     9 |             let { x: Int32 } := r;
+    10 |         else
+    11 |             skip;
+    12 |         end if;
+    13 |         return ExitSuccess();
+    14 |     end;

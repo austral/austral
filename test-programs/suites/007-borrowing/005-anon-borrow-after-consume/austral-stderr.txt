@@ -3,8 +3,14 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/007-borrowing/005-anon-borrow-after-consume/Test.aum'
+    From: line 12, column 8
+    To: line 12, column 13
   Description:
     The variable `foo` has already been consumed.
   Code:
-    [no span available]
+    10 |         let { bar: Nat8 } := foo;
+    11 |         -- Try to borrow it.
+    12 |         &foo;
+    13 |         return ExitSuccess();
+    14 |     end;

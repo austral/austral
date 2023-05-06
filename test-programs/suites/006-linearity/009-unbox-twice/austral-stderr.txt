@@ -3,8 +3,14 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/006-linearity/009-unbox-twice/Test.aum'
+    From: line 47, column 16
+    To: line 47, column 28
   Description:
     The variable `left` has already been consumed.
   Code:
-    [no span available]
+    45 |             when Left(left: Box[Int32]) do
+    46 |                 Unbox(left);
+    47 |                 Unbox(left);
+    48 |             when Right(right: Int32) do
+    49 |                 skip;
