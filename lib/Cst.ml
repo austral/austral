@@ -24,27 +24,27 @@ and concrete_import =
   ConcreteImport of identifier * identifier option
 
 and concrete_decl =
-  | ConcreteConstantDecl of identifier * typespec * docstring
-  | ConcreteOpaqueTypeDecl of identifier * concrete_type_param list * universe * docstring
+  | ConcreteConstantDecl of span * identifier * typespec * docstring
+  | ConcreteOpaqueTypeDecl of span * identifier * concrete_type_param list * universe * docstring
   | ConcreteRecordDecl of concrete_record
   | ConcreteUnionDecl of concrete_union
-  | ConcreteFunctionDecl of identifier * concrete_type_param list * concrete_param list * typespec * docstring
+  | ConcreteFunctionDecl of span * identifier * concrete_type_param list * concrete_param list * typespec * docstring
   | ConcreteTypeClassDecl of concrete_typeclass
-  | ConcreteInstanceDecl of identifier * concrete_type_param list * typespec * docstring
+  | ConcreteInstanceDecl of span * identifier * concrete_type_param list * typespec * docstring
 
 and concrete_def =
-  | ConcreteConstantDef of identifier * typespec * cexpr * docstring
+  | ConcreteConstantDef of span * identifier * typespec * cexpr * docstring
   | ConcreteRecordDef of concrete_record
   | ConcreteUnionDef of concrete_union
-  | ConcreteFunctionDef of identifier * concrete_type_param list * concrete_param list * typespec * cstmt * docstring * pragma list
+  | ConcreteFunctionDef of span * identifier * concrete_type_param list * concrete_param list * typespec * cstmt * docstring * pragma list
   | ConcreteTypeClassDef of concrete_typeclass
   | ConcreteInstanceDef of concrete_instance
 
 and concrete_record =
-  ConcreteRecord of identifier * concrete_type_param list * universe * concrete_slot list * docstring
+  ConcreteRecord of span * identifier * concrete_type_param list * universe * concrete_slot list * docstring
 
 and concrete_union =
-  ConcreteUnion of identifier * concrete_type_param list * universe * concrete_case list * docstring
+  ConcreteUnion of span * identifier * concrete_type_param list * universe * concrete_case list * docstring
 
 and concrete_slot =
   ConcreteSlot of identifier * typespec
@@ -53,10 +53,10 @@ and concrete_case =
   ConcreteCase of identifier * concrete_slot list
 
 and concrete_typeclass =
-  ConcreteTypeClass of identifier * concrete_type_param * concrete_method_decl list * docstring
+  ConcreteTypeClass of span * identifier * concrete_type_param * concrete_method_decl list * docstring
 
 and concrete_instance =
-  ConcreteInstance of identifier * concrete_type_param list * typespec * concrete_method_def list * docstring
+  ConcreteInstance of span * identifier * concrete_type_param list * typespec * concrete_method_def list * docstring
 
 and concrete_method_decl =
   ConcreteMethodDecl of identifier * concrete_type_param list * concrete_param list * typespec * docstring

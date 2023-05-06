@@ -42,20 +42,20 @@ let make_module_body (name: module_name) (imports: concrete_import_list list) (p
   ConcreteModuleBody (name, kind, docstring, imports, defs)
 
 let concrete_decl_name = function
-  | ConcreteConstantDecl (n, _, _) -> Some n
-  | ConcreteOpaqueTypeDecl (n, _, _, _) -> Some n
-  | ConcreteRecordDecl (ConcreteRecord (n, _, _, _, _)) -> Some n
-  | ConcreteUnionDecl (ConcreteUnion (n, _, _, _, _)) -> Some n
-  | ConcreteFunctionDecl (n, _, _, _, _) -> Some n
-  | ConcreteTypeClassDecl (ConcreteTypeClass (n, _, _, _)) -> Some n
+  | ConcreteConstantDecl (_, n, _, _) -> Some n
+  | ConcreteOpaqueTypeDecl (_, n, _, _, _) -> Some n
+  | ConcreteRecordDecl (ConcreteRecord (_, n, _, _, _, _)) -> Some n
+  | ConcreteUnionDecl (ConcreteUnion (_, n, _, _, _, _)) -> Some n
+  | ConcreteFunctionDecl (_, n, _, _, _, _) -> Some n
+  | ConcreteTypeClassDecl (ConcreteTypeClass (_, n, _, _, _)) -> Some n
   | ConcreteInstanceDecl _ -> None
 
 let def_name = function
-  | ConcreteConstantDef (n, _, _, _) -> Some n
-  | ConcreteRecordDef (ConcreteRecord (n, _, _, _, _)) -> Some n
-  | ConcreteUnionDef (ConcreteUnion (n, _, _, _, _)) -> Some n
-  | ConcreteFunctionDef (n, _, _, _, _, _, _) -> Some n
-  | ConcreteTypeClassDef (ConcreteTypeClass (n, _, _, _)) -> Some n
+  | ConcreteConstantDef (_, n, _, _, _) -> Some n
+  | ConcreteRecordDef (ConcreteRecord (_, n, _, _, _, _)) -> Some n
+  | ConcreteUnionDef (ConcreteUnion (_, n, _, _, _, _)) -> Some n
+  | ConcreteFunctionDef (_, n, _, _, _, _, _, _) -> Some n
+  | ConcreteTypeClassDef (ConcreteTypeClass (_, n, _, _, _)) -> Some n
   | ConcreteInstanceDef _ -> None
 
 let get_concrete_decl (ConcreteModuleInterface (_, _, _, decls)) name =
@@ -80,7 +80,7 @@ let get_concrete_def (ConcreteModuleBody (_, _, _, _, defs)) name =
 
 let has_instance_decl (ConcreteModuleInterface (_, _, _, decls)) (name: identifier) (typarams: concrete_type_param list) (ty: typespec): bool =
   let pred = function
-    | ConcreteInstanceDecl (name', typarams', ty', _) ->
+    | ConcreteInstanceDecl (_, name', typarams', ty', _) ->
        (name = name') && (typarams = typarams') && (ty = ty')
     | _ ->
        false
@@ -91,7 +91,7 @@ let get_instance_def (ConcreteModuleBody (_, _, _, _, defs)) (name: identifier) 
   let filter = function
     | ConcreteInstanceDef ci -> Some ci
     | _ -> None
-  and pred (ConcreteInstance (name', typarams', ty', _, _)) =
+  and pred (ConcreteInstance (_, name', typarams', ty', _, _)) =
     (name = name') && (typarams = typarams') && (ty = ty')
   in
   List.find_opt pred (List.filter_map filter defs)
