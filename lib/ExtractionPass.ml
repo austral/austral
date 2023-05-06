@@ -186,9 +186,9 @@ and extract_type_signatures' (def: combined_definition): type_signature option =
   match def with
   | CConstant _ ->
      None
-  | CRecord (_, name, typarams, universe, _, _) ->
+  | CRecord (_, _, name, typarams, universe, _, _) ->
      Some (TypeSignature (name, typarams, universe))
-  | CUnion (_, name, typarams, universe, _, _) ->
+  | CUnion (_, _, name, typarams, universe, _, _) ->
      Some (TypeSignature (name, typarams, universe))
   | CFunction _ ->
      None
@@ -280,264 +280,276 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
     ValueParameter (n, parse' rm typarams ts)
   in
   match def with
-  | CConstant (vis, name, typespec, def, docstring) ->
-     let ty = parse' rm empty_typarams typespec in
-     let (env, decl_id) = add_constant env { mod_id; vis; name; ty; docstring } in
-     let decl = LConstant (decl_id, vis, name, ty, def, docstring) in
-     (env, decl)
-  | CRecord (vis, name, typarams, universe, slots, docstring) ->
-     let slots = List.map (parse_slot typarams) slots in
-     (* If the universe is `Free`, check that there are no slots with types in the `Type` or `Linear` universes. *)
-     let _ =
-       if universe = FreeUniverse then
-         check_slots_are_free name slots
-       else
-         ()
-     in
-     (* If the universe is `Free`, check that there are no type parameters in
-        the `Linear` or `Type` universes. *)
-     let _ =
-       if universe = FreeUniverse then
-         (* Unless it is `Address` or `Pointer` *)
-         let qname = make_qident (mn, name, name) in
-         if (is_address_type qname) || (is_pointer_type qname) then
-           ()
-         else
-           check_typarams_are_free name typarams
-       else
-         ()
-     in
-     (* If the universe is `Region`, fail. *)
-     let _ =
-       if universe = RegionUniverse then
-         Errors.types_are_not_regions ~name ~declaration:"record"
-       else
-         ()
-     in
-     let (env, decl_id) = add_record env { mod_id; vis; name; docstring; typarams; universe; slots } in
-     let decl = LRecord (decl_id, vis, name, typarams, universe, slots, docstring) in
-     (env, decl)
-  | CUnion (vis, name, typarams, universe, cases, docstring) ->
-     (* If the universe is `Free`, check that there are no cases with slots with types in the `Type` or `Linear` universes. *)
-     let _ =
-       if universe = FreeUniverse then
-         let cases = List.map (fun (QualifiedCase (n, slots)) -> TypedCase (n, List.map (parse_slot typarams) slots)) cases
+  | CConstant (span, vis, name, typespec, def, docstring) ->
+     adorn_error_with_span span
+       (fun _ ->
+         let ty = parse' rm empty_typarams typespec in
+         let (env, decl_id) = add_constant env { mod_id; vis; name; ty; docstring } in
+         let decl = LConstant (decl_id, vis, name, ty, def, docstring) in
+         (env, decl))
+  | CRecord (span, vis, name, typarams, universe, slots, docstring) ->
+     adorn_error_with_span span
+       (fun _ ->
+         let slots = List.map (parse_slot typarams) slots in
+         (* If the universe is `Free`, check that there are no slots with types in the `Type` or `Linear` universes. *)
+         let _ =
+           if universe = FreeUniverse then
+             check_slots_are_free name slots
+           else
+             ()
          in
-         check_cases_are_free cases
-       else
-         ()
-     in
-     (* If the universe is `Free`, check that there are no type parameters in
-        the `Linear` or `Type` universes. *)
-     let _ =
-       if universe = FreeUniverse then
-         check_typarams_are_free name typarams
-       else
-         ()
-     in
-     (* If the universe is `Region`, fail. *)
-     let _ =
-       if universe = RegionUniverse then
-         Errors.types_are_not_regions ~name ~declaration:"union"
-       else
-         ()
-     in
-     (* Add the union itself to the env *)
-     let (env, union_id) = add_union env { mod_id; vis; name; docstring; typarams; universe } in
-     (* If the union is public, the cases are public, otherwise they are private. *)
-     let case_vis: vis =
-       match vis with
-       | TypeVisPublic -> VisPublic
-       | TypeVisOpaque -> VisPrivate
-       | TypeVisPrivate -> VisPrivate
-     in
-     (* Convert the list of cases into a list of union_case_input records *)
-     let case_map (QualifiedCase (n, slots)): union_case_input =
-       let docstring = Docstring "" in (* TODO: Store docstrings in slots and cases *)
-       {
-         mod_id = mod_id;
-         vis = case_vis;
-         union_id = union_id;
-         name = n;
-         slots = List.map (parse_slot typarams) slots;
-         docstring = docstring;
-       }
-     in
-     let cases: union_case_input list = List.map case_map cases in
-     (* Add the union cases to the environmenmt *)
-     let (env, linked_cases) = add_union_cases env cases in
-     (* Construct the decl *)
-     let decl = LUnion (union_id, vis, name, typarams, universe, linked_cases, docstring) in
-     (env, decl)
-  | CFunction (vis, name, typarams, params, rt, body, docstring, pragmas) ->
-     let value_params = List.map (parse_param typarams) params
-     and rt = parse' rm typarams rt
-     and external_name: string option =
-       (match pragmas with
-        | [ForeignImportPragma s] ->
-           Some s
-        | _ ->
-           None)
-     and export_name: string option =
-       (match pragmas with
-        | [ForeignExportPragma name] ->
-           Some name
-        | _ ->
-           None)
-     in
-     let _ =
-       (* Check: if we have both an export name and an external name, raise an error. *)
-       match (external_name, export_name) with
-       | (Some _, Some _) ->
-          Errors.foreign_import_export name
-       | _ ->
-          ()
-     in
-     let _ =
-       (* Check: if we have an export name the function can't be generic *)
-       match export_name with
-       | Some _ ->
-          if typarams_size typarams > 0 then
-            Errors.export_generic name
-          else
-            ()
-       | None ->
-          ()
-     in
-     let _ =
-       (* Check: all type parameters must appear in the type signature. *)
-       check_all_type_parameters_appear_in_signature typarams value_params rt
-     in
-     let fn_input: function_input = {
-         mod_id = mod_id;
-         vis = vis;
-         name = name;
-         docstring = docstring;
-         typarams = typarams;
-         value_params = value_params;
-         rt = rt;
-         external_name = external_name;
-         body = None
-       }
-     in
-     let (env, decl_id) = add_function env fn_input in
-     let env =
-       (* If the function has an export name, register it in the environment. *)
-       match export_name with
-       | Some name ->
-          add_exported_function env decl_id name
-       | None ->
-          env
-     in
-     let decl = LFunction (decl_id, vis, name, typarams, value_params, rt, body, docstring, pragmas) in
-     (env, decl)
-  | CTypeclass (vis, name, typaram, methods, docstring) ->
-     (* Check: the universe is one of {Type, Linear, Free} *)
-     let _ =
-       match typaram_universe typaram with
-       | TypeUniverse -> ()
-       | LinearUniverse -> ()
-       | FreeUniverse -> ()
-       | RegionUniverse ->
-          Errors.typeclass_param_not_region name
-     in
-     (* Add the typeclass itself to the env *)
-     let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
-     (* Convert the list of methods into a list of type_class_method records *)
-     let typarams = typarams_from_list [typaram] in
-     let method_map (CMethodDecl (name, method_typarams, params, rt, docstring)): type_class_method_input =
-       let effective_typarams: typarams = merge_typarams typarams method_typarams in
-       let value_params = List.map (parse_param effective_typarams) params
-       and rt = parse' rm effective_typarams rt in
-       {
-         mod_id;
-         vis;
-         typeclass_id;
-         name;
-         docstring;
-         typarams = method_typarams;
-         value_params;
-         rt;
-       }
-     in
-     let methods: type_class_method_input list = List.map method_map methods in
-     (* Add the methods to the env *)
-     let (env, linked_methods) = add_type_class_methods env methods in
-     (* Construct the decl *)
-     let decl = LTypeclass (typeclass_id, vis, name, typaram, linked_methods, docstring) in
-     (env, decl)
-  | CInstance (vis, name, typarams, argument, methods, docstring) ->
-     let typeclass_name = qident_to_sident name |> sident_name in
-     (* First add the instance to the env, then the methods. *)
-     let argument = parse' rm typarams argument in
-     (* Find typeclass info. *)
-     let (typeclass_id, typeclass_mod_id, typeclass_param_name, universe): decl_id * mod_id * identifier * universe =
-       match get_decl_by_name env (qident_to_sident name) with
-       | Some decl ->
-          (match decl with
-           | TypeClass { id; mod_id; param; _ } ->
-              (id, mod_id, typaram_name param, typaram_universe param)
+         (* If the universe is `Free`, check that there are no type parameters in
+            the `Linear` or `Type` universes. *)
+         let _ =
+           if universe = FreeUniverse then
+             (* Unless it is `Address` or `Pointer` *)
+             let qname = make_qident (mn, name, name) in
+             if (is_address_type qname) || (is_pointer_type qname) then
+               ()
+             else
+               check_typarams_are_free name typarams
+           else
+             ()
+         in
+         (* If the universe is `Region`, fail. *)
+         let _ =
+           if universe = RegionUniverse then
+             Errors.types_are_not_regions ~name ~declaration:"record"
+           else
+             ()
+         in
+         let (env, decl_id) = add_record env { mod_id; vis; name; docstring; typarams; universe; slots } in
+         let decl = LRecord (decl_id, vis, name, typarams, universe, slots, docstring) in
+         (env, decl))
+  | CUnion (span, vis, name, typarams, universe, cases, docstring) ->
+     adorn_error_with_span span
+       (fun _ ->
+         (* If the universe is `Free`, check that there are no cases with slots with types in the `Type` or `Linear` universes. *)
+         let _ =
+           if universe = FreeUniverse then
+             let cases = List.map (fun (QualifiedCase (n, slots)) -> TypedCase (n, List.map (parse_slot typarams) slots)) cases
+             in
+             check_cases_are_free cases
+           else
+             ()
+         in
+         (* If the universe is `Free`, check that there are no type parameters in
+            the `Linear` or `Type` universes. *)
+         let _ =
+           if universe = FreeUniverse then
+             check_typarams_are_free name typarams
+           else
+             ()
+         in
+         (* If the universe is `Region`, fail. *)
+         let _ =
+           if universe = RegionUniverse then
+             Errors.types_are_not_regions ~name ~declaration:"union"
+           else
+             ()
+         in
+         (* Add the union itself to the env *)
+         let (env, union_id) = add_union env { mod_id; vis; name; docstring; typarams; universe } in
+         (* If the union is public, the cases are public, otherwise they are private. *)
+         let case_vis: vis =
+           match vis with
+           | TypeVisPublic -> VisPublic
+           | TypeVisOpaque -> VisPrivate
+           | TypeVisPrivate -> VisPrivate
+         in
+         (* Convert the list of cases into a list of union_case_input records *)
+         let case_map (QualifiedCase (n, slots)): union_case_input =
+           let docstring = Docstring "" in (* TODO: Store docstrings in slots and cases *)
+           {
+             mod_id = mod_id;
+             vis = case_vis;
+             union_id = union_id;
+             name = n;
+             slots = List.map (parse_slot typarams) slots;
+             docstring = docstring;
+           }
+         in
+         let cases: union_case_input list = List.map case_map cases in
+         (* Add the union cases to the environmenmt *)
+         let (env, linked_cases) = add_union_cases env cases in
+         (* Construct the decl *)
+         let decl = LUnion (union_id, vis, name, typarams, universe, linked_cases, docstring) in
+         (env, decl))
+  | CFunction (span, vis, name, typarams, params, rt, body, docstring, pragmas) ->
+     adorn_error_with_span span
+       (fun _ ->
+         let value_params = List.map (parse_param typarams) params
+         and rt = parse' rm typarams rt
+         and external_name: string option =
+           (match pragmas with
+            | [ForeignImportPragma s] ->
+               Some s
+            | _ ->
+               None)
+         and export_name: string option =
+           (match pragmas with
+            | [ForeignExportPragma name] ->
+               Some name
+            | _ ->
+               None)
+         in
+         let _ =
+           (* Check: if we have both an export name and an external name, raise an error. *)
+           match (external_name, export_name) with
+           | (Some _, Some _) ->
+              Errors.foreign_import_export name
            | _ ->
-              Errors.instance_for_non_typeclass typeclass_name)
-       | None ->
-          Errors.unknown_typeclass typeclass_name
-     in
-     (* Check the argument has the right universe for the typeclass. *)
-     let _ = check_instance_argument_has_right_universe universe argument in
-     (* Check the argument has the right shape. *)
-     let _ = check_instance_argument_has_right_shape typarams argument in
-     (* Check that the non of the type parameters in the generic instance
-        collide with the type parameter of the typeclass. *)
-     let _ = check_disjoint_typarams typeclass_param_name typarams in
-     (* Local uniqueness: does this instance collide with other instances in this module? *)
-     let _ =
-       let other_instances: decl list =
-         List.filter (fun decl ->
-             match decl with
-             | Instance { typeclass_id=typeclass_id'; _ } ->
-                equal_decl_id typeclass_id typeclass_id'
-             | _ -> false)
-           (module_instances env mod_id)
-       in
-       check_instance_locally_unique other_instances argument
-     in
-     (* Global uniqueness: check orphan rules. *)
-     let _ = check_instance_orphan_rules env mod_id typeclass_mod_id argument in
-     (* Add the instance to the env *)
-     let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
-     let (env, instance_id) = add_instance env input in
-     (* Convert the list of methods into a list of instance_method_input records *)
-     let method_map (CMethodDef (name, method_typarams, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
-       let effective_typarams: typarams = merge_typarams typarams method_typarams in
-       let value_params = List.map (parse_param effective_typarams) params
-       and rt = parse' rm effective_typarams rt
-       and method_id: decl_id =
-         (match get_method_from_typeclass_id_and_name env typeclass_id name with
-          | Some (TypeClassMethod { id; _ }) ->
-             id
-          | _ ->
-             Errors.typeclass_no_method
-               ~typeclass:typeclass_name
-               ~method_name:name)
-       in
-       ({
-           instance_id = instance_id;
-           method_id = method_id;
-           docstring = meth_docstring;
-           name = name;
-           typarams = method_typarams;
-           value_params = value_params;
-           rt = rt;
-           body = None;
-         },
-        body)
-     in
-     let methods: (instance_method_input * astmt) list = List.map method_map methods in
-     (* Add the methods to the env *)
-     let (env, linked_methods) = add_instance_methods env methods in
-     (* Construct the decl *)
-     let decl = LInstance (instance_id, vis, name, typarams, argument, linked_methods, docstring) in
-     (env, decl)
+              ()
+         in
+         let _ =
+           (* Check: if we have an export name the function can't be generic *)
+           match export_name with
+           | Some _ ->
+              if typarams_size typarams > 0 then
+                Errors.export_generic name
+              else
+                ()
+           | None ->
+              ()
+         in
+         let _ =
+           (* Check: all type parameters must appear in the type signature. *)
+           check_all_type_parameters_appear_in_signature typarams value_params rt
+         in
+         let fn_input: function_input = {
+             mod_id = mod_id;
+             vis = vis;
+             name = name;
+             docstring = docstring;
+             typarams = typarams;
+             value_params = value_params;
+             rt = rt;
+             external_name = external_name;
+             body = None
+           }
+         in
+         let (env, decl_id) = add_function env fn_input in
+         let env =
+           (* If the function has an export name, register it in the environment. *)
+           match export_name with
+           | Some name ->
+              add_exported_function env decl_id name
+           | None ->
+              env
+         in
+         let decl = LFunction (decl_id, vis, name, typarams, value_params, rt, body, docstring, pragmas) in
+         (env, decl))
+  | CTypeclass (span, vis, name, typaram, methods, docstring) ->
+     adorn_error_with_span span
+       (fun _ ->
+         (* Check: the universe is one of {Type, Linear, Free} *)
+         let _ =
+           match typaram_universe typaram with
+           | TypeUniverse -> ()
+           | LinearUniverse -> ()
+           | FreeUniverse -> ()
+           | RegionUniverse ->
+              Errors.typeclass_param_not_region name
+         in
+         (* Add the typeclass itself to the env *)
+         let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
+         (* Convert the list of methods into a list of type_class_method records *)
+         let typarams = typarams_from_list [typaram] in
+         let method_map (CMethodDecl (name, method_typarams, params, rt, docstring)): type_class_method_input =
+           let effective_typarams: typarams = merge_typarams typarams method_typarams in
+           let value_params = List.map (parse_param effective_typarams) params
+           and rt = parse' rm effective_typarams rt in
+           {
+             mod_id;
+             vis;
+             typeclass_id;
+             name;
+             docstring;
+             typarams = method_typarams;
+             value_params;
+             rt;
+           }
+         in
+         let methods: type_class_method_input list = List.map method_map methods in
+         (* Add the methods to the env *)
+         let (env, linked_methods) = add_type_class_methods env methods in
+         (* Construct the decl *)
+         let decl = LTypeclass (typeclass_id, vis, name, typaram, linked_methods, docstring) in
+         (env, decl))
+  | CInstance (span, vis, name, typarams, argument, methods, docstring) ->
+     adorn_error_with_span span
+       (fun _ ->
+         let typeclass_name = qident_to_sident name |> sident_name in
+         (* First add the instance to the env, then the methods. *)
+         let argument = parse' rm typarams argument in
+         (* Find typeclass info. *)
+         let (typeclass_id, typeclass_mod_id, typeclass_param_name, universe): decl_id * mod_id * identifier * universe =
+           match get_decl_by_name env (qident_to_sident name) with
+           | Some decl ->
+              (match decl with
+               | TypeClass { id; mod_id; param; _ } ->
+                  (id, mod_id, typaram_name param, typaram_universe param)
+               | _ ->
+                  Errors.instance_for_non_typeclass typeclass_name)
+           | None ->
+              Errors.unknown_typeclass typeclass_name
+         in
+         (* Check the argument has the right universe for the typeclass. *)
+         let _ = check_instance_argument_has_right_universe universe argument in
+         (* Check the argument has the right shape. *)
+         let _ = check_instance_argument_has_right_shape typarams argument in
+         (* Check that the non of the type parameters in the generic instance
+            collide with the type parameter of the typeclass. *)
+         let _ = check_disjoint_typarams typeclass_param_name typarams in
+         (* Local uniqueness: does this instance collide with other instances in this module? *)
+         let _ =
+           let other_instances: decl list =
+             List.filter (fun decl ->
+                 match decl with
+                 | Instance { typeclass_id=typeclass_id'; _ } ->
+                    equal_decl_id typeclass_id typeclass_id'
+                 | _ -> false)
+               (module_instances env mod_id)
+           in
+           check_instance_locally_unique other_instances argument
+         in
+         (* Global uniqueness: check orphan rules. *)
+         let _ = check_instance_orphan_rules env mod_id typeclass_mod_id argument in
+         (* Add the instance to the env *)
+         let input: instance_input = { mod_id; vis; typeclass_id; docstring; typarams; argument } in
+         let (env, instance_id) = add_instance env input in
+         (* Convert the list of methods into a list of instance_method_input records *)
+         let method_map (CMethodDef (name, method_typarams, params, rt, meth_docstring, body)): (instance_method_input * astmt) =
+           let effective_typarams: typarams = merge_typarams typarams method_typarams in
+           let value_params = List.map (parse_param effective_typarams) params
+           and rt = parse' rm effective_typarams rt
+           and method_id: decl_id =
+             (match get_method_from_typeclass_id_and_name env typeclass_id name with
+              | Some (TypeClassMethod { id; _ }) ->
+                 id
+              | _ ->
+                 Errors.typeclass_no_method
+                   ~typeclass:typeclass_name
+                   ~method_name:name)
+           in
+           ({
+               instance_id = instance_id;
+               method_id = method_id;
+               docstring = meth_docstring;
+               name = name;
+               typarams = method_typarams;
+               value_params = value_params;
+               rt = rt;
+               body = None;
+             },
+            body)
+         in
+         let methods: (instance_method_input * astmt) list = List.map method_map methods in
+         (* Add the methods to the env *)
+         let (env, linked_methods) = add_instance_methods env methods in
+         (* Construct the decl *)
+         let decl = LInstance (instance_id, vis, name, typarams, argument, linked_methods, docstring) in
+         (env, decl))
 
 (** Utility functions to add lists of things to the environment. *)
 and add_union_cases (env: env) (cases: union_case_input list): (env * (linked_case list)) =
