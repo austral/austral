@@ -59,7 +59,6 @@ module Austral.Pervasive is
     constant minimum_bytesize: ByteSize;
     constant maximum_bytesize: ByteSize;
 
-
     typeclass TrappingArithmetic(T: Type) is
         method trappingAdd(lhs: T, rhs: T): T;
         method trappingSubtract(lhs: T, rhs: T): T;
@@ -316,4 +315,18 @@ module Austral.Pervasive is
     instance ToFloat64(Index);
     instance ToFloat64(Float32);
     instance ToFloat64(Float64);
+
+    typeclass Remainder(T: Type) is
+        method rem(lhs: T, rhs: T): T;
+    end;
+
+    instance Remainder(Nat8);
+    instance Remainder(Nat16);
+    instance Remainder(Nat32);
+    instance Remainder(Nat64);
+    instance Remainder(Int8);
+    instance Remainder(Int16);
+    instance Remainder(Int32);
+    instance Remainder(Int64);
+    instance Remainder(Index);
 end module.

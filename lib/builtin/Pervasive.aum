@@ -2013,4 +2013,113 @@ module body Austral.Pervasive is
             return Some(value => value);
         end;
     end;
+
+    ---
+    --- Remainder
+    ---
+
+    instance Remainder(Nat8) is
+        method rem(lhs: Nat8, rhs: Nat8): Nat8 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Nat8)");
+            end if;
+            return @embed(Nat8, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Nat16) is
+        method rem(lhs: Nat16, rhs: Nat16): Nat16 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Nat16)");
+            end if;
+            return @embed(Nat16, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Nat32) is
+        method rem(lhs: Nat32, rhs: Nat32): Nat32 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Nat32)");
+            end if;
+            return @embed(Nat32, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Nat64) is
+        method rem(lhs: Nat64, rhs: Nat64): Nat64 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Nat64)");
+            end if;
+            return @embed(Nat64, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Nat8) is
+        method rem(lhs: Int8, rhs: Int8): Int8 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Int8)");
+            end if;
+            if (lhs = minimum_int8) and (rhs = -1) then
+                abort("Overflow in rem(Int8)");
+            end if;
+            return @embed(Int8, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Int8) is
+        method rem(lhs: Int8, rhs: Int8): Int8 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Int8)");
+            end if;
+            if (lhs = minimum_int8) and (rhs = -1) then
+                abort("Overflow in rem(Int8)");
+            end if;
+            return @embed(Int8, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Int16) is
+        method rem(lhs: Int16, rhs: Int16): Int16 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Int16)");
+            end if;
+            if (lhs = minimum_int16) and (rhs = -1) then
+                abort("Overflow in rem(Int16)");
+            end if;
+            return @embed(Int16, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Int32) is
+        method rem(lhs: Int32, rhs: Int32): Int32 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Int32)");
+            end if;
+            if (lhs = minimum_int32) and (rhs = -1) then
+                abort("Overflow in rem(Int32)");
+            end if;
+            return @embed(Int32, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Int64) is
+        method rem(lhs: Int64, rhs: Int64): Int64 is
+            if rhs = 0 then
+               abort("Division by zero in rem(Int64)");
+            end if;
+            if (lhs = minimum_int64) and (rhs = -1) then
+                abort("Overflow in rem(Int64)");
+            end if;
+            return @embed(Int64, "($1 % $2)", lhs, rhs);
+        end;
+    end;
+
+    instance Remainder(Index) is
+        method rem(lhs: Index, rhs: Index): Index is
+            if rhs = 0 then
+               abort("Division by zero in rem(Index)");
+            end if;
+            return @embed(Index, "($1 % $2)", lhs, rhs);
+        end;
+    end;
 end module body.
