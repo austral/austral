@@ -11,6 +11,7 @@ open Ast
 open Type
 open TypeParameter
 open TypeParameters
+open Span
 
 type combined_module = CombinedModule of {
       name: module_name;
@@ -23,12 +24,12 @@ type combined_module = CombinedModule of {
     }
 
 and combined_definition =
-  | CConstant of vis * identifier * qtypespec * aexpr * docstring
-  | CRecord of type_vis * identifier * typarams * universe * qslot list * docstring
-  | CUnion of type_vis * identifier * typarams * universe * qcase list * docstring
-  | CFunction of vis * identifier * typarams * qparam list * qtypespec * astmt * docstring * pragma list
-  | CTypeclass of vis * identifier * type_parameter * combined_method_decl list * docstring
-  | CInstance of vis * qident * typarams * qtypespec * combined_method_def list * docstring
+  | CConstant of span * vis * identifier * qtypespec * aexpr * docstring
+  | CRecord of span * type_vis * identifier * typarams * universe * qslot list * docstring
+  | CUnion of span * type_vis * identifier * typarams * universe * qcase list * docstring
+  | CFunction of span * vis * identifier * typarams * qparam list * qtypespec * astmt * docstring * pragma list
+  | CTypeclass of span * vis * identifier * type_parameter * combined_method_decl list * docstring
+  | CInstance of span * vis * qident * typarams * qtypespec * combined_method_def list * docstring
 
 and qslot = QualifiedSlot of identifier * qtypespec
 
