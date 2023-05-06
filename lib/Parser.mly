@@ -190,20 +190,20 @@ interface_decl:
   ;
 
 constant_decl:
-  | docstringopt CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl ($3, $5, $1) }
+  | docstringopt CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl (from_loc $loc, $3, $5, $1) }
   ;
 
 type_decl:
   | doc=docstringopt TYPE name=identifier
     typarams=type_parameter_list COLON universe=universe
-    SEMI { ConcreteOpaqueTypeDecl (name, typarams, universe, doc) }
+    SEMI { ConcreteOpaqueTypeDecl (from_loc $loc, name, typarams, universe, doc) }
   ;
 
 record:
   | doc=docstringopt RECORD name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS slots=slot*
-    END SEMI { ConcreteRecord (name, typarams, universe, slots, doc) }
+    END SEMI { ConcreteRecord (from_loc $loc, name, typarams, universe, slots, doc) }
   ;
 
 slot:
@@ -214,7 +214,7 @@ union:
   | doc=docstringopt UNION name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS cases=case*
-    END SEMI { ConcreteUnion (name, typarams, universe, cases, doc) }
+    END SEMI { ConcreteUnion (from_loc $loc, name, typarams, universe, cases, doc) }
   ;
 
 case:
@@ -226,7 +226,7 @@ function_decl:
   | doc=docstringopt typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
     COLON rt=typespec SEMI
-    { ConcreteFunctionDecl (name, typarams, params, rt, doc) }
+    { ConcreteFunctionDecl (from_loc $loc, name, typarams, params, rt, doc) }
   ;
 
 generic_segment:
@@ -240,7 +240,7 @@ generic_segment_inner:
 typeclass:
   | doc=docstringopt TYPECLASS name=identifier LPAREN typaram=type_parameter RPAREN
     IS methods=method_decl* END SEMI
-    { ConcreteTypeClass (name, typaram, methods, doc) }
+    { ConcreteTypeClass (from_loc $loc, name, typaram, methods, doc) }
   ;
 
 method_decl:
@@ -253,7 +253,7 @@ method_decl:
 instance_decl:
   | doc=docstringopt typarams=generic_segment
     INSTANCE name=identifier LPAREN arg=typespec RPAREN SEMI
-    { ConcreteInstanceDecl (name, typarams, arg, doc) }
+    { ConcreteInstanceDecl (from_loc $loc, name, typarams, arg, doc) }
   ;
 
 body_decl:
@@ -267,14 +267,14 @@ body_decl:
 
 constant_def:
   | doc=docstringopt CONSTANT name=identifier COLON ty=typespec
-    ASSIGN v=expression SEMI { ConcreteConstantDef (name, ty, v, doc) }
+    ASSIGN v=expression SEMI { ConcreteConstantDef (from_loc $loc, name, ty, v, doc) }
   ;
 
 function_def:
   | doc=docstringopt typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
     COLON rt=typespec IS pragmas=pragma* body=block? END SEMI
-    { ConcreteFunctionDef (name, typarams, params, rt, Option.value body ~default:(CBlock (from_loc $loc, [])), doc, pragmas) }
+    { ConcreteFunctionDef (from_loc $loc, name, typarams, params, rt, Option.value body ~default:(CBlock (from_loc $loc, [])), doc, pragmas) }
   ;
 
 pragma:
@@ -289,7 +289,7 @@ instance_def:
     INSTANCE name=identifier LPAREN arg=typespec RPAREN IS
     methods=method_def*
     END SEMI
-    { ConcreteInstanceDef (ConcreteInstance (name, typarams, arg, methods, doc)) }
+    { ConcreteInstanceDef (ConcreteInstance (from_loc $loc, name, typarams, arg, methods, doc)) }
   ;
 
 method_def:

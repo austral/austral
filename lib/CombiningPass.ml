@@ -152,18 +152,18 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
     make_qident (module_name, n, n)
   in
   match decl with
-  | ConcreteConstantDecl (name, ty, docstring) ->
+  | ConcreteConstantDecl (_, name, ty, docstring) ->
      (match def with
-      | ConcreteConstantDef (name', ty', value, _) ->
+      | ConcreteConstantDef (_, name', ty', value, _) ->
          if (name = name') && (ty = ty') then
            CConstant (VisPublic, name, qualify_typespec ii ty, abs_expr bi value, docstring)
          else
            Errors.type_mismatch name
       | _ ->
          Errors.declaration_kind_mismatch ~name ~expected:"constant")
-  | ConcreteOpaqueTypeDecl (name, typarams, universe, docstring) ->
+  | ConcreteOpaqueTypeDecl (_, name, typarams, universe, docstring) ->
      (match def with
-      | ConcreteRecordDef (ConcreteRecord (name', typarams', universe', slots, _)) ->
+      | ConcreteRecordDef (ConcreteRecord (_, name', typarams', universe', slots, _)) ->
          if (name = name') && (typarams = typarams') && (universe = universe') then
            let qname = make_qname name' in
            CRecord (TypeVisOpaque,
@@ -177,7 +177,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
              Errors.universe_mismatch name
            else
              Errors.type_mismatch name
-      | ConcreteUnionDef (ConcreteUnion (name', typarams', universe', cases, _)) ->
+      | ConcreteUnionDef (ConcreteUnion (_, name', typarams', universe', cases, _)) ->
          if (name = name') && (typarams = typarams') && (universe = universe') then
            let qname = make_qname name' in
            CUnion (TypeVisOpaque,
@@ -193,9 +193,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
              Errors.type_mismatch name
       | _ ->
          Errors.declaration_kind_mismatch ~name ~expected:"type")
-  | ConcreteFunctionDecl (name, typarams, params, rt, docstring) ->
+  | ConcreteFunctionDecl (_, name, typarams, params, rt, docstring) ->
      (match def with
-      | ConcreteFunctionDef (name', typarams', params', rt', body, _, pragmas) ->
+      | ConcreteFunctionDef (_, name', typarams', params', rt', body, _, pragmas) ->
          if (name = name') && (typarams = typarams') && (params = params') && (rt = rt') then
            let qname = make_qname name' in
            CFunction (VisPublic,
@@ -222,9 +222,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
              ~msg:msg
       | _ ->
          Errors.declaration_kind_mismatch ~name ~expected:"function")
-  | ConcreteInstanceDecl (name, typarams, argument, docstring) ->
+  | ConcreteInstanceDecl (_, name, typarams, argument, docstring) ->
      (match def with
-      | ConcreteInstanceDef (ConcreteInstance (name', typarams', argument', methods, _)) ->
+      | ConcreteInstanceDef (ConcreteInstance (_, name', typarams', argument', methods, _)) ->
          if (name = name') && (typarams = typarams') && (argument = argument') then
            (* Instance names might refer to an imported typeclass, so we have to
               qualify them. Since we're parsing a public declaration, which
@@ -250,13 +250,13 @@ let private_def module_name im def =
     make_qident (module_name, n, n)
   in
   match def with
-  | ConcreteConstantDef (name, ty, value, docstring) ->
+  | ConcreteConstantDef (_, name, ty, value, docstring) ->
      CConstant (VisPrivate,
                 name,
                 qualify_typespec im ty,
                 abs_expr im value,
                 docstring)
-  | ConcreteRecordDef (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
+  | ConcreteRecordDef (ConcreteRecord (_, name, typarams, universe, slots, docstring)) ->
      let qname = make_qname name in
      CRecord (TypeVisPrivate,
               name,
@@ -264,7 +264,7 @@ let private_def module_name im def =
               universe,
               parse_slots im slots,
               docstring)
-  | ConcreteUnionDef (ConcreteUnion (name, typarams, universe, cases, docstring)) ->
+  | ConcreteUnionDef (ConcreteUnion (_, name, typarams, universe, cases, docstring)) ->
      let qname = make_qname name in
      CUnion (TypeVisPrivate,
              name,
@@ -272,7 +272,7 @@ let private_def module_name im def =
              universe,
              parse_cases im cases,
              docstring)
-  | ConcreteFunctionDef (name, typarams, params, rt, body, docstring, pragmas) ->
+  | ConcreteFunctionDef (_, name, typarams, params, rt, body, docstring, pragmas) ->
      let qname = make_qname name in
      CFunction (VisPrivate,
                 name,
@@ -282,7 +282,7 @@ let private_def module_name im def =
                 abs_stmt im body,
                 docstring,
                 pragmas)
-  | ConcreteTypeClassDef (ConcreteTypeClass (name, typaram, methods, docstring)) ->
+  | ConcreteTypeClassDef (ConcreteTypeClass (_, name, typaram, methods, docstring)) ->
      let qname = make_qname name in
      CTypeclass (VisPrivate,
                  name,
@@ -293,7 +293,7 @@ let private_def module_name im def =
                      Errors.multiarg_typeclass name),
                  parse_method_decls module_name im methods,
                  docstring)
-  | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, methods, docstring)) ->
+  | ConcreteInstanceDef (ConcreteInstance (_, name, typarams, argument, methods, docstring)) ->
      (* Instance names might refer to an imported typeclass, so we have to
         qualify them. Since we're parsing a private declaration, which means the
         instance (and thus the name of the typeclass) appears in the body file,
@@ -340,7 +340,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
   | (Some name) ->
      (match decl with
       (* Some declarations don't need to have a matching body *)
-      | ConcreteRecordDecl (ConcreteRecord (name, typarams, universe, slots, docstring)) ->
+      | ConcreteRecordDecl (ConcreteRecord (_, name, typarams, universe, slots, docstring)) ->
          let qname = make_qname name in
          CRecord (TypeVisPublic,
                   name,
@@ -348,7 +348,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
                   universe,
                   parse_slots im slots,
                   docstring)
-      | ConcreteUnionDecl (ConcreteUnion (name, typarams, universe, cases, docstring)) ->
+      | ConcreteUnionDecl (ConcreteUnion (_, name, typarams, universe, cases, docstring)) ->
          let qname = make_qname name in
          CUnion (TypeVisPublic,
                  name,
@@ -356,7 +356,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
                  universe,
                  parse_cases im cases,
                  docstring)
-      | ConcreteTypeClassDecl (ConcreteTypeClass (name, typaram, methods, docstring)) ->
+      | ConcreteTypeClassDecl (ConcreteTypeClass (_, name, typaram, methods, docstring)) ->
          let qname = make_qname name in
          CTypeclass (VisPublic,
                      name,
@@ -376,7 +376,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
              Errors.missing_body_definition ~name ~declaration:None))
   | None ->
      (match decl with
-      | ConcreteInstanceDecl (name, typarams, argument, _) ->
+      | ConcreteInstanceDecl (_, name, typarams, argument, _) ->
          (* It's an instance declaration. Find the corresponding instance in the body. *)
          (match get_instance_def cmb name typarams argument with
           | (Some def) ->
@@ -400,7 +400,7 @@ and parse_def (module_name: module_name) (cmi: concrete_module_interface) (im: i
          Some (private_def module_name im def))
   | None ->
      (match def with
-      | ConcreteInstanceDef (ConcreteInstance (name, typarams, argument, _, _)) ->
+      | ConcreteInstanceDef (ConcreteInstance (_, name, typarams, argument, _, _)) ->
       (* It's an instance declaration. If the interface file declares it, ignore
          it: it's already been processed. Otherwise, process it as a private
          instance declaration. *)
