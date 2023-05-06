@@ -3,8 +3,21 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/008-typeclasses/004-expect-free/Test.aum'
+    From: line 7, column 8
+    To: line 14, column 8
   Description:
     Cannot define an instance with argument `Foo` because it should belong to the `Free` universe, but it is actually in the `Linear` universe.
   Code:
-    [no span available]
+     5 | 
+     6 |     record Foo: Linear is
+     7 |     end;
+     8 | 
+     9 |     instance AcceptsFree(Foo) is
+    10 |         method Accept(x: Foo): Unit is
+    11 |             let {} := x;
+    12 |             return nil;
+    13 |         end;
+    14 |     end;
+    15 | 
+    16 |     function main(): ExitCode is

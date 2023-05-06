@@ -3,8 +3,20 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/008-typeclasses/007-trivial-duplicate/Test.aum'
+    From: line 10, column 8
+    To: line 16, column 8
   Description:
     Instance overlaps.
   Code:
-    [no span available]
+     8 |             return nil;
+     9 |         end;
+    10 |     end;
+    11 | 
+    12 |     instance Foo(Nat8) is
+    13 |         method Accept(x: Nat8): Unit is
+    14 |             return nil;
+    15 |         end;
+    16 |     end;
+    17 | 
+    18 |     function main(): ExitCode is

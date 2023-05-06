@@ -3,8 +3,18 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/003-record/002-free-record-has-linear/Test.aum'
+    From: line 3, column 8
+    To: line 7, column 8
   Description:
     `Bar` was declared to belong to the `Free` universe, but it contains a type that belongs to the `Linear` universe.
   Code:
-    [no span available]
+    1 | module body Test is
+    2 |     record Foo: Linear is
+    3 |     end;
+    4 | 
+    5 |     record Bar: Free is
+    6 |         foo: Foo;
+    7 |     end;
+    8 | 
+    9 |     function main(): ExitCode is

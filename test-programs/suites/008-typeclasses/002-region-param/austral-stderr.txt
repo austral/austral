@@ -3,10 +3,17 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/008-typeclasses/002-region-param/Test.aum'
+    From: line 1, column 19
+    To: line 4, column 8
   Description:
     The parameter for the typeclass `AcceptsRegion` cannot be declared to be in the `Region` universe, because regions are distinct from types.
 
     Consider using one of `Type`, `Linear`, or `Free` instead.
   Code:
-    [no span available]
+    1 | module body Test is
+    2 |     typeclass AcceptsRegion(R: Region) is
+    3 |         method Accept(x: R): Unit;
+    4 |     end;
+    5 | 
+    6 |     function main(): ExitCode is
