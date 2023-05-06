@@ -3,8 +3,14 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/006-linearity/012-consume-twice-in-expr/Test.aum'
+    From: line 17, column 8
+    To: line 17, column 36
   Description:
     The variable `r` is consumed multiple times within the same expression.
   Code:
-    [no span available]
+    15 |     function main(): ExitCode is
+    16 |         let r: R := R(x => 32);
+    17 |         foo(consume(r), consume(r));
+    18 |         return ExitSuccess();
+    19 |     end;

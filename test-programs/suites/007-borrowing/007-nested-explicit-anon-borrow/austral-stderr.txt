@@ -3,8 +3,14 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/007-borrowing/007-nested-explicit-anon-borrow/Test.aum'
+    From: line 12, column 12
+    To: line 12, column 17
   Description:
     The variable `foo` cannot be consumed or borrowed again while it is borrowed (immutably).
   Code:
-    [no span available]
+    10 |         borrow foo as fooref in rho do
+    11 |             -- Borrow it again.
+    12 |             &foo;
+    13 |         end;
+    14 |         -- Consume the record by destructuring.

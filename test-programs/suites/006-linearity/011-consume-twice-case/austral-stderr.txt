@@ -3,8 +3,14 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/006-linearity/011-consume-twice-case/Test.aum'
+    From: line 17, column 16
+    To: line 17, column 31
   Description:
     The variable `value` has already been consumed.
   Code:
-    [no span available]
+    15 |             when Some(value: R) do
+    16 |                 Consume(value);
+    17 |                 Consume(value);
+    18 |             when None do
+    19 |                 skip;

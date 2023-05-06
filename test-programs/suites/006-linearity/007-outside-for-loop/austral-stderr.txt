@@ -3,8 +3,16 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/006-linearity/007-outside-for-loop/Test.aum'
+    From: line 8, column 8
+    To: line 10, column 16
   Description:
     The  variable `r` was consumed in the loop, without afterwards being reassigned.
   Code:
-    [no span available]
+     6 |     function main(): ExitCode is
+     7 |         let r: R := R(x => 32);
+     8 |         for i from 0 to 10 do
+     9 |             let { x: Int32 } := r;
+    10 |         end for;
+    11 |         return ExitSuccess();
+    12 |     end;

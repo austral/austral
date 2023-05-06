@@ -3,8 +3,19 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/006-linearity/010-forget-case/Test.aum'
+    From: line 9, column 8
+    To: line 14, column 17
   Description:
     Forgot to consume a linear variable: `value`.
   Code:
-    [no span available]
+     7 |         let r: R := R(x => 32);
+     8 |         let ropt: Option[R] := Some(value => r);
+     9 |         case ropt of
+    10 |             when Some(value: R) do
+    11 |                 skip;
+    12 |             when None do
+    13 |                 skip;
+    14 |         end case;
+    15 |         return ExitSuccess();
+    16 |     end;
