@@ -156,9 +156,9 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
      adorn_error_with_span span
        (fun _ ->
          match def with
-         | ConcreteConstantDef (_, name', ty', value, _) ->
+         | ConcreteConstantDef (defspan, name', ty', value, _) ->
             if (name = name') && (ty = ty') then
-              CConstant (VisPublic, name, qualify_typespec ii ty, abs_expr bi value, docstring)
+              CConstant (defspan, VisPublic, name, qualify_typespec ii ty, abs_expr bi value, docstring)
             else
               Errors.type_mismatch name
          | _ ->
@@ -167,10 +167,11 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
      adorn_error_with_span span
        (fun _ ->
          match def with
-         | ConcreteRecordDef (ConcreteRecord (_, name', typarams', universe', slots, _)) ->
+         | ConcreteRecordDef (ConcreteRecord (defspan, name', typarams', universe', slots, _)) ->
             if (name = name') && (typarams = typarams') && (universe = universe') then
               let qname = make_qname name' in
-              CRecord (TypeVisOpaque,
+              CRecord (defspan,
+                       TypeVisOpaque,
                        name,
                        name_typarams bi typarams qname,
                        universe,
@@ -181,10 +182,11 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                 Errors.universe_mismatch name
               else
                 Errors.type_mismatch name
-         | ConcreteUnionDef (ConcreteUnion (_, name', typarams', universe', cases, _)) ->
+         | ConcreteUnionDef (ConcreteUnion (defspan, name', typarams', universe', cases, _)) ->
             if (name = name') && (typarams = typarams') && (universe = universe') then
               let qname = make_qname name' in
-              CUnion (TypeVisOpaque,
+              CUnion (defspan,
+                      TypeVisOpaque,
                       name,
                       name_typarams bi typarams qname,
                       universe,
@@ -201,10 +203,11 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
      adorn_error_with_span span
        (fun _ ->
          match def with
-         | ConcreteFunctionDef (_, name', typarams', params', rt', body, _, pragmas) ->
+         | ConcreteFunctionDef (defspan, name', typarams', params', rt', body, _, pragmas) ->
             if (name = name') && (typarams = typarams') && (params = params') && (rt = rt') then
               let qname = make_qname name' in
-              CFunction (VisPublic,
+              CFunction (defspan,
+                         VisPublic,
                          name,
                          name_typarams bi typarams qname,
                          parse_params ii params,
@@ -232,7 +235,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
      adorn_error_with_span span
        (fun _ ->
          match def with
-         | ConcreteInstanceDef (ConcreteInstance (_, name', typarams', argument', methods, _)) ->
+         | ConcreteInstanceDef (ConcreteInstance (defspan, name', typarams', argument', methods, _)) ->
             if (name = name') && (typarams = typarams') && (argument = argument') then
               (* Instance names might refer to an imported typeclass, so we have to
                  qualify them. Since we're parsing a public declaration, which
@@ -240,7 +243,8 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
                  the interface file, we use the interface imports for
                  qualification. *)
               let qname = qualify_identifier ii name in
-              CInstance (VisPublic,
+              CInstance (defspan,
+                         VisPublic,
                          qname,
                          name_typarams bi typarams qname,
                          qualify_typespec ii argument,
@@ -258,31 +262,35 @@ let private_def module_name im def =
     make_qident (module_name, n, n)
   in
   match def with
-  | ConcreteConstantDef (_, name, ty, value, docstring) ->
-     CConstant (VisPrivate,
+  | ConcreteConstantDef (span, name, ty, value, docstring) ->
+     CConstant (span,
+                VisPrivate,
                 name,
                 qualify_typespec im ty,
                 abs_expr im value,
                 docstring)
-  | ConcreteRecordDef (ConcreteRecord (_, name, typarams, universe, slots, docstring)) ->
+  | ConcreteRecordDef (ConcreteRecord (span, name, typarams, universe, slots, docstring)) ->
      let qname = make_qname name in
-     CRecord (TypeVisPrivate,
+     CRecord (span,
+              TypeVisPrivate,
               name,
               name_typarams im typarams qname,
               universe,
               parse_slots im slots,
               docstring)
-  | ConcreteUnionDef (ConcreteUnion (_, name, typarams, universe, cases, docstring)) ->
+  | ConcreteUnionDef (ConcreteUnion (span, name, typarams, universe, cases, docstring)) ->
      let qname = make_qname name in
-     CUnion (TypeVisPrivate,
+     CUnion (span,
+             TypeVisPrivate,
              name,
              name_typarams im typarams qname,
              universe,
              parse_cases im cases,
              docstring)
-  | ConcreteFunctionDef (_, name, typarams, params, rt, body, docstring, pragmas) ->
+  | ConcreteFunctionDef (span, name, typarams, params, rt, body, docstring, pragmas) ->
      let qname = make_qname name in
-     CFunction (VisPrivate,
+     CFunction (span,
+                VisPrivate,
                 name,
                 name_typarams im typarams qname,
                 parse_params im params,
@@ -290,9 +298,10 @@ let private_def module_name im def =
                 abs_stmt im body,
                 docstring,
                 pragmas)
-  | ConcreteTypeClassDef (ConcreteTypeClass (_, name, typaram, methods, docstring)) ->
+  | ConcreteTypeClassDef (ConcreteTypeClass (span, name, typaram, methods, docstring)) ->
      let qname = make_qname name in
-     CTypeclass (VisPrivate,
+     CTypeclass (span,
+                 VisPrivate,
                  name,
                  (match (typarams_as_list (name_typarams im [typaram] qname)) with
                   | [tp] ->
@@ -301,13 +310,14 @@ let private_def module_name im def =
                      Errors.multiarg_typeclass name),
                  parse_method_decls module_name im methods,
                  docstring)
-  | ConcreteInstanceDef (ConcreteInstance (_, name, typarams, argument, methods, docstring)) ->
+  | ConcreteInstanceDef (ConcreteInstance (span, name, typarams, argument, methods, docstring)) ->
      (* Instance names might refer to an imported typeclass, so we have to
         qualify them. Since we're parsing a private declaration, which means the
         instance (and thus the name of the typeclass) appears in the body file,
         we can use the body imports for qualification. *)
      let qname = qualify_identifier im name in
-     CInstance (VisPrivate,
+     CInstance (span,
+                VisPrivate,
                 qname,
                 name_typarams im typarams qname,
                 qualify_typespec im argument,
@@ -348,25 +358,28 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
   | (Some name) ->
      (match decl with
       (* Some declarations don't need to have a matching body *)
-      | ConcreteRecordDecl (ConcreteRecord (_, name, typarams, universe, slots, docstring)) ->
+      | ConcreteRecordDecl (ConcreteRecord (span, name, typarams, universe, slots, docstring)) ->
          let qname = make_qname name in
-         CRecord (TypeVisPublic,
+         CRecord (span,
+                  TypeVisPublic,
                   name,
                   name_typarams im typarams qname,
                   universe,
                   parse_slots im slots,
                   docstring)
-      | ConcreteUnionDecl (ConcreteUnion (_, name, typarams, universe, cases, docstring)) ->
+      | ConcreteUnionDecl (ConcreteUnion (span, name, typarams, universe, cases, docstring)) ->
          let qname = make_qname name in
-         CUnion (TypeVisPublic,
+         CUnion (span,
+                 TypeVisPublic,
                  name,
                  name_typarams im typarams qname,
                  universe,
                  parse_cases im cases,
                  docstring)
-      | ConcreteTypeClassDecl (ConcreteTypeClass (_, name, typaram, methods, docstring)) ->
+      | ConcreteTypeClassDecl (ConcreteTypeClass (span, name, typaram, methods, docstring)) ->
          let qname = make_qname name in
-         CTypeclass (VisPublic,
+         CTypeclass (span,
+                     VisPublic,
                      name,
                  (match (typarams_as_list (name_typarams im [typaram] qname)) with
                   | [tp] ->
@@ -421,18 +434,18 @@ and parse_def (module_name: module_name) (cmi: concrete_module_interface) (im: i
 
 let as_public (def: combined_definition): combined_definition =
   match def with
-  | CConstant (_, name, ty, value, docstring) ->
-     CConstant (VisPublic, name, ty, value, docstring)
-  | CRecord (_, name, typarams, universe, slots, docstring) ->
-     CRecord (TypeVisPublic, name, typarams, universe, slots, docstring)
-  | CUnion (_, name, typarams, universe, cases, docstring) ->
-     CUnion (TypeVisPublic, name, typarams, universe, cases, docstring)
-  | CFunction (_, name, typarams, params, rt, body, docstring, pragmas) ->
-     CFunction (VisPublic, name, typarams, params, rt, body, docstring, pragmas)
-  | CTypeclass (_, name, typaram, methods, docstring) ->
-     CTypeclass (VisPublic, name, typaram, methods, docstring)
-  | CInstance (_, name, typarams, argument, methods, docstring) ->
-     CInstance (VisPublic, name, typarams, argument, methods, docstring)
+  | CConstant (span, _, name, ty, value, docstring) ->
+     CConstant (span, VisPublic, name, ty, value, docstring)
+  | CRecord (span, _, name, typarams, universe, slots, docstring) ->
+     CRecord (span, TypeVisPublic, name, typarams, universe, slots, docstring)
+  | CUnion (span, _, name, typarams, universe, cases, docstring) ->
+     CUnion (span, TypeVisPublic, name, typarams, universe, cases, docstring)
+  | CFunction (span, _, name, typarams, params, rt, body, docstring, pragmas) ->
+     CFunction (span, VisPublic, name, typarams, params, rt, body, docstring, pragmas)
+  | CTypeclass (span, _, name, typaram, methods, docstring) ->
+     CTypeclass (span, VisPublic, name, typaram, methods, docstring)
+  | CInstance (span, _, name, typarams, argument, methods, docstring) ->
+     CInstance (span, VisPublic, name, typarams, argument, methods, docstring)
 
 let body_as_combined (env: env) (body: concrete_module_body): combined_module =
   with_frame "Module combining pass: module body without interface"
