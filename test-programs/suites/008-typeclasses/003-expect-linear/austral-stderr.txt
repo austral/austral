@@ -3,8 +3,20 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/008-typeclasses/003-expect-linear/Test.aum'
+    From: line 4, column 8
+    To: line 10, column 8
   Description:
     Cannot define an instance with argument `Nat8` because it should belong to the `Linear` universe, but it is actually in the `Free` universe.
   Code:
-    [no span available]
+     2 |     typeclass AcceptsLinear(T: Linear) is
+     3 |         method Accept(x: T): Unit;
+     4 |     end;
+     5 | 
+     6 |     instance AcceptsLinear(Nat8) is
+     7 |         method Accept(x: Nat8): Unit is
+     8 |             return nil;
+     9 |         end;
+    10 |     end;
+    11 | 
+    12 |     function main(): ExitCode is

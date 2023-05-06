@@ -3,8 +3,19 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/008-typeclasses/013-orphan-instance/Test.aum'
+    From: line 4, column 19
+    To: line 9, column 8
   Description:
     Orphan rule broken: typeclass and type are both foreign.
   Code:
-    [no span available]
+     2 | import Test_Type (Foo);
+     3 | 
+     4 | module body Test is
+     5 |     instance Acceptable(Foo) is
+     6 |         method Accept(value: Foo): Unit is
+     7 |             return nil;
+     8 |         end;
+     9 |     end;
+    10 | 
+    11 |     function main(): ExitCode is

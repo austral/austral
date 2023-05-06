@@ -10,6 +10,7 @@ open Ast
 open Combined
 open Reporter
 open Error
+open Span
 
 module Errors = struct
   let missing_return ~name ~declaration =
@@ -66,13 +67,15 @@ let rec ends_in_return (stmt: astmt): bool =
 let check_ends_in_return (CombinedModule { decls; _ }): unit =
   with_frame "Return check"
     (fun _ ->
-      let check_method_ends_in_return (CMethodDef (name, _, _, _, _, body)): unit =
-        if ends_in_return body then
-          ()
-        else
-          Errors.missing_return
-            ~name:name
-            ~declaration:"method"
+      let check_method_ends_in_return (span: span) (CMethodDef (name, _, _, _, _, body)): unit =
+        adorn_error_with_span span
+          (fun _ ->
+            if ends_in_return body then
+              ()
+            else
+              Errors.missing_return
+                ~name:name
+                ~declaration:"method")
       in
       let check_decl_ends_in_return (decl: combined_definition): unit =
         match decl with
@@ -82,23 +85,25 @@ let check_ends_in_return (CombinedModule { decls; _ }): unit =
            ()
         | CUnion _ ->
            ()
-        | CFunction (_, name, _, _, _, body, _, pragmas) ->
-           (match pragmas with
-            | [] ->
-               (* No pragmas: regular function. *)
-               if ends_in_return body then
-                 ()
-               else
-                 Errors.missing_return
-                   ~name
-                   ~declaration:"function"
-            | _ ->
-               (* Yes pragmas: foreign function, ignore the body. *)
-               ())
+        | CFunction (span, _, name, _, _, _, body, _, pragmas) ->
+           adorn_error_with_span span
+             (fun _ ->
+               match pragmas with
+               | [] ->
+                  (* No pragmas: regular function. *)
+                  if ends_in_return body then
+                    ()
+                  else
+                    Errors.missing_return
+                      ~name
+                      ~declaration:"function"
+               | _ ->
+                  (* Yes pragmas: foreign function, ignore the body. *)
+                  ())
         | CTypeclass _ ->
            ()
-        | CInstance (_, _, _, _, methods, _) ->
-           let _ = List.map check_method_ends_in_return methods in
+        | CInstance (span, _, _, _, _, methods, _) ->
+           let _ = List.map (check_method_ends_in_return span) methods in
            ()
       in
       let _ = List.map check_decl_ends_in_return decls

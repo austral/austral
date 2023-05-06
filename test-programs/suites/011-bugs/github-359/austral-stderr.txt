@@ -3,8 +3,18 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/011-bugs/github-359/Test.aum'
+    From: line 4, column 8
+    To: line 8, column 8
   Description:
     The type `Foo` expects `1` type arguments, but I only found `2` arguments.
   Code:
-    [no span available]
+     2 |     record Foo[A: Free]: Free is
+     3 |         a: A;
+     4 |     end;
+     5 | 
+     6 |     function foo(f: Foo[Int32, Int32]): Unit is
+     7 |         return nil;
+     8 |     end;
+     9 | 
+    10 |     function main(): ExitCode is

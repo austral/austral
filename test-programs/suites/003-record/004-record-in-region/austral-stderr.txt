@@ -3,10 +3,15 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/003-record/004-record-in-region/Test.aum'
+    From: line 1, column 19
+    To: line 2, column 30
   Description:
     The record `Foo` was declared to belong to the `Region` universe, but regions are distinct from types.
 
     Consider using one of `Type`, `Linear`, or `Free` instead.
   Code:
-    [no span available]
+    1 | module body Test is
+    2 |     record Foo: Region is end;
+    3 | 
+    4 |     function main(): ExitCode is

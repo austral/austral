@@ -3,8 +3,21 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/008-typeclasses/009-generic-duplicate/Test.aum'
+    From: line 15, column 8
+    To: line 22, column 8
   Description:
     Instance overlaps.
   Code:
-    [no span available]
+    13 |             return nil;
+    14 |         end;
+    15 |     end;
+    16 | 
+    17 |     generic [U: Free]
+    18 |     instance Foo(Bar[U]) is
+    19 |         method Accept(x: Bar[U]): Unit is
+    20 |             return nil;
+    21 |         end;
+    22 |     end;
+    23 | 
+    24 |     function main(): ExitCode is

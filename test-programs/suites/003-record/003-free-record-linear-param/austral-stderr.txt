@@ -3,8 +3,14 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/003-record/003-free-record-linear-param/Test.aum'
+    From: line 1, column 19
+    To: line 3, column 8
   Description:
     `Foo` was declared to belong to the `Free` universe, but it has a type parameter that belongs to the `Type` universe.
   Code:
-    [no span available]
+    1 | module body Test is
+    2 |     record Foo[A: Type]: Free is
+    3 |     end;
+    4 | 
+    5 |     function main(): ExitCode is

@@ -3,8 +3,19 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/004-union/002-free-union-has-linear/Test.aum'
+    From: line 3, column 8
+    To: line 8, column 8
   Description:
     `B` was declared to belong to the `Free` universe, but it contains a type that belongs to the `Linear` universe.
   Code:
-    [no span available]
+     1 | module body Test is
+     2 |     record Foo: Linear is
+     3 |     end;
+     4 | 
+     5 |     union Bar: Free is
+     6 |         case B is
+     7 |             foo: Foo;
+     8 |     end;
+     9 | 
+    10 |     function main(): ExitCode is

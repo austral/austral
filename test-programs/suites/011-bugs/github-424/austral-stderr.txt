@@ -3,8 +3,16 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/011-bugs/github-424/Test.aum'
+    From: line 1, column 19
+    To: line 5, column 8
   Description:
     The type parameter `T` does not appear anywhere in the signature of the function.
   Code:
-    [no span available]
+    1 | module body Test is
+    2 |     generic [T: Free] -- spurious
+    3 |     function mutate_int(var: Int32): Unit is
+    4 |         return nil;
+    5 |     end;
+    6 | 
+    7 |     function main(): ExitCode is

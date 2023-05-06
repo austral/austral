@@ -3,8 +3,15 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/009-names/002-dup-rec-rec/Test.aum'
+    From: line 2, column 26
+    To: line 4, column 26
   Description:
     A declaration with the name `A` already exists in the module `Test`.
   Code:
-    [no span available]
+    1 | module body Test is
+    2 |     record A: Free is end;
+    3 | 
+    4 |     record A: Free is end;
+    5 | 
+    6 |     function main(): ExitCode is

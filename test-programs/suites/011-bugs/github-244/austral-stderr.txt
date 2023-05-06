@@ -3,10 +3,27 @@ Error:
   Module:
     Test
   Location:
-    [no span available]
+    Filename: 'test-programs/suites/011-bugs/github-244/Test.aum'
+    From: line 6, column 8
+    To: line 17, column 8
   Description:
     The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is `A`.
-    
+
     This is, regrettably, a load-bearing hack for https://github.com/austral/austral/issues/244. Fixing this properly would require rewriting large parts of the frontend.
   Code:
-    [no span available]
+     4 | 
+     5 |         method myPrintFixedArray(array: FixedArray[A]): Unit;
+     6 |     end;
+     7 | 
+     8 |     generic [A: Free(MyPrintable)]
+     9 |     instance MyPrintable(FixedArray[A]) is
+    10 |         method myPrint(value: FixedArray[A]): Unit is
+    11 |             return myPrintFixedArray(value);
+    12 |         end;
+    13 | 
+    14 |         method myPrintFixedArray(array: FixedArray[FixedArray[A]]): Unit is
+    15 |             return nil;
+    16 |         end;
+    17 |     end;
+    18 | 
+    19 |     function main(): ExitCode is
