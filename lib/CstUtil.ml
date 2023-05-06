@@ -11,7 +11,7 @@ open Error
 open ErrorText
 
 module Errors = struct
-  let pragma_argument_error ~pragma_name ~argument = 
+  let pragma_argument_error ~pragma_name ~argument =
     let text = Text ("Invalid " ^ pragma_name ^ " pragma.") :: match argument with
     | Some argument -> [Break; Text "This pragma takes exactly one argument, "; Code argument]
     | None -> [Break; Text "This pragma takes no arguments."]
@@ -110,7 +110,7 @@ let make_pragma name args =
          ForeignImportPragma f
        else
          raise_err ()
-    | _ -> 
+    | _ ->
        raise_err ()
   else
     if s = "Foreign_Export" then
@@ -149,3 +149,14 @@ let mod_int_name (inter: concrete_module_interface): module_name =
 let mod_body_name (body: concrete_module_body): module_name =
   let (ConcreteModuleBody (name, _, _, _, _)) = body in
   name
+
+let rec typespec_string (ts: typespec): string =
+  match ts with
+  | TypeSpecifier (name, args) ->
+     (match args with
+      | [] -> (ident_string name)
+      | args -> (ident_string name) ^ "[" ^ (String.concat ", " (List.map typespec_string args)) ^ "]")
+  | ConcreteReadRef (ty, reg) ->
+     "&[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+  | ConcreteWriteRef (ty, reg) ->
+     "&![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"

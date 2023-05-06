@@ -63,6 +63,15 @@ module Errors = struct
          Text " has no corresponding body implementation."
        ]
 
+  let missing_instance_body_definition ~(name: identifier) ~(ty: typespec) =
+    austral_raise DeclarationError [
+        Text "The instance ";
+        Code (ident_string name);
+        Text " with type ";
+        Code (typespec_string ty);
+        Text " has no corresponding body implementation."
+      ]
+
   let module_name_mismatch ~interface ~body =
     austral_raise DeclarationError [
       Text "Module interface and body have different names: ";
@@ -373,7 +382,7 @@ and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb
           | (Some def) ->
              match_decls module_name im bm decl (ConcreteInstanceDef def)
           | None ->
-             Errors.missing_body_definition ~name ~declaration:(Some "instance"))
+             Errors.missing_instance_body_definition ~name ~ty:argument)
       | _ ->
          internal_err "Couldn't parse declaration declaration")
 

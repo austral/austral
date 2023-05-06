@@ -29,3 +29,5 @@ val make_pragma : identifier -> concrete_arglist -> pragma
 val mod_int_name : concrete_module_interface -> module_name
 
 val mod_body_name : concrete_module_body -> module_name
+
+val typespec_string : typespec -> string
