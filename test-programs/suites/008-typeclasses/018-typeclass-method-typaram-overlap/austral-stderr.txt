@@ -1,18 +1,24 @@
-Error:
-  Title: Generic Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/018-typeclass-method-typaram-overlap/Test.aum'
-    From: line 1, column 19
-    To: line 5, column 8
-  Description:
-    Multiple type parameters have the same name.
-  Code:
-    1 | module body Test is
-    2 |     typeclass PrintViaRef(T: Free) is
-    3 |         generic [T: Region]
-    4 |         method printRef(ref: &[T, T]): Unit;
-    5 |     end;
-    6 | 
-    7 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Multiple type parameters have the same name."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/018-typeclass-method-typaram-overlap/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end[": { "line": 5, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    typeclass PrintViaRef(T: Free) is" ],
+    [ 3, "        generic [T: Region]" ],
+    [ 4, "        method printRef(ref: &[T, T]): Unit;" ],
+    [ 5, "    end;" ],
+    [ 6, "" ],
+    [ 7, "    function main(): ExitCode is" ]
+  ]
+}

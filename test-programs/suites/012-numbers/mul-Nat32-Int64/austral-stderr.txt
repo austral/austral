@@ -1,17 +1,26 @@
-
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/012-numbers/mul-Nat32-Int64/Test.aum'
-    From: line 5, column 8
-    To: line 5, column 33
-  Description:
-    Both operands to an arithmetic expression must be compatible types. The LHS has type `Nat32` but the RHS has type `Int64`.
-  Code:
-    3 |         let a: Nat32    := 10;
-    4 |         let b: Int64    := 20;
-    5 |         let c: Nat32    := a * b;
-    6 |         return ExitSuccess();
-    7 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Both operands to an arithmetic expression must be compatible types. The LHS has type "
+    },
+    { "type": "type", "content": "Nat32" },
+    { "type": "text", "content": " but the RHS has type " },
+    { "type": "type", "content": "Int64" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/012-numbers/mul-Nat32-Int64/Test.aum",
+    "startp": { "line": 5, "column": 8 },
+    "end[": { "line": 5, "column": 33 }
+  },
+  "context": [
+    [ 3, "        let a: Nat32    := 10;" ],
+    [ 4, "        let b: Int64    := 20;" ],
+    [ 5, "        let c: Nat32    := a * b;" ],
+    [ 6, "        return ExitSuccess();" ],
+    [ 7, "    end;" ]
+  ]
+}

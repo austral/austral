@@ -148,6 +148,56 @@ let render_error_to_plain (error: austral_error): string =
   ^ code_text
   ^ "\n"
 
+let pos_json (p: position): Yojson.Basic.t =
+  let (Position { line; column; }) = p in
+  `Assoc [
+      ("line", `Int line);
+      ("column", `Int column)
+    ]
+
+let span_json (span: span): Yojson.Basic.t =
+  let (Span { filename; startp; endp; }) = span in
+  `Assoc [
+      ("filename", `String filename);
+      ("startp", pos_json startp);
+      ("end[", pos_json endp)
+    ]
+
+let source_ctx_json (ctx: source_ctx): Yojson.Basic.t =
+  let (SourceContext lines) = ctx in
+  let line_json ((n, l): (int * string)): Yojson.Basic.t =
+    `List [`Int n; `String l]
+  in
+  `List (List.map line_json lines)
+
+let render_error_to_json (error: austral_error): Yojson.Basic.t =
+  (* Break up the error. *)
+  let (AustralError { span; kind; text; source_ctx; module_name }) = error in
+  (* Render components to JSON. *)
+  let module_name: Yojson.Basic.t =
+    match module_name with
+    | Some mn -> `String (mod_name_string mn)
+    | None -> `Null
+  in
+  let span: Yojson.Basic.t =
+    match span with
+    | Some span -> span_json span
+    | None -> `Null
+  in
+  let source_ctx: Yojson.Basic.t =
+    match source_ctx with
+    | Some source_ctx -> source_ctx_json source_ctx
+    | None -> `Null
+  in
+  (* Put it together. *)
+  `Assoc [
+      ("module", module_name);
+      ("kind", `String (error_title kind));
+      ("text", error_text_to_json text);
+      ("span", span);
+      ("context", source_ctx)
+    ]
+
 (* Utility functions. *)
 
 let err (message: string) =

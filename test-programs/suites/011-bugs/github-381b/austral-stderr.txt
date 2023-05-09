@@ -1,16 +1,23 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/011-bugs/github-381b/Test.aum'
-    From: line 4, column 8
-    To: line 4, column 36
-  Description:
-    Expected a value of type `Int32`, but got a value of type `FixedArray[Nat8]`.
-  Code:
-    2 |     function main(): ExitCode is
-    3 |         let x: Int32 := 10;
-    4 |         x := "This shouldn't work.";
-    5 |         return ExitSuccess();
-    6 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Expected a value of type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": ", but got a value of type " },
+    { "type": "type", "content": "FixedArray[Nat8]" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/011-bugs/github-381b/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end[": { "line": 4, "column": 36 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let x: Int32 := 10;" ],
+    [ 4, "        x := \"This shouldn't work.\";" ],
+    [ 5, "        return ExitSuccess();" ],
+    [ 6, "    end;" ]
+  ]
+}

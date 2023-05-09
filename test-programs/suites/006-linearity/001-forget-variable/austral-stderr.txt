@@ -1,16 +1,24 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/006-linearity/001-forget-variable/Test.aum'
-    From: line 8, column 8
-    To: line 8, column 29
-  Description:
-    The variable `r` is not consumed by the time of the return statement. Did you forget to call a destructor, or destructure the contents?
-  Code:
-     6 |     function main(): ExitCode is
-     7 |         let r: R := R(x => 32);
-     8 |         return ExitSuccess();
-     9 |     end;
-    10 | end module body.
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "r" },
+    {
+      "type": "text",
+      "content": " is not consumed by the time of the return statement. Did you forget to call a destructor, or destructure the contents?"
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/006-linearity/001-forget-variable/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end[": { "line": 8, "column": 29 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let r: R := R(x => 32);" ],
+    [ 8, "        return ExitSuccess();" ],
+    [ 9, "    end;" ],
+    [ 10, "end module body." ]
+  ]
+}

@@ -1,16 +1,26 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/004-union/003-free-union-linear-param/Test.aum'
-    From: line 1, column 19
-    To: line 3, column 8
-  Description:
-    `Foo` was declared to belong to the `Free` universe, but it has a type parameter that belongs to the `Type` universe.
-  Code:
-    1 | module body Test is
-    2 |     union Foo[A: Type]: Free is
-    3 |     end;
-    4 | 
-    5 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": " was declared to belong to the " },
+    { "type": "code", "content": "Free" },
+    { "type": "text", "content": " universe, but it " },
+    { "type": "text", "content": "has a type parameter" },
+    { "type": "text", "content": " that belongs to the " },
+    { "type": "code", "content": "Type" },
+    { "type": "text", "content": " universe." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/004-union/003-free-union-linear-param/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end[": { "line": 3, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    union Foo[A: Type]: Free is" ],
+    [ 3, "    end;" ],
+    [ 4, "" ],
+    [ 5, "    function main(): ExitCode is" ]
+  ]
+}

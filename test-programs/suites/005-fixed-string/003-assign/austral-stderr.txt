@@ -1,16 +1,22 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/005-fixed-string/003-assign/Test.aum'
-    From: line 4, column 8
-    To: line 4, column 20
-  Description:
-    The array index operator doesn't work in lvalues.
-  Code:
-    2 |     function main(): ExitCode is
-    3 |         let s: FixedArray[Nat8] := "Hello, world!";
-    4 |         s[0] := 'J';
-    5 |         return ExitSuccess();
-    6 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The array index operator doesn't work in lvalues."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/005-fixed-string/003-assign/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end[": { "line": 4, "column": 20 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let s: FixedArray[Nat8] := \"Hello, world!\";" ],
+    [ 4, "        s[0] := 'J';" ],
+    [ 5, "        return ExitSuccess();" ],
+    [ 6, "    end;" ]
+  ]
+}

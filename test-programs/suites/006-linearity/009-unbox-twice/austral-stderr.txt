@@ -1,16 +1,21 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/006-linearity/009-unbox-twice/Test.aum'
-    From: line 47, column 16
-    To: line 47, column 28
-  Description:
-    The variable `left` has already been consumed.
-  Code:
-    45 |             when Left(left: Box[Int32]) do
-    46 |                 Unbox(left);
-    47 |                 Unbox(left);
-    48 |             when Right(right: Int32) do
-    49 |                 skip;
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "left" },
+    { "type": "text", "content": " has already been consumed." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/006-linearity/009-unbox-twice/Test.aum",
+    "startp": { "line": 47, "column": 16 },
+    "end[": { "line": 47, "column": 28 }
+  },
+  "context": [
+    [ 45, "            when Left(left: Box[Int32]) do" ],
+    [ 46, "                Unbox(left);" ],
+    [ 47, "                Unbox(left);" ],
+    [ 48, "            when Right(right: Int32) do" ],
+    [ 49, "                skip;" ]
+  ]
+}

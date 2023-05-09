@@ -1,16 +1,21 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/007-borrowing/005-anon-borrow-after-consume/Test.aum'
-    From: line 12, column 8
-    To: line 12, column 13
-  Description:
-    The variable `foo` has already been consumed.
-  Code:
-    10 |         let { bar: Nat8 } := foo;
-    11 |         -- Try to borrow it.
-    12 |         &foo;
-    13 |         return ExitSuccess();
-    14 |     end;
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "foo" },
+    { "type": "text", "content": " has already been consumed." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/007-borrowing/005-anon-borrow-after-consume/Test.aum",
+    "startp": { "line": 12, "column": 8 },
+    "end[": { "line": 12, "column": 13 }
+  },
+  "context": [
+    [ 10, "        let { bar: Nat8 } := foo;" ],
+    [ 11, "        -- Try to borrow it." ],
+    [ 12, "        &foo;" ],
+    [ 13, "        return ExitSuccess();" ],
+    [ 14, "    end;" ]
+  ]
+}

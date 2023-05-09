@@ -61,6 +61,17 @@ module Errors = struct
       Text "Unknown target type ";
       Code target
     ]
+
+  let unknown_error_reporting_mode (mode: string) =
+    austral_raise CliError [
+      Text "Unknown error reporting mode: ";
+      Code mode;
+      Text ". Valid values are ";
+      Code "plain";
+      Text " and ";
+      Code "json";
+      Text "."
+    ]
 end
 
 type entrypoint =
@@ -78,6 +89,11 @@ type target =
   | CStandalone of { output_path: string; entrypoint: entrypoint option; }
 [@@deriving eq]
 
+type error_reporting_mode =
+  | ErrorReportPlain
+  | ErrorReportJson
+[@@deriving eq]
+
 type cmd =
   | HelpCommand
   | VersionCommand
@@ -85,6 +101,7 @@ type cmd =
   | WholeProgramCompile of {
       modules: mod_source list;
       target: target;
+      error_reporting_mode: error_reporting_mode;
     }
 [@@deriving eq]
 
@@ -172,17 +189,35 @@ let parse_target_type (arglist: arglist): (arglist * target) =
         an entrypoint. *)
      parse_executable_target arglist
 
+let parse_error_reporting_mode (arglist: arglist): (arglist * error_reporting_mode) =
+  match pop_value_flag arglist "error-format" with
+  | Some (arglist, value) ->
+     (* An explicit error reporting mode was passed. *)
+     (match value with
+      | "plain" ->
+         (* Report errors in plain text. *)
+         (arglist, ErrorReportPlain)
+      | "json" ->
+         (* Report errors in JSON. *)
+         (arglist, ErrorReportJson)
+      | _ ->
+         Errors.unknown_error_reporting_mode value)
+  | None ->
+     (* The default target is plain text errors. *)
+     (arglist, ErrorReportPlain)
+
 let parse_compile_command' (arglist: arglist): (arglist * cmd) =
   (* Parse module list *)
   let (arglist, modules): (arglist * string list) = pop_positional arglist in
   let modules: mod_source list = List.map parse_mod_source modules in
+  let (arglist, error_reporting_mode) = parse_error_reporting_mode arglist in
   (* There must be at least one module. *)
   if ((List.length modules) < 1) then
     Errors.missing_module ()
   else
     (* Parse the target type. *)
     let (arglist, target): (arglist * target) = parse_target_type arglist in
-    (arglist, WholeProgramCompile { modules = modules; target = target; })
+    (arglist, WholeProgramCompile { modules = modules; target = target; error_reporting_mode = error_reporting_mode; })
 
 let parse_compile_command (arglist: arglist): (arglist * cmd) =
   match pop_bool_flag arglist "help" with

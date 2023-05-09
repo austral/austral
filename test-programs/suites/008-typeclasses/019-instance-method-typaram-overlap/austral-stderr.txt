@@ -1,24 +1,30 @@
-Error:
-  Title: Generic Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/019-instance-method-typaram-overlap/Test.aum'
-    From: line 4, column 8
-    To: line 12, column 8
-  Description:
-    Multiple type parameters have the same name.
-  Code:
-     2 |     typeclass Foo(T: Free) is
-     3 |         method foo(x: T): Unit;
-     4 |     end;
-     5 | 
-     6 |     generic [U: Type]
-     7 |     instance Foo(Nat8) is
-     8 |         generic [U: Type]
-     9 |         method foo(x: U): Unit is
-    10 |             return nil;
-    11 |         end;
-    12 |     end;
-    13 | 
-    14 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Multiple type parameters have the same name."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/019-instance-method-typaram-overlap/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end[": { "line": 12, "column": 8 }
+  },
+  "context": [
+    [ 2, "    typeclass Foo(T: Free) is" ],
+    [ 3, "        method foo(x: T): Unit;" ],
+    [ 4, "    end;" ],
+    [ 5, "" ],
+    [ 6, "    generic [U: Type]" ],
+    [ 7, "    instance Foo(Nat8) is" ],
+    [ 8, "        generic [U: Type]" ],
+    [ 9, "        method foo(x: U): Unit is" ],
+    [ 10, "            return nil;" ],
+    [ 11, "        end;" ],
+    [ 12, "    end;" ],
+    [ 13, "" ],
+    [ 14, "    function main(): ExitCode is" ]
+  ]
+}

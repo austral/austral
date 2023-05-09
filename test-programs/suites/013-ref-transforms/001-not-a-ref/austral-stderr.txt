@@ -1,16 +1,23 @@
-Error:
-  Title: Generic Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/013-ref-transforms/001-not-a-ref/Test.aum'
-    From: line 4, column 8
-    To: line 4, column 22
-  Description:
-    The head of a reference transform expression must be of a reference type, but I got `Unit`
-  Code:
-    2 |     function main(): ExitCode is
-    3 |         let value: Unit := nil;
-    4 |         &(value->foo);
-    5 |         return ExitSuccess();
-    6 |     end;
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The head of a reference transform expression must be of a reference type, but I got "
+    },
+    { "type": "type", "content": "Unit" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/013-ref-transforms/001-not-a-ref/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end[": { "line": 4, "column": 22 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let value: Unit := nil;" ],
+    [ 4, "        &(value->foo);" ],
+    [ 5, "        return ExitSuccess();" ],
+    [ 6, "    end;" ]
+  ]
+}

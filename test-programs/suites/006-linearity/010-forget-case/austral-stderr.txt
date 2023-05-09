@@ -1,21 +1,26 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/006-linearity/010-forget-case/Test.aum'
-    From: line 9, column 8
-    To: line 14, column 17
-  Description:
-    Forgot to consume a linear variable: `value`.
-  Code:
-     7 |         let r: R := R(x => 32);
-     8 |         let ropt: Option[R] := Some(value => r);
-     9 |         case ropt of
-    10 |             when Some(value: R) do
-    11 |                 skip;
-    12 |             when None do
-    13 |                 skip;
-    14 |         end case;
-    15 |         return ExitSuccess();
-    16 |     end;
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "Forgot to consume a linear variable: " },
+    { "type": "code", "content": "value" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/006-linearity/010-forget-case/Test.aum",
+    "startp": { "line": 9, "column": 8 },
+    "end[": { "line": 14, "column": 17 }
+  },
+  "context": [
+    [ 7, "        let r: R := R(x => 32);" ],
+    [ 8, "        let ropt: Option[R] := Some(value => r);" ],
+    [ 9, "        case ropt of" ],
+    [ 10, "            when Some(value: R) do" ],
+    [ 11, "                skip;" ],
+    [ 12, "            when None do" ],
+    [ 13, "                skip;" ],
+    [ 14, "        end case;" ],
+    [ 15, "        return ExitSuccess();" ],
+    [ 16, "    end;" ]
+  ]
+}

@@ -68,6 +68,9 @@ val error_title : error_kind -> string
 (** Render an error to plain text, for display to the terminal. *)
 val render_error_to_plain : austral_error -> string
 
+(** Render an error to JSON, for tools or the end to end tests. *)
+val render_error_to_json : austral_error -> Yojson.Basic.t
+
 (** Utility: raise a generic error. *)
 val err : string -> 'a
 

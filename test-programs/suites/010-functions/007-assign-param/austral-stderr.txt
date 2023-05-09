@@ -1,16 +1,22 @@
-Error:
-  Title: Generic Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/010-functions/007-assign-param/Test.aum'
-    From: line 3, column 8
-    To: line 3, column 16
-  Description:
-    Cannot assign a value to a function parameter.
-  Code:
-    1 | module body Test is
-    2 |     function foo(x: Int32): Unit is
-    3 |         x := 10;
-    4 |         return nil;
-    5 |     end;
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Cannot assign a value to a function parameter."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/010-functions/007-assign-param/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end[": { "line": 3, "column": 16 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function foo(x: Int32): Unit is" ],
+    [ 3, "        x := 10;" ],
+    [ 4, "        return nil;" ],
+    [ 5, "    end;" ]
+  ]
+}

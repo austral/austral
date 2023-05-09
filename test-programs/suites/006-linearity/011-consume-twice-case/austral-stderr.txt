@@ -1,16 +1,21 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/006-linearity/011-consume-twice-case/Test.aum'
-    From: line 17, column 16
-    To: line 17, column 31
-  Description:
-    The variable `value` has already been consumed.
-  Code:
-    15 |             when Some(value: R) do
-    16 |                 Consume(value);
-    17 |                 Consume(value);
-    18 |             when None do
-    19 |                 skip;
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "value" },
+    { "type": "text", "content": " has already been consumed." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/006-linearity/011-consume-twice-case/Test.aum",
+    "startp": { "line": 17, "column": 16 },
+    "end[": { "line": 17, "column": 31 }
+  },
+  "context": [
+    [ 15, "            when Some(value: R) do" ],
+    [ 16, "                Consume(value);" ],
+    [ 17, "                Consume(value);" ],
+    [ 18, "            when None do" ],
+    [ 19, "                skip;" ]
+  ]
+}

@@ -1,16 +1,23 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/011-bugs/github-381/Test.aum'
-    From: line 12, column 10
-    To: line 12, column 46
-  Description:
-    Expected a value of type `Nat32`, but got a value of type `FixedArray[Nat8]`.
-  Code:
-    10 |       generic [R: Region]
-    11 |       function mangle(thing: &![Mut, R]): Unit is
-    12 |           thing->x.y := "this shouldn't work";
-    13 |           return nil;
-    14 |       end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Expected a value of type " },
+    { "type": "type", "content": "Nat32" },
+    { "type": "text", "content": ", but got a value of type " },
+    { "type": "type", "content": "FixedArray[Nat8]" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/011-bugs/github-381/Test.aum",
+    "startp": { "line": 12, "column": 10 },
+    "end[": { "line": 12, "column": 46 }
+  },
+  "context": [
+    [ 10, "      generic [R: Region]" ],
+    [ 11, "      function mangle(thing: &![Mut, R]): Unit is" ],
+    [ 12, "          thing->x.y := \"this shouldn't work\";" ],
+    [ 13, "          return nil;" ],
+    [ 14, "      end;" ]
+  ]
+}

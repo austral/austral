@@ -1,23 +1,24 @@
-Error:
-  Title: Generic Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/009-generic-duplicate/Test.aum'
-    From: line 15, column 8
-    To: line 22, column 8
-  Description:
-    Instance overlaps.
-  Code:
-    13 |             return nil;
-    14 |         end;
-    15 |     end;
-    16 | 
-    17 |     generic [U: Free]
-    18 |     instance Foo(Bar[U]) is
-    19 |         method Accept(x: Bar[U]): Unit is
-    20 |             return nil;
-    21 |         end;
-    22 |     end;
-    23 | 
-    24 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [ { "type": "text", "content": "Instance overlaps." } ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/009-generic-duplicate/Test.aum",
+    "startp": { "line": 15, "column": 8 },
+    "end[": { "line": 22, "column": 8 }
+  },
+  "context": [
+    [ 13, "            return nil;" ],
+    [ 14, "        end;" ],
+    [ 15, "    end;" ],
+    [ 16, "" ],
+    [ 17, "    generic [U: Free]" ],
+    [ 18, "    instance Foo(Bar[U]) is" ],
+    [ 19, "        method Accept(x: Bar[U]): Unit is" ],
+    [ 20, "            return nil;" ],
+    [ 21, "        end;" ],
+    [ 22, "    end;" ],
+    [ 23, "" ],
+    [ 24, "    function main(): ExitCode is" ]
+  ]
+}

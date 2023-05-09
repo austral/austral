@@ -77,8 +77,8 @@ let rec exec (cmd: cmd): unit =
      print_version ()
   | CompileHelp ->
      print_compile_usage ()
-  | WholeProgramCompile { modules; target; } ->
-     exec_compile modules target
+  | WholeProgramCompile { modules; target; error_reporting_mode } ->
+     exec_compile modules target error_reporting_mode
 
 and print_usage _: unit =
   print_endline ("austral " ^ version_string);
@@ -116,7 +116,7 @@ and print_compile_usage _: unit =
   print_endline "              both an interface and body file, or 'file.aum' for";
   print_endline "              modules with only a body."
 
-and exec_compile (modules: mod_source list) (target: target): unit =
+and exec_compile (modules: mod_source list) (target: target) (error_reporting_mode: error_reporting_mode): unit =
   (* Parse source files *)
   let (mods, source_map): (module_source list * source_map) = parse_source_files modules in
   (* Error handling setup *)
@@ -124,10 +124,19 @@ and exec_compile (modules: mod_source list) (target: target): unit =
     exec_target mods target
   with Austral_error error ->
     (* Print errors *)
-    let error: austral_error = try_adding_source_ctx error source_map in
-    Printf.eprintf "%s" (render_error_to_plain error);
-    html_error_dump error;
-    dump_and_die ()
+    begin
+      match error_reporting_mode with
+      | ErrorReportPlain ->
+         let error: austral_error = try_adding_source_ctx error source_map in
+         Printf.eprintf "%s" (render_error_to_plain error);
+         html_error_dump error;
+         dump_and_die ()
+      | ErrorReportJson ->
+         let error: austral_error = try_adding_source_ctx error source_map in
+         Printf.eprintf "%s" (Yojson.Basic.pretty_to_string (render_error_to_json error));
+         html_error_dump error;
+         dump_and_die ()
+    end
 
 and dump_and_die _: unit =
   print_endline "Compiler call tree printed to calltree.html";
