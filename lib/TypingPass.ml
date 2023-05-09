@@ -184,7 +184,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let _ =
                    match source with
                    (* All good. *)
-                   | VarLocal _ -> ()
+                   | VarLocal mut ->
+                      (match mut with
+                       | Mutable -> ()
+                       | Immutable -> Errors.cant_assign_to_immutable_var var)
                    | VarConstant ->
                       Errors.cannot_assign_to_constant ()
                    | VarParam ->

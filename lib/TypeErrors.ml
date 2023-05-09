@@ -341,6 +341,13 @@ let cannot_assign_to_parameter _ =
       Text "Cannot assign a value to a function parameter."
     ]
 
+let cant_assign_to_immutable_var (name: identifier) =
+  austral_raise GenericError [
+      Text "Cannot assign a value to ";
+      Code (ident_string name);
+      Text " because it is immutable."
+    ]
+
 let ref_transform_needs_ref ty =
   austral_raise GenericError [
       Text "The head of a reference transform expression must be of a reference type, but I got ";
