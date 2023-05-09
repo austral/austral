@@ -43,10 +43,24 @@ let reborrow_wrong_type (ty: ty) =
 
 let borrow_non_linear ty =
   austral_raise TypeError [
-    Text "Cannot borrow ";
-    Type ty;
-    Text " because it is not a linear type."
-  ]
+      Text "Cannot borrow ";
+      Type ty;
+      Text " because it is not a linear type."
+    ]
+
+let cannot_borrow_immutable_var_mutably (name: identifier) =
+  austral_raise TypeError [
+      Text "Cannot borrow the variable ";
+      Code (ident_string name);
+      Text " mutably because the variable is immutable."
+    ]
+
+let cannot_borrow_param_mutably (name: identifier) =
+  austral_raise TypeError [
+      Text "Cannot borrow the variable ";
+      Code (ident_string name);
+      Text " mutably because the it is a function parameter, and therefore immutable."
+    ]
 
 let call_non_callable ty =
   austral_raise TypeError [

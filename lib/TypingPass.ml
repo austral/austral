@@ -268,7 +268,23 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          adorn_error_with_span span
            (fun _ ->
              (match get_var lexenv original with
-              | (Some (orig_ty, _)) ->
+              | (Some (orig_ty, src)) ->
+                 (* Check we can borrow the variable. *)
+                 let _ =
+                   match (src, mode) with
+                   | (_, ReadBorrow) ->
+                      (* Anything can be borrowed immutably. *)
+                      ()
+                   | (VarLocal Immutable, WriteBorrow) ->
+                      (* Immutable variables cannot be borrowed mutably. *)
+                      Errors.cannot_borrow_immutable_var_mutably original
+                   | (VarParam, WriteBorrow) ->
+                      (* Parameters cannot be borrowed mutably. *)
+                      Errors.cannot_borrow_param_mutably original
+                   | _ ->
+                      (* And anything else is fine. *)
+                      ()
+                 in
                  let u = type_universe orig_ty in
                  if ((u = LinearUniverse) || (u = TypeUniverse)) then
                    let region_obj = fresh_region () in
