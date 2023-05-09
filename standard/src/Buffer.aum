@@ -115,7 +115,7 @@ module body Standard.Buffer is
         let addr: Address[T] := allocateBuffer(capacity);
         case nullCheck(addr) of
             when Some(value: Pointer[T]) do
-                let buf: Buffer[T] := Buffer(
+                var buf: Buffer[T] := Buffer(
                     capacity => capacity,
                     size => size,
                     array => value
@@ -399,7 +399,7 @@ module body Standard.Buffer is
 
     generic [T: Type, U: Type]
     function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U] is
-        let newbuf: Buffer[U] := allocateEmpty();
+        var newbuf: Buffer[U] := allocateEmpty();
         if buf.size > 0 then
             -- Iterate over everything in the buffer, transforming it and moving it
             -- to the new buffer.
