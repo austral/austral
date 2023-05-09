@@ -1,0 +1,1 @@
+Test we can assign to a `var` variable.
