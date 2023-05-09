@@ -27,3 +27,5 @@ and text_elem =
 val error_text_to_plain : err_text -> string
 
 val error_text_to_html  : err_text -> string
+
+val error_text_to_json  : err_text -> Yojson.Basic.t

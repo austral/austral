@@ -41,3 +41,17 @@ and text_elem_to_html (elem: text_elem): string =
       "<code>" ^ (type_string ty) ^ "</code>"
   | Break ->
       "<br><br>"
+
+let rec error_text_to_json (txt: err_text): Yojson.Basic.t =
+  `List (List.map text_elem_to_json txt)
+
+and text_elem_to_json (elem: text_elem): Yojson.Basic.t =
+  match elem with
+  | Text s ->
+     `Assoc [("type", `String "text"); ("content", `String s)]
+  | Code c ->
+     `Assoc [("type", `String "code"); ("content", `String c)]
+  | Type ty ->
+     `Assoc [("type", `String "type"); ("content", `String (type_string ty))]
+  | Break ->
+     `Assoc [("type", `String "break")]
