@@ -332,7 +332,7 @@ let_stmt:
   ;
 
 let_simple:
-  | LET identifier COLON typespec ASSIGN expression SEMI { CLet (from_loc $loc, $2, $4, $6) }
+  | LET name=identifier COLON ty=typespec ASSIGN e=expression SEMI { CLet (from_loc $loc, name, ty, e) }
   ;
 
 let_destructure:
