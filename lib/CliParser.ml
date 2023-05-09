@@ -189,28 +189,28 @@ let parse_target_type (arglist: arglist): (arglist * target) =
         an entrypoint. *)
      parse_executable_target arglist
 
-let parse_error_reporting_mode (arglist: arglist): error_reporting_mode =
+let parse_error_reporting_mode (arglist: arglist): (arglist * error_reporting_mode) =
   match pop_value_flag arglist "error-format" with
-  | Some (_, value) ->
+  | Some (arglist, value) ->
      (* An explicit error reporting mode was passed. *)
      (match value with
       | "plain" ->
          (* Report errors in plain text. *)
-         ErrorReportPlain
+         (arglist, ErrorReportPlain)
       | "json" ->
          (* Report errors in JSON. *)
-         ErrorReportJson
+         (arglist, ErrorReportJson)
       | _ ->
          Errors.unknown_error_reporting_mode value)
   | None ->
      (* The default target is plain text errors. *)
-     ErrorReportPlain
+     (arglist, ErrorReportPlain)
 
 let parse_compile_command' (arglist: arglist): (arglist * cmd) =
   (* Parse module list *)
   let (arglist, modules): (arglist * string list) = pop_positional arglist in
   let modules: mod_source list = List.map parse_mod_source modules in
-  let error_reporting_mode: error_reporting_mode = parse_error_reporting_mode arglist in
+  let (arglist, error_reporting_mode) = parse_error_reporting_mode arglist in
   (* There must be at least one module. *)
   if ((List.length modules) < 1) then
     Errors.missing_module ()
