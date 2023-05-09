@@ -133,7 +133,7 @@ and exec_compile (modules: mod_source list) (target: target) (error_reporting_mo
          dump_and_die ()
       | ErrorReportJson ->
          let error: austral_error = try_adding_source_ctx error source_map in
-         Printf.eprintf "%s" (Yojson.Basic.to_string (render_error_to_json error));
+         Printf.eprintf "%s" (Yojson.Basic.pretty_to_string (render_error_to_json error));
          html_error_dump error;
          dump_and_die ()
     end
