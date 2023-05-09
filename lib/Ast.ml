@@ -24,8 +24,8 @@ type qbinding =
 
 type astmt =
   | ASkip of span
-  | ALet of span * identifier * qtypespec * aexpr * astmt
-  | ADestructure of span * qbinding list * aexpr * astmt
+  | ALet of span * mutability * identifier * qtypespec * aexpr * astmt
+  | ADestructure of span * mutability * qbinding list * aexpr * astmt
   | AAssign of span * lvalue * aexpr
   | AIf of span * aexpr * astmt * astmt
   | AWhen of span * aexpr * astmt

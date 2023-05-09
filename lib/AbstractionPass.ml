@@ -129,14 +129,14 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
   match l with
   | first::rest ->
      (match first with
-      | CLet (span, _, n, t, v) ->
-         ALet (span, n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
-      | CDestructure (span, _, bs, e) ->
+      | CLet (span, mut, n, t, v) ->
+         ALet (span, mut, n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
+      | CDestructure (span, mut, bs, e) ->
          let bs' = List.map (fun (ConcreteBinding {name; ty; rename; }) -> QBinding { name; ty = qualify_typespec im ty; rename; }) bs
          and e' = abs_expr im e
          and b = let_reshape im rest
          in
-         ADestructure (span, bs', e', b)
+         ADestructure (span, mut, bs', e', b)
       | s ->
          (if rest = [] then
             abs_stmt im s

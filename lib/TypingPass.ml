@@ -112,7 +112,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       match stmt with
       | ASkip span ->
          TSkip span
-      | ALet (span, name, ty, value, body) ->
+      | ALet (span, _, name, ty, value, body) ->
          pi ("Name", name);
          adorn_error_with_span span
            (fun _ ->
@@ -127,7 +127,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let lexenv' = push_var lexenv name ty VarLocal in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
              TLet (span, name, ty, value', body'))
-      | ADestructure (span, bindings, value, body) ->
+      | ADestructure (span, _, bindings, value, body) ->
          adorn_error_with_span span
            (fun _ ->
              let value' = augment_expr module_name env rm typarams lexenv None value in
