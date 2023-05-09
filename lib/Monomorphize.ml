@@ -357,12 +357,12 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
   match stmt with
   | TSkip _ ->
      (MSkip, env)
-  | TLet (_, name, ty, value, body) ->
+  | TLet (_, _, name, ty, value, body) ->
      let (ty, env) = strip_and_mono env ty in
      let (value, env) = monomorphize_expr env value in
      let (body, env) = monomorphize_stmt env body in
      (MLet (name, ty, value, body), env)
-  | TDestructure (_, bindings, value, body) ->
+  | TDestructure (_, _, bindings, value, body) ->
      let (bindings, env) = monomorphize_binding_list env (List.map (fun (TypedBinding { name; ty; rename; }) -> (name, strip_type ty, rename)) bindings) in
      let (value, env) = monomorphize_expr env value in
      let (body, env) = monomorphize_stmt env body in
