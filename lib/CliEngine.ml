@@ -77,7 +77,8 @@ let rec exec (cmd: cmd): unit =
      print_version ()
   | CompileHelp ->
      print_compile_usage ()
-  | WholeProgramCompile { modules; target; } ->
+  | WholeProgramCompile { modules; target; error_reporting_mode } ->
+     let _ = error_reporting_mode in
      exec_compile modules target
 
 and print_usage _: unit =
