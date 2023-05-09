@@ -37,6 +37,7 @@ type pragma =
 type mutability =
   | Immutable
   | Mutable
+[@@deriving (show)]
 
 (** Whether a reference is a read reference or a write reference. *)
 type borrowing_mode =
