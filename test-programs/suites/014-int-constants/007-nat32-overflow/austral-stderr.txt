@@ -1,16 +1,23 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/014-int-constants/007-nat32-overflow/Test.aum'
-    From: line 3, column 8
-    To: line 3, column 38
-  Description:
-    The integer `4294967296` does not fit the type `Nat32`.
-  Code:
-    1 | module body Test is
-    2 |     function main(): ExitCode is
-    3 |         let n: Nat32 := 4'294'967'296;
-    4 |         return ExitSuccess();
-    5 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The integer " },
+    { "type": "code", "content": "4294967296" },
+    { "type": "text", "content": " does not fit the type " },
+    { "type": "type", "content": "Nat32" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/014-int-constants/007-nat32-overflow/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end[": { "line": 3, "column": 38 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let n: Nat32 := 4'294'967'296;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

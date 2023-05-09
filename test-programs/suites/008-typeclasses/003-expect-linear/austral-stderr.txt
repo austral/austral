@@ -1,22 +1,31 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/003-expect-linear/Test.aum'
-    From: line 4, column 8
-    To: line 10, column 8
-  Description:
-    Cannot define an instance with argument `Nat8` because it should belong to the `Linear` universe, but it is actually in the `Free` universe.
-  Code:
-     2 |     typeclass AcceptsLinear(T: Linear) is
-     3 |         method Accept(x: T): Unit;
-     4 |     end;
-     5 | 
-     6 |     instance AcceptsLinear(Nat8) is
-     7 |         method Accept(x: Nat8): Unit is
-     8 |             return nil;
-     9 |         end;
-    10 |     end;
-    11 | 
-    12 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot define an instance with argument " },
+    { "type": "type", "content": "Nat8" },
+    { "type": "text", "content": " because it should belong to the " },
+    { "type": "code", "content": "Linear" },
+    { "type": "text", "content": " universe, but it is actually in the " },
+    { "type": "code", "content": "Free" },
+    { "type": "text", "content": " universe." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/003-expect-linear/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end[": { "line": 10, "column": 8 }
+  },
+  "context": [
+    [ 2, "    typeclass AcceptsLinear(T: Linear) is" ],
+    [ 3, "        method Accept(x: T): Unit;" ],
+    [ 4, "    end;" ],
+    [ 5, "" ],
+    [ 6, "    instance AcceptsLinear(Nat8) is" ],
+    [ 7, "        method Accept(x: Nat8): Unit is" ],
+    [ 8, "            return nil;" ],
+    [ 9, "        end;" ],
+    [ 10, "    end;" ],
+    [ 11, "" ],
+    [ 12, "    function main(): ExitCode is" ]
+  ]
+}

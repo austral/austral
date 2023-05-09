@@ -1,16 +1,23 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/014-int-constants/002-nat16-neg/Test.aum'
-    From: line 3, column 8
-    To: line 3, column 27
-  Description:
-    The integer `-1` does not fit the type `Nat16`.
-  Code:
-    1 | module body Test is
-    2 |     function main(): ExitCode is
-    3 |         let n: Nat16 := -1;
-    4 |         return ExitSuccess();
-    5 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The integer " },
+    { "type": "code", "content": "-1" },
+    { "type": "text", "content": " does not fit the type " },
+    { "type": "type", "content": "Nat16" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/014-int-constants/002-nat16-neg/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end[": { "line": 3, "column": 27 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let n: Nat16 := -1;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

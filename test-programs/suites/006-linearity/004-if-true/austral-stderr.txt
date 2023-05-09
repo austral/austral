@@ -1,20 +1,34 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/006-linearity/004-if-true/Test.aum'
-    From: line 8, column 8
-    To: line 12, column 15
-  Description:
-    The variable `r` is used inconsistently in the branches of an if statement. In one branch it is consumed while in the other it is not yet consumed.
-  Code:
-     6 |     function main(): ExitCode is
-     7 |         let r: R := R(x => 32);
-     8 |         if true then
-     9 |             let { x: Int32 } := r;
-    10 |         else
-    11 |             skip;
-    12 |         end if;
-    13 |         return ExitSuccess();
-    14 |     end;
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "r" },
+    {
+      "type": "text",
+      "content": " is used inconsistently in the branches of "
+    },
+    { "type": "text", "content": "an if" },
+    { "type": "text", "content": " statement. In one branch it is " },
+    { "type": "text", "content": "consumed" },
+    { "type": "text", "content": " while in the other it is " },
+    { "type": "text", "content": "not yet consumed" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/006-linearity/004-if-true/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end[": { "line": 12, "column": 15 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let r: R := R(x => 32);" ],
+    [ 8, "        if true then" ],
+    [ 9, "            let { x: Int32 } := r;" ],
+    [ 10, "        else" ],
+    [ 11, "            skip;" ],
+    [ 12, "        end if;" ],
+    [ 13, "        return ExitSuccess();" ],
+    [ 14, "    end;" ]
+  ]
+}

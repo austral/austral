@@ -1,17 +1,35 @@
-Error:
-  Title: Declaration Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/004-union/004-union-in-region/Test.aum'
-    From: line 1, column 19
-    To: line 2, column 29
-  Description:
-    The union `Foo` was declared to belong to the `Region` universe, but regions are distinct from types.
-
-    Consider using one of `Type`, `Linear`, or `Free` instead.
-  Code:
-    1 | module body Test is
-    2 |     union Foo: Region is end;
-    3 | 
-    4 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The " },
+    { "type": "text", "content": "union" },
+    { "type": "text", "content": " " },
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": " was declared to belong to the " },
+    { "type": "code", "content": "Region" },
+    {
+      "type": "text",
+      "content": " universe, but regions are distinct from types."
+    },
+    { "type": "break" },
+    { "type": "text", "content": "Consider using one of " },
+    { "type": "code", "content": "Type" },
+    { "type": "text", "content": ", " },
+    { "type": "code", "content": "Linear" },
+    { "type": "text", "content": ", or " },
+    { "type": "code", "content": "Free" },
+    { "type": "text", "content": " instead." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/004-union/004-union-in-region/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end[": { "line": 2, "column": 29 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    union Foo: Region is end;" ],
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode is" ]
+  ]
+}

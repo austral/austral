@@ -1,18 +1,26 @@
-Error:
-  Title: Declaration Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/011-bugs/github-424/Test.aum'
-    From: line 1, column 19
-    To: line 5, column 8
-  Description:
-    The type parameter `T` does not appear anywhere in the signature of the function.
-  Code:
-    1 | module body Test is
-    2 |     generic [T: Free] -- spurious
-    3 |     function mutate_int(var: Int32): Unit is
-    4 |         return nil;
-    5 |     end;
-    6 | 
-    7 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The type parameter " },
+    { "type": "code", "content": "T" },
+    {
+      "type": "text",
+      "content": " does not appear anywhere in the signature of the function."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/011-bugs/github-424/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end[": { "line": 5, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    generic [T: Free] -- spurious" ],
+    [ 3, "    function mutate_int(var: Int32): Unit is" ],
+    [ 4, "        return nil;" ],
+    [ 5, "    end;" ],
+    [ 6, "" ],
+    [ 7, "    function main(): ExitCode is" ]
+  ]
+}

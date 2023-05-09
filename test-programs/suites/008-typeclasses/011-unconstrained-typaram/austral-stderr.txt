@@ -1,18 +1,27 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/011-unconstrained-typaram/Test.aum'
-    From: line 14, column 8
-    To: line 14, column 22
-  Description:
-    The type parameter `T` does not implement the type class `Acceptable`
-
-    Consider adding a constraint to the type parameter.
-  Code:
-    12 |     generic [T: Free]
-    13 |     function Foo(value: T): Unit is
-    14 |         Accept(value);
-    15 |         return nil;
-    16 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The type parameter " },
+    { "type": "code", "content": "T" },
+    { "type": "text", "content": " does not implement the type class " },
+    { "type": "code", "content": "Acceptable" },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "Consider adding a constraint to the type parameter."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/011-unconstrained-typaram/Test.aum",
+    "startp": { "line": 14, "column": 8 },
+    "end[": { "line": 14, "column": 22 }
+  },
+  "context": [
+    [ 12, "    generic [T: Free]" ],
+    [ 13, "    function Foo(value: T): Unit is" ],
+    [ 14, "        Accept(value);" ],
+    [ 15, "        return nil;" ],
+    [ 16, "    end;" ]
+  ]
+}

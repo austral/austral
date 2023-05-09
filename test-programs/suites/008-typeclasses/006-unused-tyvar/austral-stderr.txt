@@ -1,23 +1,29 @@
-Error:
-  Title: Declaration Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/006-unused-tyvar/Test.aum'
-    From: line 8, column 8
-    To: line 15, column 8
-  Description:
-    The number of type parameters in the instance declaration must be the same as the number of type variables applied to the argument.
-  Code:
-     6 |     record Holder[A: Free]: Free is
-     7 |         a: A;
-     8 |     end;
-     9 | 
-    10 |     generic [A: Free, B: Free]
-    11 |     instance TC(Holder[A]) is
-    12 |         method Accept(x: Holder[A]): Unit is
-    13 |             return nil;
-    14 |         end;
-    15 |     end;
-    16 | 
-    17 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The number of type parameters in the instance declaration must be the same as the number of type variables applied to the argument."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/006-unused-tyvar/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end[": { "line": 15, "column": 8 }
+  },
+  "context": [
+    [ 6, "    record Holder[A: Free]: Free is" ],
+    [ 7, "        a: A;" ],
+    [ 8, "    end;" ],
+    [ 9, "" ],
+    [ 10, "    generic [A: Free, B: Free]" ],
+    [ 11, "    instance TC(Holder[A]) is" ],
+    [ 12, "        method Accept(x: Holder[A]): Unit is" ],
+    [ 13, "            return nil;" ],
+    [ 14, "        end;" ],
+    [ 15, "    end;" ],
+    [ 16, "" ],
+    [ 17, "    function main(): ExitCode is" ]
+  ]
+}

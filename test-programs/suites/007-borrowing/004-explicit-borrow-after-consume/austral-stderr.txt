@@ -1,18 +1,25 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/007-borrowing/004-explicit-borrow-after-consume/Test.aum'
-    From: line 12, column 8
-    To: line 14, column 12
-  Description:
-    Cannot borrow the variable `foo` because it is already consumed.
-  Code:
-    10 |         let { bar: Nat8 } := foo;
-    11 |         -- Try to borrow it.
-    12 |         borrow foo as fooref in rho do
-    13 |             skip;
-    14 |         end;
-    15 |         return ExitSuccess();
-    16 |     end;
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "Cannot borrow the variable " },
+    { "type": "code", "content": "foo" },
+    { "type": "text", "content": " because it is already " },
+    { "type": "text", "content": "consumed" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/007-borrowing/004-explicit-borrow-after-consume/Test.aum",
+    "startp": { "line": 12, "column": 8 },
+    "end[": { "line": 14, "column": 12 }
+  },
+  "context": [
+    [ 10, "        let { bar: Nat8 } := foo;" ],
+    [ 11, "        -- Try to borrow it." ],
+    [ 12, "        borrow foo as fooref in rho do" ],
+    [ 13, "            skip;" ],
+    [ 14, "        end;" ],
+    [ 15, "        return ExitSuccess();" ],
+    [ 16, "    end;" ]
+  ]
+}

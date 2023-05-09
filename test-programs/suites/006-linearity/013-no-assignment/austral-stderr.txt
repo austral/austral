@@ -1,16 +1,21 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/006-linearity/013-no-assignment/Test.aum'
-    From: line 6, column 8
-    To: line 6, column 21
-  Description:
-    Cannot assign to the variable `foo` because it is not yet consumed.
-  Code:
-    4 |     function main(): ExitCode is
-    5 |         let foo: Foo := Foo();
-    6 |         foo := Foo();
-    7 |         let {} := foo;
-    8 |         return ExitSuccess();
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "Cannot assign to the variable " },
+    { "type": "code", "content": "foo" },
+    { "type": "text", "content": " because it is not yet consumed." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/006-linearity/013-no-assignment/Test.aum",
+    "startp": { "line": 6, "column": 8 },
+    "end[": { "line": 6, "column": 21 }
+  },
+  "context": [
+    [ 4, "    function main(): ExitCode is" ],
+    [ 5, "        let foo: Foo := Foo();" ],
+    [ 6, "        foo := Foo();" ],
+    [ 7, "        let {} := foo;" ],
+    [ 8, "        return ExitSuccess();" ]
+  ]
+}

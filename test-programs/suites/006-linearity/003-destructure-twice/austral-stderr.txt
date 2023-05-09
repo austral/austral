@@ -1,16 +1,21 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/006-linearity/003-destructure-twice/Test.aum'
-    From: line 9, column 8
-    To: line 9, column 36
-  Description:
-    The variable `r` has already been consumed.
-  Code:
-     7 |         let r: R := R(x => 32);
-     8 |         let { x as x1: Int32 } := r;
-     9 |         let { x as x2: Int32 } := r;
-    10 |         return ExitSuccess();
-    11 |     end;
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "r" },
+    { "type": "text", "content": " has already been consumed." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/006-linearity/003-destructure-twice/Test.aum",
+    "startp": { "line": 9, "column": 8 },
+    "end[": { "line": 9, "column": 36 }
+  },
+  "context": [
+    [ 7, "        let r: R := R(x => 32);" ],
+    [ 8, "        let { x as x1: Int32 } := r;" ],
+    [ 9, "        let { x as x2: Int32 } := r;" ],
+    [ 10, "        return ExitSuccess();" ],
+    [ 11, "    end;" ]
+  ]
+}

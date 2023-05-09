@@ -1,16 +1,23 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/014-int-constants/008-nat64-overflow/Test.aum'
-    From: line 3, column 8
-    To: line 3, column 51
-  Description:
-    The integer `18446744073709551616` does not fit the type `Nat64`.
-  Code:
-    1 | module body Test is
-    2 |     function main(): ExitCode is
-    3 |         let n: Nat64 := 18'446'744'073'709'551'616;
-    4 |         return ExitSuccess();
-    5 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The integer " },
+    { "type": "code", "content": "18446744073709551616" },
+    { "type": "text", "content": " does not fit the type " },
+    { "type": "type", "content": "Nat64" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/014-int-constants/008-nat64-overflow/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end[": { "line": 3, "column": 51 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let n: Nat64 := 18'446'744'073'709'551'616;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

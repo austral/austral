@@ -1,20 +1,27 @@
-Error:
-  Title: Declaration Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/009-names/004-dup-fun-fun/Test.aum'
-    From: line 4, column 8
-    To: line 8, column 8
-  Description:
-    A declaration with the name `A` already exists in the module `Test`.
-  Code:
-     2 |     function A(): Unit is
-     3 |         return nil;
-     4 |     end;
-     5 | 
-     6 |     function A(): Unit is
-     7 |         return nil;
-     8 |     end;
-     9 | 
-    10 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "A declaration with the name " },
+    { "type": "code", "content": "A" },
+    { "type": "text", "content": " already exists in the module " },
+    { "type": "code", "content": "Test" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/009-names/004-dup-fun-fun/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end[": { "line": 8, "column": 8 }
+  },
+  "context": [
+    [ 2, "    function A(): Unit is" ],
+    [ 3, "        return nil;" ],
+    [ 4, "    end;" ],
+    [ 5, "" ],
+    [ 6, "    function A(): Unit is" ],
+    [ 7, "        return nil;" ],
+    [ 8, "    end;" ],
+    [ 9, "" ],
+    [ 10, "    function main(): ExitCode is" ]
+  ]
+}

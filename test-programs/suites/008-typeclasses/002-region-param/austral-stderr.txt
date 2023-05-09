@@ -1,19 +1,35 @@
-Error:
-  Title: Declaration Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/002-region-param/Test.aum'
-    From: line 1, column 19
-    To: line 4, column 8
-  Description:
-    The parameter for the typeclass `AcceptsRegion` cannot be declared to be in the `Region` universe, because regions are distinct from types.
-
-    Consider using one of `Type`, `Linear`, or `Free` instead.
-  Code:
-    1 | module body Test is
-    2 |     typeclass AcceptsRegion(R: Region) is
-    3 |         method Accept(x: R): Unit;
-    4 |     end;
-    5 | 
-    6 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The parameter for the typeclass " },
+    { "type": "code", "content": "AcceptsRegion" },
+    { "type": "text", "content": " cannot be declared to be in the " },
+    { "type": "code", "content": "Region" },
+    {
+      "type": "text",
+      "content": " universe, because regions are distinct from types."
+    },
+    { "type": "break" },
+    { "type": "text", "content": "Consider using one of " },
+    { "type": "code", "content": "Type" },
+    { "type": "text", "content": ", " },
+    { "type": "code", "content": "Linear" },
+    { "type": "text", "content": ", or " },
+    { "type": "code", "content": "Free" },
+    { "type": "text", "content": " instead." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/002-region-param/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end[": { "line": 4, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    typeclass AcceptsRegion(R: Region) is" ],
+    [ 3, "        method Accept(x: R): Unit;" ],
+    [ 4, "    end;" ],
+    [ 5, "" ],
+    [ 6, "    function main(): ExitCode is" ]
+  ]
+}

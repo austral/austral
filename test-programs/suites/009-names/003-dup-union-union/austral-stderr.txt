@@ -1,17 +1,24 @@
-Error:
-  Title: Declaration Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/009-names/003-dup-union-union/Test.aum'
-    From: line 2, column 25
-    To: line 4, column 25
-  Description:
-    A declaration with the name `A` already exists in the module `Test`.
-  Code:
-    1 | module body Test is
-    2 |     union A: Free is end;
-    3 | 
-    4 |     union A: Free is end;
-    5 | 
-    6 |     function main(): ExitCode is
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "A declaration with the name " },
+    { "type": "code", "content": "A" },
+    { "type": "text", "content": " already exists in the module " },
+    { "type": "code", "content": "Test" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/009-names/003-dup-union-union/Test.aum",
+    "startp": { "line": 2, "column": 25 },
+    "end[": { "line": 4, "column": 25 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    union A: Free is end;" ],
+    [ 3, "" ],
+    [ 4, "    union A: Free is end;" ],
+    [ 5, "" ],
+    [ 6, "    function main(): ExitCode is" ]
+  ]
+}

@@ -1,18 +1,30 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/020-unsatisfied-constraint/Test.aum'
-    From: line 12, column 8
-    To: line 12, column 20
-  Description:
-    Type constraint not satisfied: the type `Int32` does not implement the typeclass `Foo`.
-
-    This constraint is for the type variable `T`.
-  Code:
-    10 | 
-    11 |     function main(): ExitCode is
-    12 |         fooable(10);
-    13 |         return ExitSuccess();
-    14 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Type constraint not satisfied: the type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": " does not implement the typeclass " },
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": "." },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This constraint is for the type variable "
+    },
+    { "type": "code", "content": "T" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/020-unsatisfied-constraint/Test.aum",
+    "startp": { "line": 12, "column": 8 },
+    "end[": { "line": 12, "column": 20 }
+  },
+  "context": [
+    [ 10, "" ],
+    [ 11, "    function main(): ExitCode is" ],
+    [ 12, "        fooable(10);" ],
+    [ 13, "        return ExitSuccess();" ],
+    [ 14, "    end;" ]
+  ]
+}

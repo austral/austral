@@ -1,16 +1,24 @@
-Error:
-  Title: Linearity Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/007-borrowing/012-cant-reborrow-twice/Test.aum'
-    From: line 13, column 12
-    To: line 13, column 52
-  Description:
-    The variable `fooref` is reborrowed multiple times in the same expression.
-  Code:
-    11 |         let foo: Foo := Foo();
-    12 |         borrow! foo as fooref in R do
-    13 |             bar(reborrow(fooref), reborrow(fooref));
-    14 |         end;
-    15 |         let {} := foo;
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "fooref" },
+    {
+      "type": "text",
+      "content": " is reborrowed multiple times in the same expression."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/007-borrowing/012-cant-reborrow-twice/Test.aum",
+    "startp": { "line": 13, "column": 12 },
+    "end[": { "line": 13, "column": 52 }
+  },
+  "context": [
+    [ 11, "        let foo: Foo := Foo();" ],
+    [ 12, "        borrow! foo as fooref in R do" ],
+    [ 13, "            bar(reborrow(fooref), reborrow(fooref));" ],
+    [ 14, "        end;" ],
+    [ 15, "        let {} := foo;" ]
+  ]
+}

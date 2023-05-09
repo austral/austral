@@ -1,16 +1,22 @@
-Error:
-  Title: Type Error
-  Module:
-    Test
-  Location:
-    Filename: 'test-programs/suites/008-typeclasses/016-private-instance/Test.aum'
-    From: line 5, column 8
-    To: line 5, column 33
-  Description:
-    The typeclass `Foo` has no instance which matches for `Bool`
-  Code:
-    3 | module body Test is
-    4 |     function main(): ExitCode is
-    5 |         let u: Unit := foo(true);
-    6 |         return ExitSuccess();
-    7 |     end;
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The typeclass " },
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": " has no instance which matches for " },
+    { "type": "type", "content": "Bool" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/008-typeclasses/016-private-instance/Test.aum",
+    "startp": { "line": 5, "column": 8 },
+    "end[": { "line": 5, "column": 33 }
+  },
+  "context": [
+    [ 3, "module body Test is" ],
+    [ 4, "    function main(): ExitCode is" ],
+    [ 5, "        let u: Unit := foo(true);" ],
+    [ 6, "        return ExitSuccess();" ],
+    [ 7, "    end;" ]
+  ]
+}
