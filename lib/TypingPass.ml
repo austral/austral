@@ -124,7 +124,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let ty = replace_variables bindings expected_ty in
              pt ("Type", ty);
              pt ("Value type", get_type value');
-             let lexenv' = push_var lexenv name ty VarLocal in
+             let lexenv' = push_var lexenv name ty (VarLocal mut) in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
              TLet (span, mut, name, ty, value', body'))
       | ADestructure (span, mut, bindings, value, body) ->
@@ -157,7 +157,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      let newvars: (identifier * ty * var_source) list =
                        List.map (fun (_, ty, actual, rename) ->
                            let _ = match_type (env, module_name) ty actual in
-                           (rename, ty, VarLocal))
+                           (rename, ty, VarLocal mut))
                          bindings''
                      in
                      let lexenv' = push_vars lexenv newvars in
@@ -184,7 +184,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let _ =
                    match source with
                    (* All good. *)
-                   | VarLocal -> ()
+                   | VarLocal _ -> ()
                    | VarConstant ->
                       Errors.cannot_assign_to_constant ()
                    | VarParam ->
@@ -254,7 +254,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              and f' = augment_expr module_name env rm typarams lexenv None final in
              if is_compatible_with_index_type i' then
                if is_compatible_with_index_type f' then
-                 let lexenv' = push_var lexenv name index_type VarLocal in
+                 let lexenv' = push_var lexenv name index_type (VarLocal Immutable) in
                  let b' = augment_stmt (update_lexenv ctx lexenv') body in
                  TFor (span, name, i', f', b')
                else
@@ -276,7 +276,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                       | WriteBorrow ->
                          WriteRef (orig_ty, RegionTy region_obj))
                    in
-                   let lexenv' = push_var lexenv rename refty VarLocal in
+                   let lexenv' = push_var lexenv rename refty (VarLocal Immutable) in
                    let rm' = add_region rm region region_obj in
                    let ctx' = update_lexenv ctx lexenv' in
                    let ctx''= update_rm ctx' rm' in
@@ -475,7 +475,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
                             let _ = pi ("Binding name", rename)
                             in
                             pt ("Binding type",  decl_ty);
-                            (rename, decl_ty, VarLocal)
+                            (rename, decl_ty, VarLocal Immutable)
                           else
                             Errors.slot_wrong_type
                               ~name:rename

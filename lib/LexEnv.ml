@@ -5,13 +5,14 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 open Identifier
+open Common
 open Type
 open Error
 
 type var_source =
   | VarConstant
   | VarParam
-  | VarLocal
+  | VarLocal of mutability
 
 type lexenv = (identifier * ty * var_source) list
 

@@ -606,7 +606,7 @@ and augment_variable (ctx: expr_ctx) (name: qident) (asserted_ty: ty option): te
              TConstVar (name, ty)
           | VarParam ->
              TParamVar ((original_name name), ty)
-          | VarLocal ->
+          | VarLocal _ ->
              TLocalVar ((original_name name), ty))
       | None ->
          Errors.unknown_name
@@ -936,7 +936,7 @@ and augment_borrow_expr (ctx: expr_ctx) (mode: borrowing_mode) (name: qident): t
           and reg: region = fresh_region ()
           in
           TBorrowExpr (mode, name, reg, ty)
-       | VarLocal ->
+       | VarLocal _ ->
           let name: identifier = original_name name
           and reg: region = fresh_region ()
           in
@@ -961,7 +961,7 @@ and augment_reborrow (ctx: expr_ctx) (name: qident): texpr =
   let _ =
     (match src with
      | VarParam -> ()
-     | VarLocal -> ()
+     | VarLocal _ -> ()
      | VarConstant ->
         Errors.reborrow_constant ())
   in
