@@ -15,7 +15,7 @@
   },
   "context": [
     [ 2, "    function main(): ExitCode is" ],
-    [ 3, "        let x: Int32 := 10;" ],
+    [ 3, "        var x: Int32 := 10;" ],
     [ 4, "        x := \"This shouldn't work.\";" ],
     [ 5, "        return ExitSuccess();" ],
     [ 6, "    end;" ]

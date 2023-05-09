@@ -17,7 +17,7 @@
   "context": [
     [ 1, "module body Test is" ],
     [ 2, "    generic [T: Free] -- spurious" ],
-    [ 3, "    function mutate_int(var: Int32): Unit is" ],
+    [ 3, "    function mutate_int(x: Int32): Unit is" ],
     [ 4, "        return nil;" ],
     [ 5, "    end;" ],
     [ 6, "" ],

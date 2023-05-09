@@ -1,6 +1,6 @@
 module body Test is
     generic [T: Free] -- spurious
-    function mutate_int(var: Int32): Unit is
+    function mutate_int(x: Int32): Unit is
         return nil;
     end;
 
