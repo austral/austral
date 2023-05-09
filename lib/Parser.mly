@@ -67,6 +67,7 @@ open Span
 %token ELSE
 %token ELSE_IF
 %token LET
+%token VAR
 %token WHILE
 %token FOR
 %token DO

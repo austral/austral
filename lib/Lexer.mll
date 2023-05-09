@@ -146,6 +146,7 @@ rule token = parse
   | "then" { THEN }
   | "else" { ELSE }
   | "let" { LET }
+  | "var" { VAR }
   | "while" { WHILE }
   | "for" { FOR }
   | "do" { DO }
