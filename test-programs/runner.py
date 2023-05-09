@@ -191,11 +191,11 @@ def _get_file_contents(test_dir: str, filename: str):
 #
 
 
-def run_test(test: Test):
+def run_test(test: Test, replace_stderr: bool):
     if isinstance(test, TestSuccess):
         _run_success_test(test)
     elif isinstance(test, TestFailure):
-        _run_failure_test(test)
+        _run_failure_test(test, replace_stderr)
     elif isinstance(test, TestProgramFailure):
         _run_program_failure_test(test)
     else:
@@ -361,7 +361,7 @@ def _run_success_test(test: Test):
 def trim_lines(text):
     return "\n".join([line if line.strip() else "" for line in text.strip().split("\n")])
 
-def _run_failure_test(test: TestFailure):
+def _run_failure_test(test: TestFailure, replace_stderr: bool):
     suite_name: str = test.suite_name
     test_name: str = test.name
     # Construct the compiler command.
@@ -389,25 +389,31 @@ def _run_failure_test(test: TestFailure):
             ],
         )
     # Compilation failed. Does the actual stderr match expected?
-    stderr: str = trim_lines(result.stderr.decode("utf-8"))
-    if stderr != trim_lines(test.expected_compiler_error):
-        report(
-            properties=[
-                ("Suite", suite_name),
-                ("Test", test_name),
-                (
-                    "Description",
-                    "Austral compiler failed, but compiler output does not "
-                    "match what we expected.",
-                ),
-                ("Command", " ".join(compile_cmd)),
-                ("Return code", code),
-            ],
-            outputs=[
-                ("EXPECTED STDERR", test.expected_compiler_error),
-                ("ACTUAL STDERR", stderr),
-            ],
-        )
+    if replace_stderr:
+        # If replace_stderr is true, just take the actual stderr and overwrite the expected stderr.
+        stderr: str = trim_lines(result.stderr.decode("utf-8"))
+        with open(test.directory + "/austral-stderr.txt", "w") as stream:
+            stream.write(stderr)
+    else:
+        stderr: str = trim_lines(result.stderr.decode("utf-8"))
+        if stderr != trim_lines(test.expected_compiler_error):
+            report(
+                properties=[
+                    ("Suite", suite_name),
+                    ("Test", test_name),
+                    (
+                        "Description",
+                        "Austral compiler failed, but compiler output does not "
+                        "match what we expected.",
+                    ),
+                    ("Command", " ".join(compile_cmd)),
+                    ("Return code", code),
+                ],
+                outputs=[
+                    ("EXPECTED STDERR", test.expected_compiler_error),
+                    ("ACTUAL STDERR", stderr),
+                ],
+            )
     # Compilation failed and output matches.
     print("PASS")
 
@@ -542,7 +548,7 @@ def _run_program_failure_test(test: Test):
 #
 
 
-def run_all_tests(suites: list, suite_pattern: str = "", name_pattern: str = ""):
+def run_all_tests(suites: list, suite_pattern: str = "", name_pattern: str = "", replace_stderr: bool = False):
     """
     Run the given suites.
 
@@ -556,7 +562,7 @@ def run_all_tests(suites: list, suite_pattern: str = "", name_pattern: str = "")
             for test in suite.tests:
                 if len(name_pattern) == 0 or test.name.find(name_pattern) != -1:
                     print(f"\t{test.name.ljust(45)}", end="")
-                    run_test(test)
+                    run_test(test, replace_stderr)
 
 
 #
@@ -566,6 +572,8 @@ def run_all_tests(suites: list, suite_pattern: str = "", name_pattern: str = "")
 if __name__ == "__main__":
     import sys
 
-    suite_pattern = sys.argv[1] if len(sys.argv) > 1 else ""
-    name_pattern = sys.argv[2] if len(sys.argv) > 2 else ""
-    run_all_tests(collect_suites(), suite_pattern, name_pattern)
+    replace_stderr: bool = "--replace-stderr" in sys.argv
+    args: list[str] = [arg for arg in sys.argv if not arg.startswith("--")]
+    suite_pattern = args if len(args) > 1 else ""
+    name_pattern = args[2] if len(args) > 2 else ""
+    run_all_tests(collect_suites(), suite_pattern, name_pattern, replace_stderr)
