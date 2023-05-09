@@ -34,9 +34,9 @@ let rec ends_in_return (stmt: astmt): bool =
   match stmt with
   | ASkip _ ->
      false
-  | ALet (_, _, _, _, body) ->
+  | ALet (_, _, _, _, _, body) ->
      ends_in_return body
-  | ADestructure (_, _, _, body) ->
+  | ADestructure (_, _, _, _, body) ->
      ends_in_return body
   | AAssign _ ->
      false

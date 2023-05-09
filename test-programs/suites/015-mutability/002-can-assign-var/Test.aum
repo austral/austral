@@ -1,10 +1,8 @@
 module body Test is
-    record Foo: Linear is end;
-
     function main(): ExitCode is
-        var foo: Foo := Foo();
-        foo := Foo();
-        let {} := foo;
+        var a: Int32 := 10;
+        a := 20;
+        printLn(a);
         return ExitSuccess();
     end;
 end module body.

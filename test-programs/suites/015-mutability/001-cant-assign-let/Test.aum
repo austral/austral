@@ -1,7 +1,7 @@
 module body Test is
     function main(): ExitCode is
-        let s: FixedArray[Nat8] := "Hello, world!";
-        s[0] := 'J';
+        let a: Int32 := 10;
+        a := 20;
         return ExitSuccess();
     end;
 end module body.

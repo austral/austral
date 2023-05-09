@@ -136,16 +136,16 @@ let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
   match stmt with
   | TSkip span ->
      TSkip span
-  | TLet (span, name, ty, value, body) ->
+  | TLet (span, mut, name, ty, value, body) ->
      let ty = replace_variables bindings ty
      and value = replace_tyvars_expr bindings value
      and body = replace_tyvars_stmt bindings body in
-     TLet (span, name, ty, value, body)
-  | TDestructure (span, bs, value, body) ->
+     TLet (span, mut, name, ty, value, body)
+  | TDestructure (span, mut, bs, value, body) ->
      let bs = List.map (fun (TypedBinding { name; ty; rename; }) -> TypedBinding { name; ty = replace_variables bindings ty; rename = rename; }) bs
      and value = replace_tyvars_expr bindings value
      and body = replace_tyvars_stmt bindings body in
-     TDestructure (span, bs, value, body)
+     TDestructure (span, mut, bs, value, body)
   | TAssign (span, lvalue, value) ->
      let lvalue = replace_tyvars_lvalue bindings lvalue
      and value = replace_tyvars_expr bindings value in

@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    { "type": "text", "content": "Cannot assign a value to " },
+    { "type": "code", "content": "a" },
+    { "type": "text", "content": " because it is immutable." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/015-mutability/001-cant-assign-let/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end[": { "line": 4, "column": 16 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let a: Int32 := 10;" ],
+    [ 4, "        a := 20;" ],
+    [ 5, "        return ExitSuccess();" ],
+    [ 6, "    end;" ]
+  ]
+}

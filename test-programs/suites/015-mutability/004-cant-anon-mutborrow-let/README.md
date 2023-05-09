@@ -1,0 +1,1 @@
+Test we can't mutably borrow an immutable variable.

@@ -94,8 +94,8 @@ and cexpr =
 
 and cstmt =
   | CSkip of span
-  | CLet of span * identifier * typespec * cexpr
-  | CDestructure of span * concrete_binding list * cexpr
+  | CLet of span * mutability * identifier * typespec * cexpr
+  | CDestructure of span * mutability * concrete_binding list * cexpr
   | CAssign of span * concrete_lvalue * cexpr
   | CIf of span * cexpr * cstmt * cstmt
   | CCase of span * cexpr * concrete_when list

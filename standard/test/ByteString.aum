@@ -78,7 +78,7 @@ module body Standard.Test.ByteString is
 
     function storeNthTest(): Unit is
         testHeading("storeNth");
-        let b: ByteString := makeByteString(3, 'a');
+        var b: ByteString := makeByteString(3, 'a');
         assertLength(&b, 3);
         assertTrue(nth(&b, 0) = 'a', "[0] = a");
         assertTrue(nth(&b, 1) = 'a', "[1] = a");

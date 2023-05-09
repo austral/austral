@@ -112,7 +112,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       match stmt with
       | ASkip span ->
          TSkip span
-      | ALet (span, name, ty, value, body) ->
+      | ALet (span, mut, name, ty, value, body) ->
          pi ("Name", name);
          adorn_error_with_span span
            (fun _ ->
@@ -124,10 +124,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let ty = replace_variables bindings expected_ty in
              pt ("Type", ty);
              pt ("Value type", get_type value');
-             let lexenv' = push_var lexenv name ty VarLocal in
+             let lexenv' = push_var lexenv name ty (VarLocal mut) in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
-             TLet (span, name, ty, value', body'))
-      | ADestructure (span, bindings, value, body) ->
+             TLet (span, mut, name, ty, value', body'))
+      | ADestructure (span, mut, bindings, value, body) ->
          adorn_error_with_span span
            (fun _ ->
              let value' = augment_expr module_name env rm typarams lexenv None value in
@@ -157,13 +157,14 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      let newvars: (identifier * ty * var_source) list =
                        List.map (fun (_, ty, actual, rename) ->
                            let _ = match_type (env, module_name) ty actual in
-                           (rename, ty, VarLocal))
+                           (rename, ty, VarLocal mut))
                          bindings''
                      in
                      let lexenv' = push_vars lexenv newvars in
                      let body' = augment_stmt (update_lexenv ctx lexenv') body in
                      TDestructure (
                          span,
+                         mut,
                          List.map (fun (name, _, ty, rename) -> TypedBinding { name; ty; rename; }) bindings'',
                          value',
                          body'
@@ -183,7 +184,10 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let _ =
                    match source with
                    (* All good. *)
-                   | VarLocal -> ()
+                   | VarLocal mut ->
+                      (match mut with
+                       | Mutable -> ()
+                       | Immutable -> Errors.cant_assign_to_immutable_var var)
                    | VarConstant ->
                       Errors.cannot_assign_to_constant ()
                    | VarParam ->
@@ -253,7 +257,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              and f' = augment_expr module_name env rm typarams lexenv None final in
              if is_compatible_with_index_type i' then
                if is_compatible_with_index_type f' then
-                 let lexenv' = push_var lexenv name index_type VarLocal in
+                 let lexenv' = push_var lexenv name index_type (VarLocal Immutable) in
                  let b' = augment_stmt (update_lexenv ctx lexenv') body in
                  TFor (span, name, i', f', b')
                else
@@ -264,7 +268,23 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          adorn_error_with_span span
            (fun _ ->
              (match get_var lexenv original with
-              | (Some (orig_ty, _)) ->
+              | (Some (orig_ty, src)) ->
+                 (* Check we can borrow the variable. *)
+                 let _ =
+                   match (src, mode) with
+                   | (_, ReadBorrow) ->
+                      (* Anything can be borrowed immutably. *)
+                      ()
+                   | (VarLocal Immutable, WriteBorrow) ->
+                      (* Immutable variables cannot be borrowed mutably. *)
+                      Errors.cannot_borrow_immutable_var_mutably original
+                   | (VarParam, WriteBorrow) ->
+                      (* Parameters cannot be borrowed mutably. *)
+                      Errors.cannot_borrow_param_mutably original
+                   | _ ->
+                      (* And anything else is fine. *)
+                      ()
+                 in
                  let u = type_universe orig_ty in
                  if ((u = LinearUniverse) || (u = TypeUniverse)) then
                    let region_obj = fresh_region () in
@@ -275,7 +295,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                       | WriteBorrow ->
                          WriteRef (orig_ty, RegionTy region_obj))
                    in
-                   let lexenv' = push_var lexenv rename refty VarLocal in
+                   let lexenv' = push_var lexenv rename refty (VarLocal Immutable) in
                    let rm' = add_region rm region region_obj in
                    let ctx' = update_lexenv ctx lexenv' in
                    let ctx''= update_rm ctx' rm' in
@@ -474,7 +494,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
                             let _ = pi ("Binding name", rename)
                             in
                             pt ("Binding type",  decl_ty);
-                            (rename, decl_ty, VarLocal)
+                            (rename, decl_ty, VarLocal Immutable)
                           else
                             Errors.slot_wrong_type
                               ~name:rename

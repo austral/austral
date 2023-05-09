@@ -15,7 +15,7 @@
     "end[": { "line": 13, "column": 52 }
   },
   "context": [
-    [ 11, "        let foo: Foo := Foo();" ],
+    [ 11, "        var foo: Foo := Foo();" ],
     [ 12, "        borrow! foo as fooref in R do" ],
     [ 13, "            bar(reborrow(fooref), reborrow(fooref));" ],
     [ 14, "        end;" ],

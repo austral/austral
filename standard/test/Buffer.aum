@@ -90,7 +90,7 @@ module body Standard.Test.Buffer is
     
     function storeTest(): Unit is
         testHeading("storeNth");
-        let b: Buffer[Int32] := initialize(1, 10);
+        var b: Buffer[Int32] := initialize(1, 10);
         assertLength(&b, 1);
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
         storeNth(&!b, 0, 20);
@@ -102,7 +102,7 @@ module body Standard.Test.Buffer is
 
     function swapNthTest(): Unit is
         testHeading("swapNth");
-        let b: Buffer[Int32] := initialize(1, 10);
+        var b: Buffer[Int32] := initialize(1, 10);
         assertLength(&b, 1);
         assertTrue(nth(&b, 0) = 10, "[0] = 10");
         let old: Int32 := swapNth(&!b, 0, 20);
@@ -115,7 +115,7 @@ module body Standard.Test.Buffer is
 
     function swapIndexTest(): Unit is
         testHeading("swapIndex");
-        let b: Buffer[Int32] := initialize(2, 0);
+        var b: Buffer[Int32] := initialize(2, 0);
         assertLength(&b, 2);
         storeNth(&!b, 0, 10);
         storeNth(&!b, 1, 20);
@@ -135,7 +135,7 @@ module body Standard.Test.Buffer is
 
     function swapTransformTest(): Unit is
         testHeading("swapTransform");
-        let b: Buffer[Int32] := initialize(1, 30);
+        var b: Buffer[Int32] := initialize(1, 30);
         assertLength(&b, 1);
         swapTransform(&!b, 0, double);
         assertTrue(nth(&b, 0) = 60, "[0] = 60");
@@ -146,7 +146,7 @@ module body Standard.Test.Buffer is
 
     function fillTest(): Unit is
         testHeading("initialize then fill");
-        let b: Buffer[Int32] := initialize(3, 10);
+        var b: Buffer[Int32] := initialize(3, 10);
         fill(&!b, 20);
         assertLength(&b, 3);
         assertTrue(nth(&b, 0) = 20, "[0] = 20");
@@ -159,7 +159,7 @@ module body Standard.Test.Buffer is
 
     function insertFrontTest(): Unit is
         testHeading("insertFront");
-        let b: Buffer[Int32] := allocateEmpty();
+        var b: Buffer[Int32] := allocateEmpty();
         -- []
         assertLength(&b, 0);
         -- [3]
@@ -183,7 +183,7 @@ module body Standard.Test.Buffer is
 
     function insertBackTest(): Unit is
         testHeading("insertBack");
-        let b: Buffer[Int32] := allocateEmpty();
+        var b: Buffer[Int32] := allocateEmpty();
         -- []
         assertLength(&b, 0);
         -- [1]
@@ -207,7 +207,7 @@ module body Standard.Test.Buffer is
 
     function removeFirstTest(): Unit is
         testHeading("removeFirst");
-        let b: Buffer[Int32] := allocateEmpty();
+        var b: Buffer[Int32] := allocateEmpty();
         -- []
         assertLength(&b, 0);
         insertBack(&!b, 1);
@@ -236,7 +236,7 @@ module body Standard.Test.Buffer is
 
     function removeLastTest(): Unit is
         testHeading("removeLast");
-        let b: Buffer[Int32] := allocateEmpty();
+        var b: Buffer[Int32] := allocateEmpty();
         -- []
         assertLength(&b, 0);
         insertBack(&!b, 1);
@@ -266,7 +266,7 @@ module body Standard.Test.Buffer is
     function reverseEmptyTest(): Unit is
         testHeading("reverse (empty)");
         -- Test empty array
-        let b: Buffer[Int32] := allocateEmpty();
+        var b: Buffer[Int32] := allocateEmpty();
         assertLength(&b, 0);
         reverse(&!b);
         assertLength(&b, 0);
@@ -277,7 +277,7 @@ module body Standard.Test.Buffer is
     function reverseNonEmptyTest(): Unit is
         testHeading("reverse (non-empty)");
         -- Test non-empty array
-        let b: Buffer[Int32] := allocateEmpty();
+        var b: Buffer[Int32] := allocateEmpty();
         insertBack(&!b, 1);
         insertBack(&!b, 2);
         insertBack(&!b, 3);
@@ -299,7 +299,7 @@ module body Standard.Test.Buffer is
     function inPlaceMapTest(): Unit is
         testHeading("inPlaceMap");
         -- Create an array [1,2,3,4,5]
-        let b: Buffer[Int32] := allocateEmpty();
+        var b: Buffer[Int32] := allocateEmpty();
         insertBack(&!b, 1);
         insertBack(&!b, 2);
         insertBack(&!b, 3);
@@ -322,7 +322,7 @@ module body Standard.Test.Buffer is
     function inPlaceMapEmptyTest(): Unit is
         testHeading("inPlaceMapEmpty");
 
-        let b: Buffer[Int32] := allocateEmpty();
+        var b: Buffer[Int32] := allocateEmpty();
         inPlaceMap(&!b, double);
         assertLength(&b, 0);
  
@@ -354,7 +354,7 @@ module body Standard.Test.Buffer is
     function mapTest(): Unit is
         testHeading("map");
         -- Create an array [North, South, East, West]
-        let b1: Buffer[CardinalDirection] := allocateEmpty();
+        var b1: Buffer[CardinalDirection] := allocateEmpty();
         insertBack(&!b1, North());
         insertBack(&!b1, South());
         insertBack(&!b1, East());

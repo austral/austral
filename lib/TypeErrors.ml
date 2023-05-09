@@ -43,10 +43,24 @@ let reborrow_wrong_type (ty: ty) =
 
 let borrow_non_linear ty =
   austral_raise TypeError [
-    Text "Cannot borrow ";
-    Type ty;
-    Text " because it is not a linear type."
-  ]
+      Text "Cannot borrow ";
+      Type ty;
+      Text " because it is not a linear type."
+    ]
+
+let cannot_borrow_immutable_var_mutably (name: identifier) =
+  austral_raise TypeError [
+      Text "Cannot borrow the variable ";
+      Code (ident_string name);
+      Text " mutably because the variable is immutable."
+    ]
+
+let cannot_borrow_param_mutably (name: identifier) =
+  austral_raise TypeError [
+      Text "Cannot borrow the variable ";
+      Code (ident_string name);
+      Text " mutably because the it is a function parameter, and therefore immutable."
+    ]
 
 let call_non_callable ty =
   austral_raise TypeError [
@@ -339,6 +353,13 @@ let cannot_assign_to_constant _ =
 let cannot_assign_to_parameter _ =
   austral_raise GenericError [
       Text "Cannot assign a value to a function parameter."
+    ]
+
+let cant_assign_to_immutable_var (name: identifier) =
+  austral_raise GenericError [
+      Text "Cannot assign a value to ";
+      Code (ident_string name);
+      Text " because it is immutable."
     ]
 
 let ref_transform_needs_ref ty =

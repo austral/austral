@@ -6,6 +6,7 @@
 *)
 (** Stores the lexical environment. *)
 open Identifier
+open Common
 open Type
 
 (** A lexical environment. *)
@@ -16,7 +17,7 @@ type lexenv
 type var_source =
   | VarConstant
   | VarParam
-  | VarLocal
+  | VarLocal of mutability
 
 (** The empty lexenv. *)
 val empty_lexenv : lexenv

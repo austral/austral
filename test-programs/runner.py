@@ -574,6 +574,6 @@ if __name__ == "__main__":
 
     replace_stderr: bool = "--replace-stderr" in sys.argv
     args: list[str] = [arg for arg in sys.argv if not arg.startswith("--")]
-    suite_pattern = args if len(args) > 1 else ""
+    suite_pattern = args[1] if len(args) > 1 else ""
     name_pattern = args[2] if len(args) > 2 else ""
     run_all_tests(collect_suites(), suite_pattern, name_pattern, replace_stderr)

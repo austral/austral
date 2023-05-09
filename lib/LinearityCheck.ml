@@ -594,7 +594,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
   match stmt with
   | TSkip _ ->
      tbl
-  | TLet (span, name, ty, expr, body) ->
+  | TLet (span, _, name, ty, expr, body) ->
      adorn_error_with_span span
        (fun _ ->
          (* First, check the expression. *)
@@ -608,7 +608,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
            tbl
          else
            check_stmt tbl depth body)
-  | TDestructure (span, bindings, expr, body) ->
+  | TDestructure (span, _, bindings, expr, body) ->
      adorn_error_with_span span
        (fun _ ->
          (* First, check the expression. *)

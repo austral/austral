@@ -11,7 +11,7 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        let foo: Foo := Foo(value => 10);
+        var foo: Foo := Foo(value => 10);
         borrow! foo as fooref in R do
             show(reborrow(fooref));
             show(reborrow(fooref));

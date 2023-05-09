@@ -2,10 +2,11 @@ module body Test is
     record Foo: Linear is end;
 
     function main(): ExitCode is
-        var foo: Foo := Foo();
-        let {} := foo;  -- Consume
-        foo := Foo();   -- Assign
-        let {} := foo;  -- Consume
+        let foo: Foo := Foo();
+        borrow! foo as fooref in R do
+            skip;
+        end;
+        let {} := foo;
         return ExitSuccess();
     end;
 end module body.

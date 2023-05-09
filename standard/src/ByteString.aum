@@ -39,7 +39,7 @@ module body Standard.ByteString is
 
     function fromLiteral(arr: FixedArray[Nat8]): ByteString is
         let size: Index := fixedArraySize(arr);
-        let str: ByteString := makeByteString(size, ' ');
+        var str: ByteString := makeByteString(size, ' ');
         for i from 0 to size - 1 do
             storeNth(&!str, i, arr[i]);
         end for;

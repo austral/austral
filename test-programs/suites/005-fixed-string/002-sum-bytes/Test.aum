@@ -1,6 +1,6 @@
 module body Test is
     function sum(array: FixedArray[Nat8]) : Nat8 is
-        let res : Nat8 := 0;
+        var res : Nat8 := 0;
         for i from 0 to fixedArraySize(array) - 1 do
             res := res + array[i];
         end for;

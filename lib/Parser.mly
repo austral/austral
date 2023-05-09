@@ -67,6 +67,7 @@ open Span
 %token ELSE
 %token ELSE_IF
 %token LET
+%token VAR
 %token WHILE
 %token FOR
 %token DO
@@ -331,11 +332,11 @@ let_stmt:
   ;
 
 let_simple:
-  | LET identifier COLON typespec ASSIGN expression SEMI { CLet (from_loc $loc, $2, $4, $6) }
+  | mut=var_mutability name=identifier COLON ty=typespec ASSIGN e=expression SEMI { CLet (from_loc $loc, mut, name, ty, e) }
   ;
 
 let_destructure:
-  | LET LCURLY b=binding_list RCURLY ASSIGN e=expression SEMI { CDestructure (from_loc $loc, b, e) }
+  | mut=var_mutability LCURLY b=binding_list RCURLY ASSIGN e=expression SEMI { CDestructure (from_loc $loc, mut, b, e) }
   ;
 
 binding_list:
@@ -345,6 +346,11 @@ binding_list:
 binding:
   | name=identifier COLON ty=typespec { ConcreteBinding { name = name; ty = ty; rename = name } }
   | name=identifier AS rename=identifier COLON ty=typespec { ConcreteBinding { name = name; ty = ty; rename = rename } }
+  ;
+
+var_mutability:
+  | LET { Immutable }
+  | VAR { Mutable }
   ;
 
 lvalue:

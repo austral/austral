@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot borrow the variable " },
+    { "type": "code", "content": "foo" },
+    {
+      "type": "text",
+      "content": " mutably because the variable is immutable."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/015-mutability/004-cant-anon-mutborrow-let/Test.aum",
+    "startp": { "line": 11, "column": 8 },
+    "end[": { "line": 11, "column": 19 }
+  },
+  "context": [
+    [ 9, "    function main(): ExitCode is" ],
+    [ 10, "        let foo: Foo := Foo();" ],
+    [ 11, "        bar(&!foo);" ],
+    [ 12, "        let {} := foo;" ],
+    [ 13, "        return ExitSuccess();" ]
+  ]
+}
