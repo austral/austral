@@ -215,6 +215,7 @@ def _test_cmd(test: Test) -> list:
             "--entrypoint=Test:main",
             "--target-type=c",
             "--output=test-programs/output.c",
+            "--error-format=json",
         ]
 
 
