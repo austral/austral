@@ -8,7 +8,7 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        let foo: Foo := Foo();
+        var foo: Foo := Foo();
         borrow! foo as fooref in R do
             bar(reborrow(fooref), reborrow(fooref));
         end;
