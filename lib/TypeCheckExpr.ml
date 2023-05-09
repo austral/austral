@@ -925,26 +925,33 @@ and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
                ~source:(get_type expr')))
 
 and augment_borrow_expr (ctx: expr_ctx) (mode: borrowing_mode) (name: qident): texpr =
-  (match get_variable (ctx_env ctx) (ctx_lexenv ctx) name with
-   | Some (ty, src) ->
-      (* TODO: check if `ty` is linear? *)
-      (match src with
-       | VarConstant ->
-          Errors.borrow_constant ()
-       | VarParam ->
-          let name: identifier = original_name name
-          and reg: region = fresh_region ()
-          in
-          TBorrowExpr (mode, name, reg, ty)
-       | VarLocal _ ->
-          let name: identifier = original_name name
-          and reg: region = fresh_region ()
-          in
-          TBorrowExpr (mode, name, reg, ty))
-   | None ->
-      Errors.unknown_name
-        ~kind:"variable"
-        ~name:(original_name name))
+  match get_variable (ctx_env ctx) (ctx_lexenv ctx) name with
+  | Some (ty, src) ->
+     (* TODO: check if `ty` is linear? *)
+     (* Check we can borrow the variable. *)
+     let _ =
+       match (src, mode) with
+       | (_, ReadBorrow) ->
+          (* Anything can be borrowed immutably. *)
+          ()
+       | (VarLocal Immutable, WriteBorrow) ->
+          (* Immutable variables cannot be borrowed mutably. *)
+          Errors.cannot_borrow_immutable_var_mutably (local_name name)
+       | (VarParam, WriteBorrow) ->
+          (* Parameters cannot be borrowed mutably. *)
+          Errors.cannot_borrow_param_mutably (local_name name)
+       | _ ->
+          (* And anything else is fine. *)
+          ()
+     in
+     let name: identifier = original_name name
+     and reg: region = fresh_region ()
+     in
+     TBorrowExpr (mode, name, reg, ty)
+  | None ->
+     Errors.unknown_name
+       ~kind:"variable"
+       ~name:(original_name name)
 
 and augment_reborrow (ctx: expr_ctx) (name: qident): texpr =
   (* Find the variable's type and source. *)
