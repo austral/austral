@@ -33,6 +33,11 @@ type pragma =
   | ForeignExportPragma of string
   | UnsafeModulePragma
 
+(** Whether a variable is immutable or mutable. *)
+type mutability =
+  | Immutable
+  | Mutable
+
 (** Whether a reference is a read reference or a write reference. *)
 type borrowing_mode =
   | ReadBorrow
