@@ -10,6 +10,7 @@ open Ast
 open Escape
 open Qualifier
 open Span
+open Common
 open Error
 
 let rec abs_stmt im stmt =
@@ -57,6 +58,48 @@ let rec abs_stmt im stmt =
   | CReturn (span, e) ->
      AReturn (span, abs_expr im e)
 
+and try_folding (e: aexpr): aexpr =
+  match try_folding' e with
+  | Some bi ->
+     IntConstant (Z.to_string bi)
+  | None ->
+     e
+
+and try_folding' (e: aexpr): Z.t option =
+  let parse_bigint (s: string): Z.t =
+    try
+      Z.of_string s
+    with
+    | Invalid_argument _ ->
+       internal_err ("Failed to parse '" ^ s ^ "' as a big int. This is a bug in the parser.")
+  in
+  match e with
+  | IntConstant i ->
+     Some (parse_bigint i)
+  | ArithmeticExpression (op, lhs, rhs) -> begin
+      match (try_folding' lhs) with
+      | Some lhs -> begin
+          match (try_folding' rhs) with
+          | Some rhs -> begin
+              Some (apply_op op lhs rhs)
+            end
+          | None -> None
+        end
+      | None -> None
+    end
+  | _ ->
+     None
+
+and apply_op (op: arithmetic_operator) (lhs: Z.t) (rhs: Z.t): Z.t =
+  let f =
+    match op with
+    | Add -> Z.add
+    | Subtract -> Z.sub
+    | Multiply -> Z.mul
+    | Divide -> Z.div
+  in
+  f lhs rhs
+
 and abs_expr im expr =
   match expr with
   | CNilConstant _ -> NilConstant
@@ -68,7 +111,8 @@ and abs_expr im expr =
   | CFuncall (_, name, args) ->
      FunctionCall (qualify_identifier im name, abs_arglist im args)
   | CArith (_, op, lhs, rhs) ->
-     ArithmeticExpression (op, abs_expr im lhs, abs_expr im rhs)
+     let e: aexpr = ArithmeticExpression (op, abs_expr im lhs, abs_expr im rhs) in
+     try_folding e
   | CComparison (_, op, lhs, rhs) ->
      Comparison (op, abs_expr im lhs, abs_expr im rhs)
   | CConjunction (_, lhs, rhs) ->
