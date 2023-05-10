@@ -1,0 +1,1 @@
+Test that a function parameter cannot have the same name as a declaration.

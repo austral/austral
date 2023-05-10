@@ -105,6 +105,15 @@ type case_mode =
   | ReadRefCaseMode of ty
   | WriteRefCaseMode of ty
 
+let check_var_doesnt_collide_with_decl (ctx: stmt_ctx) (name: identifier) =
+  let (StmtCtx (module_name, env, _, _, _, _)) = ctx in
+  let sname: sident = make_sident module_name name in
+  match get_decl_by_name env sname with
+  | Some _ ->
+     Errors.var_collides_with_decl name
+  | None ->
+     ()
+
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   with_frame ("Augment statement: " ^ (stmt_kind stmt))
     (fun _ ->
@@ -116,6 +125,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          pi ("Name", name);
          adorn_error_with_span span
            (fun _ ->
+             let _ = check_var_doesnt_collide_with_decl ctx name in
              let expected_ty = parse_typespec env rm typarams ty in
              pt ("Expected type", expected_ty);
              let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
@@ -130,6 +140,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       | ADestructure (span, mut, bindings, value, body) ->
          adorn_error_with_span span
            (fun _ ->
+             let _ =
+               List.map (fun (QBinding { rename; _ }) -> check_var_doesnt_collide_with_decl ctx rename) bindings
+             in
              let value' = augment_expr module_name env rm typarams lexenv None value in
              (* Check: the value must be a public record type *)
              let rec_ty = get_type value' in
@@ -267,6 +280,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       | ABorrow { span; original; rename; region; body; mode; } ->
          adorn_error_with_span span
            (fun _ ->
+             let _ = check_var_doesnt_collide_with_decl ctx rename in
              (match get_var lexenv original with
               | (Some (orig_ty, src)) ->
                  (* Check we can borrow the variable. *)
@@ -603,6 +617,10 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
       | LFunction (decl_id, vis, name, typarams, params, rt, body, doc, pragmas) ->
          ps ("Kind", "Function");
          pi ("Name", name);
+         let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
+         let _ =
+           List.map (fun (ValueParameter (name, _)) -> check_var_doesnt_collide_with_decl ctx name) params
+         in
          (match pragmas with
           | [ForeignImportPragma s] ->
              if typarams_size typarams = 0 then
@@ -613,11 +631,9 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
              else
                Errors.foreign_type_parameters ()
           | [ForeignExportPragma _] ->
-             let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
              let body' = augment_stmt ctx body in
              TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
           | [] ->
-             let ctx = StmtCtx (module_name, env, rm, typarams, (lexenv_from_params params), rt) in
              let body' = augment_stmt ctx body in
              TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
           | _ ->
@@ -643,6 +659,9 @@ and augment_method_decl _ _ _ (LMethodDecl (decl_id, name, params, rt, _)) =
 
 and augment_method_def module_name menv rm typarams (LMethodDef (ins_meth_id, name, params, rt, _, body)) =
   let ctx = StmtCtx (module_name, menv, rm, typarams, (lexenv_from_params params), rt) in
+  let _ =
+    List.map (fun (ValueParameter (name, _)) -> check_var_doesnt_collide_with_decl ctx name) params
+  in
   let body' = augment_stmt ctx body in
   TypedMethodDef (ins_meth_id, name, params, rt, body')
 

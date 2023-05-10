@@ -1,0 +1,1 @@
+Test that a local variable cannot have the same name as a declaration.

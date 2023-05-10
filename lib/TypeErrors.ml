@@ -374,3 +374,10 @@ let ref_transform_not_record ty =
       Type ty;
       Text " is not a record"
     ]
+
+let var_collides_with_decl (name: identifier) =
+  austral_raise GenericError [
+      Text "The variable ";
+      Code (ident_string name);
+      Text " collides with the name of a declaration."
+    ]

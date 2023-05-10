@@ -1,0 +1,8 @@
+module body Test is
+    constant foo: Bool := true;
+
+    function main(): ExitCode is
+        let foo: Int32 := 10;
+        return ExitSuccess();
+    end;
+end module body.

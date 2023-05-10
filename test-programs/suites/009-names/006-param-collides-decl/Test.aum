@@ -1,0 +1,12 @@
+module body Test is
+    constant foo: Bool := true;
+
+    function test(foo: Int32): Int32 is
+        return foo;
+    end;
+
+    function main(): ExitCode is
+        test(10);
+        return ExitSuccess();
+    end;
+end module body.
