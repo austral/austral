@@ -1,1 +1,24 @@
-This should fail.
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "foo" },
+    {
+      "type": "text",
+      "content": " collides with the name of a declaration."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/009-names/005-var-collides-decl/Test.aum",
+    "startp": { "line": 5, "column": 8 },
+    "end[": { "line": 5, "column": 29 }
+  },
+  "context": [
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode is" ],
+    [ 5, "        let foo: Int32 := 10;" ],
+    [ 6, "        return ExitSuccess();" ],
+    [ 7, "    end;" ]
+  ]
+}
