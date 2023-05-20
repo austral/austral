@@ -13,6 +13,8 @@ type qtypespec =
   | QTypeSpecifier of qident * qtypespec list
   | QReadRef of qtypespec * qtypespec
   | QWriteRef of qtypespec * qtypespec
+  | QSpan of qtypespec * qtypespec
+  | QSpanWrite of qtypespec * qtypespec
 [@@deriving show]
 
 type qbinding =
