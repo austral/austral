@@ -124,6 +124,19 @@ void* au_index_array(au_array_t array, au_index_t index, au_index_t elem_size) {
   return (void*)(ptr);
 }
 
+void* au_index_span(au_span_t span, au_index_t index, au_index_t elem_size) {
+  if (index >= span.size) {
+    au_abort_internal("au_index_span: index out of bounds.");
+  }
+  au_index_t offset = 0;
+  if (__builtin_mul_overflow(index, elem_size, &offset)) {
+    au_abort_internal("au_index_span: index * elem_size overflows.");
+  }
+  char* data = (char*) span.data;
+  char* ptr = data + offset;
+  return (void*)(ptr);
+}
+
 au_unit_t au_printf(const char* format, ...) {
   extern int vprintf(const char* format, va_list arg);
 
