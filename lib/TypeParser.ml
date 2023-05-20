@@ -26,12 +26,6 @@ module Errors = struct
       Text "Function pointer type specifier must have at least one argument."
     ]
 
-  let not_a_region typename =
-    austral_raise TypeError [
-      Code typename;
-      Text " takes as second argument a region, but was given a type."
-    ]
-
   let typaram_wrong_universe ~param ~expected ~actual =
     austral_raise TypeError [
       Text "The type parameter ";
@@ -156,32 +150,6 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
              Errors.wrong_arity
                ~typename:"FixedArray"
                ~expected:1
-               ~actual:None)
-      | "Reference" ->
-         (match args with
-          | [ty; ty'] ->
-             let u = type_universe ty' in
-             if (u = RegionUniverse) then
-               Some (ReadRef (ty, ty'))
-             else
-               Errors.not_a_region "Reference"
-          | _ ->
-             Errors.wrong_arity
-               ~typename:"Reference"
-               ~expected:2
-               ~actual:None)
-      | "WriteReference" ->
-         (match args with
-          | [ty; ty'] ->
-             let u' = type_universe ty' in
-             if (u' = RegionUniverse) then
-               Some (WriteRef (ty, ty'))
-             else
-               Errors.not_a_region "WriteReference"
-          | _ ->
-             Errors.wrong_arity
-               ~typename:"WriteReference"
-               ~expected:2
                ~actual:None)
       | "Fn" ->
          Some (parse_function_pointer args)
