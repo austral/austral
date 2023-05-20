@@ -66,6 +66,14 @@ let rec monomorphize_ty (env: env) (ty: stripped_ty): (mono_ty * env) =
      let (ty, env) = monomorphize_ty env ty in
      let (region, env) = monomorphize_ty env region in
      (MonoWriteRef (ty, region), env)
+  | SSpan (ty, region) ->
+     let (ty, env) = monomorphize_ty env ty in
+     let (region, env) = monomorphize_ty env region in
+     (MonoSpan (ty, region), env)
+  | SSpanMut (ty, region) ->
+     let (ty, env) = monomorphize_ty env ty in
+     let (region, env) = monomorphize_ty env region in
+     (MonoSpanMut (ty, region), env)
   | SAddress ty ->
      let (ty, env) = monomorphize_ty env ty in
      (MonoAddress ty, env)
