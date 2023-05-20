@@ -1,0 +1,15 @@
+module body Test is
+    generic [R: Region]
+    function foo(span: Span[Int32, R]): Unit is
+        return nil;
+    end;
+
+    generic [R: Region]
+    function bar(span: Span![Int32, R]): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

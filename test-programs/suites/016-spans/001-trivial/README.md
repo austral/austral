@@ -1,0 +1,1 @@
+Absolutely basic test: test that type names parse, compile etc.
