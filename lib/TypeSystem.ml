@@ -87,6 +87,10 @@ let rec type_variables = function
      TypeVarSet.union (type_variables ty) (type_variables r)
   | WriteRef (ty, r) ->
      TypeVarSet.union (type_variables ty) (type_variables r)
+  | Span (ty, r) ->
+     TypeVarSet.union (type_variables ty) (type_variables r)
+  | SpanMut (ty, r) ->
+     TypeVarSet.union (type_variables ty) (type_variables r)
   | TyVar v ->
      TypeVarSet.singleton v
   | Address ty ->
