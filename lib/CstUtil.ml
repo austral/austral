@@ -160,3 +160,7 @@ let rec typespec_string (ts: typespec): string =
      "&[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
   | ConcreteWriteRef (ty, reg) ->
      "&![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+  | ConcreteSpan (ty, reg) ->
+     "Span[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+  | ConcreteSpanWrite (ty, reg) ->
+     "Span![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
