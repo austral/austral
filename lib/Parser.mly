@@ -41,6 +41,8 @@ open Span
 /* Borrowing */
 %token BORROW_WRITE
 %token BORROW_READ
+%token SPAN_READ
+%token SPAN_WRITE
 %token REBORROW
 %token REF_TRANSFORM
 /* Keywords */
@@ -543,6 +545,8 @@ typespec:
   | identifier { TypeSpecifier ($1, []) }
   | BORROW_READ LBRACKET typespec COMMA typespec RBRACKET { ConcreteReadRef ($3, $5) }
   | BORROW_WRITE LBRACKET typespec COMMA typespec RBRACKET { ConcreteWriteRef ($3, $5) }
+  | SPAN_READ LBRACKET typespec COMMA typespec RBRACKET { ConcreteSpan ($3, $5) }
+  | SPAN_WRITE LBRACKET typespec COMMA typespec RBRACKET { ConcreteSpanWrite ($3, $5) }
   ;
 
 universe:
