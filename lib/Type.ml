@@ -103,6 +103,10 @@ let rec type_string = function
      read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | WriteRef (t, r) ->
      write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+  | Span (t, r) ->
+     "Span[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+  | SpanMut (t, r) ->
+     "Span![" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | TyVar (TypeVariable (n, _, _, _)) ->
      ident_string n
   | Address ty ->
@@ -190,6 +194,18 @@ let rec equal_ty a b =
   | WriteRef (ty, r) ->
      (match b with
       | WriteRef (ty', r') ->
+         (equal_ty ty ty') && (equal_ty r r')
+      | _ ->
+         false)
+  | Span (ty, r) ->
+     (match b with
+      | Span (ty', r') ->
+         (equal_ty ty ty') && (equal_ty r r')
+      | _ ->
+         false)
+  | SpanMut (ty, r) ->
+     (match b with
+      | SpanMut (ty', r') ->
          (equal_ty ty ty') && (equal_ty r r')
       | _ ->
          false)
