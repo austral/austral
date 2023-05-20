@@ -68,6 +68,8 @@ and typespec =
   | TypeSpecifier of identifier * typespec list
   | ConcreteReadRef of typespec * typespec
   | ConcreteWriteRef of typespec * typespec
+  | ConcreteSpan of typespec * typespec
+  | ConcreteSpanWrite of typespec * typespec
 
 and cexpr =
   | CNilConstant of span
