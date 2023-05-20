@@ -152,9 +152,9 @@ let rec gen_type (ty: mono_ty): c_ty =
      CPointer (gen_type t)
   | MonoWriteRef (t, _) ->
      CPointer (gen_type t)
-  | MonoSpan (t, _) ->
+  | MonoSpan _ ->
      CNamedType "au_span_t"
-  | MonoSpanMut (t, _) ->
+  | MonoSpanMut _ ->
      CNamedType "au_span_t"
   | MonoAddress t ->
      CPointer (gen_type t)
