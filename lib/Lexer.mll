@@ -121,6 +121,8 @@ rule token = parse
   | "&!" { BORROW_WRITE }
   | "&(" { REF_TRANSFORM }
   | "&" { BORROW_READ }
+  | "Span" { SPAN_READ }
+  | "Span!" { SPAN_WRITE }
   | "reborrow" { REBORROW }
   (* Keywords *)
   | "module" { MODULE }
