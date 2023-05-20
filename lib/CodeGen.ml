@@ -559,6 +559,10 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
            err "Not allowed"
         | MonoWriteRef _ ->
            err "Not allowed"
+        | MonoSpan _ ->
+           err "Not allowed"
+        | MonoSpanMut _ ->
+           err "Not allowed"
         | MonoAddress _ ->
            gen_type t
         | MonoPointer _ ->
