@@ -83,8 +83,8 @@ and cexpr =
   | CDisjunction of span * cexpr * cexpr
   | CNegation of span * cexpr
   | CIfExpression of span * cexpr * cexpr * cexpr
-  | CPath of span * cexpr * concrete_path_elem list
-  | CRefPath of span * cexpr * concrete_ref_path_elem list
+  | CPath of span * identifier * concrete_path_elem list
+  | CRefPath of span * identifier * concrete_ref_path_elem list
   | CEmbed of span * typespec * string * cexpr list
   | CDeref of span * cexpr
   | CTypecast of span * cexpr * typespec
