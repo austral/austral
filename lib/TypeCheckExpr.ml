@@ -665,9 +665,9 @@ and augment_path_expr (ctx: expr_ctx) (path: path_expr): typed_path_expr =
   | PathHead name ->
      augment_path_head ctx name
   | SlotAccessor (subpath, name) ->
-     augment_path_slot_acessor ctx subpath name
+     augment_path_slot_accessor ctx subpath name
   | PointerSlotAccessor (subpath, name) ->
-     err "derp"
+     augment_path_pointer_slot_accessor ctx subpath name
   | ArrayIndex (subpath, expr) ->
      err "derp"
 
@@ -732,6 +732,49 @@ and augment_path_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (name: ident
   let bindings = match_typarams_ctx ctx typarams type_args in
   let slot_ty' = replace_variables bindings slot_ty in
   TSlotAccessor (subpath, name, slot_ty')
+
+and augment_path_pointer_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (name: identifier): typed_path_expr =
+  (* Get the type of the subpath. *)
+  let ty: ty = path_type subpath in
+  (* Get the name of the type. *)
+  let type_name: qident = begin
+      match head_ty with
+      | ReadRef (ty, _) -> begin
+          match ty with
+          | NamedType (name, args, _) ->
+             name
+          | _ ->
+             Errors.path_not_record ty
+        end
+      | WriteRef (ty, _) -> begin
+          match ty with
+          | NamedType (name, args, _) ->
+             name
+          | _ ->
+             Errors.path_not_record ty
+        end
+      | _ ->
+         Errors.path_not_record head_ty
+    end
+  in
+  (* Ensure is is a record. *)
+  let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name ty in
+  (* Ensure we can access it. *)
+  let _ =
+    if (vis = TypeVisPublic) || ((ctx_module_name ctx) = source_module) then
+      (* The record is public, or it is defined in the same module as we are. *)
+      ()
+    else
+      Errors.path_not_public
+        ~type_name:(original_name type_name)
+        ~slot_name
+  in
+  (* Get the slot with the given name. *)
+  let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
+  (* Make the type. *)
+  let bindings = match_typarams_ctx ctx typarams type_args in
+  let slot_ty' = replace_variables bindings slot_ty in
+  TPointerSlotAccessor (subpath, name, slot_ty')
 
 and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
   (* The typecast operator has four uses:
