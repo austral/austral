@@ -96,10 +96,10 @@ let rec get_type = function
      ty
   | TUnionConstructor (ty, _, _) ->
      ty
-  | TPath { ty; _ } ->
-     ty
-  | TRefPath (_, _, ty) ->
-     ty
+  | TPath path ->
+     path_type path
+  | TRefPath path ->
+     path_type path
   | TEmbed (ty, _, _) ->
      ty
   | TDeref e ->
@@ -121,14 +121,9 @@ let rec get_type = function
   | TReborrow (_, ty, region) ->
      WriteRef (ty, RegionTy region)
 
-and path_elem_type = function
-  | TSlotAccessor (_, t) ->
-     t
-  | TPointerSlotAccessor (_, t) ->
-     t
-  | TArrayIndex (_, t) ->
-     t
-
-and ref_path_elem_type = function
-  | TRefSlotAccessor (_, ty) ->
-     ty
+and path_type (pe: typed_path_expr): ty =
+  match pe with
+  | TPathHead (_, ty) -> ty
+  | TSlotAccessor (_, _, ty) -> ty
+  | TPointerSlotAccessor (_, _,ty) -> ty
+  | TArrayIndex (_, _, ty) -> ty
