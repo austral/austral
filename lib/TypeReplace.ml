@@ -86,16 +86,10 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      let ty = replace_variables bindings ty
      and args = List.map (fun (n, e) -> (n, replace_tyvars_expr bindings e)) args in
      TUnionConstructor (ty, case_name, args)
-  | TPath { head; elems; ty } ->
-     let head = replace_tyvars_expr bindings head
-     and elems = List.map (replace_tyvars_path bindings) elems
-     and ty = replace_variables bindings ty in
-    TPath { head = head; elems = elems; ty = ty }
-  | TRefPath (head, elems, ty) ->
-     let head = replace_tyvars_expr bindings head
-     and elems = List.map (replace_tyvars_ref_path bindings) elems
-     and ty = replace_variables bindings ty in
-    TRefPath (head, elems, ty)
+  | TPath path ->
+     TPath (replace_tyvars_path bindings path)
+  | TRefPath path ->
+     TRefPath (replace_tyvars_path bindings path)
   | TEmbed (ty, fmt, args) ->
      let ty = replace_variables bindings ty
      and args = List.map (replace_tyvars_expr bindings) args in
@@ -113,24 +107,23 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      let ty = replace_variables bindings ty in
      TReborrow (name, ty, region)
 
-and replace_tyvars_path (bindings: type_bindings) (elem: typed_path_elem): typed_path_elem =
-  match elem with
-  | TSlotAccessor (name, ty) ->
-     let ty = replace_variables bindings ty in
-     TSlotAccessor (name, ty)
-  | TPointerSlotAccessor (name, ty) ->
-     let ty = replace_variables bindings ty in
-     TPointerSlotAccessor (name, ty)
-  | TArrayIndex (idx, ty) ->
-     let idx = replace_tyvars_expr bindings idx
+and replace_tyvars_path (bindings: type_bindings) (e: typed_path_expr): typed_path_expr =
+  match e with
+  | TPathHead (name, ty) ->
+     TPathHead (name, replace_variables bindings ty)
+  | TSlotAccessor (path, name, ty) ->
+     let path = replace_tyvars_path bindings path
      and ty = replace_variables bindings ty in
-     TArrayIndex (idx, ty)
-
-and replace_tyvars_ref_path (bindings: type_bindings) (elem: typed_ref_path_elem): typed_ref_path_elem =
-  match elem with
-  | TRefSlotAccessor (name, ty) ->
-     let ty = replace_variables bindings ty in
-     TRefSlotAccessor (name, ty)
+     TSlotAccessor (path, name, ty)
+  | TPointerSlotAccessor (path, name, ty) ->
+     let path = replace_tyvars_path bindings path
+     and ty = replace_variables bindings ty in
+     TPointerSlotAccessor (path, name, ty)
+  | TArrayIndex (path, expr, ty) ->
+     let path = replace_tyvars_path bindings path
+     and expr = replace_tyvars_expr bindings expr
+     and ty = replace_variables bindings ty in
+     TArrayIndex (path, expr, ty)
 
 let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
   match stmt with
@@ -147,7 +140,7 @@ let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
      and body = replace_tyvars_stmt bindings body in
      TDestructure (span, mut, bs, value, body)
   | TAssign (span, lvalue, value) ->
-     let lvalue = replace_tyvars_lvalue bindings lvalue
+     let lvalue = replace_tyvars_path bindings lvalue
      and value = replace_tyvars_expr bindings value in
      TAssign (span, lvalue, value)
   | TIf (span, c, t, f) ->
@@ -192,11 +185,6 @@ let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
   | TReturn (span, expr) ->
      let expr = replace_tyvars_expr bindings expr in
      TReturn (span, expr)
-
-and replace_tyvars_lvalue (bindings: type_bindings) (lvalue: typed_lvalue): typed_lvalue =
-  let (TypedLValue (name, elems)) = lvalue in
-  let elems = List.map (replace_tyvars_path bindings) elems in
-  TypedLValue (name, elems)
 
 and replace_tyvars_when (bindings: type_bindings) (twhen: typed_when): typed_when =
   let (TypedWhen (name, bs, body)) = twhen in
