@@ -665,6 +665,7 @@ and augment_path_expr (ctx: expr_ctx) (path: path_expr): typed_path_expr =
   | PointerSlotAccessor (subpath, name) ->
      augment_path_pointer_slot_accessor ctx subpath name
   | ArrayIndex (subpath, expr) ->
+     let _ = (subpath, expr) in
      err "derp"
 
 and augment_path_head (ctx: expr_ctx) (name: identifier): typed_path_expr =
