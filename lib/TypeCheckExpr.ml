@@ -545,7 +545,6 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   | IfExpression (c, t, f) ->
      augment_if_expr ctx c t f
   | Path path ->
-
      TPath (augment_path_expr ctx path)
   | RefPath path ->
      let _ = path in
@@ -676,9 +675,9 @@ and augment_path_head (ctx: expr_ctx) (name: identifier): typed_path_expr =
     | None ->
        Errors.unknown_name
          ~kind:"variable"
-         ~name:(original_name name)
+         ~name:name
   in
-  TPath (name, ty)
+  TPathHead (name, ty)
 
 and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
   (* The type of the expression being dereferenced must be either a read-only
@@ -699,16 +698,17 @@ and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
    | _ ->
       Errors.dereference_non_reference ty)
 
-and augment_path_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (name: identifier): typed_path_expr =
+and augment_path_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (slot_name: identifier): typed_path_expr =
   (* Get the type of the subpath. *)
+  let subpath: typed_path_expr = augment_path_expr ctx subpath in
   let ty: ty = path_type subpath in
   (* Get the name of the type. *)
-  let type_name: qident = begin
-      match head_ty with
+  let (type_name, type_args): qident * ty list = begin
+      match ty with
       | NamedType (name, args, _) ->
-         name
+         (name, args)
       | _ ->
-         Errors.path_not_record head_ty
+         Errors.path_not_record ty
     end
   in
   (* Ensure is is a record. *)
@@ -721,37 +721,38 @@ and augment_path_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (name: ident
     else
       Errors.path_not_public
         ~type_name:(original_name type_name)
-        ~slot_name
+        ~slot_name:slot_name
   in
   (* Get the slot with the given name. *)
   let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
   (* Make the type. *)
   let bindings = match_typarams_ctx ctx typarams type_args in
   let slot_ty' = replace_variables bindings slot_ty in
-  TSlotAccessor (subpath, name, slot_ty')
+  TSlotAccessor (subpath, slot_name, slot_ty')
 
-and augment_path_pointer_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (name: identifier): typed_path_expr =
+and augment_path_pointer_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (slot_name: identifier): typed_path_expr =
   (* Get the type of the subpath. *)
+  let subpath: typed_path_expr = augment_path_expr ctx subpath in
   let ty: ty = path_type subpath in
   (* Get the name of the type. *)
-  let type_name: qident = begin
-      match head_ty with
+  let (type_name, type_args): qident * ty list = begin
+      match ty with
       | ReadRef (ty, _) -> begin
           match ty with
           | NamedType (name, args, _) ->
-             name
+             (name, args)
           | _ ->
              Errors.path_not_record ty
         end
       | WriteRef (ty, _) -> begin
           match ty with
           | NamedType (name, args, _) ->
-             name
+             (name, args)
           | _ ->
              Errors.path_not_record ty
         end
       | _ ->
-         Errors.path_not_record head_ty
+         Errors.path_not_record ty
     end
   in
   (* Ensure is is a record. *)
@@ -771,7 +772,7 @@ and augment_path_pointer_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (nam
   (* Make the type. *)
   let bindings = match_typarams_ctx ctx typarams type_args in
   let slot_ty' = replace_variables bindings slot_ty in
-  TPointerSlotAccessor (subpath, name, slot_ty')
+  TPointerSlotAccessor (subpath, slot_name, slot_ty')
 
 and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
   (* The typecast operator has four uses:
