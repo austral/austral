@@ -64,8 +64,8 @@ and aexpr =
   | Disjunction of aexpr * aexpr
   | Negation of aexpr
   | IfExpression of aexpr * aexpr * aexpr
-  | Path of aexpr * path_elem list
-  | RefPath of aexpr * ref_path_elem list
+  | Path of path_expr
+  | RefPath of path_expr
   | Embed of qtypespec * string * aexpr list
   | Deref of aexpr
   | Typecast of aexpr * qtypespec
@@ -80,13 +80,11 @@ and abstract_arglist =
   | Positional of aexpr list
   | Named of (identifier * aexpr) list
 
-and path_elem =
-  | SlotAccessor of identifier
-  | PointerSlotAccessor of identifier
-  | ArrayIndex of aexpr
-
-and ref_path_elem =
-  | RefSlotAccessor of identifier
+and path_expr =
+  | PathHead of identifier
+  | SlotAccessor of path_expr * identifier
+  | PointerSlotAccessor of path_expr * identifier
+  | ArrayIndex of path_expr * aexpr
 
 and lvalue =
-  LValue of identifier * path_elem list
+  LValue of path_expr
