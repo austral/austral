@@ -310,47 +310,6 @@ and monomorphize_named_expr_list (env: env) (exprs: (identifier * texpr) list): 
   | [] ->
      ([], env)
 
-and monomorphize_path_elems (env: env) (elems: typed_path_elem list): (mtyped_path_elem list * env) =
-  match elems with
-  | first::rest ->
-     let (first, env) = monomorphize_path_elem env first in
-     let (rest, env) = monomorphize_path_elems env rest in
-     (first :: rest, env)
-  | [] ->
-     ([], env)
-
-and monomorphize_path_elem (env: env) (elem: typed_path_elem): (mtyped_path_elem * env) =
-  match elem with
-  | TSlotAccessor (name, ty) ->
-     let ty = strip_type ty in
-     let (ty, env) = monomorphize_ty env ty in
-     (MSlotAccessor (name, ty), env)
-  | TPointerSlotAccessor (name, ty) ->
-     let ty = strip_type ty in
-     let (ty, env) = monomorphize_ty env ty in
-     (MPointerSlotAccessor (name, ty), env)
-  | TArrayIndex (idx, ty) ->
-     let ty = strip_type ty in
-     let (ty, env) = monomorphize_ty env ty in
-     let (idx, env) = monomorphize_expr env idx in
-     (MArrayIndex (idx, ty), env)
-
-and monomorphize_ref_path_elems (env: env) (elems: typed_ref_path_elem list): (mtyped_ref_path_elem list * env) =
-  match elems with
-  | first::rest ->
-     let (first, env) = monomorphize_ref_path_elem env first in
-     let (rest, env) = monomorphize_ref_path_elems env rest in
-     (first :: rest, env)
-  | [] ->
-     ([], env)
-
-and monomorphize_ref_path_elem (env: env) (elem: typed_ref_path_elem): (mtyped_ref_path_elem * env) =
-  match elem with
-  | TRefSlotAccessor (name, ty) ->
-     let ty = strip_type ty in
-     let (ty, env) = monomorphize_ty env ty in
-     (MRefSlotAccessor (name, ty), env)
-
 (* Monomorphize statements *)
 
 let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
