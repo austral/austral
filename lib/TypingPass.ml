@@ -59,12 +59,6 @@ let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * typ
   | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
-(** Copied from TypeCheckExpr *)
-let get_path_ty_from_elems (elems: typed_path_elem list): ty =
-  assert ((List.length elems) > 0);
-  let last = List.nth elems ((List.length elems) - 1) in
-  path_elem_type last
-
 let stmt_kind (stmt: astmt): string =
   match stmt with
   | ASkip _ -> "skip"
