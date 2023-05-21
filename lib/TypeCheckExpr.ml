@@ -668,19 +668,51 @@ and augment_if_expr ctx c t f =
 and augment_path_expr (ctx: expr_ctx) (path: path_expr): typed_path_expr =
   match path with
   | PathHead name -> begin
-      match get_var (ctx_lexenv ctx) name with
-      | Some (ty, _) ->
-         TPathHead (name, ty)
-      | None ->
-         Errors.unknown_name
-           ~kind:"variable"
-           ~name:(original_name name)
+      (* Get the type of the variable. *)
+      let ty: ty = match get_var (ctx_lexenv ctx) name with
+        | Some (ty, _) ->
+           ty
+        | None ->
+           Errors.unknown_name
+             ~kind:"variable"
+             ~name:(original_name name)
+      in
+      TPath (name, ty)
     end
   | SlotAccessor (subpath, name) ->
-
+     (* Get the type of the subpath. *)
+     let ty: ty = path_type subpath in
+     (* Get the name of the type. *)
+     let type_name: qident = begin
+       match head_ty with
+       | NamedType (name, args, _) ->
+          name
+       | _ ->
+          Errors.path_not_record head_ty
+       end
+     in
+     (* Ensure is is a record. *)
+     let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name ty in
+     (* Ensure we can access it. *)
+     let _ =
+       if (vis = TypeVisPublic) || ((ctx_module_name ctx) = source_module) then
+         (* The record is public, or it is defined in the same module as we are. *)
+         ()
+       else
+         Errors.path_not_public
+           ~type_name:(original_name type_name)
+           ~slot_name
+     in
+     (* Get the slot with the given name. *)
+     let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
+     (* Make the type. *)
+     let bindings = match_typarams_ctx ctx typarams type_args in
+     let slot_ty' = replace_variables bindings slot_ty in
+     TSlotAccessor (subpath, name, slot_ty')
   | PointerSlotAccessor (subpath, name) ->
-
+     err "derp"
   | ArrayIndex (subpath, expr) ->
+     err "derp"
 
 and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
   (* The type of the expression being dereferenced must be either a read-only
