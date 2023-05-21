@@ -545,9 +545,11 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   | IfExpression (c, t, f) ->
      augment_if_expr ctx c t f
   | Path path ->
-     augment_path_expr ctx path
+
+     TPath (augment_path_expr ctx path)
   | RefPath path ->
-     augment_ref_path_expr ctx path
+     let _ = path in
+     internal_err "TODO"
   | Embed (ty, expr, args) ->
      TEmbed (
          parse_typespec ctx ty,
