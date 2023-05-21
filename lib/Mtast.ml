@@ -41,7 +41,7 @@ and mstmt =
   | MSkip
   | MLet of identifier * mono_ty * mexpr * mstmt
   | MDestructure of mono_binding list * mexpr * mstmt
-  | MAssign of mtyped_lvalue * mexpr
+  | MAssign of mtyped_path * mexpr
   | MIf of mexpr * mstmt * mstmt
   | MCase of mexpr * mtyped_when list * Tast.case_ref
   | MWhile of mexpr * mstmt
@@ -87,12 +87,8 @@ and mexpr =
   | MIfExpression of mexpr * mexpr * mexpr
   | MRecordConstructor of mono_ty * (identifier * mexpr) list
   | MUnionConstructor of mono_ty * identifier * (identifier * mexpr) list
-  | MPath of {
-      head: mexpr;
-      elems: mtyped_path_elem list;
-      ty: mono_ty
-    }
-  | MRefPath of mexpr * mtyped_ref_path_elem list * mono_ty
+  | MPath of mtyped_path
+  | MRefPath of mtyped_path
   | MEmbed of mono_ty * string * mexpr list
   | MDeref of mexpr
   | MTypecast of mexpr * mono_ty
@@ -103,16 +99,11 @@ and mexpr =
 and mtyped_when =
   MTypedWhen of identifier * mono_binding list * mstmt
 
-and mtyped_path_elem =
-  | MSlotAccessor of identifier * mono_ty
-  | MPointerSlotAccessor of identifier * mono_ty
-  | MArrayIndex of mexpr * mono_ty
-
-and mtyped_ref_path_elem =
-  | MRefSlotAccessor of identifier * mono_ty
-
-and mtyped_lvalue =
-  MTypedLValue of identifier * mtyped_path_elem list
+and mtyped_path =
+  | MPathHead of identifier * mono_ty
+  | MSlotAccessor of mtyped_path * identifier * mono_ty
+  | MPointerSlotAccessor of mtyped_path * identifier * mono_ty
+  | MArrayIndex of mtyped_path * mexpr * mono_ty
 
 and mvalue_parameter =
   MValueParameter of identifier * mono_ty
@@ -173,10 +164,10 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MUnionConstructor (ty, _, _) ->
      ty
-  | MPath { ty; _ } ->
-     ty
-  | MRefPath (_, _, ty) ->
-     ty
+  | MPath path ->
+     mpath_type path
+  | MRefPath path ->
+     mpath_type path
   | MEmbed (ty, _, _) ->
      ty
   | MDeref e ->
@@ -199,3 +190,10 @@ let rec get_type (e: mexpr): mono_ty =
          MonoWriteRef (ty, MonoRegionTy region))
   | MReborrow (_, ty, region) ->
      MonoWriteRef (ty, MonoRegionTy region)
+
+and mpath_type (pe: mtyped_path): mono_ty =
+  match pe with
+  | MPathHead (_, ty) -> ty
+  | MSlotAccessor (_, _, ty) -> ty
+  | MPointerSlotAccessor (_, _,ty) -> ty
+  | MArrayIndex (_, _, ty) -> ty
