@@ -248,10 +248,10 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
                 ("tag", union_tag_value ty case_name);
                 ("data", CStructInitializer [(gen_ident case_name, args)])
               ], gen_type ty)
-  | MPath { head; elems; _ } ->
-     gen_path mn (g head) (List.rev elems)
-  | MRefPath (head, elems, _) ->
-     CAddressOf (gen_ref_path (g head) elems)
+  | MPath path ->
+     gen_path mn path
+  | MRefPath path ->
+     CAddressOf (gen_path mn path)
   | MEmbed (ty, expr, args) ->
      CEmbed (gen_type ty, expr, List.map g args)
   | MDeref e ->
@@ -265,43 +265,16 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
   | MReborrow (name, _, _) ->
      CVar (gen_ident name)
 
-and gen_path (mn: module_name) (expr: c_expr) (elems: mtyped_path_elem list): c_expr =
-  match elems with
-  | [elem] ->
-     gen_path_elem mn expr elem
-  | elem::rest ->
-     let expr' = gen_path_elem mn expr elem in
-     gen_path mn expr' rest
-  | [] ->
-     expr
-
-and gen_path_elem (mn: module_name) (expr: c_expr) (elem: mtyped_path_elem): c_expr =
-  match elem with
-  | MSlotAccessor (n, _) ->
-     CStructAccessor (expr, gen_ident n)
-  | MPointerSlotAccessor (n, _) ->
-     CPointerStructAccessor (expr, gen_ident n)
-  | MArrayIndex (e, t) ->
-     CDeref (CCast (CFuncall ("au_index_array",
-                              [
-                                expr;
-                                gen_exp mn e;
-                                CSizeOf (gen_type t);
-                      ]),
-                    CPointer (gen_type t)))
-
-and gen_ref_path (head: c_expr) (elems: mtyped_ref_path_elem list): c_expr =
-  let elems: c_path_elem list = List.mapi gen_ref_path_elem elems
-  in
-  CPath (head, elems)
-
-and gen_ref_path_elem (i: int) (elem: mtyped_ref_path_elem): c_path_elem =
-  match elem with
-  | MRefSlotAccessor (n, _) ->
-     if i = 0 then
-       CPathPointer (gen_ident n)
-     else
-       CPathSlot (gen_ident n)
+and gen_path (mn: module_name) (path: mtyped_path): c_expr =
+  match path with
+  | MPathHead (name, _) ->
+     CVar (gen_ident name)
+  | MSlotAccessor (subpath, name, _) ->
+     CStructAccessor (gen_path mn subpath, gen_ident name)
+  | MPointerSlotAccessor (subpath, name, _) ->
+     CPointerStructAccessor (gen_path mn subpath, gen_ident name)
+  | MArrayIndex (subpath, expr, _) ->
+     CIndex (gen_path mn subpath, gen_exp mn expr)
 
 (* Statements *)
 
@@ -322,8 +295,8 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
-  | MAssign (lvalue, v) ->
-     CAssign (gen_lvalue mn lvalue, ge v)
+  | MAssign (path, v) ->
+     CAssign (gen_path mn path, ge v)
   | MIf (c, tb, fb) ->
      CIf (ge c, gs tb, gs fb)
   | MCase (e, whens, case_ref) ->
@@ -355,9 +328,6 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CDiscarding (ge e)
   | MReturn e ->
      CReturn (ge e)
-
-and gen_lvalue (mn: module_name) (MTypedLValue (name, elems)) =
-  gen_path mn (CVar (gen_ident name)) elems
 
 and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: case_ref): c_stmt =
   (* Code gen for a case statement: generate a variable, and assign the value
