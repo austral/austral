@@ -4,6 +4,7 @@
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
+open Identifier
 open Imports
 open Cst
 open Ast
@@ -123,10 +124,10 @@ and abs_expr im expr =
      Negation (abs_expr im e)
   | CIfExpression (_, c, t, f) ->
      IfExpression (abs_expr im c, abs_expr im t, abs_expr im f)
-  | CPath (_, e, es) ->
-     Path (abs_path im e es)
-  | CRefPath (_, e, es) ->
-     RefPath (abs_path im e es)
+  | CPath (_, name, es) ->
+     Path (abs_path im name es)
+  | CRefPath (_, name, es) ->
+     RefPath (abs_path im name es)
   | CEmbed (_, ty, expr, args) ->
      Embed (qualify_typespec im ty, expr, List.map (abs_expr im) args)
   | CDeref (_, e) ->
@@ -152,10 +153,10 @@ and abs_arglist im args =
   | ConcreteNamedArgs l ->
      Named (List.map (fun (n, v) -> (n, abs_expr im v)) l)
 
-and abs_path (im: import_map) (head: cexpr) (elems: concrete_path_elem list): path_expr =
-  match rest with
+and abs_path (im: import_map) (head: identifier) (elems: concrete_path_elem list): path_expr =
+  match elems with
   | [] ->
-     PathHead (abs_expr im head)
+     PathHead head
   | first::rest -> begin
       let rest = abs_path im head rest in
       match first with
@@ -166,20 +167,6 @@ and abs_path (im: import_map) (head: cexpr) (elems: concrete_path_elem list): pa
       | CArrayIndex expr ->
          ArrayIndex (rest, abs_expr im expr)
     end
-
-and abs_path_elem im elem =
-  match elem with
-  | CSlotAccessor i ->
-     SlotAccessor i
-  | CPointerSlotAccessor i ->
-     PointerSlotAccessor i
-  | CArrayIndex ie ->
-     ArrayIndex (abs_expr im ie)
-
-and abs_ref_path_elem elem =
-  match elem with
-  | CRefPointerSlotAccessor i ->
-     RefSlotAccessor i
 
 (* Given a list of statements, find the first let statement, if any, and put the
    remainder of the list under its body. Then call let_reshape on that
@@ -204,5 +191,5 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
   | [] ->
      ASkip empty_span
 
-and abs_lvalue im (ConcreteLValue (head, elems)) =
-  LValue (head, List.map (abs_path_elem im) elems)
+and abs_lvalue im (ConcreteLValue (head, path)) =
+  LValue (abs_path im head path)
