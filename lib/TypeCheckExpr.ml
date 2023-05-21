@@ -90,11 +90,6 @@ let match_type_with_value_ctx (ctx: expr_ctx) (expected: ty) (value: texpr): typ
 let match_typarams_ctx (ctx: expr_ctx) (typarams: typarams) (type_args: ty list): type_bindings =
   match_typarams (ctx_env ctx, ctx_module_name ctx) typarams type_args
 
-let get_ref_path_ty_from_elems (elems: typed_ref_path_elem list): ty =
-  assert ((List.length elems) > 0);
-  let last = List.nth elems ((List.length elems) - 1) in
-  ref_path_elem_type last
-
 (** Is this expression of boolean type? *)
 let is_bool (e: texpr): bool =
   match get_type e with
