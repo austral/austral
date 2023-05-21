@@ -473,7 +473,7 @@ compound_expression:
   ;
 
 path:
-  | initial=atomic_expression elems=path_rest+ { CPath (from_loc $loc, initial, elems) }
+  | initial=identifier elems=path_rest+ { CPath (from_loc $loc, initial, elems) }
   ;
 
 path_rest:
@@ -495,7 +495,7 @@ array_index:
   ;
 
 ref_path:
-  | REF_TRANSFORM initial=identifier elems=ref_path_rest+ RPAREN { CRefPath (from_loc $loc, CVariable (from_loc $loc, initial), elems) }
+  | REF_TRANSFORM initial=identifier elems=ref_path_rest+ RPAREN { CRefPath (from_loc $loc, initial, elems) }
   ;
 
 ref_path_rest:
