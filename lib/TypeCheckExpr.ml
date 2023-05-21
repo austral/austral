@@ -665,7 +665,22 @@ and augment_if_expr ctx c t f =
       ~form:"expression"
       ~ty:(get_type c')
 
+and augment_path_expr (ctx: expr_ctx) (path: path_expr): typed_path_expr =
+  match path with
+  | PathHead name -> begin
+      match get_var (ctx_lexenv ctx) name with
+      | Some (ty, _) ->
+         TPathHead (name, ty)
+      | None ->
+         Errors.unknown_name
+           ~kind:"variable"
+           ~name:(original_name name)
+    end
+  | SlotAccessor (subpath, name) ->
 
+  | PointerSlotAccessor (subpath, name) ->
+
+  | ArrayIndex (subpath, expr) ->
 
 and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
   (* The type of the expression being dereferenced must be either a read-only
