@@ -707,7 +707,7 @@ and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
    | _ ->
       Errors.dereference_non_reference ty)
 
-and augment_path_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (name: identifier): typed_path_expr
+and augment_path_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (name: identifier): typed_path_expr =
   (* Get the type of the subpath. *)
   let ty: ty = path_type subpath in
   (* Get the name of the type. *)
