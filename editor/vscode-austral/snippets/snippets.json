@@ -2,13 +2,21 @@
   "Module interface": {
     "scope": "austral",
     "prefix": "module",
-    "body": ["module $1 is", "\t$2", "end module."],
+    "body": [
+      "module $1 is",
+      "\t$2",
+      "end module."
+    ],
     "description": "Empty module interface declaration"
   },
   "Module body": {
     "scope": "austral",
     "prefix": "module body",
-    "body": ["module body $1 is", "\t$2", "end module body."],
+    "body": [
+      "module body $1 is",
+      "\t$2",
+      "end module body."
+    ],
     "description": "Empty module body declaration"
   },
   "Main module body": {
@@ -27,13 +35,22 @@
   "Generic function body": {
     "scope": "austral",
     "prefix": "generic",
-    "body": ["generic [R: Region]", "function $1($2): $3 is", "\t$4", "end;"],
+    "body": [
+      "generic [R: Region]",
+      "function $1($2): $3 is",
+      "\t$4",
+      "end;"
+    ],
     "description": "Empty generic function declaration."
   },
   "Function body": {
     "scope": "austral",
     "prefix": "function",
-    "body": ["function $1($2): $3 is", "\t$4", "end;"],
+    "body": [
+      "function $1($2): $3 is",
+      "\t$4",
+      "end;"
+    ],
     "description": "Empty function declaration."
   },
   "C FFI function pattern": {
@@ -49,7 +66,12 @@
   "Case statement": {
     "scope": "austral",
     "prefix": "case",
-    "body": ["case $1 of", "\twhen $2 do", "\t\t$3", "end case;"],
+    "body": [
+      "case $1 of",
+      "\twhen $2 do",
+      "\t\t$3",
+      "end case;"
+    ],
     "description": "Case statement"
   }
 }
