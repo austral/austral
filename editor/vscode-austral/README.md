@@ -33,6 +33,7 @@ To inspect the textmate scopes assigned run the VSCode command "Developer: Inspe
 ## Features
 
 - Context-aware syntax highlighting.
+- Snippets
 
 ## Release Notes
 

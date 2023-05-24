@@ -7,19 +7,36 @@
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Snippets"
   ],
   "contributes": {
-    "languages": [{
-      "id": "austral",
-      "aliases": ["Austral", "austral"],
-      "extensions": [".aum",".aui"],
-      "configuration": "./language-configuration.json"
-    }],
-    "grammars": [{
-      "language": "austral",
-      "scopeName": "source.austral",
-      "path": "./syntaxes/austral.tmLanguage.json"
-    }]
+    "languages": [
+      {
+        "id": "austral",
+        "aliases": [
+          "Austral",
+          "austral"
+        ],
+        "extensions": [
+          ".aum",
+          ".aui"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "austral",
+        "scopeName": "source.austral",
+        "path": "./syntaxes/austral.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "austral",
+        "path": "./snippets/austral.code-snippets"
+      }
+    ]
   }
 }
