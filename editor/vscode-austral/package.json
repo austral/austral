@@ -35,7 +35,7 @@
     "snippets": [
       {
         "language": "austral",
-        "path": "./snippets/austral.code-snippets"
+        "path": "./snippets/snippets.json"
       }
     ]
   }
