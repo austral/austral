@@ -1,0 +1,77 @@
+{
+  "Module interface": {
+    "scope": "austral",
+    "prefix": "module",
+    "body": [
+      "module $1 is",
+      "\t$2",
+      "end module."
+    ],
+    "description": "Empty module interface declaration"
+  },
+  "Module body": {
+    "scope": "austral",
+    "prefix": "module body",
+    "body": [
+      "module body $1 is",
+      "\t$2",
+      "end module body."
+    ],
+    "description": "Empty module body declaration"
+  },
+  "Main module body": {
+    "scope": "austral",
+    "prefix": "module body",
+    "body": [
+      "module body $1 is",
+      "\tfunction main(): ExitCode is",
+      "\t\t$2",
+      "\t\treturn ExitSuccess();",
+      "\tend;",
+      "end module body."
+    ],
+    "description": "Module body declaration with main function"
+  },
+  "Generic function body": {
+    "scope": "austral",
+    "prefix": "generic",
+    "body": [
+      "generic [R: Region]",
+      "function $1($2): $3 is",
+      "\t$4",
+      "end;"
+    ],
+    "description": "Empty generic function declaration."
+  },
+  "Function body": {
+    "scope": "austral",
+    "prefix": "function",
+    "body": [
+      "function $1($2): $3 is",
+      "\t$4",
+      "end;"
+    ],
+    "description": "Empty function declaration."
+  },
+  "C FFI function pattern": {
+    "scope": "austral",
+    "prefix": "function C_",
+    "body": [
+      "function C_$1($2): $3 is",
+      "\tpragma Foreign_Import(External_Name => \"$1\");",
+      "end;"
+    ],
+    "description": "A C FFI function declaration"
+  },
+  "Case statement": {
+    "scope": "austral",
+    "prefix": "case",
+    "body": [
+      "case $1 of",
+      "\twhen $2 do",
+      "\t\t$3",
+      "end case;"
+    ],
+    "description": "Case statement"
+  }
+}
