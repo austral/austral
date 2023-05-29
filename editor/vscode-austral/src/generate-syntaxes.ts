@@ -1,4 +1,4 @@
-import grammar from "./austral.tmlanguage";
+import grammar from "./austral.tmLanguage";
 import { writeFile } from "fs";
 import * as path from "path";
 const syntaxPath = path.join(
