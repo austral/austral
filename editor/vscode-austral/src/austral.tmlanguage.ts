@@ -1,5 +1,17 @@
 import { TmLanguage } from "./tmlanguage";
 
+/** Convert refs into an array of patterns that only include the given ref.
+ * This is a convience function for simplifying
+ *
+ * ```ts
+ * // ...
+ *     patterns: [ { include: "..." }, { include: "..." }, { include: "..." } ]
+ * // ...
+ * ```
+ *
+ * @param refs references to patterns in the repository, or scopes
+ * @returns
+ */
 const include = (...refs: string[]) => refs.map((r) => ({ include: r }));
 
 const language: TmLanguage = {
@@ -307,54 +319,24 @@ const language: TmLanguage = {
           match: ";",
           name: "punctuation.terminator.statement.austral",
         },
-        {
-          include: "#comment",
-        },
-        {
-          include: "#let_simple",
-        },
-        {
-          include: "#pragma",
-        },
-        {
-          include: "#let_destructure",
-        },
-        {
-          include: "#borrow_head",
-        },
-        {
-          include: "#if_head",
-        },
-        {
-          include: "#case_head",
-        },
-        {
-          include: "#for_loop_head",
-        },
-        {
-          include: "#while_loop_head",
-        },
-        {
-          include: "#if_body",
-        },
-        {
-          include: "#case_body",
-        },
-        {
-          include: "#do_block",
-        },
-        {
-          include: "#constant_decl",
-        },
-        {
-          include: "#keywords",
-        },
-        {
-          include: "#context_expression",
-        },
-        {
-          include: "#assignment",
-        },
+        ...include(
+          "#comment",
+          "#let_simple",
+          "#pragma",
+          "#let_destructure",
+          "#borrow_head",
+          "#if_head",
+          "#case_head",
+          "#for_loop_head",
+          "#while_loop_head",
+          "#if_body",
+          "#case_body",
+          "#do_block",
+          "#constant_decl",
+          "#keywords",
+          "#context_expression",
+          "#assignment"
+        ),
       ],
     },
     universe_assertion: {
@@ -372,27 +354,15 @@ const language: TmLanguage = {
     },
     context_module_interface: {
       patterns: [
-        {
-          include: "#comment",
-        },
-        {
-          include: "#string_triple",
-        },
-        {
-          include: "#pragma",
-        },
-        {
-          include: "#constant_decl",
-        },
-        {
-          include: "#record_body",
-        },
-        {
-          include: "#union_body",
-        },
-        {
-          include: "#union_or_record_head",
-        },
+        ...include(
+          "#comment",
+          "#string_triple",
+          "#pragma",
+          "#constant_decl",
+          "#record_body",
+          "#union_body",
+          "#union_or_record_head"
+        ),
         {
           comment: "type declaration",
           name: "meta.type.austral",
@@ -426,41 +396,23 @@ const language: TmLanguage = {
             },
           },
         },
-        {
-          include: "#generic",
-        },
-        {
-          include: "#function_head",
-        },
-        {
-          include: "#typeclass_head",
-        },
-        {
-          include: "#typeclass_body",
-        },
-        {
-          include: "#instance_head",
-        },
-        {
-          include: "#keywords",
-        },
+        ...include(
+          "#generic",
+          "#function_head",
+          "#typeclass_head",
+          "#typeclass_body",
+          "#instance_head",
+          "#keywords"
+        ),
       ],
     },
     context_module_body: {
-      patterns: [
-        {
-          include: "#instance_body",
-        },
-        {
-          include: "#function_body",
-        },
-        {
-          include: "#assignment",
-        },
-        {
-          include: "#context_module_interface",
-        },
-      ],
+      patterns: include(
+        "#instance_body",
+        "#function_body",
+        "#assignment",
+        "#context_module_interface"
+      ),
     },
     import_simple: {
       comment: "initial highlighting on import without the symbol list",
@@ -522,26 +474,14 @@ const language: TmLanguage = {
       ],
     },
     constants: {
-      patterns: [
-        {
-          include: "#float_constant",
-        },
-        {
-          include: "#bool_constants",
-        },
-        {
-          include: "#nil_constant",
-        },
-        {
-          include: "#integer_constants",
-        },
-        {
-          include: "#triple_string",
-        },
-        {
-          include: "#string",
-        },
-      ],
+      patterns: include(
+        "#float_constant",
+        "#bool_constants",
+        "#nil_constant",
+        "#integer_constants",
+        "#triple_string",
+        "#string"
+      ),
     },
     assignment: {
       comment: "the := ...; part of an assignment statement",
@@ -659,11 +599,7 @@ const language: TmLanguage = {
               name: "punctuation.definition.end.bracket.square.c",
             },
           },
-          patterns: [
-            {
-              include: "#context_expression",
-            },
-          ],
+          patterns: include("#context_expression"),
         },
         {
           comment: "slot access (including pointer)",
@@ -748,14 +684,7 @@ const language: TmLanguage = {
       },
     },
     pragma: {
-      patterns: [
-        {
-          include: "#pragma_simple",
-        },
-        {
-          include: "#pragma_params",
-        },
-      ],
+      patterns: include("#pragma_simple", "#pragma_params"),
     },
     operators: {
       patterns: [
@@ -862,11 +791,7 @@ const language: TmLanguage = {
         },
         "3": {
           name: "meta.slot.type.austral",
-          patterns: [
-            {
-              include: "#typespec",
-            },
-          ],
+          patterns: include("#typespec"),
         },
       },
     },
@@ -886,11 +811,7 @@ const language: TmLanguage = {
           name: "punctuation.colon.austral",
         },
         "4": {
-          patterns: [
-            {
-              include: "#typespec",
-            },
-          ],
+          patterns: include("#typespec"),
         },
       },
     },
@@ -1023,11 +944,7 @@ const language: TmLanguage = {
           name: "punctuation.section.parameters.begin.bracket.round.austral",
         },
         "4": {
-          patterns: [
-            {
-              include: "#context_function_paramater_def",
-            },
-          ],
+          patterns: include("#context_function_paramater_def"),
         },
         "5": {
           name: "punctuation.section.parameters.end.bracket.round.austral",
@@ -1103,11 +1020,7 @@ const language: TmLanguage = {
           name: "punctuation.definition.block.end.austral keyword.control.$0.austral",
         },
       },
-      patterns: [
-        {
-          include: "#context_block",
-        },
-      ],
+      patterns: include("#context_block"),
     },
     case_head: {
       name: "meta.case.austral",
@@ -1118,11 +1031,7 @@ const language: TmLanguage = {
           name: "keyword.control.$0.austral",
         },
       },
-      patterns: [
-        {
-          include: "#context_expression",
-        },
-      ],
+      patterns: include("#context_expression"),
     },
     when_head: {
       name: "meta.case.when.austral",
@@ -1156,11 +1065,7 @@ const language: TmLanguage = {
               name: "punctuation.definition.binding-pattern.end.austral",
             },
           },
-          patterns: [
-            {
-              include: "#context_binding_list",
-            },
-          ],
+          patterns: include("#context_binding_list"),
         },
       ],
     },
@@ -1206,14 +1111,7 @@ const language: TmLanguage = {
           name: "punctuation.definition.block.end.austral keyword.control.end.$1.austral",
         },
       },
-      patterns: [
-        {
-          include: "#when_head",
-        },
-        {
-          include: "#context_block",
-        },
-      ],
+      patterns: include("#when_head", "#context_block"),
     },
     if_head: {
       comment: "head of an (else) if statement",
@@ -1225,11 +1123,7 @@ const language: TmLanguage = {
           name: "keyword.control.$0.austral",
         },
       },
-      patterns: [
-        {
-          include: "#context_expression",
-        },
-      ],
+      patterns: include("#context_expression"),
     },
     if_body: {
       name: "meta.if.body.austral",
@@ -1249,11 +1143,7 @@ const language: TmLanguage = {
           name: "keyword.control.end.if.austral",
         },
       },
-      patterns: [
-        {
-          include: "#context_block",
-        },
-      ],
+      patterns: include("#context_block"),
     },
     function_body: {
       name: "meta.function.austral",
@@ -1269,11 +1159,7 @@ const language: TmLanguage = {
           name: "punctuation.definition.block.end.austral keyword.other.end.austral",
         },
       },
-      patterns: [
-        {
-          include: "#context_block",
-        },
-      ],
+      patterns: include("#context_block"),
     },
     let_destructure: {
       name: "meta.let.destructure.austral",
@@ -1292,11 +1178,7 @@ const language: TmLanguage = {
           name: "punctuation.definition.binding-pattern.end.austral",
         },
       },
-      patterns: [
-        {
-          include: "#context_binding_list",
-        },
-      ],
+      patterns: include("#context_binding_list"),
     },
     let_simple: {
       name: "meta.let.destructure.austral",
@@ -1324,11 +1206,7 @@ const language: TmLanguage = {
           name: "punctuation.brackets.round.austral",
         },
         "4": {
-          patterns: [
-            {
-              include: "#typespec",
-            },
-          ],
+          patterns: include("#typespec"),
         },
         "5": {
           name: "punctuation.brackets.round.austral",
@@ -1350,25 +1228,12 @@ const language: TmLanguage = {
         },
       },
       patterns: [
-        {
-          include: "#string_triple",
-        },
-        {
-          include: "#comment",
-        },
+        ...include("#string_triple", "#comment"),
         {
           match: "\\bfunction\\b",
           name: "invalid.illegal.function-in-instance.austral",
         },
-        {
-          include: "#generic",
-        },
-        {
-          include: "#function_head",
-        },
-        {
-          include: "#function_body",
-        },
+        ...include("#generic", "#function_head", "#function_body"),
       ],
     },
     typeclass_head: {
@@ -1401,11 +1266,7 @@ const language: TmLanguage = {
               name: "punctuation.section.type-parameters.end.brackets.round.austral",
             },
           },
-          patterns: [
-            {
-              include: "#context_type_parameter_list",
-            },
-          ],
+          patterns: include("#context_type_parameter_list"),
         },
       ],
     },
@@ -1425,22 +1286,12 @@ const language: TmLanguage = {
         },
       },
       patterns: [
-        {
-          include: "#string_triple",
-        },
-        {
-          include: "#comment",
-        },
+        ...include("#string_triple", "#comment"),
         {
           match: "\\bfunction\\b",
           name: "invalid.illegal.function-in-typeclass.austral",
         },
-        {
-          include: "#generic",
-        },
-        {
-          include: "#function_head",
-        },
+        ...include("#generic", "#function_head"),
       ],
     },
     module: {
@@ -1467,11 +1318,7 @@ const language: TmLanguage = {
               name: "keyword.other.end.module.interface.austral storage.type.module.interface.austral",
             },
           },
-          patterns: [
-            {
-              include: "#context_module_interface",
-            },
-          ],
+          patterns: include("#context_module_interface"),
         },
       ],
     },
@@ -1497,11 +1344,7 @@ const language: TmLanguage = {
           name: "keyword.other.end.module.body.austral storage.type.module.body.austral",
         },
       },
-      patterns: [
-        {
-          include: "#context_module_body",
-        },
-      ],
+      patterns: include("#context_module_body"),
     },
     escapes: {
       comment: "string escape characters",
