@@ -1,5 +1,7 @@
 import { TmLanguage } from "./tmlanguage";
 
+const include = (...refs: string[]) => refs.map((r) => ({ include: r }));
+
 const language: TmLanguage = {
   name: "Austral",
   patterns: [
@@ -7,21 +9,13 @@ const language: TmLanguage = {
       match: "\\.",
       name: "punctuation.delimiter.module.end.austral",
     },
-    {
-      include: "#import",
-    },
-    {
-      include: "#import_simple",
-    },
-    {
-      include: "#module_body",
-    },
-    {
-      include: "#module",
-    },
-    {
-      include: "#context_block",
-    },
+    ...include(
+      "#import",
+      "#import_simple",
+      "#module_body",
+      "#module",
+      "#context_block"
+    ),
   ],
   repository: {
     keywords: {
