@@ -38,5 +38,8 @@
         "path": "./snippets/snippets.json"
       }
     ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.5"
   }
 }
