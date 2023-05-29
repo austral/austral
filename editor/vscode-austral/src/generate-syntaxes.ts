@@ -8,6 +8,6 @@ const syntaxPath = path.join(
   "austral.tmLanguage.json"
 );
 
-writeFile(syntaxPath, JSON.stringify(grammar), (err) => {
+writeFile(syntaxPath, JSON.stringify(grammar, undefined, 4), (err) => {
   if (err) console.error(`failed to write syntax: ${err}`);
 });
