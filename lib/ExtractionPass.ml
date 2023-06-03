@@ -11,6 +11,7 @@ open Type
 open TypeSystem
 open Combined
 open Linked
+module Ast = Stages.Ast
 open Ast
 open Id
 open DeclIdSet

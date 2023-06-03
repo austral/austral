@@ -45,6 +45,12 @@ type borrowing_mode =
   | WriteBorrow
 [@@deriving (show, sexp)]
 
+(** Whether a borrow statement is borrowing as read, write, or reborrow. *)
+type borrow_stmt_kind =
+  | Read
+  | Write
+  | Reborrow
+
 (** Whether a module is safe or unsafe. *)
 type module_kind =
   | SafeModule
