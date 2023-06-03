@@ -265,16 +265,12 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      let (ty, env) = strip_and_mono env ty in
      let (args, env) = monomorphize_named_expr_list env args in
      (MUnionConstructor (ty, case_name, args), env)
-  | TPath { head; elems; ty } ->
-     let (ty, env) = strip_and_mono env ty in
-     let (head, env) = monomorphize_expr env head in
-     let (elems, env) = monomorphize_path_elems env elems in
-     (MPath { head = head; elems = elems; ty = ty }, env)
-  | TRefPath (head, elems, ty) ->
-     let (ty, env) = strip_and_mono env ty in
-     let (head, env) = monomorphize_expr env head in
-     let (elems, env) = monomorphize_ref_path_elems env elems in
-     (MRefPath (head, elems, ty), env)
+  | TPath path_expr ->
+     let (path_expr, env) = monomorphize_path_expr env path_expr in
+     (MPath path_expr, env)
+  | TRefPath path_expr ->
+     let (path_expr, env) = monomorphize_path_expr env path_expr in
+     (MRefPath path_expr, env)
   | TEmbed (ty, fmt, args) ->
      let (ty, env) = strip_and_mono env ty in
      let (args, env) = monomorphize_expr_list env args in
@@ -310,6 +306,25 @@ and monomorphize_named_expr_list (env: env) (exprs: (identifier * texpr) list): 
   | [] ->
      ([], env)
 
+and monomorphize_path_expr (env: env) (expr: typed_path_expr): (mtyped_path * env) =
+  match expr with
+  | TPathHead (name, ty) ->
+     let (ty, env) = strip_and_mono env ty in
+     (MPathHead (name, ty), env)
+  | TSlotAccessor (path, name, ty) ->
+     let (path, env) = monomorphize_path_expr env path in
+     let (ty, env) = strip_and_mono env ty in
+     (MSlotAccessor (path, name, ty), env)
+  | TPointerSlotAccessor (path, name, ty) ->
+     let (path, env) = monomorphize_path_expr env path in
+     let (ty, env) = strip_and_mono env ty in
+     (MPointerSlotAccessor (path, name, ty), env)
+  | TArrayIndex (path, expr, ty) ->
+     let (path, env) = monomorphize_path_expr env path in
+     let (expr, env) = monomorphize_expr env expr in
+     let (ty, env) = strip_and_mono env ty in
+     (MArrayIndex (path, expr, ty), env)
+
 (* Monomorphize statements *)
 
 let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
@@ -327,7 +342,7 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
      let (body, env) = monomorphize_stmt env body in
      (MDestructure (bindings, value, body), env)
   | TAssign (_, lvalue, value) ->
-     let (lvalue, env) = monomorphize_lvalue env lvalue in
+     let (lvalue, env) = monomorphize_path_expr env lvalue in
      let (value, env) = monomorphize_expr env value in
      (MAssign (lvalue, value), env)
   | TIf (_, c, t, f) ->
@@ -364,12 +379,6 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
   | TReturn (_, value) ->
      let (value, env) = monomorphize_expr env value in
      (MReturn value, env)
-
-and monomorphize_lvalue (env: env) (lvalue: typed_lvalue): (mtyped_lvalue * env) =
-  match lvalue with
-  | TypedLValue (name, elems) ->
-     let (elems, env) = monomorphize_path_elems env elems in
-     (MTypedLValue (name, elems), env)
 
 and monomorphize_whens (env: env) (whens: typed_when list): (mtyped_when list * env) =
   match whens with
