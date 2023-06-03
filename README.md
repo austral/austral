@@ -77,7 +77,23 @@ $ ./fib
 fib(10) = 55
 ```
 
-## Building
+## Building with Nix
+
+If you have [Nix][nix], this will be much simpler. I know this sounds like yak
+shaving but Nix is actually very good and useful.
+
+[nix]: https://nixos.org/
+
+Just:
+
+```bash
+$ nix-shell
+$ make
+```
+
+And you're done.
+
+## Building without Nix
 
 Building the `austral` compiler requires `make` and the `dune` build system for
 OCaml, and a C compiler for building the resulting output. You should install OCaml
