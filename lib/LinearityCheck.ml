@@ -6,6 +6,7 @@
 *)
 open Identifier
 open Tast
+open TastUtil
 open Type
 open TypeSystem
 open Reporter
@@ -271,49 +272,33 @@ let rec count (name: identifier) (expr: texpr): appearances =
      merge_list (List.map (fun (_, e) -> c e) args)
   | TUnionConstructor (_, _, args) ->
      merge_list (List.map (fun (_, e) -> c e) args)
-  | TPath { head; elems; _ } ->
-     let head_apps: appearances =
-       (* If the head of the path is a variable, check if it is the one we are
-          looking for. If it is, count that as a path appearance. *)
-       (match head with
-        | TParamVar (name', _) ->
-           if equal_identifier name name' then
-             path_once
-           else
-             zero_appearances
-        | TLocalVar (name', _) ->
-           if equal_identifier name name' then
-             path_once
-           else
-             zero_appearances
-        | _ ->
-           (* Otherwise, just count the appearances inside the expression. *)
-           c head)
-     and path_apps: appearances = merge_list (List.map (count_path_elem name) elems)
+  | TPath path_expr ->
+     let head_apps: appearances = begin
+         (* If the head of the path is a variable, check if it is the one we are
+            looking for. If it is, count that as a path appearance. *)
+         let head: identifier = path_head path_expr in
+         if equal_identifier name head then
+           path_once
+         else
+           zero_appearances
+       end
+     and tail_apps: appearances = count_path_tail name path_expr
      in
-     merge head_apps path_apps
-  | TRefPath (head, elems, _) ->
-     let head_apps: appearances =
+     merge head_apps tail_apps
+  | TRefPath path_expr ->
+     let head_apps: appearances = begin
        (* If the head of the path is a variable, check if it is the one we are
           looking for. If it is, count that as an appearance, because
           transforming a mutable reference consumes it. *)
-       (match head with
-        | TParamVar (name', _) ->
-           if equal_identifier name name' then
-             consumed_once
-           else
-             zero_appearances
-        | TLocalVar (name', _) ->
-           if equal_identifier name name' then
-             consumed_once
-           else
-             zero_appearances
-        | _ ->
-           (* Otherwise, just count the appearances inside the expression. *)
-           c head)
-     and path_apps: appearances = merge_list (List.map count_ref_path_elem elems)
+         let head: identifier = path_head path_expr in
+         if equal_identifier name head then
+           path_once
+         else
+           zero_appearances
+       end
+     and tail_apps: appearances = count_path_tail name path_expr
      in
-     merge head_apps path_apps
+     merge head_apps tail_apps
   | TEmbed (_, _, args) ->
      merge_list (List.map c args)
   | TDeref e ->
@@ -335,19 +320,12 @@ let rec count (name: identifier) (expr: texpr): appearances =
      else
        zero_appearances
 
-and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
-  match elem with
-  | TSlotAccessor _ ->
-     zero_appearances
-  | TPointerSlotAccessor _ ->
-     zero_appearances
-  | TArrayIndex (e, _) ->
-     count name e
-
-and count_ref_path_elem (elem: typed_ref_path_elem): appearances =
-  match elem with
-  | TRefSlotAccessor _ ->
-     zero_appearances
+and count_path_tail (name: identifier) (expr: typed_path_expr): appearances =
+  match expr with
+  | TPathHead _ -> zero_appearances
+  | TSlotAccessor (prev, _, _) -> count_path_tail name prev
+  | TPointerSlotAccessor (prev, _, _) -> count_path_tail name prev
+  | TArrayIndex (_, e, _) -> count name e
 
 (* Utilities *)
 
@@ -645,12 +623,12 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
             operator (e.g. `[foo(x)]`) and that wouldn't typecheck in the first
             place. If the lvalue is a variable we can assign to it however, if it's been
             consumed. *)
-         let (TypedLValue (var_name, path_elems)) = lvalue in
+         let var_name: identifier = path_head lvalue in
          let tbl: state_tbl = check_expr tbl depth expr in
          (match get_entry tbl var_name with
           | Some (_, _, state) ->
-             (match path_elems with
-              | [] ->
+             (match lvalue with
+              | TPathHead _ ->
                  (* Assigning to a variable. *)
                  (match state with
                   | Unconsumed | BorrowedRead | BorrowedWrite ->
