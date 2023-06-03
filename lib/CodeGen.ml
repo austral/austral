@@ -273,8 +273,14 @@ and gen_path (mn: module_name) (path: mtyped_path): c_expr =
      CStructAccessor (gen_path mn subpath, gen_ident name)
   | MPointerSlotAccessor (subpath, name, _) ->
      CPointerStructAccessor (gen_path mn subpath, gen_ident name)
-  | MArrayIndex (subpath, expr, _) ->
-     CIndex (gen_path mn subpath, gen_exp mn expr)
+  | MArrayIndex (subpath, expr, t) ->
+     CDeref (CCast (CFuncall ("au_index_array",
+                              [
+                                gen_path mn subpath;
+                                gen_exp mn expr;
+                                CSizeOf (gen_type t);
+                      ]),
+                    CPointer (gen_type t)))
 
 (* Statements *)
 
