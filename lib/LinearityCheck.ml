@@ -285,7 +285,7 @@ let rec count (name: identifier) (expr: texpr): appearances =
      and tail_apps: appearances = count_path_tail name path_expr
      in
      merge head_apps tail_apps
-  | TRefPath path_expr ->
+  | TRefPath (path_expr, _) ->
      let head_apps: appearances = begin
        (* If the head of the path is a variable, check if it is the one we are
           looking for. If it is, count that as an appearance, because

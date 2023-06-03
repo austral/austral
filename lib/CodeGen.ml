@@ -250,7 +250,7 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
               ], gen_type ty)
   | MPath path ->
      gen_path mn path
-  | MRefPath path ->
+  | MRefPath (path, _) ->
      CAddressOf (gen_path mn path)
   | MEmbed (ty, expr, args) ->
      CEmbed (gen_type ty, expr, List.map g args)

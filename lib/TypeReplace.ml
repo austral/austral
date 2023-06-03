@@ -88,8 +88,8 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      TUnionConstructor (ty, case_name, args)
   | TPath path ->
      TPath (replace_tyvars_path bindings path)
-  | TRefPath path ->
-     TRefPath (replace_tyvars_path bindings path)
+  | TRefPath (path, ty) ->
+     TRefPath (replace_tyvars_path bindings path, replace_variables bindings ty)
   | TEmbed (ty, fmt, args) ->
      let ty = replace_variables bindings ty
      and args = List.map (replace_tyvars_expr bindings) args in

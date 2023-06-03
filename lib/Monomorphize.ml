@@ -268,9 +268,10 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   | TPath path_expr ->
      let (path_expr, env) = monomorphize_path_expr env path_expr in
      (MPath path_expr, env)
-  | TRefPath path_expr ->
+  | TRefPath (path_expr, ty) ->
      let (path_expr, env) = monomorphize_path_expr env path_expr in
-     (MRefPath path_expr, env)
+     let (ty, env) = strip_and_mono env ty in
+     (MRefPath (path_expr, ty), env)
   | TEmbed (ty, fmt, args) ->
      let (ty, env) = strip_and_mono env ty in
      let (args, env) = monomorphize_expr_list env args in

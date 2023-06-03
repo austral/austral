@@ -87,7 +87,7 @@ and texpr =
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
   | TPath of typed_path_expr
-  | TRefPath of typed_path_expr
+  | TRefPath of typed_path_expr * ty
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty

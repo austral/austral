@@ -98,8 +98,8 @@ let rec get_type = function
      ty
   | TPath path ->
      path_type path
-  | TRefPath path ->
-     path_type path
+  | TRefPath (_, ty) ->
+     ty
   | TEmbed (ty, _, _) ->
      ty
   | TDeref e ->
@@ -134,3 +134,10 @@ let rec path_head (e: typed_path_expr): identifier =
   | TSlotAccessor (e, _, _) -> path_head e
   | TPointerSlotAccessor (e, _ ,_) -> path_head e
   | TArrayIndex (e, _, _) -> path_head e
+
+let rec path_head_ty (e: typed_path_expr): ty =
+  match e with
+  | TPathHead (_, ty) -> ty
+  | TSlotAccessor (e, _, _) -> path_head_ty e
+  | TPointerSlotAccessor (e, _ ,_) -> path_head_ty e
+  | TArrayIndex (e, _, _) -> path_head_ty e
