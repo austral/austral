@@ -665,8 +665,7 @@ and augment_path_expr (ctx: expr_ctx) (path: path_expr): typed_path_expr =
   | PointerSlotAccessor (subpath, name) ->
      augment_path_pointer_slot_accessor ctx subpath name
   | ArrayIndex (subpath, expr) ->
-     let _ = (subpath, expr) in
-     err "derp"
+     augment_path_array_index ctx subpath expr
 
 and augment_path_head (ctx: expr_ctx) (name: identifier): typed_path_expr =
   (* Get the type of the variable. *)
@@ -774,6 +773,31 @@ and augment_path_pointer_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (slo
   let bindings = match_typarams_ctx ctx typarams type_args in
   let slot_ty' = replace_variables bindings slot_ty in
   TPointerSlotAccessor (subpath, slot_name, slot_ty')
+
+and augment_path_array_index (ctx: expr_ctx) (subpath: path_expr) (idx_expr: aexpr): typed_path_expr =
+  (* The type of the subpath must be fixed array. *)
+  let subpath: typed_path_expr = augment_path_expr ctx subpath in
+  let ty: ty = path_type subpath in
+  let elem_ty: ty = begin
+      match ty with
+      | StaticArray ty ->
+         ty
+      | _ ->
+         err "Not an array"
+    end
+  in
+  (* The type of the expression must be index. *)
+  let idx_expr: texpr = augment_expr ctx None idx_expr in
+  let expr_ty: ty = get_type idx_expr in
+  let _ = begin
+      match expr_ty with
+      | Integer (Unsigned, WidthIndex) ->
+         ()
+      | _ ->
+         err "not idx type"
+    end
+  in
+  TArrayIndex (subpath, idx_expr, elem_ty)
 
 and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
   (* The typecast operator has four uses:
