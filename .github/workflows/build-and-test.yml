@@ -41,7 +41,7 @@ jobs:
         run: nix-shell --command './standard/test_bin'
 
       - name: print size of nix store
-        run: du -h /nix/store
+        run: du -s -h /nix/store
 
       - name: upload compiler binary
         uses: actions/upload-artifact@v2
