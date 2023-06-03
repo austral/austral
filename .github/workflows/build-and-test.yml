@@ -38,7 +38,7 @@ jobs:
         run: nix-shell --command 'make -C standard clean && make -C standard'
 
       - name: test the stdlib
-        run: nix-shell --command './standard./test_bin'
+        run: nix-shell --command './standard/test_bin'
 
       - name: upload compiler binary
         uses: actions/upload-artifact@v2
