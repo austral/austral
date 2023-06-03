@@ -1,11 +1,9 @@
 { nixpkgs ? import <nixpkgs> { }}:
 
 let
-  pinnedPkgs = nixpkgs.fetchFromGitHub {
-    owner  = "NixOS";
-    repo   = "nixpkgs";
-    rev    = "4d2b37a84fad1091b9de401eb450aae66f1a741e";
-    sha256 = "11w3wn2yjhaa5pv20gbfbirvjq6i3m7pqrq2msf0g7cv44vijwgw";
+  pinnedPkgs = builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/23.05.tar.gz";
+    sha256 = "10wn0l08j9lgqcw8177nh2ljrnxdrpri7bp0g7nvrsn9rkawvlbf";
   };
   pkgs = import pinnedPkgs {};
 in
