@@ -547,30 +547,7 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   | Path path ->
      TPath (augment_path_expr ctx path)
   | RefPath path ->
-     (* Augment the path as if it were a normal path. *)
-     let path = augment_path_expr ctx path in
-     let path_ty = path_type path in
-     (* Is the head a reference? Get the region. *)
-     let head_ty: ty = path_head_ty path in
-     let (read, reg): bool * ty =
-       match head_ty with
-       | ReadRef (_, reg) ->
-          (true, reg)
-       | WriteRef (_, reg) ->
-          (false, reg)
-       | _ ->
-          err "Not a reference"
-     in
-     (* Construct the path. *)
-     let ref_ty: ty =
-       if read then
-         ReadRef (path_ty, reg)
-       else
-         WriteRef (path_ty, reg)
-     in
-     (* Return *)
-     TRefPath (path, ref_ty)
-
+     augment_ref_path ctx path
   | Embed (ty, expr, args) ->
      TEmbed (
          parse_typespec ctx ty,
@@ -820,6 +797,31 @@ and augment_path_array_index (ctx: expr_ctx) (subpath: path_expr) (idx_expr: aex
     end
   in
   TArrayIndex (subpath, idx_expr, elem_ty)
+
+and augment_ref_path (ctx: expr_ctx) (path: path_expr): texpr =
+  (* Augment the path as if it were a normal path. *)
+  let path = augment_path_expr ctx path in
+  let path_ty = path_type path in
+  (* Is the head a reference? Get the region. *)
+  let head_ty: ty = path_head_ty path in
+  let (read, reg): bool * ty =
+    match head_ty with
+    | ReadRef (_, reg) ->
+       (true, reg)
+    | WriteRef (_, reg) ->
+       (false, reg)
+    | _ ->
+       err "Not a reference"
+  in
+  (* Construct the path. *)
+  let ref_ty: ty =
+    if read then
+      ReadRef (path_ty, reg)
+    else
+      WriteRef (path_ty, reg)
+  in
+  (* Return *)
+  TRefPath (path, ref_ty)
 
 and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
   (* The typecast operator has four uses:
