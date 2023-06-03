@@ -63,7 +63,7 @@ module body Standard.Test.Box is
         let e: Either[Box[Int32], Int32] := makeBox(10);
         case e of
             when Left(left: Box[Int32]) do
-                var box: Box[Int32] := left;        
+                var box: Box[Int32] := left;
                 storeFree(&!box, 20);
                 assertTrue(unbox(box) = 20, "box contents equal 20");
             when Right(right: Int32) do
@@ -77,7 +77,7 @@ module body Standard.Test.Box is
         let e: Either[Box[Int32], Int32] := makeBox(10);
         case e of
             when Left(left: Box[Int32]) do
-                var box: Box[Int32] := left;      
+                var box: Box[Int32] := left;
                 let old: Int32 := boxSwap(&!box, 20);
                 assertTrue(old = 10, "old box contents equal 10");
                 assertTrue(unbox(box) = 20, "box contents equal 20");

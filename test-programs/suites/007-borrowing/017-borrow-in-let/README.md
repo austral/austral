@@ -1,0 +1,1 @@
+Test we can borrow in a let.

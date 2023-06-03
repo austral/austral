@@ -432,7 +432,7 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
   | (     Unconsumed,         Zero,            _) -> (* Not yet consumed, and at most read through a path. *)
      tbl
   | (     Unconsumed,          One,         Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid (but owed if the loop depth doesn't match). *)
-     consume_once tbl depth name
+     consume_once tbl depth name ty
   | (     Unconsumed,          One,            _) -> (* Not yet consumed, consumed once, accessed through a path. Valid if it's a mutable reference. *)
      let _ = maybe_error_consumed_and_accessed_through_path name ty in tbl
   | (     Unconsumed,  MoreThanOne,            _) -> (* Not yet consumed, consumed more than once. *)
@@ -452,11 +452,14 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
      error_already_consumed name ty;
      tbl
 
-and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier): state_tbl =
+and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (ty: ty): state_tbl =
   let tbl: state_tbl = update_tbl tbl name Consumed in
   if depth <> get_loop_depth tbl name then
     (* Consumed inside a loop, so mark it as pending. *)
-    mark_pending tbl name
+    if universe_linear_ish (type_universe ty) then
+      mark_pending tbl name
+    else
+      tbl
   else
     (* Nothing else to do. *)
     tbl
