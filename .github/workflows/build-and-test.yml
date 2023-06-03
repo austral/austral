@@ -19,6 +19,9 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-23.05
 
+      - name: set up nix shell
+        run: nix-shell --command 'true'
+
       - name: make
         run: nix-shell --command 'make'
 
