@@ -79,12 +79,9 @@ fib(10) = 55
 
 ## Building with Nix
 
-If you have [Nix][nix], this will be much simpler. I know this sounds like yak
-shaving but Nix is actually very good and useful.
+If you have [Nix][nix], this will be much simpler. Just:
 
 [nix]: https://nixos.org/
-
-Just:
 
 ```bash
 $ nix-shell
