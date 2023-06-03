@@ -889,7 +889,6 @@ and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
 and augment_borrow_expr (ctx: expr_ctx) (mode: borrowing_mode) (name: qident): texpr =
   match get_variable (ctx_env ctx) (ctx_lexenv ctx) name with
   | Some (ty, src) ->
-     (* TODO: check if `ty` is linear? *)
      (* Check we can borrow the variable. *)
      let _ =
        match (src, mode) with
