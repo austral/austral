@@ -2,9 +2,9 @@
   "module": "Test",
   "kind": "Type Error",
   "text": [
-    { "type": "text", "content": "Cannot take a path of the type " },
+    { "type": "text", "content": "The type " },
     { "type": "type", "content": "Foo" },
-    { "type": "text", "content": " because it is not a record." }
+    { "type": "text", "content": " is not a record." }
   ],
   "span": {
     "filename": "test-programs/suites/013-ref-transforms/002-not-a-record/Test.aum",

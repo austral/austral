@@ -119,7 +119,7 @@ let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * typ
      let mod_name: module_name = module_name_from_id env mod_id in
      (mod_name, vis, typarams, slots)
   | Some _ ->
-     Errors.path_not_record ty
+     Errors.cant_find_record ty
   | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
@@ -739,19 +739,19 @@ and augment_path_pointer_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (slo
   let subpath: typed_path_expr = augment_path_expr ctx subpath in
   let ty: ty = path_type subpath in
   (* Get the name of the type. *)
-  let (type_name, type_args): qident * ty list = begin
+  let (pointed_to_type, type_name, type_args): ty * qident * ty list = begin
       match ty with
       | ReadRef (ty, _) -> begin
           match ty with
           | NamedType (name, args, _) ->
-             (name, args)
+             (ty, name, args)
           | _ ->
              Errors.cant_pointer_access_slot_not_record slot_name ty
         end
       | WriteRef (ty, _) -> begin
           match ty with
           | NamedType (name, args, _) ->
-             (name, args)
+             (ty, name, args)
           | _ ->
              Errors.cant_pointer_access_slot_not_record slot_name ty
         end
@@ -760,7 +760,7 @@ and augment_path_pointer_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (slo
     end
   in
   (* Ensure is is a record. *)
-  let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name ty in
+  let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name pointed_to_type in
   (* Ensure we can access it. *)
   let _ =
     if (vis = TypeVisPublic) || ((ctx_module_name ctx) = source_module) then

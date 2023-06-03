@@ -275,6 +275,12 @@ let no_such_slot ~type_name ~slot_name =
     Code (ident_string slot_name)
   ]
 
+let cant_find_record ty = 
+  austral_raise TypeError [
+    Text "The type ";
+    Type ty;
+    Text " is not a record."
+  ]
 let no_suitable_instance ~typeclass ~ty =
   austral_raise TypeError [
     Text "The typeclass ";
