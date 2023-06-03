@@ -235,3 +235,10 @@ and transform_whens (whens: Ast.abstract_when list): AstDB.abstract_when list =
     let body = transform_stmt body in
     AstDB.AbstractWhen (id, bindings, body)
   ) whens
+
+let transform_expr (expr: Ast.aexpr): AstDB.aexpr =
+  let (expr, acc) = lift_borrows expr [] in
+  if (List.length acc) > 0 then
+    Error.err "Borrow expressions not allowed in this context."
+  else
+    expr
