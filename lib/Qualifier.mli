@@ -8,7 +8,7 @@
 open Identifier
 open Imports
 open Cst
-open Ast
+open Stages.Ast
 
 (* Turn an identifier into a qualified identifier, given the import map. *)
 val qualify_identifier : import_map -> identifier -> qident

@@ -5,7 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  *)
 (** Type checking of expressions. *)
-open Ast
+open Stages.Ast
 open Tast
 open Type
 open Identifier

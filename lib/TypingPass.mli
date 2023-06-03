@@ -8,7 +8,7 @@
 open Identifier
 open Common
 open Env
-open Ast
+open Stages.Ast
 open Linked
 open Tast
 

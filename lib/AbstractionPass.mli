@@ -14,6 +14,7 @@
  *)
 open Imports
 open Cst
+module Ast = Stages.Ast
 open Ast
 
 val abs_stmt : import_map -> cstmt -> astmt

@@ -17,7 +17,7 @@ open RegionMap
 open Type
 open TypeSystem
 open TypeParser
-open Ast
+open Stages.Ast
 open Tast
 open TastUtil
 open TypeParameter

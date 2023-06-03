@@ -6,6 +6,7 @@
 *)
 open Imports
 open Cst
+module Ast = Stages.Ast
 open Ast
 open Escape
 open Qualifier

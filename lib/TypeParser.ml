@@ -14,7 +14,7 @@ open TypeParameters
 open TypeSystem
 open Region
 open RegionMap
-open Ast
+open Stages.Ast
 open Env
 open EnvTypes
 open Error

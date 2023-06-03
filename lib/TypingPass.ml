@@ -21,7 +21,7 @@ open LexEnv
 open Env
 open EnvTypes
 open EnvUtils
-open Ast
+open Stages.Ast
 open Tast
 open TastUtil
 open Linked

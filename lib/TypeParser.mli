@@ -10,7 +10,7 @@ open Type
 open TypeSignature
 open TypeParameters
 open RegionMap
-open Ast
+open Stages.Ast
 open Env
 
 (* Given a type's list of type parameters, its declared universe, and a list of

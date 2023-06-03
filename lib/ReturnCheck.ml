@@ -6,7 +6,7 @@
 *)
 
 open Identifier
-open Ast
+open Stages.Ast
 open Combined
 open Reporter
 open Error

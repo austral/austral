@@ -7,6 +7,7 @@
 open Identifier
 open Common
 open Imports
+module Ast = Stages.Ast
 open Ast
 open Type
 open TypeParameter

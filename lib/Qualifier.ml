@@ -8,7 +8,7 @@
 open Identifier
 open Imports
 open Cst
-open Ast
+open Stages.Ast
 
 let qualify_identifier (m: import_map) (i: identifier): qident =
   match get_symbol m i with
