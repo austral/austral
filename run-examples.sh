@@ -6,7 +6,7 @@
 
 set -euxo pipefail
 
-opam exec -- dune build
+dune build
 
 function compile() {
     ./austral compile $1/$2.aui,$1/$2.aum --entrypoint=Example.$2:main --output=testbin
