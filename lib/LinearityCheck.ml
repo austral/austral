@@ -23,6 +23,11 @@ type var_state =
   | Consumed
 [@@deriving show]
 
+let universe_linear_ish = function
+  | LinearUniverse -> true
+  | TypeUniverse -> true
+  | _ -> false
+
 type state_tbl = StateTable of (identifier * ty * loop_depth * var_state) list * identifier list
 [@@deriving show]
 
@@ -88,11 +93,14 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
        let others = List.filter (fun (n, _, _, _) -> not (equal_identifier name n)) rows in
        StateTable (others, pending)
      else
-       austral_raise LinearityError [
-           Text "Forgot to consume a linear variable: ";
-           Code (ident_string name);
-           Text "."
-         ]
+       if universe_linear_ish (type_universe ty) then
+         austral_raise LinearityError [
+             Text "Forgot to consume a linear variable: ";
+             Code (ident_string name);
+             Text "."
+           ]
+       else
+         tbl
 
 let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   match names with
@@ -312,11 +320,6 @@ let is_unconsumed (tbl: state_tbl) (name: identifier): bool =
   | Unconsumed -> true
   | _ -> false
 
-let universe_linear_ish = function
-  | LinearUniverse -> true
-  | TypeUniverse -> true
-  | _ -> false
-
 let humanize_state (state: var_state): string =
   match state with
   | Unconsumed -> "not yet consumed"
@@ -419,7 +422,8 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
   | (     Unconsumed,          One,            _) -> (* Not yet consumed, consumed once, accessed through a path. Valid if it's a mutable reference. *)
      let _ = maybe_error_consumed_and_accessed_through_path name ty in tbl
   | (     Unconsumed,  MoreThanOne,            _) -> (* Not yet consumed, consumed more than once. *)
-     error_consumed_more_than_once name
+     error_consumed_more_than_once name ty;
+     tbl
   | (   BorrowedRead,         Zero,            _) -> (* Read borrowed, and at most accessed through a path. *)
      tbl
   | (   BorrowedRead,            _,            _) -> (* Read borrowed, and either consumed, reborrowed or borrowed again. *)
@@ -431,7 +435,8 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
   | (       Consumed,         Zero,         Zero) -> (* Already consumed, and unused. *)
      tbl
   | (       Consumed,            _,            _) -> (* Already consumed, and used in some way. *)
-     error_already_consumed name
+     error_already_consumed name ty;
+     tbl
 
 and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier): state_tbl =
   let tbl: state_tbl = update_tbl tbl name Consumed in
@@ -442,12 +447,15 @@ and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier): state_
     (* Nothing else to do. *)
     tbl
 
-and error_consumed_more_than_once (name: identifier) =
-   austral_raise LinearityError [
-      Text "The variable ";
-      Code (ident_string name);
-      Text " is consumed multiple times within the same expression.";
-   ]
+and error_consumed_more_than_once (name: identifier) (ty: ty) =
+  if universe_linear_ish (type_universe ty) then
+    austral_raise LinearityError [
+        Text "The variable ";
+        Code (ident_string name);
+        Text " is consumed multiple times within the same expression.";
+      ]
+  else
+    ()
 
 and maybe_error_consumed_and_accessed_through_path (name: identifier) (ty: ty) =
    match ty with
@@ -474,12 +482,15 @@ and error_write_borrowed_and_something_else (name: identifier) =
       Text "cannot be used in any way while it is vorrowed (mutably).";
    ]
 
-and error_already_consumed (name: identifier) =
-   austral_raise LinearityError [
-      Text "The variable ";
-      Code (ident_string name);
-      Text " has already been consumed.";
-   ]
+and error_already_consumed (name: identifier) (ty: ty) =
+  if universe_linear_ish (type_universe ty) then
+    austral_raise LinearityError [
+        Text "The variable ";
+        Code (ident_string name);
+        Text " has already been consumed.";
+      ]
+  else
+    ()
 
 let check_expr (tbl: state_tbl) (depth: loop_depth) (expr: texpr): state_tbl =
   (* For each variable in the table, check if the variable is used correctly in
@@ -501,37 +512,28 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
        (fun _ ->
          (* First, check the expression. *)
          let tbl: state_tbl = check_expr tbl depth expr in
-         (* If the type is linear, add an entry to the table. *)
-         if universe_linear_ish (type_universe ty) then
-           let tbl: state_tbl = add_entry tbl name ty depth in
-           let tbl: state_tbl = check_stmt tbl depth body in
-           (* Once we leave the scope, remove the variable we added. *)
-           let tbl: state_tbl = remove_entry tbl name in
-           tbl
-         else
-           check_stmt tbl depth body)
+         (* Add an entry to the table. *)
+         let tbl: state_tbl = add_entry tbl name ty depth in
+         let tbl: state_tbl = check_stmt tbl depth body in
+         (* Once we leave the scope, remove the variable we added. *)
+         let tbl: state_tbl = remove_entry tbl name in
+         tbl)
   | TDestructure (span, _, bindings, expr, body) ->
      adorn_error_with_span span
        (fun _ ->
          (* First, check the expression. *)
          let tbl: state_tbl = check_expr tbl depth expr in
-         (* Iterate over the bidings, for each that is linear, add an entry to the
-            table. Also, keep track of the names of the linear variables. *)
+         (* Iterate over the bidings, for each, add an entry to the table. Also,
+            keep track of the names of the variables. *)
          let linear_names: identifier list =
-           List.filter_map (fun (TypedBinding { rename; ty; _ }) ->
-               if universe_linear_ish (type_universe ty) then
-                 Some rename
-               else
-                 None)
+           List.filter_map (fun (TypedBinding { rename; _ }) ->
+               Some rename)
              bindings
          in
          let tbl: state_tbl =
            Util.iter_with_context
              (fun tbl (TypedBinding { rename; ty; _ }) ->
-               if universe_linear_ish (type_universe ty) then
-                 add_entry tbl rename ty depth
-               else
-                 tbl)
+               add_entry tbl rename ty depth)
              tbl
              bindings
          in
@@ -550,17 +552,20 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          let (TypedLValue (var_name, path_elems)) = lvalue in
          let tbl: state_tbl = check_expr tbl depth expr in
          (match get_entry tbl var_name with
-          | Some (_, _, state) ->
+          | Some (ty, _, state) ->
              (match path_elems with
               | [] ->
                  (* Assigning to a variable. *)
                  (match state with
                   | Unconsumed | BorrowedRead | BorrowedWrite ->
-                     austral_raise LinearityError [
-                         Text "Cannot assign to the variable ";
-                         Code (ident_string var_name);
-                         Text " because it is not yet consumed."
-                       ]
+                     if universe_linear_ish (type_universe ty) then
+                       austral_raise LinearityError [
+                           Text "Cannot assign to the variable ";
+                           Code (ident_string var_name);
+                           Text " because it is not yet consumed."
+                         ]
+                     else
+                       tbl
                   | Consumed ->
                      let tbl: state_tbl = update_tbl tbl var_name Unconsumed in
                      if is_pending tbl var_name then
@@ -703,11 +708,14 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
                      (* Write references can be dropped implicitly. *)
                      ()
                   | _ ->
-                     austral_raise LinearityError [
-                         Text "The variable ";
-                         Code (ident_string name);
-                         Text " is not consumed by the time of the return statement. Did you forget to call a destructor, or destructure the contents?"
-             ]))
+                     if universe_linear_ish (type_universe ty) then
+                       austral_raise LinearityError [
+                           Text "The variable ";
+                           Code (ident_string name);
+                           Text " is not consumed by the time of the return statement. Did you forget to call a destructor, or destructure the contents?"
+                         ]
+                     else
+                       ()))
              (tbl_to_list tbl)
          in
          tbl)
