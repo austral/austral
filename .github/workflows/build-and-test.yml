@@ -28,8 +28,17 @@ jobs:
       - name: make test
         run: nix-shell --command 'make test'
 
-      - name: run tests
-        run: nix-shell --command 'bash run-tests.sh'
+      - name: end-to-end tests
+        run: nix-shell --command 'python test-programs/runner.py'
+
+      - name: examples
+        run: nix-shell --commmand 'bash run-examples.sh'
+
+      - name: build the stdlib
+        run: nix-shell --commmand 'make -C standard clean && make -C standard'
+
+      - name: test the stdlib
+        run: nix-shell --commmand './standard./test_bin'
 
       - name: upload compiler binary
         uses: actions/upload-artifact@v2
