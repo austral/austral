@@ -182,7 +182,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                 in
                 let var: identifier = path_head path in
                 (* Get the var type and source. *)
-                let _, source = begin
+                let var_ty, source = begin
                     match get_var lexenv var with
                     | Some (var_ty, source) ->
                        (var_ty, source)
@@ -190,6 +190,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                        Errors.unknown_name ~kind:"variable" ~name:var
                   end
                 in
+                (* Check types *)
+                let value: texpr = augment_expr module_name env rm typarams lexenv None value in
+                let _ = match_type (env, module_name) var_ty (get_type value) in
                 (* Check: can we write to this variable? *)
                 let _ = begin
                     match source with
@@ -205,7 +208,6 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                       end
                   end
                 in
-                let value: texpr = augment_expr module_name env rm typarams lexenv None value in
                 TAssign (span, path, value)
              end)
       | AIf (span, c, t, f) ->
