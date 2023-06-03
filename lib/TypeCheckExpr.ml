@@ -124,7 +124,7 @@ let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * typ
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
 let get_slot_with_name type_name slots slot_name =
-  match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
+  match List.find_opt (fun (TypedSlot (n, _)) -> equal_identifier n slot_name) slots with
   | Some s -> s
   | None ->
      Errors.no_such_slot
