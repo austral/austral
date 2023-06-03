@@ -228,6 +228,10 @@ module SmallCombined = struct
   open TypeParameters
   open Span
 
+  type qslot = Combined.qslot
+  type qcase = Combined.qcase
+  type qparam = Combined.qparam
+
   type combined_module = CombinedModule of {
         name: module_name;
         kind: module_kind;
@@ -243,16 +247,8 @@ module SmallCombined = struct
     | CRecord of span * type_vis * identifier * typarams * universe * qslot list * docstring
     | CUnion of span * type_vis * identifier * typarams * universe * qcase list * docstring
     | CFunction of span * vis * identifier * typarams * qparam list * qtypespec * astmt * docstring * pragma list
-    | CTypeclass of span * vis * identifier * type_parameter * combined_method_decl list * docstring
+    | CTypeclass of span * vis * identifier * type_parameter * Combined.combined_method_decl list * docstring
     | CInstance of span * vis * qident * typarams * qtypespec * combined_method_def list * docstring
-
-  and qslot = QualifiedSlot of identifier * qtypespec
-
-  and qcase = QualifiedCase of identifier * qslot list
-
-  and qparam = QualifiedParameter of identifier * qtypespec
-
-  and combined_method_decl = CMethodDecl of identifier * typarams * qparam list * qtypespec * docstring
 
   and combined_method_def = CMethodDef of identifier * typarams * qparam list * qtypespec * docstring * astmt
 end
