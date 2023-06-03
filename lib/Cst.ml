@@ -107,7 +107,7 @@ and cstmt =
       rename: identifier;
       region: identifier;
       body: cstmt;
-      mode: borrowing_mode
+      mode: borrow_stmt_kind
     }
   | CBlock of span * cstmt list
   | CDiscarding of span * cexpr

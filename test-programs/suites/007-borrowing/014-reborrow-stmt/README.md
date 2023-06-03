@@ -1,0 +1,1 @@
+Test that the reborrow statement works as expected.

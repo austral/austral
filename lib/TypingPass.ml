@@ -286,13 +286,13 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  (* Check we can borrow the variable. *)
                  let _ =
                    match (src, mode) with
-                   | (_, ReadBorrow) ->
+                   | (_, Read) ->
                       (* Anything can be borrowed immutably. *)
                       ()
-                   | (VarLocal Immutable, WriteBorrow) ->
+                   | (VarLocal Immutable, Write) ->
                       (* Immutable variables cannot be borrowed mutably. *)
                       Errors.cannot_borrow_immutable_var_mutably original
-                   | (VarParam, WriteBorrow) ->
+                   | (VarParam, Write) ->
                       (* Parameters cannot be borrowed mutably. *)
                       Errors.cannot_borrow_param_mutably original
                    | _ ->
@@ -304,10 +304,20 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                    let region_obj = fresh_region () in
                    let refty =
                      (match mode with
-                      | ReadBorrow ->
+                      | Read ->
                          ReadRef (orig_ty, RegionTy region_obj)
-                      | WriteBorrow ->
-                         WriteRef (orig_ty, RegionTy region_obj))
+                      | Write ->
+                         WriteRef (orig_ty, RegionTy region_obj)
+                      | Reborrow ->
+                         let pointed_ty = begin
+                             match orig_ty with
+                             | WriteRef (pointed_ty, _) ->
+                                pointed_ty
+                             | _ ->
+                                err ("Cannot reborrow something that is not a mutable reference: " ^ (type_string orig_ty))
+                           end
+                         in
+                         WriteRef (pointed_ty, RegionTy region_obj))
                    in
                    let lexenv' = push_var lexenv rename refty (VarLocal Immutable) in
                    let rm' = add_region rm region region_obj in

@@ -75,6 +75,7 @@ open Span
 %token TO
 %token BORROW
 %token MUTABLE_BORROW
+%token REBORROW_STMT
 %token IN
 %token RETURN
 %token SKIP
@@ -364,14 +365,19 @@ when_stmt:
 borrow_stmt:
   | read_borrow_stmt { $1 }
   | mutable_borrow_stmt { $1 }
+  | reborrow_stmt { $1 }
   ;
 
 read_borrow_stmt:
-  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=ReadBorrow } }
+  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=Read } }
   ;
 
 mutable_borrow_stmt:
-  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=WriteBorrow } }
+  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=Write } }
+  ;
+
+reborrow_stmt:
+  | REBORROW_STMT o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=Reborrow } }
   ;
 
 block:

@@ -50,7 +50,7 @@ module Ast = struct
         rename: identifier;
         region: identifier;
         body: astmt;
-        mode: borrowing_mode
+        mode: borrow_stmt_kind
       }
     | ABlock of span * astmt * astmt
     | ADiscarding of span * aexpr
