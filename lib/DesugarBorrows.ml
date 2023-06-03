@@ -14,7 +14,7 @@ open Span
 
 (* Lift anonymous borrows from expressions. *)
 
-type acc_rec = { original: qident; rename: qident; mode: borrowing_mode; }
+type acc_rec = { original: qident; rename: qident; mode: borrow_stmt_kind }
 type acc = acc_rec list
 
 let make_rename (original: qident): qident =
@@ -23,6 +23,11 @@ let make_rename (original: qident): qident =
   and c = local_name original in
   let c' = make_ident ((ident_string c) ^ "_tmp_ref") in
   make_qident (a, b, c')
+
+let make_mode (mode: borrowing_mode): borrow_stmt_kind =
+  match mode with
+  | ReadBorrow -> Read
+  | WriteBorrow -> Write
 
 let rec lift_borrows (expr: Ast.aexpr) (acc: acc): AstDB.aexpr * acc =
   match expr with
@@ -34,7 +39,7 @@ let rec lift_borrows (expr: Ast.aexpr) (acc: acc): AstDB.aexpr * acc =
   | Ast.Variable id -> (AstDB.Variable id, acc)
   | Ast.BorrowExpr (mode, original) ->
     let rename = make_rename original in
-    let acc_rec = { original; rename; mode } in
+    let acc_rec = { original; rename; mode=make_mode mode } in
     let renamed_expr = AstDB.Variable rename in
     (renamed_expr, acc_rec :: acc)
   | Ast.Reborrow original ->
@@ -148,16 +153,15 @@ let anonymous_region _: identifier =
   counter := !counter + 1;
   make_ident fresh_id
 
-let wrap_stmt_with_borrows (stmt: Ast.astmt) (acc: acc): Ast.astmt =
-  let wrap_with_borrows stmt acc_rec =
-    let borrow_stmt = Ast.ABorrow {
-                          span = empty_span;
-                          original = original_name acc_rec.original;
-                          rename = original_name acc_rec.rename;
-                          region = anonymous_region ();
-                          body = stmt;
-                          mode = mode;
-                        } in
-    Ast.ABlock (stmt_span stmt, borrow_stmt, acc_rec.body)
+let wrap_stmt_with_borrows (stmt: AstDB.astmt) (acc: acc): AstDB.astmt =
+  let wrap_with_borrow (stmt: AstDB.astmt) (acc_rec: acc_rec): AstDB.astmt =
+    AstDB.ABorrow {
+        span = empty_span;
+        original = original_name acc_rec.original;
+        rename = original_name acc_rec.rename;
+        region = anonymous_region ();
+        body = stmt;
+        mode = acc_rec.mode;
+      }
   in
-  List.fold_left wrap_with_borrows stmt acc
+  List.fold_left wrap_with_borrow stmt acc
