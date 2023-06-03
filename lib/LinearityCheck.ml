@@ -63,6 +63,18 @@ let add_entry (tbl: state_tbl) (name: identifier) (ty: ty) (depth: loop_depth): 
         should already have caught a duplicate variable. *)
      internal_err "An entry exists in the state table with this name."
 
+let trim_free (tbl: state_tbl): state_tbl =
+  let (StateTable (entries, pending)) = tbl in
+  let trim tuple =
+    let (_, ty, _, _) = tuple in
+    if universe_linear_ish (type_universe ty) then
+      Some tuple
+    else
+      None
+  in
+  let entries = List.filter_map trim entries in
+  StateTable (entries, pending)
+
 let update_tbl (tbl: state_tbl) (name: identifier) (state: var_state): state_tbl =
   match get_entry tbl name with
   | None ->
@@ -347,6 +359,8 @@ let partition (n: int): partitions =
 (* Table consistency *)
 
 let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
+  let a: state_tbl = trim_free a
+  and b: state_tbl = trim_free b in
   (* Tables should have the same set of variable names. *)
   let state_table_names (tbl: state_tbl): identifier list =
     let l: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list tbl) in
