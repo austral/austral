@@ -1,12 +1,15 @@
 {
   "module": "Test",
-  "kind": "Generic Error",
+  "kind": "Type Error",
   "text": [
     {
       "type": "text",
-      "content": "The head of a reference transform expression must be of a reference type, but I got "
+      "content": "Cannot access (via a reference) the slot "
     },
-    { "type": "type", "content": "Unit" }
+    { "type": "code", "content": "foo" },
+    { "type": "text", "content": " because the type " },
+    { "type": "type", "content": "Unit" },
+    { "type": "text", "content": " is not a reference to a record type." }
   ],
   "span": {
     "filename": "test-programs/suites/013-ref-transforms/001-not-a-ref/Test.aum",
