@@ -1,22 +1,27 @@
 module body Test is
-      record Other: Linear is
+      record Foo: Linear is
+          x: Bar;
+      end;
+
+      record Bar: Linear is
           y: Nat32;
       end;
 
-      record Mut: Linear is
-          x: Other;
+      function test2(bar: Bar): Unit is
+          let { y: Nat32 } := bar;
+          return nil;
       end;
 
       generic [R: Region]
-      function mangle(thing: &![Mut, R]): Unit is
-          thing->x.y := "this shouldn't work";
+      function test(ref: &[Foo, R]): Unit is
+          test2(ref->x);
           return nil;
       end;
 
       function main(): ExitCode is
-          let foo: Mut := Mut(x => Other(y => 5));
-          mangle(&!foo);
-          let { x: Other } := foo;
+          let foo: Foo := Foo(x => Bar(y => 5));
+          test(&foo);
+          let { x: Bar } := foo;
           let { y: Nat32 } := x;
           return ExitSuccess();
       end;

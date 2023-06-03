@@ -301,6 +301,24 @@ let path_not_public ~type_name ~slot_name =
     Text " and so cannot be read."
   ]
 
+let cant_access_slot_not_record slot ty =
+  austral_raise TypeError [
+      Text "Cannot access the slot ";
+      Code (ident_string slot);
+      Text " because the type ";
+      Type ty;
+      Text " is not a record type.";
+  ]
+
+let cant_pointer_access_slot_not_record slot ty =
+  austral_raise TypeError [
+      Text "Cannot access (via a reference) the slot ";
+      Code (ident_string slot);
+      Text " because the type ";
+      Type ty;
+      Text " is not a reference to a record type.";
+  ]
+
 let path_not_record ty =
   austral_raise TypeError [
     Text "Cannot take a path of the type ";

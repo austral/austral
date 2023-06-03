@@ -545,7 +545,12 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   | IfExpression (c, t, f) ->
      augment_if_expr ctx c t f
   | Path path ->
-     TPath (augment_path_expr ctx path)
+     let path = TPath (augment_path_expr ctx path) in
+     let u = type_universe (get_type path) in
+     if (u = LinearUniverse) || (u = TypeUniverse) then
+       Errors.path_not_free (get_type path)
+     else
+       path
   | RefPath path ->
      augment_ref_path ctx path
   | Embed (ty, expr, args) ->
@@ -707,7 +712,7 @@ and augment_path_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (slot_name: 
       | NamedType (name, args, _) ->
          (name, args)
       | _ ->
-         Errors.path_not_record ty
+         Errors.cant_access_slot_not_record slot_name ty
     end
   in
   (* Ensure is is a record. *)
@@ -741,17 +746,17 @@ and augment_path_pointer_slot_accessor (ctx: expr_ctx) (subpath: path_expr) (slo
           | NamedType (name, args, _) ->
              (name, args)
           | _ ->
-             Errors.path_not_record ty
+             Errors.cant_pointer_access_slot_not_record slot_name ty
         end
       | WriteRef (ty, _) -> begin
           match ty with
           | NamedType (name, args, _) ->
              (name, args)
           | _ ->
-             Errors.path_not_record ty
+             Errors.cant_pointer_access_slot_not_record slot_name ty
         end
       | _ ->
-         Errors.path_not_record ty
+         Errors.cant_pointer_access_slot_not_record slot_name ty
     end
   in
   (* Ensure is is a record. *)
@@ -787,15 +792,7 @@ and augment_path_array_index (ctx: expr_ctx) (subpath: path_expr) (idx_expr: aex
   in
   (* The type of the expression must be index. *)
   let idx_expr: texpr = augment_expr ctx None idx_expr in
-  let expr_ty: ty = get_type idx_expr in
-  let _ = begin
-      match expr_ty with
-      | Integer (Unsigned, WidthIndex) ->
-         ()
-      | _ ->
-         err "not idx type"
-    end
-  in
+  let _ = match_type_with_value_ctx ctx index_type idx_expr in
   TArrayIndex (subpath, idx_expr, elem_ty)
 
 and augment_ref_path (ctx: expr_ctx) (path: path_expr): texpr =

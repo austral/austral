@@ -25,4 +25,6 @@ val make_ctx : module_name -> env -> region_map -> typarams -> lexenv -> expr_ct
     expressions. *)
 val augment_expr : expr_ctx -> ty option -> aexpr -> texpr
 
+val augment_path_expr : expr_ctx -> path_expr -> typed_path_expr
+
 val cast_arguments : type_bindings -> value_parameter list -> texpr list -> texpr list

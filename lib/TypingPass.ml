@@ -173,11 +173,41 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                    Errors.destructure_not_public rec_ty
               | _ ->
                  Errors.destructure_non_record rec_ty))
-      | AAssign (span, path, value) ->
+      | AAssign (span, LValue path, value) ->
          adorn_error_with_span span
-           (fun _ ->
-             let _ = (path, value) in
-             internal_err "TODO")
+           (fun _ -> begin
+                let path: typed_path_expr =
+                  let ctx: TypeCheckExpr.expr_ctx = TypeCheckExpr.make_ctx module_name env rm typarams lexenv in
+                  TypeCheckExpr.augment_path_expr ctx path
+                in
+                let var: identifier = path_head path in
+                (* Get the var type and source. *)
+                let _, source = begin
+                    match get_var lexenv var with
+                    | Some (var_ty, source) ->
+                       (var_ty, source)
+                    | None ->
+                       Errors.unknown_name ~kind:"variable" ~name:var
+                  end
+                in
+                (* Check: can we write to this variable? *)
+                let _ = begin
+                    match source with
+                    (* All good. *)
+                    | VarLocal mut ->
+                       (match mut with
+                        | Mutable -> ()
+                        | Immutable -> Errors.cant_assign_to_immutable_var var)
+                    | VarConstant ->
+                       Errors.cannot_assign_to_constant ()
+                    | VarParam -> begin
+                        Errors.cannot_assign_to_parameter ()
+                      end
+                  end
+                in
+                let value: texpr = augment_expr module_name env rm typarams lexenv None value in
+                TAssign (span, path, value)
+             end)
       | AIf (span, c, t, f) ->
          adorn_error_with_span span
            (fun _ ->
