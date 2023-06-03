@@ -68,6 +68,6 @@ jobs:
       - name: assert executable does not exist
         run: test ! -f austral
 
-      - name: save nix store tp cacje
+      - name: save nix store to cache
         if: "steps.nix-cache.outputs.cache-hit != 'true'"
         run: "nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nixcache"
