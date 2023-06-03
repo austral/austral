@@ -9,7 +9,7 @@
 open Identifier
 open Imports
 open Cst
-open Combined
+open Stages.Combined
 open Env
 
 (** Given an interface declaration, and a body declaration, return the combined

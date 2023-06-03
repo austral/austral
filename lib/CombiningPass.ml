@@ -12,7 +12,7 @@ open TypeParameters
 open AbstractionPass
 open Cst
 open CstUtil
-open Combined
+open Stages.Combined
 open Env
 open ImportResolution
 open Reporter

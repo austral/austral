@@ -7,7 +7,7 @@
 
 open Identifier
 open Stages.Ast
-open Combined
+open Stages.Combined
 open Reporter
 open Error
 open Span

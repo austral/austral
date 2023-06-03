@@ -21,7 +21,7 @@ open Cst
 open CstUtil
 open Tast
 open Error
-open Combined
+open Stages.Combined
 open Linked
 open Mtast
 open Monomorphize

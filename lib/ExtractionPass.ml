@@ -9,7 +9,7 @@ open ModuleNameSet
 open Common
 open Type
 open TypeSystem
-open Combined
+open Stages.Combined
 open Linked
 module Ast = Stages.Ast
 open Ast
