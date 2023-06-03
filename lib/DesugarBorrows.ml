@@ -5,8 +5,6 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
-(** Desugar anonymous borrows. *)
-
 open Stages
 open Identifier
 open Common
