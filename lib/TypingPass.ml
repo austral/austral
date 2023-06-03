@@ -299,42 +299,38 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                       (* And anything else is fine. *)
                       ()
                  in
-                 let u = type_universe orig_ty in
-                 if ((u = LinearUniverse) || (u = TypeUniverse)) then
-                   let region_obj = fresh_region () in
-                   let refty =
-                     (match mode with
-                      | Read ->
-                         ReadRef (orig_ty, RegionTy region_obj)
-                      | Write ->
-                         WriteRef (orig_ty, RegionTy region_obj)
-                      | Reborrow ->
-                         let pointed_ty = begin
-                             match orig_ty with
-                             | WriteRef (pointed_ty, _) ->
-                                pointed_ty
-                             | _ ->
-                                err ("Cannot reborrow something that is not a mutable reference: " ^ (type_string orig_ty))
-                           end
-                         in
-                         WriteRef (pointed_ty, RegionTy region_obj))
-                   in
-                   let lexenv' = push_var lexenv rename refty (VarLocal Immutable) in
-                   let rm' = add_region rm region region_obj in
-                   let ctx' = update_lexenv ctx lexenv' in
-                   let ctx''= update_rm ctx' rm' in
-                   TBorrow {
-                       span=span;
-                       original=original;
-                       rename=rename;
-                       region=region;
-                       orig_type=orig_ty;
-                       ref_type=refty;
-                       body=augment_stmt ctx'' body;
-                       mode=mode
-                     }
-                 else
-                   Errors.borrow_non_linear orig_ty
+                 let region_obj = fresh_region () in
+                 let refty =
+                   (match mode with
+                    | Read ->
+                       ReadRef (orig_ty, RegionTy region_obj)
+                    | Write ->
+                       WriteRef (orig_ty, RegionTy region_obj)
+                    | Reborrow ->
+                       let pointed_ty = begin
+                           match orig_ty with
+                           | WriteRef (pointed_ty, _) ->
+                              pointed_ty
+                           | _ ->
+                              err ("Cannot reborrow something that is not a mutable reference: " ^ (type_string orig_ty))
+                         end
+                       in
+                       WriteRef (pointed_ty, RegionTy region_obj))
+                 in
+                 let lexenv' = push_var lexenv rename refty (VarLocal Immutable) in
+                 let rm' = add_region rm region region_obj in
+                 let ctx' = update_lexenv ctx lexenv' in
+                 let ctx''= update_rm ctx' rm' in
+                 TBorrow {
+                     span=span;
+                     original=original;
+                     rename=rename;
+                     region=region;
+                     orig_type=orig_ty;
+                     ref_type=refty;
+                     body=augment_stmt ctx'' body;
+                     mode=mode
+                   }
               | None ->
                  Errors.unknown_name ~kind:"variable" ~name:original))
       | ABlock (span, f, r) ->
