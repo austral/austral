@@ -14,14 +14,15 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
 
+      - name: get cache key
+        id: cache-key
+        run: echo "cache-key=$(sha256sum shell.nix | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
+
       - uses: cachix/install-nix-action@v20
         name: install nix
         with:
           nix_path: nixpkgs=channel:nixos-23.05
 
-      - name: get cache key
-        id: cache-key
-        run: echo "cache-key=$(sha256sum shell.nix | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
 
       - name: restore nix store from cache
         uses: actions/cache@v3
