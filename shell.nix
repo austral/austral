@@ -10,8 +10,9 @@ in
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    # Libraries
+    # General
     gmp
+    python311
 
     # Tooling
     ocamlPackages.ocaml
