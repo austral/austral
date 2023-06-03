@@ -260,10 +260,6 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CCast (g e, gen_type ty)
   | MSizeOf ty ->
      CSizeOf (gen_type ty)
-  | MBorrowExpr (_, name, _, _) ->
-     CAddressOf (CVar (gen_ident name))
-  | MReborrow (name, _, _) ->
-     CVar (gen_ident name)
 
 and gen_path (mn: module_name) (expr: c_expr) (elems: mtyped_path_elem list): c_expr =
   match elems with
@@ -312,13 +308,13 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
   match stmt with
   | MSkip ->
      CBlock []
-  | MLet (n, t, v, b) ->
-     let l = CLet (gen_ident n, gen_type t, ge v) in
+  | MLet (n, t, b) ->
+     let l = CLet (gen_ident n, gen_type t, None) in
      CBlock [l; gs b]
   | MDestructure (bs, e, b) ->
      let tmp = new_variable () in
-     let vardecl = CLet (tmp, gen_type (get_type e), ge e)
-     and bs' = List.map (fun (MonoBinding { name; ty; rename; }) -> CLet (gen_ident rename, gen_type ty, CStructAccessor (CVar tmp, gen_ident name))) bs
+     let vardecl = CLet (tmp, gen_type (get_type e), Some (ge e))
+     and bs' = List.map (fun (MonoBinding { name; ty; rename; }) -> CLet (gen_ident rename, gen_type ty, Some (CStructAccessor (CVar tmp, gen_ident name)))) bs
      and b' = gs b
      in
      CBlock (List.concat [[vardecl]; bs'; [b']])
@@ -332,7 +328,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
      CExplicitBlock [
-         CLet (gen_ident v, CNamedType "size_t", ge i);
+         CLet (gen_ident v, CNamedType "size_t", Some (ge i));
          CFor (gen_ident v, ge f, gs b)
        ]
   | MBorrow { original; rename; orig_type; body; mode; _ } ->
@@ -344,7 +340,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
            false)
      in
      if is_pointer then
-       let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
+       let l = CLet (gen_ident rename, gen_type orig_type, Some (CVar (gen_ident original))) in
        CBlock [l; gs body]
      else
        let e = begin
@@ -367,7 +363,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
               gen_type orig_type
          end
        in
-       let l = CLet (gen_ident rename, ty, e) in
+       let l = CLet (gen_ident rename, ty, Some e) in
        CBlock [l; gs body]
   | MBlock (a, b) ->
      CBlock [gs a; gs b]
@@ -396,7 +392,7 @@ and gen_case (mn: module_name) (e: mexpr) (whens: mtyped_when list) (case_ref: c
   in
   let switch = CSwitch (accessor, cases) in
   CBlock [
-      CLet (var, gen_type ty, gen_exp mn e);
+      CLet (var, gen_type ty, Some (gen_exp mn e));
       switch
     ]
 
@@ -419,7 +415,7 @@ and when_to_case (mn: module_name) (ty: mono_ty) (var: string) (case_ref: case_r
       | CaseRef ->
          CPointer (gen_type ty)
     in
-    CLet (gen_ident rename, ty, get_binding name)
+    CLet (gen_ident rename, ty, Some (get_binding name))
   in
   let bindings' = List.map f bindings in
   let body'' = CExplicitBlock (List.append bindings' [gen_stmt mn body]) in

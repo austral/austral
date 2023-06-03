@@ -17,7 +17,7 @@ open RegionMap
 open Type
 open TypeSystem
 open TypeParser
-open Stages.Ast
+open Stages.AstDB
 open Tast
 open TastUtil
 open TypeParameter
@@ -570,10 +570,6 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      augment_typecast ctx expr ty
   | SizeOf ty ->
      TSizeOf (parse_typespec ctx ty)
-  | BorrowExpr (mode, name) ->
-     augment_borrow_expr ctx mode name
-  | Reborrow name ->
-     augment_reborrow ctx name
 
 (* Type Checking: Internals *)
 
@@ -923,67 +919,6 @@ and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
              Errors.cast_invalid
                ~target:target_type
                ~source:(get_type expr')))
-
-and augment_borrow_expr (ctx: expr_ctx) (mode: borrowing_mode) (name: qident): texpr =
-  match get_variable (ctx_env ctx) (ctx_lexenv ctx) name with
-  | Some (ty, src) ->
-     (* TODO: check if `ty` is linear? *)
-     (* Check we can borrow the variable. *)
-     let _ =
-       match (src, mode) with
-       | (_, ReadBorrow) ->
-          (* Anything can be borrowed immutably. *)
-          ()
-       | (VarLocal Immutable, WriteBorrow) ->
-          (* Immutable variables cannot be borrowed mutably. *)
-          Errors.cannot_borrow_immutable_var_mutably (local_name name)
-       | (VarParam, WriteBorrow) ->
-          (* Parameters cannot be borrowed mutably. *)
-          Errors.cannot_borrow_param_mutably (local_name name)
-       | _ ->
-          (* And anything else is fine. *)
-          ()
-     in
-     let name: identifier = original_name name
-     and reg: region = fresh_region ()
-     in
-     TBorrowExpr (mode, name, reg, ty)
-  | None ->
-     Errors.unknown_name
-       ~kind:"variable"
-       ~name:(original_name name)
-
-and augment_reborrow (ctx: expr_ctx) (name: qident): texpr =
-  (* Find the variable's type and source. *)
-  let (ty, src): ty * var_source =
-    (match get_variable (ctx_env ctx) (ctx_lexenv ctx) name with
-     | Some (ty, src) ->
-        (ty, src)
-     | None ->
-        Errors.unknown_name
-          ~kind:"variable"
-          ~name:(original_name name))
-  in
-  (* Check it's either a local variable or a function parameter. *)
-  let _ =
-    (match src with
-     | VarParam -> ()
-     | VarLocal _ -> ()
-     | VarConstant ->
-        Errors.reborrow_constant ())
-  in
-  (* Check the type is a mutable reference, get the pointed-to type. *)
-  let pointed_to: ty =
-    (match ty with
-     | WriteRef (ty, _) ->
-        ty
-     | _ ->
-        Errors.reborrow_wrong_type ty)
-  in
-  (* Create a fresh region. *)
-  let reg: region = fresh_region () in
-  (* Construct the expression. *)
-  TReborrow (original_name name, pointed_to, reg)
 
 and augment_arglist (ctx: expr_ctx) (args: abstract_arglist): typed_arglist =
   match args with

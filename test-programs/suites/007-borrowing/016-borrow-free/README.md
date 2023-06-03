@@ -1,0 +1,1 @@
+Test we can borrow free types.

@@ -54,7 +54,7 @@ and c_path_elem =
   | CPathPointer of string
 
 type c_stmt =
-  | CLet of string * c_ty * c_expr
+  | CLet of string * c_ty * c_expr option
   | CAssign of c_expr * c_expr
   | CDiscarding of c_expr
   | CIf of c_expr * c_stmt * c_stmt

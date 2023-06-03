@@ -311,17 +311,23 @@ let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
      (match expr with
       | TIntConstant value ->
          match_int_type_with_value signedness width value
+      | TCast (TIntConstant value, _) ->
+         match_int_type_with_value signedness width value
       | _ ->
          match_type ctx ty (get_type expr))
   | SingleFloat ->
      (match expr with
       | TFloatConstant _ ->
          empty_bindings
+      | TCast (TFloatConstant _, _) ->
+         empty_bindings
       | _ ->
          match_type ctx ty (get_type expr))
   | DoubleFloat ->
      (match expr with
       | TFloatConstant _ ->
+         empty_bindings
+      | TCast (TFloatConstant _, _) ->
          empty_bindings
       | _ ->
          match_type ctx ty (get_type expr))

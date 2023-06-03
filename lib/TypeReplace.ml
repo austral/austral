@@ -106,12 +106,6 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
   | TSizeOf ty ->
      let ty = replace_variables bindings ty in
      TSizeOf ty
-  | TBorrowExpr (mode, name, region, ty) ->
-     let ty = replace_variables bindings ty in
-     TBorrowExpr (mode, name, region, ty)
-  | TReborrow (name, ty, region) ->
-     let ty = replace_variables bindings ty in
-     TReborrow (name, ty, region)
 
 and replace_tyvars_path (bindings: type_bindings) (elem: typed_path_elem): typed_path_elem =
   match elem with
@@ -136,20 +130,19 @@ let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
   match stmt with
   | TSkip span ->
      TSkip span
-  | TLet (span, mut, name, ty, value, body) ->
+  | TLet (span, mut, name, ty, body) ->
      let ty = replace_variables bindings ty
-     and value = replace_tyvars_expr bindings value
      and body = replace_tyvars_stmt bindings body in
-     TLet (span, mut, name, ty, value, body)
+     TLet (span, mut, name, ty, body)
   | TDestructure (span, mut, bs, value, body) ->
      let bs = List.map (fun (TypedBinding { name; ty; rename; }) -> TypedBinding { name; ty = replace_variables bindings ty; rename = rename; }) bs
      and value = replace_tyvars_expr bindings value
      and body = replace_tyvars_stmt bindings body in
      TDestructure (span, mut, bs, value, body)
-  | TAssign (span, lvalue, value) ->
+  | TAssign (span, lvalue, value, first) ->
      let lvalue = replace_tyvars_lvalue bindings lvalue
      and value = replace_tyvars_expr bindings value in
-     TAssign (span, lvalue, value)
+     TAssign (span, lvalue, value, first)
   | TIf (span, c, t, f) ->
      let c = replace_tyvars_expr bindings c
      and t = replace_tyvars_stmt bindings t

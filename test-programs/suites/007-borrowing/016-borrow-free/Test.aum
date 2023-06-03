@@ -1,0 +1,9 @@
+module body Test is
+    function main(): ExitCode is
+        let foo: Unit := nil;
+        borrow foo as fooref in R do
+            skip;
+        end;
+        return ExitSuccess();
+    end;
+end module body.

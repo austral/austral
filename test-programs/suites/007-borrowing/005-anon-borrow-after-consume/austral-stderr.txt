@@ -2,20 +2,16 @@
   "module": "Test",
   "kind": "Linearity Error",
   "text": [
-    { "type": "text", "content": "The variable " },
+    { "type": "text", "content": "Cannot borrow the variable " },
     { "type": "code", "content": "foo" },
-    { "type": "text", "content": " has already been consumed." }
+    { "type": "text", "content": " because it is already " },
+    { "type": "text", "content": "consumed" },
+    { "type": "text", "content": "." }
   ],
   "span": {
-    "filename": "test-programs/suites/007-borrowing/005-anon-borrow-after-consume/Test.aum",
-    "startp": { "line": 12, "column": 8 },
-    "end[": { "line": 12, "column": 13 }
+    "filename": "",
+    "startp": { "line": 0, "column": 0 },
+    "end[": { "line": 0, "column": 0 }
   },
-  "context": [
-    [ 10, "        let { bar: Nat8 } := foo;" ],
-    [ 11, "        -- Try to borrow it." ],
-    [ 12, "        &foo;" ],
-    [ 13, "        return ExitSuccess();" ],
-    [ 14, "    end;" ]
-  ]
+  "context": null
 }

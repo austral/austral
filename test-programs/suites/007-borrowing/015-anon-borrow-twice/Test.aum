@@ -1,0 +1,22 @@
+module body Test is
+    record Foo: Linear is
+        bar: Nat8;
+    end;
+
+    generic [R1: Region, R2: Region]
+    function Accept_Ref(a: &[Foo, R1], b: &[Foo, R2]): Unit is
+        printLn(a->bar);
+        printLn(b->bar);
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        -- Create a linear record.
+        let foo: Foo := Foo(bar => 'a');
+        -- Anonymously borrow it.
+        Accept_Ref(&foo, &foo);
+        -- Consume it by destructuring.
+        let { bar: Nat8 } := foo;
+        return ExitSuccess();
+    end;
+end module body.

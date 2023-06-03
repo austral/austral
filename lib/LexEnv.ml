@@ -25,7 +25,7 @@ let get_var (l: lexenv) (name: identifier): (ty * var_source) option =
 let push_var l name ty source =
   match get_var l name with
   | (Some _) ->
-     err "push_var: var with this name already exists"
+     err ("push_var: var with the name " ^ (ident_string name) ^ " already exists")
   | None ->
      (name, ty, source) :: l
 

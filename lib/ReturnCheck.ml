@@ -7,7 +7,7 @@
 
 open Identifier
 open Stages.Ast
-open Combined
+open Stages.Combined
 open Reporter
 open Error
 open Span
@@ -34,7 +34,7 @@ let rec ends_in_return (stmt: astmt): bool =
   match stmt with
   | ASkip _ ->
      false
-  | ALet (_, _, _, _, _, body) ->
+  | ALet (_, _, _, _, body) ->
      ends_in_return body
   | ADestructure (_, _, _, _, body) ->
      ends_in_return body

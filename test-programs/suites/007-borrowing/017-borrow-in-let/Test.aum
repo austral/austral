@@ -1,0 +1,18 @@
+module body Test is
+    record Foo: Linear is
+        value: Int32;
+    end;
+
+    generic [R: Region]
+    function test(ref: &[Foo, R]): Int32 is
+        return ref->value;
+    end;
+
+    function main(): ExitCode is
+        let foo: Foo := Foo(value => 10);
+        let fv: Int32 := test(&foo);
+        printLn(fv);
+        let { value: Int32 } := foo;
+        return ExitSuccess();
+    end;
+end module body.

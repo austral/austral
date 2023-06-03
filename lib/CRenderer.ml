@@ -106,9 +106,15 @@ and render_linkage = function
 
 and render_stmt (i: indentation) (stmt: c_stmt): line list =
   match stmt with
-  | CLet (name, ty, value) ->
-     let s = (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";" in
-     [Line (i, s)]
+  | CLet (name, ty, value) -> begin
+      match value with
+      | (Some value) ->
+         let s = (render_type ty) ^ " " ^ name ^ " = " ^ (e value) ^ ";" in
+         [Line (i, s)]
+      | None ->
+         let s = (render_type ty) ^ " " ^ name ^ ";" in
+         [Line (i, s)]
+     end
   | CAssign (lvalue, value) ->
      let s = (e lvalue) ^ " = " ^ (e value) ^ ";" in
      [Line (i, s)]

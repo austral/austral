@@ -21,7 +21,7 @@ open LexEnv
 open Env
 open EnvTypes
 open EnvUtils
-open Stages.Ast
+open Stages.AstDB
 open Tast
 open TastUtil
 open Linked
@@ -121,27 +121,21 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       match stmt with
       | ASkip span ->
          TSkip span
-      | ALet (span, mut, name, ty, value, body) ->
+      | ALet (span, mut, name, ty, body) ->
          pi ("Name", name);
          adorn_error_with_span span
            (fun _ ->
              let _ = check_var_doesnt_collide_with_decl ctx name in
-             let expected_ty = parse_typespec env rm typarams ty in
-             pt ("Expected type", expected_ty);
-             let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
-             let bindings = match_type_with_value (env, module_name) expected_ty value' in
-             ps ("Bindings", show_bindings bindings);
-             let ty = replace_variables bindings expected_ty in
+             let ty = parse_typespec env rm typarams ty in
              pt ("Type", ty);
-             pt ("Value type", get_type value');
              let lexenv' = push_var lexenv name ty (VarLocal mut) in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
-             TLet (span, mut, name, ty, value', body'))
+             TLet (span, mut, name, ty, body'))
       | ADestructure (span, mut, bindings, value, body) ->
          adorn_error_with_span span
            (fun _ ->
              let _ =
-               List.map (fun (QBinding { rename; _ }) -> check_var_doesnt_collide_with_decl ctx rename) bindings
+               List.map (fun (Stages.Ast.QBinding { rename; _ }) -> check_var_doesnt_collide_with_decl ctx rename) bindings
              in
              let value' = augment_expr module_name env rm typarams lexenv None value in
              (* Check: the value must be a public record type *)
@@ -158,7 +152,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let typebindings = match_type (env, module_name) orig_type rec_ty in
                  if (vis = TypeVisPublic) || (module_name = source_module) then
                    (* Find the set of slot names and the set of binding names, and compare them *)
-                   let binding_names = List.map (fun (QBinding { name; _}) -> name) bindings
+                   let binding_names = List.map (fun (Stages.Ast.QBinding { name; _}) -> name) bindings
                    and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
                    if ident_set_eq binding_names slot_names then
                      let bindings': (identifier * qtypespec * ty * identifier) list =
@@ -188,44 +182,47 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                    Errors.destructure_not_public rec_ty
               | _ ->
                  Errors.destructure_non_record rec_ty))
-      | AAssign (span, LValue (var, elems), value) ->
+      | AAssign (span, LValue (var, elems), value, first) ->
          adorn_error_with_span span
            (fun _ ->
              (match get_var lexenv var with
               | Some (var_ty, source) ->
                  (* Check: can we write to this variable? *)
                  let _ =
-                   match source with
-                   (* All good. *)
-                   | VarLocal mut ->
-                      (match mut with
-                       | Mutable -> ()
-                       | Immutable -> Errors.cant_assign_to_immutable_var var)
-                   | VarConstant ->
-                      Errors.cannot_assign_to_constant ()
-                   | VarParam ->
-                      (* We can only assign to a parameter if we're going through a reference at some point. *)
-                      (match elems with
-                       | [] ->    Errors.cannot_assign_to_parameter ()
-                       | elems ->
-                          if goes_through_parameter elems then
-                            ()
-                          else
-                            Errors.cannot_assign_to_parameter ())
+                   if first then
+                     ()
+                   else
+                     match source with
+                     (* All good. *)
+                     | VarLocal mut ->
+                        (match mut with
+                        | Mutable -> ()
+                        | Immutable -> Errors.cant_assign_to_immutable_var var)
+                     | VarConstant ->
+                        Errors.cannot_assign_to_constant ()
+                     | VarParam ->
+                        (* We can only assign to a parameter if we're going through a reference at some point. *)
+                        (match elems with
+                        | [] ->    Errors.cannot_assign_to_parameter ()
+                        | elems ->
+                           if goes_through_parameter elems then
+                              ()
+                           else
+                              Errors.cannot_assign_to_parameter ())
                  in
                  (match elems with
                   | [] ->
                      (* Assigning to a variable. *)
                      let value = augment_expr module_name env rm typarams lexenv None value in
                      let _ = match_type_with_value (env, module_name) var_ty value in
-                     TAssign (span, TypedLValue (var, []), value)
+                     TAssign (span, TypedLValue (var, []), value, first)
                   | elems ->
                      (* Assigning to a path. *)
                      let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
                      let value = augment_expr module_name env rm typarams lexenv None value in
                      let ty = get_path_ty_from_elems elems in
                      let _ = match_type_with_value (env, module_name) ty value in
-                     TAssign (span, TypedLValue (var, elems), value))
+                     TAssign (span, TypedLValue (var, elems), value, first))
               | None ->
                  Errors.unknown_name ~kind:"variable" ~name:var))
       | AIf (span, c, t, f) ->
@@ -299,42 +296,38 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                       (* And anything else is fine. *)
                       ()
                  in
-                 let u = type_universe orig_ty in
-                 if ((u = LinearUniverse) || (u = TypeUniverse)) then
-                   let region_obj = fresh_region () in
-                   let refty =
-                     (match mode with
-                      | Read ->
-                         ReadRef (orig_ty, RegionTy region_obj)
-                      | Write ->
-                         WriteRef (orig_ty, RegionTy region_obj)
-                      | Reborrow ->
-                         let pointed_ty = begin
-                             match orig_ty with
-                             | WriteRef (pointed_ty, _) ->
-                                pointed_ty
-                             | _ ->
-                                err ("Cannot reborrow something that is not a mutable reference: " ^ (type_string orig_ty))
-                           end
-                         in
-                         WriteRef (pointed_ty, RegionTy region_obj))
-                   in
-                   let lexenv' = push_var lexenv rename refty (VarLocal Immutable) in
-                   let rm' = add_region rm region region_obj in
-                   let ctx' = update_lexenv ctx lexenv' in
-                   let ctx''= update_rm ctx' rm' in
-                   TBorrow {
-                       span=span;
-                       original=original;
-                       rename=rename;
-                       region=region;
-                       orig_type=orig_ty;
-                       ref_type=refty;
-                       body=augment_stmt ctx'' body;
-                       mode=mode
-                     }
-                 else
-                   Errors.borrow_non_linear orig_ty
+                 let region_obj = fresh_region () in
+                 let refty =
+                   (match mode with
+                    | Read ->
+                       ReadRef (orig_ty, RegionTy region_obj)
+                    | Write ->
+                       WriteRef (orig_ty, RegionTy region_obj)
+                    | Reborrow ->
+                       let pointed_ty = begin
+                           match orig_ty with
+                           | WriteRef (pointed_ty, _) ->
+                              pointed_ty
+                           | _ ->
+                              err ("Cannot reborrow something that is not a mutable reference: " ^ (type_string orig_ty))
+                         end
+                       in
+                       WriteRef (pointed_ty, RegionTy region_obj))
+                 in
+                 let lexenv' = push_var lexenv rename refty (VarLocal Immutable) in
+                 let rm' = add_region rm region region_obj in
+                 let ctx' = update_lexenv ctx lexenv' in
+                 let ctx''= update_rm ctx' rm' in
+                 TBorrow {
+                     span=span;
+                     original=original;
+                     rename=rename;
+                     region=region;
+                     orig_type=orig_ty;
+                     ref_type=refty;
+                     body=augment_stmt ctx'' body;
+                     mode=mode
+                   }
               | None ->
                  Errors.unknown_name ~kind:"variable" ~name:original))
       | ABlock (span, f, r) ->
@@ -473,7 +466,7 @@ and group_cases_whens (cases: decl list) (whens: abstract_when list): (typed_cas
 
 and group_bindings_slots (bindings: qbinding list) (slots: typed_slot list): (identifier * qtypespec * ty * identifier) list =
   let f (binding: qbinding): (identifier * qtypespec * ty * identifier) =
-    let QBinding { name; ty; rename; } = binding in
+    let Stages.Ast.QBinding { name; ty; rename; } = binding in
     let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> equal_identifier name n') slots in
     (name, ty, ty', rename)
   in
@@ -487,7 +480,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
       and (TypedCase (_, slots)) = c in
       pi ("Case name", name);
       (* Check the set of binding names is the same as the set of slots *)
-      let binding_names = List.map (fun (QBinding { name; _ }) -> name) bindings
+      let binding_names = List.map (fun (Stages.Ast.QBinding { name; _ }) -> name) bindings
       and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
       if ident_set_eq binding_names slot_names then
         (* Check the type of each binding matches the type of the slot *)
@@ -590,10 +583,6 @@ and is_constant = function
      false
   | TSizeOf _ ->
      true
-  | TBorrowExpr _ ->
-     false
-  | TReborrow _ ->
-     false
 
 and is_path_elem_constant = function
   | TSlotAccessor _ ->

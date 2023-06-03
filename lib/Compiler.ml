@@ -21,7 +21,7 @@ open Cst
 open CstUtil
 open Tast
 open Error
-open Combined
+open Stages
 open Linked
 open Mtast
 open Monomorphize
@@ -65,7 +65,7 @@ type module_source =
       body_code: string
     }
 
-let parse_and_combine (env: env) (source: module_source): (env * module_name * combined_module * file_id option * file_id) =
+let parse_and_combine (env: env) (source: module_source): (env * module_name * Combined.combined_module * file_id option * file_id) =
   match source with
   | TwoFileModuleSource { int_filename; int_code; body_filename; body_code } ->
      let (env, int_file_id) = add_file env { path = int_filename; contents = int_code } in
@@ -77,7 +77,7 @@ let parse_and_combine (env: env) (source: module_source): (env * module_name * c
          let cb: concrete_module_body = parse_module_body body_code body_filename in
          let ci: concrete_module_interface = append_import_to_interface ci pervasive_imports
          and cb: concrete_module_body = append_import_to_body cb pervasive_imports in
-         let combined: combined_module = combine env ci cb in
+         let combined: Combined.combined_module = combine env ci cb in
          (env, name, combined, Some int_file_id, body_file_id))
   | BodyModuleSource { body_filename; body_code } ->
      let (env, body_file_id) = add_file env { path = body_filename; contents = body_code } in
@@ -86,7 +86,7 @@ let parse_and_combine (env: env) (source: module_source): (env * module_name * c
      adorn_error_with_module_name name
        (fun _ ->
          let cb: concrete_module_body = append_import_to_body cb pervasive_imports in
-         let combined: combined_module = body_as_combined env cb in
+         let combined: Combined.combined_module = body_as_combined env cb in
          (env, name, combined, None, body_file_id))
 
 let rec compile_mod (c: compiler) (source: module_source): compiler =
@@ -95,17 +95,18 @@ let rec compile_mod (c: compiler) (source: module_source): compiler =
       let env: env = cenv c in
       let (env, name, combined, int_file_id, body_file_id) = parse_and_combine env source in
       adorn_error_with_module_name name
-       (fun _ ->
-         let _ = check_ends_in_return combined in
-         let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
-         let typed: typed_module = augment_module env linked in
-         let _ = check_module_linearity typed in
-         let env: env = extract_bodies env typed in
-         let (env, mono): (env * mono_module) = monomorphize env typed in
-         let unit: c_unit = gen_module env mono in
-         let unit_code: string = render_unit unit in
-         let code: string = (compiler_code c) ^ "\n" ^ unit_code in
-         Compiler (env, code)))
+        (fun _ ->
+          let _ = check_ends_in_return combined in
+          let combined: SmallCombined.combined_module = DesugaringPass.desugar combined in
+          let (env, linked): (env * linked_module) = extract env combined int_file_id body_file_id in
+          let typed: typed_module = augment_module env linked in
+          let _ = check_module_linearity typed in
+          let env: env = extract_bodies env typed in
+          let (env, mono): (env * mono_module) = monomorphize env typed in
+          let unit: c_unit = gen_module env mono in
+          let unit_code: string = render_unit unit in
+          let code: string = (compiler_code c) ^ "\n" ^ unit_code in
+          Compiler (env, code)))
 
 let rec compile_multiple c modules =
   match modules with

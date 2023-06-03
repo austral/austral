@@ -1,21 +1,26 @@
 module body Test is
-    typeclass PrintViaRef(T: Free) is
+    record Foo: Linear is
+        foo: Nat8;
+    end;
+
+    typeclass PrintViaRef(T: Type) is
         generic [R: Region]
         method printRef(ref: &[T, R]): Unit;
     end;
 
-    instance PrintViaRef(Nat8) is
+    instance PrintViaRef(Foo) is
         generic [R: Region]
-        method printRef(ref: &[Nat8, R]): Unit is
+        method printRef(ref: &[Foo, R]): Unit is
             print("Ref = ");
-            printLn(!ref);
+            printLn(ref->foo);
             return nil;
         end;
     end;
 
     function main(): ExitCode is
-        let n: Nat8 := 10;
-        printRef(&n);
+        let f: Foo := Foo(foo => 10);
+        printRef(&f);
+        let { foo: Nat8 } := f;
         return ExitSuccess();
     end;
 end module body.
