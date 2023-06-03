@@ -30,9 +30,9 @@ module Ast = struct
 
   type astmt =
     | ASkip of span
-    | ALet of span * mutability * identifier * qtypespec * aexpr * astmt
+    | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr
+    | AAssign of span * lvalue * aexpr * bool
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
     | ACase of span * aexpr * abstract_when list
@@ -151,9 +151,9 @@ module AstDB = struct
 
   type astmt =
     | ASkip of span
-    | ALet of span * mutability * identifier * qtypespec * aexpr * astmt
+    | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr
+    | AAssign of span * lvalue * aexpr * bool
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
     | ACase of span * aexpr * abstract_when list

@@ -38,7 +38,7 @@ and concrete_method =
 
 and mstmt =
   | MSkip
-  | MLet of identifier * mono_ty * mexpr * mstmt
+  | MLet of identifier * mono_ty * mstmt
   | MDestructure of mono_binding list * mexpr * mstmt
   | MAssign of mtyped_lvalue * mexpr
   | MIf of mexpr * mstmt * mstmt

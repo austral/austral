@@ -23,7 +23,7 @@ let rec abs_stmt im stmt =
   | CDestructure _ ->
      err "Destructure statement not in a list context"
   | CAssign (span, lvalue, value) ->
-     AAssign (span, abs_lvalue im lvalue, abs_expr im value)
+     AAssign (span, abs_lvalue im lvalue, abs_expr im value, false)
   | CIf (span, c, t, f) ->
      let c = abs_expr im c
      and t = abs_stmt im t
@@ -175,7 +175,8 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
   | first::rest ->
      (match first with
       | CLet (span, mut, n, t, v) ->
-         ALet (span, mut, n, qualify_typespec im t, abs_expr im v, let_reshape im rest)
+         ALet (span, mut, n, qualify_typespec im t,
+            ABlock (empty_span, AAssign (span, LValue (n, []), Typecast (abs_expr im v, qualify_typespec im t), true), let_reshape im rest))
       | CDestructure (span, mut, bs, e) ->
          let bs' = List.map (fun (ConcreteBinding {name; ty; rename; }) -> QBinding { name; ty = qualify_typespec im ty; rename; }) bs
          and e' = abs_expr im e

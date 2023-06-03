@@ -121,22 +121,16 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       match stmt with
       | ASkip span ->
          TSkip span
-      | ALet (span, mut, name, ty, value, body) ->
+      | ALet (span, mut, name, ty, body) ->
          pi ("Name", name);
          adorn_error_with_span span
            (fun _ ->
              let _ = check_var_doesnt_collide_with_decl ctx name in
-             let expected_ty = parse_typespec env rm typarams ty in
-             pt ("Expected type", expected_ty);
-             let value' = augment_expr module_name env rm typarams lexenv (Some expected_ty) value in
-             let bindings = match_type_with_value (env, module_name) expected_ty value' in
-             ps ("Bindings", show_bindings bindings);
-             let ty = replace_variables bindings expected_ty in
+             let ty = parse_typespec env rm typarams ty in
              pt ("Type", ty);
-             pt ("Value type", get_type value');
              let lexenv' = push_var lexenv name ty (VarLocal mut) in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
-             TLet (span, mut, name, ty, value', body'))
+             TLet (span, mut, name, ty, body'))
       | ADestructure (span, mut, bindings, value, body) ->
          adorn_error_with_span span
            (fun _ ->
@@ -188,44 +182,47 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                    Errors.destructure_not_public rec_ty
               | _ ->
                  Errors.destructure_non_record rec_ty))
-      | AAssign (span, LValue (var, elems), value) ->
+      | AAssign (span, LValue (var, elems), value, first) ->
          adorn_error_with_span span
            (fun _ ->
              (match get_var lexenv var with
               | Some (var_ty, source) ->
                  (* Check: can we write to this variable? *)
                  let _ =
-                   match source with
-                   (* All good. *)
-                   | VarLocal mut ->
-                      (match mut with
-                       | Mutable -> ()
-                       | Immutable -> Errors.cant_assign_to_immutable_var var)
-                   | VarConstant ->
-                      Errors.cannot_assign_to_constant ()
-                   | VarParam ->
-                      (* We can only assign to a parameter if we're going through a reference at some point. *)
-                      (match elems with
-                       | [] ->    Errors.cannot_assign_to_parameter ()
-                       | elems ->
-                          if goes_through_parameter elems then
-                            ()
-                          else
-                            Errors.cannot_assign_to_parameter ())
+                   if first then
+                     ()
+                   else
+                     match source with
+                     (* All good. *)
+                     | VarLocal mut ->
+                        (match mut with
+                        | Mutable -> ()
+                        | Immutable -> Errors.cant_assign_to_immutable_var var)
+                     | VarConstant ->
+                        Errors.cannot_assign_to_constant ()
+                     | VarParam ->
+                        (* We can only assign to a parameter if we're going through a reference at some point. *)
+                        (match elems with
+                        | [] ->    Errors.cannot_assign_to_parameter ()
+                        | elems ->
+                           if goes_through_parameter elems then
+                              ()
+                           else
+                              Errors.cannot_assign_to_parameter ())
                  in
                  (match elems with
                   | [] ->
                      (* Assigning to a variable. *)
                      let value = augment_expr module_name env rm typarams lexenv None value in
                      let _ = match_type_with_value (env, module_name) var_ty value in
-                     TAssign (span, TypedLValue (var, []), value)
+                     TAssign (span, TypedLValue (var, []), value, first)
                   | elems ->
                      (* Assigning to a path. *)
                      let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
                      let value = augment_expr module_name env rm typarams lexenv None value in
                      let ty = get_path_ty_from_elems elems in
                      let _ = match_type_with_value (env, module_name) ty value in
-                     TAssign (span, TypedLValue (var, elems), value))
+                     TAssign (span, TypedLValue (var, elems), value, first))
               | None ->
                  Errors.unknown_name ~kind:"variable" ~name:var))
       | AIf (span, c, t, f) ->

@@ -31,9 +31,9 @@ type case_ref =
 
 type tstmt =
   | TSkip of span
-  | TLet of span * mutability * identifier * ty * texpr * tstmt
+  | TLet of span * mutability * identifier * ty * tstmt
   | TDestructure of span * mutability * typed_binding list * texpr * tstmt
-  | TAssign of span * typed_lvalue * texpr
+  | TAssign of span * typed_lvalue * texpr * bool
   | TIf of span * texpr * tstmt * tstmt
   | TCase of span * texpr * typed_when list * case_ref
   | TWhile of span * texpr * tstmt

@@ -524,11 +524,9 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
   match stmt with
   | TSkip _ ->
      tbl
-  | TLet (span, _, name, ty, expr, body) ->
+  | TLet (span, _, name, ty, body) ->
      adorn_error_with_span span
        (fun _ ->
-         (* First, check the expression. *)
-         let tbl: state_tbl = check_expr tbl depth expr in
          (* Add an entry to the table. *)
          let tbl: state_tbl = add_entry tbl name ty depth in
          let tbl: state_tbl = check_stmt tbl depth body in
@@ -558,7 +556,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          (* Once we leave the scope, remove the linear variables we added. *)
          let tbl: state_tbl = remove_entries tbl linear_names in
          tbl)
-  | TAssign (span, lvalue, expr) ->
+  | TAssign (span, lvalue, expr, first) ->
      adorn_error_with_span span
        (fun _ ->
          (* Linear values can't be consumed in an L-value, because the only place
@@ -576,11 +574,14 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
                  (match state with
                   | Unconsumed | BorrowedRead | BorrowedWrite ->
                      if universe_linear_ish (type_universe ty) then
-                       austral_raise LinearityError [
-                           Text "Cannot assign to the variable ";
-                           Code (ident_string var_name);
-                           Text " because it is not yet consumed."
-                         ]
+                       if first then
+                         tbl
+                       else
+                          austral_raise LinearityError [
+                              Text "Cannot assign to the variable ";
+                              Code (ident_string var_name);
+                              Text " because it is not yet consumed."
+                            ]
                      else
                        tbl
                   | Consumed ->

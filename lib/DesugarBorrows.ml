@@ -178,21 +178,20 @@ let rec transform_stmt (stmt: Ast.astmt): AstDB.astmt =
   match stmt with
   | Ast.ASkip span ->
     AstDB.ASkip span
-  | Ast.ALet (span, mutability, name, ty, value, body) ->
-    let (value, acc) = lift_borrows value [] in
+  | Ast.ALet (span, mutability, name, ty, body) ->
     let body = transform_stmt body in
-    let stmt = AstDB.ALet (span, mutability, name, ty, value, body) in
-    wrap_stmt_with_borrows stmt acc
+    let stmt = AstDB.ALet (span, mutability, name, ty, body) in
+    stmt
   | Ast.ADestructure (span, mutability, bindings, value, body) ->
     let (value, acc) = lift_borrows value [] in
     let body = transform_stmt body in
     let stmt = AstDB.ADestructure (span, mutability, bindings, value, body) in
     wrap_stmt_with_borrows stmt acc
-  | Ast.AAssign (span, Ast.LValue (name, elems), value) ->
+  | Ast.AAssign (span, Ast.LValue (name, elems), value, first) ->
     let (value, acc) = lift_borrows value [] in
     let (elems, acc') = lift_path_elems elems [] in
     let acc = acc @ acc' in
-    let stmt = AstDB.AAssign (span, AstDB.LValue (name, elems), value) in
+    let stmt = AstDB.AAssign (span, AstDB.LValue (name, elems), value, first) in
     wrap_stmt_with_borrows stmt acc
   | Ast.AIf (span, cond, then', else') ->
     let (cond, acc) = lift_borrows cond [] in
