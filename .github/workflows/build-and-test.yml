@@ -18,28 +18,24 @@ jobs:
         id: cache-key
         run: echo "cache-key=$(sha256sum shell.nix | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
 
+      - name: cache nix store
+        uses: actions/cache@v3.0.8
+        id: nix-cache
+        with:
+          path: /tmp/nixcache
+          key: ${{ steps.cache-key.outputs.cache-key }}
+
       - uses: cachix/install-nix-action@v20
         name: install nix
         with:
           nix_path: nixpkgs=channel:nixos-23.05
 
-
       - name: restore nix store from cache
-        uses: actions/cache@v3
-        with:
-          path: /nix/store
-          key: ${{ runner.os }}-nix-${{ steps.cache-key.outputs.cache-key }}
-          restore-keys: |
-            ${{ runner.os }}-nix-
+        if: "steps.nix-cache.outputs.cache-hit == 'true'"
+        run: "nix-store --import < /tmp/nixcache"
 
       - name: set up nix shell
         run: nix-shell --command 'true'
-
-      - name: save nix store to cache
-        uses: actions/cache@v3
-        with:
-          path: /nix/store
-          key: ${{ runner.os }}-nix-${{ steps.cache-key.outputs.cache-key }}
 
       - name: make
         run: nix-shell --command 'make'
@@ -71,3 +67,7 @@ jobs:
 
       - name: assert executable does not exist
         run: test ! -f austral
+
+      - name: save nix store tp cacje
+        if: "steps.nix-cache.outputs.cache-hit != 'true'"
+        run: "nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nixcache"
