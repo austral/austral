@@ -165,3 +165,75 @@ let wrap_stmt_with_borrows (stmt: AstDB.astmt) (acc: acc): AstDB.astmt =
       }
   in
   List.fold_left wrap_with_borrow stmt acc
+
+(* Transform statements. *)
+
+let rec transform_stmt (stmt: Ast.astmt): AstDB.astmt =
+  match stmt with
+  | Ast.ASkip span ->
+    AstDB.ASkip span
+  | Ast.ALet (span, mutability, name, ty, value, body) ->
+    let (value, acc) = lift_borrows value [] in
+    let body = transform_stmt body in
+    let stmt = AstDB.ALet (span, mutability, name, ty, value, body) in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.ADestructure (span, mutability, bindings, value, body) ->
+    let (value, acc) = lift_borrows value [] in
+    let body = transform_stmt body in
+    let stmt = AstDB.ADestructure (span, mutability, bindings, value, body) in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.AAssign (span, Ast.LValue (name, elems), value) ->
+    let (value, acc) = lift_borrows value [] in
+    let (elems, acc') = lift_path_elems elems [] in
+    let acc = acc @ acc' in
+    let stmt = AstDB.AAssign (span, AstDB.LValue (name, elems), value) in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.AIf (span, cond, then', else') ->
+    let (cond, acc) = lift_borrows cond [] in
+    let then' = transform_stmt then' in
+    let else' = transform_stmt else' in
+    let stmt = AstDB.AIf (span, cond, then', else') in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.AWhen (span, cond, body) ->
+    let (cond, acc) = lift_borrows cond [] in
+    let body = transform_stmt body in
+    let stmt = AstDB.AWhen (span, cond, body) in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.ACase (span, expr, whens) ->
+    let (expr, acc) = lift_borrows expr [] in
+    let whens = transform_whens whens in
+    let stmt = AstDB.ACase (span, expr, whens) in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.AWhile (span, cond, body) ->
+    let (cond, acc) = lift_borrows cond [] in
+    let body = transform_stmt body in
+    let stmt = AstDB.AWhile (span, cond, body) in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.AFor { span; name; initial; final; body } ->
+    let (initial, acc) = lift_borrows initial [] in
+    let (final, acc') = lift_borrows final acc in
+    let acc = acc @ acc' in
+    let body = transform_stmt body in
+    let stmt = AstDB.AFor { span; name; initial; final; body } in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.ABlock (span, stmt1, stmt2) ->
+    let stmt1 = transform_stmt stmt1 in
+    let stmt2 = transform_stmt stmt2 in
+    AstDB.ABlock (span, stmt1, stmt2)
+  | Ast.ADiscarding (span, expr) ->
+    let (expr, acc) = lift_borrows expr [] in
+    let stmt = AstDB.ADiscarding (span, expr) in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.AReturn (span, expr) ->
+    let (expr, acc) = lift_borrows expr [] in
+    let stmt = AstDB.AReturn (span, expr) in
+    wrap_stmt_with_borrows stmt acc
+  | Ast.ABorrow { span; original; rename; region; body; mode } ->
+    let body = transform_stmt body in
+    AstDB.ABorrow { span; original; rename; region; body; mode }
+
+and transform_whens (whens: Ast.abstract_when list): AstDB.abstract_when list =
+  List.map (fun (Ast.AbstractWhen (id, bindings, body)) ->
+    let body = transform_stmt body in
+    AstDB.AbstractWhen (id, bindings, body)
+  ) whens
