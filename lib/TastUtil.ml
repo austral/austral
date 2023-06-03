@@ -96,10 +96,6 @@ let rec get_type = function
      ty
   | TUnionConstructor (ty, _, _) ->
      ty
-  | TPath { ty; _ } ->
-     ty
-  | TRefPath (_, _, ty) ->
-     ty
   | TEmbed (ty, _, _) ->
      ty
   | TDeref e ->
@@ -112,15 +108,6 @@ let rec get_type = function
          internal_err ("a dereference expression was constructed whose argument is not a reference type."))
   | TSizeOf _ ->
      Integer (Unsigned, WidthByteSize)
-
-and path_elem_type = function
-  | TSlotAccessor (_, t) ->
-     t
-  | TPointerSlotAccessor (_, t) ->
-     t
-  | TArrayIndex (_, t) ->
-     t
-
-and ref_path_elem_type = function
-  | TRefSlotAccessor (_, ty) ->
-     ty
+  | TSlotAccessor (_, _, ty) -> ty
+  | TPointerSlotAccessor (_, _, ty) -> ty
+  | TArrayIndex (_, _, ty) -> ty

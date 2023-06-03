@@ -10,10 +10,10 @@ module C = Combined
 module SC = SmallCombined
 
 let te (expr: Ast.aexpr): AstDB.aexpr =
-  DesugarBorrows.transform_expr expr
+  DesugarBorrows.transform_expr (DesugarPaths.transform_expr expr)
 
 let ts (stmt: Ast.astmt): AstDB.astmt =
-  DesugarBorrows.transform_stmt stmt
+  DesugarBorrows.transform_stmt (DesugarPaths.transform_stmt stmt)
 
 let copy_combined_method_def (C.CMethodDef (id, tp, qp, qt, ds, ast)) =
   SC.CMethodDef (id, tp, qp, qt, ds, ts ast)

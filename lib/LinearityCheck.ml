@@ -61,7 +61,7 @@ let add_entry (tbl: state_tbl) (name: identifier) (ty: ty) (depth: loop_depth): 
   | Some _ ->
      (* The justification for this being an internal error is that the compiler
         should already have caught a duplicate variable. *)
-     internal_err "An entry exists in the state table with this name."
+     internal_err ("An entry exists in the state table with this name: " ^ (ident_string name))
 
 let trim_free (tbl: state_tbl): state_tbl =
   let (StateTable (entries, pending)) = tbl in
@@ -112,7 +112,9 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
              Text "."
            ]
        else
-         tbl
+         let (StateTable (rows, pending)) = tbl in
+         let others = List.filter (fun (n, _, _, _) -> not (equal_identifier name n)) rows in
+         StateTable (others, pending)
 
 let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   match names with
@@ -169,31 +171,13 @@ let pending_error (names: identifier list) =
       Text "consumed in the loop, without afterwards being reassigned."
     ]
 
-type appearances = {
-    consumed: int;
-    path: int;
-  }
+type appearances = { consumed: int; }
 
-let zero_appearances: appearances = {
-    consumed = 0;
-    path = 0;
-  }
+let zero_appearances: appearances = { consumed = 0; }
 
-let consumed_once: appearances = {
-    consumed = 1;
-    path = 0;
-  }
+let consumed_once: appearances = { consumed = 1; }
 
-let path_once: appearances = {
-    consumed = 0;
-    path = 1;
-  }
-
-let merge (a: appearances) (b: appearances): appearances =
-  {
-    consumed = a.consumed + b.consumed;
-    path = a.path + b.path;
-  }
+let merge (a: appearances) (b: appearances): appearances = { consumed = a.consumed + b.consumed; }
 
 let merge_list (l: appearances list): appearances =
   List.fold_left merge zero_appearances l
@@ -252,69 +236,18 @@ let rec count (name: identifier) (expr: texpr): appearances =
      merge_list (List.map (fun (_, e) -> c e) args)
   | TUnionConstructor (_, _, args) ->
      merge_list (List.map (fun (_, e) -> c e) args)
-  | TPath { head; elems; _ } ->
-     let head_apps: appearances =
-       (* If the head of the path is a variable, check if it is the one we are
-          looking for. If it is, count that as a path appearance. *)
-       (match head with
-        | TParamVar (name', _) ->
-           if equal_identifier name name' then
-             path_once
-           else
-             zero_appearances
-        | TLocalVar (name', _) ->
-           if equal_identifier name name' then
-             path_once
-           else
-             zero_appearances
-        | _ ->
-           (* Otherwise, just count the appearances inside the expression. *)
-           c head)
-     and path_apps: appearances = merge_list (List.map (count_path_elem name) elems)
-     in
-     merge head_apps path_apps
-  | TRefPath (head, elems, _) ->
-     let head_apps: appearances =
-       (* If the head of the path is a variable, check if it is the one we are
-          looking for. If it is, count that as an appearance, because
-          transforming a mutable reference consumes it. *)
-       (match head with
-        | TParamVar (name', _) ->
-           if equal_identifier name name' then
-             consumed_once
-           else
-             zero_appearances
-        | TLocalVar (name', _) ->
-           if equal_identifier name name' then
-             consumed_once
-           else
-             zero_appearances
-        | _ ->
-           (* Otherwise, just count the appearances inside the expression. *)
-           c head)
-     and path_apps: appearances = merge_list (List.map count_ref_path_elem elems)
-     in
-     merge head_apps path_apps
   | TEmbed (_, _, args) ->
      merge_list (List.map c args)
   | TDeref e ->
      c e
   | TSizeOf _ ->
      zero_appearances
-
-and count_path_elem (name: identifier) (elem: typed_path_elem): appearances =
-  match elem with
-  | TSlotAccessor _ ->
-     zero_appearances
-  | TPointerSlotAccessor _ ->
-     zero_appearances
-  | TArrayIndex (e, _) ->
-     count name e
-
-and count_ref_path_elem (elem: typed_ref_path_elem): appearances =
-  match elem with
-  | TRefSlotAccessor _ ->
-     zero_appearances
+  | TSlotAccessor (e, _, _) ->
+     c e
+  | TPointerSlotAccessor (e, _, _) ->
+     c e
+  | TArrayIndex (e, i, _) ->
+     merge (c e) (c i)
 
 (* Utilities *)
 
@@ -421,40 +354,45 @@ let rec check_var_in_expr (tbl: state_tbl) (depth: loop_depth) (name: identifier
   (* Count the appearances of the variable in the expression. *)
   let apps: appearances = count name expr in
   (* Destructure apps. *)
-  let { consumed: int; path: int; } = apps in
+  let { consumed: int; } = apps in
   (* What is the current state of this variable? *)
   let state: var_state = get_state tbl name in
   (* Make a tuple with the variable's state, and the partitioned appearances. *)
-  let tup = (state, partition consumed, partition path) in
+  let tup = (state, partition consumed) in
   match tup with
-  (*       State        Consumed       Path    *)
-  (* ---------------|-------------|----------- *)
-  | (     Unconsumed,         Zero,            _) -> (* Not yet consumed, and at most read through a path. *)
+  (*       State        Consumed  *)
+  (* ---------------|-------------*)
+  | (     Unconsumed,         Zero) -> (* Not yet consumed, not consumed. *)
      tbl
-  | (     Unconsumed,          One,         Zero) -> (* Not yet consumed, consumed once, and nothing else. Valid (but owed if the loop depth doesn't match). *)
+  | (     Unconsumed,          One) -> (* Not yet consumed, consumed once. *)
      consume_once tbl depth name ty
-  | (     Unconsumed,          One,            _) -> (* Not yet consumed, consumed once, accessed through a path. Valid if it's a mutable reference. *)
-     let _ = maybe_error_consumed_and_accessed_through_path name ty in tbl
-  | (     Unconsumed,  MoreThanOne,            _) -> (* Not yet consumed, consumed more than once. *)
+  | (     Unconsumed,  MoreThanOne) -> (* Not yet consumed, consumed more than once. *)
      error_consumed_more_than_once name ty;
      tbl
-  | (   BorrowedRead,         Zero,            _) -> (* Read borrowed, and at most accessed through a path. *)
+  | (   BorrowedRead,         Zero) -> (* Read borrowed, and not consumed. *)
      tbl
-  | (   BorrowedRead,            _,            _) -> (* Read borrowed, and either consumed, reborrowed or borrowed again. *)
-     error_read_borrowed_and_something_else name
-  | (  BorrowedWrite,         Zero,         Zero) -> (* Write borrowed, unused. *)
+  | (   BorrowedRead,            _) -> (* Read borrowed, and consumed zero or more times. *)
+     error_read_borrowed_and_consumed name ty;
      tbl
-  | (  BorrowedWrite,            _,            _) -> (* Write borrowed, used in some way. *)
-     error_write_borrowed_and_something_else name
-  | (       Consumed,         Zero,         Zero) -> (* Already consumed, and unused. *)
+  | (  BorrowedWrite,         Zero) -> (* Write borrowed, and not consumed. *)
      tbl
-  | (       Consumed,            _,            _) -> (* Already consumed, and used in some way. *)
+  | (  BorrowedWrite,            _) -> (* Write borrowed, and consumed zero or more times. *)
+     error_write_borrowed_and_consumed name ty;
+     tbl
+  | (       Consumed,         Zero) -> (* Already consumed, and unused. *)
+     tbl
+  | (       Consumed,            _) -> (* Already consumed, and consumed again zero or more times. *)
      error_already_consumed name ty;
      tbl
 
 and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (ty: ty): state_tbl =
-  let tbl: state_tbl = update_tbl tbl name Consumed in
-  if depth <> get_loop_depth tbl name then
+  let tbl: state_tbl =
+    if universe_linear_ish (type_universe ty) then
+      update_tbl tbl name Consumed
+    else
+      tbl
+  in
+    if depth <> get_loop_depth tbl name then
     (* Consumed inside a loop, so mark it as pending. *)
     if universe_linear_ish (type_universe ty) then
       mark_pending tbl name
@@ -474,30 +412,25 @@ and error_consumed_more_than_once (name: identifier) (ty: ty) =
   else
     ()
 
-and maybe_error_consumed_and_accessed_through_path (name: identifier) (ty: ty) =
-   match ty with
-   | WriteRef _ ->
-     ()
-   | _ ->
-      austral_raise LinearityError [
-         Text "The variable ";
-         Code (ident_string name);
-         Text " cannot be consumed and also accessed through a path in the same expression.";
+and error_read_borrowed_and_consumed (name: identifier) (ty: ty) =
+  if universe_linear_ish (type_universe ty) then
+    austral_raise LinearityError [
+        Text "The variable ";
+        Code (ident_string name);
+        Text " cannot be consumed while it is borrowed (immutably).";
       ]
+  else
+    ()
 
-and error_read_borrowed_and_something_else (name: identifier) =
-   austral_raise LinearityError [
-      Text "The variable ";
-      Code (ident_string name);
-      Text " cannot be consumed or borrowed again while it is borrowed (immutably).";
-   ]
-
-and error_write_borrowed_and_something_else (name: identifier) =
-   austral_raise LinearityError [
-      Text "The variable ";
-      Code (ident_string name);
-      Text "cannot be used in any way while it is vorrowed (mutably).";
-   ]
+and error_write_borrowed_and_consumed (name: identifier) (ty: ty) =
+  if universe_linear_ish (type_universe ty) then
+    austral_raise LinearityError [
+        Text "The variable ";
+        Code (ident_string name);
+        Text "cannot be consumed while it is borrowed (mutably).";
+      ]
+  else
+    ()
 
 and error_already_consumed (name: identifier) (ty: ty) =
   if universe_linear_ish (type_universe ty) then
@@ -556,45 +489,39 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          (* Once we leave the scope, remove the linear variables we added. *)
          let tbl: state_tbl = remove_entries tbl linear_names in
          tbl)
-  | TAssign (span, lvalue, expr, first) ->
+  | TAssign (span, lvalue, rvalue) ->
      adorn_error_with_span span
        (fun _ ->
-         (* Linear values can't be consumed in an L-value, because the only place
-            where they could appear is as the index value to an array indexing
-            operator (e.g. `[foo(x)]`) and that wouldn't typecheck in the first
-            place. If the lvalue is a variable we can assign to it however, if it's been
-            consumed. *)
-         let (TypedLValue (var_name, path_elems)) = lvalue in
-         let tbl: state_tbl = check_expr tbl depth expr in
-         (match get_entry tbl var_name with
-          | Some (ty, _, state) ->
-             (match path_elems with
-              | [] ->
-                 (* Assigning to a variable. *)
-                 (match state with
-                  | Unconsumed | BorrowedRead | BorrowedWrite ->
-                     if universe_linear_ish (type_universe ty) then
-                       if first then
-                         tbl
-                       else
-                          austral_raise LinearityError [
-                              Text "Cannot assign to the variable ";
-                              Code (ident_string var_name);
-                              Text " because it is not yet consumed."
-                            ]
-                     else
-                       tbl
-                  | Consumed ->
-                     let tbl: state_tbl = update_tbl tbl var_name Unconsumed in
-                     if is_pending tbl var_name then
-                       remove_pending tbl var_name
-                     else
-                       tbl)
-              | _ ->
-                 (* Assigning to a path. *)
-                 tbl)
-          | None ->
-             tbl))
+         let tbl: state_tbl = check_expr tbl depth lvalue in
+         let tbl: state_tbl = check_expr tbl depth rvalue in
+         tbl)
+  | TAssignVar (span, name, rvalue) ->
+     adorn_error_with_span span
+       (fun _ ->
+         let tbl: state_tbl = check_expr tbl depth rvalue in
+         let name = local_name name in
+         let (ty, _, state) = get_entry_or_fail tbl name in
+         begin
+           match state with
+           | Unconsumed | BorrowedRead | BorrowedWrite ->
+              if universe_linear_ish (type_universe ty) then
+                austral_raise LinearityError [
+                    Text "Cannot assign to the variable ";
+                    Code (ident_string name);
+                    Text " because it is not yet consumed."
+                  ]
+              else
+                tbl
+           | Consumed ->
+              let tbl: state_tbl = update_tbl tbl name Unconsumed in
+              if is_pending tbl name then
+                remove_pending tbl name
+              else
+                tbl
+         end)
+  | TInitialAssign (_, rvalue) ->
+     let tbl: state_tbl = check_expr tbl depth rvalue in
+     tbl
   | TIf (span, cond, tb, fb) ->
      adorn_error_with_span span
        (fun _ ->
@@ -610,8 +537,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          let tbls: state_tbl list = check_whens tbl depth whens in
          let _ = table_list_is_consistent tbls in
          (match tbls with
-          | first::rest ->
-             let _ = rest in
+          | first::_ ->
              first
           | [] ->
              tbl))
@@ -659,43 +585,41 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
                 (* Mark the original as being write-borrowed. *)
                 update_tbl tbl original BorrowedWrite
            in
-           (* If it's a mutable borrow, or a reborrow, add the reference variable. *)
-           let tbl: state_tbl =
-             match mode with
-             | Write ->
-                add_entry tbl rename ref_type depth
-             | Reborrow ->
-                add_entry tbl rename ref_type depth
-             | Read ->
-                tbl
-           in
+           (* Add the rename. *)
+           let tbl: state_tbl = add_entry tbl rename ref_type depth in
            (* Traverse the body. *)
            let tbl: state_tbl = check_stmt tbl depth body in
            (* After the body, unborrow the variable. *)
            let tbl: state_tbl = update_tbl tbl original Unconsumed in
-           (* If it's a mutable borrow, or a reborrow, remove the reference from the state table. *)
-           let tbl: state_tbl =
-             match mode with
-             | Read ->
-                tbl
-             | Write ->
-                remove_entry tbl rename
-             | Reborrow ->
-                remove_entry tbl rename
-           in
+           (* Remove the rename from the table. *)
+           let tbl: state_tbl = remove_entry tbl rename in
            tbl
          else
            (* If we're read-borrowing, and the variable is already read-borrowed, that's also allowed. *)
            let state: var_state = get_state tbl original in
            if (mode = Read) && (state = BorrowedRead) then
+             (* Add the rename. *)
+             let tbl: state_tbl = add_entry tbl rename ref_type depth in
              (* Traverse the body. *)
              let tbl: state_tbl = check_stmt tbl depth body in
              (* After the body, unborrow the variable. *)
              let tbl: state_tbl = update_tbl tbl original Unconsumed in
+             (* Remove the rename from the table. *)
+             let tbl: state_tbl = remove_entry tbl rename in
              tbl
            else
+            let mode_string = begin
+             match mode with
+             | Read ->
+                "borrow (immutably)"
+             | Write ->
+                "borrow (mutably)"
+             | Reborrow ->
+                "reborrow"
+            end
+            in
             austral_raise LinearityError [
-                  Text "Cannot borrow the variable ";
+                  Text ("Cannot " ^ mode_string ^ " the variable ");
                   Code (ident_string original);
                   Text " because it is already ";
                   Text (humanize_state state);
@@ -743,39 +667,27 @@ and check_whens (tbl: state_tbl) (depth: loop_depth) (whens: typed_when list): s
 
 and check_when (tbl: state_tbl) (depth: loop_depth) (whn: typed_when): state_tbl =
   let TypedWhen (_, bindings, body) = whn in
-  (* Iterate over the bidings, for each that is linear, add an entry to the
-     table. Keep track of the names of the linear variables we added. *)
-  let linear_names: identifier list =
-    List.filter_map (fun (TypedBinding { ty; rename; _ }) ->
-        if universe_linear_ish (type_universe ty) then
-          Some rename
-        else
-          None)
-      bindings
+  (* Add bindings to the table. *)
+  let names: identifier list =
+    List.map (fun (TypedBinding { rename; _ }) -> rename) bindings
   in
   let tbl: state_tbl =
     Util.iter_with_context
       (fun tbl (TypedBinding { rename; ty; _ }) ->
-        if universe_linear_ish (type_universe ty) then
-          add_entry tbl rename ty depth
-        else
-          tbl)
+        add_entry tbl rename ty depth)
       tbl
       bindings
   in
   (* Check the body. *)
   let tbl: state_tbl = check_stmt tbl depth body in
   (* Once we leave the scope, remove the linear variables we added. *)
-  let tbl: state_tbl = remove_entries tbl linear_names in
+  let tbl: state_tbl = remove_entries tbl names in
   tbl
 
 let init_tbl (tbl: state_tbl) (params: value_parameter list): state_tbl =
   let f (tbl: state_tbl) (ValueParameter (name, ty)): state_tbl =
-    if universe_linear_ish (type_universe ty) then
-      (* Add this parameter to the list at depth zero. *)
-      add_entry tbl name ty 0
-    else
-      tbl
+    (* Add this parameter to the list at depth zero. *)
+    add_entry tbl name ty 0
   in
   Util.iter_with_context f tbl params
 

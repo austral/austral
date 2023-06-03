@@ -23,7 +23,7 @@ let rec abs_stmt im stmt =
   | CDestructure _ ->
      err "Destructure statement not in a list context"
   | CAssign (span, lvalue, value) ->
-     AAssign (span, abs_lvalue im lvalue, abs_expr im value, false)
+     AAssign (span, abs_expr im lvalue, abs_expr im value)
   | CIf (span, c, t, f) ->
      let c = abs_expr im c
      and t = abs_stmt im t
@@ -124,10 +124,10 @@ and abs_expr im expr =
      Negation (abs_expr im e)
   | CIfExpression (_, c, t, f) ->
      IfExpression (abs_expr im c, abs_expr im t, abs_expr im f)
-  | CPath (_, e, es) ->
-     Path (abs_expr im e, List.map (abs_path_elem im) es)
-  | CRefPath (_, e, es) ->
-     RefPath (abs_expr im e, List.map abs_ref_path_elem es)
+  | CPath (_, head, es) ->
+     Path (qualify_identifier im head, List.map (abs_path_elem im) es)
+  | CRefPath (_, head, es) ->
+     RefPath (qualify_identifier im head, List.map (abs_path_elem im) es)
   | CEmbed (_, ty, expr, args) ->
      Embed (qualify_typespec im ty, expr, List.map (abs_expr im) args)
   | CDeref (_, e) ->
@@ -162,11 +162,6 @@ and abs_path_elem im elem =
   | CArrayIndex ie ->
      ArrayIndex (abs_expr im ie)
 
-and abs_ref_path_elem elem =
-  match elem with
-  | CRefPointerSlotAccessor i ->
-     RefSlotAccessor i
-
 (* Given a list of statements, find the first let statement, if any, and put the
    remainder of the list under its body. Then call let_reshape on that
    remainder. *)
@@ -176,7 +171,7 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
      (match first with
       | CLet (span, mut, n, t, v) ->
          ALet (span, mut, n, qualify_typespec im t,
-            ABlock (empty_span, AAssign (span, LValue (n, []), Typecast (abs_expr im v, qualify_typespec im t), true), let_reshape im rest))
+            ABlock (empty_span, AInitialAssign (qualify_identifier im n, qualify_typespec im t, Typecast (abs_expr im v, qualify_typespec im t)), let_reshape im rest))
       | CDestructure (span, mut, bs, e) ->
          let bs' = List.map (fun (ConcreteBinding {name; ty; rename; }) -> QBinding { name; ty = qualify_typespec im ty; rename; }) bs
          and e' = abs_expr im e
@@ -190,6 +185,3 @@ and let_reshape (im: import_map) (l: cstmt list): astmt =
             ABlock (empty_span, abs_stmt im s, let_reshape im rest)))
   | [] ->
      ASkip empty_span
-
-and abs_lvalue im (ConcreteLValue (head, elems)) =
-  LValue (head, List.map (abs_path_elem im) elems)

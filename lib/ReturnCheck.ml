@@ -40,6 +40,8 @@ let rec ends_in_return (stmt: astmt): bool =
      ends_in_return body
   | AAssign _ ->
      false
+  | AInitialAssign _ ->
+     false
   | AIf (_, _, tb, fb) ->
      (ends_in_return tb) && (ends_in_return fb)
   | AWhen (_, _, b) ->

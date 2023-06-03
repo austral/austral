@@ -5,9 +5,9 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  *)
 
-(** Desugar anonymous borrows. *)
+(** Desugar paths into reference transforms. *)
 open Stages
 
-val transform_expr : AstDP.aexpr -> AstDB.aexpr
+val transform_expr : Ast.aexpr -> AstDP.aexpr
 
-val transform_stmt : AstDP.astmt -> AstDB.astmt
+val transform_stmt : Ast.astmt -> AstDP.astmt

@@ -252,7 +252,8 @@ module body Standard.Buffer is
 
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit is
-        for i from 0 to buf->size - 1 do
+        let last: Index := buf->size - 1;
+        for i from 0 to last do
             storeNth(reborrow(buf), i, element);
         end for;
         -- invariants(buf : &[Buffer[T], R]);
@@ -291,17 +292,19 @@ module body Standard.Buffer is
     generic [T: Type, R: Region]
     function insert(buf: &![Buffer[T], R], pos: Index, element: T): Unit is
         -- Check `pos` is in bounds.
-        if pos > buf->size then
+        let old_size: Index := buf->size;
+        if pos > old_size then
             abort("insert: index out of range");
         end if;
         -- If insertion would increase make `size` match `capacity`, resize
         -- the array.
-        if (buf->size + 1) = buf->size then
+        let new_size: Index := buf->size + 1;
+        if new_size < old_size then
             bump(reborrow(buf));
         end if;
         -- If the array is non-empty, we have to move everything to the right of
         -- the position one step to the right.
-        if buf->size > 0 then
+        if new_size > 0 then
            shiftRight(
                ptr => buf->array,
                chunk_start => pos,
@@ -312,7 +315,7 @@ module body Standard.Buffer is
         -- Insert.
         let index_ptr: Pointer[T] := positiveOffset(buf->array, pos);
         store(index_ptr, element);
-        buf->size := buf->size + 1;
+        buf->size := new_size;
         -- invariants(buf : &[Buffer[T], R]);
         return nil;
     end;
@@ -324,7 +327,8 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function insertBack(buf: &![Buffer[T], R], element: T): Unit is
-        return insert(buf, buf->size, element);
+        let size: Index := buf->size;
+        return insert(buf, size, element);
     end;
 
     ---
@@ -389,7 +393,7 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit is
-        if buf->size > 0 then    
+        if buf->size > 0 then
             for i from 0 to buf->size - 1 do
                 swapTransform(reborrow(buf), i, fn);
             end for;
@@ -419,7 +423,7 @@ module body Standard.Buffer is
         -- Return the new buffer.
         return newbuf;
     end;
-    
+
     ---
     --- Utilities
     ---

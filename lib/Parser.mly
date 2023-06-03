@@ -355,7 +355,8 @@ var_mutability:
   ;
 
 lvalue:
-  | n=identifier elems=path_rest* { ConcreteLValue (n, elems) }
+  | n=identifier elems=path_rest* { CPath (from_loc $loc, n, elems) }
+  ;
 
 when_stmt:
   | WHEN identifier LPAREN binding_list RPAREN DO block { ConcreteWhen ($2, $4, $7) }
@@ -479,7 +480,7 @@ compound_expression:
   ;
 
 path:
-  | initial=atomic_expression elems=path_rest+ { CPath (from_loc $loc, initial, elems) }
+  | initial=identifier elems=path_rest+ { CPath (from_loc $loc, initial, elems) }
   ;
 
 path_rest:
@@ -501,15 +502,7 @@ array_index:
   ;
 
 ref_path:
-  | REF_TRANSFORM initial=identifier elems=ref_path_rest+ RPAREN { CRefPath (from_loc $loc, CVariable (from_loc $loc, initial), elems) }
-  ;
-
-ref_path_rest:
-  | ref_slot_accessor { $1 }
-  ;
-
-ref_slot_accessor:
-  | HYPHEN_RIGHT identifier { CRefPointerSlotAccessor $2 }
+  | REF_TRANSFORM initial=identifier elems=path_rest+ RPAREN { CRefPath (from_loc $loc, initial, elems) }
   ;
 
 comp_op:

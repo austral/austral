@@ -83,8 +83,8 @@ and cexpr =
   | CDisjunction of span * cexpr * cexpr
   | CNegation of span * cexpr
   | CIfExpression of span * cexpr * cexpr * cexpr
-  | CPath of span * cexpr * concrete_path_elem list
-  | CRefPath of span * cexpr * concrete_ref_path_elem list
+  | CPath of span * identifier * concrete_path_elem list
+  | CRefPath of span * identifier * concrete_path_elem list
   | CEmbed of span * typespec * string * cexpr list
   | CDeref of span * cexpr
   | CTypecast of span * cexpr * typespec
@@ -96,7 +96,7 @@ and cstmt =
   | CSkip of span
   | CLet of span * mutability * identifier * typespec * cexpr
   | CDestructure of span * mutability * concrete_binding list * cexpr
-  | CAssign of span * concrete_lvalue * cexpr
+  | CAssign of span * cexpr * cexpr
   | CIf of span * cexpr * cstmt * cstmt
   | CCase of span * cexpr * concrete_when list
   | CWhile of span * cexpr * cstmt
@@ -140,9 +140,3 @@ and concrete_path_elem =
   | CSlotAccessor of identifier
   | CPointerSlotAccessor of identifier
   | CArrayIndex of cexpr
-
-and concrete_ref_path_elem =
-  | CRefPointerSlotAccessor of identifier
-
-and concrete_lvalue =
-  ConcreteLValue of identifier * concrete_path_elem list

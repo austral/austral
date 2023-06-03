@@ -40,7 +40,9 @@ and mstmt =
   | MSkip
   | MLet of identifier * mono_ty * mstmt
   | MDestructure of mono_binding list * mexpr * mstmt
-  | MAssign of mtyped_lvalue * mexpr
+  | MAssign of mexpr * mexpr
+  | MAssignVar of qident * mexpr
+  | MInitialAssign of qident * mexpr
   | MIf of mexpr * mstmt * mstmt
   | MCase of mexpr * mtyped_when list * Tast.case_ref
   | MWhile of mexpr * mstmt
@@ -86,30 +88,16 @@ and mexpr =
   | MIfExpression of mexpr * mexpr * mexpr
   | MRecordConstructor of mono_ty * (identifier * mexpr) list
   | MUnionConstructor of mono_ty * identifier * (identifier * mexpr) list
-  | MPath of {
-      head: mexpr;
-      elems: mtyped_path_elem list;
-      ty: mono_ty
-    }
-  | MRefPath of mexpr * mtyped_ref_path_elem list * mono_ty
   | MEmbed of mono_ty * string * mexpr list
   | MDeref of mexpr
   | MTypecast of mexpr * mono_ty
   | MSizeOf of mono_ty
+  | MSlotAccessor of mexpr * identifier * mono_ty
+  | MPointerSlotAccessor of mexpr * identifier * mono_ty
+  | MArrayIndex of mexpr * mexpr * mono_ty
 
 and mtyped_when =
   MTypedWhen of identifier * mono_binding list * mstmt
-
-and mtyped_path_elem =
-  | MSlotAccessor of identifier * mono_ty
-  | MPointerSlotAccessor of identifier * mono_ty
-  | MArrayIndex of mexpr * mono_ty
-
-and mtyped_ref_path_elem =
-  | MRefSlotAccessor of identifier * mono_ty
-
-and mtyped_lvalue =
-  MTypedLValue of identifier * mtyped_path_elem list
 
 and mvalue_parameter =
   MValueParameter of identifier * mono_ty
@@ -170,10 +158,6 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MUnionConstructor (ty, _, _) ->
      ty
-  | MPath { ty; _ } ->
-     ty
-  | MRefPath (_, _, ty) ->
-     ty
   | MEmbed (ty, _, _) ->
      ty
   | MDeref e ->
@@ -188,3 +172,6 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MSizeOf _ ->
      MonoInteger (Unsigned, Width64)
+  | MSlotAccessor (_, _, ty) -> ty
+  | MPointerSlotAccessor (_, _, ty) -> ty
+  | MArrayIndex (_, _, ty) -> ty

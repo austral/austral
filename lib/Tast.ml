@@ -33,7 +33,9 @@ type tstmt =
   | TSkip of span
   | TLet of span * mutability * identifier * ty * tstmt
   | TDestructure of span * mutability * typed_binding list * texpr * tstmt
-  | TAssign of span * typed_lvalue * texpr * bool
+  | TAssign of span * texpr * texpr
+  | TAssignVar of span * qident * texpr
+  | TInitialAssign of qident * texpr
   | TIf of span * texpr * tstmt * tstmt
   | TCase of span * texpr * typed_when list * case_ref
   | TWhile of span * texpr * tstmt
@@ -85,33 +87,16 @@ and texpr =
   | TIfExpression of texpr * texpr * texpr
   | TRecordConstructor of ty * (identifier * texpr) list
   | TUnionConstructor of ty * identifier * (identifier * texpr) list
-  | TPath of {
-      head: texpr;
-      elems: typed_path_elem list;
-      ty: ty
-    }
-  | TRefPath of texpr * typed_ref_path_elem list * ty
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
+  | TSlotAccessor of texpr * identifier * ty
+  | TPointerSlotAccessor of texpr * identifier * ty
+  | TArrayIndex of texpr * texpr * ty
 [@@deriving show]
 
 and typed_when =
   TypedWhen of identifier * typed_binding list * tstmt
-[@@deriving show]
-
-and typed_path_elem =
-  | TSlotAccessor of identifier * ty
-  | TPointerSlotAccessor of identifier * ty
-  | TArrayIndex of texpr * ty
-[@@deriving show]
-
-and typed_ref_path_elem =
-  | TRefSlotAccessor of identifier * ty
-[@@deriving show]
-
-and typed_lvalue =
-  TypedLValue of identifier * typed_path_elem list
 [@@deriving show]
 
 and typed_arglist =
