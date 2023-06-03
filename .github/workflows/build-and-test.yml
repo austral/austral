@@ -21,7 +21,7 @@ jobs:
 
       - name: get cache key
         id: cache-key
-        run: echo "::set-output name=cache-key::$(sha256sum shell.nix | cut -d ' ' -f 1)"
+        run: echo "cache-key=$(sha256sum shell.nix | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
 
       - name: restore nix store from cache
         uses: actions/cache@v3
