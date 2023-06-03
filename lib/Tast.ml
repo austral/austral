@@ -47,7 +47,7 @@ type tstmt =
       orig_type: ty;
       ref_type: ty;
       body: tstmt;
-      mode: borrowing_mode
+      mode: borrow_stmt_kind
     }
   | TBlock of span * tstmt * tstmt
   | TDiscarding of span * texpr

@@ -50,6 +50,7 @@ type borrow_stmt_kind =
   | Read
   | Write
   | Reborrow
+[@@deriving (show, sexp)]
 
 (** Whether a module is safe or unsafe. *)
 type module_kind =

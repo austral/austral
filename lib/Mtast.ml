@@ -53,7 +53,7 @@ and mstmt =
       orig_type: mono_ty;
       ref_type: mono_ty;
       body: mstmt;
-      mode: borrowing_mode
+      mode: borrow_stmt_kind
     }
   | MBlock of mstmt * mstmt
   | MDiscarding of mexpr

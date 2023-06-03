@@ -724,29 +724,38 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          if is_unconsumed tbl original then
            let tbl: state_tbl =
              match mode with
-             | ReadBorrow ->
+             | Read ->
+                (* Mark the original as being read-borrowed. *)
                 update_tbl tbl original BorrowedRead
-             | WriteBorrow ->
+             | Write ->
+                (* Mark the original as being write-borrowed. *)
+                update_tbl tbl original BorrowedWrite
+             | Reborrow ->
+                (* Mark the original as being write-borrowed. *)
                 update_tbl tbl original BorrowedWrite
            in
-           (* If it's a mutable borrow, add the reference variable. *)
+           (* If it's a mutable borrow, or a reborrow, add the reference variable. *)
            let tbl: state_tbl =
              match mode with
-             | WriteBorrow ->
+             | Write ->
                 add_entry tbl rename ref_type depth
-             | ReadBorrow ->
+             | Reborrow ->
+                add_entry tbl rename ref_type depth
+             | Read ->
                 tbl
            in
            (* Traverse the body. *)
            let tbl: state_tbl = check_stmt tbl depth body in
            (* After the body, unborrow the variable. *)
            let tbl: state_tbl = update_tbl tbl original Unconsumed in
-           (* If it's a mutable borrow, remove the reference from the state table. *)
+           (* If it's a mutable borrow, or a reborrow, remove the reference from the state table. *)
            let tbl: state_tbl =
              match mode with
-             | ReadBorrow ->
+             | Read ->
                 tbl
-             | WriteBorrow ->
+             | Write ->
+                remove_entry tbl rename
+             | Reborrow ->
                 remove_entry tbl rename
            in
            tbl

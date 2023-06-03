@@ -1,0 +1,29 @@
+module body Test is
+    record Foo: Linear is
+        value: Int32;
+    end;
+
+    generic [R: Region]
+    function show(a: &![Foo, R]): Unit is
+        print("value = ");
+        printLn(a->value);
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        var foo: Foo := Foo(value => 10);
+        borrow! foo as fooref in R do
+            borrow~ fooref as fooref2a in R2 do
+                show(fooref2a);
+            end;
+            borrow~ fooref as fooref2b in R2 do
+                show(fooref2b);
+            end;
+            borrow~ fooref as fooref2c in R2 do
+                show(fooref2c);
+            end;
+        end;
+        let { value: Int32 } := foo;
+        return ExitSuccess();
+    end;
+end module body.

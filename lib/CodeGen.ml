@@ -335,7 +335,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
          CLet (gen_ident v, CNamedType "size_t", ge i);
          CFor (gen_ident v, ge f, gs b)
        ]
-  | MBorrow { original; rename; orig_type; body; _ } ->
+  | MBorrow { original; rename; orig_type; body; mode; _ } ->
      let is_pointer =
        (match orig_type with
         | MonoAddress _ ->
@@ -347,7 +347,27 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
        let l = CLet (gen_ident rename, gen_type orig_type, CVar (gen_ident original)) in
        CBlock [l; gs body]
      else
-       let l = CLet (gen_ident rename, CPointer (gen_type orig_type), CAddressOf (CVar (gen_ident original))) in
+       let e = begin
+           match mode with
+           | Read ->
+              CAddressOf (CVar (gen_ident original))
+           | Write ->
+              CAddressOf (CVar (gen_ident original))
+           | Reborrow ->
+              CVar (gen_ident original)
+         end
+       in
+       let ty = begin
+           match mode with
+           | Read ->
+              CPointer (gen_type orig_type)
+           | Write ->
+              CPointer (gen_type orig_type)
+           | Reborrow ->
+              gen_type orig_type
+         end
+       in
+       let l = CLet (gen_ident rename, ty, e) in
        CBlock [l; gs body]
   | MBlock (a, b) ->
      CBlock [gs a; gs b]
