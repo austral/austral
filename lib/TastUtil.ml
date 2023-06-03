@@ -127,3 +127,10 @@ and path_type (pe: typed_path_expr): ty =
   | TSlotAccessor (_, _, ty) -> ty
   | TPointerSlotAccessor (_, _,ty) -> ty
   | TArrayIndex (_, _, ty) -> ty
+
+let rec path_head (e: typed_path_expr): identifier =
+  match e with
+  | TPathHead (head, _) -> head
+  | TSlotAccessor (e, _, _) -> path_head e
+  | TPointerSlotAccessor (e, _ ,_) -> path_head e
+  | TArrayIndex (e, _, _) -> path_head e

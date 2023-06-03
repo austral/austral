@@ -39,3 +39,5 @@ val arglist_to_positional : typed_arglist * identifier list -> texpr list
 val get_type : texpr -> ty
 
 val path_type : typed_path_expr -> ty
+
+val path_head : typed_path_expr -> identifier
