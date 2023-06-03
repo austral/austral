@@ -760,14 +760,22 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
            in
            tbl
          else
+           (* If we're read-borrowing, and the variable is already read-borrowed, that's also allowed. *)
            let state: var_state = get_state tbl original in
-           austral_raise LinearityError [
-               Text "Cannot borrow the variable ";
-               Code (ident_string original);
-               Text " because it is already ";
-               Text (humanize_state state);
-               Text "."
-             ])
+           if (mode = Read) && (state = BorrowedRead) then
+             (* Traverse the body. *)
+             let tbl: state_tbl = check_stmt tbl depth body in
+             (* After the body, unborrow the variable. *)
+             let tbl: state_tbl = update_tbl tbl original Unconsumed in
+             tbl
+           else
+            austral_raise LinearityError [
+                  Text "Cannot borrow the variable ";
+                  Code (ident_string original);
+                  Text " because it is already ";
+                  Text (humanize_state state);
+                  Text "."
+               ])
   | TBlock (_, a, b) ->
      let tbl: state_tbl = check_stmt tbl depth a in
      let tbl: state_tbl = check_stmt tbl depth b in

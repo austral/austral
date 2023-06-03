@@ -244,7 +244,8 @@ module SmallCombined = struct
 
   and combined_definition =
     | CConstant of span * vis * identifier * qtypespec * aexpr * docstring
-    | CRecord of span * type_vis * identifier * typarams * universe * qslot list * docstring
+    | CRecord of span * type_vis * identifier * typarams * universe * qslot
+ list * docstring
     | CUnion of span * type_vis * identifier * typarams * universe * qcase list * docstring
     | CFunction of span * vis * identifier * typarams * qparam list * qtypespec * astmt * docstring * pragma list
     | CTypeclass of span * vis * identifier * type_parameter * Combined.combined_method_decl list * docstring

@@ -9,9 +9,10 @@ open ModuleNameSet
 open Common
 open Type
 open TypeSystem
-open Stages.Combined
+open Stages.SmallCombined
+open Stages
 open Linked
-module Ast = Stages.Ast
+module Ast = Stages.AstDB
 open Ast
 open Id
 open DeclIdSet
@@ -275,9 +276,9 @@ and extract_definitions (env: env) (mod_id: mod_id) (mn: module_name) (local_typ
 and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_types: type_signature list) (def: combined_definition): (env * linked_definition)  =
   let rm = empty_region_map in
   let parse' = parse_type env local_types in
-  let rec parse_slot (typarams: typarams) (QualifiedSlot (n, ts)): typed_slot =
+  let rec parse_slot (typarams: typarams) (Combined.QualifiedSlot (n, ts)): typed_slot =
     TypedSlot (n, parse' rm typarams ts)
-  and parse_param (typarams: typarams) (QualifiedParameter (n, ts)): value_parameter =
+  and parse_param (typarams: typarams) (Combined.QualifiedParameter (n, ts)): value_parameter =
     ValueParameter (n, parse' rm typarams ts)
   in
   match def with
@@ -328,7 +329,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
          (* If the universe is `Free`, check that there are no cases with slots with types in the `Type` or `Linear` universes. *)
          let _ =
            if universe = FreeUniverse then
-             let cases = List.map (fun (QualifiedCase (n, slots)) -> TypedCase (n, List.map (parse_slot typarams) slots)) cases
+             let cases = List.map (fun (Combined.QualifiedCase (n, slots)) -> TypedCase (n, List.map (parse_slot typarams) slots)) cases
              in
              check_cases_are_free cases
            else
@@ -359,7 +360,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            | TypeVisPrivate -> VisPrivate
          in
          (* Convert the list of cases into a list of union_case_input records *)
-         let case_map (QualifiedCase (n, slots)): union_case_input =
+         let case_map (Combined.QualifiedCase (n, slots)): union_case_input =
            let docstring = Docstring "" in (* TODO: Store docstrings in slots and cases *)
            {
              mod_id = mod_id;
@@ -456,7 +457,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
          let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
          (* Convert the list of methods into a list of type_class_method records *)
          let typarams = typarams_from_list [typaram] in
-         let method_map (CMethodDecl (name, method_typarams, params, rt, docstring)): type_class_method_input =
+         let method_map (Combined.CMethodDecl (name, method_typarams, params, rt, docstring)): type_class_method_input =
            let effective_typarams: typarams = merge_typarams typarams method_typarams in
            let value_params = List.map (parse_param effective_typarams) params
            and rt = parse' rm effective_typarams rt in

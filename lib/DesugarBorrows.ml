@@ -15,12 +15,20 @@ open Span
 type acc_rec = { original: qident; rename: qident; mode: borrow_stmt_kind }
 type acc = acc_rec list
 
+let tmp_counter: int ref = ref 0
+
+let fresh_tmp _: int =
+  let fresh_id = !tmp_counter in
+  tmp_counter := !tmp_counter + 1;
+  fresh_id
+
 let make_rename (original: qident): qident =
   let a = source_module_name original
   and b = original_name original
   and c = local_name original in
-  let c' = make_ident ((ident_string c) ^ "_tmp_ref") in
-  make_qident (a, b, c')
+  let b = make_ident ((ident_string b) ^ "_tmp_ref" ^ (string_of_int (fresh_tmp ()))) in
+  let c = make_ident ((ident_string c) ^ "_tmp_ref" ^ (string_of_int (fresh_tmp ()))) in
+  make_qident (a, b, c)
 
 let make_mode (mode: borrowing_mode): borrow_stmt_kind =
   match mode with

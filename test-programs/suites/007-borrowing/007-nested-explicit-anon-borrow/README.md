@@ -1,1 +1,1 @@
-Test we can't borrow a variable anonymously inside a borrow of the same variable.
+Test we can borrow a variable anonymously inside a borrow of the same variable.

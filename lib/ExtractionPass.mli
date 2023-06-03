@@ -5,7 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 open TypeSignature
-open Stages.Combined
+open Stages.SmallCombined
 open Linked
 open Env
 open Id

@@ -10,7 +10,7 @@ module body Test is
         borrow foo as fooref in rho do
             -- Borrow it again.
             borrow foo as fooref2 in rho2 do
-                skip;
+                printLn(fooref2->bar);
             end;
         end;
         -- Consume the record by destructuring.

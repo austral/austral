@@ -21,7 +21,7 @@ open LexEnv
 open Env
 open EnvTypes
 open EnvUtils
-open Stages.Ast
+open Stages.AstDB
 open Tast
 open TastUtil
 open Linked
@@ -141,7 +141,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          adorn_error_with_span span
            (fun _ ->
              let _ =
-               List.map (fun (QBinding { rename; _ }) -> check_var_doesnt_collide_with_decl ctx rename) bindings
+               List.map (fun (Stages.Ast.QBinding { rename; _ }) -> check_var_doesnt_collide_with_decl ctx rename) bindings
              in
              let value' = augment_expr module_name env rm typarams lexenv None value in
              (* Check: the value must be a public record type *)
@@ -158,7 +158,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let typebindings = match_type (env, module_name) orig_type rec_ty in
                  if (vis = TypeVisPublic) || (module_name = source_module) then
                    (* Find the set of slot names and the set of binding names, and compare them *)
-                   let binding_names = List.map (fun (QBinding { name; _}) -> name) bindings
+                   let binding_names = List.map (fun (Stages.Ast.QBinding { name; _}) -> name) bindings
                    and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
                    if ident_set_eq binding_names slot_names then
                      let bindings': (identifier * qtypespec * ty * identifier) list =
@@ -473,7 +473,7 @@ and group_cases_whens (cases: decl list) (whens: abstract_when list): (typed_cas
 
 and group_bindings_slots (bindings: qbinding list) (slots: typed_slot list): (identifier * qtypespec * ty * identifier) list =
   let f (binding: qbinding): (identifier * qtypespec * ty * identifier) =
-    let QBinding { name; ty; rename; } = binding in
+    let Stages.Ast.QBinding { name; ty; rename; } = binding in
     let (TypedSlot (_, ty')) = List.find (fun (TypedSlot (n', _)) -> equal_identifier name n') slots in
     (name, ty, ty', rename)
   in
@@ -487,7 +487,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
       and (TypedCase (_, slots)) = c in
       pi ("Case name", name);
       (* Check the set of binding names is the same as the set of slots *)
-      let binding_names = List.map (fun (QBinding { name; _ }) -> name) bindings
+      let binding_names = List.map (fun (Stages.Ast.QBinding { name; _ }) -> name) bindings
       and slot_names = List.map (fun (TypedSlot (n, _)) -> n) slots in
       if ident_set_eq binding_names slot_names then
         (* Check the type of each binding matches the type of the slot *)

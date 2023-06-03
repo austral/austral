@@ -11,7 +11,7 @@
 open Identifier
 open Common
 open Imports
-module Ast = Stages.Ast
+module Ast = Stages.AstDB
 open Ast
 open Type
 open TypeParameter
