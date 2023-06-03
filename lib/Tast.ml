@@ -9,7 +9,6 @@ open Identifier
 open Common
 open Escape
 open Type
-open Region
 open TypeParameter
 open TypeParameters
 open TypeBindings
@@ -95,9 +94,6 @@ and texpr =
   | TEmbed of ty * string * texpr list
   | TDeref of texpr
   | TSizeOf of ty
-  | TBorrowExpr of borrowing_mode * identifier * region * ty
-  | TReborrow of identifier * ty * region
-  (** `ty` is the type pointed to by the reference *)
 [@@deriving show]
 
 and typed_when =

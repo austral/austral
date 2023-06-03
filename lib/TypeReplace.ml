@@ -106,12 +106,6 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
   | TSizeOf ty ->
      let ty = replace_variables bindings ty in
      TSizeOf ty
-  | TBorrowExpr (mode, name, region, ty) ->
-     let ty = replace_variables bindings ty in
-     TBorrowExpr (mode, name, region, ty)
-  | TReborrow (name, ty, region) ->
-     let ty = replace_variables bindings ty in
-     TReborrow (name, ty, region)
 
 and replace_tyvars_path (bindings: type_bindings) (elem: typed_path_elem): typed_path_elem =
   match elem with

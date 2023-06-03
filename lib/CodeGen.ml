@@ -260,10 +260,6 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CCast (g e, gen_type ty)
   | MSizeOf ty ->
      CSizeOf (gen_type ty)
-  | MBorrowExpr (_, name, _, _) ->
-     CAddressOf (CVar (gen_ident name))
-  | MReborrow (name, _, _) ->
-     CVar (gen_ident name)
 
 and gen_path (mn: module_name) (expr: c_expr) (elems: mtyped_path_elem list): c_expr =
   match elems with

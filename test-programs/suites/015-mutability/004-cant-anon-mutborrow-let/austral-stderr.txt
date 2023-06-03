@@ -10,15 +10,9 @@
     }
   ],
   "span": {
-    "filename": "test-programs/suites/015-mutability/004-cant-anon-mutborrow-let/Test.aum",
-    "startp": { "line": 11, "column": 8 },
-    "end[": { "line": 11, "column": 19 }
+    "filename": "",
+    "startp": { "line": 0, "column": 0 },
+    "end[": { "line": 0, "column": 0 }
   },
-  "context": [
-    [ 9, "    function main(): ExitCode is" ],
-    [ 10, "        let foo: Foo := Foo();" ],
-    [ 11, "        bar(&!foo);" ],
-    [ 12, "        let {} := foo;" ],
-    [ 13, "        return ExitSuccess();" ]
-  ]
+  "context": null
 }
