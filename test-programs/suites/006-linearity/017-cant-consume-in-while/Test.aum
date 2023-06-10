@@ -1,0 +1,16 @@
+module body Test is
+    record Foo: Linear is end;
+
+    function consume(foo: Foo): Bool is
+        let {} := foo;
+        return false;
+    end;
+
+    function main(): ExitCode is
+        let foo: Foo := Foo();
+        while consume(foo) do
+            skip;
+        end while;
+        return ExitSuccess();
+    end;
+end module body.
