@@ -138,7 +138,7 @@ module Combined = struct
   and combined_method_def = CMethodDef of identifier * typarams * qparam list * qtypespec * docstring * astmt
 end
 
-(** The AST, but anonymous borrows are desugard. *)
+(** The AST, but anonymous borrows are desugared. *)
 module AstDB = struct
   open Identifier
   open Common
