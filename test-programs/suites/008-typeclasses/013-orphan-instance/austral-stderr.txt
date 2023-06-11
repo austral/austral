@@ -10,7 +10,7 @@
   "span": {
     "filename": "test-programs/suites/008-typeclasses/013-orphan-instance/Test.aum",
     "startp": { "line": 4, "column": 19 },
-    "end[": { "line": 9, "column": 8 }
+    "end": { "line": 9, "column": 8 }
   },
   "context": [
     [ 2, "import Test_Type (Foo);" ],

@@ -9,7 +9,7 @@
   "span": {
     "filename": "test-programs/suites/015-mutability/001-cant-assign-let/Test.aum",
     "startp": { "line": 4, "column": 8 },
-    "end[": { "line": 4, "column": 16 }
+    "end": { "line": 4, "column": 16 }
   },
   "context": [
     [ 2, "    function main(): ExitCode is" ],

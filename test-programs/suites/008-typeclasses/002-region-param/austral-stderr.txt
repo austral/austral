@@ -22,7 +22,7 @@
   "span": {
     "filename": "test-programs/suites/008-typeclasses/002-region-param/Test.aum",
     "startp": { "line": 1, "column": 19 },
-    "end[": { "line": 4, "column": 8 }
+    "end": { "line": 4, "column": 8 }
   },
   "context": [
     [ 1, "module body Test is" ],

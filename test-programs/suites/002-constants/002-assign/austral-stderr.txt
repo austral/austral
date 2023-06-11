@@ -11,7 +11,7 @@
   "span": {
     "filename": "test-programs/suites/002-constants/002-assign/Test.aum",
     "startp": { "line": 5, "column": 8 },
-    "end[": { "line": 5, "column": 18 }
+    "end": { "line": 5, "column": 18 }
   },
   "context": [
     [ 3, "" ],

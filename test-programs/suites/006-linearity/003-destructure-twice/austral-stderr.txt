@@ -9,7 +9,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/003-destructure-twice/Test.aum",
     "startp": { "line": 9, "column": 8 },
-    "end[": { "line": 9, "column": 36 }
+    "end": { "line": 9, "column": 36 }
   },
   "context": [
     [ 7, "        let r: R := R(x => 32);" ],

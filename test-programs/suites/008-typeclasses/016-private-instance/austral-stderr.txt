@@ -10,7 +10,7 @@
   "span": {
     "filename": "test-programs/suites/008-typeclasses/016-private-instance/Test.aum",
     "startp": { "line": 5, "column": 8 },
-    "end[": { "line": 5, "column": 33 }
+    "end": { "line": 5, "column": 33 }
   },
   "context": [
     [ 3, "module body Test is" ],

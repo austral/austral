@@ -14,7 +14,7 @@
   "span": {
     "filename": "test-programs/suites/012-numbers/sub-Int16-Int32/Test.aum",
     "startp": { "line": 5, "column": 8 },
-    "end[": { "line": 5, "column": 33 }
+    "end": { "line": 5, "column": 33 }
   },
   "context": [
     [ 3, "        let a: Int16    := 10;" ],

@@ -11,7 +11,7 @@
   "span": {
     "filename": "test-programs/suites/014-int-constants/007-nat32-overflow/Test.aum",
     "startp": { "line": 3, "column": 8 },
-    "end[": { "line": 3, "column": 38 }
+    "end": { "line": 3, "column": 38 }
   },
   "context": [
     [ 1, "module body Test is" ],

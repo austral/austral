@@ -11,7 +11,7 @@
   "span": {
     "filename": "test-programs/suites/009-names/004-dup-fun-fun/Test.aum",
     "startp": { "line": 4, "column": 8 },
-    "end[": { "line": 8, "column": 8 }
+    "end": { "line": 8, "column": 8 }
   },
   "context": [
     [ 2, "    function A(): Unit is" ],

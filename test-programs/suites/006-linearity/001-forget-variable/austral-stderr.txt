@@ -12,7 +12,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/001-forget-variable/Test.aum",
     "startp": { "line": 8, "column": 8 },
-    "end[": { "line": 8, "column": 29 }
+    "end": { "line": 8, "column": 29 }
   },
   "context": [
     [ 6, "    function main(): ExitCode is" ],

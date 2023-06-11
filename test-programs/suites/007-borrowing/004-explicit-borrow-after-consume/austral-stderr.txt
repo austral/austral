@@ -11,7 +11,7 @@
   "span": {
     "filename": "test-programs/suites/007-borrowing/004-explicit-borrow-after-consume/Test.aum",
     "startp": { "line": 12, "column": 8 },
-    "end[": { "line": 14, "column": 12 }
+    "end": { "line": 14, "column": 12 }
   },
   "context": [
     [ 10, "        let { bar: Nat8 } := foo;" ],

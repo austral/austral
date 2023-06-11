@@ -8,7 +8,7 @@
   "span": {
     "filename": "test-programs/suites/007-borrowing/009-dereference-linear/Test.aum",
     "startp": { "line": 7, "column": 12 },
-    "end[": { "line": 7, "column": 27 }
+    "end": { "line": 7, "column": 27 }
   },
   "context": [
     [ 5, "        let foo: Foo := Foo();" ],

@@ -14,7 +14,7 @@
   "span": {
     "filename": "test-programs/suites/011-bugs/github-359/Test.aum",
     "startp": { "line": 4, "column": 8 },
-    "end[": { "line": 8, "column": 8 }
+    "end": { "line": 8, "column": 8 }
   },
   "context": [
     [ 2, "    record Foo[A: Free]: Free is" ],

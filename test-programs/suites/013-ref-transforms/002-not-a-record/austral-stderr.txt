@@ -9,7 +9,7 @@
   "span": {
     "filename": "test-programs/suites/013-ref-transforms/002-not-a-record/Test.aum",
     "startp": { "line": 9, "column": 12 },
-    "end[": { "line": 9, "column": 27 }
+    "end": { "line": 9, "column": 27 }
   },
   "context": [
     [ 7, "        let foo: Foo := Blank();" ],

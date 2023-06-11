@@ -9,7 +9,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/009-unbox-twice/Test.aum",
     "startp": { "line": 47, "column": 16 },
-    "end[": { "line": 47, "column": 28 }
+    "end": { "line": 47, "column": 28 }
   },
   "context": [
     [ 45, "            when Left(left: Box[Int32]) do" ],

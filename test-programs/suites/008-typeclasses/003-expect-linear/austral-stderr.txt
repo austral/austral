@@ -13,7 +13,7 @@
   "span": {
     "filename": "test-programs/suites/008-typeclasses/003-expect-linear/Test.aum",
     "startp": { "line": 4, "column": 8 },
-    "end[": { "line": 10, "column": 8 }
+    "end": { "line": 10, "column": 8 }
   },
   "context": [
     [ 2, "    typeclass AcceptsLinear(T: Linear) is" ],

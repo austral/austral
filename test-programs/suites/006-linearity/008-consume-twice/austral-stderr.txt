@@ -9,7 +9,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/008-consume-twice/Test.aum",
     "startp": { "line": 14, "column": 8 },
-    "end[": { "line": 14, "column": 19 }
+    "end": { "line": 14, "column": 19 }
   },
   "context": [
     [ 12, "        let r: R := R(x => 32);" ],

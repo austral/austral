@@ -14,7 +14,7 @@
   "span": {
     "filename": "test-programs/suites/012-numbers/div-Nat16-Index/Test.aum",
     "startp": { "line": 5, "column": 8 },
-    "end[": { "line": 5, "column": 33 }
+    "end": { "line": 5, "column": 33 }
   },
   "context": [
     [ 3, "        let a: Nat16    := 10;" ],

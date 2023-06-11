@@ -14,7 +14,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/007-outside-for-loop/Test.aum",
     "startp": { "line": 8, "column": 8 },
-    "end[": { "line": 10, "column": 16 }
+    "end": { "line": 10, "column": 16 }
   },
   "context": [
     [ 6, "    function main(): ExitCode is" ],

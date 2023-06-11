@@ -11,7 +11,7 @@
   "span": {
     "filename": "test-programs/suites/009-names/003-dup-union-union/Test.aum",
     "startp": { "line": 2, "column": 25 },
-    "end[": { "line": 4, "column": 25 }
+    "end": { "line": 4, "column": 25 }
   },
   "context": [
     [ 1, "module body Test is" ],
