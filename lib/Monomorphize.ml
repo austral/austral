@@ -401,6 +401,14 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
   | TReturn (_, value) ->
      let (value, env) = monomorphize_expr env value in
      (MReturn value, env)
+  | TLetTmp (name, ty, expr, body) ->
+     let (ty, env) = strip_and_mono env ty in
+     let (expr, env) = monomorphize_expr env expr in
+     let (body, env) = monomorphize_stmt env body in
+     (MLetTmp (name, ty, expr, body), env)
+  | TAssignTmp (name, value) ->
+     let (value, env) = monomorphize_expr env value in
+     (MAssignTmp (name, value), env)
 
 and monomorphize_lvalue (env: env) (lvalue: typed_lvalue): (mtyped_lvalue * env) =
   match lvalue with
