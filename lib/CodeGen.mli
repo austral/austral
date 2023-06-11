@@ -7,7 +7,7 @@
 open Identifier
 open Id
 open Env
-open Mtast
+open Stages.Mtast
 open CRepr
 
 val gen_decl_id : decl_id -> string

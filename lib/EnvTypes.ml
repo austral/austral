@@ -16,7 +16,7 @@ open TypeParameters
 open Stages.Tast
 open MonoType
 open MonoTypeBindings
-open Mtast
+open Stages.Mtast
 
 (** A file record contains a file's path and contents. *)
 type file_rec = FileRec of { id: file_id; path: string; contents: string }
