@@ -11,78 +11,132 @@ open Span
 let rec lift (stmt: Ast.astmt): AstLC.astmt =
   match stmt with
   | Ast.ASkip span ->
-    AstLC.ASkip span
+     AstLC.ASkip span
   | Ast.ALet (span, m, id, qt, s) ->
-    AstLC.ALet (span, m, id, qt, lift s)
+     AstLC.ALet (span, m, id, qt, lift s)
   | Ast.ADestructure (span, m, qbl, e, s) ->
-    AstLC.ADestructure (span, m, qbl, transform e, lift s)
-  | Ast.AAssign (span, lv, e, b) ->
-    AstLC.AAssign (span, lift_lv lv, transform e, b)
+     AstLC.ADestructure (span, m, qbl, transform e, lift s)
+  | Ast.AAssign (span, lv, e) ->
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     let lv = transform lv in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.AAssign (span, lv, Temporary tmp)
+       )
+  | Ast.AInitialAssign (name, typespec, expr) ->
+     AstLC.AInitialAssign (name, typespec, transform expr)
   | Ast.AIf (span, e, s1, s2) ->
-    let tmp: identifier = fresh_ident () in
-    let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (
-        tmp,
-        e
-      ),
-      AstLC.AIf (
-        span,
-        Temporary tmp,
-        lift s1,
-        lift s2
-      )
-    )
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.AIf (
+             span,
+             Temporary tmp,
+             lift s1,
+             lift s2
+           )
+       )
   | Ast.AWhen (span, e, s) ->
-    AstLC.AWhen (span, transform e, lift s)
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.AWhen (
+             span,
+             Temporary tmp,
+             lift s
+           )
+       )
   | Ast.ACase (span, e, awl) ->
-    let tmp: identifier = fresh_ident () in
-    let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (
-        tmp,
-        e
-      ),
-      AstLC.ACase (
-        span,
-        Temporary tmp,
-        List.map transform_abstract_when awl
-      )
-    )
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.ACase (
+             span,
+             Temporary tmp,
+             List.map transform_abstract_when awl
+           )
+       )
   | Ast.AWhile (span, e, s) ->
-    let tmp: identifier = fresh_ident () in
-    let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (
-        tmp,
-        e
-      ),
-      AstLC.AWhile (
-        span,
-        Temporary tmp,
-        AstLC.ABlock (
-          empty_span,
-          lift s,
-          AssignTmp (tmp, e)
-        )
-      )
-    )
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.AWhile (
+             span,
+             Temporary tmp,
+             AstLC.ABlock (
+                 empty_span,
+                 lift s,
+                 AssignTmp (tmp, e)
+               )
+           )
+       )
   | Ast.AFor {span; name; initial; final; body} ->
-    AstLC.AFor {span; name; initial=transform initial; final=transform final; body=lift body}
+     let tmp_initial: identifier = fresh_ident () in
+     let tmp_final: identifier = fresh_ident () in
+     let idx =
+       Ast.QTypeSpecifier (
+           make_qident (
+               make_mod_name "Austral.Pervasive",
+               make_ident "Index",
+               make_ident "Index"
+             ),
+           []
+         )
+     in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp_initial,
+             Typecast (transform initial, idx)
+           ),
+         AstLC.ABlock (
+             empty_span,
+             AstLC.LetTmp (
+                 tmp_final,
+                 Typecast (transform final, idx)
+               ),
+             AstLC.AFor {
+                 span;
+                 name;
+                 initial=Temporary tmp_initial;
+                 final=Temporary tmp_final;
+                 body=lift body
+               }
+           )
+       )
   | Ast.ABorrow {span; original; rename; region; body; mode} ->
-    AstLC.ABorrow {span; original; rename; region; body=lift body; mode}
+     AstLC.ABorrow {span; original; rename; region; body=lift body; mode}
   | Ast.ABlock (span, s1, s2) ->
-    AstLC.ABlock (span, lift s1, lift s2)
+     AstLC.ABlock (span, lift s1, lift s2)
   | Ast.ADiscarding (span, e) ->
-    AstLC.ADiscarding (span, transform e)
+     AstLC.ADiscarding (span, transform e)
   | Ast.AReturn (span, e) ->
-    AstLC.AReturn (span, transform e)
-
-and lift_lv (Ast.LValue (name, elems)) =
-  AstLC.LValue (name, List.map transform_elem elems)
+     AstLC.AReturn (span, transform e)
 
 and transform (expr: Ast.aexpr): AstLC.aexpr =
   match expr with
@@ -112,10 +166,10 @@ and transform (expr: Ast.aexpr): AstLC.aexpr =
     AstLC.Negation (transform e)
   | Ast.IfExpression (e1, e2, e3) ->
     AstLC.IfExpression (transform e1, transform e2, transform e3)
-  | Ast.Path (e, pel) ->
-    AstLC.Path (transform e, transform_path pel)
-  | Ast.RefPath (e, rpel) ->
-    AstLC.RefPath (transform e, rpel)
+  | Ast.Path (head, pel) ->
+    AstLC.Path (head, transform_path pel)
+  | Ast.RefPath (head, rpel) ->
+    AstLC.RefPath (head, transform_path rpel)
   | Ast.Embed (qt, s, el) ->
     AstLC.Embed (qt, s, List.map transform el)
   | Ast.Deref e ->

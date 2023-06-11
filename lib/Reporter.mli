@@ -11,7 +11,7 @@ open Identifier
 open Type
 
 (** Render the event list and dump it to a file. *)
-val dump : unit -> unit
+val dump: unit -> unit
 
 (** Run some code inside a named frame. *)
 val with_frame : string -> (unit -> 'a) -> 'a

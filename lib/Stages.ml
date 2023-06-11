@@ -32,7 +32,8 @@ module Ast = struct
     | ASkip of span
     | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr * bool
+    | AAssign of span * aexpr * aexpr
+    | AInitialAssign of qident * qtypespec * aexpr
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
     | ACase of span * aexpr * abstract_when list
@@ -70,8 +71,8 @@ module Ast = struct
     | Disjunction of aexpr * aexpr
     | Negation of aexpr
     | IfExpression of aexpr * aexpr * aexpr
-    | Path of aexpr * path_elem list
-    | RefPath of aexpr * ref_path_elem list
+    | Path of qident * path_elem list
+    | RefPath of qident * path_elem list
     | Embed of qtypespec * string * aexpr list
     | Deref of aexpr
     | Typecast of aexpr * qtypespec
@@ -90,12 +91,6 @@ module Ast = struct
     | SlotAccessor of identifier
     | PointerSlotAccessor of identifier
     | ArrayIndex of aexpr
-
-  and ref_path_elem =
-    | RefSlotAccessor of identifier
-
-  and lvalue =
-    LValue of identifier * path_elem list
 end
 
 (** The combined representation merges the interface and body. *)
@@ -149,13 +144,12 @@ module AstLC = struct
 
   type qbinding = Ast.qbinding
 
-  type ref_path_elem = Ast.ref_path_elem
-
   type astmt =
     | ASkip of span
     | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr * bool
+    | AAssign of span * aexpr * aexpr
+    | AInitialAssign of qident * qtypespec * aexpr
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
     | ACase of span * aexpr * abstract_when list
@@ -196,8 +190,8 @@ module AstLC = struct
     | Disjunction of aexpr * aexpr
     | Negation of aexpr
     | IfExpression of aexpr * aexpr * aexpr
-    | Path of aexpr * path_elem list
-    | RefPath of aexpr * ref_path_elem list
+    | Path of qident * path_elem list
+    | RefPath of qident * path_elem list
     | Embed of qtypespec * string * aexpr list
     | Deref of aexpr
     | Typecast of aexpr * qtypespec
@@ -211,17 +205,91 @@ module AstLC = struct
   and abstract_arglist =
     | Positional of aexpr list
     | Named of (identifier * aexpr) list
-  
+
   and path_elem =
     | SlotAccessor of identifier
     | PointerSlotAccessor of identifier
     | ArrayIndex of aexpr
-
-  and lvalue =
-    LValue of identifier * path_elem list
 end
 
-(** The AstLC, but anonymous borrows are desugared. *)
+(** The AstLC, but paths are desugared. *)
+module AstDP = struct
+  open Identifier
+  open Common
+  open Span
+  open Escape
+
+  type qtypespec = Ast.qtypespec
+
+  type qbinding = Ast.qbinding
+
+  type astmt =
+    | ASkip of span
+    | ALet of span * mutability * identifier * qtypespec * astmt
+    | ADestructure of span * mutability * qbinding list * aexpr * astmt
+    | AAssign of span * aexpr * aexpr
+    | AAssignVar of span * qident * aexpr
+    | AInitialAssign of qident * qtypespec * aexpr
+    | AIf of span * aexpr * astmt * astmt
+    | AWhen of span * aexpr * astmt
+    | ACase of span * aexpr * abstract_when list
+    | AWhile of span * aexpr * astmt
+    | AFor of {
+        span: span;
+        name: identifier;
+        initial: aexpr;
+        final: aexpr;
+        body: astmt
+      }
+    | ABorrow of {
+        span: span;
+        original: identifier;
+        rename: identifier;
+        region: identifier;
+        body: astmt;
+        mode: borrow_stmt_kind
+      }
+    | ABlock of span * astmt * astmt
+    | ADiscarding of span * aexpr
+    | AReturn of span * aexpr
+    | LetTmp of identifier * aexpr
+    | AssignTmp of identifier * aexpr
+
+  and aexpr =
+    | NilConstant
+    | BoolConstant of bool
+    | IntConstant of string
+    | FloatConstant of string
+    | StringConstant of escaped_string
+    | Variable of qident
+    | Temporary of identifier
+    | FunctionCall of qident * abstract_arglist
+    | ArithmeticExpression of arithmetic_operator * aexpr * aexpr
+    | Comparison of comparison_operator * aexpr * aexpr
+    | Conjunction of aexpr * aexpr
+    | Disjunction of aexpr * aexpr
+    | Negation of aexpr
+    | IfExpression of aexpr * aexpr * aexpr
+    | Embed of qtypespec * string * aexpr list
+    | Deref of aexpr
+    | Typecast of aexpr * qtypespec
+    | SizeOf of qtypespec
+    | BorrowExpr of borrowing_mode * qident
+    | Reborrow of qident
+    (* Path expressions *)
+    | SlotAccessor of aexpr * identifier
+    | PointerSlotAccessor of aexpr * identifier
+    | ArrayIndex of aexpr * aexpr
+
+  and abstract_when =
+    | AbstractWhen of identifier * qbinding list * astmt
+
+  and abstract_arglist =
+    | Positional of aexpr list
+    | Named of (identifier * aexpr) list
+end
+
+(** The AstDP, but anonymous borrows are desugared. *)
 module AstDB = struct
   open Identifier
   open Common
@@ -236,7 +304,9 @@ module AstDB = struct
     | ASkip of span
     | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr * bool
+    | AAssign of span * aexpr * aexpr
+    | AAssignVar of span * qident * aexpr
+    | AInitialAssign of qident * qtypespec * aexpr
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
     | ACase of span * aexpr * abstract_when list
@@ -277,12 +347,14 @@ module AstDB = struct
     | Disjunction of aexpr * aexpr
     | Negation of aexpr
     | IfExpression of aexpr * aexpr * aexpr
-    | Path of aexpr * path_elem list
-    | RefPath of aexpr * ref_path_elem list
     | Embed of qtypespec * string * aexpr list
     | Deref of aexpr
     | Typecast of aexpr * qtypespec
     | SizeOf of qtypespec
+    (* Path expressions *)
+    | SlotAccessor of aexpr * identifier
+    | PointerSlotAccessor of aexpr * identifier
+    | ArrayIndex of aexpr * aexpr
 
   and abstract_when =
     | AbstractWhen of identifier * qbinding list * astmt
@@ -290,17 +362,6 @@ module AstDB = struct
   and abstract_arglist =
     | Positional of aexpr list
     | Named of (identifier * aexpr) list
-
-  and path_elem =
-    | SlotAccessor of identifier
-    | PointerSlotAccessor of identifier
-    | ArrayIndex of aexpr
-
-  and ref_path_elem =
-    | RefSlotAccessor of identifier
-
-  and lvalue =
-    LValue of identifier * path_elem list
 end
 
 (** The combined representation, but bodies are thoroughly desugared. *)
@@ -409,7 +470,9 @@ module Tast = struct
     | TSkip of span
     | TLet of span * mutability * identifier * ty * tstmt
     | TDestructure of span * mutability * typed_binding list * texpr * tstmt
-    | TAssign of span * typed_lvalue * texpr * bool
+    | TAssign of span * texpr * texpr
+    | TAssignVar of span * qident * texpr
+    | TInitialAssign of qident * texpr
     | TIf of span * texpr * tstmt * tstmt
     | TCase of span * texpr * typed_when list * case_ref
     | TWhile of span * texpr * tstmt
@@ -464,12 +527,9 @@ module Tast = struct
     | TIfExpression of texpr * texpr * texpr
     | TRecordConstructor of ty * (identifier * texpr) list
     | TUnionConstructor of ty * identifier * (identifier * texpr) list
-    | TPath of {
-        head: texpr;
-        elems: typed_path_elem list;
-        ty: ty
-      }
-    | TRefPath of texpr * typed_ref_path_elem list * ty
+    | TSlotAccessor of texpr * identifier * ty
+    | TPointerSlotAccessor of texpr * identifier * ty
+    | TArrayIndex of texpr * texpr * ty
     | TEmbed of ty * string * texpr list
     | TDeref of texpr
     | TSizeOf of ty
@@ -477,20 +537,6 @@ module Tast = struct
 
   and typed_when =
     TypedWhen of identifier * typed_binding list * tstmt
-  [@@deriving show]
-
-  and typed_path_elem =
-    | TSlotAccessor of identifier * ty
-    | TPointerSlotAccessor of identifier * ty
-    | TArrayIndex of texpr * ty
-  [@@deriving show]
-
-  and typed_ref_path_elem =
-    | TRefSlotAccessor of identifier * ty
-  [@@deriving show]
-
-  and typed_lvalue =
-    TypedLValue of identifier * typed_path_elem list
   [@@deriving show]
 
   and typed_arglist =
@@ -552,7 +598,9 @@ module Mtast = struct
     | MSkip
     | MLet of identifier * mono_ty * mstmt
     | MDestructure of mono_binding list * mexpr * mstmt
-    | MAssign of mtyped_lvalue * mexpr
+    | MAssign of mexpr * mexpr
+    | MAssignVar of qident * mexpr
+    | MInitialAssign of qident * mexpr
     | MIf of mexpr * mstmt * mstmt
     | MCase of mexpr * mtyped_when list * Tast.case_ref
     | MWhile of mexpr * mstmt
@@ -601,30 +649,16 @@ module Mtast = struct
     | MIfExpression of mexpr * mexpr * mexpr
     | MRecordConstructor of mono_ty * (identifier * mexpr) list
     | MUnionConstructor of mono_ty * identifier * (identifier * mexpr) list
-    | MPath of {
-        head: mexpr;
-        elems: mtyped_path_elem list;
-        ty: mono_ty
-      }
-    | MRefPath of mexpr * mtyped_ref_path_elem list * mono_ty
     | MEmbed of mono_ty * string * mexpr list
     | MDeref of mexpr
     | MTypecast of mexpr * mono_ty
     | MSizeOf of mono_ty
+    | MSlotAccessor of mexpr * identifier * mono_ty
+    | MPointerSlotAccessor of mexpr * identifier * mono_ty
+    | MArrayIndex of mexpr * mexpr * mono_ty
 
   and mtyped_when =
     MTypedWhen of identifier * mono_binding list * mstmt
-
-  and mtyped_path_elem =
-    | MSlotAccessor of identifier * mono_ty
-    | MPointerSlotAccessor of identifier * mono_ty
-    | MArrayIndex of mexpr * mono_ty
-
-  and mtyped_ref_path_elem =
-    | MRefSlotAccessor of identifier * mono_ty
-
-  and mtyped_lvalue =
-    MTypedLValue of identifier * mtyped_path_elem list
 
   and mvalue_parameter =
     MValueParameter of identifier * mono_ty

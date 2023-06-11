@@ -75,9 +75,15 @@ let adorn_error_with_span (new_span: span) (f: unit -> 'a): 'a =
   with Austral_error error ->
     let (AustralError { module_name; kind; text; span; source_ctx }) = error in
     match span with
-    | Some _ ->
-       (* The error already has a span, do nothing. *)
-       raise (Austral_error error)
+    | Some span' ->
+       (* The error already has a span. *)
+       if span' = empty_span then
+         (* The error has the empty span, add ours. *)
+         let new_err = AustralError { module_name; kind; text; span = Some new_span; source_ctx } in
+         raise (Austral_error new_err)
+       else
+         (* The error has a non-empty span, reraise. *)
+         raise (Austral_error error)
     | None ->
        (* Add the span *)
        let new_err = AustralError { module_name; kind; text; span = Some new_span; source_ctx } in

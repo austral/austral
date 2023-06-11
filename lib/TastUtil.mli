@@ -38,6 +38,4 @@ val arglist_to_positional : typed_arglist * identifier list -> texpr list
 
 val get_type : texpr -> ty
 
-val path_elem_type : typed_path_elem -> ty
-
-val ref_path_elem_type : typed_ref_path_elem -> ty
+val dump_stmt : tstmt -> string

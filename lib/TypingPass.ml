@@ -59,12 +59,6 @@ let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * typ
   | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
-(** Copied from TypeCheckExpr *)
-let get_path_ty_from_elems (elems: typed_path_elem list): ty =
-  assert ((List.length elems) > 0);
-  let last = List.nth elems ((List.length elems) - 1) in
-  path_elem_type last
-
 let stmt_kind (stmt: astmt): string =
   match stmt with
   | ASkip _ -> "skip"
@@ -82,6 +76,8 @@ let stmt_kind (stmt: astmt): string =
   | AReturn _ -> "return"
   | LetTmp _ -> "let"
   | AssignTmp _ -> "assign"
+  | AAssignVar _ -> "assign"
+  | AInitialAssign _ -> "assign"
 
 let is_boolean = function
   | Boolean -> true
@@ -92,15 +88,6 @@ let is_compatible_with_index_type = function
      true
   | e ->
      (get_type e) = index_type
-
-let goes_through_parameter (elems: path_elem list): bool =
-  let pred (elem: path_elem): bool =
-    match elem with
-    | SlotAccessor _ -> false
-    | PointerSlotAccessor _ -> true
-    | ArrayIndex _ -> false
-  in
-  List.exists pred elems
 
 type case_mode =
   | NormalCaseMode
@@ -201,49 +188,73 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                    Errors.destructure_not_public rec_ty
               | _ ->
                  Errors.destructure_non_record rec_ty))
-      | AAssign (span, LValue (var, elems), value, first) ->
+      | AAssign (span, lvalue, rvalue) ->
          adorn_error_with_span span
            (fun _ ->
-             (match get_var lexenv var with
-              | Some (var_ty, source) ->
-                 (* Check: can we write to this variable? *)
-                 let _ =
-                   if first then
-                     ()
-                   else
-                     match source with
-                     (* All good. *)
-                     | VarLocal mut ->
-                        (match mut with
-                        | Mutable -> ()
-                        | Immutable -> Errors.cant_assign_to_immutable_var var)
+             (* Augment both sides. *)
+             let lvalue: texpr = augment_expr module_name env rm typarams lexenv None lvalue
+             and rvalue: texpr = augment_expr module_name env rm typarams lexenv None rvalue in
+             (* The type of the lvalue must be a read reference. *)
+             let lvalue_ty: ty = get_type lvalue in
+             let pointed_ty: ty = begin
+                 match lvalue_ty with
+                 | WriteRef (ty, _) ->
+                    ty
+                 | _ ->
+                    err ("Can't assign: lvalue is not a mutable reference: " ^ (type_string lvalue_ty))
+               end
+             in
+             (* The pointed to type and the type of the rvalue must match. *)
+             let _ = match_type_with_value (env, module_name) pointed_ty rvalue in
+             (* The pointed-to type must be in the free universe. *)
+             let _ =
+               if (type_universe pointed_ty) = FreeUniverse then
+                 ()
+               else
+                 austral_raise LinearityError [
+                     Text "Cannot assign to a path that ends in a type, ";
+                     Type pointed_ty;
+                     Text ", not in the Free universe."
+                   ]
+             in
+             (* Construct the assignment. *)
+             TAssign (span, lvalue, rvalue))
+      | AAssignVar (span, name, rvalue) ->
+         adorn_error_with_span span
+           (fun _ ->
+             (* Augment the rvalue. *)
+             let rvalue: texpr = augment_expr module_name env rm typarams lexenv None rvalue in
+             (* Get the type of the lvalue. *)
+             let lvalue_ty: ty = begin
+                 let name: identifier = original_name name in
+               match get_var lexenv name with
+               | (Some (orig_ty, src)) -> begin
+                   let _ =
+                     match src with
+                     | VarLocal Mutable ->
+                        ()
+                     | VarLocal Immutable ->
+                        Errors.cant_assign_to_immutable_var name
                      | VarConstant ->
-                        Errors.cannot_assign_to_constant ()
+                        Errors.cannot_assign_to_constant name
                      | VarParam ->
-                        (* We can only assign to a parameter if we're going through a reference at some point. *)
-                        (match elems with
-                        | [] ->    Errors.cannot_assign_to_parameter ()
-                        | elems ->
-                           if goes_through_parameter elems then
-                              ()
-                           else
-                              Errors.cannot_assign_to_parameter ())
-                 in
-                 (match elems with
-                  | [] ->
-                     (* Assigning to a variable. *)
-                     let value = augment_expr module_name env rm typarams lexenv None value in
-                     let _ = match_type_with_value (env, module_name) var_ty value in
-                     TAssign (span, TypedLValue (var, []), value, first)
-                  | elems ->
-                     (* Assigning to a path. *)
-                     let elems = augment_lvalue_path env module_name rm typarams lexenv var_ty elems in
-                     let value = augment_expr module_name env rm typarams lexenv None value in
-                     let ty = get_path_ty_from_elems elems in
-                     let _ = match_type_with_value (env, module_name) ty value in
-                     TAssign (span, TypedLValue (var, elems), value, first))
-              | None ->
-                 Errors.unknown_name ~kind:"variable" ~name:var))
+                        Errors.cannot_assign_to_parameter name
+                   in
+                   orig_ty
+                 end
+               | None ->
+                  Errors.unknown_name ~kind:"variable" ~name:name
+               end
+             in
+             (* Types must match. *)
+             let _ = match_type_with_value (env, module_name) lvalue_ty rvalue in
+             (* Construct the assignment. *)
+             TAssignVar (span, name, rvalue))
+      | AInitialAssign (name, ty, rvalue) ->
+         let rvalue: texpr = augment_expr module_name env rm typarams lexenv None rvalue in
+         let ty = parse_typespec env rm typarams ty in
+         let _ = match_type_with_value (env, module_name) ty rvalue in
+         TInitialAssign (name, rvalue)
       | AIf (span, c, t, f) ->
          adorn_error_with_span span
            (fun _ ->
@@ -310,8 +321,17 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                       (* Immutable variables cannot be borrowed mutably. *)
                       Errors.cannot_borrow_immutable_var_mutably original
                    | (VarParam, Write) ->
-                      (* Parameters cannot be borrowed mutably. *)
-                      Errors.cannot_borrow_param_mutably original
+                      (* Parameters cannot be borrowed mutably, unless they're mutable references. *)
+                      let is_mut = begin
+                        match orig_ty with
+                        | WriteRef _ -> true
+                        | _ -> false
+                      end
+                      in
+                      if is_mut then
+                        ()
+                      else
+                        Errors.cannot_borrow_param_mutably original
                    | _ ->
                       (* And anything else is fine. *)
                       ()
@@ -419,47 +439,6 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
         TCase (span, expr', whens'', case_ref)
       else
         Errors.case_non_exhaustive ())
-
-and augment_lvalue_path (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elems: path_elem list): typed_path_elem list =
-  match elems with
-  | [elem] ->
-     [augment_lvalue_path_elem env module_name rm typarams lexenv head_ty elem]
-  | elem::rest ->
-     let elem' = augment_lvalue_path_elem env module_name rm typarams lexenv head_ty elem in
-     let rest' = augment_lvalue_path env module_name rm typarams lexenv (path_elem_type elem') rest in
-     elem' :: rest'
-  | [] ->
-     err "Path is empty"
-
-and augment_lvalue_path_elem (env: env) (module_name: module_name) (rm: region_map) (typarams: typarams) (lexenv: lexenv) (head_ty: ty) (elem: path_elem): typed_path_elem =
-  let ctx: TypeCheckExpr.expr_ctx = TypeCheckExpr.make_ctx module_name env rm typarams lexenv in
-  match elem with
-  | SlotAccessor slot_name ->
-     (match head_ty with
-      | NamedType (name, args, _) ->
-         TypeCheckExpr.augment_slot_accessor_elem ctx slot_name name args head_ty
-      | _ ->
-         Errors.path_not_record head_ty)
-  | PointerSlotAccessor slot_name ->
-     (match head_ty with
-      | Pointer pointed_to ->
-         (* TODO: addresses should not be indexable *)
-         TypeCheckExpr.augment_pointer_slot_accessor_elem ctx slot_name pointed_to
-      | WriteRef (ty, _) ->
-         (match ty with
-          | NamedType (name, args, _) ->
-             TypeCheckExpr.augment_reference_slot_accessor_elem ctx slot_name name args ty
-          | _ ->
-             Errors.path_not_record ty)
-      | _ ->
-         Errors.path_not_record head_ty)
-  | ArrayIndex ie ->
-     let ie' = augment_expr module_name env rm typarams lexenv None ie in
-     let _ = ie' in
-     (match head_ty with
-      | _ ->
-         Errors.lvalue_index ())
-
 
 and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty): (ty * decl list) =
   let name: qident = (match ty with
@@ -598,28 +577,18 @@ and is_constant = function
      List.for_all (fun (_, v) -> is_constant v) values
   | TUnionConstructor (_, _, values) ->
      List.for_all (fun (_, v) -> is_constant v) values
-  | TPath { head; elems; _ } ->
-     (is_constant head) && (List.for_all is_path_elem_constant elems)
-  | TRefPath (head, elems, _) ->
-     (is_constant head) && (List.for_all is_ref_path_elem_constant elems)
   | TEmbed _ ->
      true
   | TDeref _ ->
      false
   | TSizeOf _ ->
      true
-
-and is_path_elem_constant = function
   | TSlotAccessor _ ->
      true
   | TPointerSlotAccessor _ ->
      true
-  | TArrayIndex (e, _) ->
-     is_constant e
-
-and is_ref_path_elem_constant = function
-  | TRefSlotAccessor _ ->
-     true
+  | TArrayIndex (_, idx, _) ->
+     is_constant idx
 
 let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: linked_definition): typed_decl =
   with_frame "Augment declaration"

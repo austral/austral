@@ -36,82 +36,84 @@ let make_mode (mode: borrowing_mode): borrow_stmt_kind =
   | ReadBorrow -> Read
   | WriteBorrow -> Write
 
-let rec lift_borrows (expr: AstLC.aexpr) (acc: acc): AstDB.aexpr * acc =
+let rec lift_borrows (expr: AstDP.aexpr) (acc: acc): AstDB.aexpr * acc =
   match expr with
-  | AstLC.NilConstant -> (AstDB.NilConstant, acc)
-  | AstLC.BoolConstant b -> (AstDB.BoolConstant b, acc)
-  | AstLC.IntConstant i -> (AstDB.IntConstant i, acc)
-  | AstLC.FloatConstant f -> (AstDB.FloatConstant f, acc)
-  | AstLC.StringConstant s -> (AstDB.StringConstant s, acc)
-  | AstLC.Variable id -> (AstDB.Variable id, acc)
-  | AstLC.Temporary name -> (AstDB.Temporary name, acc)
-  | AstLC.BorrowExpr (mode, original) ->
+  | AstDP.NilConstant -> (AstDB.NilConstant, acc)
+  | AstDP.BoolConstant b -> (AstDB.BoolConstant b, acc)
+  | AstDP.IntConstant i -> (AstDB.IntConstant i, acc)
+  | AstDP.FloatConstant f -> (AstDB.FloatConstant f, acc)
+  | AstDP.StringConstant s -> (AstDB.StringConstant s, acc)
+  | AstDP.Variable id -> (AstDB.Variable id, acc)
+  | AstDP.Temporary id -> (AstDB.Temporary id, acc)
+  | AstDP.BorrowExpr (mode, original) ->
     let rename = make_rename original in
     let acc_rec = { original; rename; mode=make_mode mode } in
     let renamed_expr = AstDB.Variable rename in
     (renamed_expr, acc_rec :: acc)
-  | AstLC.Reborrow original ->
+  | AstDP.Reborrow original ->
     let rename = make_rename original in
     let acc_rec = { original; rename; mode = Reborrow } in
     let renamed_expr = AstDB.Variable rename in
     (renamed_expr, acc_rec :: acc)
-  | AstLC.FunctionCall (id, args) ->
-    let (args', acc') = lift_arglist args acc in
+  | AstDP.FunctionCall (id, args) ->
+    let (args', acc) = lift_arglist args acc in
     let expr' = AstDB.FunctionCall (id, args') in
-    (expr', acc')
-  | AstLC.ArithmeticExpression (op, left, right) ->
-    let (left', acc') = lift_borrows left acc in
-    let (right', acc'') = lift_borrows right acc' in
-    (AstDB.ArithmeticExpression (op, left', right'), acc'')
-  | AstLC.Comparison (op, left, right) ->
-    let (left', acc') = lift_borrows left acc in
-    let (right', acc'') = lift_borrows right acc' in
-    (AstDB.Comparison (op, left', right'), acc'')
-  | AstLC.Conjunction (left, right) ->
-    let (left', acc') = lift_borrows left acc in
-    let (right', acc'') = lift_borrows right acc' in
-    (AstDB.Conjunction (left', right'), acc'')
-  | AstLC.Disjunction (left, right) ->
-    let (left', acc') = lift_borrows left acc in
-    let (right', acc'') = lift_borrows right acc' in
-    (AstDB.Disjunction (left', right'), acc'')
-  | AstLC.Negation expr' ->
-    let (expr'', acc') = lift_borrows expr' acc in
-    (AstDB.Negation expr'', acc')
-  | AstLC.IfExpression (cond, then', else') ->
-    let (cond', acc') = lift_borrows cond acc in
-    let (then'', acc'') = lift_borrows then' acc' in
-    let (else'', acc''') = lift_borrows else' acc'' in
-    (AstDB.IfExpression (cond', then'', else''), acc''')
-  | AstLC.Path (expr', path) ->
-    let (expr'', acc') = lift_borrows expr' acc in
-    let (path', acc'') = lift_path_elems path acc' in
-    (AstDB.Path (expr'', path'), acc'')
-  | AstLC.RefPath (expr', path) ->
-    let (expr'', acc') = lift_borrows expr' acc in
-    let (path', acc'') = lift_ref_path_elems path acc' in
-    (AstDB.RefPath (expr'', path'), acc'')
-  | AstLC.Embed (ty, str, exprs) ->
-    let (exprs', acc') = lift_borrows_list exprs acc in
-    (AstDB.Embed (ty, str, exprs'), acc')
-  | AstLC.Deref expr' ->
-    let (expr'', acc') = lift_borrows expr' acc in
-    (AstDB.Deref expr'', acc')
-  | AstLC.Typecast (expr', ty) ->
-    let (expr'', acc') = lift_borrows expr' acc in
-    (AstDB.Typecast (expr'', ty), acc')
- | AstLC.SizeOf ty -> (AstDB.SizeOf ty, acc)
+    (expr', acc)
+  | AstDP.ArithmeticExpression (op, left, right) ->
+    let (left', acc) = lift_borrows left acc in
+    let (right', acc) = lift_borrows right acc in
+    (AstDB.ArithmeticExpression (op, left', right'), acc)
+  | AstDP.Comparison (op, left, right) ->
+    let (left', acc) = lift_borrows left acc in
+    let (right', acc) = lift_borrows right acc in
+    (AstDB.Comparison (op, left', right'), acc)
+  | AstDP.Conjunction (left, right) ->
+    let (left', acc) = lift_borrows left acc in
+    let (right', acc) = lift_borrows right acc in
+    (AstDB.Conjunction (left', right'), acc)
+  | AstDP.Disjunction (left, right) ->
+    let (left', acc) = lift_borrows left acc in
+    let (right', acc) = lift_borrows right acc in
+    (AstDB.Disjunction (left', right'), acc)
+  | AstDP.Negation expr' ->
+    let (expr'', acc) = lift_borrows expr' acc in
+    (AstDB.Negation expr'', acc)
+  | AstDP.IfExpression (cond, then', else') ->
+    let (cond', acc) = lift_borrows cond acc in
+    let (then'', acc) = lift_borrows then' acc in
+    let (else'', acc) = lift_borrows else' acc in
+    (AstDB.IfExpression (cond', then'', else''), acc)
+  | AstDP.Embed (ty, str, exprs) ->
+    let (exprs', acc) = lift_borrows_list exprs acc in
+    (AstDB.Embed (ty, str, exprs'), acc)
+  | AstDP.Deref expr' ->
+    let (expr'', acc) = lift_borrows expr' acc in
+    (AstDB.Deref expr'', acc)
+  | AstDP.Typecast (expr', ty) ->
+    let (expr'', acc) = lift_borrows expr' acc in
+    (AstDB.Typecast (expr'', ty), acc)
+  | AstDP.SizeOf ty -> (AstDB.SizeOf ty, acc)
+  | AstDP.SlotAccessor (subpath, name) ->
+     let (subpath, acc) = lift_borrows subpath acc in
+     (AstDB.SlotAccessor (subpath, name), acc)
+  | AstDP.PointerSlotAccessor (subpath, name) ->
+     let (subpath, acc) = lift_borrows subpath acc in
+     (AstDB.PointerSlotAccessor (subpath, name), acc)
+  | AstDP.ArrayIndex (subpath, expr) ->
+     let (subpath, acc) = lift_borrows subpath acc in
+     let (expr, acc) = lift_borrows expr acc in
+     (AstDB.ArrayIndex (subpath, expr), acc)
 
-and lift_arglist (args: AstLC.abstract_arglist) (acc: acc): (AstDB.abstract_arglist * acc) =
+and lift_arglist (args: AstDP.abstract_arglist) (acc: acc): (AstDB.abstract_arglist * acc) =
   match args with
-  | AstLC.Positional exprs ->
+  | AstDP.Positional exprs ->
     let (exprs', acc') = lift_borrows_list exprs acc in
     (AstDB.Positional exprs', acc')
-  | AstLC.Named pairs ->
+  | AstDP.Named pairs ->
     let (pairs', acc') = lift_named_arg_pairs pairs acc in
     (AstDB.Named pairs', acc')
 
-and lift_named_arg_pairs (pairs: (identifier * AstLC.aexpr) list) (acc: acc): ((identifier * AstDB.aexpr) list * acc) =
+and lift_named_arg_pairs (pairs: (identifier * AstDP.aexpr) list) (acc: acc): ((identifier * AstDB.aexpr) list * acc) =
   let (acc, l) = Util.map_with_context (fun (acc, pair) ->
                      let (name, expr) = pair in
                      let (expr, acc) = lift_borrows expr acc in
@@ -122,7 +124,7 @@ and lift_named_arg_pairs (pairs: (identifier * AstLC.aexpr) list) (acc: acc): ((
   in
   (l, acc)
 
-and lift_borrows_list (exprs: AstLC.aexpr list) (acc: acc): (AstDB.aexpr list * acc) =
+and lift_borrows_list (exprs: AstDP.aexpr list) (acc: acc): (AstDB.aexpr list * acc) =
   let (acc, l) = Util.map_with_context (fun (acc, expr) ->
                      let (expr, acc) = lift_borrows expr acc in
                      (acc, expr))
@@ -130,27 +132,6 @@ and lift_borrows_list (exprs: AstLC.aexpr list) (acc: acc): (AstDB.aexpr list * 
                    exprs
   in
   (l, acc)
-
-and lift_path_elems (elems: AstLC.path_elem list) (acc: acc): (AstDB.path_elem list * acc) =
-  let lift_elem elem acc' =
-    match elem with
-    | AstLC.SlotAccessor name ->
-       (AstDB.SlotAccessor name, acc)
-    | AstLC.PointerSlotAccessor name ->
-       (AstDB.PointerSlotAccessor name, acc)
-    | AstLC.ArrayIndex expr ->
-       let (expr', acc'') = lift_borrows expr acc' in
-       (AstDB.ArrayIndex expr', acc'')
-  in
-  List.fold_right (fun elem (elems', acc') -> let (elem', acc'') = lift_elem elem acc' in (elem' :: elems', acc'')) elems ([], acc)
-
-and lift_ref_path_elems (elems: Ast.ref_path_elem list) (acc: acc): (AstDB.ref_path_elem list * acc) =
-  let lift_elem elem acc' =
-    match elem with
-    | Ast.RefSlotAccessor name ->
-       (AstDB.RefSlotAccessor name, acc')
-  in
-  List.fold_right (fun elem (elems', acc') -> let (elem', acc'') = lift_elem elem acc' in (elem' :: elems', acc'')) elems ([], acc)
 
 (* Wrap statements in borrow statements *)
 
@@ -176,84 +157,90 @@ let wrap_stmt_with_borrows (stmt: AstDB.astmt) (acc: acc): AstDB.astmt =
 
 (* Transform statements. *)
 
-let rec transform_stmt (stmt: AstLC.astmt): AstDB.astmt =
+let rec transform_stmt (stmt: AstDP.astmt): AstDB.astmt =
   match stmt with
-  | AstLC.ASkip span ->
-    AstDB.ASkip span
-  | AstLC.ALet (span, mutability, name, ty, body) ->
-    let body = transform_stmt body in
-    let stmt = AstDB.ALet (span, mutability, name, ty, body) in
-    stmt
-  | AstLC.ADestructure (span, mutability, bindings, value, body) ->
-    let (value, acc) = lift_borrows value [] in
-    let body = transform_stmt body in
-    let stmt = AstDB.ADestructure (span, mutability, bindings, value, body) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.AAssign (span, AstLC.LValue (name, elems), value, first) ->
-    let (value, acc) = lift_borrows value [] in
-    let (elems, acc') = lift_path_elems elems [] in
-    let acc = acc @ acc' in
-    let stmt = AstDB.AAssign (span, AstDB.LValue (name, elems), value, first) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.LetTmp (name, value) ->
-    let (value, acc) = lift_borrows value [] in
-    let stmt = AstDB.LetTmp (name, value) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.AssignTmp (name, value) ->
-    let (value, acc) = lift_borrows value [] in
-    let stmt = AstDB.AssignTmp (name, value) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.AIf (span, cond, then', else') ->
-    let (cond, acc) = lift_borrows cond [] in
-    let then' = transform_stmt then' in
-    let else' = transform_stmt else' in
-    let stmt = AstDB.AIf (span, cond, then', else') in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.AWhen (span, cond, body) ->
-    let (cond, acc) = lift_borrows cond [] in
-    let body = transform_stmt body in
-    let stmt = AstDB.AWhen (span, cond, body) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.ACase (span, expr, whens) ->
-    let (expr, acc) = lift_borrows expr [] in
-    let whens = transform_whens whens in
-    let stmt = AstDB.ACase (span, expr, whens) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.AWhile (span, cond, body) ->
-    let (cond, acc) = lift_borrows cond [] in
-    let body = transform_stmt body in
-    let stmt = AstDB.AWhile (span, cond, body) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.AFor { span; name; initial; final; body } ->
-    let (initial, acc) = lift_borrows initial [] in
-    let (final, acc') = lift_borrows final acc in
-    let acc = acc @ acc' in
-    let body = transform_stmt body in
-    let stmt = AstDB.AFor { span; name; initial; final; body } in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.ABlock (span, stmt1, stmt2) ->
-    let stmt1 = transform_stmt stmt1 in
-    let stmt2 = transform_stmt stmt2 in
-    AstDB.ABlock (span, stmt1, stmt2)
-  | AstLC.ADiscarding (span, expr) ->
-    let (expr, acc) = lift_borrows expr [] in
-    let stmt = AstDB.ADiscarding (span, expr) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.AReturn (span, expr) ->
-    let (expr, acc) = lift_borrows expr [] in
-    let stmt = AstDB.AReturn (span, expr) in
-    wrap_stmt_with_borrows stmt acc
-  | AstLC.ABorrow { span; original; rename; region; body; mode } ->
-    let body = transform_stmt body in
-    AstDB.ABorrow { span; original; rename; region; body; mode }
+  | AstDP.ASkip span ->
+     AstDB.ASkip span
+  | AstDP.ALet (span, mutability, name, ty, body) ->
+     let body = transform_stmt body in
+     let stmt = AstDB.ALet (span, mutability, name, ty, body) in
+     stmt
+  | AstDP.ADestructure (span, mutability, bindings, value, body) ->
+     let (value, acc) = lift_borrows value [] in
+     let body = transform_stmt body in
+     let stmt = AstDB.ADestructure (span, mutability, bindings, value, body) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AAssign (span, path, value) ->
+     let (path, acc) = lift_borrows path [] in
+     let (value, acc) = lift_borrows value acc in
+     let stmt = AstDB.AAssign (span, path, value) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AAssignVar (span, name, value) ->
+     let (value, acc) = lift_borrows value [] in
+     let stmt = AstDB.AAssignVar (span, name, value) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AInitialAssign (name, ty, value) ->
+     let (value, acc) = lift_borrows value [] in
+     let stmt = AstDB.AInitialAssign (name, ty, value) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.LetTmp (name, value) ->
+     let (value, acc) = lift_borrows value [] in
+     let stmt = AstDB.LetTmp (name, value) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AssignTmp (name, value) ->
+     let (value, acc) = lift_borrows value [] in
+     let stmt = AstDB.AssignTmp (name, value) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AIf (span, cond, then', else') ->
+     let (cond, acc) = lift_borrows cond [] in
+     let then' = transform_stmt then' in
+     let else' = transform_stmt else' in
+     let stmt = AstDB.AIf (span, cond, then', else') in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AWhen (span, cond, body) ->
+     let (cond, acc) = lift_borrows cond [] in
+     let body = transform_stmt body in
+     let stmt = AstDB.AWhen (span, cond, body) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.ACase (span, expr, whens) ->
+     let (expr, acc) = lift_borrows expr [] in
+     let whens = transform_whens whens in
+     let stmt = AstDB.ACase (span, expr, whens) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AWhile (span, cond, body) ->
+     let (cond, acc) = lift_borrows cond [] in
+     let body = transform_stmt body in
+     let stmt = AstDB.AWhile (span, cond, body) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AFor { span; name; initial; final; body } ->
+     let (initial, acc) = lift_borrows initial [] in
+     let (final, acc) = lift_borrows final acc in
+     let body = transform_stmt body in
+     let stmt = AstDB.AFor { span; name; initial; final; body } in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.ABlock (span, stmt1, stmt2) ->
+     let stmt1 = transform_stmt stmt1 in
+     let stmt2 = transform_stmt stmt2 in
+     AstDB.ABlock (span, stmt1, stmt2)
+  | AstDP.ADiscarding (span, expr) ->
+     let (expr, acc) = lift_borrows expr [] in
+     let stmt = AstDB.ADiscarding (span, expr) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.AReturn (span, expr) ->
+     let (expr, acc) = lift_borrows expr [] in
+     let stmt = AstDB.AReturn (span, expr) in
+     wrap_stmt_with_borrows stmt acc
+  | AstDP.ABorrow { span; original; rename; region; body; mode } ->
+     let body = transform_stmt body in
+     AstDB.ABorrow { span; original; rename; region; body; mode }
 
-and transform_whens (whens: AstLC.abstract_when list): AstDB.abstract_when list =
-  List.map (fun (AstLC.AbstractWhen (id, bindings, body)) ->
+and transform_whens (whens: AstDP.abstract_when list): AstDB.abstract_when list =
+  List.map (fun (AstDP.AbstractWhen (id, bindings, body)) ->
     let body = transform_stmt body in
     AstDB.AbstractWhen (id, bindings, body)
   ) whens
 
-let transform_expr (expr: AstLC.aexpr): AstDB.aexpr =
+let transform_expr (expr: AstDP.aexpr): AstDB.aexpr =
   let (expr, acc) = lift_borrows expr [] in
   if (List.length acc) > 0 then
     Error.err "Borrow expressions not allowed in this context."

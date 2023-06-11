@@ -58,10 +58,6 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MUnionConstructor (ty, _, _) ->
      ty
-  | MPath { ty; _ } ->
-     ty
-  | MRefPath (_, _, ty) ->
-     ty
   | MEmbed (ty, _, _) ->
      ty
   | MDeref e ->
@@ -76,3 +72,6 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MSizeOf _ ->
      MonoInteger (Unsigned, Width64)
+  | MSlotAccessor (_, _, ty) -> ty
+  | MPointerSlotAccessor (_, _, ty) -> ty
+  | MArrayIndex (_, _, ty) -> ty
