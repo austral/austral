@@ -357,8 +357,6 @@ module AstDB = struct
     | Disjunction of aexpr * aexpr
     | Negation of aexpr
     | IfExpression of aexpr * aexpr * aexpr
-    | Path of aexpr * path_elem list
-    | RefPath of aexpr * ref_path_elem list
     | Embed of qtypespec * string * aexpr list
     | Deref of aexpr
     | Typecast of aexpr * qtypespec
