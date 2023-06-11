@@ -5,7 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
-open Tast
+open Stages.Tast
 open TypeBindings
 
 let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =

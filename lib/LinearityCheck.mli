@@ -7,7 +7,7 @@
 
 (** The linearity checker. *)
 open Identifier
-open Tast
+open Stages.Tast
 open Type
 
 (** The loop depth represents, for a particular piece of code, how many loops

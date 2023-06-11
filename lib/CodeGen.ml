@@ -12,7 +12,7 @@ open Env
 open EnvUtils
 open MonoType
 open MonoTypeBindings
-open Tast
+open Stages.Tast
 open Mtast
 open CRepr
 open Util

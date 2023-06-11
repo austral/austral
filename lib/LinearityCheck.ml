@@ -5,7 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 open Identifier
-open Tast
+open Stages.Tast
 open Type
 open TypeSystem
 open Reporter

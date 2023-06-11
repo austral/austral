@@ -18,9 +18,9 @@ open TypeReplace
 open TypeParameter
 open TypeParameters
 open TypeMatch
-open Tast
+open Stages.Tast
 open Mtast
-open Linked
+open Stages.Linked
 open Id
 open Reporter
 open Region

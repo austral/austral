@@ -12,8 +12,7 @@ open TypeSystem
 open Stages.SmallCombined
 open Stages
 open Linked
-module Ast = Stages.AstDB
-open Ast
+open Stages.AstDB
 open Id
 open DeclIdSet
 open ModIdSet

@@ -6,7 +6,7 @@
 *)
 
 open Type
-open Tast
+open Stages.Tast
 open Identifier
 open StringSet
 open Error

@@ -8,7 +8,7 @@
 open Env
 open TypeStripping
 open MonoType
-open Tast
+open Stages.Tast
 open Mtast
 
 (** Monomorphize a type specifier, returning a monomorphic type and the updated

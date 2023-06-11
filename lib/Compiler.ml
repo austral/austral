@@ -19,7 +19,7 @@ open CRenderer
 open CRepr
 open Cst
 open CstUtil
-open Tast
+open Stages.Tast
 open Error
 open Stages
 open Linked

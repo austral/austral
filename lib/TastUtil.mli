@@ -7,7 +7,7 @@
 
 (** Utils for the TAST *)
 open Type
-open Tast
+open Stages.Tast
 open Identifier
 
 val arglist_size : typed_arglist -> int

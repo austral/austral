@@ -18,7 +18,7 @@ open Type
 open TypeSystem
 open TypeParser
 open Stages.AstDB
-open Tast
+open Stages.Tast
 open TastUtil
 open TypeParameter
 open TypeParameters

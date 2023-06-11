@@ -5,7 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 open Env
-open Tast
+open Stages.Tast
 
 let rec extract_bodies (env: env) (m: typed_module): env =
   let (TypedModule (_, decls)) = m in
