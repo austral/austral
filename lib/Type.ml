@@ -103,6 +103,10 @@ let rec type_string = function
      read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | WriteRef (t, r) ->
      write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+  | Span (t, r) ->
+     "Span[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+  | SpanMut (t, r) ->
+     "Span![" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | TyVar (TypeVariable (n, _, _, _)) ->
      ident_string n
   | Address ty ->
