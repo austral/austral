@@ -197,6 +197,18 @@ let rec equal_ty a b =
          (equal_ty ty ty') && (equal_ty r r')
       | _ ->
          false)
+    | Span (ty, r) ->
+     (match b with
+      | Span (ty', r') ->
+         (equal_ty ty ty') && (equal_ty r r')
+      | _ ->
+         false)
+  | SpanMut (ty, r) ->
+     (match b with
+      | SpanMut (ty', r') ->
+         (equal_ty ty ty') && (equal_ty r r')
+      | _ ->
+         false)
   | TyVar v ->
      (match b with
       | TyVar v' ->
