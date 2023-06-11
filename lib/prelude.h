@@ -45,6 +45,13 @@ typedef struct {
   size_t size;
 } au_array_t;
 
+typedef struct {
+  void* data;
+  size_t size;
+} au_span_t;
+
+extern au_span_t au_make_span(void* data, size_t size);
+
 extern au_array_t au_make_array_from_string(const char* data, size_t size);
 
 extern void* au_array_index(au_array_t* array, size_t index, size_t elem_size);
