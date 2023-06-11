@@ -138,7 +138,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let ty = get_type value in
          let lexenv = push_var lexenv name ty (VarLocal Mutable) in
          let body = augment_stmt (update_lexenv ctx lexenv) body in
-         TLetTmp (name, value, body)
+         TLetTmp (name, ty, value, body)
       | ADestructure (span, mut, bindings, value, body) ->
          adorn_error_with_span span
            (fun _ ->
