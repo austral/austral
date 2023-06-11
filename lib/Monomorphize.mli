@@ -9,7 +9,7 @@ open Env
 open TypeStripping
 open MonoType
 open Stages.Tast
-open Mtast
+open Stages.Mtast
 
 (** Monomorphize a type specifier, returning a monomorphic type and the updated
    environment. *)

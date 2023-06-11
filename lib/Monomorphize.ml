@@ -19,7 +19,7 @@ open TypeParameter
 open TypeParameters
 open TypeMatch
 open Stages.Tast
-open Mtast
+open Stages.Mtast
 open Stages.Linked
 open Id
 open Reporter

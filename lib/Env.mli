@@ -9,7 +9,7 @@ open Type
 open MonoType
 open MonoTypeBindings
 open Stages.Tast
-open Mtast
+open Stages.Mtast
 open Id
 open LexEnv
 open EnvTypes

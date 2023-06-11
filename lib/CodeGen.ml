@@ -13,7 +13,8 @@ open EnvUtils
 open MonoType
 open MonoTypeBindings
 open Stages.Tast
-open Mtast
+open Stages.Mtast
+open MtastUtil
 open CRepr
 open Util
 open Escape
