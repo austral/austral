@@ -1,0 +1,1 @@
+Test we can't consume a variable in the condition of a while loop.
