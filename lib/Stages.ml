@@ -261,6 +261,8 @@ module AstDP = struct
     | ABlock of span * astmt * astmt
     | ADiscarding of span * aexpr
     | AReturn of span * aexpr
+    | LetTmp of identifier * aexpr * astmt
+    | AssignTmp of identifier * aexpr
 
   and aexpr =
     | NilConstant
@@ -269,6 +271,7 @@ module AstDP = struct
     | FloatConstant of string
     | StringConstant of escaped_string
     | Variable of qident
+    | Temporary of identifier
     | FunctionCall of qident * abstract_arglist
     | ArithmeticExpression of arithmetic_operator * aexpr * aexpr
     | Comparison of comparison_operator * aexpr * aexpr
