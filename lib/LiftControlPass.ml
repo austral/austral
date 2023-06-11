@@ -21,9 +21,9 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.AIf (span, e, s1, s2) ->
     let tmp: tmp = fresh_tmp () in
     let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (tmp, e),
+    AstLC.LetTmp (
+      tmp,
+      e,
       AstLC.AIf (
         span,
         Temporary tmp,
@@ -36,9 +36,9 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.ACase (span, e, awl) ->
     let tmp: tmp = fresh_tmp () in
     let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (tmp, e),
+    AstLC.LetTmp (
+      tmp,
+      e,
       AstLC.ACase (
         span,
         Temporary tmp,
@@ -48,9 +48,9 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.AWhile (span, e, s) ->
     let tmp: tmp = fresh_tmp () in
     let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (tmp, e),
+    AstLC.LetTmp (
+      tmp,
+      e,
       AstLC.AWhile (
         span,
         Temporary tmp,

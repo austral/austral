@@ -181,7 +181,7 @@ module AstLC = struct
     | ABlock of span * astmt * astmt
     | ADiscarding of span * aexpr
     | AReturn of span * aexpr
-    | LetTmp of tmp * aexpr
+    | LetTmp of tmp * aexpr * astmt
     | AssignTmp of tmp * aexpr
 
   and aexpr =
