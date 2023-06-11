@@ -112,7 +112,9 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
              Text "."
            ]
        else
-         tbl
+         let (StateTable (rows, pending)) = tbl in
+         let others = List.filter (fun (n, _, _, _) -> not (equal_identifier name n)) rows in
+         StateTable (others, pending)
 
 let rec remove_entries (tbl: state_tbl) (names: identifier list): state_tbl =
   match names with
