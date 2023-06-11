@@ -134,6 +134,14 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = all_distinct [is_tyvar ty; is_tyvar r] in
      let _ = no_leftovers 2 in
      ()
+  | Span (ty, r) ->
+     let _ = all_distinct [is_tyvar ty; is_tyvar r] in
+     let _ = no_leftovers 2 in
+     ()
+  | SpanMut (ty, r) ->
+     let _ = all_distinct [is_tyvar ty; is_tyvar r] in
+     let _ = no_leftovers 2 in
+     ()
   | TyVar _ ->
      Errors.lone_tyvar ()
   | Address ty ->
