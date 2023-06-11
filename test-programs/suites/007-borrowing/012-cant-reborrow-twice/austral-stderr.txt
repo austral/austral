@@ -11,7 +11,7 @@
   "span": {
     "filename": "test-programs/suites/007-borrowing/012-cant-reborrow-twice/Test.aum",
     "startp": { "line": 12, "column": 8 },
-    "end[": { "line": 14, "column": 12 }
+    "end": { "line": 14, "column": 12 }
   },
   "context": [
     [ 10, "    function main(): ExitCode is" ],

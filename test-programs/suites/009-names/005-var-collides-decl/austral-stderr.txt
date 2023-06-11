@@ -12,7 +12,7 @@
   "span": {
     "filename": "test-programs/suites/009-names/005-var-collides-decl/Test.aum",
     "startp": { "line": 5, "column": 8 },
-    "end[": { "line": 5, "column": 29 }
+    "end": { "line": 5, "column": 29 }
   },
   "context": [
     [ 3, "" ],

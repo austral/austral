@@ -14,7 +14,7 @@
   "span": {
     "filename": "test-programs/suites/003-record/002-free-record-has-linear/Test.aum",
     "startp": { "line": 3, "column": 8 },
-    "end[": { "line": 7, "column": 8 }
+    "end": { "line": 7, "column": 8 }
   },
   "context": [
     [ 1, "module body Test is" ],

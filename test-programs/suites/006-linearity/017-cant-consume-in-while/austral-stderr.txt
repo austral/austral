@@ -9,7 +9,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/017-cant-consume-in-while/Test.aum",
     "startp": { "line": 11, "column": 8 },
-    "end[": { "line": 13, "column": 18 }
+    "end": { "line": 13, "column": 18 }
   },
   "context": [
     [ 9, "    function main(): ExitCode is" ],

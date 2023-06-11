@@ -9,7 +9,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/010-forget-case/Test.aum",
     "startp": { "line": 9, "column": 8 },
-    "end[": { "line": 14, "column": 17 }
+    "end": { "line": 14, "column": 17 }
   },
   "context": [
     [ 7, "        let r: R := R(x => 32);" ],

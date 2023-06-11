@@ -166,7 +166,7 @@ let span_json (span: span): Yojson.Basic.t =
   `Assoc [
       ("filename", `String filename);
       ("startp", pos_json startp);
-      ("end[", pos_json endp)
+      ("end", pos_json endp)
     ]
 
 let source_ctx_json (ctx: source_ctx): Yojson.Basic.t =

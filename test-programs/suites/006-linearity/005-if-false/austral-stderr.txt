@@ -18,7 +18,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/005-if-false/Test.aum",
     "startp": { "line": 8, "column": 8 },
-    "end[": { "line": 12, "column": 15 }
+    "end": { "line": 12, "column": 15 }
   },
   "context": [
     [ 6, "    function main(): ExitCode is" ],

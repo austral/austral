@@ -17,7 +17,7 @@
   "span": {
     "filename": "test-programs/suites/011-bugs/github-244/Test.aum",
     "startp": { "line": 6, "column": 8 },
-    "end[": { "line": 17, "column": 8 }
+    "end": { "line": 17, "column": 8 }
   },
   "context": [
     [ 4, "" ],

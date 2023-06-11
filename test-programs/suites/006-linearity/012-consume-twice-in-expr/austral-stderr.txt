@@ -12,7 +12,7 @@
   "span": {
     "filename": "test-programs/suites/006-linearity/012-consume-twice-in-expr/Test.aum",
     "startp": { "line": 17, "column": 8 },
-    "end[": { "line": 17, "column": 36 }
+    "end": { "line": 17, "column": 36 }
   },
   "context": [
     [ 15, "    function main(): ExitCode is" ],

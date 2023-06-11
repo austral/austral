@@ -11,7 +11,7 @@
   "span": {
     "filename": "test-programs/suites/007-borrowing/005-anon-borrow-after-consume/Test.aum",
     "startp": { "line": 10, "column": 8 },
-    "end[": { "line": 10, "column": 33 }
+    "end": { "line": 10, "column": 33 }
   },
   "context": [
     [ 8, "        let foo: Foo := Foo(bar => 'a');" ],

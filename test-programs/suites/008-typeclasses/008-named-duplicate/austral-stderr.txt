@@ -5,7 +5,7 @@
   "span": {
     "filename": "test-programs/suites/008-typeclasses/008-named-duplicate/Test.aum",
     "startp": { "line": 13, "column": 8 },
-    "end[": { "line": 19, "column": 8 }
+    "end": { "line": 19, "column": 8 }
   },
   "context": [
     [ 11, "            return nil;" ],

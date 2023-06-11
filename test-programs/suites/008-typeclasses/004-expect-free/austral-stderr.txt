@@ -13,7 +13,7 @@
   "span": {
     "filename": "test-programs/suites/008-typeclasses/004-expect-free/Test.aum",
     "startp": { "line": 7, "column": 8 },
-    "end[": { "line": 14, "column": 8 }
+    "end": { "line": 14, "column": 8 }
   },
   "context": [
     [ 5, "" ],

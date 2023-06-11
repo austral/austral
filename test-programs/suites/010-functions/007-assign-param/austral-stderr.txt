@@ -10,7 +10,7 @@
   "span": {
     "filename": "test-programs/suites/010-functions/007-assign-param/Test.aum",
     "startp": { "line": 3, "column": 8 },
-    "end[": { "line": 3, "column": 16 }
+    "end": { "line": 3, "column": 16 }
   },
   "context": [
     [ 1, "module body Test is" ],

@@ -11,7 +11,7 @@
   "span": {
     "filename": "test-programs/suites/010-functions/006-wrong-arity/Test.aum",
     "startp": { "line": 7, "column": 8 },
-    "end[": { "line": 7, "column": 17 }
+    "end": { "line": 7, "column": 17 }
   },
   "context": [
     [ 5, "" ],

@@ -12,7 +12,7 @@
   "span": {
     "filename": "test-programs/suites/015-mutability/004-cant-anon-mutborrow-let/Test.aum",
     "startp": { "line": 10, "column": 8 },
-    "end[": { "line": 10, "column": 30 }
+    "end": { "line": 10, "column": 30 }
   },
   "context": [
     [ 8, "" ],

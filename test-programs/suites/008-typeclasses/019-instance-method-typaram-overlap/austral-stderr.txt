@@ -10,7 +10,7 @@
   "span": {
     "filename": "test-programs/suites/008-typeclasses/019-instance-method-typaram-overlap/Test.aum",
     "startp": { "line": 4, "column": 8 },
-    "end[": { "line": 12, "column": 8 }
+    "end": { "line": 12, "column": 8 }
   },
   "context": [
     [ 2, "    typeclass Foo(T: Free) is" ],

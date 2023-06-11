@@ -10,7 +10,7 @@
   "span": {
     "filename": "test-programs/suites/008-typeclasses/006-unused-tyvar/Test.aum",
     "startp": { "line": 8, "column": 8 },
-    "end[": { "line": 15, "column": 8 }
+    "end": { "line": 15, "column": 8 }
   },
   "context": [
     [ 6, "    record Holder[A: Free]: Free is" ],

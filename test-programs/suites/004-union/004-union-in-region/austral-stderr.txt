@@ -24,7 +24,7 @@
   "span": {
     "filename": "test-programs/suites/004-union/004-union-in-region/Test.aum",
     "startp": { "line": 1, "column": 19 },
-    "end[": { "line": 2, "column": 29 }
+    "end": { "line": 2, "column": 29 }
   },
   "context": [
     [ 1, "module body Test is" ],

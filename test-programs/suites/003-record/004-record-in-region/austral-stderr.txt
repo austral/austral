@@ -24,7 +24,7 @@
   "span": {
     "filename": "test-programs/suites/003-record/004-record-in-region/Test.aum",
     "startp": { "line": 1, "column": 19 },
-    "end[": { "line": 2, "column": 30 }
+    "end": { "line": 2, "column": 30 }
   },
   "context": [
     [ 1, "module body Test is" ],
