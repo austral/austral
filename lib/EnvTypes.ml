@@ -13,7 +13,7 @@ open Common
 open Type
 open TypeParameter
 open TypeParameters
-open Tast
+open Stages.Tast
 open MonoType
 open MonoTypeBindings
 open Mtast

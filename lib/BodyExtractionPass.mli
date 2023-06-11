@@ -5,7 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 open Env
-open Tast
+open Stages.Tast
 
 (** Given a typed module, extract the function and instance method bodies and
     store them in the environment. *)

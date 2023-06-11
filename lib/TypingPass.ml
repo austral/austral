@@ -22,9 +22,9 @@ open Env
 open EnvTypes
 open EnvUtils
 open Stages.AstDB
-open Tast
+open Stages.Tast
 open TastUtil
-open Linked
+open Stages.Linked
 open Util
 open Reporter
 open Error

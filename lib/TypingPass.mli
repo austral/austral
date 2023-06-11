@@ -9,8 +9,8 @@ open Identifier
 open Common
 open Env
 open Stages.AstDB
-open Linked
-open Tast
+open Stages.Linked
+open Stages.Tast
 
 (** The context for statement checking. *)
 type stmt_ctx

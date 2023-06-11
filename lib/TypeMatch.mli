@@ -10,7 +10,7 @@ open Identifier
 open Type
 open TypeBindings
 open TypeParameters
-open Tast
+open Stages.Tast
 open Env
 open EnvTypes
 

@@ -12,7 +12,7 @@ open Type
 open TypeBindings
 open TypeParameter
 open TypeParameters
-open Tast
+open Stages.Tast
 open TastUtil
 open Env
 open EnvTypes

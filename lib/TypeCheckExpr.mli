@@ -6,7 +6,7 @@
  *)
 (** Type checking of expressions. *)
 open Stages.AstDB
-open Tast
+open Stages.Tast
 open Type
 open Identifier
 open Env

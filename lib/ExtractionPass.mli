@@ -6,7 +6,7 @@
 *)
 open TypeSignature
 open Stages.SmallCombined
-open Linked
+open Stages.Linked
 open Env
 open Id
 

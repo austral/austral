@@ -8,7 +8,7 @@ open Identifier
 open Type
 open MonoType
 open MonoTypeBindings
-open Tast
+open Stages.Tast
 open Mtast
 open Id
 open DeclIdSet
