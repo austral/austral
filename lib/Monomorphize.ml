@@ -142,6 +142,9 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   | TLocalVar (name, ty) ->
      let (ty, env) = strip_and_mono env ty in
      (MLocalVar (name, ty), env)
+  | TTemporary (name, ty) ->
+     let (ty, env) = strip_and_mono env ty in
+     (MTemporary (name, ty), env)
   | TFunVar (decl_id, ty, bindings) ->
      (* Monomorphize the type. *)
      let (rt, env) = strip_and_mono env ty in
