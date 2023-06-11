@@ -153,9 +153,9 @@ let rec gen_type (ty: mono_ty): c_ty =
      CPointer (gen_type t)
   | MonoWriteRef (t, _) ->
      CPointer (gen_type t)
-  | MonoSpan (t, _) ->
+  | MonoSpan _ ->
      CNamedType "au_span_t"
-  | MonoSpanMut (t, _) ->
+  | MonoSpanMut _ ->
      CNamedType "au_span_t"
   | MonoAddress t ->
      CPointer (gen_type t)
@@ -565,6 +565,10 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
         | MonoReadRef _ ->
            err "Not allowed"
         | MonoWriteRef _ ->
+           err "Not allowed"
+        | MonoSpan _ ->
+           err "Not allowed"
+        | MonoSpanMut _ ->
            err "Not allowed"
         | MonoAddress _ ->
            gen_type t
