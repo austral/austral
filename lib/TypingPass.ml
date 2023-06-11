@@ -547,6 +547,8 @@ and is_constant = function
      false
   | TLocalVar _ ->
      false
+  | TTemporary _ ->
+     false
   | TFunVar _ ->
      true
   | TFuncall _ ->
