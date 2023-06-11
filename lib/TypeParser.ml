@@ -263,7 +263,6 @@ let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typa
      in
      WriteRef (ty', r')
 
-
 (* Is the given name a type parameter in the list of type paramters? If so,
    return it as a type variable. *)
 and is_param (typarams: typarams) (name: qident): ty option =
