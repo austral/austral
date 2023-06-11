@@ -80,6 +80,8 @@ let stmt_kind (stmt: astmt): string =
   | ABlock _ -> "block"
   | ADiscarding _ -> "discard"
   | AReturn _ -> "return"
+  | LetTmp _ -> "let"
+  | AssignTmp _ -> "assign"
 
 let is_boolean = function
   | Boolean -> true
