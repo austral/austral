@@ -1,4 +1,6 @@
 _build
 austral
+calltree.html
+error.html
 *~
 lib/BuiltInModules.ml
