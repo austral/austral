@@ -1,1 +1,23 @@
-this should fail
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "foo" },
+    { "type": "text", "content": " has already been consumed." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/006-linearity/017-cant-consume-in-while/Test.aum",
+    "startp": { "line": 11, "column": 8 },
+    "end[": { "line": 13, "column": 18 }
+  },
+  "context": [
+    [ 9, "    function main(): ExitCode is" ],
+    [ 10, "        let foo: Foo := Foo();" ],
+    [ 11, "        while consume(foo) do" ],
+    [ 12, "            skip;" ],
+    [ 13, "        end while;" ],
+    [ 14, "        return ExitSuccess();" ],
+    [ 15, "    end;" ]
+  ]
+}
