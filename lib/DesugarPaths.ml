@@ -115,10 +115,9 @@ and transform_stmt (stmt: AstLC.astmt): AstDP.astmt =
      end
   | AstLC.AInitialAssign (name, ty, e) ->
      AstDP.AInitialAssign (name, ty, transform_expr e)
-  | AstLC.LetTmp (name, expr, body) ->
-     let expr = transform_expr expr
-     and body = transform_stmt body in
-     AstDP.LetTmp (name, expr, body)
+  | AstLC.LetTmp (name, expr) ->
+     let expr = transform_expr expr in
+     AstDP.LetTmp (name, expr)
   | AstLC.AssignTmp (name, expr) ->
      let expr = transform_expr expr in
      AstDP.AssignTmp (name, expr)

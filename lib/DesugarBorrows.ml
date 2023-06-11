@@ -183,11 +183,11 @@ let rec transform_stmt (stmt: AstDP.astmt): AstDB.astmt =
      let (value, acc) = lift_borrows value [] in
      let stmt = AstDB.AInitialAssign (name, ty, value) in
      wrap_stmt_with_borrows stmt acc
-  | AstLC.LetTmp (name, value) ->
+  | AstDP.LetTmp (name, value) ->
     let (value, acc) = lift_borrows value [] in
     let stmt = AstDB.LetTmp (name, value) in
     wrap_stmt_with_borrows stmt acc
-  | AstLC.AssignTmp (name, value) ->
+  | AstDP.AssignTmp (name, value) ->
     let (value, acc) = lift_borrows value [] in
     let stmt = AstDB.AssignTmp (name, value) in
     wrap_stmt_with_borrows stmt acc
@@ -233,15 +233,6 @@ let rec transform_stmt (stmt: AstDP.astmt): AstDB.astmt =
   | AstDP.ABorrow { span; original; rename; region; body; mode } ->
     let body = transform_stmt body in
     AstDB.ABorrow { span; original; rename; region; body; mode }
-  | AstDP.LetTmp (name, expr, body) ->
-     let (expr, acc) = lift_borrows expr [] in
-     let body = transform_stmt body in
-     let stmt = AstDB.LetTmp (name, expr, body) in
-     wrap_stmt_with_borrows stmt acc
-  | AstDP.AssignTmp (name, expr) ->
-     let (expr, acc) = lift_borrows expr [] in
-     let stmt = AstDB.AssignTmp (name, expr) in
-     wrap_stmt_with_borrows stmt acc
 
 
 and transform_whens (whens: AstDP.abstract_when list): AstDB.abstract_when list =

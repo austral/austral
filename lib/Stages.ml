@@ -252,7 +252,7 @@ module AstDP = struct
     | ABlock of span * astmt * astmt
     | ADiscarding of span * aexpr
     | AReturn of span * aexpr
-    | LetTmp of identifier * aexpr * astmt
+    | LetTmp of identifier * aexpr
     | AssignTmp of identifier * aexpr
 
   and aexpr =

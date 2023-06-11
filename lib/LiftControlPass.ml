@@ -85,12 +85,18 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
            []
          )
      in
-     AstLC.LetTmp (
-         tmp_initial,
-         Typecast (transform initial, idx),
+     AstLC.ABlock (
+         empty_span,
          AstLC.LetTmp (
-             tmp_final,
-             Typecast (transform final, idx),
+             tmp_initial,
+             Typecast (transform initial, idx)
+           ),
+         AstLC.ABlock (
+             empty_span,
+             AstLC.LetTmp (
+                 tmp_final,
+                 Typecast (transform final, idx)
+               ),
              AstLC.AFor {
                  span;
                  name;
