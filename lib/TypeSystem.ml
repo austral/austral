@@ -58,6 +58,8 @@ let is_comparable = function
   | RegionTy _ -> false
   | ReadRef _ -> false
   | WriteRef _ -> false
+  | Span _ -> false
+  | SpanMut _ -> false
   | TyVar _ -> false
   | Address _ -> true
   | Pointer _ -> true
