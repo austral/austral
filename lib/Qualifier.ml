@@ -24,3 +24,7 @@ let rec qualify_typespec (m: import_map) (ts: typespec): qtypespec =
      QReadRef (qualify_typespec m t, qualify_typespec m r)
   | ConcreteWriteRef (t, r) ->
      QWriteRef (qualify_typespec m t, qualify_typespec m r)
+  | ConcreteSpan (t, r) ->
+     QSpan (qualify_typespec m t, qualify_typespec m r)
+  | ConcreteSpanWrite (t, r) ->
+     QSpanWrite (qualify_typespec m t, qualify_typespec m r)

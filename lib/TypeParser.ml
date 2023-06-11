@@ -262,6 +262,16 @@ let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typa
      and r' = parse_type env sigs rm typarams r
      in
      WriteRef (ty', r')
+  | QSpan (ty, r) ->
+     let ty' = parse_type env sigs rm typarams ty
+     and r' = parse_type env sigs rm typarams r
+     in
+     Span (ty', r')
+  | QSpanWrite (ty, r) ->
+     let ty' = parse_type env sigs rm typarams ty
+     and r' = parse_type env sigs rm typarams r
+     in
+     SpanMut (ty', r')
 
 (* Is the given name a type parameter in the list of type paramters? If so,
    return it as a type variable. *)
