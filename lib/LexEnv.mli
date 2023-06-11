@@ -20,13 +20,18 @@ type var_source =
   | VarLocal of mutability
 
 (** The empty lexenv. *)
-val empty_lexenv : lexenv
+val empty_lexenv : unit -> lexenv
 
 (** Add a variable to the lexenv given its name, type, and source. *)
 val push_var : lexenv -> identifier -> ty -> var_source -> lexenv
 
 (** Add a list of variables. *)
 val push_vars : lexenv -> (identifier * ty * var_source) list -> lexenv
+
+(** Remove a variable. *)
+val remove_var : lexenv -> identifier -> unit
+
+val remove_vars : lexenv -> identifier list -> unit
 
 (** Retrieve a variable by name. *)
 val get_var : lexenv -> identifier -> (ty * var_source) option

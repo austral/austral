@@ -183,6 +183,14 @@ let rec transform_stmt (stmt: AstDP.astmt): AstDB.astmt =
      let (value, acc) = lift_borrows value [] in
      let stmt = AstDB.AInitialAssign (name, ty, value) in
      wrap_stmt_with_borrows stmt acc
+  | AstLC.LetTmp (name, value) ->
+    let (value, acc) = lift_borrows value [] in
+    let stmt = AstDB.LetTmp (name, value) in
+    wrap_stmt_with_borrows stmt acc
+  | AstLC.AssignTmp (name, value) ->
+    let (value, acc) = lift_borrows value [] in
+    let stmt = AstDB.AssignTmp (name, value) in
+    wrap_stmt_with_borrows stmt acc
   | AstDP.AIf (span, cond, then', else') ->
     let (cond, acc) = lift_borrows cond [] in
     let then' = transform_stmt then' in

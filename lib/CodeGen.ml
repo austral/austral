@@ -309,9 +309,9 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CAssign (CVar (gen_ident (local_name name)), ge rvalue)
   | MInitialAssign (name, rvalue) ->
      CAssign (CVar (gen_ident (local_name name)), ge rvalue)
-  | MLetTmp (name, ty, expr, body) ->
+  | MLetTmp (name, ty, expr) ->
     let l = CLet (gen_ident name, gen_type ty, Some (ge expr)) in
-    CBlock [l; gs body]
+    l
   | MAssignTmp (name, value) ->
     CAssign (CVar (gen_ident name), ge value)
   | MIf (c, tb, fb) ->

@@ -369,11 +369,10 @@ let rec monomorphize_stmt (env: env) (stmt: tstmt): (mstmt * env) =
   | TReturn (_, value) ->
      let (value, env) = monomorphize_expr env value in
      (MReturn value, env)
-  | TLetTmp (name, ty, expr, body) ->
+  | TLetTmp (name, ty, expr) ->
      let (ty, env) = strip_and_mono env ty in
      let (expr, env) = monomorphize_expr env expr in
-     let (body, env) = monomorphize_stmt env body in
-     (MLetTmp (name, ty, expr, body), env)
+     (MLetTmp (name, ty, expr), env)
   | TAssignTmp (name, value) ->
      let (value, env) = monomorphize_expr env value in
      (MAssignTmp (name, value), env)

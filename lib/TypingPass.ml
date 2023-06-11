@@ -119,13 +119,13 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              pt ("Type", ty);
              let lexenv' = push_var lexenv name ty (VarLocal mut) in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
+             remove_var lexenv name;
              TLet (span, mut, name, ty, body'))
-      | LetTmp (name, value, body) ->
+      | LetTmp (name, value) ->
          let value = augment_expr module_name env rm typarams lexenv None value in
          let ty = get_type value in
-         let lexenv = push_var lexenv name ty (VarLocal Mutable) in
-         let body = augment_stmt (update_lexenv ctx lexenv) body in
-         TLetTmp (name, ty, value, body)
+         let _ = push_var lexenv name ty (VarLocal Mutable) in
+         TLetTmp (name, ty, value)
       | AssignTmp (name, value) ->
          let value = augment_expr module_name env rm typarams lexenv None value in
          begin
@@ -174,6 +174,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      in
                      let lexenv' = push_vars lexenv newvars in
                      let body' = augment_stmt (update_lexenv ctx lexenv') body in
+                     remove_vars lexenv' (List.map (fun (n, _, _) -> n) newvars);
                      TDestructure (
                          span,
                          mut,
@@ -298,6 +299,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                if is_compatible_with_index_type f' then
                  let lexenv' = push_var lexenv name index_type (VarLocal Immutable) in
                  let b' = augment_stmt (update_lexenv ctx lexenv') body in
+                 remove_var lexenv name;
                  TFor (span, name, i', f', b')
                else
                  Errors.for_bounds_non_integral ~bound:"final" ~ty:(get_type f')
@@ -356,6 +358,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  let rm' = add_region rm region region_obj in
                  let ctx' = update_lexenv ctx lexenv' in
                  let ctx''= update_rm ctx' rm' in
+                 let body = augment_stmt ctx'' body in
+                 remove_var lexenv rename;
                  TBorrow {
                      span=span;
                      original=original;
@@ -363,7 +367,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      region=region;
                      orig_type=orig_ty;
                      ref_type=refty;
-                     body=augment_stmt ctx'' body;
+                     body=body;
                      mode=mode
                    }
               | None ->
@@ -517,6 +521,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
                         bindings'' in
         let lexenv' = push_vars lexenv newvars in
         let body' = augment_stmt (update_lexenv ctx lexenv') body in
+        remove_vars lexenv (List.map (fun (n, _, _) -> n) newvars);
         TypedWhen (name, List.map (fun (name, _, ty, rename) -> TypedBinding { name; ty; rename}) bindings'', body')
       else
         Errors.case_wrong_slots ())
@@ -592,7 +597,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
       match decl with
       | LConstant (decl_id, vis, name, ty, expr, doc) ->
          ps ("Kind", "Constant");
-         let expr' = augment_expr module_name env rm empty_typarams empty_lexenv (Some ty) expr in
+         let expr' = augment_expr module_name env rm empty_typarams (empty_lexenv ()) (Some ty) expr in
          let _ = match_type_with_value (env, module_name) ty expr' in
          let _ = validate_constant_expression expr' in
          TConstant (decl_id, vis, name, ty, expr', doc)
@@ -640,7 +645,7 @@ and lexenv_from_params (params: value_parameter list): lexenv =
   | (ValueParameter (n, t))::rest ->
      push_var (lexenv_from_params rest) n t VarParam
   | [] ->
-     empty_lexenv
+     empty_lexenv ()
 
 and augment_method_decl _ _ _ (LMethodDecl (decl_id, name, params, rt, _)) =
   TypedMethodDecl (decl_id, name, params, rt)
