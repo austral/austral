@@ -11,67 +11,67 @@ open Span
 let rec lift (stmt: Ast.astmt): AstLC.astmt =
   match stmt with
   | Ast.ASkip span ->
-    AstLC.ASkip span
+     AstLC.ASkip span
   | Ast.ALet (span, m, id, qt, s) ->
-    AstLC.ALet (span, m, id, qt, lift s)
+     AstLC.ALet (span, m, id, qt, lift s)
   | Ast.ADestructure (span, m, qbl, e, s) ->
-    AstLC.ADestructure (span, m, qbl, transform e, lift s)
+     AstLC.ADestructure (span, m, qbl, transform e, lift s)
   | Ast.AAssign (span, lv, e) ->
      AstLC.AAssign (span, transform lv, transform e)
   | Ast.AInitialAssign (name, typespec, expr) ->
      AstLC.AInitialAssign (name, typespec, transform expr)
   | Ast.AIf (span, e, s1, s2) ->
-    let tmp: identifier = fresh_ident () in
-    let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (
-        tmp,
-        e
-      ),
-      AstLC.AIf (
-        span,
-        Temporary tmp,
-        lift s1,
-        lift s2
-      )
-    )
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.AIf (
+             span,
+             Temporary tmp,
+             lift s1,
+             lift s2
+           )
+       )
   | Ast.AWhen (span, e, s) ->
-    AstLC.AWhen (span, transform e, lift s)
+     AstLC.AWhen (span, transform e, lift s)
   | Ast.ACase (span, e, awl) ->
-    let tmp: identifier = fresh_ident () in
-    let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (
-        tmp,
-        e
-      ),
-      AstLC.ACase (
-        span,
-        Temporary tmp,
-        List.map transform_abstract_when awl
-      )
-    )
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.ACase (
+             span,
+             Temporary tmp,
+             List.map transform_abstract_when awl
+           )
+       )
   | Ast.AWhile (span, e, s) ->
-    let tmp: identifier = fresh_ident () in
-    let e = transform e in
-    AstLC.ABlock (
-      empty_span,
-      AstLC.LetTmp (
-        tmp,
-        e
-      ),
-      AstLC.AWhile (
-        span,
-        Temporary tmp,
-        AstLC.ABlock (
-          empty_span,
-          lift s,
-          AssignTmp (tmp, e)
-        )
-      )
-    )
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.AWhile (
+             span,
+             Temporary tmp,
+             AstLC.ABlock (
+                 empty_span,
+                 lift s,
+                 AssignTmp (tmp, e)
+               )
+           )
+       )
   | Ast.AFor {span; name; initial; final; body} ->
      let tmp_initial: identifier = fresh_ident () in
      let tmp_final: identifier = fresh_ident () in
@@ -107,13 +107,13 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
            )
        )
   | Ast.ABorrow {span; original; rename; region; body; mode} ->
-    AstLC.ABorrow {span; original; rename; region; body=lift body; mode}
+     AstLC.ABorrow {span; original; rename; region; body=lift body; mode}
   | Ast.ABlock (span, s1, s2) ->
-    AstLC.ABlock (span, lift s1, lift s2)
+     AstLC.ABlock (span, lift s1, lift s2)
   | Ast.ADiscarding (span, e) ->
-    AstLC.ADiscarding (span, transform e)
+     AstLC.ADiscarding (span, transform e)
   | Ast.AReturn (span, e) ->
-    AstLC.AReturn (span, transform e)
+     AstLC.AReturn (span, transform e)
 
 and transform (expr: Ast.aexpr): AstLC.aexpr =
   match expr with
