@@ -304,48 +304,52 @@ let partition (n: int): partitions =
 let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
   let a: state_tbl = trim_free a
   and b: state_tbl = trim_free b in
-  (* Tables should have the same set of variable names. *)
-  let state_table_names (tbl: state_tbl): identifier list =
-    let l: identifier list = List.map (fun (name, _, _, _) -> name) (tbl_to_list tbl) in
-    List.sort (fun a b -> String.compare (ident_string a) (ident_string b)) l
+  (* Find common variables. *)
+  let names: identifier list =
+    List.filter_map (fun (name, _, _, _) ->
+        match get_entry b name with
+        | Some _ -> Some name
+        | None -> None)
+      (tbl_to_list a)
   in
-  let names_a: identifier list = state_table_names a
-  and names_b: identifier list = state_table_names b
-  in
-  if List.equal equal_identifier names_a names_b then
-    (* Make a list of triples with the variable name, its state in A, and its
-       state in B. *)
-    let common: (identifier * var_state * var_state) list =
-      List.filter_map (fun (name, _, _, state_a) ->
+  (* Make a list of triples with the variable name, its state in A, and its
+     state in B. *)
+  let common: (identifier * var_state * var_state) list =
+    List.map (fun name ->
+        let state_a =
+          match get_entry a name with
+          | Some (_, _, state_a) ->
+             state_a
+          | None ->
+             internal_err "bad state table"
+        in
+        let state_b =
           match get_entry b name with
           | Some (_, _, state_b) ->
-             Some (name, state_a, state_b)
+             state_b
           | None ->
-             None)
-        (tbl_to_list a)
-    in
-    (* Ensure the states are the same. *)
-    List.iter (fun (name, state_a, state_b) ->
-        if state_a <> state_b then
-          austral_raise LinearityError [
-              Text "The variable ";
-              Code (ident_string name);
-              Text " is used inconsistently in the branches of ";
-              Text stmt_name;
-              Text " statement. In one branch it is ";
-              Text (humanize_state state_a);
-              Text " while in the other it is ";
-              Text (humanize_state state_b);
-              Text "."
-            ]
-        else
-          ()) common
-  else
-    (* I *think* this is an internal error. *)
-    internal_err ("Consumption state tables are inconsistent. This is likely a bug in the linearity checker. Table contents:\n\n"
-                  ^ (show_state_tbl a)
-                  ^ "\n\n"
-                  ^ (show_state_tbl b))
+             internal_err "bad state table"
+        in
+        (name, state_a, state_b))
+      names
+  in
+  (* Ensure the states are the same. *)
+  List.iter (fun (name, state_a, state_b) ->
+      if state_a <> state_b then
+        austral_raise LinearityError [
+            Text "The variable ";
+            Code (ident_string name);
+            Text " is used inconsistently in the branches of ";
+            Text stmt_name;
+            Text " statement. In one branch it is ";
+            Text (humanize_state state_a);
+            Text " while in the other it is ";
+            Text (humanize_state state_b);
+            Text "."
+          ]
+      else
+        ())
+    common
 
 let rec table_list_is_consistent (lst: state_tbl list): unit =
   match lst with
