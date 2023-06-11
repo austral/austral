@@ -538,6 +538,40 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          (* Once we leave the scope, remove the variable we added. *)
          let tbl: state_tbl = remove_entry tbl name in
          tbl)
+  | TLetTmp (name, ty, expr, body) ->
+     (* Add an entry to the table. *)
+     let tbl: state_tbl = add_entry tbl name ty depth in
+     let tbl: state_tbl = check_expr tbl depth expr in
+     let tbl: state_tbl = check_stmt tbl depth body in
+     (* Once we leave the scope, remove the variable we added. *)
+     let tbl: state_tbl = remove_entry tbl name in
+     tbl
+  | TAssignTmp (name, expr) ->
+    let tbl: state_tbl = check_expr tbl depth expr in
+    begin
+      match get_entry tbl name with
+      | Some (ty, _, state) ->
+         begin
+           match state with
+           | Unconsumed | BorrowedRead | BorrowedWrite ->
+              if universe_linear_ish (type_universe ty) then
+                austral_raise LinearityError [
+                    Text "Cannot assign to the variable ";
+                    Code (ident_string name);
+                    Text " because it is not yet consumed."
+                  ]
+              else
+                tbl
+           | Consumed ->
+              let tbl: state_tbl = update_tbl tbl name Unconsumed in
+              if is_pending tbl name then
+                remove_pending tbl name
+              else
+                tbl
+         end
+      | None ->
+         tbl
+    end
   | TDestructure (span, _, bindings, expr, body) ->
      adorn_error_with_span span
        (fun _ ->
