@@ -23,7 +23,7 @@ let rec abs_stmt im stmt =
   | CDestructure _ ->
      err "Destructure statement not in a list context"
   | CAssign (span, lvalue, value) ->
-     AAssign (span, abs_expr im lvalue, abs_expr im value, false)
+     AAssign (span, abs_expr im lvalue, abs_expr im value)
   | CIf (span, c, t, f) ->
      let c = abs_expr im c
      and t = abs_stmt im t
