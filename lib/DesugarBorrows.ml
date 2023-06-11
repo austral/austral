@@ -160,16 +160,16 @@ let wrap_stmt_with_borrows (stmt: AstDB.astmt) (acc: acc): AstDB.astmt =
 let rec transform_stmt (stmt: AstDP.astmt): AstDB.astmt =
   match stmt with
   | AstDP.ASkip span ->
-    AstDB.ASkip span
+     AstDB.ASkip span
   | AstDP.ALet (span, mutability, name, ty, body) ->
-    let body = transform_stmt body in
-    let stmt = AstDB.ALet (span, mutability, name, ty, body) in
-    stmt
+     let body = transform_stmt body in
+     let stmt = AstDB.ALet (span, mutability, name, ty, body) in
+     stmt
   | AstDP.ADestructure (span, mutability, bindings, value, body) ->
-    let (value, acc) = lift_borrows value [] in
-    let body = transform_stmt body in
-    let stmt = AstDB.ADestructure (span, mutability, bindings, value, body) in
-    wrap_stmt_with_borrows stmt acc
+     let (value, acc) = lift_borrows value [] in
+     let body = transform_stmt body in
+     let stmt = AstDB.ADestructure (span, mutability, bindings, value, body) in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.AAssign (span, path, value) ->
      let (path, acc) = lift_borrows path [] in
      let (value, acc) = lift_borrows value acc in
@@ -184,55 +184,55 @@ let rec transform_stmt (stmt: AstDP.astmt): AstDB.astmt =
      let stmt = AstDB.AInitialAssign (name, ty, value) in
      wrap_stmt_with_borrows stmt acc
   | AstDP.LetTmp (name, value) ->
-    let (value, acc) = lift_borrows value [] in
-    let stmt = AstDB.LetTmp (name, value) in
-    wrap_stmt_with_borrows stmt acc
+     let (value, acc) = lift_borrows value [] in
+     let stmt = AstDB.LetTmp (name, value) in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.AssignTmp (name, value) ->
-    let (value, acc) = lift_borrows value [] in
-    let stmt = AstDB.AssignTmp (name, value) in
-    wrap_stmt_with_borrows stmt acc
+     let (value, acc) = lift_borrows value [] in
+     let stmt = AstDB.AssignTmp (name, value) in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.AIf (span, cond, then', else') ->
-    let (cond, acc) = lift_borrows cond [] in
-    let then' = transform_stmt then' in
-    let else' = transform_stmt else' in
-    let stmt = AstDB.AIf (span, cond, then', else') in
-    wrap_stmt_with_borrows stmt acc
+     let (cond, acc) = lift_borrows cond [] in
+     let then' = transform_stmt then' in
+     let else' = transform_stmt else' in
+     let stmt = AstDB.AIf (span, cond, then', else') in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.AWhen (span, cond, body) ->
-    let (cond, acc) = lift_borrows cond [] in
-    let body = transform_stmt body in
-    let stmt = AstDB.AWhen (span, cond, body) in
-    wrap_stmt_with_borrows stmt acc
+     let (cond, acc) = lift_borrows cond [] in
+     let body = transform_stmt body in
+     let stmt = AstDB.AWhen (span, cond, body) in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.ACase (span, expr, whens) ->
-    let (expr, acc) = lift_borrows expr [] in
-    let whens = transform_whens whens in
-    let stmt = AstDB.ACase (span, expr, whens) in
-    wrap_stmt_with_borrows stmt acc
+     let (expr, acc) = lift_borrows expr [] in
+     let whens = transform_whens whens in
+     let stmt = AstDB.ACase (span, expr, whens) in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.AWhile (span, cond, body) ->
-    let (cond, acc) = lift_borrows cond [] in
-    let body = transform_stmt body in
-    let stmt = AstDB.AWhile (span, cond, body) in
-    wrap_stmt_with_borrows stmt acc
+     let (cond, acc) = lift_borrows cond [] in
+     let body = transform_stmt body in
+     let stmt = AstDB.AWhile (span, cond, body) in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.AFor { span; name; initial; final; body } ->
-    let (initial, acc) = lift_borrows initial [] in
-    let (final, acc) = lift_borrows final acc in
-    let body = transform_stmt body in
-    let stmt = AstDB.AFor { span; name; initial; final; body } in
-    wrap_stmt_with_borrows stmt acc
+     let (initial, acc) = lift_borrows initial [] in
+     let (final, acc) = lift_borrows final acc in
+     let body = transform_stmt body in
+     let stmt = AstDB.AFor { span; name; initial; final; body } in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.ABlock (span, stmt1, stmt2) ->
-    let stmt1 = transform_stmt stmt1 in
-    let stmt2 = transform_stmt stmt2 in
-    AstDB.ABlock (span, stmt1, stmt2)
+     let stmt1 = transform_stmt stmt1 in
+     let stmt2 = transform_stmt stmt2 in
+     AstDB.ABlock (span, stmt1, stmt2)
   | AstDP.ADiscarding (span, expr) ->
-    let (expr, acc) = lift_borrows expr [] in
-    let stmt = AstDB.ADiscarding (span, expr) in
-    wrap_stmt_with_borrows stmt acc
+     let (expr, acc) = lift_borrows expr [] in
+     let stmt = AstDB.ADiscarding (span, expr) in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.AReturn (span, expr) ->
-    let (expr, acc) = lift_borrows expr [] in
-    let stmt = AstDB.AReturn (span, expr) in
-    wrap_stmt_with_borrows stmt acc
+     let (expr, acc) = lift_borrows expr [] in
+     let stmt = AstDB.AReturn (span, expr) in
+     wrap_stmt_with_borrows stmt acc
   | AstDP.ABorrow { span; original; rename; region; body; mode } ->
-    let body = transform_stmt body in
-    AstDB.ABorrow { span; original; rename; region; body; mode }
+     let body = transform_stmt body in
+     AstDB.ABorrow { span; original; rename; region; body; mode }
 
 and transform_whens (whens: AstDP.abstract_when list): AstDB.abstract_when list =
   List.map (fun (AstDP.AbstractWhen (id, bindings, body)) ->
