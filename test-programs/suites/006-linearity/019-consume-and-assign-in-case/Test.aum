@@ -1,0 +1,23 @@
+module body Test is
+    record Foo: Linear is
+    end;
+
+    union Test: Free is
+        case Pass;
+        case Fail;
+    end;
+
+    function main(): ExitCode is
+        var foo: Foo := Foo();
+        var check: Test := Pass();
+        case check of
+            when Pass() do
+                let {} := foo;
+                foo := Foo();
+            when Fail() do
+                skip;
+        end case;
+        let {} := foo;
+        return ExitSuccess();
+    end;
+end module body.
