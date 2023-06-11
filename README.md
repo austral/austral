@@ -96,21 +96,31 @@ Building the `austral` compiler requires `make` and the `dune` build system for
 OCaml, and a C compiler for building the resulting output. You should install OCaml
 4.13.0 or above.
 
-First, install [opam][opam]. On Debian/Ubuntu you can just do:
-
-```bash
-$ sudo apt-get install opam
-$ opam init
-$ opam install dune
-```
-
-Then:
+First:
 
 ```bash
 $ git clone git@github.com:austral/austral.git
 $ cd austral
-$ ./install-ocaml-deps.sh
-$ make
+```
+
+Next, install [opam][opam]. On Debian/Ubuntu you can just do:
+
+```bash
+$ sudo apt-get install opam
+$ opam init
+```
+
+Then, create an opam switch for austral and install dependencies via opam:
+
+```bash
+opam switch create austral 4.13.0
+eval $(opam env --switch=austral)
+opam install --deps-only -y .
+```
+
+Finally:
+```bash
+make
 ```
 
 To run the tests:

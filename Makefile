@@ -15,11 +15,14 @@ $(BIN): $(SRC)
 test: $(BIN)
 	dune runtest
 
+.PHONY: install
 install: $(BIN)
 	install -m 755 austral /usr/local/bin/austral
 
+.PHONY: uninstall
 uninstall:
 	sudo rm /usr/local/bin/austral
 
+.PHONY: clean
 clean:
-	rm $(BIN); rm -rf _build; rm lib/BuiltInModules.ml
+	rm -f $(BIN); rm -rf _build; rm -f lib/BuiltInModules.ml

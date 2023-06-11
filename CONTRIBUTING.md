@@ -33,16 +33,7 @@ For bug reports, questions, and feature requests, please open an issue
 
 ## Development Environment
 
-Short version:
-
-```bash
-$ sudo apt-get install opam
-$ git clone git@github.com:austral/austral.git
-$ cd austral
-$ ./install-ocaml-deps.sh
-$ make
-$ ./run-tests.sh
-```
+Follow the "Building without Nix" section of the [README.md](./README.md)
 
 ## Contribution Areas
 
