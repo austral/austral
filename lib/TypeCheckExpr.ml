@@ -539,6 +539,8 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
      TStringConstant s
   | Variable name ->
      augment_variable ctx name asserted_ty
+  | Temporary name ->
+     augment_temporary ctx name
   | FunctionCall (name, args) ->
      let arglist: typed_arglist = augment_arglist ctx args in
      augment_call ctx name arglist asserted_ty
@@ -608,6 +610,13 @@ and augment_variable (ctx: expr_ctx) (name: qident) (asserted_ty: ty option): te
          Errors.unknown_name
            ~kind:"variable"
            ~name:(original_name name))
+
+and augment_temporary (ctx: expr_ctx) (name: identifier): texpr =
+  match get_var (ctx_lexenv ctx) name with
+  | Some (ty, _) ->
+     TTemporary (name, ty)
+  | None ->
+     internal_err ("Temporary variable does not exist in lexenv: " ^ (ident_string name))
 
 and augment_comparison ctx op lhs rhs =
   let lhs' = aug ctx lhs
