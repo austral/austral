@@ -126,8 +126,8 @@ and pp (stmt: tstmt) (depth: int): string =
   match stmt with
   | TSkip _ ->
      indent "skip\n"
-  | TLet (_, _, _, _, body) ->
-     (indent "let\n")
+  | TLet (_, _, name, _, body) ->
+     (indent ("let " ^ (ident_string name) ^ "\n"))
      ^ (pp body inc)
      ^ (indent "end let\n")
   | TDestructure (_, _, _, _, body) ->
@@ -156,8 +156,10 @@ and pp (stmt: tstmt) (depth: int): string =
      (indent "for\n")
      ^ (pp body inc)
      ^ (indent "end for\n")
-  | TBorrow { body; _ } ->
-     (indent "borrow\n")
+  | TBorrow { body; original; rename; _ } ->
+     let original = ident_string original
+     and rename = ident_string rename in
+     (indent ("borrow " ^ original ^ " as " ^ rename ^ "\n"))
      ^ (pp body inc)
      ^ (indent "end borrow\n")
   | TBlock (_, a, b) ->
