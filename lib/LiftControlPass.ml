@@ -102,10 +102,10 @@ and transform (expr: Ast.aexpr): AstLC.aexpr =
     AstLC.Negation (transform e)
   | Ast.IfExpression (e1, e2, e3) ->
     AstLC.IfExpression (transform e1, transform e2, transform e3)
-  | Ast.Path (e, pel) ->
-    AstLC.Path (transform e, transform_path pel)
-  | Ast.RefPath (e, rpel) ->
-    AstLC.RefPath (transform e, rpel)
+  | Ast.Path (head, pel) ->
+    AstLC.Path (head, transform_path pel)
+  | Ast.RefPath (head, rpel) ->
+    AstLC.RefPath (head, transform_path rpel)
   | Ast.Embed (qt, s, el) ->
     AstLC.Embed (qt, s, List.map transform el)
   | Ast.Deref e ->
