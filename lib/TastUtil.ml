@@ -72,6 +72,8 @@ let rec get_type = function
      ty
   | TFunVar (_, ty, _) ->
      ty
+  | TTemporary (_, ty) ->
+     ty
   | TFuncall (_, _, _, ty, _) ->
      ty
   | TMethodCall (_, _, _, _, ty, _) ->
