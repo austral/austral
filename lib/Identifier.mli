@@ -76,3 +76,6 @@ val equal_qident : qident -> qident -> bool
 
 (** Convert a qualified identifier to a sourced identifier. *)
 val qident_to_sident : qident -> sident
+
+(** Create a fresh identifier. *)
+val fresh_ident : unit -> identifier
