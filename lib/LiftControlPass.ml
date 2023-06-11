@@ -17,7 +17,17 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.ADestructure (span, m, qbl, e, s) ->
      AstLC.ADestructure (span, m, qbl, transform e, lift s)
   | Ast.AAssign (span, lv, e) ->
-     AstLC.AAssign (span, transform lv, transform e)
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     let lv = transform lv in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.AAssign (span, lv, Temporary tmp)
+       )
   | Ast.AInitialAssign (name, typespec, expr) ->
      AstLC.AInitialAssign (name, typespec, transform expr)
   | Ast.AIf (span, e, s1, s2) ->
