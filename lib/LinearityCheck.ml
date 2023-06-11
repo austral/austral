@@ -6,7 +6,6 @@
 *)
 open Identifier
 open Stages.Tast
-open TastUtil
 open Type
 open TypeSystem
 open Reporter
