@@ -323,6 +323,11 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CBlock (List.concat [[vardecl]; bs'; [b']])
   | MAssign (lvalue, v) ->
      CAssign (gen_lvalue mn lvalue, ge v)
+  | MLetTmp (name, ty, expr, body) ->
+    let l = CLet (gen_ident name, gen_type ty, Some (ge expr)) in
+    CBlock [l; gs body]
+  | MAssignTmp (name, value) ->
+    CAssign (CVar (gen_ident name), ge value)
   | MIf (c, tb, fb) ->
      CIf (ge c, gs tb, gs fb)
   | MCase (e, whens, case_ref) ->

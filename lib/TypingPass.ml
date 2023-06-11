@@ -80,6 +80,8 @@ let stmt_kind (stmt: astmt): string =
   | ABlock _ -> "block"
   | ADiscarding _ -> "discard"
   | AReturn _ -> "return"
+  | LetTmp _ -> "let"
+  | AssignTmp _ -> "assign"
 
 let is_boolean = function
   | Boolean -> true
@@ -131,6 +133,22 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let lexenv' = push_var lexenv name ty (VarLocal mut) in
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
              TLet (span, mut, name, ty, body'))
+      | LetTmp (name, value, body) ->
+         let value = augment_expr module_name env rm typarams lexenv None value in
+         let ty = get_type value in
+         let lexenv = push_var lexenv name ty (VarLocal Mutable) in
+         let body = augment_stmt (update_lexenv ctx lexenv) body in
+         TLetTmp (name, ty, value, body)
+      | AssignTmp (name, value) ->
+         let value = augment_expr module_name env rm typarams lexenv None value in
+         begin
+           match get_var lexenv name with
+           | Some (ty, _) ->
+              let _ = match_type (env, module_name) ty (get_type value) in
+              TAssignTmp (name, value)
+           | None ->
+              internal_err "Unknown temporary."
+         end
       | ADestructure (span, mut, bindings, value, body) ->
          adorn_error_with_span span
            (fun _ ->

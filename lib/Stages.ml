@@ -149,9 +149,7 @@ module AstLC = struct
 
   type qbinding = Ast.qbinding
 
-  type path_elem = Ast.path_elem
   type ref_path_elem = Ast.ref_path_elem
-  type lvalue = Ast.lvalue
 
   type astmt =
     | ASkip of span
@@ -213,9 +211,17 @@ module AstLC = struct
   and abstract_arglist =
     | Positional of aexpr list
     | Named of (identifier * aexpr) list
+  
+  and path_elem =
+    | SlotAccessor of identifier
+    | PointerSlotAccessor of identifier
+    | ArrayIndex of aexpr
+
+  and lvalue =
+    LValue of identifier * path_elem list
 end
 
-(** The AST, but anonymous borrows are desugared. *)
+(** The AstLC, but anonymous borrows are desugared. *)
 module AstDB = struct
   open Identifier
   open Common
@@ -253,6 +259,8 @@ module AstDB = struct
     | ABlock of span * astmt * astmt
     | ADiscarding of span * aexpr
     | AReturn of span * aexpr
+    | LetTmp of identifier * aexpr * astmt
+    | AssignTmp of identifier * aexpr
 
   and aexpr =
     | NilConstant
@@ -419,6 +427,8 @@ module Tast = struct
     | TBlock of span * tstmt * tstmt
     | TDiscarding of span * texpr
     | TReturn of span * texpr
+    | TLetTmp of identifier * ty * texpr * tstmt
+    | TAssignTmp of identifier * texpr
   [@@deriving show]
 
   and texpr =
@@ -559,6 +569,8 @@ module Mtast = struct
     | MBlock of mstmt * mstmt
     | MDiscarding of mexpr
     | MReturn of mexpr
+    | MLetTmp of identifier * mono_ty * mexpr * mstmt
+    | MAssignTmp of identifier * mexpr
 
   and mexpr =
     | MNilConstant

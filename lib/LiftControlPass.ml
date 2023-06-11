@@ -17,7 +17,7 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.ADestructure (span, m, qbl, e, s) ->
     AstLC.ADestructure (span, m, qbl, transform e, lift s)
   | Ast.AAssign (span, lv, e, b) ->
-    AstLC.AAssign (span, lv, transform e, b)
+    AstLC.AAssign (span, lift_lv lv, transform e, b)
   | Ast.AIf (span, e, s1, s2) ->
     let tmp: identifier = fresh_ident () in
     let e = transform e in
@@ -72,6 +72,9 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.AReturn (span, e) ->
     AstLC.AReturn (span, transform e)
 
+and lift_lv (Ast.LValue (name, elems)) =
+  AstLC.LValue (name, List.map transform_elem elems)
+
 and transform (expr: Ast.aexpr): AstLC.aexpr =
   match expr with
   | Ast.NilConstant ->
@@ -101,7 +104,7 @@ and transform (expr: Ast.aexpr): AstLC.aexpr =
   | Ast.IfExpression (e1, e2, e3) ->
     AstLC.IfExpression (transform e1, transform e2, transform e3)
   | Ast.Path (e, pel) ->
-    AstLC.Path (transform e, pel)
+    AstLC.Path (transform e, transform_path pel)
   | Ast.RefPath (e, rpel) ->
     AstLC.RefPath (transform e, rpel)
   | Ast.Embed (qt, s, el) ->
@@ -125,3 +128,15 @@ and transform_arglist al =
   match al with
   | Ast.Positional el -> AstLC.Positional (List.map transform el)
   | Ast.Named idel -> AstLC.Named (List.map (fun (id, e) -> (id, transform e)) idel)
+
+and transform_path (elems: Ast.path_elem list): AstLC.path_elem list =
+  List.map transform_elem elems
+
+and transform_elem (elem: Ast.path_elem): AstLC.path_elem =
+  match elem with
+  | Ast.SlotAccessor name ->
+    AstLC.SlotAccessor name
+  | Ast.PointerSlotAccessor name ->
+    AstLC.PointerSlotAccessor name
+  | Ast.ArrayIndex expr ->
+    AstLC.ArrayIndex (transform expr)
