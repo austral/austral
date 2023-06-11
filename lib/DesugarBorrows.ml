@@ -234,7 +234,6 @@ let rec transform_stmt (stmt: AstDP.astmt): AstDB.astmt =
     let body = transform_stmt body in
     AstDB.ABorrow { span; original; rename; region; body; mode }
 
-
 and transform_whens (whens: AstDP.abstract_when list): AstDB.abstract_when list =
   List.map (fun (AstDP.AbstractWhen (id, bindings, body)) ->
     let body = transform_stmt body in

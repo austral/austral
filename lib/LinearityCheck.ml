@@ -6,6 +6,7 @@
 *)
 open Identifier
 open Stages.Tast
+open TastUtil
 open Type
 open TypeSystem
 open Reporter
@@ -751,7 +752,11 @@ and check_decl_linearity (decl: typed_decl): unit =
   match decl with
   | TFunction (_, _, name, _, params, _, b, _) ->
      with_frame ("Checking linearity of function " ^ (ident_string name))
-       (fun _ -> linearity_check params b)
+       (fun _ ->
+         let _ = print_endline "---------------" in
+         let _ = print_endline (dump_stmt b) in
+         let _ = print_endline "---------------" in
+         linearity_check params b)
   | TInstance (_, _, _, _, _, methods, _) ->
      let _ = List.map check_method_linearity methods in
      ()
