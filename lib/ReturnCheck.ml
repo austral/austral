@@ -63,6 +63,8 @@ let rec ends_in_return (stmt: astmt): bool =
          false)
   | AReturn _ ->
      true
+  | AInitialAssign _ ->
+     false
 
 let check_ends_in_return (CombinedModule { decls; _ }): unit =
   with_frame "Return check"
