@@ -14,7 +14,6 @@ open Error
 (* Data structures *)
 
 type loop_depth = int
-[@@deriving show]
 
 type var_state =
   | Unconsumed
@@ -29,7 +28,13 @@ let universe_linear_ish = function
   | _ -> false
 
 type state_tbl = StateTable of (identifier * ty * loop_depth * var_state) list * identifier list
-[@@deriving show]
+
+let show_state_tbl (tbl: state_tbl): string =
+  let (StateTable (entries, pending)) = tbl in
+  "Entries:\n"
+  ^ (String.concat "\n" (List.map (fun (n, _, l, v) -> (ident_string n) ^ "\t" ^ (string_of_int l) ^ "\t" ^ (show_var_state v)) entries))
+  ^ "\nPending:\n"
+  ^ (String.concat "\n" (List.map ident_string pending))
 
 let empty_tbl: state_tbl = StateTable ([], [])
 
