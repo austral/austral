@@ -156,7 +156,7 @@ module AstLC = struct
     | ASkip of span
     | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr
+    | AAssign of span * aexpr * aexpr
     | AInitialAssign of qident * qtypespec * aexpr
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
@@ -218,9 +218,6 @@ module AstLC = struct
     | SlotAccessor of identifier
     | PointerSlotAccessor of identifier
     | ArrayIndex of aexpr
-
-  and lvalue =
-    LValue of identifier * path_elem list
 end
 
 (** The AstLC, but paths are desugared. *)
