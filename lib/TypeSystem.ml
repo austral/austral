@@ -39,6 +39,8 @@ let is_numeric = function
   | RegionTy _ -> false
   | ReadRef _ -> false
   | WriteRef _ -> false
+  | Span _ -> false
+  | SpanMut _ -> false
   | TyVar _ -> false
   | Address _ -> false
   | Pointer _ -> false
