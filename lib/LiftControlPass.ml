@@ -18,7 +18,7 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
     AstLC.ADestructure (span, m, qbl, transform e, lift s)
   | Ast.AAssign (span, lv, e) ->
      AstLC.AAssign (span, lift_lv lv, transform e)
-  | Ast.AAssign (name, typespec, expr) ->
+  | Ast.AInitialAssign (name, typespec, expr) ->
      AstLC.AInitialAssign (name, typespec, expr)
   | Ast.AIf (span, e, s1, s2) ->
     let tmp: identifier = fresh_ident () in
