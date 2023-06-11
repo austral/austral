@@ -129,6 +129,22 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          merge_bindings bindings bindings'
       | _ ->
          Errors.type_mismatch a b)
+  | Span (t, r) ->
+     (match b with
+      | Span (t', r') ->
+         let bindings = match_type ctx t t' in
+         let bindings' = match_type ctx r r' in
+         merge_bindings bindings bindings'
+      | _ ->
+         Errors.type_mismatch a b)
+  | SpanMut (t, r) ->
+     (match b with
+      | SpanMut (t', r') ->
+         let bindings = match_type ctx t t' in
+         let bindings' = match_type ctx r r' in
+         merge_bindings bindings bindings'
+      | _ ->
+         Errors.type_mismatch a b)
   | TyVar tyvar ->
      match_type_var ctx tyvar b
   | Address t ->
