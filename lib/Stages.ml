@@ -91,12 +91,6 @@ module Ast = struct
     | SlotAccessor of identifier
     | PointerSlotAccessor of identifier
     | ArrayIndex of aexpr
-
-  and ref_path_elem =
-    | RefSlotAccessor of identifier
-
-  and lvalue =
-    LValue of identifier * path_elem list
 end
 
 (** The combined representation merges the interface and body. *)
@@ -150,8 +144,6 @@ module AstLC = struct
 
   type qbinding = Ast.qbinding
 
-  type ref_path_elem = Ast.ref_path_elem
-
   type astmt =
     | ASkip of span
     | ALet of span * mutability * identifier * qtypespec * astmt
@@ -198,8 +190,8 @@ module AstLC = struct
     | Disjunction of aexpr * aexpr
     | Negation of aexpr
     | IfExpression of aexpr * aexpr * aexpr
-    | Path of aexpr * path_elem list
-    | RefPath of aexpr * ref_path_elem list
+    | Path of qident * path_elem list
+    | RefPath of qident * path_elem list
     | Embed of qtypespec * string * aexpr list
     | Deref of aexpr
     | Typecast of aexpr * qtypespec

@@ -60,6 +60,8 @@ and transform_expr (expr: AstLC.aexpr): AstDP.aexpr =
      AstDP.StringConstant es
   | AstLC.Variable q ->
      AstDP.Variable q
+  | AstLC.Temporary n ->
+     AstDP.Temporary n
   | AstLC.FunctionCall (q, al) ->
      AstDP.FunctionCall (q, transform_arglist al)
   | AstLC.ArithmeticExpression (ao, e1, e2) ->
@@ -113,6 +115,13 @@ and transform_stmt (stmt: AstLC.astmt): AstDP.astmt =
      end
   | AstLC.AInitialAssign (name, ty, e) ->
      AstDP.AInitialAssign (name, ty, transform_expr e)
+  | AstLC.LetTmp (name, expr, body) ->
+     let expr = transform_expr expr
+     and body = transform_stmt body in
+     AstDP.LetTmp (name, expr, body)
+  | AstLC.AssignTmp (name, expr) ->
+     let expr = transform_expr expr in
+     AstDP.AssignTmp (name, expr)
   | AstLC.AIf (span, e, s1, s2) ->
      AstDP.AIf (span, transform_expr e, transform_stmt s1, transform_stmt s2)
   | AstLC.AWhen (span, e, s) ->
