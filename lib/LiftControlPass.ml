@@ -17,7 +17,7 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.ADestructure (span, m, qbl, e, s) ->
     AstLC.ADestructure (span, m, qbl, transform e, lift s)
   | Ast.AAssign (span, lv, e) ->
-     AstLC.AAssign (span, lift_lv lv, transform e)
+     AstLC.AAssign (span, transform lv, transform e)
   | Ast.AInitialAssign (name, typespec, expr) ->
      AstLC.AInitialAssign (name, typespec, transform expr)
   | Ast.AIf (span, e, s1, s2) ->
@@ -73,9 +73,6 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
     AstLC.ADiscarding (span, transform e)
   | Ast.AReturn (span, e) ->
     AstLC.AReturn (span, transform e)
-
-and lift_lv (Ast.LValue (name, elems)) =
-  AstLC.LValue (name, List.map transform_elem elems)
 
 and transform (expr: Ast.aexpr): AstLC.aexpr =
   match expr with
