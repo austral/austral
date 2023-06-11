@@ -138,6 +138,91 @@ module Combined = struct
   and combined_method_def = CMethodDef of identifier * typarams * qparam list * qtypespec * docstring * astmt
 end
 
+(* The AST, but expressions in control structures are lifted into temporaries. *)
+module AstLC = struct
+  open Identifier
+  open Common
+  open Span
+  open Escape
+  open Temporary
+
+  type qtypespec = Ast.qtypespec
+
+  type qbinding = Ast.qbinding
+
+  type astmt =
+    | ASkip of span
+    | ALet of span * mutability * identifier * qtypespec * astmt
+    | ADestructure of span * mutability * qbinding list * aexpr * astmt
+    | AAssign of span * lvalue * aexpr * bool
+    | AIf of span * aexpr * astmt * astmt
+    | AWhen of span * aexpr * astmt
+    | ACase of span * aexpr * abstract_when list
+    | AWhile of span * aexpr * astmt
+    | AFor of {
+        span: span;
+        name: identifier;
+        initial: aexpr;
+        final: aexpr;
+        body: astmt
+      }
+    | ABorrow of {
+        span: span;
+        original: identifier;
+        rename: identifier;
+        region: identifier;
+        body: astmt;
+        mode: borrow_stmt_kind
+      }
+    | ABlock of span * astmt * astmt
+    | ADiscarding of span * aexpr
+    | AReturn of span * aexpr
+    | LetTmp of tmp * aexpr
+    | AssignTmp of tmp * aexpr
+
+  and aexpr =
+    | NilConstant
+    | BoolConstant of bool
+    | IntConstant of string
+    | FloatConstant of string
+    | StringConstant of escaped_string
+    | Variable of qident
+    | FunctionCall of qident * abstract_arglist
+    | ArithmeticExpression of arithmetic_operator * aexpr * aexpr
+    | Comparison of comparison_operator * aexpr * aexpr
+    | Conjunction of aexpr * aexpr
+    | Disjunction of aexpr * aexpr
+    | Negation of aexpr
+    | IfExpression of aexpr * aexpr * aexpr
+    | Path of aexpr * path_elem list
+    | RefPath of aexpr * ref_path_elem list
+    | Embed of qtypespec * string * aexpr list
+    | Deref of aexpr
+    | Typecast of aexpr * qtypespec
+    | SizeOf of qtypespec
+    | BorrowExpr of borrowing_mode * qident
+    | Reborrow of qident
+    | Temporary of tmp
+
+  and abstract_when =
+    | AbstractWhen of identifier * qbinding list * astmt
+
+  and abstract_arglist =
+    | Positional of aexpr list
+    | Named of (identifier * aexpr) list
+
+  and path_elem =
+    | SlotAccessor of identifier
+    | PointerSlotAccessor of identifier
+    | ArrayIndex of aexpr
+
+  and ref_path_elem =
+    | RefSlotAccessor of identifier
+
+  and lvalue =
+    LValue of identifier * path_elem list
+end
+
 (** The AST, but anonymous borrows are desugared. *)
 module AstDB = struct
   open Identifier
