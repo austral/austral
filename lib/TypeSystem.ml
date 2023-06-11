@@ -20,6 +20,8 @@ let type_universe = function
   | RegionTy _ -> RegionUniverse
   | ReadRef _ -> FreeUniverse
   | WriteRef _ -> LinearUniverse
+  | Span _ -> FreeUniverse
+  | SpanMut _ -> LinearUniverse
   | TyVar (TypeVariable (_, u, _, _)) -> u
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
