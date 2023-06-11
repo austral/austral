@@ -4,8 +4,8 @@
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
+open Identifier
 open Stages
-open Temporary
 open Span
 
 let rec lift (stmt: Ast.astmt): AstLC.astmt =
@@ -19,7 +19,7 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.AAssign (span, lv, e, b) ->
     AstLC.AAssign (span, lv, transform e, b)
   | Ast.AIf (span, e, s1, s2) ->
-    let tmp: tmp = fresh_tmp () in
+    let tmp: identifier = fresh_ident () in
     let e = transform e in
     AstLC.LetTmp (
       tmp,
@@ -34,7 +34,7 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
   | Ast.AWhen (span, e, s) ->
     AstLC.AWhen (span, transform e, lift s)
   | Ast.ACase (span, e, awl) ->
-    let tmp: tmp = fresh_tmp () in
+    let tmp: identifier = fresh_ident () in
     let e = transform e in
     AstLC.LetTmp (
       tmp,
@@ -46,7 +46,7 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
       )
     )
   | Ast.AWhile (span, e, s) ->
-    let tmp: tmp = fresh_tmp () in
+    let tmp: identifier = fresh_ident () in
     let e = transform e in
     AstLC.LetTmp (
       tmp,

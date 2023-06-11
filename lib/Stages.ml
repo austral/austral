@@ -144,7 +144,6 @@ module AstLC = struct
   open Common
   open Span
   open Escape
-  open Temporary
 
   type qtypespec = Ast.qtypespec
 
@@ -181,8 +180,8 @@ module AstLC = struct
     | ABlock of span * astmt * astmt
     | ADiscarding of span * aexpr
     | AReturn of span * aexpr
-    | LetTmp of tmp * aexpr * astmt
-    | AssignTmp of tmp * aexpr
+    | LetTmp of identifier * aexpr * astmt
+    | AssignTmp of identifier * aexpr
 
   and aexpr =
     | NilConstant
@@ -191,6 +190,7 @@ module AstLC = struct
     | FloatConstant of string
     | StringConstant of escaped_string
     | Variable of qident
+    | Temporary of identifier
     | FunctionCall of qident * abstract_arglist
     | ArithmeticExpression of arithmetic_operator * aexpr * aexpr
     | Comparison of comparison_operator * aexpr * aexpr
@@ -206,7 +206,6 @@ module AstLC = struct
     | SizeOf of qtypespec
     | BorrowExpr of borrowing_mode * qident
     | Reborrow of qident
-    | Temporary of tmp
 
   and abstract_when =
     | AbstractWhen of identifier * qbinding list * astmt
