@@ -59,7 +59,7 @@ let cannot_borrow_param_mutably (name: identifier) =
   austral_raise TypeError [
       Text "Cannot borrow the variable ";
       Code (ident_string name);
-      Text " mutably because the it is a function parameter, and therefore immutable."
+      Text " mutably because it is a function parameter, and therefore immutable."
     ]
 
 let call_non_callable ty =
@@ -380,4 +380,20 @@ let var_collides_with_decl (name: identifier) =
       Text "The variable ";
       Code (ident_string name);
       Text " collides with the name of a declaration."
+    ]
+
+let cant_access_slot_not_record (slot_name: identifier) (ty: ty) =
+  austral_raise TypeError [
+      Text "Can't access the slot ";
+      Code (ident_string slot_name);
+      Text " because the type ";
+      Type ty;
+      Text " is not a record."
+    ]
+
+let cant_index_not_fixed_array (ty: ty) =
+  austral_raise TypeError [
+      Text "I can't use the array indexing operator here, because the type ";
+      Type ty;
+      Text " is not a fixed array."
     ]
