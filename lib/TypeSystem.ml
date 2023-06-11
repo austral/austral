@@ -120,6 +120,10 @@ let rec is_concrete = function
      is_concrete ty
   | WriteRef (ty, _) ->
      is_concrete ty
+  | Span (ty, _) ->
+     is_concrete ty
+  | SpanMut (ty, _) ->
+     is_concrete ty
   | TyVar _ ->
      (* Individual type variables need not be instantiated. *)
      true
