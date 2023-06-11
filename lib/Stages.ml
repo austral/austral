@@ -427,6 +427,8 @@ module Tast = struct
     | TBlock of span * tstmt * tstmt
     | TDiscarding of span * texpr
     | TReturn of span * texpr
+    | TLetTmp of identifier * ty * texpr * tstmt
+    | TAssignTmp of identifier * texpr
   [@@deriving show]
 
   and texpr =
@@ -567,6 +569,8 @@ module Mtast = struct
     | MBlock of mstmt * mstmt
     | MDiscarding of mexpr
     | MReturn of mexpr
+    | MLetTmp of identifier * mono_ty * mexpr * mstmt
+    | MAssignTmp of identifier * mexpr
 
   and mexpr =
     | MNilConstant
