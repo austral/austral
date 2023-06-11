@@ -197,6 +197,14 @@ let overlapping_instances (a: ty) (b: ty): bool =
      (match b with
       | WriteRef _ -> true
       | _ -> false)
+  | Span _ ->
+     (match b with
+      | Span _ -> true
+      | _ -> false)
+  | SpanMut _ ->
+     (match b with
+      | SpanMut _ -> true
+      | _ -> false)
   | TyVar _ ->
      err "Not allowed"
   | Address _ ->
