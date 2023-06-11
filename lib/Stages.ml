@@ -32,7 +32,8 @@ module Ast = struct
     | ASkip of span
     | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr * bool
+    | AAssign of span * aexpr * aexpr
+    | AInitialAssign of qident * qtypespec * aexpr
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
     | ACase of span * aexpr * abstract_when list
@@ -70,8 +71,8 @@ module Ast = struct
     | Disjunction of aexpr * aexpr
     | Negation of aexpr
     | IfExpression of aexpr * aexpr * aexpr
-    | Path of aexpr * path_elem list
-    | RefPath of aexpr * ref_path_elem list
+    | Path of qident * path_elem list
+    | RefPath of qident * path_elem list
     | Embed of qtypespec * string * aexpr list
     | Deref of aexpr
     | Typecast of aexpr * qtypespec
