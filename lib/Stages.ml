@@ -314,7 +314,9 @@ module AstDB = struct
     | ASkip of span
     | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr * bool
+    | AAssign of span * aexpr * aexpr
+    | AAssignVar of span * qident * aexpr
+    | AInitialAssign of qident * qtypespec * aexpr
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
     | ACase of span * aexpr * abstract_when list
@@ -361,6 +363,10 @@ module AstDB = struct
     | Deref of aexpr
     | Typecast of aexpr * qtypespec
     | SizeOf of qtypespec
+    (* Path expressions *)
+    | SlotAccessor of aexpr * identifier
+    | PointerSlotAccessor of aexpr * identifier
+    | ArrayIndex of aexpr * aexpr
 
   and abstract_when =
     | AbstractWhen of identifier * qbinding list * astmt
@@ -368,17 +374,6 @@ module AstDB = struct
   and abstract_arglist =
     | Positional of aexpr list
     | Named of (identifier * aexpr) list
-
-  and path_elem =
-    | SlotAccessor of identifier
-    | PointerSlotAccessor of identifier
-    | ArrayIndex of aexpr
-
-  and ref_path_elem =
-    | RefSlotAccessor of identifier
-
-  and lvalue =
-    LValue of identifier * path_elem list
 end
 
 (** The combined representation, but bodies are thoroughly desugared. *)
