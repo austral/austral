@@ -1,0 +1,16 @@
+module body Test is
+    record Foo: Linear is
+    end;
+
+    function main(): ExitCode is
+        var foo: Foo := Foo();
+        if true then
+            let {} := foo;
+            foo := Foo();
+        else
+            skip;
+        end if;
+        let {} := foo;
+        return ExitSuccess();
+    end;
+end module body.
