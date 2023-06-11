@@ -261,6 +261,7 @@ module AstDB = struct
     | FloatConstant of string
     | StringConstant of escaped_string
     | Variable of qident
+    | Temporary of identifier
     | FunctionCall of qident * abstract_arglist
     | ArithmeticExpression of arithmetic_operator * aexpr * aexpr
     | Comparison of comparison_operator * aexpr * aexpr
@@ -430,6 +431,7 @@ module Tast = struct
     | TParamVar of identifier * ty
     | TLocalVar of identifier * ty
     | TFunVar of decl_id * ty * type_bindings
+    | TTemporary of identifier * ty
     (** Represents accessing a function as a value. *)
     | TFuncall of decl_id * qident * texpr list * ty * type_bindings
     | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * type_bindings
@@ -567,6 +569,7 @@ module Mtast = struct
     | MConstVar of qident * mono_ty
     | MParamVar of identifier * mono_ty
     | MLocalVar of identifier * mono_ty
+    | MTemporary of identifier * mono_ty
     | MGenericFunVar of mono_id * mono_ty
     | MConcreteFunVar of decl_id * mono_ty
     | MConcreteFuncall of decl_id * qident * mexpr list * mono_ty
