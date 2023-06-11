@@ -2,7 +2,7 @@
   "module": "Test",
   "kind": "Linearity Error",
   "text": [
-    { "type": "text", "content": "Cannot borrow the variable " },
+    { "type": "text", "content": "Cannot reborrow the variable " },
     { "type": "code", "content": "fooref" },
     { "type": "text", "content": " because it is already " },
     { "type": "text", "content": "borrowed (read-write)" },
