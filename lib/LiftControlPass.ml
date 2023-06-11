@@ -37,7 +37,20 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
            )
        )
   | Ast.AWhen (span, e, s) ->
-     AstLC.AWhen (span, transform e, lift s)
+     let tmp: identifier = fresh_ident () in
+     let e = transform e in
+     AstLC.ABlock (
+         empty_span,
+         AstLC.LetTmp (
+             tmp,
+             e
+           ),
+         AstLC.AWhen (
+             span,
+             Temporary tmp,
+             lift s
+           )
+       )
   | Ast.ACase (span, e, awl) ->
      let tmp: identifier = fresh_ident () in
      let e = transform e in
