@@ -389,7 +389,7 @@ module body Standard.Buffer is
 
     generic [T: Type, R: Region]
     function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit is
-        if buf->size > 0 then    
+        if buf->size > 0 then
             for i from 0 to buf->size - 1 do
                 swapTransform(reborrow(buf), i, fn);
             end for;
@@ -419,7 +419,7 @@ module body Standard.Buffer is
         -- Return the new buffer.
         return newbuf;
     end;
-    
+
     ---
     --- Utilities
     ---

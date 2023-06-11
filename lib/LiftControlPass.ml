@@ -64,7 +64,33 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
       )
     )
   | Ast.AFor {span; name; initial; final; body} ->
-    AstLC.AFor {span; name; initial=transform initial; final=transform final; body=lift body}
+     let tmp_initial: identifier = fresh_ident () in
+     let tmp_final: identifier = fresh_ident () in
+     let idx =
+       Ast.QTypeSpecifier (
+           make_qident (
+               make_mod_name "Austral.Pervasive",
+               make_ident "Index",
+               make_ident "Index"
+             ),
+           []
+         )
+     in
+     AstLC.LetTmp (
+         tmp_initial,
+         Typecast (transform initial, idx),
+         AstLC.LetTmp (
+             tmp_final,
+             Typecast (transform final, idx),
+             AstLC.AFor {
+                 span;
+                 name;
+                 initial=Temporary tmp_initial;
+                 final=Temporary tmp_final;
+                 body=lift body
+               }
+           )
+       )
   | Ast.ABorrow {span; original; rename; region; body; mode} ->
     AstLC.ABorrow {span; original; rename; region; body=lift body; mode}
   | Ast.ABlock (span, s1, s2) ->
