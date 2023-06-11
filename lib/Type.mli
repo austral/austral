@@ -44,6 +44,8 @@ type ty =
   | RegionTy of region
   | ReadRef of ty * ty
   | WriteRef of ty * ty
+  | Span of ty * ty
+  | SpanMut of ty * ty
   | TyVar of type_var
   | Address of ty
   | Pointer of ty
