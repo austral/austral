@@ -188,6 +188,14 @@ let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
   | TReturn (span, expr) ->
      let expr = replace_tyvars_expr bindings expr in
      TReturn (span, expr)
+  | TLetTmp (name, ty, expr, body) ->
+     let ty = replace_variables bindings ty
+     and expr = replace_tyvars_expr bindings expr
+     and body = replace_tyvars_stmt bindings body in
+     TLetTmp (name, ty, expr, body)
+   | TAssignTmp (name, value) ->
+     let value = replace_tyvars_expr bindings value in
+     TAssignTmp (name, value)
 
 and replace_tyvars_lvalue (bindings: type_bindings) (lvalue: typed_lvalue): typed_lvalue =
   let (TypedLValue (name, elems)) = lvalue in
