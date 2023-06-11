@@ -26,8 +26,9 @@ let make_rename (original: qident): qident =
   let a = source_module_name original
   and b = original_name original
   and c = local_name original in
-  let b = make_ident ((ident_string b) ^ "_tmp_ref" ^ (string_of_int (fresh_tmp ()))) in
-  let c = make_ident ((ident_string c) ^ "_tmp_ref" ^ (string_of_int (fresh_tmp ()))) in
+  let id = string_of_int (fresh_tmp ()) in
+  let b = make_ident ((ident_string b) ^ "_tmp_ref" ^ id) in
+  let c = make_ident ((ident_string c) ^ "_tmp_ref" ^ id) in
   make_qident (a, b, c)
 
 let make_mode (mode: borrowing_mode): borrow_stmt_kind =
