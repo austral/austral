@@ -22,6 +22,8 @@ type stripped_ty =
   | SRegionTy of region
   | SReadRef of stripped_ty * stripped_ty
   | SWriteRef of stripped_ty * stripped_ty
+  | SSpan of stripped_ty * stripped_ty
+  | SSpanMut of stripped_ty * stripped_ty
   | SAddress of stripped_ty
   | SPointer of stripped_ty
   | SFnPtr of stripped_ty list * stripped_ty
@@ -77,6 +79,26 @@ and strip_type' (ty: ty): stripped_ty option =
              internal_err "unable to strip write ref type")
       | None ->
          internal_err "write ref instantiated with a region type.")
+  | Span (ty, r) ->
+     (match (strip_type' ty) with
+      | Some ty ->
+         (match (strip_type' r) with
+          | Some r ->
+             Some (SSpan (ty, r))
+          | None ->
+             internal_err "unable to strip span type")
+      | None ->
+         internal_err "span instantiated with a region type.")
+  | SpanMut (ty, r) ->
+     (match (strip_type' ty) with
+      | Some ty ->
+         (match (strip_type' r) with
+          | Some r ->
+             Some (SSpanMut (ty, r))
+          | None ->
+             internal_err "unable to strip span! type")
+      | None ->
+         internal_err "span! instantiated with a region type.")
   | TyVar (TypeVariable (name, u, source, _)) ->
      if u = RegionUniverse then
        Some (SRegionTyVar (name, source))

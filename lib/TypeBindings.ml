@@ -174,6 +174,10 @@ let rec replace_variables bindings ty =
      ReadRef (replace_variables bindings ty, replace_variables bindings region)
   | WriteRef (ty, region) ->
      WriteRef (replace_variables bindings ty, replace_variables bindings region)
+  | Span (ty, region) ->
+     Span (replace_variables bindings ty, replace_variables bindings region)
+  | SpanMut (ty, region) ->
+     SpanMut (replace_variables bindings ty, replace_variables bindings region)
   | Address ty ->
      Address (replace_variables bindings ty)
   | Pointer ty ->

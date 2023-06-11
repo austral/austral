@@ -23,6 +23,8 @@ type mono_ty =
   | MonoRegionTy of region
   | MonoReadRef of mono_ty * mono_ty
   | MonoWriteRef of mono_ty * mono_ty
+  | MonoSpan of mono_ty * mono_ty
+  | MonoSpanMut of mono_ty * mono_ty
   | MonoAddress of mono_ty
   | MonoPointer of mono_ty
   | MonoFnPtr of mono_ty list * mono_ty

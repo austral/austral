@@ -26,6 +26,8 @@ type stripped_ty =
   | SRegionTy of region
   | SReadRef of stripped_ty * stripped_ty
   | SWriteRef of stripped_ty * stripped_ty
+  | SSpan of stripped_ty * stripped_ty
+  | SSpanMut of stripped_ty * stripped_ty
   | SAddress of stripped_ty
   | SPointer of stripped_ty
   | SFnPtr of stripped_ty list * stripped_ty

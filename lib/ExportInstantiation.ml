@@ -79,6 +79,10 @@ let rec transform_ty (ty: ty): c_ty =
      Errors.disallowed_type ty
   | WriteRef _ ->
      Errors.disallowed_type ty
+  | Span _ ->
+     Errors.disallowed_type ty
+  | SpanMut _ ->
+     Errors.disallowed_type ty
   | TyVar _ ->
      Errors.disallowed_type ty
   | Address t ->

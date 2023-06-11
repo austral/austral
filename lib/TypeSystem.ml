@@ -20,6 +20,8 @@ let type_universe = function
   | RegionTy _ -> RegionUniverse
   | ReadRef _ -> FreeUniverse
   | WriteRef _ -> LinearUniverse
+  | Span _ -> FreeUniverse
+  | SpanMut _ -> LinearUniverse
   | TyVar (TypeVariable (_, u, _, _)) -> u
   | Address _ -> FreeUniverse
   | Pointer _ -> FreeUniverse
@@ -37,6 +39,8 @@ let is_numeric = function
   | RegionTy _ -> false
   | ReadRef _ -> false
   | WriteRef _ -> false
+  | Span _ -> false
+  | SpanMut _ -> false
   | TyVar _ -> false
   | Address _ -> false
   | Pointer _ -> false
@@ -54,6 +58,8 @@ let is_comparable = function
   | RegionTy _ -> false
   | ReadRef _ -> false
   | WriteRef _ -> false
+  | Span _ -> false
+  | SpanMut _ -> false
   | TyVar _ -> false
   | Address _ -> true
   | Pointer _ -> true
@@ -80,6 +86,10 @@ let rec type_variables = function
   | ReadRef (ty, r) ->
      TypeVarSet.union (type_variables ty) (type_variables r)
   | WriteRef (ty, r) ->
+     TypeVarSet.union (type_variables ty) (type_variables r)
+  | Span (ty, r) ->
+     TypeVarSet.union (type_variables ty) (type_variables r)
+  | SpanMut (ty, r) ->
      TypeVarSet.union (type_variables ty) (type_variables r)
   | TyVar v ->
      TypeVarSet.singleton v
@@ -109,6 +119,10 @@ let rec is_concrete = function
   | ReadRef (ty, _) ->
      is_concrete ty
   | WriteRef (ty, _) ->
+     is_concrete ty
+  | Span (ty, _) ->
+     is_concrete ty
+  | SpanMut (ty, _) ->
      is_concrete ty
   | TyVar _ ->
      (* Individual type variables need not be instantiated. *)

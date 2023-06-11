@@ -134,6 +134,14 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = all_distinct [is_tyvar ty; is_tyvar r] in
      let _ = no_leftovers 2 in
      ()
+  | Span (ty, r) ->
+     let _ = all_distinct [is_tyvar ty; is_tyvar r] in
+     let _ = no_leftovers 2 in
+     ()
+  | SpanMut (ty, r) ->
+     let _ = all_distinct [is_tyvar ty; is_tyvar r] in
+     let _ = no_leftovers 2 in
+     ()
   | TyVar _ ->
      Errors.lone_tyvar ()
   | Address ty ->
@@ -196,6 +204,14 @@ let overlapping_instances (a: ty) (b: ty): bool =
   | WriteRef _ ->
      (match b with
       | WriteRef _ -> true
+      | _ -> false)
+  | Span _ ->
+     (match b with
+      | Span _ -> true
+      | _ -> false)
+  | SpanMut _ ->
+     (match b with
+      | SpanMut _ -> true
       | _ -> false)
   | TyVar _ ->
      err "Not allowed"
@@ -260,6 +276,10 @@ and is_type_local (env: env) (mod_id: mod_id) (ty: ty): bool =
      true
   | WriteRef _ ->
      true
+  | Span _ ->
+     true
+  | SpanMut _ ->
+     true
   | TyVar _ ->
      (* Not applicable. *)
      false
@@ -276,7 +296,7 @@ and is_type_local (env: env) (mod_id: mod_id) (ty: ty): bool =
 let check_disjoint_typarams (name: identifier) (typarams: typarams): unit =
   match get_typaram typarams name with
   | Some _ ->
-     Errors.shadowing_typeclass_param name    
+     Errors.shadowing_typeclass_param name
   | None ->
      (* No collision *)
      ()
