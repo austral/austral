@@ -783,6 +783,10 @@ and mono_to_ty (ty: mono_ty): ty =
      ReadRef (r ty, r region)
   | MonoWriteRef (ty, region) ->
      WriteRef (r ty, r region)
+  | MonoSpan (ty, region) ->
+     Span (r ty, r region)
+  | MonoSpanMut (ty, region) ->
+     SpanMut (r ty, r region)
   | MonoAddress ty ->
      Address (r ty)
   | MonoPointer ty ->
