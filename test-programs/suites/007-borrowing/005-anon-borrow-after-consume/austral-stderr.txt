@@ -9,9 +9,15 @@
     { "type": "text", "content": "." }
   ],
   "span": {
-    "filename": "",
-    "startp": { "line": 0, "column": 0 },
-    "end[": { "line": 0, "column": 0 }
+    "filename": "test-programs/suites/007-borrowing/005-anon-borrow-after-consume/Test.aum",
+    "startp": { "line": 10, "column": 8 },
+    "end[": { "line": 10, "column": 33 }
   },
-  "context": null
+  "context": [
+    [ 8, "        let foo: Foo := Foo(bar => 'a');" ],
+    [ 9, "        -- Consume the record by destructuring." ],
+    [ 10, "        let { bar: Nat8 } := foo;" ],
+    [ 11, "        -- Try to borrow it." ],
+    [ 12, "        &foo;" ]
+  ]
 }
