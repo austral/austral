@@ -8,6 +8,6 @@ open Stages
 
 (** Desugar anonymous borrows. *)
 
-val transform_expr : AstLC.aexpr -> AstDB.aexpr
+val transform_expr : AstDP.aexpr -> AstDB.aexpr
 
-val transform_stmt : AstLC.astmt -> AstDB.astmt
+val transform_stmt : AstDP.astmt -> AstDB.astmt
