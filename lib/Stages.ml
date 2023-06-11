@@ -138,6 +138,83 @@ module Combined = struct
   and combined_method_def = CMethodDef of identifier * typarams * qparam list * qtypespec * docstring * astmt
 end
 
+(* The AST, but expressions in control structures are lifted into temporaries. *)
+module AstLC = struct
+  open Identifier
+  open Common
+  open Span
+  open Escape
+
+  type qtypespec = Ast.qtypespec
+
+  type qbinding = Ast.qbinding
+
+  type path_elem = Ast.path_elem
+  type ref_path_elem = Ast.ref_path_elem
+  type lvalue = Ast.lvalue
+
+  type astmt =
+    | ASkip of span
+    | ALet of span * mutability * identifier * qtypespec * astmt
+    | ADestructure of span * mutability * qbinding list * aexpr * astmt
+    | AAssign of span * lvalue * aexpr * bool
+    | AIf of span * aexpr * astmt * astmt
+    | AWhen of span * aexpr * astmt
+    | ACase of span * aexpr * abstract_when list
+    | AWhile of span * aexpr * astmt
+    | AFor of {
+        span: span;
+        name: identifier;
+        initial: aexpr;
+        final: aexpr;
+        body: astmt
+      }
+    | ABorrow of {
+        span: span;
+        original: identifier;
+        rename: identifier;
+        region: identifier;
+        body: astmt;
+        mode: borrow_stmt_kind
+      }
+    | ABlock of span * astmt * astmt
+    | ADiscarding of span * aexpr
+    | AReturn of span * aexpr
+    | LetTmp of identifier * aexpr * astmt
+    | AssignTmp of identifier * aexpr
+
+  and aexpr =
+    | NilConstant
+    | BoolConstant of bool
+    | IntConstant of string
+    | FloatConstant of string
+    | StringConstant of escaped_string
+    | Variable of qident
+    | Temporary of identifier
+    | FunctionCall of qident * abstract_arglist
+    | ArithmeticExpression of arithmetic_operator * aexpr * aexpr
+    | Comparison of comparison_operator * aexpr * aexpr
+    | Conjunction of aexpr * aexpr
+    | Disjunction of aexpr * aexpr
+    | Negation of aexpr
+    | IfExpression of aexpr * aexpr * aexpr
+    | Path of aexpr * path_elem list
+    | RefPath of aexpr * ref_path_elem list
+    | Embed of qtypespec * string * aexpr list
+    | Deref of aexpr
+    | Typecast of aexpr * qtypespec
+    | SizeOf of qtypespec
+    | BorrowExpr of borrowing_mode * qident
+    | Reborrow of qident
+
+  and abstract_when =
+    | AbstractWhen of identifier * qbinding list * astmt
+
+  and abstract_arglist =
+    | Positional of aexpr list
+    | Named of (identifier * aexpr) list
+end
+
 (** The AST, but anonymous borrows are desugared. *)
 module AstDB = struct
   open Identifier
@@ -184,6 +261,7 @@ module AstDB = struct
     | FloatConstant of string
     | StringConstant of escaped_string
     | Variable of qident
+    | Temporary of identifier
     | FunctionCall of qident * abstract_arglist
     | ArithmeticExpression of arithmetic_operator * aexpr * aexpr
     | Comparison of comparison_operator * aexpr * aexpr
@@ -353,6 +431,7 @@ module Tast = struct
     | TParamVar of identifier * ty
     | TLocalVar of identifier * ty
     | TFunVar of decl_id * ty * type_bindings
+    | TTemporary of identifier * ty
     (** Represents accessing a function as a value. *)
     | TFuncall of decl_id * qident * texpr list * ty * type_bindings
     | TMethodCall of ins_meth_id * qident * typarams * texpr list * ty * type_bindings
@@ -490,6 +569,7 @@ module Mtast = struct
     | MConstVar of qident * mono_ty
     | MParamVar of identifier * mono_ty
     | MLocalVar of identifier * mono_ty
+    | MTemporary of identifier * mono_ty
     | MGenericFunVar of mono_id * mono_ty
     | MConcreteFunVar of decl_id * mono_ty
     | MConcreteFuncall of decl_id * qident * mexpr list * mono_ty

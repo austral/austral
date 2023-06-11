@@ -26,6 +26,8 @@ let rec get_type (e: mexpr): mono_ty =
      ty
   | MLocalVar (_, ty) ->
      ty
+  | MTemporary (_, ty) ->
+     ty
   | MGenericFunVar (_, ty) ->
      ty
   | MConcreteFunVar (_, ty) ->

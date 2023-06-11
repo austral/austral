@@ -226,6 +226,11 @@ let rec count (name: identifier) (expr: texpr): appearances =
        consumed_once
      else
        zero_appearances
+  | TTemporary (name', _) ->
+     if equal_identifier name name' then
+       consumed_once
+     else
+       zero_appearances
   | TFunVar _ ->
      zero_appearances
   | TFuncall (_, _, args, _, _) ->

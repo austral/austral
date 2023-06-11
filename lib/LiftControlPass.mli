@@ -3,10 +3,11 @@
    See LICENSE file for details.
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
- *)
+*)
 
-type tmp
+open Stages
 
-val fresh_tmp : unit -> tmp
+(** Lift complex expressions in control structures. *)
+val lift: Ast.astmt -> AstLC.astmt
 
-val tmp_to_string : tmp -> string
+val transform: Ast.aexpr -> AstLC.aexpr
