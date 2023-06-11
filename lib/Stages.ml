@@ -156,7 +156,8 @@ module AstLC = struct
     | ASkip of span
     | ALet of span * mutability * identifier * qtypespec * astmt
     | ADestructure of span * mutability * qbinding list * aexpr * astmt
-    | AAssign of span * lvalue * aexpr * bool
+    | AAssign of span * lvalue * aexpr
+    | AInitialAssign of qident * qtypespec * aexpr
     | AIf of span * aexpr * astmt * astmt
     | AWhen of span * aexpr * astmt
     | ACase of span * aexpr * abstract_when list
