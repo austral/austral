@@ -61,7 +61,7 @@ let add_entry (tbl: state_tbl) (name: identifier) (ty: ty) (depth: loop_depth): 
   | Some _ ->
      (* The justification for this being an internal error is that the compiler
         should already have caught a duplicate variable. *)
-     internal_err "An entry exists in the state table with this name."
+     internal_err ("An entry exists in the state table with this name: " ^ (ident_string name))
 
 let trim_free (tbl: state_tbl): state_tbl =
   let (StateTable (entries, pending)) = tbl in
