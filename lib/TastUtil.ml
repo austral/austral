@@ -5,6 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
+open Common
 open Type
 open Stages.Tast
 open Identifier
@@ -156,10 +157,10 @@ and pp (stmt: tstmt) (depth: int): string =
      (indent "for\n")
      ^ (pp body inc)
      ^ (indent "end for\n")
-  | TBorrow { body; original; rename; _ } ->
+  | TBorrow { body; original; rename; mode; _ } ->
      let original = ident_string original
      and rename = ident_string rename in
-     (indent ("borrow " ^ original ^ " as " ^ rename ^ "\n"))
+     (indent ("borrow " ^ original ^ " as " ^ rename ^ "(" ^ (show_borrow_stmt_kind mode) ^ ")\n"))
      ^ (pp body inc)
      ^ (indent "end borrow\n")
   | TBlock (_, a, b) ->
