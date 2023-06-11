@@ -207,7 +207,9 @@ let for_bounds_non_integral ~bound ~ty =
     Text bound;
     Text " value in the loop range is ";
     Type ty;
-    Text " which is not an integer type."
+    Text " which is not ";
+    Code "Index";
+    Text "."
   ]
 
 let foreign_in_safe_module () =
