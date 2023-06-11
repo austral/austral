@@ -44,6 +44,7 @@ let rec lift_borrows (expr: AstDP.aexpr) (acc: acc): AstDB.aexpr * acc =
   | AstDP.FloatConstant f -> (AstDB.FloatConstant f, acc)
   | AstDP.StringConstant s -> (AstDB.StringConstant s, acc)
   | AstDP.Variable id -> (AstDB.Variable id, acc)
+  | AstDP.Temporary id -> (AstDB.Temporary id, acc)
   | AstDP.BorrowExpr (mode, original) ->
     let rename = make_rename original in
     let acc_rec = { original; rename; mode=make_mode mode } in
