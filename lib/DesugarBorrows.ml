@@ -195,10 +195,9 @@ let rec transform_stmt (stmt: AstLC.astmt): AstDB.astmt =
     let acc = acc @ acc' in
     let stmt = AstDB.AAssign (span, AstDB.LValue (name, elems), value, first) in
     wrap_stmt_with_borrows stmt acc
-  | AstLC.LetTmp (name, value, body) ->
+  | AstLC.LetTmp (name, value) ->
     let (value, acc) = lift_borrows value [] in
-    let body = transform_stmt body in
-    let stmt = AstDB.LetTmp (name, value, body) in
+    let stmt = AstDB.LetTmp (name, value) in
     wrap_stmt_with_borrows stmt acc
   | AstLC.AssignTmp (name, value) ->
     let (value, acc) = lift_borrows value [] in

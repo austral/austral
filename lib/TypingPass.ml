@@ -134,12 +134,11 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              let body' = augment_stmt (update_lexenv ctx lexenv') body in
              remove_var lexenv name;
              TLet (span, mut, name, ty, body'))
-      | LetTmp (name, value, body) ->
+      | LetTmp (name, value) ->
          let value = augment_expr module_name env rm typarams lexenv None value in
          let ty = get_type value in
-         let lexenv = push_var lexenv name ty (VarLocal Mutable) in
-         let body = augment_stmt (update_lexenv ctx lexenv) body in
-         TLetTmp (name, ty, value, body)
+         let _ = push_var lexenv name ty (VarLocal Mutable) in
+         TLetTmp (name, ty, value)
       | AssignTmp (name, value) ->
          let value = augment_expr module_name env rm typarams lexenv None value in
          begin

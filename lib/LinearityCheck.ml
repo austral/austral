@@ -538,13 +538,10 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          (* Once we leave the scope, remove the variable we added. *)
          let tbl: state_tbl = remove_entry tbl name in
          tbl)
-  | TLetTmp (name, ty, expr, body) ->
+  | TLetTmp (name, ty, expr) ->
      (* Add an entry to the table. *)
      let tbl: state_tbl = add_entry tbl name ty depth in
      let tbl: state_tbl = check_expr tbl depth expr in
-     let tbl: state_tbl = check_stmt tbl depth body in
-     (* Once we leave the scope, remove the variable we added. *)
-     let tbl: state_tbl = remove_entry tbl name in
      tbl
   | TAssignTmp (name, expr) ->
     let tbl: state_tbl = check_expr tbl depth expr in

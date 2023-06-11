@@ -178,7 +178,7 @@ module AstLC = struct
     | ABlock of span * astmt * astmt
     | ADiscarding of span * aexpr
     | AReturn of span * aexpr
-    | LetTmp of identifier * aexpr * astmt
+    | LetTmp of identifier * aexpr
     | AssignTmp of identifier * aexpr
 
   and aexpr =
@@ -259,7 +259,7 @@ module AstDB = struct
     | ABlock of span * astmt * astmt
     | ADiscarding of span * aexpr
     | AReturn of span * aexpr
-    | LetTmp of identifier * aexpr * astmt
+    | LetTmp of identifier * aexpr
     | AssignTmp of identifier * aexpr
 
   and aexpr =
@@ -427,7 +427,7 @@ module Tast = struct
     | TBlock of span * tstmt * tstmt
     | TDiscarding of span * texpr
     | TReturn of span * texpr
-    | TLetTmp of identifier * ty * texpr * tstmt
+    | TLetTmp of identifier * ty * texpr
     | TAssignTmp of identifier * texpr
   [@@deriving show]
 
@@ -569,7 +569,7 @@ module Mtast = struct
     | MBlock of mstmt * mstmt
     | MDiscarding of mexpr
     | MReturn of mexpr
-    | MLetTmp of identifier * mono_ty * mexpr * mstmt
+    | MLetTmp of identifier * mono_ty * mexpr
     | MAssignTmp of identifier * mexpr
 
   and mexpr =
