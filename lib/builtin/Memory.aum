@@ -105,4 +105,30 @@ module body Austral.Memory is
         let size: ByteSize := elem_size * count_bytes;
         return size;
     end;
+
+    generic [T: Type, R: Region]
+    function span(ref: &[Pointer[T], R], start: Index, final: Index): Span[T, R] is
+        let size: Index := (final - start) + 1;
+        let p: Pointer[T] := !ref;
+        let poffset: Pointer[T] := positiveOffset(p, start);
+        return @embed(Span[T, R], "au_make_span($1, $2)", poffset, size);
+    end;
+
+    generic [T: Type, R: Region]
+    function spanWrite(ref: &![Pointer[T], R], start: Index, final: Index): Span![T, R] is
+        let size: Index := (final - start) + 1;
+        let p: Pointer[T] := !ref;
+        let poffset: Pointer[T] := positiveOffset(p, start);
+        return @embed(Span![T, R], "au_make_span($1, $2)", poffset, size);
+    end;
+
+    generic [T: Type, R: Region]
+    function spanLength(sp: Span[T, R]): Index is
+        return @embed(Index, "$1.size", sp);
+    end;
+
+    generic [T: Type, R: Region]
+    function spanWriteLength(sp: Span![T, R]): Index is
+        return @embed(Index, "$1.size", sp);
+    end;
 end module body.
