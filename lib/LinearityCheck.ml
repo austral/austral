@@ -104,7 +104,7 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
                    ^ "`, but no such variable exists in the state table. Table contents: \n\n"
                    ^ (show_state_tbl tbl))
   | Some (ty, _, state) ->
-     let is_write_ref: bool = match ty with WriteRef _ -> true | _ -> false in
+     let is_write_ref: bool = match ty with WriteRef _ -> true | SpanMut _ -> true | _ -> false in
      if (state = Consumed) || is_write_ref then
        let (StateTable (rows, pending)) = tbl in
        let others = List.filter (fun (n, _, _, _) -> not (equal_identifier name n)) rows in
@@ -694,6 +694,9 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
                  (match ty with
                   | WriteRef _ ->
                      (* Write references can be dropped implicitly. *)
+                     ()
+                  | SpanMut _ ->
+                     (* Write spans can be dropped implicitly. *)
                      ()
                   | _ ->
                      if universe_linear_ish (type_universe ty) then

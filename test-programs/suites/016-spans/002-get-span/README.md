@@ -1,0 +1,1 @@
+Test we can acquire a span from a reference to a pointer.
