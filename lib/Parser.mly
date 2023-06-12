@@ -44,6 +44,7 @@ open Span
 %token SPAN_READ
 %token SPAN_WRITE
 %token REBORROW
+%token REBORROW_SIGIL
 %token REF_TRANSFORM
 /* Keywords */
 %token MODULE
@@ -415,6 +416,7 @@ atomic_expression:
   | BORROW_READ identifier { CBorrowExpr (from_loc $loc, ReadBorrow, $2) }
   | BORROW_WRITE identifier { CBorrowExpr (from_loc $loc, WriteBorrow, $2) }
   | REBORROW LPAREN identifier RPAREN { CReborrow (from_loc $loc, $3) }
+  | REBORROW_SIGIL identifier { CReborrow (from_loc $loc, $2) }
   | DEREF atomic_expression { CDeref (from_loc $loc, $2) }
   ;
 
