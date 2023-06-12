@@ -17,7 +17,7 @@
     [ 10, "    function main(): ExitCode is" ],
     [ 11, "        var foo: Foo := Foo();" ],
     [ 12, "        borrow! foo as fooref in R do" ],
-    [ 13, "            bar(reborrow(fooref), reborrow(fooref));" ],
+    [ 13, "            bar(&~fooref, &~fooref);" ],
     [ 14, "        end;" ],
     [ 15, "        let {} := foo;" ],
     [ 16, "        return ExitSuccess();" ]

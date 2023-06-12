@@ -1,7 +1,7 @@
 module body Test is
     record Foo: Linear is
     end;
-    
+
     generic [R: Region, S: Region]
     function bar(a: &![Foo, R], b: &![Foo, S]): Unit is
         return nil;
@@ -10,7 +10,7 @@ module body Test is
     function main(): ExitCode is
         var foo: Foo := Foo();
         borrow! foo as fooref in R do
-            bar(reborrow(fooref), reborrow(fooref));
+            bar(&~fooref, &~fooref);
         end;
         let {} := foo;
         return ExitSuccess();

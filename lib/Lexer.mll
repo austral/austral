@@ -123,8 +123,7 @@ rule token = parse
   | "&" { BORROW_READ }
   | "Span" { SPAN_READ }
   | "Span!" { SPAN_WRITE }
-  | "reborrow" { REBORROW }
-  | "&~" { REBORROW_SIGIL }
+  | "&~" { REBORROW }
   (* Keywords *)
   | "module" { MODULE }
   | "is" { IS }

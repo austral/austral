@@ -253,7 +253,7 @@ module body Standard.Buffer is
     generic [T: Free, R: Region]
     function fill(buf: &![Buffer[T], R], element: T): Unit is
         for i from 0 to buf->size - 1 do
-            storeNth(reborrow(buf), i, element);
+            storeNth(&~buf, i, element);
         end for;
         -- invariants(buf : &[Buffer[T], R]);
         return nil;
@@ -297,7 +297,7 @@ module body Standard.Buffer is
         -- If insertion would increase make `size` match `capacity`, resize
         -- the array.
         if (buf->size + 1) = buf->size then
-            bump(reborrow(buf));
+            bump(&~buf);
         end if;
         -- If the array is non-empty, we have to move everything to the right of
         -- the position one step to the right.
@@ -378,7 +378,7 @@ module body Standard.Buffer is
         if buf->size > 0 then
             for i from 0 to buf->size / 2 do
                 let j: Index := (buf->size - i) - 1;
-                swapIndex(reborrow(buf), i, j);
+                swapIndex(&~buf, i, j);
             end for;
         end if;
         -- invariants(buf : &[Buffer[T], R]);
@@ -393,7 +393,7 @@ module body Standard.Buffer is
     function inPlaceMap(buf: &![Buffer[T], R], fn: Fn[T, T]): Unit is
         if buf->size > 0 then
             for i from 0 to buf->size - 1 do
-                swapTransform(reborrow(buf), i, fn);
+                swapTransform(&~buf, i, fn);
             end for;
         end if;
         return nil;
