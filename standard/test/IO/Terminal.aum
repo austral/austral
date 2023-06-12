@@ -41,7 +41,7 @@ module body Standard.Test.IO.Terminal is
     generic [R: Region]
     function stdoutWriteByteTest(term: &![TerminalCapability, R]): Unit is
         testHeading("stdout: writeByte");
-        var stdout: StandardOutput := acquireOutput(reborrow(term));
+        var stdout: StandardOutput := acquireOutput(&~term);
         writeByte(&!stdout, 'a');
         releaseOutput(stdout);
         assertSuccess("writeByte completed");
@@ -51,7 +51,7 @@ module body Standard.Test.IO.Terminal is
     generic [R: Region]
     function stderrWriteByteTest(term: &![TerminalCapability, R]): Unit is
         testHeading("stderr: writeByte");
-        var stderr: StandardError := acquireError(reborrow(term));
+        var stderr: StandardError := acquireError(&~term);
         writeByte(&!stderr, 'a');
         releaseError(stderr);
         assertSuccess("writeByte completed");

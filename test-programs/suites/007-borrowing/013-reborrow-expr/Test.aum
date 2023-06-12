@@ -13,9 +13,9 @@ module body Test is
     function main(): ExitCode is
         var foo: Foo := Foo(value => 10);
         borrow! foo as fooref in R do
-            show(reborrow(fooref));
-            show(reborrow(fooref));
-            show(reborrow(fooref));
+            show(&~fooref);
+            show(&~fooref);
+            show(&~fooref);
         end;
         let { value: Int32 } := foo;
         return ExitSuccess();
