@@ -454,11 +454,11 @@ argument_list:
   ;
 
 positional_arglist:
-  | separated_list(COMMA, expression) { $1 }
+  | separated_nonempty_list(COMMA, expression) { $1 }
   ;
 
 named_arglist:
-  | separated_list(COMMA, named_arg) { $1 }
+  | separated_nonempty_list(COMMA, named_arg) { $1 }
   ;
 
 named_arg:
