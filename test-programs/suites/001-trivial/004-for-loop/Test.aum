@@ -1,6 +1,6 @@
-module body Test is
-    pragma Unsafe_Module;
+pragma Unsafe_Module;
 
+module body Test is
     function Put(str: FixedArray[Nat8]): Int32 is
         pragma Foreign_Import(External_Name => "puts");
     end;

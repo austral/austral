@@ -1,3 +1,5 @@
+pragma Unsafe_Module;
+
 import Austral.Memory (
     Pointer,
     Address,
@@ -9,8 +11,6 @@ import Austral.Memory (
 );
 
 module body Test is
-    pragma Unsafe_Module;
-
     record Box[T: Type]: Linear is
         pointer: Pointer[T];
     end;

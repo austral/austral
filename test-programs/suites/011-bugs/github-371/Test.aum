@@ -1,10 +1,10 @@
+pragma Unsafe_Module;
+
 import Austral.Memory (
     Pointer
 );
 
 module body Test is
-    pragma Unsafe_Module;
-
     record Bar: Free is
         fooptr: Pointer[Foo];
     end;
