@@ -1,6 +1,6 @@
-module body Example.RTR is
-    pragma Unsafe_Module;
+pragma Unsafe_Module;
 
+module body Example.RTR is
     record R: Linear is
         X: Int32;
     end;

@@ -1,6 +1,6 @@
-module body Example.String is
-    pragma Unsafe_Module;
+pragma Unsafe_Module;
 
+module body Example.String is
     function Put_Character(character: Nat8): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;

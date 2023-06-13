@@ -1,6 +1,6 @@
-module body Example.FFI is
-    pragma Unsafe_Module;
+pragma Unsafe_Module;
 
+module body Example.FFI is
     function Put_Character(character: Int32): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;

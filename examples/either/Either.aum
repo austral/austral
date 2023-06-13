@@ -1,6 +1,6 @@
-module body Example.Either is
-    pragma Unsafe_Module;
+pragma Unsafe_Module;
 
+module body Example.Either is
     function Put_Char(character: Int32): Int32 is
         pragma Foreign_Import(External_Name => "putchar");
     end;

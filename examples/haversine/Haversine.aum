@@ -1,7 +1,6 @@
-module body Example.Haversine is
-    -- FFI stuff.
-    pragma Unsafe_Module;
+pragma Unsafe_Module;
 
+module body Example.Haversine is
     function Sin(value: Float64): Float64 is
         pragma Foreign_Import(External_Name => "sin");
     end;
