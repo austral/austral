@@ -27,3 +27,10 @@ jobs:
 
       - name: build
         run: opam exec dune build
+
+      - name: upload compiler binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: austral-macos-bin
+          path: austral
+          retention-days: 1
