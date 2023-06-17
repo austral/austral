@@ -164,3 +164,36 @@ let rec typespec_string (ts: typespec): string =
      "Span[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
   | ConcreteSpanWrite (ty, reg) ->
      "Span![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+
+let decl_replace_docstring_and_pragmas (decl: concrete_decl) (docstring: docstring) (pragmas: pragma list): concrete_decl =
+  let _ = pragmas in
+  match decl with
+  | ConcreteConstantDecl (span, name, ty, _) ->
+     ConcreteConstantDecl (span, name, ty, docstring)
+  | ConcreteOpaqueTypeDecl (span, name, typarams, universe, _) ->
+     ConcreteOpaqueTypeDecl (span, name, typarams, universe, docstring)
+  | ConcreteRecordDecl (ConcreteRecord (span, name, typarams, universe, slots, _)) ->
+     ConcreteRecordDecl (ConcreteRecord (span, name, typarams, universe, slots, docstring))
+  | ConcreteUnionDecl (ConcreteUnion (span, name, typarams, universe, cases, _)) ->
+     ConcreteUnionDecl (ConcreteUnion (span, name, typarams, universe, cases, docstring))
+  | ConcreteFunctionDecl (span, name, typarams, params, rt, _) ->
+     ConcreteFunctionDecl (span, name, typarams, params, rt, docstring)
+  | ConcreteTypeClassDecl (ConcreteTypeClass (span, name, typarams, methods, _)) ->
+     ConcreteTypeClassDecl (ConcreteTypeClass (span, name, typarams, methods, docstring))
+  | ConcreteInstanceDecl (span, name, methods, ty, _) ->
+     ConcreteInstanceDecl (span, name, methods, ty, docstring)
+
+let def_replace_docstring_and_pragmas (decl: concrete_def) (docstring: docstring) (pragmas: pragma list): concrete_def =
+  match decl with
+  | ConcreteConstantDef (span, name, ty, expr, _) ->
+     ConcreteConstantDef (span, name, ty, expr, docstring)
+  | ConcreteRecordDef (ConcreteRecord (span, name, typarams, universe, slots, _)) ->
+     ConcreteRecordDef (ConcreteRecord (span, name, typarams, universe, slots, docstring))
+  | ConcreteUnionDef (ConcreteUnion (span, name, typarams, universe, cases, _)) ->
+     ConcreteUnionDef (ConcreteUnion (span, name, typarams, universe, cases, docstring))
+  | ConcreteFunctionDef (span, name, typarams, params, ty, body, _, _) ->
+     ConcreteFunctionDef (span, name, typarams, params, ty, body, docstring, pragmas)
+  | ConcreteTypeClassDef (ConcreteTypeClass (span, name, typarams, methods, _)) ->
+     ConcreteTypeClassDef (ConcreteTypeClass (span, name, typarams, methods, docstring))
+  | ConcreteInstanceDef (ConcreteInstance (span, name, typarams, ty, methods, _)) ->
+     ConcreteInstanceDef (ConcreteInstance (span, name, typarams, ty, methods, docstring))

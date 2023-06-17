@@ -31,3 +31,7 @@ val mod_int_name : concrete_module_interface -> module_name
 val mod_body_name : concrete_module_body -> module_name
 
 val typespec_string : typespec -> string
+
+val decl_replace_docstring_and_pragmas: concrete_decl -> docstring -> pragma list -> concrete_decl
+
+val def_replace_docstring_and_pragmas: concrete_def -> docstring -> pragma list -> concrete_def
