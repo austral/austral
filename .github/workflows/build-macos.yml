@@ -22,5 +22,8 @@ jobs:
       - name: install ocaml dependencies
         run: opam install --deps-only -y .
 
+      - name: embed builtins
+        run: make lib/BuiltInModules.ml
+
       - name: build
-        run: make
+        run: opam exec dune build
