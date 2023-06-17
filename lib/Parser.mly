@@ -184,6 +184,10 @@ imported_symbol:
 /* Declarations */
 
 interface_decl:
+  | docstringopt pragma* interface_decl_inner { decl_replace_docstring_and_pragmas $3 $1 $2 }
+  ;
+
+interface_decl_inner:
   | constant_decl { $1 }
   | type_decl { $1 }
   | record { ConcreteRecordDecl $1 }
@@ -194,13 +198,13 @@ interface_decl:
   ;
 
 constant_decl:
-  | docstringopt CONSTANT identifier COLON typespec SEMI { ConcreteConstantDecl (from_loc $loc, $3, $5, $1) }
+  | CONSTANT n=identifier COLON t=typespec SEMI { ConcreteConstantDecl (from_loc $loc, n, t, Docstring "") }
   ;
 
 type_decl:
-  | doc=docstringopt TYPE name=identifier
+  | TYPE name=identifier
     typarams=type_parameter_list COLON universe=universe
-    SEMI { ConcreteOpaqueTypeDecl (from_loc $loc, name, typarams, universe, doc) }
+    SEMI { ConcreteOpaqueTypeDecl (from_loc $loc, name, typarams, universe, Docstring "") }
   ;
 
 record:
@@ -227,10 +231,10 @@ case:
   ;
 
 function_decl:
-  | doc=docstringopt typarams=generic_segment
+  | typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
     COLON rt=typespec SEMI
-    { ConcreteFunctionDecl (from_loc $loc, name, typarams, params, rt, doc) }
+    { ConcreteFunctionDecl (from_loc $loc, name, typarams, params, rt, Docstring "") }
   ;
 
 generic_segment:
@@ -242,9 +246,9 @@ generic_segment_inner:
   ;
 
 typeclass:
-  | doc=docstringopt TYPECLASS name=identifier LPAREN typaram=type_parameter RPAREN
+  | TYPECLASS name=identifier LPAREN typaram=type_parameter RPAREN
     IS methods=method_decl* END SEMI
-    { ConcreteTypeClass (from_loc $loc, name, typaram, methods, doc) }
+    { ConcreteTypeClass (from_loc $loc, name, typaram, methods, Docstring "") }
   ;
 
 method_decl:
@@ -255,13 +259,14 @@ method_decl:
   ;
 
 instance_decl:
-  | doc=docstringopt typarams=generic_segment
+  | typarams=generic_segment
     INSTANCE name=identifier LPAREN arg=typespec RPAREN SEMI
-    { ConcreteInstanceDecl (from_loc $loc, name, typarams, arg, doc) }
+    { ConcreteInstanceDecl (from_loc $loc, name, typarams, arg, Docstring "") }
   ;
 
 body_decl:
   | docstringopt pragma* body_decl_inner { def_replace_docstring_and_pragmas $3 $1 $2 }
+  ;
 
 body_decl_inner:
   | constant_def { $1 }
