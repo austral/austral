@@ -3,7 +3,7 @@ on:
   - push
 
 jobs:
-  build-and-test-linux:
+  build:
     strategy:
       fail-fast: true
 
