@@ -13,3 +13,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+
+      - name: install OCaml 4.14.11
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.14.11
