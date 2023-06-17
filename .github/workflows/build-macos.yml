@@ -21,3 +21,6 @@ jobs:
 
       - name: install ocaml dependencies
         run: opam install --deps-only -y .
+
+      - name: build
+        run: opam exec dune build
