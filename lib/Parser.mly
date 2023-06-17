@@ -261,7 +261,7 @@ instance_decl:
   ;
 
 body_decl:
-  | docstringopt pragma* body_decl_inner { $3 }
+  | docstringopt pragma* body_decl_inner { def_replace_docstring_and_pragmas $3 $1 $2 }
 
 body_decl_inner:
   | constant_def { $1 }
