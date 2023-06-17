@@ -1,0 +1,15 @@
+name: Build on MacOS
+on:
+  - push
+
+jobs:
+  build-and-test-linux:
+    strategy:
+      fail-fast: true
+
+    runs-on:
+      - macos-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
