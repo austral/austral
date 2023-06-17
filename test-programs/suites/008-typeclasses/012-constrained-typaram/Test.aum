@@ -1,12 +1,12 @@
 pragma Unsafe_Module;
 
 module body Test is
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Nat8): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
+    pragma Foreign_Import(External_Name => "puts");
     function Put_String(str: FixedArray[Nat8]): Int32 is
-        pragma Foreign_Import(External_Name => "puts");
     end;
 
     typeclass Acceptable(T: Free) is

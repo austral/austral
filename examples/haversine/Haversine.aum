@@ -1,20 +1,20 @@
 pragma Unsafe_Module;
 
 module body Example.Haversine is
+    pragma Foreign_Import(External_Name => "sin");
     function Sin(value: Float64): Float64 is
-        pragma Foreign_Import(External_Name => "sin");
     end;
 
+    pragma Foreign_Import(External_Name => "cos");
     function Cos(value: Float64): Float64 is
-        pragma Foreign_Import(External_Name => "cos");
     end;
 
+    pragma Foreign_Import(External_Name => "asin");
     function Arcsin(value: Float64): Float64 is
-        pragma Foreign_Import(External_Name => "asin");
     end;
 
+    pragma Foreign_Import(External_Name => "sqrt");
     function Sqrt(value: Float64): Float64 is
-        pragma Foreign_Import(External_Name => "sqrt");
     end;
 
     -- Actual code.

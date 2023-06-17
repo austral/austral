@@ -5,8 +5,8 @@ module body Example.RTR is
         X: Int32;
     end;
 
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Int32): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function main(): ExitCode is

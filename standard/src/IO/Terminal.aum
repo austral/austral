@@ -116,11 +116,11 @@ module body Standard.IO.Terminal is
         return @embed(Address[Nat8], "au_stdin()");
     end;
 
+    pragma Foreign_Import(External_Name => "fputc");
     function fputc(c: Int32, stream: Address[Nat8]): Int32 is
-        pragma Foreign_Import(External_Name => "fputc");
     end;
 
+    pragma Foreign_Import(External_Name => "fgetc");
     function fgetc(stream: Address[Nat8]): Int32 is
-        pragma Foreign_Import(External_Name => "fgetc");
     end;
 end module body.

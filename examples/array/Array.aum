@@ -12,8 +12,8 @@ import Austral.Memory (
 );
 
 module body Example.Array is
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Nat8): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function Show_Bool(b: Bool): Unit is

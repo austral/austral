@@ -117,8 +117,8 @@ module body Example.Buffer is
     --    return buffer->array[index];
     -- end;
 
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Int32): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function main(): ExitCode is

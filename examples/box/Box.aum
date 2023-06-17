@@ -82,8 +82,8 @@ module body Example.Box is
         return old_value;
     end;
 
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Int32): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function main(): ExitCode is

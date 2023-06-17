@@ -1,8 +1,8 @@
 pragma Unsafe_Module;
 
 module body Example.Either is
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Char(character: Int32): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function main(): ExitCode is
