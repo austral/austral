@@ -1,3 +1,6 @@
+-- Need this to use Austral.Memory.
+pragma Unsafe_Module;
+
 import Austral.Memory (
     Address,
     Pointer,
@@ -11,9 +14,6 @@ import Austral.Memory (
 );
 
 module body Example.Buffer is
-    -- Need this to use Austral.Memory.
-    pragma Unsafe_Module;
-
     ----------
     -- Private
     ----------
@@ -117,8 +117,8 @@ module body Example.Buffer is
     --    return buffer->array[index];
     -- end;
 
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Int32): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function main(): ExitCode is

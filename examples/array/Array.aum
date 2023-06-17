@@ -1,3 +1,5 @@
+pragma Unsafe_Module;
+
 import Austral.Memory (
     Address,
     Pointer,
@@ -10,10 +12,8 @@ import Austral.Memory (
 );
 
 module body Example.Array is
-    pragma Unsafe_Module;
-
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Nat8): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function Show_Bool(b: Bool): Unit is

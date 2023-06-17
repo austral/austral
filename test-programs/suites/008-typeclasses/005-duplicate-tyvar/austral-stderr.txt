@@ -9,12 +9,10 @@
   ],
   "span": {
     "filename": "test-programs/suites/008-typeclasses/005-duplicate-tyvar/Test.aum",
-    "startp": { "line": 9, "column": 8 },
+    "startp": { "line": 11, "column": 4 },
     "end": { "line": 16, "column": 8 }
   },
   "context": [
-    [ 7, "        a: A;" ],
-    [ 8, "        b: B;" ],
     [ 9, "    end;" ],
     [ 10, "" ],
     [ 11, "    generic [T: Free]" ],

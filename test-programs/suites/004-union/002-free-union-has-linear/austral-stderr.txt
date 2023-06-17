@@ -13,12 +13,10 @@
   ],
   "span": {
     "filename": "test-programs/suites/004-union/002-free-union-has-linear/Test.aum",
-    "startp": { "line": 3, "column": 8 },
+    "startp": { "line": 5, "column": 4 },
     "end": { "line": 8, "column": 8 }
   },
   "context": [
-    [ 1, "module body Test is" ],
-    [ 2, "    record Foo: Linear is" ],
     [ 3, "    end;" ],
     [ 4, "" ],
     [ 5, "    union Bar: Free is" ],

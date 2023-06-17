@@ -23,7 +23,7 @@
   ],
   "span": {
     "filename": "test-programs/suites/004-union/004-union-in-region/Test.aum",
-    "startp": { "line": 1, "column": 19 },
+    "startp": { "line": 2, "column": 4 },
     "end": { "line": 2, "column": 29 }
   },
   "context": [

@@ -21,7 +21,7 @@
   ],
   "span": {
     "filename": "test-programs/suites/008-typeclasses/002-region-param/Test.aum",
-    "startp": { "line": 1, "column": 19 },
+    "startp": { "line": 2, "column": 4 },
     "end": { "line": 4, "column": 8 }
   },
   "context": [

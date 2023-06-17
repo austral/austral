@@ -4,6 +4,8 @@
 --
 -- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
+pragma Unsafe_Module;
+
 import Austral.Memory (
     Address,
     Pointer,
@@ -21,8 +23,6 @@ import Austral.Memory (
 );
 
 module body Standard.Buffer is
-    pragma Unsafe_Module;
-
     """
     The smallest value of capacity. Enforced at array allocation
     time.

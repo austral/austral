@@ -1,3 +1,5 @@
+pragma Unsafe_Module;
+
 import Austral.Memory (
     Pointer,
     Address,
@@ -11,8 +13,6 @@ import Austral.Memory (
 );
 
 module body Test is
-    pragma Unsafe_Module;
-
     function allocateOrDie(): Pointer[Int32] is
         let addr: Address[Int32] := allocateBuffer(10);
         case nullCheck(addr) of

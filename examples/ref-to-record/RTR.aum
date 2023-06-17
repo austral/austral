@@ -1,12 +1,12 @@
-module body Example.RTR is
-    pragma Unsafe_Module;
+pragma Unsafe_Module;
 
+module body Example.RTR is
     record R: Linear is
         X: Int32;
     end;
 
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Int32): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function main(): ExitCode is

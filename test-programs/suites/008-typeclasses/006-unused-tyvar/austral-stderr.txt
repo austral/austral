@@ -9,12 +9,10 @@
   ],
   "span": {
     "filename": "test-programs/suites/008-typeclasses/006-unused-tyvar/Test.aum",
-    "startp": { "line": 8, "column": 8 },
+    "startp": { "line": 10, "column": 4 },
     "end": { "line": 15, "column": 8 }
   },
   "context": [
-    [ 6, "    record Holder[A: Free]: Free is" ],
-    [ 7, "        a: A;" ],
     [ 8, "    end;" ],
     [ 9, "" ],
     [ 10, "    generic [A: Free, B: Free]" ],

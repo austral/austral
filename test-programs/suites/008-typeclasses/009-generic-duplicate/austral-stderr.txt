@@ -4,12 +4,10 @@
   "text": [ { "type": "text", "content": "Instance overlaps." } ],
   "span": {
     "filename": "test-programs/suites/008-typeclasses/009-generic-duplicate/Test.aum",
-    "startp": { "line": 15, "column": 8 },
+    "startp": { "line": 17, "column": 4 },
     "end": { "line": 22, "column": 8 }
   },
   "context": [
-    [ 13, "            return nil;" ],
-    [ 14, "        end;" ],
     [ 15, "    end;" ],
     [ 16, "" ],
     [ 17, "    generic [U: Free]" ],

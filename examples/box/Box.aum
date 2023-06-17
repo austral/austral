@@ -1,3 +1,5 @@
+pragma Unsafe_Module;
+
 import Austral.Memory (
     Address,
     Pointer,
@@ -11,8 +13,6 @@ import Austral.Memory (
 );
 
 module body Example.Box is
-    pragma Unsafe_Module;
-
     -- A linear pointer.
     record Box[T: Type]: Linear is
         pointer: Pointer[T];
@@ -82,8 +82,8 @@ module body Example.Box is
         return old_value;
     end;
 
+    pragma Foreign_Import(External_Name => "putchar");
     function Put_Character(character: Int32): Int32 is
-        pragma Foreign_Import(External_Name => "putchar");
     end;
 
     function main(): ExitCode is

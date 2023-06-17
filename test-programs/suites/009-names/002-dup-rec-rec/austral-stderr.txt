@@ -10,11 +10,10 @@
   ],
   "span": {
     "filename": "test-programs/suites/009-names/002-dup-rec-rec/Test.aum",
-    "startp": { "line": 2, "column": 26 },
+    "startp": { "line": 4, "column": 4 },
     "end": { "line": 4, "column": 26 }
   },
   "context": [
-    [ 1, "module body Test is" ],
     [ 2, "    record A: Free is end;" ],
     [ 3, "" ],
     [ 4, "    record A: Free is end;" ],
