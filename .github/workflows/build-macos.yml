@@ -17,7 +17,7 @@ jobs:
       - name: install ocaml
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.15
+          ocaml-compiler: 4.14.1
 
       - name: install ocaml dependencies
         run: opam install --deps-only -y .
