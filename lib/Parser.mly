@@ -204,10 +204,10 @@ type_decl:
   ;
 
 record:
-  | doc=docstringopt RECORD name=identifier
+  | RECORD name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS slots=slot*
-    END SEMI { ConcreteRecord (from_loc $loc, name, typarams, universe, slots, doc) }
+    END SEMI { ConcreteRecord (from_loc $loc, name, typarams, universe, slots, Docstring "") }
   ;
 
 slot:
@@ -215,10 +215,10 @@ slot:
   ;
 
 union:
-  | doc=docstringopt UNION name=identifier
+  | UNION name=identifier
     typarams=type_parameter_list COLON universe=universe
     IS cases=case*
-    END SEMI { ConcreteUnion (from_loc $loc, name, typarams, universe, cases, doc) }
+    END SEMI { ConcreteUnion (from_loc $loc, name, typarams, universe, cases, Docstring "") }
   ;
 
 case:
@@ -261,6 +261,9 @@ instance_decl:
   ;
 
 body_decl:
+  | docstringopt pragma* body_decl_inner { $3 }
+
+body_decl_inner:
   | constant_def { $1 }
   | record { ConcreteRecordDef $1 }
   | union { ConcreteUnionDef $1 }
@@ -270,15 +273,15 @@ body_decl:
   ;
 
 constant_def:
-  | doc=docstringopt CONSTANT name=identifier COLON ty=typespec
-    ASSIGN v=expression SEMI { ConcreteConstantDef (from_loc $loc, name, ty, v, doc) }
+  | CONSTANT name=identifier COLON ty=typespec
+    ASSIGN v=expression SEMI { ConcreteConstantDef (from_loc $loc, name, ty, v, Docstring "") }
   ;
 
 function_def:
-  | doc=docstringopt typarams=generic_segment
+  | typarams=generic_segment
     FUNCTION name=identifier LPAREN params=parameter_list RPAREN
-    COLON rt=typespec IS pragmas=pragma* body=block? END SEMI
-    { ConcreteFunctionDef (from_loc $loc, name, typarams, params, rt, Option.value body ~default:(CBlock (from_loc $loc, [])), doc, pragmas) }
+    COLON rt=typespec IS body=block? END SEMI
+    { ConcreteFunctionDef (from_loc $loc, name, typarams, params, rt, Option.value body ~default:(CBlock (from_loc $loc, [])), Docstring "", []) }
   ;
 
 pragma:
@@ -289,11 +292,11 @@ pragma:
   ;
 
 instance_def:
-  | doc=docstringopt typarams=generic_segment
+  | typarams=generic_segment
     INSTANCE name=identifier LPAREN arg=typespec RPAREN IS
     methods=method_def*
     END SEMI
-    { ConcreteInstanceDef (ConcreteInstance (from_loc $loc, name, typarams, arg, methods, doc)) }
+    { ConcreteInstanceDef (ConcreteInstance (from_loc $loc, name, typarams, arg, methods, Docstring "")) }
   ;
 
 method_def:
