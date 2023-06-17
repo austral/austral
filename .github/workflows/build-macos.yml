@@ -1,6 +1,9 @@
 name: Build on MacOS
 on:
-  - push
+  # Only build when merging a PR or pushing to master.
+  push:
+    branches:
+      - master
 
 jobs:
   build:
