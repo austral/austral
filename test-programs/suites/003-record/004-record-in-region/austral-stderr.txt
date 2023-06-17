@@ -23,7 +23,7 @@
   ],
   "span": {
     "filename": "test-programs/suites/003-record/004-record-in-region/Test.aum",
-    "startp": { "line": 1, "column": 19 },
+    "startp": { "line": 2, "column": 4 },
     "end": { "line": 2, "column": 30 }
   },
   "context": [

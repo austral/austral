@@ -10,11 +10,10 @@
   ],
   "span": {
     "filename": "test-programs/suites/009-names/001-dup-const-const/Test.aum",
-    "startp": { "line": 2, "column": 27 },
+    "startp": { "line": 4, "column": 4 },
     "end": { "line": 4, "column": 27 }
   },
   "context": [
-    [ 1, "module body Test is" ],
     [ 2, "    constant A: Int32 := 0;" ],
     [ 3, "" ],
     [ 4, "    constant A: Int32 := 1;" ],

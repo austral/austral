@@ -13,7 +13,7 @@
   ],
   "span": {
     "filename": "test-programs/suites/004-union/003-free-union-linear-param/Test.aum",
-    "startp": { "line": 1, "column": 19 },
+    "startp": { "line": 2, "column": 4 },
     "end": { "line": 3, "column": 8 }
   },
   "context": [

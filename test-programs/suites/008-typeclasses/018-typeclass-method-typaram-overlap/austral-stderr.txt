@@ -9,7 +9,7 @@
   ],
   "span": {
     "filename": "test-programs/suites/008-typeclasses/018-typeclass-method-typaram-overlap/Test.aum",
-    "startp": { "line": 1, "column": 19 },
+    "startp": { "line": 2, "column": 4 },
     "end": { "line": 5, "column": 8 }
   },
   "context": [
