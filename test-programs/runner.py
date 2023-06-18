@@ -386,7 +386,7 @@ def _run_success_test(test: TestSuccess) -> TestResult:
         "gcc",
         "-fwrapv",  # Modular arithmetic semantics
         "-Wno-builtin-declaration-mismatch",
-        f"--output={test.c_path}",
+        test.c_path,
         "-lm",  # Math stdlib,
         "-o",
         test.bin_path
@@ -554,7 +554,7 @@ def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
         "gcc",
         "-fwrapv",  # Modular arithmetic semantics
         "-Wno-builtin-declaration-mismatch",
-        f"--output={test.c_path}",
+        test.c_path,
         "-lm",  # Math stdlib,
         "-o",
         test.bin_path
