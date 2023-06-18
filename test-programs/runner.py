@@ -599,10 +599,10 @@ def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
 
 
 def run_all_tests(
-    suites: list,
-    suite_pattern: str = "",
-    name_pattern: str = "",
-    replace_stderr: bool = False,
+    tests: list[Test],
+    suite_pattern: str | None,
+    name_pattern: str | None,
+    replace_stderr: bool,
 ) -> list[TestResult]:
     """
     Run the given suites.
@@ -612,11 +612,17 @@ def run_all_tests(
     An empty pattern means match all.
     """
     results: list[TestResult] = []
-    for suite in suites:
-        if len(suite_pattern) == 0 or suite.name.find(suite_pattern) != -1:
-            for test in suite.tests:
-                if len(name_pattern) == 0 or test.name.find(name_pattern) != -1:
-                    results.append(run_test(test, replace_stderr))
+    for test in tests:
+        if suite_pattern is not None:
+            if test.suite_name.find(suite_pattern) == -1:
+                continue
+
+        if name_pattern is not None:
+            if test.name.find(name_pattern) == -1:
+                continue
+
+        results.append(run_test(test, replace_stderr))
+
     return results
 
 
@@ -629,8 +635,8 @@ if __name__ == "__main__":
 
     replace_stderr: bool = "--replace-stderr" in sys.argv
     args: list[str] = [arg for arg in sys.argv if not arg.startswith("--")]
-    suite_pattern = args[1] if len(args) > 1 else ""
-    name_pattern = args[2] if len(args) > 2 else ""
+    suite_pattern: str | None = args[1] if len(args) > 1 else None
+    name_pattern: str | None = args[2] if len(args) > 2 else None
     try:
         tests: list[Test] = collect_tests()
         results: list[TestResult] = run_all_tests(
