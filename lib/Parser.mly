@@ -390,8 +390,10 @@ mutable_borrow_stmt:
   ;
 
 reborrow_stmt:
-  | REBORROW_STMT o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=Reborrow } }
+  | BORROW name=identifier COLON REBORROW LBRACKET typespec COMMA reg=identifier RBRACKET ASSIGN REBORROW orig=identifier DO body=block END BORROW SEMI
+    { CBorrow { span=from_loc $loc; original=orig; rename=name; region=reg; body=body; mode=Reborrow } }
   ;
+
 
 block:
   | blocklist { CBlock (from_loc $loc, $1) }
