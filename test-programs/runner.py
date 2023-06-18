@@ -275,7 +275,7 @@ def _test_cmd(test: Test) -> list:
         ]
 
 
-def _run_success_test(test: Test):
+def _run_success_test(test: TestSuccess):
     # Find the source files.
     expected_output = test.expected_output
     suite_name: str = test.suite_name
@@ -478,7 +478,7 @@ def _run_failure_test(test: TestFailure, replace_stderr: bool):
     print("PASS")
 
 
-def _run_program_failure_test(test: Test):
+def _run_program_failure_test(test: TestProgramFailure):
     # Find the source files.
     expected_stderr: str = test.expected_program_stderr
     suite_name: str = test.suite_name
