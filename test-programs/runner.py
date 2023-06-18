@@ -48,8 +48,15 @@ class Test(object):
     """
     Base class of test objects.
     """
+    name: str
+    suite_name: str
+    directory: str
 
-    pass
+    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None):
+        self.name = name
+        self.suite_name = suite_name
+        self.directory = directory
+        self.cli = cli
 
 
 class TestSuccess(Test):
@@ -57,11 +64,8 @@ class TestSuccess(Test):
     A test that is expected to succeed.
     """
 
-    def __init__(self, name, suite_name, directory, cli, expected_output):
-        self.name = name
-        self.suite_name = suite_name
-        self.directory = directory
-        self.cli = cli
+    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_output):
+        super().__init__(name, suite_name, directory, cli)
         self.expected_output = expected_output
 
 
@@ -70,11 +74,8 @@ class TestFailure(Test):
     A test that is expected to fail when compiling the code.
     """
 
-    def __init__(self, name, suite_name, directory, cli, expected_compiler_error):
-        self.name = name
-        self.suite_name = suite_name
-        self.directory = directory
-        self.cli = cli
+    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_compiler_error):
+        super().__init__(name, suite_name, directory, cli)
         self.expected_compiler_error = expected_compiler_error
 
 
@@ -84,11 +85,8 @@ class TestProgramFailure(Test):
     should return a failure exit code, and print to stderr.
     """
 
-    def __init__(self, name, suite_name, directory, cli, expected_program_stderr):
-        self.name = name
-        self.suite_name = suite_name
-        self.directory = directory
-        self.cli = cli
+    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_program_stderr):
+        super().__init__(name, suite_name, directory, cli)
         self.expected_program_stderr = expected_program_stderr
 
 
@@ -128,10 +126,10 @@ def collect_suites() -> list:
         # Iterate over each test.
         for test_name in test_names:
             test_dir: str = os.path.join(suite_dir, test_name)
-            expected_error = _get_file_contents(test_dir, "austral-stderr.txt")
-            expected_output = _get_file_contents(test_dir, "program-stdout.txt")
-            program_stderr = _get_file_contents(test_dir, "program-stderr.txt")
-            cli = _get_file_contents(test_dir, "cli.txt")
+            expected_error: str | None = _get_file_contents(test_dir, "austral-stderr.txt")
+            expected_output: str | None = _get_file_contents(test_dir, "program-stdout.txt")
+            program_stderr: str | None = _get_file_contents(test_dir, "program-stderr.txt")
+            cli: str | None = _get_file_contents(test_dir, "cli.txt")
             if (expected_error is not None) and (expected_output is not None):
                 die(
                     "Can't have both `austral-stderr.txt` and `program-stdout.txt` in the same test."
@@ -196,7 +194,7 @@ def collect_suites() -> list:
     return suites
 
 
-def _get_file_contents(test_dir: str, filename: str):
+def _get_file_contents(test_dir: str, filename: str) -> str | None:
     if os.path.isfile(os.path.join(test_dir, filename)):
         with open(os.path.join(test_dir, filename), "r") as stream:
             data: str = stream.read().strip()
