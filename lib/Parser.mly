@@ -385,7 +385,8 @@ read_borrow_stmt:
   ;
 
 mutable_borrow_stmt:
-  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=Write } }
+  | BORROW name=identifier COLON BORROW_WRITE LBRACKET typespec COMMA reg=identifier RBRACKET ASSIGN BORROW_WRITE orig=identifier DO body=block END BORROW SEMI
+    { CBorrow { span=from_loc $loc; original=orig; rename=name; region=reg; body=body; mode=Write } }
   ;
 
 reborrow_stmt:
