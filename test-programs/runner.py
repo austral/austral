@@ -113,19 +113,6 @@ class TestProgramFailure(Test):
         self.expected_program_stderr = expected_program_stderr
 
 
-class Suite(object):
-    """
-    A collection of tests.
-    """
-
-    name: str
-    tests: list[Test]
-
-    def __init__(self, name: str, tests: list[Test]):
-        self.name = name
-        self.tests = tests
-
-
 class TestResult(object):
     """
     Base class of test results.
@@ -203,12 +190,12 @@ def report_fail(result: TestFail):
 #
 
 
-def collect_suites() -> list:
+def collect_tests() -> list[Test]:
     """
     Get the list of all test suites.
     """
     # Result aggregator.
-    suites: list = []
+    tests: list[Test] = []
     # Find the `suites/`` directory.
     suites_dir: str = os.path.join(DIR, "suites")
     # Find the test suites.
@@ -220,7 +207,6 @@ def collect_suites() -> list:
         test_names: list = sorted(
             [name for name in os.listdir(suite_dir) if name != "README.md"]
         )
-        tests: list = []
         # Iterate over each test.
         for test_name in test_names:
             test_dir: str = os.path.join(suite_dir, test_name)
@@ -288,14 +274,7 @@ def collect_suites() -> list:
                             expected_program_stderr=program_stderr,
                         )
                     )
-        # Add the suite.
-        suites.append(
-            Suite(
-                name=suite_name,
-                tests=tests,
-            )
-        )
-    return suites
+    return tests
 
 
 def _get_file_contents(test_dir: str, filename: str) -> str | None:
@@ -653,8 +632,9 @@ if __name__ == "__main__":
     suite_pattern = args[1] if len(args) > 1 else ""
     name_pattern = args[2] if len(args) > 2 else ""
     try:
+        tests: list[Test] = collect_tests()
         results: list[TestResult] = run_all_tests(
-            collect_suites(), suite_pattern, name_pattern, replace_stderr
+            tests, suite_pattern, name_pattern, replace_stderr
         )
         report_test_results(results)
     except ValueError as e:
