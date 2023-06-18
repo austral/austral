@@ -684,16 +684,18 @@ if __name__ == "__main__":
     suite_pattern: str | None = args[1] if len(args) > 1 else None
     name_pattern: str | None = args[2] if len(args) > 2 else None
     try:
+        print("Collecting...")
         tests: list[Test] = collect_tests()
+        print("Running...")
         results: list[TestResult] = run_all_tests(
             tests, suite_pattern, name_pattern, replace_stderr
         )
         report_test_results(results)
         if have_failures(results):
-            print("Some tests failed")
+            print("\nSome tests failed")
             exit(-1)
         else:
-            print("All tests passed")
+            print("\nAll tests passed")
             exit(0)
     except ValueError as e:
         print(e)
