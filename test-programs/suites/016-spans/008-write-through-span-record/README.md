@@ -1,0 +1,1 @@
+Test we can write through a span in a record.
