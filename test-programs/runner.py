@@ -29,9 +29,9 @@ def die(message: str):
 
 def report(properties, outputs):
     print("\n\n--- BEGIN ERROR ---")
-    for (name, value) in properties:
+    for name, value in properties:
         print(f"{name}: {value}")
-    for (name, value) in outputs:
+    for name, value in outputs:
         print(f"--- BEGIN {name} ---")
         print(value)
         print(f"--- END {name} ---\n")
@@ -48,6 +48,7 @@ class Test(object):
     """
     Base class of test objects.
     """
+
     name: str
     suite_name: str
     directory: str
@@ -63,9 +64,17 @@ class TestSuccess(Test):
     """
     A test that is expected to succeed.
     """
+
     expected_output: str | None
 
-    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_output: str | None):
+    def __init__(
+        self,
+        name: str,
+        suite_name: str,
+        directory: str,
+        cli: str | None,
+        expected_output: str | None,
+    ):
         super().__init__(name, suite_name, directory, cli)
         self.expected_output = expected_output
 
@@ -74,9 +83,17 @@ class TestFailure(Test):
     """
     A test that is expected to fail when compiling the code.
     """
+
     expected_compiler_error: str
 
-    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_compiler_error: str):
+    def __init__(
+        self,
+        name: str,
+        suite_name: str,
+        directory: str,
+        cli: str | None,
+        expected_compiler_error: str,
+    ):
         super().__init__(name, suite_name, directory, cli)
         self.expected_compiler_error = expected_compiler_error
 
@@ -86,9 +103,17 @@ class TestProgramFailure(Test):
     A test that is expected to compile successfully, but the compiled program
     should return a failure exit code, and print to stderr.
     """
+
     expected_program_stderr: str
 
-    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_program_stderr: str):
+    def __init__(
+        self,
+        name: str,
+        suite_name: str,
+        directory: str,
+        cli: str | None,
+        expected_program_stderr: str,
+    ):
         super().__init__(name, suite_name, directory, cli)
         self.expected_program_stderr = expected_program_stderr
 
@@ -97,6 +122,7 @@ class Suite(object):
     """
     A collection of tests.
     """
+
     name: str
     tests: list[Test]
 
@@ -131,9 +157,15 @@ def collect_suites() -> list:
         # Iterate over each test.
         for test_name in test_names:
             test_dir: str = os.path.join(suite_dir, test_name)
-            expected_error: str | None = _get_file_contents(test_dir, "austral-stderr.txt")
-            expected_output: str | None = _get_file_contents(test_dir, "program-stdout.txt")
-            program_stderr: str | None = _get_file_contents(test_dir, "program-stderr.txt")
+            expected_error: str | None = _get_file_contents(
+                test_dir, "austral-stderr.txt"
+            )
+            expected_output: str | None = _get_file_contents(
+                test_dir, "program-stdout.txt"
+            )
+            program_stderr: str | None = _get_file_contents(
+                test_dir, "program-stderr.txt"
+            )
             cli: str | None = _get_file_contents(test_dir, "cli.txt")
             if (expected_error is not None) and (expected_output is not None):
                 die(
@@ -382,8 +414,12 @@ def _run_success_test(test: Test):
     os.remove("test-programs/output.c")
     os.remove("test-programs/testbin")
 
+
 def trim_lines(text):
-    return "\n".join([line if line.strip() else "" for line in text.strip().split("\n")])
+    return "\n".join(
+        [line if line.strip() else "" for line in text.strip().split("\n")]
+    )
+
 
 def _run_failure_test(test: TestFailure, replace_stderr: bool):
     suite_name: str = test.suite_name
@@ -572,7 +608,12 @@ def _run_program_failure_test(test: Test):
 #
 
 
-def run_all_tests(suites: list, suite_pattern: str = "", name_pattern: str = "", replace_stderr: bool = False):
+def run_all_tests(
+    suites: list,
+    suite_pattern: str = "",
+    name_pattern: str = "",
+    replace_stderr: bool = False,
+):
     """
     Run the given suites.
 
