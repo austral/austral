@@ -2,7 +2,7 @@ pragma Unsafe_Module;
 
 module body Test is
     pragma Foreign_Import(External_Name => "puts");
-    function Put(str: FixedArray[Nat8]): Int32 is
+    function Put(str: Span[Nat8, Static]): Int32 is
     end;
 
     function main(): ExitCode is
