@@ -809,6 +809,21 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
       (* Construct the result type. *)
       TArrayIndex (expr, index_expr, ReadRef (elem_ty, reg))
     end
+  | WriteRef (ty, reg) -> begin
+      let elem_ty: ty =
+        match ty with
+        | StaticArray ty ->
+           ty
+        | Span (ty, _) ->
+           ty
+        | SpanMut (ty, _) ->
+           ty
+        | _ ->
+           Errors.cant_index_not_fixed_array_or_span ty
+      in
+      (* Construct the result type. *)
+      TArrayIndex (expr, index_expr, WriteRef (elem_ty, reg))
+    end
   | Span (ty, reg) ->
      TSpanIndex (expr, index_expr, ReadRef (ty, reg))
   | SpanMut (ty, reg) ->
