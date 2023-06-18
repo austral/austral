@@ -131,7 +131,7 @@ and args_string = function
 
 let index_type = Integer (Unsigned, WidthIndex)
 
-let string_type = StaticArray (Integer (Unsigned, Width8))
+let string_type = Span (Integer (Unsigned, Width8), RegionTy static_region)
 
 let rec equal_ty a b =
   match a with
