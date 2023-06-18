@@ -2,16 +2,16 @@ module body Test is
     typeclass MyPrintable(A: Free) is
         method myPrint(value: A): Unit;
 
-        method myPrintFixedArray(array: FixedArray[A]): Unit;
+        method myPrintSpan(array: Span[A, Static]): Unit;
     end;
 
     generic [A: Free(MyPrintable)]
-    instance MyPrintable(FixedArray[A]) is
-        method myPrint(value: FixedArray[A]): Unit is
-            return myPrintFixedArray(value);
+    instance MyPrintable(Span[A, Static]) is
+        method myPrint(value: Span[A, Static]): Unit is
+            return myPrintSpan(value);
         end;
 
-        method myPrintFixedArray(array: FixedArray[FixedArray[A]]): Unit is
+        method myPrintSpan(array: Span[Span[A, Static], Static]): Unit is
             return nil;
         end;
     end;

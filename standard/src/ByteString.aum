@@ -37,8 +37,8 @@ module body Standard.ByteString is
         );
     end;
 
-    function fromLiteral(arr: FixedArray[Nat8]): ByteString is
-        let size: Index := fixedArraySize(arr);
+    function fromLiteral(arr: Span[Nat8, Static]): ByteString is
+        let size: Index := spanLength(arr);
         var str: ByteString := makeByteString(size, ' ');
         for i from 0 to size - 1 do
             storeNth(&!str, i, arr[i]);

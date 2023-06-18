@@ -5,19 +5,19 @@
 -- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 module body Standard.Test.Unit is
-    function suiteHeading(heading: FixedArray[Nat8]): Unit is
+    function suiteHeading(heading: Span[Nat8, Static]): Unit is
         print("Suite: ");
         printLn(heading);
         return nil;
     end;
 
-    function testHeading(heading: FixedArray[Nat8]): Unit is
+    function testHeading(heading: Span[Nat8, Static]): Unit is
         print("    Test: ");
         printLn(heading);
         return nil;
     end;
 
-    function assertTrue(value: Bool, message: FixedArray[Nat8]): Unit is
+    function assertTrue(value: Bool, message: Span[Nat8, Static]): Unit is
         print("        Assert: ");
         print(message);
         if value then
@@ -28,7 +28,7 @@ module body Standard.Test.Unit is
         return nil;
     end;
 
-    function assertFalse(value: Bool, message: FixedArray[Nat8]): Unit is
+    function assertFalse(value: Bool, message: Span[Nat8, Static]): Unit is
         print("        Assert: ");
         print(message);
         if not value then
@@ -39,14 +39,14 @@ module body Standard.Test.Unit is
         return nil;
     end;
 
-    function assertSuccess(message: FixedArray[Nat8]): Unit is
+    function assertSuccess(message: Span[Nat8, Static]): Unit is
         print("        Assert: ");
         print(message);
         printLn(" ✓");
         return nil;
     end;
 
-    function assertFailure(message: FixedArray[Nat8]): Unit is
+    function assertFailure(message: Span[Nat8, Static]): Unit is
         print("        Assert failure: ");
         print(message);
         abort("Assertion failed (assertFailure).");
