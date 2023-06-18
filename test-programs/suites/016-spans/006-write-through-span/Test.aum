@@ -25,11 +25,21 @@ module body Test is
         end case;
     end;
 
+    function downcast(idx: Index): Int32 is
+        case toInt32(idx) of
+            when Some(value: Int32) do
+                return value;
+            when None do
+                abort("Index value too large for Int32.");
+        end case;
+    end;
+
     generic [R: Region]
     function writeValues(ref: &![Pointer[Int32], R]): Unit is
         var sp: Span![Int32, R] := spanWrite(ref, 0, 9);
         for i from 0 to 9 do
-            sp[i] := i + 1;
+            let newval: Int32 := downcast(i + 1);
+            sp[i] := newval;
         end for;
         return nil;
     end;
