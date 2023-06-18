@@ -179,9 +179,9 @@ class TestFail(TestResult):
 def report_test_results(results: list[TestResult]):
     for result in results:
         if isinstance(result, TestPass):
-            return report_pass(result)
+            report_pass(result)
         elif isinstance(result, TestFail):
-            return report_fail(result)
+            report_fail(result)
         else:
             raise ValueError("Unknown test result type: ", result)
 
@@ -586,7 +586,7 @@ def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
         # Have stderr, expected stderr. Check they match.
         if stderr == expected_stderr:
             # Output matches. Pass.
-            print("PASS")
+            return TestPass(test=test)
         else:
             # Output mismatch. Error.
             return TestFail(
@@ -635,7 +635,6 @@ def run_all_tests(
     results: list[TestResult] = []
     for suite in suites:
         if len(suite_pattern) == 0 or suite.name.find(suite_pattern) != -1:
-            print(suite.name)
             for test in suite.tests:
                 if len(name_pattern) == 0 or test.name.find(name_pattern) != -1:
                     results.append(run_test(test, replace_stderr))
