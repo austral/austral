@@ -393,9 +393,9 @@ let cant_access_slot_not_record (slot_name: identifier) (ty: ty) =
       Text " is not a record."
     ]
 
-let cant_index_not_fixed_array (ty: ty) =
+let cant_index_not_fixed_array_or_span (ty: ty) =
   austral_raise TypeError [
       Text "I can't use the array indexing operator here, because the type ";
       Type ty;
-      Text " is not a fixed array."
+      Text " is not a fixed array or a span."
     ]

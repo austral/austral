@@ -1,0 +1,1 @@
+Test we can index into a span.

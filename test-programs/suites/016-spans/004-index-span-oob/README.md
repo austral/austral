@@ -1,0 +1,1 @@
+Test that indexing into a span out of bounds fails.
