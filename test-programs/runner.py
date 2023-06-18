@@ -8,6 +8,7 @@ This script runs the end-to-end tests of the compiler.
 """
 import os
 import subprocess
+from uuid import uuid4
 
 #
 # Constants
@@ -47,12 +48,14 @@ class Test(object):
     name: str
     suite_name: str
     directory: str
+    c_code: str
 
     def __init__(self, name: str, suite_name: str, directory: str, cli: str | None):
         self.name = name
         self.suite_name = suite_name
         self.directory = directory
         self.cli = cli
+        self.c_code = str(uuid4()) + ".c"
 
 
 class TestSuccess(Test):
