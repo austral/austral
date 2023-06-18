@@ -142,15 +142,6 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
          Some DoubleFloat
       | "Static" ->
          Some (RegionTy static_region)
-      | "FixedArray" ->
-         (match args with
-          | [ty] ->
-             Some (StaticArray ty)
-          | _ ->
-             Errors.wrong_arity
-               ~typename:"FixedArray"
-               ~expected:1
-               ~actual:None)
       | "Fn" ->
          Some (parse_function_pointer args)
       | _ ->
