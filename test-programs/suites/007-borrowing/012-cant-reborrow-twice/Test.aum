@@ -9,9 +9,9 @@ module body Test is
 
     function main(): ExitCode is
         var foo: Foo := Foo();
-        borrow! foo as fooref in R do
+        borrow fooref: &![Foo, R] := &!foo do
             bar(&~fooref, &~fooref);
-        end;
+        end borrow;
         let {} := foo;
         return ExitSuccess();
     end;

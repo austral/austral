@@ -29,10 +29,10 @@ module body Test is
             let sp: Span[Int32, R] := span(ref, 0, 9);
             printLn(spanLength(sp));
         end borrow;
-        borrow! ptr as ref2 in R do
+        borrow ref2: &![Pointer[Int32], R] := &!ptr do
             let sp2: Span![Int32, R] := spanWrite(ref2, 0, 9);
             printLn(spanWriteLength(sp2));
-        end;
+        end borrow;
         deallocate(ptr);
         let addr: Address[Int32] := allocateBuffer(10);
         return ExitSuccess();
