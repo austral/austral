@@ -34,7 +34,6 @@ module body Test is
             printLn(spanWriteLength(sp2));
         end borrow;
         deallocate(ptr);
-        let addr: Address[Int32] := allocateBuffer(10);
         return ExitSuccess();
     end;
 end module body.
