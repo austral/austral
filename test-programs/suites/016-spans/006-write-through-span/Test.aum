@@ -8,8 +8,6 @@ import Austral.Memory (
     deallocate,
     span,
     spanWrite,
-    spanLength,
-    spanWriteLength,
     positiveOffset,
     store
 );
