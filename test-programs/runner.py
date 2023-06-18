@@ -48,6 +48,7 @@ class Test(object):
     """
     Base class of test objects.
     """
+
     pass
 
 
@@ -55,6 +56,7 @@ class TestSuccess(Test):
     """
     A test that is expected to succeed.
     """
+
     def __init__(self, name, suite_name, directory, cli, expected_output):
         self.name = name
         self.suite_name = suite_name
@@ -67,6 +69,7 @@ class TestFailure(Test):
     """
     A test that is expected to fail when compiling the code.
     """
+
     def __init__(self, name, suite_name, directory, cli, expected_compiler_error):
         self.name = name
         self.suite_name = suite_name
@@ -80,6 +83,7 @@ class TestProgramFailure(Test):
     A test that is expected to compile successfully, but the compiled program
     should return a failure exit code, and print to stderr.
     """
+
     def __init__(self, name, suite_name, directory, cli, expected_program_stderr):
         self.name = name
         self.suite_name = suite_name
@@ -92,6 +96,7 @@ class Suite(object):
     """
     A collection of tests.
     """
+
     def __init__(self, name, tests):
         self.name = name
         self.tests = tests
