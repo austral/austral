@@ -63,8 +63,9 @@ class TestSuccess(Test):
     """
     A test that is expected to succeed.
     """
+    expected_output: str | None
 
-    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_output):
+    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_output: str | None):
         super().__init__(name, suite_name, directory, cli)
         self.expected_output = expected_output
 
@@ -73,8 +74,9 @@ class TestFailure(Test):
     """
     A test that is expected to fail when compiling the code.
     """
+    expected_compiler_error: str
 
-    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_compiler_error):
+    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_compiler_error: str):
         super().__init__(name, suite_name, directory, cli)
         self.expected_compiler_error = expected_compiler_error
 
@@ -84,8 +86,9 @@ class TestProgramFailure(Test):
     A test that is expected to compile successfully, but the compiled program
     should return a failure exit code, and print to stderr.
     """
+    expected_program_stderr: str
 
-    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_program_stderr):
+    def __init__(self, name: str, suite_name: str, directory: str, cli: str | None, expected_program_stderr: str):
         super().__init__(name, suite_name, directory, cli)
         self.expected_program_stderr = expected_program_stderr
 
@@ -94,8 +97,10 @@ class Suite(object):
     """
     A collection of tests.
     """
+    name: str
+    tests: list[Test]
 
-    def __init__(self, name, tests):
+    def __init__(self, name: str, tests: list[Test]):
         self.name = name
         self.tests = tests
 
@@ -158,7 +163,7 @@ def collect_suites() -> list:
                         expected_output=expected_output,
                     )
                 )
-            # There is neither a `austral-stderr.txt` nor an `program-stdout.txt `file.
+            # There is neither an `austral-stderr.txt` nor an `program-stdout.txt `file.
             else:
                 if program_stderr is None:
                     # The program should compile and run successfully and produce no
@@ -184,7 +189,7 @@ def collect_suites() -> list:
                             expected_program_stderr=program_stderr,
                         )
                     )
-                    # Add the suite.
+        # Add the suite.
         suites.append(
             Suite(
                 name=suite_name,
