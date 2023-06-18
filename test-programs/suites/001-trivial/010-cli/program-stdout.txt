@@ -1,3 +1,3 @@
 Number of CLI arguments = 1
     i = 0
-    i-th arg = ./test-programs/testbin
+    i-th arg = /tmp/austral_e2e_001-trivial_010-cli.bin

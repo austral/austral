@@ -1,1 +1,1 @@
-./austral compile --target-type=c $DIR/Type.aum $DIR/Test.aum --entrypoint=Test:main --output=test-programs/output.c --error-format=json
+./austral compile --target-type=c $DIR/Type.aum $DIR/Test.aum --entrypoint=Test:main --output=$C_PATH --error-format=json
