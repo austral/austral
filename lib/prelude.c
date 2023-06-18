@@ -45,14 +45,12 @@ typedef struct {
   size_t size;
 } au_span_t;
 
-typedef au_span_t au_array_t;
-
 au_span_t au_make_span(void* data, size_t size) {
   return (au_span_t){ .data = data, .size = size };
 }
 
-au_array_t au_make_array_from_string(const char* data, size_t size) {
-  return (au_array_t){ .data = (void*) data, .size = size };
+au_span_t au_make_span_from_string(const char* data, size_t size) {
+  return (au_span_t){ .data = (void*) data, .size = size };
 }
 
 void* au_stdout() {
@@ -95,7 +93,7 @@ au_unit_t au_abort_internal(const char* message) {
   return nil;
 }
 
-au_unit_t au_abort(au_array_t message) {
+au_unit_t au_abort(au_span_t message) {
   extern int fprintf(void* stream, const char* format, ...);
   extern int fflush(void* stream);
   extern void _Exit(int status);
@@ -118,7 +116,7 @@ au_unit_t au_printf(const char* format, ...) {
   return nil;
 }
 
-void* au_array_index(au_array_t* array, size_t index, size_t elem_size) {
+void* au_array_index(au_span_t* array, size_t index, size_t elem_size) {
   if (index >= array->size) {
     au_abort_internal("Array index out of bounds.");
   }
@@ -216,7 +214,7 @@ size_t _au_bounded_strlen(char* string, size_t bound) {
 /* The maximum size of each CLI arg. */
 #define AU_MAX_ARG_SIZE (10*AU_KIBIBYTE)
 
-au_array_t au_get_nth_arg(size_t n) {
+au_span_t au_get_nth_arg(size_t n) {
   // Sanity check.
   if (_au_argv == NULL) {
     au_abort_internal("Prelude error: argv was not set.");
@@ -235,6 +233,6 @@ au_array_t au_get_nth_arg(size_t n) {
   // Measure the length.
   size_t size = _au_bounded_strlen(arg, AU_MAX_ARG_SIZE);
   // Otherwise, return it.
-  au_array_t arg_array = ((au_array_t){ .data = (void*)arg, .size = size });
+  au_span_t arg_array = ((au_span_t){ .data = (void*)arg, .size = size });
   return arg_array;
 }

@@ -45,13 +45,11 @@ typedef struct {
   size_t size;
 } au_span_t;
 
-typedef au_span_t au_array_t;
-
 extern au_span_t au_make_span(void* data, size_t size);
 
-extern au_array_t au_make_array_from_string(const char* data, size_t size);
+extern au_span_t au_make_span_from_string(const char* data, size_t size);
 
-extern void* au_array_index(au_array_t* array, size_t index, size_t elem_size);
+extern void* au_array_index(au_span_t* array, size_t index, size_t elem_size);
 
 extern void* au_stdout();
 
@@ -59,7 +57,7 @@ extern void* au_stderr();
 
 extern void* au_stdin();
 
-extern au_unit_t au_abort(au_array_t message);
+extern au_unit_t au_abort(au_span_t message);
 
 extern au_unit_t au_printf(const char* format, ...);
 
@@ -85,6 +83,6 @@ void au_store_cli_args(int argc, char** argv);
 
 size_t au_get_argc();
 
-au_array_t au_get_nth_arg(size_t n);
+au_span_t au_get_nth_arg(size_t n);
 
 /* --- END prelude.h --- */

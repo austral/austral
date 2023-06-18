@@ -197,7 +197,7 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CFloat f
   | MStringConstant s ->
      CFuncall (
-         "au_make_array_from_string",
+         "au_make_span_from_string",
          [
            CString s;
            CInt (string_of_int (String.length (escaped_to_string s)))
@@ -593,7 +593,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      and ff_rt = return_type_to_c_type rt in
      let ff_local_decl = CLocalFunctionDeclaration (underlying, ff_params, ff_rt, LinkageExternal) in
      let make_param (n: identifier) (t: mono_ty) =
-       if ((gen_type t) = (CNamedType "au_array_t")) || ((gen_type t) = (CNamedType "au_span_t")) then
+       if (gen_type t) = (CNamedType "au_span_t") then
          (* Extract the pointer from the Array struct *)
          CStructAccessor (CVar (gen_ident n), "data")
        else
