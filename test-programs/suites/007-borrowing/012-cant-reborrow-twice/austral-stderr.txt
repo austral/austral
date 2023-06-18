@@ -11,14 +11,14 @@
   "span": {
     "filename": "test-programs/suites/007-borrowing/012-cant-reborrow-twice/Test.aum",
     "startp": { "line": 12, "column": 8 },
-    "end": { "line": 14, "column": 12 }
+    "end": { "line": 14, "column": 19 }
   },
   "context": [
     [ 10, "    function main(): ExitCode is" ],
     [ 11, "        var foo: Foo := Foo();" ],
-    [ 12, "        borrow! foo as fooref in R do" ],
+    [ 12, "        borrow fooref: &![Foo, R] := &!foo do" ],
     [ 13, "            bar(&~fooref, &~fooref);" ],
-    [ 14, "        end;" ],
+    [ 14, "        end borrow;" ],
     [ 15, "        let {} := foo;" ],
     [ 16, "        return ExitSuccess();" ]
   ]

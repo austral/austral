@@ -76,9 +76,6 @@ open Span
 %token FROM
 %token TO
 %token BORROW
-%token MUTABLE_BORROW
-%token REBORROW_STMT
-%token IN
 %token RETURN
 %token SKIP
 %token UNIVERSE_FREE
@@ -374,21 +371,19 @@ when_stmt:
   ;
 
 borrow_stmt:
-  | read_borrow_stmt { $1 }
-  | mutable_borrow_stmt { $1 }
-  | reborrow_stmt { $1 }
+  | BORROW name=identifier COLON borrow_stmt_read_or_write LBRACKET typespec COMMA reg=identifier RBRACKET ASSIGN mode=borrow_stmt_mode orig=identifier DO body=block END BORROW SEMI
+    { CBorrow { span=from_loc $loc; original=orig; rename=name; region=reg; body=body; mode=mode } }
   ;
 
-read_borrow_stmt:
-  | BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=Read } }
+borrow_stmt_read_or_write:
+  | BORROW_READ { () }
+  | BORROW_WRITE { () }
   ;
 
-mutable_borrow_stmt:
-  | MUTABLE_BORROW o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=Write } }
-  ;
-
-reborrow_stmt:
-  | REBORROW_STMT o=identifier AS n=identifier IN r=identifier DO b=block END SEMI { CBorrow { span=from_loc $loc; original=o; rename=n; region=r; body=b; mode=Reborrow } }
+borrow_stmt_mode:
+  | BORROW_READ { Read }
+  | BORROW_WRITE { Write }
+  | REBORROW { Reborrow }
   ;
 
 block:

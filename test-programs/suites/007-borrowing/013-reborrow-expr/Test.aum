@@ -12,11 +12,11 @@ module body Test is
 
     function main(): ExitCode is
         var foo: Foo := Foo(value => 10);
-        borrow! foo as fooref in R do
+        borrow fooref: &![Foo, R] := &!foo do
             show(&~fooref);
             show(&~fooref);
             show(&~fooref);
-        end;
+        end borrow;
         let { value: Int32 } := foo;
         return ExitSuccess();
     end;

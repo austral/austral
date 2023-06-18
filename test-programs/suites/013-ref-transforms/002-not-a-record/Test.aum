@@ -5,9 +5,9 @@ module body Test is
 
     function main(): ExitCode is
         let foo: Foo := Blank();
-        borrow foo as fooref in R do
+        borrow fooref: &[Foo, R] := &foo do
             &(fooref->foo);
-        end;
+        end borrow;
         case foo of
             when Blank do
                 skip;

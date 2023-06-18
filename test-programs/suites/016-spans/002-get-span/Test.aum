@@ -25,14 +25,14 @@ module body Test is
 
     function main(): ExitCode is
         var ptr: Pointer[Int32] := allocateOrDie();
-        borrow ptr as ref in R do
+        borrow ref: &[Pointer[Int32], R] := &ptr do
             let sp: Span[Int32, R] := span(ref, 0, 9);
             printLn(spanLength(sp));
-        end;
-        borrow! ptr as ref2 in R do
+        end borrow;
+        borrow ref2: &![Pointer[Int32], R] := &!ptr do
             let sp2: Span![Int32, R] := spanWrite(ref2, 0, 9);
             printLn(spanWriteLength(sp2));
-        end;
+        end borrow;
         deallocate(ptr);
         let addr: Address[Int32] := allocateBuffer(10);
         return ExitSuccess();

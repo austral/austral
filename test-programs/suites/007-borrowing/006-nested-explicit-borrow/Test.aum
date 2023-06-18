@@ -7,12 +7,12 @@ module body Test is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Borrow it.
-        borrow foo as fooref in rho do
+        borrow fooref: &[Foo, rho] := &foo do
             -- Borrow it again.
-            borrow foo as fooref2 in rho2 do
+            borrow fooref2: &[Foo, R] := &foo do
                 printLn(fooref2->bar);
-            end;
-        end;
+            end borrow;
+        end borrow;
         -- Consume the record by destructuring.
         let { bar: Nat8 } := foo;
         return ExitSuccess();

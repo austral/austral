@@ -47,9 +47,9 @@ module body Test is
         PrintF('a' : Nat16);
         PrintF(3.14);
         let foo: Foo := Foo();
-        borrow foo as fooref in rho do
+        borrow fooref: &[Foo, rho] := &foo do
             PrintF(fooref);
-        end;
+        end borrow;
         PrintF(&foo);
         let {} := foo;
         return ExitSuccess();
