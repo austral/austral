@@ -13,15 +13,15 @@ module body Test is
     function main(): ExitCode is
         var foo: Foo := Foo(value => 10);
         borrow fooref: &![Foo, R] := &!foo do
-            borrow~ fooref as fooref2a in R2 do
+            borrow fooref2a: &![Foo, R2] := &~fooref do
                 show(fooref2a);
-            end;
-            borrow~ fooref as fooref2b in R2 do
+            end borrow;
+            borrow fooref2b: &![Foo, R2] := &~fooref do
                 show(fooref2b);
-            end;
-            borrow~ fooref as fooref2c in R2 do
+            end borrow;
+            borrow fooref2c: &![Foo, R2] := &~fooref do
                 show(fooref2c);
-            end;
+            end borrow;
         end borrow;
         let { value: Int32 } := foo;
         return ExitSuccess();

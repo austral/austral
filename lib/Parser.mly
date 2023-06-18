@@ -374,26 +374,20 @@ when_stmt:
   ;
 
 borrow_stmt:
-  | read_borrow_stmt { $1 }
-  | mutable_borrow_stmt { $1 }
-  | reborrow_stmt { $1 }
+  | BORROW name=identifier COLON borrow_stmt_read_or_write LBRACKET typespec COMMA reg=identifier RBRACKET ASSIGN mode=borrow_stmt_mode orig=identifier DO body=block END BORROW SEMI
+    { CBorrow { span=from_loc $loc; original=orig; rename=name; region=reg; body=body; mode=mode } }
   ;
 
-read_borrow_stmt:
-  | BORROW name=identifier COLON BORROW_READ LBRACKET typespec COMMA reg=identifier RBRACKET ASSIGN BORROW_READ orig=identifier DO body=block END BORROW SEMI
-    { CBorrow { span=from_loc $loc; original=orig; rename=name; region=reg; body=body; mode=Read } }
+borrow_stmt_read_or_write:
+  | BORROW_READ { () }
+  | BORROW_WRITE { () }
   ;
 
-mutable_borrow_stmt:
-  | BORROW name=identifier COLON BORROW_WRITE LBRACKET typespec COMMA reg=identifier RBRACKET ASSIGN BORROW_WRITE orig=identifier DO body=block END BORROW SEMI
-    { CBorrow { span=from_loc $loc; original=orig; rename=name; region=reg; body=body; mode=Write } }
+borrow_stmt_mode:
+  | BORROW_READ { Read }
+  | BORROW_WRITE { Write }
+  | REBORROW { Reborrow }
   ;
-
-reborrow_stmt:
-  | BORROW name=identifier COLON REBORROW LBRACKET typespec COMMA reg=identifier RBRACKET ASSIGN REBORROW orig=identifier DO body=block END BORROW SEMI
-    { CBorrow { span=from_loc $loc; original=orig; rename=name; region=reg; body=body; mode=Reborrow } }
-  ;
-
 
 block:
   | blocklist { CBlock (from_loc $loc, $1) }
