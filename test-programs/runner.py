@@ -204,8 +204,8 @@ def report_fail_details(result: TestFail, stream):
     print("Test:", result.test.name, file=stream)
     print("C File:", result.test.c_path, file=stream)
     print("Bin File:", result.test.bin_path, file=stream)
-    print("Austral command:", result.austral_cmd, file=stream)
-    print("GCC command:", result.cc_cmd, file=stream)
+    print("Austral command:", try_join(result.austral_cmd), file=stream)
+    print("GCC command:", try_join(result.cc_cmd), file=stream)
     print("Reason:", result.reason, file=stream)
     for key, value in result.outputs:
         print(key, file=stream)
@@ -213,6 +213,12 @@ def report_fail_details(result: TestFail, stream):
             print(f"\t{line}", file=stream)
         print(file=stream)
     print("\n\n\n\n\n", file=stream)
+
+def try_join(l: list[str] | None) -> str:
+    if l is None:
+        return ""
+    else:
+        return " ".join(l)
 
 #
 # Collection
