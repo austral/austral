@@ -1,0 +1,1 @@
+Test we can transform references to spans.
