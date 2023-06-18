@@ -169,6 +169,28 @@ class TestFail(TestResult):
         self.reason = reason
         self.outputs = outputs
 
+#
+# Reporting
+#
+
+def report_test_results(results: list[TestResult]):
+    for result in results:
+        if isinstance(result, TestPass):
+            return report_pass(result)
+        elif isinstance(result, TestFail):
+            return report_fail(result)
+        else:
+            raise ValueError("Unknown test result type: ", result)
+
+def report_pass(result: TestPass):
+    suite: str = result.test.suite_name
+    name: str = result.test.name
+    print(f"{suite.ljust(45)}  {name.ljust(45)}  PASS")
+
+def report_fail(result: TestFail):
+    suite: str = result.test.suite_name
+    name: str = result.test.name
+    print(f"{suite.ljust(45)}  {name.ljust(45)}  FAIL")
 
 #
 # Collection
@@ -595,7 +617,7 @@ def run_all_tests(
     suite_pattern: str = "",
     name_pattern: str = "",
     replace_stderr: bool = False,
-):
+) -> list[TestResult]:
     """
     Run the given suites.
 
@@ -603,13 +625,14 @@ def run_all_tests(
     If name_pattern is given, only tests that have names containing the given string are run.
     An empty pattern means match all.
     """
+    results: list[TestResult] = []
     for suite in suites:
         if len(suite_pattern) == 0 or suite.name.find(suite_pattern) != -1:
             print(suite.name)
             for test in suite.tests:
                 if len(name_pattern) == 0 or test.name.find(name_pattern) != -1:
-                    print(f"\t{test.name.ljust(45)}", end="")
-                    run_test(test, replace_stderr)
+                    results.append(run_test(test, replace_stderr))
+    return results
 
 
 #
@@ -624,7 +647,8 @@ if __name__ == "__main__":
     suite_pattern = args[1] if len(args) > 1 else ""
     name_pattern = args[2] if len(args) > 2 else ""
     try:
-        run_all_tests(collect_suites(), suite_pattern, name_pattern, replace_stderr)
+        results: list[TestResult] = run_all_tests(collect_suites(), suite_pattern, name_pattern, replace_stderr)
+        report_test_results(results)
     except ValueError as e:
         print(e)
         exit(-1)
