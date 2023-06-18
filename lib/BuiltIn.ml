@@ -23,6 +23,8 @@ let pervasive_imports =
         ConcreteImport (make_ident "Left", None);
         ConcreteImport (make_ident "Right", None);
         ConcreteImport (make_ident "abort", None);
+        ConcreteImport (make_ident "spanLength", None);
+        ConcreteImport (make_ident "spanWriteLength", None);
         ConcreteImport (make_ident "RootCapability", None);
         ConcreteImport (make_ident "surrenderRoot", None);
         ConcreteImport (make_ident "ExitCode", None);

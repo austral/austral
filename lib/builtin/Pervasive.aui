@@ -18,6 +18,12 @@ module Austral.Pervasive is
             right: R;
     end;
 
+    generic [T: Type, R: Region]
+    function spanLength(sp: Span[T, R]): Index;
+
+    generic [T: Type, R: Region]
+    function spanWriteLength(sp: Span![T, R]): Index;
+
     function abort(message: Span[Nat8, Static]): Unit;
 
     type RootCapability : Linear;
