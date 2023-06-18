@@ -1,3 +1,0 @@
-module Example.ConcreteTypeclass is
-    function main(): ExitCode;
-end module.

@@ -1,3 +1,0 @@
-module Example.RTR is
-    function main(): ExitCode;
-end module.
