@@ -1,6 +1,0 @@
-module Example.Constant is
-    -- This constant is public, since it appears in the interface file.
-    constant Rydberg_Constant : Float64;
-
-    function main(): ExitCode;
-end module.

@@ -1,3 +1,0 @@
-module Example.String is
-    function main(): ExitCode;
-end module.

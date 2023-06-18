@@ -1,3 +1,0 @@
-module Example.GenericTypeclass is
-    function main(): ExitCode;
-end module.
