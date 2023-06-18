@@ -1,0 +1,64 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
+"""
+This module implements the String type, a linear, heap-allocated byte string
+type.
+"""
+module Standard.String is
+    type String: Linear;
+
+    ---
+    --- Lifecycle
+    ---
+
+    """
+    Allocate and return an empty string.
+    """
+    function makeEmpty(): String;
+
+    """
+    Allocate and return a string with the given size, where all bytes have
+    the value of `initial`.
+    """
+    function makeString(size: Index, initial: Nat8): String;
+
+    """
+    Deallocate a string.
+    """
+    function destroyString(str: String): Unit;
+
+    """
+    Allocate and return a string from a string literal.
+    """
+    function fromLiteral(arr: Span[Nat8, Static]): String;
+
+    ---
+    --- Retrieve
+    ---
+
+    """
+    Return the length of the string.
+    """
+    generic [R: Region]
+    function length(string: &[String, R]): Index;
+
+    """
+    Return the nth byte of the string.
+    """
+    generic [R: Region]
+    function nthByte(string: &[String, R], pos: Index): Nat8;
+
+    ---
+    --- Update
+    ---
+
+    """
+    Write a byte to the given position in the string.
+    """
+    generic [R: Region]
+    function storeNth(string: &![String, R], pos: Index, byte: Nat8): Unit;
+end module.
