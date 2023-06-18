@@ -11,10 +11,10 @@ module body Example.RTR is
 
     function main(): ExitCode is
         let r: R := R(X => 97);
-        borrow r as r2 in rho do
+        borrow r2: &[R, rho] := &r do
             let c: Int32 := r2->X;
             Put_Character(c);
-        end;
+        end borrow;
         let { X: Int32 } := r;
         Put_Character(X);
         return ExitSuccess();

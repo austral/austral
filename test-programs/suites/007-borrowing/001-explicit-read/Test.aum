@@ -13,13 +13,13 @@ module body Test is
         -- Create a linear record.
         let foo: Foo := Foo(bar => 'a');
         -- Borrow it.
-        borrow foo as fooref in rho do
+        borrow fooref: &[Foo, rho] := &foo do
             -- Extract a free value from the reference.
             let subref: &[Nat8, rho] := &(fooref->bar);
             let b: Nat8 := !subref;
             -- Print it.
             Put_Character(b);
-        end;
+        end borrow;
         -- Consume the record by destructuring.
         let { bar: Nat8 } := foo;
         return ExitSuccess();

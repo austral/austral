@@ -101,10 +101,10 @@ module body Example.Box is
         let b2: Either[Box[Int32], Int32] := Make('a');
         case b2 of
             when Left(left: Box[Int32]) do
-                borrow left as value2 in rho do
+                borrow value2: &[Box[Int32], rho] := &left do
                     let contents: Int32 := Read_Free(value2);
                     Put_Character(contents);
-                end;
+                end borrow;
                 Unbox(left);
             when Right(right: Int32) do
                 abort("Unexpected.");
@@ -126,11 +126,11 @@ module body Example.Box is
         let b4: Either[Box[Int32], Int32] := Make('a');
         case b4 of
             when Left(left: Box[Int32]) do
-                borrow left as boxref in rho do
+                borrow boxref: &[Box[Int32], rho] := &left do
                     let valueref: &[Int32, rho] := Get_Value_Ref(boxref);
                     let contents: Int32 := !(valueref);
                     Put_Character(contents);
-                end;
+                end borrow;
                 Unbox(left);
             when Right(right: Int32) do
                 abort("Unexpected.");

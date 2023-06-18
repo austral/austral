@@ -9,9 +9,9 @@ module body Test is
         -- Consume the record by destructuring.
         let { bar: Nat8 } := foo;
         -- Try to borrow it.
-        borrow foo as fooref in rho do
+        borrow fooref: &[Foo, rho] := &foo do
             skip;
-        end;
+        end borrow;
         return ExitSuccess();
     end;
 end module body.

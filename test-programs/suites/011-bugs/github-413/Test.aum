@@ -14,13 +14,13 @@ module body Test is
 
     function main(): ExitCode is
         let u: Foo := Value(value => 123);
-        borrow u as uref in R do
+        borrow uref: &[Foo, R] := &u do
             case uref of
                 when Value(value: &[Int32, R]) do
                     let i: Int32 := !value;
                     printLn(i);
             end case;
-        end;
+        end borrow;
         consume(u);
         return ExitSuccess();
     end;

@@ -3,9 +3,9 @@ module body Test is
 
     function main(): ExitCode is
         let foo: Foo := Foo();
-        borrow foo as ref in R do
+        borrow ref: &[Foo, R] := &foo do
             let {} := !ref;
-        end;
+        end borrow;
         let {} := foo;
         return ExitSuccess();
     end;

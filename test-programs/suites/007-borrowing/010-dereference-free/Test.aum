@@ -5,12 +5,12 @@ module body Test is
 
     function main(): ExitCode is
         let foo: Foo := Foo(inner => 5);
-        borrow foo as ref in R do
+        borrow ref: &[Foo, R] := &foo do
             let subref: &[Int64, R] := &(ref->inner);
             let value: Int64 := !subref;
             print("value = ");
             printLn(value);
-        end;
+        end borrow;
         let { inner: Int64 } := foo;
         return ExitSuccess();
     end;

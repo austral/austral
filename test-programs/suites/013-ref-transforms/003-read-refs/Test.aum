@@ -17,7 +17,7 @@ module body Test is
         let bar: Bar := Bar(baz => baz);
         let foo: Foo := Foo(bar => bar);
         -- Borrow.
-        borrow foo as fooref in R do
+        borrow fooref: &[Foo, R] := &foo do
             -- Direct.
             let a: &[Bar, R] := &(fooref->bar);
             let b: &[Baz, R] := &(fooref->bar->baz);
@@ -27,7 +27,7 @@ module body Test is
             let d: &[Baz, R] := &(a->baz);
             let e: &[Int32, R] := &(d->i);
             printLn(!e);
-        end;
+        end borrow;
         -- Destructure.
         let { bar as bar2: Bar } := foo;
         let { baz as baz2: Baz } := bar2;

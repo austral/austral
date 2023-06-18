@@ -124,14 +124,14 @@ module body Example.Buffer is
     function main(): ExitCode is
         -- Create a buffer of e's.
         let buf: Buffer[Int32] := Initialize(3, 101);
-        borrow buf as bufref in rho do
+        borrow bufref: &[Buffer[Int32], rho] := &buf do
             let size: Index := Buffer_Size(bufref);
             if size = 3 then
                 Put_Character(97);
             end if;
             let first: Int32 := Nth_Free(bufref, 0);
             Put_Character(first);
-        end;
+        end borrow;
         Destroy_Buffer(buf);
         return ExitSuccess();
     end;

@@ -12,9 +12,9 @@
   },
   "context": [
     [ 5, "        let foo: Foo := Foo();" ],
-    [ 6, "        borrow foo as ref in R do" ],
+    [ 6, "        borrow ref: &[Foo, R] := &foo do" ],
     [ 7, "            let {} := !ref;" ],
-    [ 8, "        end;" ],
+    [ 8, "        end borrow;" ],
     [ 9, "        let {} := foo;" ]
   ]
 }

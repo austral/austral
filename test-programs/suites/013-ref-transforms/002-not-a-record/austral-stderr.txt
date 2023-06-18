@@ -13,9 +13,9 @@
   },
   "context": [
     [ 7, "        let foo: Foo := Blank();" ],
-    [ 8, "        borrow foo as fooref in R do" ],
+    [ 8, "        borrow fooref: &[Foo, R] := &foo do" ],
     [ 9, "            &(fooref->foo);" ],
-    [ 10, "        end;" ],
+    [ 10, "        end borrow;" ],
     [ 11, "        case foo of" ]
   ]
 }
