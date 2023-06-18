@@ -804,7 +804,7 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
         | SpanMut (ty, _) ->
            ty
         | _ ->
-           Errors.cant_index_not_fixed_array_or_span ty
+           Errors.cant_index_not_span ty
       in
       (* Construct the result type. *)
       TArrayIndex (expr, index_expr, ReadRef (elem_ty, reg))
@@ -819,7 +819,7 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
         | SpanMut (ty, _) ->
            ty
         | _ ->
-           Errors.cant_index_not_fixed_array_or_span ty
+           Errors.cant_index_not_span ty
       in
       (* Construct the result type. *)
       TArrayIndex (expr, index_expr, WriteRef (elem_ty, reg))
