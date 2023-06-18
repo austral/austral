@@ -8,7 +8,6 @@ This script runs the end-to-end tests of the compiler.
 """
 import os
 import subprocess
-from uuid import uuid4
 
 #
 # Constants
@@ -56,7 +55,7 @@ class Test(object):
         self.suite_name = suite_name
         self.directory = directory
         self.cli = cli
-        ident: str = str(uuid4())
+        ident: str = suite_name + "_" + name
         self.c_path = "/tmp/austral_e2e_" + ident + ".c"
         self.bin_path = "/tmp/austral_e2e_" + ident + ".bin"
 
