@@ -69,10 +69,6 @@ let rec transform_ty (ty: ty): c_ty =
      CNamedType "double"
   | NamedType _ ->
      Errors.disallowed_type ty
-  | StaticArray (Integer (Unsigned, Width8)) ->
-     c_string_type
-  | StaticArray _ ->
-     Errors.disallowed_type ty
   | RegionTy _ ->
      Errors.disallowed_type ty
   | ReadRef _ ->

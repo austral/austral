@@ -43,7 +43,6 @@ type ty =
   | SingleFloat
   | DoubleFloat
   | NamedType of qident * ty list * universe
-  | StaticArray of ty
   | RegionTy of region
   | ReadRef of ty * ty
   | WriteRef of ty * ty
@@ -95,8 +94,6 @@ let rec type_string = function
      double_float_name
   | NamedType (n, args, _) ->
      (ident_string (local_name n)) ^ args_string args
-  | StaticArray t ->
-     "FixedArray[" ^ (type_string t) ^ "]"
   | RegionTy r ->
      "Region<" ^ (string_of_int (region_id r)) ^ ">"
   | ReadRef (t, r) ->
@@ -131,7 +128,7 @@ and args_string = function
 
 let index_type = Integer (Unsigned, WidthIndex)
 
-let string_type = StaticArray (Integer (Unsigned, Width8))
+let string_type = Span (Integer (Unsigned, Width8), RegionTy static_region)
 
 let rec equal_ty a b =
   match a with
@@ -171,12 +168,6 @@ let rec equal_ty a b =
          (equal_qident n n')
          && (List.for_all (fun (a', b') -> equal_ty a' b') (List.map2 (fun a' b' -> (a',b')) args args'))
          && (equal_universe u u')
-      | _ ->
-         false)
-  | StaticArray t ->
-     (match b with
-      | StaticArray t' ->
-         equal_ty t t'
       | _ ->
          false)
   | RegionTy r ->

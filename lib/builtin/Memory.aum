@@ -121,14 +121,4 @@ module body Austral.Memory is
         let poffset: Pointer[T] := positiveOffset(p, start);
         return @embed(Span![T, R], "au_make_span($1, $2)", poffset, size);
     end;
-
-    generic [T: Type, R: Region]
-    function spanLength(sp: Span[T, R]): Index is
-        return @embed(Index, "$1.size", sp);
-    end;
-
-    generic [T: Type, R: Region]
-    function spanWriteLength(sp: Span![T, R]): Index is
-        return @embed(Index, "$1.size", sp);
-    end;
 end module body.

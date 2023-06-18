@@ -166,8 +166,6 @@ let rec replace_variables bindings ty =
      (match get_binding bindings (tyvar_to_typaram tv) with
       | Some ty -> ty
       | None -> TyVar tv)
-  | StaticArray ty ->
-     StaticArray (replace_variables bindings ty)
   | RegionTy r ->
      RegionTy r
   | ReadRef (ty, region) ->

@@ -98,12 +98,6 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
            Errors.type_mismatch a b
       | _ ->
          Errors.type_mismatch a b)
-  | StaticArray t ->
-     (match b with
-      | StaticArray t' ->
-         match_type ctx t t'
-      | _ ->
-         Errors.type_mismatch a b)
   | RegionTy r ->
      (match b with
       | RegionTy r' ->

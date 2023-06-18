@@ -120,10 +120,6 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = all_distinct (List.map is_tyvar args) in
      let _ = no_leftovers (List.length args) in
      ()
-  | StaticArray ty ->
-     let _ = is_tyvar ty in
-     let _ = no_leftovers 1 in
-     ()
   | RegionTy _ ->
      Errors.region_arg ()
   | ReadRef (ty, r) ->
@@ -191,10 +187,6 @@ let overlapping_instances (a: ty) (b: ty): bool =
          equal_qident name name'
       | _ ->
          false)
-  | StaticArray _ ->
-     (match b with
-      | StaticArray _ -> true
-      | _ -> false)
   | RegionTy _ ->
      err "Not allowed"
   | ReadRef _ ->
@@ -267,8 +259,6 @@ and is_type_local (env: env) (mod_id: mod_id) (ty: ty): bool =
   | NamedType (name, _, _) ->
      let type_mod_id: mod_id = decl_mod_id (get_decl_by_name_or_die env (qident_to_sident name)) in
      equal_mod_id mod_id type_mod_id
-  | StaticArray _ ->
-     true
   | RegionTy _ ->
      (* Not applicable. *)
      false

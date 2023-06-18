@@ -69,13 +69,6 @@ open Error
 
 *)
 
-module Errors = struct
-  let foreign_returns_array () =
-    austral_raise DeclarationError [
-      Text "Foreign functions cannot return arrays."
-    ]
-end
-
 (* Name generation *)
 
 let counter = ref 0
@@ -145,8 +138,6 @@ let rec gen_type (ty: mono_ty): c_ty =
      CNamedType "double"
   | MonoNamedType id ->
      CNamedType (gen_mono_id id)
-  | MonoStaticArray _ ->
-     CNamedType "au_array_t"
   | MonoRegionTy _ ->
      CNamedType "au_region_t"
   | MonoReadRef (t, _) ->
@@ -206,7 +197,7 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CFloat f
   | MStringConstant s ->
      CFuncall (
-         "au_make_array_from_string",
+         "au_make_span_from_string",
          [
            CString s;
            CInt (string_of_int (String.length (escaped_to_string s)))
@@ -574,20 +565,16 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
            gen_type t
         | MonoNamedType _ ->
            err "Not allowed"
-        | MonoStaticArray (MonoInteger (Unsigned, Width8)) ->
-           c_string_type
-        | MonoStaticArray _ ->
-           err "Not allowed"
         | MonoRegionTy _ ->
            err "Not allowed"
         | MonoReadRef _ ->
            err "Not allowed"
         | MonoWriteRef _ ->
            err "Not allowed"
-        | MonoSpan _ ->
-           err "Not allowed"
-        | MonoSpanMut _ ->
-           err "Not allowed"
+        | MonoSpan (ty, _) ->
+           CPointer (gen_type ty)
+        | MonoSpanMut (ty, _) ->
+           CPointer (gen_type ty)
         | MonoAddress _ ->
            gen_type t
         | MonoPointer _ ->
@@ -599,8 +586,6 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      let return_type_to_c_type t =
        match t with
-       | MonoStaticArray _ ->
-          Errors.foreign_returns_array ()
        | _ ->
           param_type_to_c_type t
      in
@@ -608,7 +593,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      and ff_rt = return_type_to_c_type rt in
      let ff_local_decl = CLocalFunctionDeclaration (underlying, ff_params, ff_rt, LinkageExternal) in
      let make_param (n: identifier) (t: mono_ty) =
-       if (gen_type t) = (CNamedType "au_array_t") then
+       if (gen_type t) = (CNamedType "au_span_t") then
          (* Extract the pointer from the Array struct *)
          CStructAccessor (CVar (gen_ident n), "data")
        else

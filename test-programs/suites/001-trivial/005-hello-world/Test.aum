@@ -4,8 +4,8 @@ module body Test is
     end;
 
     function main(): ExitCode is
-        let arr: FixedArray[Nat8] := "Hello, world!";
-        let n: Index := fixedArraySize(arr) - 1;
+        let arr: Span[Nat8, Static] := "Hello, world!";
+        let n: Index := spanLength(arr) - 1;
         @embed(Unit, "au_printf(\"Length: %i\n\", $1)", n);
         for i from 0 to n do
             @embed(Unit, "au_printf(\"%i = '%c'\n\", $1, $2)", i, arr[i]);

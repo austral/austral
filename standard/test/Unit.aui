@@ -5,12 +5,12 @@
 -- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 module Standard.Test.Unit is
-    function suiteHeading(heading: FixedArray[Nat8]): Unit;
-    function testHeading(heading: FixedArray[Nat8]): Unit;
+    function suiteHeading(heading: Span[Nat8, Static]): Unit;
+    function testHeading(heading: Span[Nat8, Static]): Unit;
 
-    function assertTrue(value: Bool, message: FixedArray[Nat8]): Unit;
-    function assertFalse(value: Bool, message: FixedArray[Nat8]): Unit;
+    function assertTrue(value: Bool, message: Span[Nat8, Static]): Unit;
+    function assertFalse(value: Bool, message: Span[Nat8, Static]): Unit;
 
-    function assertSuccess(message: FixedArray[Nat8]): Unit;
-    function assertFailure(message: FixedArray[Nat8]): Unit;
+    function assertSuccess(message: Span[Nat8, Static]): Unit;
+    function assertFailure(message: Span[Nat8, Static]): Unit;
 end module.

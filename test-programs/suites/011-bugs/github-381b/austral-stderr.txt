@@ -5,7 +5,7 @@
     { "type": "text", "content": "Expected a value of type " },
     { "type": "type", "content": "Int32" },
     { "type": "text", "content": ", but got a value of type " },
-    { "type": "type", "content": "FixedArray[Nat8]" },
+    { "type": "type", "content": "Span[Nat8, Region<0>]" },
     { "type": "text", "content": "." }
   ],
   "span": {

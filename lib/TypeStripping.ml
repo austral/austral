@@ -18,7 +18,6 @@ type stripped_ty =
   | SSingleFloat
   | SDoubleFloat
   | SNamedType of qident * stripped_ty list
-  | SStaticArray of stripped_ty
   | SRegionTy of region
   | SReadRef of stripped_ty * stripped_ty
   | SWriteRef of stripped_ty * stripped_ty
@@ -51,12 +50,6 @@ and strip_type' (ty: ty): stripped_ty option =
      Some SDoubleFloat
   | NamedType (n, args, _) ->
      Some (SNamedType (n, List.filter_map strip_type' args))
-  | StaticArray elem_ty ->
-     (match (strip_type' elem_ty) with
-      | Some elem_ty ->
-         Some (SStaticArray elem_ty)
-      | None ->
-         internal_err "array instantiated with a region type.")
   | RegionTy r ->
      Some (SRegionTy r)
   | ReadRef (ty, r) ->

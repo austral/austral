@@ -7,9 +7,7 @@ import Austral.Memory (
     nullCheck,
     deallocate,
     span,
-    spanWrite,
-    spanLength,
-    spanWriteLength
+    spanWrite
 );
 
 module body Test is

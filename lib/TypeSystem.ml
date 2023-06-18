@@ -16,7 +16,6 @@ let type_universe = function
   | SingleFloat -> FreeUniverse
   | DoubleFloat -> FreeUniverse
   | NamedType (_, _, u) -> u
-  | StaticArray _ -> FreeUniverse
   | RegionTy _ -> RegionUniverse
   | ReadRef _ -> FreeUniverse
   | WriteRef _ -> LinearUniverse
@@ -35,7 +34,6 @@ let is_numeric = function
   | SingleFloat -> true
   | DoubleFloat -> true
   | NamedType _ -> false
-  | StaticArray _ -> false
   | RegionTy _ -> false
   | ReadRef _ -> false
   | WriteRef _ -> false
@@ -54,7 +52,6 @@ let is_comparable = function
   | SingleFloat -> true
   | DoubleFloat -> true
   | NamedType _ -> false
-  | StaticArray _ -> false
   | RegionTy _ -> false
   | ReadRef _ -> false
   | WriteRef _ -> false
@@ -79,8 +76,6 @@ let rec type_variables = function
      TypeVarSet.empty
   | NamedType (_, a, _) ->
      List.fold_left TypeVarSet.union TypeVarSet.empty (List.map type_variables a)
-  | StaticArray ty ->
-     type_variables ty
   | RegionTy _ ->
      TypeVarSet.empty
   | ReadRef (ty, r) ->
@@ -112,8 +107,6 @@ let rec is_concrete = function
   | SingleFloat -> true
   | DoubleFloat -> true
   | NamedType _ -> false
-  | StaticArray ty ->
-     is_concrete ty
   | RegionTy _ ->
      true
   | ReadRef (ty, _) ->

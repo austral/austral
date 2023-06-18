@@ -6,7 +6,7 @@ module body Test is
     end;
 
     pragma Foreign_Import(External_Name => "puts");
-    function Put_String(str: FixedArray[Nat8]): Int32 is
+    function Put_String(str: Span[Nat8, Static]): Int32 is
     end;
 
     typeclass Acceptable(T: Free) is
