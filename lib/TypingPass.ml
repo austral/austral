@@ -589,6 +589,8 @@ and is_constant = function
      true
   | TArrayIndex (_, idx, _) ->
      is_constant idx
+  | TSpanIndex (_, idx, _) ->
+     is_constant idx
 
 let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (decl: linked_definition): typed_decl =
   with_frame "Augment declaration"

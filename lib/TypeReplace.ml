@@ -112,6 +112,11 @@ let rec replace_tyvars_expr (bindings: type_bindings) (expr: texpr): texpr =
      let index = replace_tyvars_expr bindings index in
      let ty = replace_variables bindings ty in
      TArrayIndex (expr, index, ty)
+   | TSpanIndex (expr, index, ty) ->
+     let expr = replace_tyvars_expr bindings expr in
+     let index = replace_tyvars_expr bindings index in
+     let ty = replace_variables bindings ty in
+     TSpanIndex (expr, index, ty)
 
 let rec replace_tyvars_stmt (bindings: type_bindings) (stmt: tstmt): tstmt =
   match stmt with

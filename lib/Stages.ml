@@ -532,6 +532,7 @@ module Tast = struct
     | TSlotAccessor of texpr * identifier * ty
     | TPointerSlotAccessor of texpr * identifier * ty
     | TArrayIndex of texpr * texpr * ty
+    | TSpanIndex of texpr * texpr * ty
     | TEmbed of ty * string * texpr list
     | TDeref of texpr
     | TSizeOf of ty
@@ -658,6 +659,7 @@ module Mtast = struct
     | MSlotAccessor of mexpr * identifier * mono_ty
     | MPointerSlotAccessor of mexpr * identifier * mono_ty
     | MArrayIndex of mexpr * mexpr * mono_ty
+    | MSpanIndex of mexpr * mexpr * mono_ty
 
   and mtyped_when =
     MTypedWhen of identifier * mono_binding list * mstmt

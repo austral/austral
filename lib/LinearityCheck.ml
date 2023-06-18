@@ -258,7 +258,9 @@ let rec count (name: identifier) (expr: texpr): appearances =
      c e
   | TArrayIndex (e, i, _) ->
      merge (c e) (c i)
-
+  | TSpanIndex (e, i, _) ->
+     merge (c e) (c i)
+ 
 (* Utilities *)
 
 let get_state (tbl: state_tbl) (name: identifier): var_state =
