@@ -800,13 +800,17 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
     | _ ->
        internal_err "Not a reference."
   in
-  (* The pointed-to type is a fixed array. *)
+  (* The pointed-to type is a fixed array, or a span. *)
   let elem_ty: ty = begin
       match ty with
       | StaticArray ty ->
          ty
+      | Span (ty, _) ->
+         ty
+      | SpanMut (ty, _) ->
+         ty
       | _ ->
-         Errors.cant_index_not_fixed_array ty
+         Errors.cant_index_not_fixed_array_or_span ty
     end
   in
   (* Construct the result type. *)
