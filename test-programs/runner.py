@@ -184,8 +184,9 @@ def report_test_results(results: list[TestResult]):
         with open("FAILURES.txt", "w") as stream:
             for fail in fails:
                 report_fail_details(fail, stream)
-        
+
         print("\n\nDetailed failures written to FAILURES.txt")
+
 
 def report_pass(result: TestPass):
     suite: str = result.test.suite_name
@@ -197,6 +198,7 @@ def report_fail(result: TestFail):
     suite: str = result.test.suite_name
     name: str = result.test.name
     print(f"{suite.ljust(45)}  {name.ljust(45)}  FAIL")
+
 
 def report_fail_details(result: TestFail, stream):
     print("Suite:", result.test.suite_name, file=stream)
@@ -213,11 +215,13 @@ def report_fail_details(result: TestFail, stream):
         print(file=stream)
     print("\n\n\n\n\n", file=stream)
 
+
 def try_join(l: list[str] | None) -> str:
     if l is None:
         return ""
     else:
         return " ".join(l)
+
 
 #
 # Collection
@@ -389,7 +393,7 @@ def _run_success_test(test: TestSuccess) -> TestResult:
         test.c_path,
         "-lm",  # Math stdlib,
         "-o",
-        test.bin_path
+        test.bin_path,
     ]
     # Call GCC.
     result: subprocess.CompletedProcess = subprocess.run(
@@ -557,7 +561,7 @@ def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
         test.c_path,
         "-lm",  # Math stdlib,
         "-o",
-        test.bin_path
+        test.bin_path,
     ]
     # Call GCC.
     result: subprocess.CompletedProcess = subprocess.run(
