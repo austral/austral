@@ -301,7 +301,7 @@ def run_test(test: Test, replace_stderr: bool):
         die("Unknown test type.")
 
 
-def _test_cmd(test: Test) -> list:
+def _test_cmd(test: Test) -> list[str]:
     if test.cli:
         cli: str = test.cli.replace("$DIR", test.directory)
         return cli.split(" ")
