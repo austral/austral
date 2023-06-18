@@ -37,7 +37,7 @@ module body Test is
         var ptr: Pointer[Int32] := allocateOrDie();
         let offset: Pointer[Int32] := positiveOffset(ptr, 5);
         store(offset, 123);
-        testMutable(&ptr);
+        testMutable(&!ptr);
         deallocate(ptr);
         return ExitSuccess();
     end;
