@@ -8,6 +8,8 @@ This script runs the end-to-end tests of the compiler.
 """
 import os
 import subprocess
+import time
+from multiprocessing import Process, Queue
 
 #
 # Constants
@@ -331,7 +333,19 @@ def _get_file_contents(test_dir: str, filename: str) -> str | None:
 #
 
 
-def run_test(test: Test, replace_stderr: bool) -> TestResult:
+def run_test(test: Test, replace_stderr: bool, queue: Queue):
+    try:
+        result: TestResult = run_test_inner(test, replace_stderr)
+        queue.put(result)
+        queue.close()
+        exit(0)
+    except Exception as e:
+        print(e)
+        queue.close()
+        exit(0)
+
+
+def run_test_inner(test: Test, replace_stderr: bool) -> TestResult:
     if isinstance(test, TestSuccess):
         return _run_success_test(test)
     elif isinstance(test, TestFailure):
@@ -637,6 +651,7 @@ def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
 # Test Runner
 #
 
+
 def filter_tests(
     tests: list[Test],
     suite_pattern: str | None,
@@ -651,7 +666,7 @@ def filter_tests(
         if name_pattern is not None:
             if test.name.find(name_pattern) == -1:
                 continue
-        
+
         filtered.append(test)
 
     return filtered
@@ -670,24 +685,45 @@ def run_all_tests(
     If name_pattern is given, only tests that have names containing the given string are run.
     An empty pattern means match all.
     """
-    tests: list[Test] = filter_tests(tests, suite_pattern, name_pattern)
-    results: list[TestResult] = []
+    filtered: list[Test] = filter_tests(tests, suite_pattern, name_pattern)
+    return run_tests_parallel(filtered, replace_stderr)
+
+
+def run_tests_parallel(
+    tests: list[Test],
+    replace_stderr: bool,
+) -> list[TestResult]:
+    queue: Queue = Queue()
+    processes: list[Process] = []
 
     for test in tests:
-        results.append(run_test(test, replace_stderr))
+        p = Process(target=run_test, args=[test, replace_stderr, queue])
+        p.start()
+        processes.append(p)
 
-    return results
+    while len(processes) != queue.qsize():
+        time.sleep(0.1)
+
+    results: list[TestResult] = []
+    while queue.qsize() > 0:
+        results.append(queue.get())
+
+    assert len(results) == len(tests)
+
+    return sorted(results, key=lambda r: r.test.suite_name + "_" + r.test.name)
 
 
 #
 # Entrypoint
 #
 
+
 def have_failures(l: list[TestResult]) -> bool:
     for result in results:
         if isinstance(result, TestFail):
             return True
     return False
+
 
 if __name__ == "__main__":
     import sys
@@ -701,7 +737,10 @@ if __name__ == "__main__":
         tests: list[Test] = collect_tests()
         print("Running...")
         results: list[TestResult] = run_all_tests(
-            tests, suite_pattern, name_pattern, replace_stderr
+            tests,
+            suite_pattern,
+            name_pattern,
+            replace_stderr,
         )
         report_test_results(results)
         if have_failures(results):
