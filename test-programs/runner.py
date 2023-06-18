@@ -48,14 +48,14 @@ class Test(object):
     name: str
     suite_name: str
     directory: str
-    c_code: str
+    c_filename: str
 
     def __init__(self, name: str, suite_name: str, directory: str, cli: str | None):
         self.name = name
         self.suite_name = suite_name
         self.directory = directory
         self.cli = cli
-        self.c_code = str(uuid4()) + ".c"
+        self.c_filename = str(uuid4()) + ".c"
 
 
 class TestSuccess(Test):
@@ -310,6 +310,7 @@ def run_test(test: Test, replace_stderr: bool) -> TestResult:
 def _test_cmd(test: Test) -> list[str]:
     if test.cli:
         cli: str = test.cli.replace("$DIR", test.directory)
+        cli: str = test.cli.replace("$C_FILENAME", test.c_filename)
         return cli.split(" ")
     else:
         body_path: str = os.path.join(test.directory, "Test.aum")
