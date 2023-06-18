@@ -670,6 +670,12 @@ def run_all_tests(
 # Entrypoint
 #
 
+def have_failures(l: list[TestResult]) -> bool:
+    for result in results:
+        if isinstance(result, TestFail):
+            return True
+    return False
+
 if __name__ == "__main__":
     import sys
 
@@ -683,6 +689,12 @@ if __name__ == "__main__":
             tests, suite_pattern, name_pattern, replace_stderr
         )
         report_test_results(results)
+        if have_failures(results):
+            print("Some tests failed")
+            exit(-1)
+        else:
+            print("All tests passed")
+            exit(0)
     except ValueError as e:
         print(e)
         exit(-1)
