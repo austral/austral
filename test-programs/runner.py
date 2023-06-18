@@ -89,6 +89,9 @@ class TestProgramFailure(Test):
 
 
 class Suite(object):
+    """
+    A collection of tests.
+    """
     def __init__(self, name, tests):
         self.name = name
         self.tests = tests
