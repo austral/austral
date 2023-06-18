@@ -155,9 +155,6 @@ rule token = parse
   | "from" { FROM }
   | "to" { TO }
   | "borrow" { BORROW }
-  | "borrow!" { MUTABLE_BORROW }
-  | "borrow~" { REBORROW_STMT }
-  | "in" { IN }
   | "return" { RETURN }
   | "skip" { SKIP }
   | "Free" { UNIVERSE_FREE }

@@ -76,9 +76,6 @@ open Span
 %token FROM
 %token TO
 %token BORROW
-%token MUTABLE_BORROW
-%token REBORROW_STMT
-%token IN
 %token RETURN
 %token SKIP
 %token UNIVERSE_FREE
