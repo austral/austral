@@ -1,0 +1,44 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Pointer,
+    Address,
+    allocateBuffer,
+    nullCheck,
+    deallocate,
+    span,
+    spanWrite,
+    spanLength,
+    spanWriteLength,
+    positiveOffset,
+    store
+);
+
+module body Test is
+    function allocateOrDie(): Pointer[Int32] is
+        let addr: Address[Int32] := allocateBuffer(10);
+        case nullCheck(addr) of
+            when Some(value: Pointer[Int32]) do
+                return value;
+            when None do
+                abort("Allocation failed.");
+        end case;
+    end;
+
+    generic [R: Region]
+    function testMutable(ref: &![Pointer[Int32], R]): Unit is
+        let sp: Span![Int32, R] := spanWrite(ref, 0, 9);
+        let val: Int32 := sp[10];
+        printLn(val);
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        var ptr: Pointer[Int32] := allocateOrDie();
+        let offset: Pointer[Int32] := positiveOffset(ptr, 5);
+        store(offset, 123);
+        testMutable(&ptr);
+        deallocate(ptr);
+        return ExitSuccess();
+    end;
+end module body.
