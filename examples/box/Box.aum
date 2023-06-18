@@ -114,9 +114,9 @@ module body Example.Box is
         case b3 of
             when Left(left: Box[Int32]) do
                 var left2: Box[Int32] := left;
-                borrow! left2 as value2 in rho do
+                borrow value2: &![Box[Int32], rho] := &!left2 do
                     Store_Free(value2, 'a');
-                end;
+                end borrow;
                 let contents: Int32 := Unbox(left2);
                 Put_Character(contents);
             when Right(right: Int32) do
@@ -140,9 +140,9 @@ module body Example.Box is
         case b5 of
             when Left(left: Box[Int32]) do
                 var left2: Box[Int32] := left;
-                borrow! left2 as boxmutref in rho do
+                borrow boxmutref: &![Box[Int32], rho] := &!left2 do
                     Swap_Mut(boxmutref, 'a');
-                end;
+                end borrow;
                 Put_Character(Unbox(left2));
             when Right(right: Int32) do
                 abort("Unexpected.");
