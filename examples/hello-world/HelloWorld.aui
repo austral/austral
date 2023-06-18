@@ -1,0 +1,3 @@
+module Example.HelloWorld is
+    function main(): ExitCode;
+end module.
