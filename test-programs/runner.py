@@ -48,14 +48,17 @@ class Test(object):
     name: str
     suite_name: str
     directory: str
-    c_filename: str
+    c_path: str
+    bin_path: str
 
     def __init__(self, name: str, suite_name: str, directory: str, cli: str | None):
         self.name = name
         self.suite_name = suite_name
         self.directory = directory
         self.cli = cli
-        self.c_filename = str(uuid4()) + ".c"
+        ident: str = str(uuid4())
+        self.c_path = "/tmp/austral_e2e_" + ident + ".c"
+        self.bin_path = "/tmp/austral_e2e_" + ident + ".bin"
 
 
 class TestSuccess(Test):
@@ -167,14 +170,23 @@ class TestFail(TestResult):
 
 
 def report_test_results(results: list[TestResult]):
+    fails: list[TestFail] = []
+
     for result in results:
         if isinstance(result, TestPass):
             report_pass(result)
         elif isinstance(result, TestFail):
             report_fail(result)
+            fails.append(result)
         else:
             raise ValueError("Unknown test result type: ", result)
 
+    if fails:
+        with open("FAILURES.txt", "w") as stream:
+            for fail in fails:
+                report_fail_details(fail, stream)
+        
+        print("\n\nDetailed failures written to FAILURES.txt")
 
 def report_pass(result: TestPass):
     suite: str = result.test.suite_name
@@ -187,6 +199,20 @@ def report_fail(result: TestFail):
     name: str = result.test.name
     print(f"{suite.ljust(45)}  {name.ljust(45)}  FAIL")
 
+def report_fail_details(result: TestFail, stream):
+    print("Suite:", result.test.suite_name, file=stream)
+    print("Test:", result.test.name, file=stream)
+    print("C File:", result.test.c_path, file=stream)
+    print("Bin File:", result.test.bin_path, file=stream)
+    print("Austral command:", result.austral_cmd, file=stream)
+    print("GCC command:", result.cc_cmd, file=stream)
+    print("Reason:", result.reason, file=stream)
+    for key, value in result.outputs:
+        print(key, file=stream)
+        for line in value.split("\n"):
+            print(f"\t{line}", file=stream)
+        print(file=stream)
+    print("\n\n\n\n\n", file=stream)
 
 #
 # Collection
@@ -310,7 +336,7 @@ def run_test(test: Test, replace_stderr: bool) -> TestResult:
 def _test_cmd(test: Test) -> list[str]:
     if test.cli:
         cli: str = test.cli.replace("$DIR", test.directory)
-        cli: str = test.cli.replace("$C_FILENAME", test.c_filename)
+        cli: str = test.cli.replace("$C_PATH", test.c_path)
         return cli.split(" ")
     else:
         body_path: str = os.path.join(test.directory, "Test.aum")
@@ -320,7 +346,7 @@ def _test_cmd(test: Test) -> list[str]:
             f"{body_path}",
             "--entrypoint=Test:main",
             "--target-type=c",
-            "--output=test-programs/output.c",
+            f"--output={test.c_path}",
             "--error-format=json",
         ]
 
@@ -354,10 +380,10 @@ def _run_success_test(test: TestSuccess) -> TestResult:
         "gcc",
         "-fwrapv",  # Modular arithmetic semantics
         "-Wno-builtin-declaration-mismatch",
-        "test-programs/output.c",
+        f"--output={test.c_path}",
         "-lm",  # Math stdlib,
         "-o",
-        "test-programs/testbin",
+        test.bin_path
     ]
     # Call GCC.
     result: subprocess.CompletedProcess = subprocess.run(
@@ -378,7 +404,7 @@ def _run_success_test(test: TestSuccess) -> TestResult:
         )
     # GCC compilation succeeded. Run the program.
     result: subprocess.CompletedProcess = subprocess.run(
-        ["./test-programs/testbin"],
+        [test.bin_path],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -522,10 +548,10 @@ def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
         "gcc",
         "-fwrapv",  # Modular arithmetic semantics
         "-Wno-builtin-declaration-mismatch",
-        "test-programs/output.c",
+        f"--output={test.c_path}",
         "-lm",  # Math stdlib,
         "-o",
-        "test-programs/testbin",
+        test.bin_path
     ]
     # Call GCC.
     result: subprocess.CompletedProcess = subprocess.run(
@@ -546,7 +572,7 @@ def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
         )
     # GCC compilation succeeded. Run the program.
     result: subprocess.CompletedProcess = subprocess.run(
-        ["./test-programs/testbin"],
+        [test.bin_path],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
