@@ -150,6 +150,7 @@ class TestFail(TestResult):
     """
     Represents a test that failed.
     """
+
     austral_cmd: list[str] | None
     cc_cmd: list[str] | None
     reason: str
@@ -169,9 +170,11 @@ class TestFail(TestResult):
         self.reason = reason
         self.outputs = outputs
 
+
 #
 # Reporting
 #
+
 
 def report_test_results(results: list[TestResult]):
     for result in results:
@@ -182,15 +185,18 @@ def report_test_results(results: list[TestResult]):
         else:
             raise ValueError("Unknown test result type: ", result)
 
+
 def report_pass(result: TestPass):
     suite: str = result.test.suite_name
     name: str = result.test.name
     print(f"{suite.ljust(45)}  {name.ljust(45)}  PASS")
 
+
 def report_fail(result: TestFail):
     suite: str = result.test.suite_name
     name: str = result.test.name
     print(f"{suite.ljust(45)}  {name.ljust(45)}  FAIL")
+
 
 #
 # Collection
@@ -453,6 +459,7 @@ def _run_success_test(test: TestSuccess) -> TestResult:
 
     return TestPass(test=test)
 
+
 def trim_lines(text):
     return "\n".join(
         [line if line.strip() else "" for line in text.strip().split("\n")]
@@ -490,11 +497,10 @@ def _run_failure_test(test: TestFailure, replace_stderr: bool) -> TestResult:
         stderr: str = trim_lines(result.stderr.decode("utf-8"))
         if stderr != trim_lines(test.expected_compiler_error):
             return TestFail(
-            test=test,
-            austral_cmd=compile_cmd,
-            cc_cmd=None,
-            reason="Austral compiler failed, but compiler output does not match what we expected.",
-
+                test=test,
+                austral_cmd=compile_cmd,
+                cc_cmd=None,
+                reason="Austral compiler failed, but compiler output does not match what we expected.",
                 outputs=[
                     ("EXPECTED STDERR", test.expected_compiler_error),
                     ("ACTUAL STDERR", stderr),
@@ -502,6 +508,7 @@ def _run_failure_test(test: TestFailure, replace_stderr: bool) -> TestResult:
             )
     # Compilation failed and output matches.
     return TestPass(test=test)
+
 
 def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
     # Find the source files.
@@ -647,7 +654,9 @@ if __name__ == "__main__":
     suite_pattern = args[1] if len(args) > 1 else ""
     name_pattern = args[2] if len(args) > 2 else ""
     try:
-        results: list[TestResult] = run_all_tests(collect_suites(), suite_pattern, name_pattern, replace_stderr)
+        results: list[TestResult] = run_all_tests(
+            collect_suites(), suite_pattern, name_pattern, replace_stderr
+        )
         report_test_results(results)
     except ValueError as e:
         print(e)
