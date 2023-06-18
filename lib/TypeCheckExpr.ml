@@ -797,8 +797,6 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
   | ReadRef (ty, reg) -> begin
       let elem_ty: ty =
         match ty with
-        | StaticArray ty ->
-           ty
         | Span (ty, _) ->
            ty
         | SpanMut (ty, _) ->
@@ -812,8 +810,6 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
   | WriteRef (ty, reg) -> begin
       let elem_ty: ty =
         match ty with
-        | StaticArray ty ->
-           ty
         | Span (ty, _) ->
            ty
         | SpanMut (ty, _) ->

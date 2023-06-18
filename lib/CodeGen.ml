@@ -69,13 +69,6 @@ open Error
 
 *)
 
-module Errors = struct
-  let foreign_returns_array () =
-    austral_raise DeclarationError [
-      Text "Foreign functions cannot return arrays."
-    ]
-end
-
 (* Name generation *)
 
 let counter = ref 0
@@ -145,8 +138,6 @@ let rec gen_type (ty: mono_ty): c_ty =
      CNamedType "double"
   | MonoNamedType id ->
      CNamedType (gen_mono_id id)
-  | MonoStaticArray _ ->
-     CNamedType "au_array_t"
   | MonoRegionTy _ ->
      CNamedType "au_region_t"
   | MonoReadRef (t, _) ->
@@ -574,10 +565,6 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
            gen_type t
         | MonoNamedType _ ->
            err "Not allowed"
-        | MonoStaticArray (MonoInteger (Unsigned, Width8)) ->
-           c_string_type
-        | MonoStaticArray _ ->
-           err "Not allowed"
         | MonoRegionTy _ ->
            err "Not allowed"
         | MonoReadRef _ ->
@@ -599,8 +586,6 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      in
      let return_type_to_c_type t =
        match t with
-       | MonoStaticArray _ ->
-          Errors.foreign_returns_array ()
        | _ ->
           param_type_to_c_type t
      in
