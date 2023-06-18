@@ -41,14 +41,11 @@ typedef uint8_t   au_region_t;
  */
 
 typedef struct {
-  void*  data;
-  au_index_t size;
-} au_array_t;
-
-typedef struct {
   void* data;
   size_t size;
 } au_span_t;
+
+typedef au_span_t au_array_t;
 
 au_span_t au_make_span(void* data, size_t size) {
   return (au_span_t){ .data = data, .size = size };

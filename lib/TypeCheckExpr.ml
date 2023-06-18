@@ -792,29 +792,33 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
   (* Augment the expression and the index expression. *)
   let expr: texpr = aug ctx expr
   and index_expr: texpr = aug ctx index_expr in
-  (* The type of the expression is a read reference. *)
-  let (ty, region): ty * ty =
-    match (get_type expr) with
-    | ReadRef (ty, reg) ->
-       (ty, reg)
-    | _ ->
-       internal_err "Not a reference."
-  in
-  (* The pointed-to type is a fixed array, or a span. *)
-  let elem_ty: ty = begin
-      match ty with
-      | StaticArray ty ->
-         ty
-      | Span (ty, _) ->
-         ty
-      | SpanMut (ty, _) ->
-         ty
-      | _ ->
-         Errors.cant_index_not_fixed_array_or_span ty
+  (* The type of the expression is a read reference, or a span. *)
+  match (get_type expr) with
+  | ReadRef (ty, reg) -> begin
+      let elem_ty: ty =
+        match ty with
+        | StaticArray ty ->
+           ty
+        | Span (ty, _) ->
+           ty
+        | SpanMut (ty, _) ->
+           ty
+        | _ ->
+           Errors.cant_index_not_fixed_array_or_span ty
+      in
+      (* Construct the result type. *)
+      TArrayIndex (expr, index_expr, ReadRef (elem_ty, reg))
     end
-  in
-  (* Construct the result type. *)
-  TArrayIndex (expr, index_expr, ReadRef (elem_ty, region))
+  | Span (ty, reg) ->
+     TSpanIndex (expr, index_expr, ReadRef (ty, reg))
+  | SpanMut (ty, reg) ->
+     TSpanIndex (expr, index_expr, WriteRef (ty, reg))
+  | _ ->
+     austral_raise TypeError [
+         Text "Expected the head of an array indexing operator to be a reference, but found the type ";
+         Type (get_type expr)
+       ]
+
 
 and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
   (* The typecast operator has four uses:

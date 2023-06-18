@@ -114,6 +114,7 @@ let rec get_type = function
   | TSlotAccessor (_, _, ty) -> ty
   | TPointerSlotAccessor (_, _, ty) -> ty
   | TArrayIndex (_, _, ty) -> ty
+  | TSpanIndex (_, _, ty) -> ty
 
 let rec dump_stmt (stmt: tstmt): string =
    pp stmt 0

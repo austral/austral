@@ -1,0 +1,69 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Pointer,
+    Address,
+    allocateBuffer,
+    nullCheck,
+    deallocate,
+    span,
+    spanWrite,
+    spanLength,
+    spanWriteLength,
+    positiveOffset,
+    store
+);
+
+module body Test is
+    function allocateOrDie(): Pointer[Int32] is
+        let addr: Address[Int32] := allocateBuffer(10);
+        case nullCheck(addr) of
+            when Some(value: Pointer[Int32]) do
+                return value;
+            when None do
+                abort("Allocation failed.");
+        end case;
+    end;
+
+    record Container[R: Region]: Free is
+        sp: Span[Int32, R];
+    end;
+
+    generic [R: Region, S: Region]
+    function testContainerTransform(ref: &[Container[R], S]): Unit is
+        for i from 0 to 9 do
+            let valref: &[Int32, R] := &(ref->sp[i]);
+            let val: Int32 := !valref;
+            printLn(val);
+        end for;
+        return nil;
+    end;
+
+    generic [R: Region, S: Region]
+    function testContainerDirect(ref: &[Container[R], S]): Unit is
+        let sp: Span[Int32, R] := ref->sp;
+        for i from 0 to 9 do
+            printLn(sp[i]);
+        end for;
+        return nil;
+    end;
+
+    generic [R: Region]
+    function testImmutable(ref: &[Pointer[Int32], R]): Unit is
+        let sp: Span[Int32, R] := span(ref, 0, 9);
+        let con: Container[R] := Container(sp => sp);
+        testContainerTransform(&con);
+        printLn("---");
+        testContainerDirect(&con);
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        var ptr: Pointer[Int32] := allocateOrDie();
+        let offset: Pointer[Int32] := positiveOffset(ptr, 5);
+        store(offset, 123);
+        testImmutable(&ptr);
+        deallocate(ptr);
+        return ExitSuccess();
+    end;
+end module body.

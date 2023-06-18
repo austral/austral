@@ -299,6 +299,11 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
      let (idx, env) = monomorphize_expr env idx in
      let (ty, env) = strip_and_mono env ty in
      (MArrayIndex (expr, idx, ty), env)
+   | TSpanIndex (expr, idx, ty) ->
+     let (expr, env) = monomorphize_expr env expr in
+     let (idx, env) = monomorphize_expr env idx in
+     let (ty, env) = strip_and_mono env ty in
+     (MSpanIndex (expr, idx, ty), env)
 
 and monomorphize_expr_list (env: env) (exprs: texpr list): (mexpr list * env) =
   match exprs with
