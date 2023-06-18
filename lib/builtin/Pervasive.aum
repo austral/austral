@@ -5,12 +5,7 @@
 -- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 module body Austral.Pervasive is
-    generic [T: Type]
-    function fixedArraySize(arr: FixedArray[T]): Index is
-        return @embed(Index, "$1.size", arr);
-    end;
-
-    function abort(message: FixedArray[Nat8]): Unit is
+    function abort(message: Span[Nat8, Static]): Unit is
         return @embed(Unit, "au_abort($1)", message);
     end;
 
@@ -27,8 +22,8 @@ module body Austral.Pervasive is
         return @embed(Index, "au_get_argc()");
     end;
 
-    function nthArgument(n: Index): FixedArray[Nat8] is
-        return @embed(FixedArray[Nat8], "au_get_nth_arg($1)", n);
+    function nthArgument(n: Index): Span[Nat8, Static] is
+        return @embed(Span[Nat8, Static], "au_get_nth_arg($1)", n);
     end;
 
     constant minimum_nat8: Int8 := 0;
@@ -867,10 +862,6 @@ module body Austral.Pervasive is
             return @embed(Unit, "au_printf(\"nil\")");
             return value;
         end;
-
-        method printFixedArray(array: FixedArray[Unit]): Unit is
-            return nil;
-        end;
     end;
 
     instance Printable(Bool) is
@@ -883,7 +874,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Unit]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Unit, R]): Unit is
             return nil;
         end;
     end;
@@ -894,9 +886,10 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Nat8]): Unit is
-            if fixedArraySize(array) > 0 then
-                for i from 0 to fixedArraySize(array) - 1 do
+        generic [R: Region]
+        method printSpan(array: Span[Nat8, R]): Unit is
+            if @embed(Index, "$1.size", array) > 0 then
+                for i from 0 to @embed(Index, "$1.size", array) - 1 do
                     @embed(Unit, "au_printf(\"%c\", $1)", array[i]);
                 end for;
             end if;
@@ -910,7 +903,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Nat16]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Nat16, R]): Unit is
             return nil;
         end;
     end;
@@ -921,7 +915,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Nat32]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Nat32, R]): Unit is
             return nil;
         end;
     end;
@@ -932,7 +927,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Nat64]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Nat64, R]): Unit is
             return nil;
         end;
     end;
@@ -943,7 +939,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Int8]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Int8, R]): Unit is
             return nil;
         end;
     end;
@@ -954,7 +951,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Int16]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Int16, R]): Unit is
             return nil;
         end;
     end;
@@ -965,7 +963,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Int32]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Int32, R]): Unit is
             return nil;
         end;
     end;
@@ -976,7 +975,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Int64]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Int64, R]): Unit is
             return nil;
         end;
     end;
@@ -987,7 +987,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Index]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Index, R]): Unit is
             return nil;
         end;
     end;
@@ -998,7 +999,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[ByteSize]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[ByteSize, R]): Unit is
             return nil;
         end;
     end;
@@ -1009,7 +1011,8 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Float32]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Float32, R]): Unit is
             return nil;
         end;
     end;
@@ -1020,18 +1023,20 @@ module body Austral.Pervasive is
             return nil;
         end;
 
-        method printFixedArray(array: FixedArray[Float64]): Unit is
+        generic [R: Region]
+        method printSpan(array: Span[Float64, R]): Unit is
             return nil;
         end;
     end;
 
-    generic [B: Free(Printable)]
-    instance Printable(FixedArray[B]) is
-        method print(value: FixedArray[B]): Unit is
-            return printFixedArray(value);
+    generic [B: Free(Printable), R: Region]
+    instance Printable(Span[B, R]) is
+        method print(value: Span[B, R]): Unit is
+            return printSpan(value);
         end;
 
-        method printFixedArray(array: FixedArray[FixedArray[B]]): Unit is
+        generic [S: Region]
+        method printSpan(array: Span[Span[B, R], S]): Unit is
             return nil;
         end;
     end;

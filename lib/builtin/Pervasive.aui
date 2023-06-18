@@ -18,10 +18,7 @@ module Austral.Pervasive is
             right: R;
     end;
 
-    generic [T: Type]
-    function fixedArraySize(arr: FixedArray[T]): Index;
-
-    function abort(message: FixedArray[Nat8]): Unit;
+    function abort(message: Span[Nat8, Static]): Unit;
 
     type RootCapability : Linear;
 
@@ -29,7 +26,7 @@ module Austral.Pervasive is
 
     function argumentCount(): Index;
 
-    function nthArgument(n: Index): FixedArray[Nat8];
+    function nthArgument(n: Index): Span[Nat8, Static];
 
     union ExitCode: Free is
         case ExitSuccess;
@@ -117,7 +114,8 @@ module Austral.Pervasive is
     typeclass Printable(A: Free) is
         method print(value: A): Unit;
 
-        method printFixedArray(array: FixedArray[A]): Unit;
+        generic [R: Region]
+        method printSpan(value: Span[A, R]): Unit;
     end;
 
     instance Printable(Unit);
@@ -134,8 +132,9 @@ module Austral.Pervasive is
     instance Printable(ByteSize);
     instance Printable(Float32);
     instance Printable(Float64);
-    generic [B: Free(Printable)]
-    instance Printable(FixedArray[B]);
+
+    generic [B: Free(Printable), R: Region]
+    instance Printable(Span[B, R]);
 
     generic [T: Free(Printable)]
     function printLn(value: T): Unit;
