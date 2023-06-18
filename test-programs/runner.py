@@ -131,6 +131,49 @@ class Suite(object):
         self.tests = tests
 
 
+class TestResult(object):
+    """
+    Base class of test results.
+    """
+
+    test: Test
+    austral_cmd: str | None
+    cc_cmd: str | None
+
+    def __init__(self, test: Test, austral_cmd: str | None, cc_cmd: str | None):
+        self.test = test
+
+
+class TestPass(TestResult):
+    """
+    Represents a passing test.
+    """
+
+    def __init__(self, test: Test, austral_cmd: str | None, cc_cmd: str | None):
+        super().__init__(test, austral_cmd, cc_cmd)
+
+
+class TestFail(TestResult):
+    """
+    Represents a test that failed.
+    """
+
+    reason: str
+    outputs: list[tuple[str, str]]
+
+    def __init__(
+        self,
+        test: Test,
+        austral_cmd: str | None,
+        cc_cmd: str | None,
+        reason: str,
+        outputs: list[tuple[str, str]],
+    ):
+        super().__init__(test, austral_cmd, cc_cmd)
+        self.reason = reason
+        self.outputs = outputs
+
+
 #
 # Collection
 #
