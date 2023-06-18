@@ -637,6 +637,25 @@ def _run_program_failure_test(test: TestProgramFailure) -> TestResult:
 # Test Runner
 #
 
+def filter_tests(
+    tests: list[Test],
+    suite_pattern: str | None,
+    name_pattern: str | None,
+) -> list[Test]:
+    filtered: list[Test] = []
+    for test in tests:
+        if suite_pattern is not None:
+            if test.suite_name.find(suite_pattern) == -1:
+                continue
+
+        if name_pattern is not None:
+            if test.name.find(name_pattern) == -1:
+                continue
+        
+        filtered.append(test)
+
+    return filtered
+
 
 def run_all_tests(
     tests: list[Test],
@@ -651,16 +670,10 @@ def run_all_tests(
     If name_pattern is given, only tests that have names containing the given string are run.
     An empty pattern means match all.
     """
+    tests: list[Test] = filter_tests(tests, suite_pattern, name_pattern)
     results: list[TestResult] = []
+
     for test in tests:
-        if suite_pattern is not None:
-            if test.suite_name.find(suite_pattern) == -1:
-                continue
-
-        if name_pattern is not None:
-            if test.name.find(name_pattern) == -1:
-                continue
-
         results.append(run_test(test, replace_stderr))
 
     return results
