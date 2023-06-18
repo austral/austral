@@ -14,8 +14,8 @@ import Standard.Buffer (
     storeNth as bufStoreNth
 );
 
-module body Standard.ByteString is
-    record ByteString: Linear is
+module body Standard.String is
+    record String: Linear is
         buf: Buffer[Nat8];
     end;
 
@@ -23,30 +23,30 @@ module body Standard.ByteString is
     --- Lifecycle
     ---
 
-    function makeEmpty(): ByteString is
+    function makeEmpty(): String is
         let buf: Buffer[Nat8] := allocateEmpty();
-        return ByteString(
+        return String(
             buf => buf
         );
     end;
 
-    function makeByteString(size: Index, initial: Nat8): ByteString is
+    function makeString(size: Index, initial: Nat8): String is
         let buf: Buffer[Nat8] := initialize(size, initial);
-        return ByteString(
+        return String(
             buf => buf
         );
     end;
 
-    function fromLiteral(arr: Span[Nat8, Static]): ByteString is
+    function fromLiteral(arr: Span[Nat8, Static]): String is
         let size: Index := spanLength(arr);
-        var str: ByteString := makeByteString(size, ' ');
+        var str: String := makeString(size, ' ');
         for i from 0 to size - 1 do
             storeNth(&!str, i, arr[i]);
         end for;
         return str;
     end;
 
-    function destroyByteString(str: ByteString): Unit is
+    function destroyString(str: String): Unit is
         let { buf: Buffer[Nat8] } := str;
         destroyFree(buf);
         return nil;
@@ -57,12 +57,12 @@ module body Standard.ByteString is
     ---
 
     generic [R: Region]
-    function length(string: &[ByteString, R]): Index is
+    function length(string: &[String, R]): Index is
         return bufLength(&(string->buf));
     end;
 
     generic [R: Region]
-    function nth(string: &[ByteString, R], pos: Index): Nat8 is
+    function nthByte(string: &[String, R], pos: Index): Nat8 is
         return bufNth(&(string->buf), pos);
     end;
 
@@ -74,7 +74,7 @@ module body Standard.ByteString is
     Write a byte to the given position in the string.
     """
     generic [R: Region]
-    function storeNth(string: &![ByteString, R], pos: Index, byte: Nat8): Unit is
+    function storeNth(string: &![String, R], pos: Index, byte: Nat8): Unit is
         return bufStoreNth(&(string->buf), pos, byte);
     end;
 end module body. 

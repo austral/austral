@@ -1,0 +1,108 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
+import Standard.String (
+    String,
+    makeEmpty,
+    makeString,
+    destroyString,
+    fromLiteral,
+    length,
+    nthByte,
+    storeNth
+);
+import Standard.Test.Unit (
+    assertTrue,
+    assertSuccess,
+    assertFailure,
+    suiteHeading,
+    testHeading
+);
+
+module body Standard.Test.String is
+    function byteStringTestSuite(): Unit is
+        suiteHeading("Standard.String");
+        makeEmptyTest();
+        makeStringTest();
+        fromLiteralTest();
+        storeNthTest();
+        return nil;
+    end;
+
+    function makeEmptyTest(): Unit is
+        testHeading("makeEmpty and destroyString");
+        let str: String := makeEmpty();
+        assertLength(&str, 0);
+        destroyString(str);
+        assertSuccess("makeEmpty and destroyString complete");
+        return nil;
+    end;
+
+    function makeStringTest(): Unit is
+        testHeading("makeString and destroyString");
+        let b: String := makeString(4, 'a');
+        assertLength(&b, 4);
+        assertTrue(nthByte(&b, 0) = 'a', "[0] = a");
+        assertTrue(nthByte(&b, 1) = 'a', "[1] = a");
+        assertTrue(nthByte(&b, 2) = 'a', "[2] = a");
+        assertTrue(nthByte(&b, 3) = 'a', "[3] = a");
+        destroyString(b);
+        assertSuccess("destroyString complete");
+        return nil;
+    end;
+  
+    function fromLiteralTest(): Unit is
+        testHeading("fromLiteral");
+        let s: String := fromLiteral("Hello, World!");
+        assertLength(&s, 13);
+        assertTrue(nthByte(&s, 0) = 'H', "[0] = H");
+        assertTrue(nthByte(&s, 1) = 'e', "[1] = e");
+        assertTrue(nthByte(&s, 2) = 'l', "[2] = l");
+        assertTrue(nthByte(&s, 3) = 'l', "[3] = l");
+        assertTrue(nthByte(&s, 4) = 'o', "[4] = o");
+        assertTrue(nthByte(&s, 5) = ',', "[5] = ,");
+        assertTrue(nthByte(&s, 6) = ' ', "[6] =  ");
+        assertTrue(nthByte(&s, 7) = 'W', "[7] = W");
+        assertTrue(nthByte(&s, 8) = 'o', "[8] = o");
+        assertTrue(nthByte(&s, 9) = 'r', "[9] = r");
+        assertTrue(nthByte(&s, 10) = 'l', "[10] = l");
+        assertTrue(nthByte(&s, 11) = 'd', "[11] = d");
+        assertTrue(nthByte(&s, 12) = '!', "[12] = !");
+        destroyString(s);
+        assertSuccess("destroyString complete");
+        return nil;
+    end;
+
+    function storeNthTest(): Unit is
+        testHeading("storeNth");
+        var b: String := makeString(3, 'a');
+        assertLength(&b, 3);
+        assertTrue(nthByte(&b, 0) = 'a', "[0] = a");
+        assertTrue(nthByte(&b, 1) = 'a', "[1] = a");
+        assertTrue(nthByte(&b, 2) = 'a', "[2] = a");
+        storeNth(&!b, 0, 'b');
+        assertTrue(nthByte(&b, 0) = 'b', "[0] = b");
+        destroyString(b);
+        assertSuccess("destroyString complete");
+        return nil;
+    end;
+
+    ---
+    --- Utilities
+    ---
+
+    generic [R: Region]
+    function assertLength(ref: &[String, R], len: Index): Unit is
+        assertTrue(length(ref) = len, "length");
+        return nil;
+    end;
+
+    generic [R: Region]
+    function assertNth(ref: &[String, R], pos: Index, value: Nat8): Unit is
+        assertTrue(nthByte(ref, pos) = value, "nthByte");
+        return nil;
+    end;
+end module body.

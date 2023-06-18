@@ -5,7 +5,7 @@ MODULES := \
 		src/Order.aui,src/Order.aum \
 		src/Box.aui,src/Box.aum \
 		src/Buffer.aui,src/Buffer.aum \
-		src/ByteString.aui,src/ByteString.aum \
+		src/String.aui,src/String.aum \
 		src/IO/IO.aui,src/IO/IO.aum \
 		src/IO/Terminal.aui,src/IO/Terminal.aum \
 		test/Unit.aui,test/Unit.aum \
@@ -15,7 +15,7 @@ MODULES := \
 		test/Order.aui,test/Order.aum \
 		test/Box.aui,test/Box.aum \
 		test/Buffer.aui,test/Buffer.aum \
-		test/ByteString.aui,test/ByteString.aum \
+		test/String.aui,test/String.aum \
 		test/IO/Terminal.aui,test/IO/Terminal.aum \
 		test/Main.aui,test/Main.aum
 TEST_BIN := test_bin
