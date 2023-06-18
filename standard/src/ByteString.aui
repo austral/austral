@@ -34,7 +34,7 @@ module Standard.ByteString is
     """
     Allocate and return a byte string from a string literal.
     """
-    function fromLiteral(arr: FixedArray[Nat8]): ByteString;
+    function fromLiteral(arr: Span[Nat8, Static]): ByteString;
 
     ---
     --- Retrieve

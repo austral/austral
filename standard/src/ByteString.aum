@@ -46,7 +46,6 @@ module body Standard.ByteString is
         return str;
     end;
 
-
     function destroyByteString(str: ByteString): Unit is
         let { buf: Buffer[Nat8] } := str;
         destroyFree(buf);
