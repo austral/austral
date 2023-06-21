@@ -121,4 +121,9 @@ module body Austral.Memory is
         let poffset: Pointer[T] := positiveOffset(p, start);
         return @embed(Span![T, R], "au_make_span($1, $2)", poffset, size);
     end;
+
+    generic [A: Type, B: Type]
+    function pointerCast(ptr: Pointer[A]): Pointer[B] is
+        return @embed(B, "$1", ptr);
+    end;
 end module body.

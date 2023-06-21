@@ -57,4 +57,7 @@ module Austral.Memory is
 
     generic [T: Type, R: Region]
     function spanWrite(ref: &![Pointer[T], R], start: Index, final: Index): Span![T, R];
+
+    generic [A: Type, B: Type]
+    function pointerCast(ptr: Pointer[A]): Pointer[B];
 end module.
