@@ -60,4 +60,7 @@ module Austral.Memory is
 
     generic [A: Type, B: Type]
     function pointerCast(ptr: Pointer[A]): Pointer[B];
+
+    generic [T: Type, R: Region]
+    function refToPointer(ref: &[T, R]): Pointer[T];
 end module.

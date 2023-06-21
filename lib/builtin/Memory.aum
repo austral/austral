@@ -124,6 +124,11 @@ module body Austral.Memory is
 
     generic [A: Type, B: Type]
     function pointerCast(ptr: Pointer[A]): Pointer[B] is
-        return @embed(B, "$1", ptr);
+        return @embed(Pointer[B], "$1", ptr);
+    end;
+
+    generic [T: Type, R: Region]
+    function refToPointer(ref: &[T, R]): Pointer[T] is
+        return @embed(Pointer[T], "$1", ref);
     end;
 end module body.
