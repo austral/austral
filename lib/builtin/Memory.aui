@@ -66,4 +66,10 @@ module Austral.Memory is
 
     generic [T: Type, R: Region]
     function refMutToPointer(ref: &![T, R]): Pointer[T];
+
+    generic [T: Type, R: Region]
+    function spanToPointer(sp: Span[T, R]): Pointer[T];
+
+    generic [T: Type, R: Region]
+    function spanWriteToPointer(sp: Span![T, R]): Pointer[T];
 end module.
