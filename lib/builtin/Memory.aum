@@ -131,4 +131,9 @@ module body Austral.Memory is
     function refToPointer(ref: &[T, R]): Pointer[T] is
         return @embed(Pointer[T], "$1", ref);
     end;
+
+    generic [T: Type, R: Region]
+    function refMutToPointer(ref: &![T, R]): Pointer[T] is
+        return @embed(Pointer[T], "$1", ref);
+    end;
 end module body.
