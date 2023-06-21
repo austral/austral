@@ -1,0 +1,1 @@
+Test converting a reference to a pointer.

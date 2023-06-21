@@ -1,0 +1,19 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Pointer,
+    refToPointer,
+    load
+);
+
+module body Test is
+    function main(): ExitCode is
+        let foo: Int32 := 10;
+        borrow ref: &[Int32, R] := &foo do
+            let ptr: Pointer[Int32] := refToPointer(ref);
+            let val: Int32 := load(ptr);
+            printLn(val);
+        end borrow;
+        return ExitSuccess();
+    end;
+end module body.
