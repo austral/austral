@@ -11,7 +11,9 @@ import Standard.Buffer (
     destroyFree,
     length as bufLength,
     nth as bufNth,
-    storeNth as bufStoreNth
+    storeNth as bufStoreNth,
+    getSpan as bufferGetSpan,
+    getSpanMut as bufferGetSpanMut
 );
 
 module body Standard.String is
@@ -76,5 +78,19 @@ module body Standard.String is
     generic [R: Region]
     function storeNth(string: &![String, R], pos: Index, byte: Nat8): Unit is
         return bufStoreNth(&(string->buf), pos, byte);
+    end;
+
+    ---
+    --- Spans
+    ---
+
+    generic [R: Region]
+    function getSpan(string: &[String, R], start: Index, final: Index): Span[Nat8, R] is
+        return bufferGetSpan(&(string->buf), start, final);
+    end;
+
+    generic [R: Region]
+    function getSpanMut(string: &![String, R], start: Index, final: Index): Span![Nat8, R] is
+        return bufferGetSpanMut(&(string->buf), start, final);
     end;
 end module body. 

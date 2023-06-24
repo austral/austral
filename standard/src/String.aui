@@ -61,4 +61,20 @@ module Standard.String is
     """
     generic [R: Region]
     function storeNth(string: &![String, R], pos: Index, byte: Nat8): Unit;
+
+    ---
+    --- Spans
+    ---
+
+    """
+    Get a span from the string.
+    """
+    generic [R: Region]
+    function getSpan(string: &[String, R], start: Index, final: Index): Span[Nat8, R];
+
+    """
+    Get a mutable span from the string.
+    """
+    generic [R: Region]
+    function getSpanMut(string: &![String, R], start: Index, final: Index): Span![Nat8, R];
 end module.
