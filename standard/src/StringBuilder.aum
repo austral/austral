@@ -1,0 +1,49 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
+import Standard.String (
+    String,
+    fromByteBuffer,
+    length,
+    nthByte
+);
+import Standard.Buffer (
+    Buffer,
+    allocateEmpty,
+    insertBack
+);
+
+module body Standard.StringBuilder is
+    record StringBuilder: Linear is
+        buffer: Buffer[Nat8];
+    end;
+
+    function makeStringBuilder(): StringBuilder is
+        let buffer: Buffer[Nat8] := allocateEmpty();
+        return StringBuilder(buffer => buffer);
+    end;
+
+    generic [R: Region]
+    function writeByte(builder: &![StringBuilder, R], byte: Nat8): Unit is
+        insertBack(&(builder->buffer), byte);
+        return nil;
+    end;
+
+    generic [R: Region, S: Region]
+    function writeString(builder: &![StringBuilder, R], string: &[String, S]): Unit is
+        for i from 0 to length(string) - 1 do
+            borrow ref: &[String, T] := &~builder do
+                insertBack(&(ref->buffer), nthByte(string, i));
+            end borrow;
+        end for;
+        return nil;
+    end;
+
+    function finalize(builder: StringBuilder): String is
+        let { buffer: Buffer[Nat8] } := builder;
+        return fromByteBuffer(buffer);
+    end;
+end module body. 
