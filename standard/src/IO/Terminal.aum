@@ -16,9 +16,11 @@ import Standard.IO (
     ByteInputStream,
     readByte
 );
-import Standard.String (
-    String,
-    makeEmpty
+import Standard.StringBuilder (
+    StringBuilder,
+    makeStringBuilder,
+    finalize,
+    writeByte as sbWriteByte
 );
 
 module body Standard.IO.Terminal is
@@ -103,9 +105,23 @@ module body Standard.IO.Terminal is
     end;
 
     generic [R: Region]
-    function readLine(stdin: &[StandardInput, R]): String is
-        let s: String := makeEmpty();
-        return s;
+    function readLine(stdin: &![StandardInput, R]): String is
+        var sb: StringBuilder := makeStringBuilder();
+        var reading: Bool := true;
+        while reading do
+            case readByte(&~stdin) of
+                when Some(value as byte: Nat8) do
+                    if (byte = '\r') or (byte = '\n') then
+                        reading := false;
+                    else
+                        sbWriteByte(&!sb, byte);
+                    end if;
+                when None do
+                    -- EOF.
+                    reading := false;
+            end case;
+        end while;
+        return finalize(sb);
     end;
 
     --

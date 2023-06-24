@@ -50,5 +50,5 @@ module Standard.IO.Terminal is
     Read a line from the standard input.
     """
     generic [R: Region]
-    function readLine(stdin: &[StandardInput, R]): String;
+    function readLine(stdin: &![StandardInput, R]): String;
 end module.
