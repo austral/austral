@@ -1,0 +1,66 @@
+--
+-- Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+-- See LICENSE file for details.
+--
+-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+--
+import Standard.Test.Unit (
+    assertTrue,
+    assertSuccess,
+    assertFailure,
+    suiteHeading,
+    testHeading
+);
+import Standard.String (
+    String,
+    destroyString,
+    nthByte,
+    length,
+    fromLiteral
+);
+import Standard.StringBuilder (
+    StringBuilder,
+    makeStringBuilder,
+    writeByte,
+    writeString,
+    finalize
+);
+
+module body Standard.Test.StringBuilder is
+    function stringBuilderTestSuite(): Unit is
+        suiteHeading("Standard.StringBuilder");
+        basicTest();
+        return nil;
+    end;
+
+    function basicTest(): Unit is
+        testHeading("basic");
+        var sb: StringBuilder := makeStringBuilder();
+        writeByte(&!sb, 'a');
+        writeByte(&!sb, 'b');
+        writeByte(&!sb, 'c');
+        let str: String := fromLiteral("def");
+        writeString(&!sb, &str);
+        let last: String := finalize(sb);
+        assertLength(&last, 6);
+        assertTrue(nthByte(&last, 0) = 'a', "[0] = a");
+        assertTrue(nthByte(&last, 1) = 'b', "[1] = b");
+        assertTrue(nthByte(&last, 2) = 'c', "[2] = c");
+        assertTrue(nthByte(&last, 3) = 'd', "[3] = d");
+        assertTrue(nthByte(&last, 4) = 'e', "[4] = e");
+        assertTrue(nthByte(&last, 5) = 'f', "[5] = f");
+        destroyString(str);
+        destroyString(last);
+        return nil;
+    end;
+
+    ---
+    --- Utilities
+    ---
+
+    generic [R: Region]
+    function assertLength(ref: &[String, R], len: Index): Unit is
+        assertTrue(length(ref) = len, "length");
+        return nil;
+    end;
+end module body.

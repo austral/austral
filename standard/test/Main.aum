@@ -11,6 +11,7 @@ import Standard.Test.Order (orderTestSuite);
 import Standard.Test.Box (boxTestSuite);
 import Standard.Test.Buffer (bufferTestSuite);
 import Standard.Test.String (byteStringTestSuite);
+import Standard.Test.StringBuilder (stringBuilderTestSuite);
 import Standard.Test.IO.Terminal (terminalTestSuite);
 
 module body Standard.Test is
@@ -23,6 +24,7 @@ module body Standard.Test is
         boxTestSuite();
         bufferTestSuite();
         byteStringTestSuite();
+        stringBuilderTestSuite();
         terminalTestSuite(&!root2);
         surrenderRoot(root2);
         return ExitSuccess();

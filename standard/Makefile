@@ -17,6 +17,7 @@ MODULES := \
 		test/Box.aui,test/Box.aum \
 		test/Buffer.aui,test/Buffer.aum \
 		test/String.aui,test/String.aum \
+		test/StringBuilder.aui,test/StringBuilder.aum \
 		test/IO/Terminal.aui,test/IO/Terminal.aum \
 		test/Main.aui,test/Main.aum
 TEST_BIN := test_bin
