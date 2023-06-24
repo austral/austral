@@ -14,6 +14,9 @@ import Standard.IO (
     ByteInputStream,
     readByte
 );
+import Standard.String (
+    String
+);
 
 module Standard.IO.Terminal is
     type StandardOutput: Linear;
@@ -42,4 +45,10 @@ module Standard.IO.Terminal is
     instance ByteOutputStream(StandardError);
 
     instance ByteInputStream(StandardInput);
+
+    """
+    Read a line from the standard input.
+    """
+    generic [R: Region]
+    function readLine(stdin: &![StandardInput, R]): String;
 end module.

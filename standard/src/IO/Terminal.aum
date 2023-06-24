@@ -16,6 +16,12 @@ import Standard.IO (
     ByteInputStream,
     readByte
 );
+import Standard.StringBuilder (
+    StringBuilder,
+    makeStringBuilder,
+    finalize,
+    writeByte as sbWriteByte
+);
 
 module body Standard.IO.Terminal is
     record StandardOutput: Linear is
@@ -96,6 +102,26 @@ module body Standard.IO.Terminal is
                 return toNat8(res);
             end if;
         end;
+    end;
+
+    generic [R: Region]
+    function readLine(stdin: &![StandardInput, R]): String is
+        var sb: StringBuilder := makeStringBuilder();
+        var reading: Bool := true;
+        while reading do
+            case readByte(&~stdin) of
+                when Some(value as byte: Nat8) do
+                    if (byte = '\r') or (byte = '\n') then
+                        reading := false;
+                    else
+                        sbWriteByte(&!sb, byte);
+                    end if;
+                when None do
+                    -- EOF.
+                    reading := false;
+            end case;
+        end while;
+        return finalize(sb);
     end;
 
     --
