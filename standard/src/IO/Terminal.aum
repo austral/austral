@@ -16,6 +16,10 @@ import Standard.IO (
     ByteInputStream,
     readByte
 );
+import Standard.String (
+    String,
+    makeEmpty
+);
 
 module body Standard.IO.Terminal is
     record StandardOutput: Linear is
@@ -96,6 +100,12 @@ module body Standard.IO.Terminal is
                 return toNat8(res);
             end if;
         end;
+    end;
+
+    generic [R: Region]
+    function readLine(stdin: &[StandardInput, R]): String is
+        let s: String := makeEmpty();
+        return s;
     end;
 
     --
