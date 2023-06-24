@@ -8,6 +8,10 @@
 This module implements the String type, a linear, heap-allocated byte string
 type.
 """
+import Standard.Buffer (
+    Buffer
+);
+
 module Standard.String is
     type String: Linear;
 
@@ -35,6 +39,11 @@ module Standard.String is
     Allocate and return a string from a string literal.
     """
     function fromLiteral(arr: Span[Nat8, Static]): String;
+
+    """
+    Turn a byte buffer into a string.
+    """
+    function fromByteBuffer(buffer: Buffer[Nat8]): String;
 
     ---
     --- Retrieve
