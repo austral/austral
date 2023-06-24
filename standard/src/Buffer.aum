@@ -19,7 +19,9 @@ import Austral.Memory (
     load,
     memcpy,
     memmove,
-    arraySizeInBytes
+    arraySizeInBytes,
+    span,
+    spanWrite
 );
 
 module body Standard.Buffer is
@@ -466,5 +468,50 @@ module body Standard.Buffer is
             count => chunk_size
         );
         return nil;
+    end;
+
+    generic [T: Type, R: Region]
+    function getSpan(buf: &[Buffer[T], R], start: Index, final: Index): Span[T, R] is
+        -- Check: start < final
+        if (start > final) then
+            abort("getSpan: start index is greater than final index");
+        end if;
+
+        -- Check: start in bounds
+        if start >= buf->size then
+            abort("getSpan: start index out of bounds");
+        end if;
+
+        -- Check: final in bounds
+        if final >= buf->size then
+            abort("getSpan: end index out of bounds");
+        end if;
+
+        -- Make a span.
+        return span(&(buf->array), start, final);
+    end;
+
+    """
+    Get a mutable span from the buffer.
+    """
+    generic [T: Type, R: Region]
+    function getSpanMut(buf: &![Buffer[T], R], start: Index, final: Index): Span![T, R] is
+        -- Check: start < final
+        if start > final then
+            abort("getSpan: start index is greater than final index");
+        end if;
+
+        -- Check: start in bounds
+        if start >= buf->size then
+            abort("getSpan: start index out of bounds");
+        end if;
+
+        -- Check: final in bounds
+        if final >= buf->size then
+            abort("getSpan: final index out of bounds");
+        end if;
+
+        -- Make a span.
+        return spanWrite(&(buf->array), start, final);
     end;
 end module body.
