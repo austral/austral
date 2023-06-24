@@ -26,7 +26,8 @@ import Standard.Buffer (
     swapTransform,
     inPlaceMap,
     map,
-    getSpan
+    getSpan,
+    getSpanMut
 );
 import Standard.Test.Unit (
     assertTrue,
@@ -58,6 +59,7 @@ module body Standard.Test.Buffer is
         mapTest();
         mapEmptyTest();
         getSpanTest();
+        getSpanMutTest();
         return nil;
     end;
 
@@ -407,6 +409,38 @@ module body Standard.Test.Buffer is
             assertTrue(sp[1] = 2,  "sp[1] = 2");
             assertTrue(sp[2] = 3,  "sp[2] = 3");
         end borrow;
+
+        -- Destroy.
+        destroyFree(b);
+
+        return nil;
+    end;
+
+    function getSpanMutTest(): Unit is
+        testHeading("getSpanMut");
+
+        var b: Buffer[Int32] := allocateEmpty();
+        -- []
+        assertLength(&b, 0);
+        insertBack(&!b, 1);
+        insertBack(&!b, 2);
+        insertBack(&!b, 3);
+        -- [1,2,3]
+        assertLength(&b, 3);
+
+        -- Get a mutable span.
+        borrow ref: &![Buffer[Int32], R] := &!b do
+            var sp: Span![Int32, R] := getSpanMut(ref, 0, 2);
+            -- Write.
+            sp[0] := 10;
+            sp[1] := 20;
+            sp[2] := 30;
+        end borrow;
+
+        -- Assert contents.
+        assertTrue(nth(&b, 0) = 10,  "[0] = 10");
+        assertTrue(nth(&b, 1) = 20,  "[1] = 20");
+        assertTrue(nth(&b, 2) = 30,  "[2] = 30");
 
         -- Destroy.
         destroyFree(b);
