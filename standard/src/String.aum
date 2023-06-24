@@ -52,6 +52,10 @@ module body Standard.String is
         return nil;
     end;
 
+    function fromByteBuffer(buffer: Buffer[Nat8]): String is
+        return String(buf => buffer);
+    end;
+
     ---
     --- Retrieve
     ---
