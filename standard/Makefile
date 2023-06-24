@@ -6,6 +6,7 @@ MODULES := \
 		src/Box.aui,src/Box.aum \
 		src/Buffer.aui,src/Buffer.aum \
 		src/String.aui,src/String.aum \
+		src/StringBuilder.aui,src/StringBuilder.aum \
 		src/IO/IO.aui,src/IO/IO.aum \
 		src/IO/Terminal.aui,src/IO/Terminal.aum \
 		test/Unit.aui,test/Unit.aum \
@@ -16,6 +17,7 @@ MODULES := \
 		test/Box.aui,test/Box.aum \
 		test/Buffer.aui,test/Buffer.aum \
 		test/String.aui,test/String.aum \
+		test/StringBuilder.aui,test/StringBuilder.aum \
 		test/IO/Terminal.aui,test/IO/Terminal.aum \
 		test/Main.aui,test/Main.aum
 TEST_BIN := test_bin
