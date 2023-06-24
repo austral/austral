@@ -190,4 +190,16 @@ module Standard.Buffer is
     """
     generic [T: Type, U: Type]
     function map(buf: Buffer[T], fn: Fn[T, U]): Buffer[U];
+
+    """
+    Get a span from the buffer.
+    """
+    generic [T: Type, R: Region]
+    function getSpan(buf: &[Buffer[T], R], start: Index, final: Index): Span[T, R];
+
+    """
+    Get a mutable span from the buffer.
+    """
+    generic [T: Type, R: Region]
+    function getSpanMut(buf: &![Buffer[T], R], start: Index, final: Index): Span![T, R];
 end module.
