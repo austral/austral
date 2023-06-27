@@ -3,7 +3,8 @@
    See LICENSE file for details.
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-*)
+ *)
+
 (** Error reporting infrastructure. *)
 open Identifier
 open Span

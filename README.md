@@ -93,8 +93,8 @@ And you're done.
 ## Building without Nix
 
 Building the `austral` compiler requires `make` and the `dune` build system for
-OCaml, and a C compiler for building the resulting output. You should install OCaml
-4.13.0 or above.
+OCaml, and a C compiler for building the resulting output. You should install
+OCaml 4.13.0 or above.
 
 First:
 
