@@ -9,7 +9,7 @@ This script runs the end-to-end tests of the compiler.
 import os
 import subprocess
 import time
-from multiprocessing import Process, Queue
+from concurrent.futures import ProcessPoolExecutor, Future
 
 #
 # Constants
@@ -333,16 +333,13 @@ def _get_file_contents(test_dir: str, filename: str) -> str | None:
 #
 
 
-def run_test(test: Test, replace_stderr: bool, queue: Queue):
+def run_test(test: Test, replace_stderr: bool) -> TestResult | None:
     try:
         result: TestResult = run_test_inner(test, replace_stderr)
-        queue.put(result)
-        queue.close()
-        exit(0)
+        return result
     except Exception as e:
         print(e)
-        queue.close()
-        exit(0)
+        return None
 
 
 def run_test_inner(test: Test, replace_stderr: bool) -> TestResult:
@@ -693,21 +690,12 @@ def run_tests_parallel(
     tests: list[Test],
     replace_stderr: bool,
 ) -> list[TestResult]:
-    queue: Queue = Queue()
-    processes: list[Process] = []
-
-    for test in tests:
-        p = Process(target=run_test, args=[test, replace_stderr, queue])
-        p.start()
-        processes.append(p)
-
-    while len(processes) != queue.qsize():
-        time.sleep(0.1)
-
-    results: list[TestResult] = []
-    while queue.qsize() > 0:
-        results.append(queue.get())
-
+    with ProcessPoolExecutor() as executor:
+        futures: list[Future[TestResult | None]] = [
+            executor.submit(run_test, test, replace_stderr)
+            for test in tests
+        ]
+    results: list[TestResult] = [r for f in futures if (r := f.result()) is not None]
     assert len(results) == len(tests)
 
     return sorted(results, key=lambda r: r.test.suite_name + "_" + r.test.name)
