@@ -34,6 +34,7 @@ Anti-features:
 - No exceptions (and no surprise control flow).
 - No implicit function calls.
 - No implicit type conversions.
+- No implicit copies.
 - No global state.
 - No subtyping.
 - No macros.
