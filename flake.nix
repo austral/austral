@@ -35,10 +35,6 @@
           version = "0.2.0";
           src = ./.;
           inherit buildInputs;
-          buildPhase = ''
-            make
-          '';
-
           installPhase = ''
             mkdir -p $out/bin
             install -m 755 austral $out/bin/austral
