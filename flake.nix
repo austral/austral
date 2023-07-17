@@ -31,7 +31,8 @@
 
       in {
         packages.default = pkgs.stdenv.mkDerivation {
-          name = "austral";
+          pname = "austral";
+          version = "0.2.0";
           src = ./.;
           inherit buildInputs;
           buildPhase = ''
