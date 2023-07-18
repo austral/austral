@@ -34,11 +34,8 @@
           pname = "austral";
           version = "0.2.0";
           src = ./.;
+          installFlags = [ "PREFIX=$(out)" ];
           inherit buildInputs;
-          installPhase = ''
-            mkdir -p $out/bin
-            install -m 755 austral $out/bin/austral
-          '';
         };
 
         devShells.default = pkgs.mkShell {
