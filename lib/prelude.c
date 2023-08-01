@@ -54,8 +54,13 @@ au_span_t au_make_span_from_string(const char* data, size_t size) {
 }
 
 void* au_stdout() {
+#if defined(__APPLE__)
+  extern void* __stdoutp;
+  return __stdoutp;
+#else
   extern void* stdout;
   return stdout;
+#endif
 }
 
 void* au_stderr() {
@@ -75,8 +80,13 @@ void* au_stderr() {
 }
 
 extern void* au_stdin() {
+#if defined(__APPLE__)
+  extern void* __stdinp;
+  return __stdinp;
+#else
   extern void* stdin;
   return stdin;
+#endif
 }
 
 au_unit_t au_abort_internal(const char* message) {
