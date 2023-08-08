@@ -1,5 +1,6 @@
 BIN := austral
 SRC := lib/*.ml lib/*.mli lib/*.mll lib/*.mly lib/dune bin/dune bin/austral.ml lib/BuiltInModules.ml
+PREFIX ?= /usr/local
 
 .PHONY: all
 all: $(BIN)
@@ -17,11 +18,11 @@ test: $(BIN)
 
 .PHONY: install
 install: $(BIN)
-	install -m 755 austral /usr/local/bin/austral
+	install -D -m 755 austral $(PREFIX)/bin/austral
 
 .PHONY: uninstall
 uninstall:
-	sudo rm /usr/local/bin/austral
+	sudo rm $(PREFIX)/bin/austral
 
 .PHONY: clean
 clean:
