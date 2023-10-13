@@ -67,7 +67,7 @@ If there are no blank-lines, returns zero and the empty string."
      ((string= previous-text "")
       ;; This case represents the beginning of the buffer. So we indent to zero.
       (indent-line-to 0))
-     ((string-match "^[ \t]*\\(module\\|import\\|record\\|union\\|interface\\|if\\|else\\|for\\|while\\|borrow\\)" previous-text)
+     ((string-match "^[ \t]*\\(module\\|import\\|record\\|union\\|interface\\|function\\|if\\|else\\|for\\|while\\|borrow\\)" previous-text)
       ;; The previous line opens a new indent block.
       (indent-line-to (+ austral-default-tab-width previous-indent)))
      ((string-match "^[ \t]*\\(end\\|\\\\);\\)" previous-text)
