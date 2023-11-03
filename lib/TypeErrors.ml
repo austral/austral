@@ -55,11 +55,13 @@ let cannot_borrow_immutable_var_mutably (name: identifier) =
       Text " mutably because the variable is immutable."
     ]
 
-let cannot_borrow_param_mutably (name: identifier) =
+let cannot_borrow_param_mutably (name: identifier) (ty: ty) =
   austral_raise TypeError [
       Text "Cannot borrow the variable ";
       Code (ident_string name);
-      Text " mutably because it is a function parameter, and therefore immutable."
+      Text " mutably because it is a function parameter, and therefore immutable.";
+      Text "\nYou can move it to a mutable local variable: ";
+      Code ("var mut_" ^ (ident_string name) ^ ": " ^ (type_string ty) ^ " := " ^ (ident_string name) ^ ";");
     ]
 
 let call_non_callable ty =

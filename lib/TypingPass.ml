@@ -331,7 +331,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                       if is_mut then
                         ()
                       else
-                        Errors.cannot_borrow_param_mutably original
+                        Errors.cannot_borrow_param_mutably original orig_ty
                    | _ ->
                       (* And anything else is fine. *)
                       ()
