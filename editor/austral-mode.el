@@ -41,11 +41,36 @@
 ;;;; Section 1. Syntax Highlighting
 ;;;;
 
+;; Build a new syntax-table from scratch to avoid any defaults:
+(defconst austral-syntax-table
+  (let ((table (make-char-table 'syntax-table)))
+    (modify-syntax-entry   ?\#        "w"  table) ;; hex/bin/oct constants.
+    (modify-syntax-entry   ?\!        "."  table)
+    (modify-syntax-entry   ?\&        "."  table)
+    (modify-syntax-entry   ?\(        "()" table)
+    (modify-syntax-entry   ?\)        ")(" table)
+    (modify-syntax-entry '(?\* . ?\/) "."  table)
+    (modify-syntax-entry '(?0  . ?9 ) "w"  table)
+    (modify-syntax-entry '(?\: . ?\>) "."  table)
+    (modify-syntax-entry   ?@         "w"  table) ;; @embed
+    (modify-syntax-entry '(?A  . ?Z ) "w"  table)
+    (modify-syntax-entry   ?\[        "(]" table)
+    (modify-syntax-entry   ?\]        ")[" table)
+    (modify-syntax-entry   ?_         "w"  table)
+    (modify-syntax-entry '(?a  . ?z ) "w"  table)
+    (modify-syntax-entry   ?\{        "(}" table)
+    (modify-syntax-entry   ?\}        "){" table)
+    (modify-syntax-entry   ?\~        "."  table) ;; &~ reborrow.
+    table))
+
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Faces-for-Font-Lock.html
 (defvar austral-font-lock-keywords
   (list
    ;; Comments
    (cons "--.*" font-lock-comment-face)
+   ;; Strings, using the syntax-table (above) would interfere with comments.
+   (cons "\"\"\"\\([^\"]*\\(\"[^\"]\\|\"\"[^\"]\\)\\)*[^\"]*\"\"\"" font-lock-doc-face)
+   (cons "\"\\([^\\\\\n]*[\\\\].\\)*[^\"\n]*\"" font-lock-string-face)
    ;; Keywords
    (cons (regexp-opt austral-keywords 'words) font-lock-keyword-face)
    ;; Types
@@ -113,6 +138,7 @@ If there are no blank-lines, returns zero and the empty string."
 ;;;;
 
 (define-derived-mode austral-mode fundamental-mode "Austral"
+  :syntax-table austral-syntax-table
   "Major mode for editing Austral source text."
   (setq font-lock-defaults '((austral-font-lock-keywords)))
   (setq indent-line-function 'austral-indent-line))
