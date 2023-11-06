@@ -84,6 +84,12 @@ let pervasive_imports =
         ConcreteImport (make_ident "toInt64", None);
         ConcreteImport (make_ident "ToIndex", None);
         ConcreteImport (make_ident "toIndex", None);
+        ConcreteImport (make_ident "ToFloat32", None);
+        ConcreteImport (make_ident "toFloat32", None);
+        ConcreteImport (make_ident "ToFloat64", None);
+        ConcreteImport (make_ident "toFloat64", None);
+        ConcreteImport (make_ident "Remainder", None);
+        ConcreteImport (make_ident "rem", None);
       ]
     )
 
