@@ -102,9 +102,13 @@ let case_non_union ty =
     Text " which is not a union type."
   ]
 
-let case_wrong_slots () =
+let case_wrong_slots (binding_names, slot_names) =
   austral_raise TypeError [
-    Text "The set of slots in the case statement doesn't match the set of slots in the union definition."
+    Text "The set of slots (";
+    Code (String.concat ", " binding_names);
+    Text ") in the case statement doesn't match the set of slots in the union definition (";
+    Code (String.concat ", " slot_names);
+    Text ")."
   ]
 
 let cast_different_references ~different_types ~different_regions =
