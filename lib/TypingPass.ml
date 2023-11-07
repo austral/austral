@@ -524,7 +524,7 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
         remove_vars lexenv (List.map (fun (n, _, _) -> n) newvars);
         TypedWhen (name, List.map (fun (name, _, ty, rename) -> TypedBinding { name; ty; rename}) bindings'', body')
       else
-        Errors.case_wrong_slots ())
+        Errors.case_wrong_slots (List.map ident_string binding_names, List.map ident_string slot_names))
 
 let rec validate_constant_expression (expr: texpr): unit =
   if is_constant expr then
