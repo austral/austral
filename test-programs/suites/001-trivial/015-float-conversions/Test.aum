@@ -1,0 +1,143 @@
+module body Test is
+    function toFloat32Test(): Unit is
+        printLn("Float32");
+        print("    Float64(0) = ");
+        case toFloat32(0.0 : Float64) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat8(0) = ");
+        case toFloat32(0 : Nat8) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toFloat32(0 : Nat16) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toFloat32(0 : Nat32) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toFloat32(0 : Nat64) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toFloat32(0 : Int8) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toFloat32(0 : Int16) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toFloat32(0 : Int32) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toFloat32(0 : Int64) of
+            when Some(value: Float32) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function toFloat64Test(): Unit is
+        printLn("Float64");
+        print("    Float32(0) = ");
+        case toFloat64(0.0 : Float32) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat8(0) = ");
+        case toFloat64(0 : Nat8) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat16(0) = ");
+        case toFloat64(0 : Nat16) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat32(0) = ");
+        case toFloat64(0 : Nat32) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Nat64(0) = ");
+        case toFloat64(0 : Nat64) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int8(0) = ");
+        case toFloat64(0 : Int8) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int16(0) = ");
+        case toFloat64(0 : Int16) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int32(0) = ");
+        case toFloat64(0 : Int32) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        print("    Int64(0) = ");
+        case toFloat64(0 : Int64) of
+            when Some(value: Float64) do
+                printLn(value);
+            when None do
+                printLn("FAIL");
+        end case;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        toFloat32Test();
+        toFloat64Test();
+        return ExitSuccess();
+    end;
+end module body.

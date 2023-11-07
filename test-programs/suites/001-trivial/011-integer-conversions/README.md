@@ -1,1 +1,1 @@
-Tests ofthe integer conversion functions.
+Tests of the integer conversion functions.
