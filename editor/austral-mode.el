@@ -34,7 +34,7 @@
 (defconst austral-deindent-2-regexp
   "^[ \t]*\\(end case;\\)")
 (defconst austral-deindent-1-regexp
-  "^[ \t]*\\(end[ \t_[:alnum:]]*[;.]\\|[)];\\|when\\>\\)")
+  "^[ \t]*\\(end[ \t_[:alnum:]]*[;.]\\|[)];\\|when\\>\\|else\\>\\)")
 
 (defconst austral-default-tab-width 4)
 
