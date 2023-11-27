@@ -112,7 +112,7 @@ and print_compile_usage _: unit =
   print_endline "                    `bin` target.";
   print_endline "";
   print_endline "Positional arguments:";
-  print_endline "    module    Of the form 'file.aui:file.aum' for modules with";
+  print_endline "    module    Of the form 'file.aui,file.aum' for modules with";
   print_endline "              both an interface and body file, or 'file.aum' for";
   print_endline "              modules with only a body."
 
