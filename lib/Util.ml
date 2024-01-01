@@ -116,7 +116,7 @@ let parse_oct (s: string): int =
 let parse_ascii_char (s: string): int =
   match s with
   | "\\n" ->
-     97
+     10
   | "\\r" ->
      13
   | "\\t" ->
