@@ -1,0 +1,3 @@
+module Example.Greet is
+    function main(root: RootCapability): ExitCode;
+end module.

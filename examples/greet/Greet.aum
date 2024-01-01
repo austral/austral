@@ -1,0 +1,38 @@
+import Standard.IO (
+    acquireTerminal,
+    releaseTerminal,
+    TerminalCapability,
+    readByte
+);
+import Standard.IO.Terminal (
+    StandardInput,
+    acquireInput,
+    releaseInput,
+    readLine
+);
+import Standard.String (
+    String, 
+    destroyString, 
+    getSpan,
+    length
+);
+
+module body Example.Greet is
+    function main(root: RootCapability): ExitCode is
+        var mutRoot: RootCapability := root;
+        var terminal: TerminalCapability := acquireTerminal(&!mutRoot);
+        var input: StandardInput := acquireInput(&!terminal);
+
+        let line: String := readLine(&!input);
+        print("Hello, ");
+        print(getSpan(&line, 0, length(&line) - 1));
+        printLn("!");
+
+        destroyString(line);
+        releaseInput(input);
+        releaseTerminal(terminal);
+        surrenderRoot(mutRoot); 
+        return ExitSuccess();
+    end;
+end module body.
+
