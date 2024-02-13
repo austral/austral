@@ -42,9 +42,11 @@ module body Standard.String is
     function fromLiteral(arr: Span[Nat8, Static]): String is
         let size: Index := spanLength(arr);
         var str: String := makeString(size, ' ');
-        for i from 0 to size - 1 do
-            storeNth(&!str, i, arr[i]);
-        end for;
+        if size > 0 then
+            for i from 0 to size - 1 do
+                storeNth(&!str, i, arr[i]);
+            end for;
+        end if;
         return str;
     end;
 
