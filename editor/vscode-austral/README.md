@@ -7,14 +7,14 @@ VS Code support for the austral programming language.
 To install austral-vscode first install the VSCode extension manager with
 
 ```sh
-npm install --global @vscode/vsce
+npm install
 ```
 
 Then package the extension with
 
 ```sh
 # NOTE: working directory must be `editor/vscode-austral`
-vsce package
+npm run build
 ```
 
 This will generate a package file called `austral-$VERSION.vsix`, which can be installed with
@@ -38,8 +38,7 @@ To re-generate the syntax run `src/generate-syntaxes.ts`.
 To run the typescript file:
 
 ```sh
-$ npm install --include=dev
-$ ./node_modules/.bin/ts-node src/generate-syntaxes.ts
+npm run syntax
 ```
 
 ## Features

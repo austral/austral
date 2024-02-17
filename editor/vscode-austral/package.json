@@ -3,6 +3,12 @@
   "displayName": "austral",
   "description": "Austral language support for VS Code",
   "version": "1.0.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/austral/austral",
+    "directory": "editor/vscode-austral"
+  },
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -40,7 +46,12 @@
     ]
   },
   "devDependencies": {
-    "ts-node": "^10.9.1",
-    "@types/node": "^20.2.5"
+    "@types/node": "^20.2.5",
+    "@vscode/vsce": "^2.23.0",
+    "ts-node": "^10.9.1"
+  },
+  "scripts": {
+    "build": "vsce package",
+    "syntax": "ts-node src/generate-syntaxes.ts"
   }
 }
