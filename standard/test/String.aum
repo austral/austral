@@ -28,6 +28,7 @@ module body Standard.Test.String is
         makeEmptyTest();
         makeStringTest();
         fromLiteralTest();
+        fromLiteralEmptyTest();
         storeNthTest();
         return nil;
     end;
@@ -71,6 +72,15 @@ module body Standard.Test.String is
         assertTrue(nthByte(&s, 10) = 'l', "[10] = l");
         assertTrue(nthByte(&s, 11) = 'd', "[11] = d");
         assertTrue(nthByte(&s, 12) = '!', "[12] = !");
+        destroyString(s);
+        assertSuccess("destroyString complete");
+        return nil;
+    end;
+
+    function fromLiteralEmptyTest(): Unit is
+        testHeading("fromLiteral empty");
+        let s: String := fromLiteral("");
+        assertLength(&s, 0);
         destroyString(s);
         assertSuccess("destroyString complete");
         return nil;
