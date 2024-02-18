@@ -1,6 +1,6 @@
 name: Build on MacOS
 on:
-  # Only build when merging a PR or pushing to master.
+  pull_request:
   push:
     branches:
       - master
@@ -15,24 +15,28 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: install ocaml
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.14.1
-
-      - name: install ocaml dependencies
-        run: opam install --deps-only -y .
-
-      - name: embed builtins
-        run: make lib/BuiltInModules.ml
+          ocaml-compiler: 4.13.0
 
       - name: build
-        run: opam exec dune build
+        run: |
+          set -x
+
+          opam switch create austral 4.13.0
+          eval $(opam env --switch=austral --set-switch)
+          opam install --deps-only -y .
+
+          make
+
+          cd standard
+          make
 
       - name: upload compiler binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: austral-macos-bin
           path: austral
