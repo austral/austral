@@ -79,7 +79,7 @@ module body Standard.IO.Terminal is
 
     instance ByteOutputStream(StandardError) is
         generic [R: Region]
-        method writeByte(stream: &![StandardOutput, R], byte: Nat8): Unit is
+        method writeByte(stream: &![StandardError, R], byte: Nat8): Unit is
             let stderr: Address[Nat8] := getStderr();
             case toInt32(byte) of
                 when Some(value as c: Int32) do
@@ -93,7 +93,7 @@ module body Standard.IO.Terminal is
 
     instance ByteInputStream(StandardInput) is
         generic [R: Region]
-        method readByte(stream: &![StandardOutput, R]): Option[Nat8] is
+        method readByte(stream: &![StandardInput, R]): Option[Nat8] is
             let stdin: Address[Nat8] := getStdin();
             let res: Int32 := fgetc(stdin);
             if res = EOF then
