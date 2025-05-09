@@ -18,10 +18,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: install nix
-        uses: DeterminateSystems/nix-installer-action@v4
+        uses: nixbuild/nix-quick-install-action@v30
 
       - name: nix cache
-        uses: DeterminateSystems/magic-nix-cache-action@v1
+        uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-${{ runner.arch }}
 
       - name: set up nix shell
         run: nix-shell --command 'true'
