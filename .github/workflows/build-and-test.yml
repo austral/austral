@@ -48,7 +48,7 @@ jobs:
         run: nix-shell --command './standard/test_bin'
 
       - name: upload compiler binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: austral-linux-bin
           path: austral
