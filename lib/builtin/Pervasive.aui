@@ -93,6 +93,7 @@ module Austral.Pervasive is
     instance TrappingArithmetic(Int64);
     instance TrappingArithmetic(Index);
     instance TrappingArithmetic(ByteSize);
+    instance TrappingArithmetic(Float32);
     instance TrappingArithmetic(Float64);
 
     instance ModularArithmetic(Nat8);
