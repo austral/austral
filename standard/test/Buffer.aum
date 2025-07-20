@@ -460,16 +460,6 @@ module body Standard.Test.Buffer is
     --- Regression Tests for Bug Fixes
     ---
 
-    -- Helper function to convert Index to Int32 for tests
-    function indexToInt32(idx: Index): Int32 is
-        case toInt32(idx) of
-            when Some(value: Int32) do
-                return value;
-            when None do
-                abort("Index value too large for Int32");
-        end case;
-    end;
-
     function reverseEvenNumberTest(): Unit is
         testHeading("reverse even number of elements");
         var b: Buffer[Int32] := allocateEmpty();
@@ -612,5 +602,15 @@ module body Standard.Test.Buffer is
     function assertNth(ref: &[Buffer[T], R], pos: Index, value: T): Unit is
         assertTrue(nth(ref, pos) = value, "nth");
         return nil;
+    end;
+
+    -- Helper function to convert Index to Int32 for tests
+    function indexToInt32(idx: Index): Int32 is
+        case toInt32(idx) of
+            when Some(value: Int32) do
+                return value;
+            when None do
+                abort("Index value too large for Int32");
+        end case;
     end;
 end module body.
