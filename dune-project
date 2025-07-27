@@ -11,7 +11,7 @@
  (homepage https://austral-lang.org/)
  (bug_reports https://github.com/austral/austral/issues)
  (depends
-  (ppxlib (= 0.25.0))
+  (ppxlib (>= 0.25.1))
   (ppx_deriving (= 5.2.1))
   (ppx_sexp_conv (= v0.15.0))
   (sexplib (= v0.15.1))
