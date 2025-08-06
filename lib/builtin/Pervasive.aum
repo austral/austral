@@ -441,6 +441,27 @@ module body Austral.Pervasive is
             return @embed(ByteSize, "$1 / $2", lhs, rhs);
         end;
     end;
+    
+    instance TrappingArithmetic(Float32) is
+        method trappingAdd(lhs: Float32, rhs: Float32): Float32 is
+            return @embed(Float32, "$1 + $2", lhs, rhs);
+        end;
+
+        method trappingSubtract(lhs: Float32, rhs: Float32): Float32 is
+            return @embed(Float32, "$1 - $2", lhs, rhs);
+        end;
+
+        method trappingMultiply(lhs: Float32, rhs: Float32): Float32 is
+            return @embed(Float32, "$1 * $2", lhs, rhs);
+        end;
+
+        method trappingDivide(lhs: Float32, rhs: Float32): Float32 is
+            if rhs = 0.0 then
+                abort("Division by zero in trappingDivide (Float32)");
+            end if;
+            return @embed(Float32, "$1 / $2", lhs, rhs);
+        end;
+    end;
 
     instance TrappingArithmetic(Float64) is
         method trappingAdd(lhs: Float64, rhs: Float64): Float64 is
