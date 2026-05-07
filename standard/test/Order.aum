@@ -5,7 +5,11 @@
 -- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 import Standard.Order (
-    equal
+    equal,
+    lessThan,
+    lessThanOrEqual,
+    greaterThan,
+    greaterThanOrEqual
 );
 import Standard.Test.Unit (
     suiteHeading,
@@ -17,14 +21,246 @@ import Standard.Test.Unit (
 module body Standard.Test.Order is
     function orderTestSuite(): Unit is
         suiteHeading("Standard.Order");
+        boolTest();
         nat8Test();
+        nat16Test();
+        nat32Test();
+        nat64Test();
+        int8Test();
+        int16Test();
+        int32Test();
+        int64Test();
+        indexTest();
+        return nil;
+    end;
+
+    function boolTest(): Unit is
+        testHeading("Bool");
+        let a: Bool := false;
+        let b: Bool := true;
+        assertTrue(equal(&a, &a), "Bool equal() returns true for false.");
+        assertTrue(equal(&b, &b), "Bool equal() returns true for true.");
+        assertFalse(equal(&a, &b), "Bool equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Bool equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Bool lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Bool lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Bool lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Bool lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Bool lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Bool lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Bool greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Bool greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Bool greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Bool greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Bool greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Bool greaterThanOrEqual() returns false for increasing argument order.");
         return nil;
     end;
 
     function nat8Test(): Unit is
         testHeading("Nat8");
-        let a: Nat8 := 0;
-        assertTrue(equal(&a, &a), "equal() works");
+        let a: Nat8 := 1;
+        let b: Nat8 := 2;
+        assertTrue(equal(&a, &a), "Nat8 equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Nat8 equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Nat8 equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Nat8 equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Nat8 lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Nat8 lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Nat8 lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Nat8 lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Nat8 lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Nat8 lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Nat8 greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Nat8 greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Nat8 greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Nat8 greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Nat8 greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Nat8 greaterThanOrEqual() returns false for increasing argument order.");
+        return nil;
+    end;
+
+    function nat16Test(): Unit is
+        testHeading("Nat16");
+        let a: Nat16 := 1;
+        let b: Nat16 := 2;
+        assertTrue(equal(&a, &a), "Nat16 equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Nat16 equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Nat16 equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Nat16 equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Nat16 lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Nat16 lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Nat16 lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Nat16 lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Nat16 lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Nat16 lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Nat16 greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Nat16 greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Nat16 greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Nat16 greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Nat16 greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Nat16 greaterThanOrEqual() returns false for increasing argument order.");
+        return nil;
+    end;
+
+    function nat32Test(): Unit is
+        testHeading("Nat32");
+        let a: Nat32 := 1;
+        let b: Nat32 := 2;
+        assertTrue(equal(&a, &a), "Nat32 equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Nat32 equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Nat32 equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Nat32 equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Nat32 lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Nat32 lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Nat32 lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Nat32 lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Nat32 lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Nat32 lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Nat32 greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Nat32 greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Nat32 greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Nat32 greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Nat32 greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Nat32 greaterThanOrEqual() returns false for increasing argument order.");
+        return nil;
+    end;
+
+    function nat64Test(): Unit is
+        testHeading("Nat64");
+        let a: Nat64 := 1;
+        let b: Nat64 := 2;
+        assertTrue(equal(&a, &a), "Nat64 equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Nat64 equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Nat64 equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Nat64 equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Nat64 lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Nat64 lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Nat64 lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Nat64 lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Nat64 lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Nat64 lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Nat64 greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Nat64 greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Nat64 greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Nat64 greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Nat64 greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Nat64 greaterThanOrEqual() returns false for increasing argument order.");
+        return nil;
+    end;
+
+    function int8Test(): Unit is
+        testHeading("Int8");
+        let a: Int8 := 1;
+        let b: Int8 := 2;
+        assertTrue(equal(&a, &a), "Int8 equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Int8 equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Int8 equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Int8 equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Int8 lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Int8 lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Int8 lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Int8 lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Int8 lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Int8 lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Int8 greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Int8 greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Int8 greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Int8 greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Int8 greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Int8 greaterThanOrEqual() returns false for increasing argument order.");
+        return nil;
+    end;
+
+    function int16Test(): Unit is
+        testHeading("Int16");
+        let a: Int16 := 1;
+        let b: Int16 := 2;
+        assertTrue(equal(&a, &a), "Int16 equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Int16 equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Int16 equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Int16 equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Int16 lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Int16 lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Int16 lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Int16 lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Int16 lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Int16 lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Int16 greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Int16 greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Int16 greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Int16 greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Int16 greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Int16 greaterThanOrEqual() returns false for increasing argument order.");
+        return nil;
+    end;
+
+    function int32Test(): Unit is
+        testHeading("Int32");
+        let a: Int32 := 1;
+        let b: Int32 := 2;
+        assertTrue(equal(&a, &a), "Int32 equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Int32 equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Int32 equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Int32 equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Int32 lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Int32 lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Int32 lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Int32 lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Int32 lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Int32 lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Int32 greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Int32 greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Int32 greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Int32 greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Int32 greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Int32 greaterThanOrEqual() returns false for increasing argument order.");
+        return nil;
+    end;
+
+    function int64Test(): Unit is
+        testHeading("Int64");
+        let a: Int64 := 1;
+        let b: Int64 := 2;
+        assertTrue(equal(&a, &a), "Int64 equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Int64 equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Int64 equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Int64 equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Int64 lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Int64 lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Int64 lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Int64 lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Int64 lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Int64 lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Int64 greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Int64 greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Int64 greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Int64 greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Int64 greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Int64 greaterThanOrEqual() returns false for increasing argument order.");
+        return nil;
+    end;
+
+    function indexTest(): Unit is
+        testHeading("Index");
+        let a: Index := 1;
+        let b: Index := 2;
+        assertTrue(equal(&a, &a), "Index equal() returns true for a.");
+        assertTrue(equal(&b, &b), "Index equal() returns true for b.");
+        assertFalse(equal(&a, &b), "Index equal() returns false for ordered distinct values.");
+        assertFalse(equal(&b, &a), "Index equal() returns false for reverse distinct values.");
+        assertTrue(lessThan(&a, &b), "Index lessThan() returns true for increasing values.");
+        assertFalse(lessThan(&b, &a), "Index lessThan() returns false for decreasing values.");
+        assertFalse(lessThan(&a, &a), "Index lessThan() returns false for equal values.");
+        assertTrue(lessThanOrEqual(&a, &b), "Index lessThanOrEqual() returns true for increasing values.");
+        assertTrue(lessThanOrEqual(&a, &a), "Index lessThanOrEqual() returns true for equal values.");
+        assertFalse(lessThanOrEqual(&b, &a), "Index lessThanOrEqual() returns false for decreasing values.");
+        assertTrue(greaterThan(&b, &a), "Index greaterThan() returns true for decreasing argument order.");
+        assertFalse(greaterThan(&a, &b), "Index greaterThan() returns false for increasing argument order.");
+        assertFalse(greaterThan(&a, &a), "Index greaterThan() returns false for equal values.");
+        assertTrue(greaterThanOrEqual(&b, &a), "Index greaterThanOrEqual() returns true for decreasing argument order.");
+        assertTrue(greaterThanOrEqual(&b, &b), "Index greaterThanOrEqual() returns true for equal values.");
+        assertFalse(greaterThanOrEqual(&a, &b), "Index greaterThanOrEqual() returns false for increasing argument order.");
         return nil;
     end;
 end module body.

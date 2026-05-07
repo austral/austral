@@ -19,14 +19,174 @@ module body Standard.Test.Equality is
     function equalityTestSuite(): Unit is
         suiteHeading("Standard.Equality");
         unitTest();
+        boolTest();
+        nat8Test();
+        nat16Test();
+        nat32Test();
+        nat64Test();
+        int8Test();
+        int16Test();
+        int32Test();
+        int64Test();
+        indexTest();
         return nil;
     end;
 
     function unitTest(): Unit is
         testHeading("Unit");
         let u: Unit := nil;
-        assertTrue(partialEq(&u, &u), "nil is partially equivalent to itself.");
-        assertTrue(equal(&u, &u), "nil is equal to itself.");
+        assertTrue(partialEq(&u, &u), "Unit partialEq() returns true for nil.");
+        assertTrue(equal(&u, &u), "Unit equal() returns true for nil.");
+        return nil;
+    end;
+
+    function boolTest(): Unit is
+        testHeading("Bool");
+        let a: Bool := false;
+        let b: Bool := true;
+        assertTrue(partialEq(&a, &a), "Bool partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Bool partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Bool partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Bool partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Bool equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Bool equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Bool equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Bool equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function nat8Test(): Unit is
+        testHeading("Nat8");
+        let a: Nat8 := 1;
+        let b: Nat8 := 2;
+        assertTrue(partialEq(&a, &a), "Nat8 partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Nat8 partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Nat8 partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Nat8 partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Nat8 equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Nat8 equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Nat8 equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Nat8 equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function nat16Test(): Unit is
+        testHeading("Nat16");
+        let a: Nat16 := 1;
+        let b: Nat16 := 2;
+        assertTrue(partialEq(&a, &a), "Nat16 partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Nat16 partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Nat16 partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Nat16 partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Nat16 equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Nat16 equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Nat16 equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Nat16 equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function nat32Test(): Unit is
+        testHeading("Nat32");
+        let a: Nat32 := 1;
+        let b: Nat32 := 2;
+        assertTrue(partialEq(&a, &a), "Nat32 partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Nat32 partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Nat32 partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Nat32 partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Nat32 equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Nat32 equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Nat32 equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Nat32 equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function nat64Test(): Unit is
+        testHeading("Nat64");
+        let a: Nat64 := 1;
+        let b: Nat64 := 2;
+        assertTrue(partialEq(&a, &a), "Nat64 partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Nat64 partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Nat64 partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Nat64 partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Nat64 equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Nat64 equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Nat64 equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Nat64 equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function int8Test(): Unit is
+        testHeading("Int8");
+        let a: Int8 := 1;
+        let b: Int8 := 2;
+        assertTrue(partialEq(&a, &a), "Int8 partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Int8 partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Int8 partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Int8 partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Int8 equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Int8 equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Int8 equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Int8 equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function int16Test(): Unit is
+        testHeading("Int16");
+        let a: Int16 := 1;
+        let b: Int16 := 2;
+        assertTrue(partialEq(&a, &a), "Int16 partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Int16 partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Int16 partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Int16 partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Int16 equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Int16 equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Int16 equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Int16 equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function int32Test(): Unit is
+        testHeading("Int32");
+        let a: Int32 := 1;
+        let b: Int32 := 2;
+        assertTrue(partialEq(&a, &a), "Int32 partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Int32 partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Int32 partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Int32 partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Int32 equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Int32 equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Int32 equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Int32 equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function int64Test(): Unit is
+        testHeading("Int64");
+        let a: Int64 := 1;
+        let b: Int64 := 2;
+        assertTrue(partialEq(&a, &a), "Int64 partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Int64 partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Int64 partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Int64 partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Int64 equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Int64 equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Int64 equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Int64 equal() is false for distinct values in reverse order.");
+        return nil;
+    end;
+
+    function indexTest(): Unit is
+        testHeading("Index");
+        let a: Index := 1;
+        let b: Index := 2;
+        assertTrue(partialEq(&a, &a), "Index partialEq() returns true for the first value.");
+        assertTrue(partialEq(&b, &b), "Index partialEq() returns true for the second value.");
+        assertFalse(partialEq(&a, &b), "Index partialEq() returns false for distinct values.");
+        assertFalse(partialEq(&b, &a), "Index partialEq() is false for distinct values in reverse order.");
+        assertTrue(equal(&a, &a), "Index equal() returns true for the first value.");
+        assertTrue(equal(&b, &b), "Index equal() returns true for the second value.");
+        assertFalse(equal(&a, &b), "Index equal() returns false for distinct values.");
+        assertFalse(equal(&b, &a), "Index equal() is false for distinct values in reverse order.");
         return nil;
     end;
 end module body.

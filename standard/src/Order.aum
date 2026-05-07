@@ -17,6 +17,78 @@ module body Standard.Order is
         end case;
     end;
 
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function lessThan(a: &[T, R], b: &[T, S]): Bool is
+        case compare(a, b) of
+             when LessThan do
+                  return true;
+             when Equal do
+                  return false;
+             when GreaterThan do
+                  return false;
+        end case;
+    end;
+
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function lessThanOrEqual(a: &[T, R], b: &[T, S]): Bool is
+        case compare(a, b) of
+             when LessThan do
+                  return true;
+             when Equal do
+                  return true;
+             when GreaterThan do
+                  return false;
+        end case;
+    end;
+
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function greaterThan(a: &[T, R], b: &[T, S]): Bool is
+        case compare(a, b) of
+             when LessThan do
+                  return false;
+             when Equal do
+                  return false;
+             when GreaterThan do
+                  return true;
+        end case;
+    end;
+
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function greaterThanOrEqual(a: &[T, R], b: &[T, S]): Bool is
+        case compare(a, b) of
+             when LessThan do
+                  return false;
+             when Equal do
+                  return true;
+             when GreaterThan do
+                  return true;
+        end case;
+    end;
+
+    instance PartialOrder(Bool) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Bool, R], b: &[Bool, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Bool) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Bool, R], b: &[Bool, S]): Ordering is
+            let av: Bool := !a;
+            let bv: Bool := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
     instance PartialOrder(Nat8) is
         generic [R: Region, S: Region]
 		method partialCompare(a: &[Nat8, R], b: &[Nat8, S]): PartialOrdering is
@@ -29,6 +101,198 @@ module body Standard.Order is
 		method compare(a: &[Nat8, R], b: &[Nat8, S]): Ordering is
             let av: Nat8 := !a;
             let bv: Nat8 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
+    instance PartialOrder(Nat16) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Nat16, R], b: &[Nat16, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Nat16) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Nat16, R], b: &[Nat16, S]): Ordering is
+            let av: Nat16 := !a;
+            let bv: Nat16 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
+    instance PartialOrder(Nat32) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Nat32, R], b: &[Nat32, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Nat32) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Nat32, R], b: &[Nat32, S]): Ordering is
+            let av: Nat32 := !a;
+            let bv: Nat32 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
+    instance PartialOrder(Nat64) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Nat64, R], b: &[Nat64, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Nat64) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Nat64, R], b: &[Nat64, S]): Ordering is
+            let av: Nat64 := !a;
+            let bv: Nat64 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
+    instance PartialOrder(Int8) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Int8, R], b: &[Int8, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Int8) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Int8, R], b: &[Int8, S]): Ordering is
+            let av: Int8 := !a;
+            let bv: Int8 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
+    instance PartialOrder(Int16) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Int16, R], b: &[Int16, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Int16) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Int16, R], b: &[Int16, S]): Ordering is
+            let av: Int16 := !a;
+            let bv: Int16 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
+    instance PartialOrder(Int32) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Int32, R], b: &[Int32, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Int32) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Int32, R], b: &[Int32, S]): Ordering is
+            let av: Int32 := !a;
+            let bv: Int32 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
+    instance PartialOrder(Int64) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Int64, R], b: &[Int64, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Int64) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Int64, R], b: &[Int64, S]): Ordering is
+            let av: Int64 := !a;
+            let bv: Int64 := !b;
+            if av = bv then
+                 return Equal();
+            else
+                if av > bv then
+                    return GreaterThan();
+                else
+                    return LessThan();
+                end if;
+            end if;
+        end;
+	end;
+
+    instance PartialOrder(Index) is
+        generic [R: Region, S: Region]
+		method partialCompare(a: &[Index, R], b: &[Index, S]): PartialOrdering is
+            return Comparable(order => compare(a, b));
+        end;
+	end;
+
+    instance TotalOrder(Index) is
+        generic [R: Region, S: Region]
+		method compare(a: &[Index, R], b: &[Index, S]): Ordering is
+            let av: Index := !a;
+            let bv: Index := !b;
             if av = bv then
                  return Equal();
             else

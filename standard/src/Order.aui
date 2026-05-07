@@ -45,6 +45,36 @@ module Standard.Order is
     generic [T: Type(TotalOrder), R: Region, S: Region]
     function equal(a: &[T, R], b: &[T, S]): Bool;
 
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function lessThan(a: &[T, R], b: &[T, S]): Bool;
+
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function lessThanOrEqual(a: &[T, R], b: &[T, S]): Bool;
+
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function greaterThan(a: &[T, R], b: &[T, S]): Bool;
+
+    generic [T: Type(TotalOrder), R: Region, S: Region]
+    function greaterThanOrEqual(a: &[T, R], b: &[T, S]): Bool;
+
+    instance PartialOrder(Bool);
+    instance TotalOrder(Bool);
     instance PartialOrder(Nat8);
     instance TotalOrder(Nat8);
+    instance PartialOrder(Nat16);
+    instance TotalOrder(Nat16);
+    instance PartialOrder(Nat32);
+    instance TotalOrder(Nat32);
+    instance PartialOrder(Nat64);
+    instance TotalOrder(Nat64);
+    instance PartialOrder(Int8);
+    instance TotalOrder(Int8);
+    instance PartialOrder(Int16);
+    instance TotalOrder(Int16);
+    instance PartialOrder(Int32);
+    instance TotalOrder(Int32);
+    instance PartialOrder(Int64);
+    instance TotalOrder(Int64);
+    instance PartialOrder(Index);
+    instance TotalOrder(Index);
 end module.

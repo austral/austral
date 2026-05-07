@@ -27,4 +27,24 @@ module Standard.Equality is
 
     instance PartialEquality(Unit);
     instance Equality(Unit);
+    instance PartialEquality(Bool);
+    instance Equality(Bool);
+    instance PartialEquality(Nat8);
+    instance Equality(Nat8);
+    instance PartialEquality(Nat16);
+    instance Equality(Nat16);
+    instance PartialEquality(Nat32);
+    instance Equality(Nat32);
+    instance PartialEquality(Nat64);
+    instance Equality(Nat64);
+    instance PartialEquality(Int8);
+    instance Equality(Int8);
+    instance PartialEquality(Int16);
+    instance Equality(Int16);
+    instance PartialEquality(Int32);
+    instance Equality(Int32);
+    instance PartialEquality(Int64);
+    instance Equality(Int64);
+    instance PartialEquality(Index);
+    instance Equality(Index);
 end module.

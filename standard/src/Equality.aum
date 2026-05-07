@@ -18,4 +18,184 @@ module body Standard.Equality is
              return true;
         end;
     end;
+
+    instance PartialEquality(Bool) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Bool, R], b: &[Bool, S]): Bool is
+            let av: Bool := !a;
+            let bv: Bool := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Bool) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Bool, R], b: &[Bool, S]): Bool is
+            let av: Bool := !a;
+            let bv: Bool := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Nat8) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Nat8, R], b: &[Nat8, S]): Bool is
+            let av: Nat8 := !a;
+            let bv: Nat8 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Nat8) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Nat8, R], b: &[Nat8, S]): Bool is
+            let av: Nat8 := !a;
+            let bv: Nat8 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Nat16) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Nat16, R], b: &[Nat16, S]): Bool is
+            let av: Nat16 := !a;
+            let bv: Nat16 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Nat16) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Nat16, R], b: &[Nat16, S]): Bool is
+            let av: Nat16 := !a;
+            let bv: Nat16 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Nat32) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Nat32, R], b: &[Nat32, S]): Bool is
+            let av: Nat32 := !a;
+            let bv: Nat32 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Nat32) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Nat32, R], b: &[Nat32, S]): Bool is
+            let av: Nat32 := !a;
+            let bv: Nat32 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Nat64) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Nat64, R], b: &[Nat64, S]): Bool is
+            let av: Nat64 := !a;
+            let bv: Nat64 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Nat64) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Nat64, R], b: &[Nat64, S]): Bool is
+            let av: Nat64 := !a;
+            let bv: Nat64 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Int8) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Int8, R], b: &[Int8, S]): Bool is
+            let av: Int8 := !a;
+            let bv: Int8 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Int8) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Int8, R], b: &[Int8, S]): Bool is
+            let av: Int8 := !a;
+            let bv: Int8 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Int16) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Int16, R], b: &[Int16, S]): Bool is
+            let av: Int16 := !a;
+            let bv: Int16 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Int16) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Int16, R], b: &[Int16, S]): Bool is
+            let av: Int16 := !a;
+            let bv: Int16 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Int32) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Int32, R], b: &[Int32, S]): Bool is
+            let av: Int32 := !a;
+            let bv: Int32 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Int32) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Int32, R], b: &[Int32, S]): Bool is
+            let av: Int32 := !a;
+            let bv: Int32 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Int64) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Int64, R], b: &[Int64, S]): Bool is
+            let av: Int64 := !a;
+            let bv: Int64 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Int64) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Int64, R], b: &[Int64, S]): Bool is
+            let av: Int64 := !a;
+            let bv: Int64 := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance PartialEquality(Index) is
+        generic [R: Region, S: Region]
+		method partialEq(a: &[Index, R], b: &[Index, S]): Bool is
+            let av: Index := !a;
+            let bv: Index := !b;
+            return av = bv;
+        end;
+    end;
+
+    instance Equality(Index) is
+        generic [R: Region, S: Region]
+		method equal(a: &[Index, R], b: &[Index, S]): Bool is
+            let av: Index := !a;
+            let bv: Index := !b;
+            return av = bv;
+        end;
+    end;
 end module body.

@@ -17,7 +17,6 @@ import Austral.Memory (
     negativeOffset,
     store,
     load,
-    memcpy,
     memmove,
     arraySizeInBytes,
     span,
@@ -276,11 +275,6 @@ module body Standard.Buffer is
         let new_addr: Address[T] := resizeArray(buf->array, new_capacity);
         case nullCheck(new_addr) of
             when Some(value as new_array: Pointer[T]) do
-                memcpy(
-                    destination => new_array,
-                    source => buf->array,
-                    count => arraySizeInBytes(sizeof(T), buf->size)
-                );
                 buf->capacity := new_capacity;
                 buf->array := new_array;
                 -- invariants(buf : &[Buffer[T], R]);

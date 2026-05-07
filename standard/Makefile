@@ -22,8 +22,16 @@ MODULES := \
 		test/Main.aui,test/Main.aum
 TEST_BIN := test_bin
 
-.DEFAULT: all
-all: $(TEST_BIN)
+.DEFAULT_GOAL := all
+.PHONY: all build test test-all
+all: test-all
+
+build: $(TEST_BIN)
+
+test: test-all
+
+test-all: $(TEST_BIN)
+	./$(TEST_BIN)
 
 $(TEST_BIN): src/*.aui src/*.aum src/*/*.aui src/*/*.aum test/*.aui test/*.aum test/*/*.aui test/*/*.aum
 	../austral compile $(MODULES) --entrypoint=Standard.Test:Main --output=$(TEST_BIN)
