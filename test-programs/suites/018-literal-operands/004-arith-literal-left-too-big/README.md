@@ -1,0 +1,1 @@
+Test that an integer literal on the left of an arithmetic operator has to fit the type of the right operand.

@@ -1,0 +1,16 @@
+module body Test is
+    function main(): ExitCode is
+        let n: Nat8 := 5;
+        if 3 < n then
+            printLn("3 < 5");
+        end if;
+        if 7 < n then
+            printLn("7 < 5");
+        end if;
+        let m: Int64 := -5000000000;
+        if -3000000000 > m then
+            printLn("-3000000000 > -5000000000");
+        end if;
+        return ExitSuccess();
+    end;
+end module body.

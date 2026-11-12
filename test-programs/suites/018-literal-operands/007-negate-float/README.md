@@ -1,0 +1,1 @@
+Test that unary minus on a float is an error and doesn't truncate the float to an integer. `-f` is `0 - f`, and an integer literal is not a float.

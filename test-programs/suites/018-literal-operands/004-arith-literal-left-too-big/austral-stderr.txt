@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The integer " },
+    { "type": "code", "content": "300" },
+    { "type": "text", "content": " does not fit the type " },
+    { "type": "type", "content": "Nat8" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/018-literal-operands/004-arith-literal-left-too-big/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 31 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let c: Nat8 := 7;" ],
+    [ 4, "        let d: Nat8 := 300 + c;" ],
+    [ 5, "        printLn(d);" ],
+    [ 6, "        return ExitSuccess();" ]
+  ]
+}

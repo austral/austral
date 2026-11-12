@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The integer " },
+    { "type": "code", "content": "3000000000" },
+    { "type": "text", "content": " does not fit the type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/018-literal-operands/005-arith-int32-literal-too-big/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 39 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let a: Int32 := 7;" ],
+    [ 4, "        let b: Int32 := a + 3000000000;" ],
+    [ 5, "        printLn(b);" ],
+    [ 6, "        return ExitSuccess();" ]
+  ]
+}

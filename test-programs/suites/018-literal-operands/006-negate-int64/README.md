@@ -1,0 +1,1 @@
+Test that unary minus works on integers that are not `Int32`.

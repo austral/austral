@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Expected a value of type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": ", but got a value of type " },
+    { "type": "type", "content": "Float64" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/018-literal-operands/002-arith-float-literal-int-operand/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 32 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let a: Int32 := 7;" ],
+    [ 4, "        let b: Int32 := a + 1.5;" ],
+    [ 5, "        printLn(b);" ],
+    [ 6, "        return ExitSuccess();" ]
+  ]
+}

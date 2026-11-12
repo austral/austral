@@ -1,0 +1,1 @@
+Test that an integer literal added to an `Int32` has to fit an `Int32`.

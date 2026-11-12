@@ -1,0 +1,1 @@
+Test that a float literal can't be added to an `Int32`.

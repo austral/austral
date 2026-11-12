@@ -1,0 +1,8 @@
+module body Test is
+    function main(): ExitCode is
+        let c: Nat8 := 7;
+        let d: Nat8 := 300 + c;
+        printLn(d);
+        return ExitSuccess();
+    end;
+end module body.
