@@ -1,0 +1,1 @@
+Test that an integer literal that fits the type it is given still compiles.

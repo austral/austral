@@ -1,0 +1,1 @@
+Test that an integer literal given a type with `: Nat8` has to fit a `Nat8`.

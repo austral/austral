@@ -1,0 +1,1 @@
+Test that an integer literal and a float literal cannot be mixed in arithmetic.
