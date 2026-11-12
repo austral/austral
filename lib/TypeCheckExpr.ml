@@ -874,6 +874,8 @@ and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
      int type, do the conversion. Similarly, if the expression is a float
      constant and the target type is a float, do the conversion. *)
   if (is_int_expr expr') && (is_int_type target_type) then
+    (* The literal has to fit the type it is given. *)
+    let _ = match_type_with_value_ctx ctx target_type expr' in
     TCast (expr', target_type)
   else
     if (is_float_expr expr') && (is_float_type target_type) then
@@ -966,11 +968,9 @@ and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (r
       Errors.arithmetic_not_numeric lhs_ty
   else
     (* If the types are different, check if at least one operator is a constant.*)
-    let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
-    and are_float_constants = (is_float_constant lhs) || (is_float_constant rhs) in
-    if (are_int_constants || are_float_constants) then
-      (* A lone constant was checked when choosing `operand_ty`. Two constants
-         pass. *)
+    if (is_numeric_literal lhs) <> (is_numeric_literal rhs) then
+      (* A lone literal was checked when choosing `operand_ty`. Two literals of
+         different types are an integer and a float, and neither decides. *)
       augment_arithmetic_call ()
     else
       Errors.arithmetic_incompatible_types ~lhs:lhs_ty ~rhs:rhs_ty
