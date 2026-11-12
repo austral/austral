@@ -1,0 +1,11 @@
+module body Test is
+    record Rec: Free is
+        n: Nat8;
+    end;
+
+    function main(): ExitCode is
+        var r: Rec := Rec(n => 0);
+        r.n := 300;
+        return ExitSuccess();
+    end;
+end module body.

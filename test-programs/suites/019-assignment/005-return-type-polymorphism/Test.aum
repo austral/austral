@@ -1,0 +1,28 @@
+module body Test is
+    generic [T: Free]
+    function nothing(): Option[T] is
+        return None();
+    end;
+
+    function show(x: Option[Int32]): Unit is
+        case x of
+            when Some(value: Int32) do
+                printLn(value);
+            when None do
+                printLn("none");
+        end case;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        var x: Option[Int32] := Some(value => 10);
+        show(x);
+        x := nothing();
+        show(x);
+        x := Some(value => 20);
+        show(x);
+        x := None();
+        show(x);
+        return ExitSuccess();
+    end;
+end module body.

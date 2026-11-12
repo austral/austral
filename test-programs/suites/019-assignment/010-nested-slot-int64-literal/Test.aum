@@ -1,0 +1,16 @@
+module body Test is
+    record Inner: Free is
+        x: Int64;
+    end;
+
+    record Outer: Free is
+        inner: Inner;
+    end;
+
+    function main(): ExitCode is
+        var o: Outer := Outer(inner => Inner(x => 1));
+        o.inner.x := 5;
+        printLn(o.inner.x);
+        return ExitSuccess();
+    end;
+end module body.

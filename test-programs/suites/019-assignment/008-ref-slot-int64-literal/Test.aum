@@ -1,0 +1,18 @@
+module body Test is
+    record Rec: Free is
+        x: Int64;
+    end;
+
+    generic [R: Region]
+    function set(ref: &![Rec, R]): Unit is
+        ref->x := 5;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        var r: Rec := Rec(x => 1);
+        set(&!r);
+        printLn(r.x);
+        return ExitSuccess();
+    end;
+end module body.

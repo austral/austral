@@ -1,0 +1,8 @@
+module body Test is
+    function main(): ExitCode is
+        var f: Float32 := 0.0;
+        f := 1.5;
+        printLn(f);
+        return ExitSuccess();
+    end;
+end module body.
