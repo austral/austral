@@ -1,0 +1,6 @@
+module body TypeLiteralArgumentElsewhere is
+    function main(): ExitCode is
+        let a: Option[5] := None();
+        return ExitSuccess();
+    end;
+end module body.

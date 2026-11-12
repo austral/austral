@@ -1,0 +1,8 @@
+module body DivideNoContext is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        let b: Decimal[7, 2] := 3;
+        debugPrintDecimal(divide(a, b, NearestEven()));
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,6 @@
+module body LiteralTooLarge is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 100000.00;
+        return ExitSuccess();
+    end;
+end module body.

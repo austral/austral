@@ -1,0 +1,13 @@
+module body DivideNoContextArgument is
+    function show(x: Decimal[9, 4]): Unit is
+        debugPrintDecimal(x);
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        let b: Decimal[7, 2] := 3;
+        show(divide(a, b, NearestEven()));
+        return ExitSuccess();
+    end;
+end module body.

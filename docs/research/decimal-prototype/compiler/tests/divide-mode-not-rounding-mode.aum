@@ -1,0 +1,7 @@
+module body DivideModeNotRoundingMode is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        let q: Decimal[9, 4] := divide(a, a, 1);
+        return ExitSuccess();
+    end;
+end module body.

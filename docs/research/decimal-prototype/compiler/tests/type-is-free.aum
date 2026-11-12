@@ -1,0 +1,19 @@
+module body TypeIsFree is
+    record Price: Free is
+        amount: Decimal[7, 2];
+    end;
+
+    function twice(x: Decimal[7, 2]): Decimal[7, 2] is
+        return x + x;
+    end;
+
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 12.50;
+        let unused: Decimal[7, 2] := 1;
+        let p: Price := Price(amount => a);
+        debugPrintDecimal(twice(a));
+        debugPrintDecimal(a);
+        debugPrintDecimal(p.amount);
+        return ExitSuccess();
+    end;
+end module body.

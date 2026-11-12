@@ -1,0 +1,7 @@
+module body GapLiteralInAssignment is
+    function main(): ExitCode is
+        var x: Decimal[7, 2] := 1;
+        x := 2.5;
+        return ExitSuccess();
+    end;
+end module body.

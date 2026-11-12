@@ -1,0 +1,8 @@
+module body GapDivideInAssignment is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        var q: Decimal[9, 4] := 0;
+        q := divide(a, a, NearestEven());
+        return ExitSuccess();
+    end;
+end module body.

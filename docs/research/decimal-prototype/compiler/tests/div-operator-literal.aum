@@ -1,0 +1,7 @@
+module body DivOperatorLiteral is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        let q: Decimal[7, 2] := a / 2;
+        return ExitSuccess();
+    end;
+end module body.

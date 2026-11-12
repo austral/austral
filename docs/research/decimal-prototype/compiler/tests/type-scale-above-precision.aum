@@ -1,0 +1,6 @@
+module body TypeScaleAbovePrecision is
+    function main(): ExitCode is
+        let a: Decimal[5, 6] := 0;
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,31 @@
+module body RoundingModeUnion is
+    function index(mode: RoundingMode): Int32 is
+        case mode of
+            when NearestEven do
+                return 0;
+            when NearestAwayFromZero do
+                return 1;
+            when NearestTowardZero do
+                return 2;
+            when AwayFromZero do
+                return 3;
+            when TowardZero do
+                return 4;
+            when TowardGreater do
+                return 5;
+            when TowardLesser do
+                return 6;
+        end case;
+    end;
+
+    function main(): ExitCode is
+        printLn(index(NearestEven()));
+        printLn(index(NearestAwayFromZero()));
+        printLn(index(NearestTowardZero()));
+        printLn(index(AwayFromZero()));
+        printLn(index(TowardZero()));
+        printLn(index(TowardGreater()));
+        printLn(index(TowardLesser()));
+        return ExitSuccess();
+    end;
+end module body.

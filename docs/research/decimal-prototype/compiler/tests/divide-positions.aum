@@ -1,0 +1,22 @@
+module body DividePositions is
+    function ratio(a: Decimal[7, 2], b: Decimal[3, 1]): Decimal[9, 6] is
+        return divide(a, b, NearestEven());
+    end;
+
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 10.00;
+        let b: Decimal[3, 1] := 0.3;
+        let q: Decimal[9, 4] := divide(a, b, NearestEven());
+        debugPrintDecimal(q);
+        debugPrintDecimal(divide(a, b, TowardGreater()) : Decimal[5, 0]);
+        debugPrintDecimal(ratio(a, b));
+        let h: Decimal[7, 3] := divide(a, 8, NearestEven());
+        debugPrintDecimal(h);
+        let r: Decimal[7, 3] := divide(1, b, TowardZero());
+        debugPrintDecimal(r);
+        var v: Decimal[9, 4] := 0;
+        v := divide(a, b, TowardZero()) : Decimal[9, 4];
+        debugPrintDecimal(v);
+        return ExitSuccess();
+    end;
+end module body.

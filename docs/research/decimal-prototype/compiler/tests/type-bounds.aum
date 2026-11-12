@@ -1,0 +1,17 @@
+module body TypeBounds is
+    function main(): ExitCode is
+        let a: Decimal[1, 0] := 9;
+        let b: Decimal[38, 0] := 99999999999999999999999999999999999999;
+        let c: Decimal[38, 38] := 0.99999999999999999999999999999999999999;
+        let d: Decimal[38, 0] := -99999999999999999999999999999999999999;
+        let e: Decimal[5, 5] := 0.00001;
+        debugPrintDecimal(a);
+        debugPrintDecimal(b);
+        debugPrintDecimal(c);
+        debugPrintDecimal(d);
+        debugPrintDecimal(e);
+        let size: ByteSize := sizeof(Decimal[7, 2]);
+        printLn(size);
+        return ExitSuccess();
+    end;
+end module body.

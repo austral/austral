@@ -1,0 +1,10 @@
+module body BuiltinNameTakenByProgram is
+    function round(x: Int32, y: Int32): Int32 is
+        return x + y;
+    end;
+
+    function main(): ExitCode is
+        printLn(round(1, 2));
+        return ExitSuccess();
+    end;
+end module body.

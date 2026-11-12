@@ -1,0 +1,17 @@
+module body Mul is
+    function main(): ExitCode is
+        let price: Decimal[7, 2] := 19.99;
+        let quantity: Decimal[5, 3] := 1.500;
+        let total: Decimal[12, 5] := price * quantity;
+        debugPrintDecimal(total);
+        let doubled: Decimal[8, 2] := price * 2;
+        debugPrintDecimal(doubled);
+        let tax: Decimal[11, 6] := price * 0.0825;
+        debugPrintDecimal(tax);
+        let more: Decimal[9, 3] := 1.50 * price;
+        debugPrintDecimal(more);
+        let negative: Decimal[8, 2] := price * -1;
+        debugPrintDecimal(negative);
+        return ExitSuccess();
+    end;
+end module body.

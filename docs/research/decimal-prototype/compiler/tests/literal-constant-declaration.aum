@@ -1,0 +1,10 @@
+module body LiteralConstantDeclaration is
+    constant rate: Decimal[4, 4] := 0.0825;
+
+    function main(): ExitCode is
+        debugPrintDecimal(rate);
+        let amount: Decimal[3, 0] := 100;
+        debugPrintDecimal(amount * rate);
+        return ExitSuccess();
+    end;
+end module body.

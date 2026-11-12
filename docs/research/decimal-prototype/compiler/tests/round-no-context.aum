@@ -1,0 +1,7 @@
+module body RoundNoContext is
+    function main(): ExitCode is
+        let x: Decimal[9, 4] := 1;
+        debugPrintDecimal(round(x, NearestEven()));
+        return ExitSuccess();
+    end;
+end module body.

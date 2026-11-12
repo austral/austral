@@ -1,0 +1,17 @@
+module body LiteralArgument is
+    record Price: Free is
+        amount: Decimal[7, 2];
+    end;
+
+    function show(x: Decimal[7, 2]): Unit is
+        debugPrintDecimal(x);
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        show(1.23);
+        let p: Price := Price(amount => 12.5);
+        debugPrintDecimal(p.amount);
+        return ExitSuccess();
+    end;
+end module body.

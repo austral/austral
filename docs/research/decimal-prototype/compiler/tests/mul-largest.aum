@@ -1,0 +1,9 @@
+module body MulLargest is
+    function main(): ExitCode is
+        let a: Decimal[19, 0] := 9999999999999999999;
+        let p: Decimal[38, 0] := a * a;
+        debugPrintDecimal(p);
+        debugPrintDecimal(a * (-a));
+        return ExitSuccess();
+    end;
+end module body.

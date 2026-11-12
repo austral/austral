@@ -1,0 +1,11 @@
+module body GapRoundingModeCaseNameTaken is
+    union Direction: Free is
+        case TowardZero;
+        case Outward;
+    end;
+
+    function main(): ExitCode is
+        let d: Direction := TowardZero();
+        return ExitSuccess();
+    end;
+end module body.

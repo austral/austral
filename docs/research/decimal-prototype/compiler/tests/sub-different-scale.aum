@@ -1,0 +1,8 @@
+module body SubDifferentScale is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        let b: Decimal[7, 3] := 1;
+        debugPrintDecimal(a - b);
+        return ExitSuccess();
+    end;
+end module body.

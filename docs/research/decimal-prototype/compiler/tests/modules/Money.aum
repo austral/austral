@@ -1,0 +1,27 @@
+module body Money is
+    constant taxRate: Decimal[4, 4] := 0.0825;
+
+    function total(line: Line): Decimal[12, 5] is
+        return line.price * line.quantity;
+    end;
+
+    function withTax(amount: Decimal[12, 5]): Decimal[9, 2] is
+        let tax: Decimal[16, 9] := amount * taxRate;
+        let gross: Decimal[16, 9] := (widen(amount) : Decimal[16, 9]) + tax;
+        return round(gross, NearestEven());
+    end;
+
+    instance Show(Decimal[9, 2]) is
+        method show(value: Decimal[9, 2]): Unit is
+            debugPrintDecimal(value);
+            return nil;
+        end;
+    end;
+
+    instance Show(Decimal[12, 5]) is
+        method show(value: Decimal[12, 5]): Unit is
+            debugPrintDecimal(value);
+            return nil;
+        end;
+    end;
+end module body.

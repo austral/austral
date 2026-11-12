@@ -1,0 +1,25 @@
+module body DivideModes is
+    function q(a: Decimal[5, 2], b: Decimal[5, 2], mode: RoundingMode): Decimal[5, 2] is
+        return divide(a, b, mode);
+    end;
+
+    function all(mode: RoundingMode): Unit is
+        debugPrintDecimal(q(1, 8, mode));
+        debugPrintDecimal(q(-1, 8, mode));
+        debugPrintDecimal(q(0.27, 2, mode));
+        debugPrintDecimal(q(2, 3, mode));
+        debugPrintDecimal(q(1, 3, mode));
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        all(NearestEven());
+        all(NearestAwayFromZero());
+        all(NearestTowardZero());
+        all(AwayFromZero());
+        all(TowardZero());
+        all(TowardGreater());
+        all(TowardLesser());
+        return ExitSuccess();
+    end;
+end module body.

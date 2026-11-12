@@ -1,0 +1,7 @@
+module body StretchCheckedNoContext is
+    function main(): ExitCode is
+        let a: Decimal[3, 2] := 9.99;
+        let r: Decimal[3, 2] := checkedAdd(a, a);
+        return ExitSuccess();
+    end;
+end module body.

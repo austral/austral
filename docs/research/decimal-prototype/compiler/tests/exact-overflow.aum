@@ -1,0 +1,8 @@
+module body ExactOverflow is
+    function main(): ExitCode is
+        let x: Decimal[9, 4] := 123.4500;
+        let a: Decimal[4, 2] := exact(x);
+        debugPrintDecimal(a);
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,8 @@
+module body CompareIntegerVariable is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        let i: Int32 := 1;
+        printLn(a = i);
+        return ExitSuccess();
+    end;
+end module body.

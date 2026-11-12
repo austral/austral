@@ -1,0 +1,995 @@
+diff -ruN a/lib/BuiltIn.ml b/lib/BuiltIn.ml
+--- a/lib/BuiltIn.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/BuiltIn.ml	2026-11-12 14:53:29.342519290 +0000
+@@ -30,6 +30,14 @@
+         ConcreteImport (make_ident "ExitCode", None);
+         ConcreteImport (make_ident "ExitSuccess", None);
+         ConcreteImport (make_ident "ExitFailure", None);
++        ConcreteImport (make_ident "RoundingMode", None);
++        ConcreteImport (make_ident "NearestEven", None);
++        ConcreteImport (make_ident "NearestAwayFromZero", None);
++        ConcreteImport (make_ident "NearestTowardZero", None);
++        ConcreteImport (make_ident "AwayFromZero", None);
++        ConcreteImport (make_ident "TowardZero", None);
++        ConcreteImport (make_ident "TowardGreater", None);
++        ConcreteImport (make_ident "TowardLesser", None);
+         ConcreteImport (make_ident "maximum_nat8", None);
+         ConcreteImport (make_ident "maximum_nat16", None);
+         ConcreteImport (make_ident "maximum_nat32", None);
+diff -ruN a/lib/CodeGen.ml b/lib/CodeGen.ml
+--- a/lib/CodeGen.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/CodeGen.ml	2026-11-12 14:53:29.342608049 +0000
+@@ -136,6 +136,8 @@
+      CNamedType "float"
+   | MonoDoubleFloat ->
+      CNamedType "double"
++  | MonoDecimal _ ->
++     CNamedType "au_decimal_t"
+   | MonoNamedType id ->
+      CNamedType (gen_mono_id id)
+   | MonoRegionTy _ ->
+@@ -563,6 +565,8 @@
+            gen_type t
+         | MonoDoubleFloat ->
+            gen_type t
++        | MonoDecimal _ ->
++           gen_type t
+         | MonoNamedType _ ->
+            err "Not allowed"
+         | MonoRegionTy _ ->
+diff -ruN a/lib/Cst.ml b/lib/Cst.ml
+--- a/lib/Cst.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/Cst.ml	2026-11-12 14:53:29.342671363 +0000
+@@ -70,6 +70,7 @@
+   | ConcreteWriteRef of typespec * typespec
+   | ConcreteSpan of typespec * typespec
+   | ConcreteSpanWrite of typespec * typespec
++  | ConcreteNatSpec of string
+ 
+ and cexpr =
+   | CNilConstant of span
+diff -ruN a/lib/CstUtil.ml b/lib/CstUtil.ml
+--- a/lib/CstUtil.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/CstUtil.ml	2026-11-12 14:53:29.342714249 +0000
+@@ -164,6 +164,8 @@
+      "Span[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+   | ConcreteSpanWrite (ty, reg) ->
+      "Span![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
++  | ConcreteNatSpec n ->
++     n
+ 
+ let decl_replace_docstring_and_pragmas (decl: concrete_decl) (docstring: docstring) (pragmas: pragma list): concrete_decl =
+   let _ = pragmas in
+diff -ruN a/lib/DecimalLit.ml b/lib/DecimalLit.ml
+--- a/lib/DecimalLit.ml	1970-01-01 00:00:00.000000000 +0000
++++ b/lib/DecimalLit.ml	2026-11-12 14:53:29.342761331 +0000
+@@ -0,0 +1,74 @@
++(* Throwaway prototype (issue #19): numeric literals read as Decimal[P, S].
++   Everything here works on the literal's text and on big integers. No floats. *)
++
++type literal = {
++    negative: bool;
++    int_digits: string;
++    (* Trailing zeros removed, so the length is the scale the value needs. *)
++    frac_digits: string;
++  }
++
++type parse_result =
++  | Parsed of literal
++  | HasExponent
++  | Malformed
++
++let all_digits (s: string): bool =
++  String.for_all (fun c -> c >= '0' && c <= '9') s
++
++let strip_trailing_zeros (s: string): string =
++  let n = ref (String.length s) in
++  while !n > 0 && s.[!n - 1] = '0' do decr n done;
++  String.sub s 0 !n
++
++let strip_leading_zeros (s: string): string =
++  let i = ref 0 in
++  while !i < String.length s && s.[!i] = '0' do incr i done;
++  String.sub s !i (String.length s - !i)
++
++(* The lexer's float rule is `sign? dec_constant period dec_constant? (exponent sign? dec_constant)?`
++   and dec_constant carries its own optional sign, so "1." and "1.-5" both arrive here. *)
++let parse (text: string): parse_result =
++  if String.contains text 'e' || String.contains text 'E' then
++    HasExponent
++  else
++    let (negative, body) =
++      if String.length text > 0 && (text.[0] = '-' || text.[0] = '+') then
++        (text.[0] = '-', String.sub text 1 (String.length text - 1))
++      else
++        (false, text)
++    in
++    let (int_digits, frac_digits) =
++      match String.index_opt body '.' with
++      | Some i -> (String.sub body 0 i, String.sub body (i + 1) (String.length body - i - 1))
++      | None -> (body, "")
++    in
++    if int_digits = "" || not (all_digits int_digits) || not (all_digits frac_digits) then
++      Malformed
++    else
++      Parsed { negative; int_digits; frac_digits = strip_trailing_zeros frac_digits }
++
++(* The coefficient at scale `s`, or None when the value has more than `s` fractional digits. *)
++let coefficient (lit: literal) (s: int): Z.t option =
++  let needed = String.length lit.frac_digits in
++  if needed > s then
++    None
++  else
++    let digits = lit.int_digits ^ lit.frac_digits ^ (String.make (s - needed) '0') in
++    let n = Z.of_string digits in
++    Some (if lit.negative then Z.neg n else n)
++
++let fits_precision (coef: Z.t) (p: int): bool =
++  Z.lt (Z.abs coef) (Z.pow (Z.of_int 10) p)
++
++(* The smallest (P, S) that holds the value exactly: `2` is (1, 0), `0.0825` is (4, 4), `1.50` is (2, 1). *)
++let minimal_type (lit: literal): int * int =
++  let s = String.length lit.frac_digits in
++  let significant = String.length (strip_leading_zeros (lit.int_digits ^ lit.frac_digits)) in
++  (max (max significant s) 1, s)
++
++(* C has no 128-bit literals, so the runtime rebuilds the coefficient from two 64-bit halves. *)
++let c_literal (coef: Z.t): string =
++  let chunk = Z.pow (Z.of_int 10) 19 in
++  let (hi, lo) = Z.div_rem (Z.abs coef) chunk in
++  Printf.sprintf "au_dec_lit(%d, %sULL, %sULL)" (if Z.sign coef < 0 then 1 else 0) (Z.to_string hi) (Z.to_string lo)
+diff -ruN a/lib/Env.ml b/lib/Env.ml
+--- a/lib/Env.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/Env.ml	2026-11-12 14:53:29.342833920 +0000
+@@ -306,9 +306,12 @@
+        equal_decl_id union_id id
+     | _ -> false
+   in
+-  List.filter pred decls
++  (* Decimal prototype: `decls` is newest-first, which made the C tag of a case
++     its index counted from the last case. The Decimal runtime takes the tag of a
++     RoundingMode as a number, so cases come back in declaration order. *)
++  List.sort (fun a b -> compare (decl_id a) (decl_id b)) (List.filter pred decls)
+ 
+-let get_callable (env: env) (importing_module_name: module_name) (name: sident): callable option =
++let get_callable(env: env) (importing_module_name: module_name) (name: sident): callable option =
+   let _ = importing_module_name in
+   match get_decl_by_name env name with
+   | Some decl ->
+diff -ruN a/lib/ExportInstantiation.ml b/lib/ExportInstantiation.ml
+--- a/lib/ExportInstantiation.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/ExportInstantiation.ml	2026-11-12 14:53:29.342904527 +0000
+@@ -67,6 +67,8 @@
+      CNamedType "float"
+   | DoubleFloat ->
+      CNamedType "double"
++  | DecimalTy _ ->
++     CNamedType "au_decimal_t"
+   | NamedType _ ->
+      Errors.disallowed_type ty
+   | RegionTy _ ->
+diff -ruN a/lib/MonoType.ml b/lib/MonoType.ml
+--- a/lib/MonoType.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/MonoType.ml	2026-11-12 14:53:29.342937115 +0000
+@@ -18,6 +18,7 @@
+   | MonoInteger of signedness * integer_width
+   | MonoSingleFloat
+   | MonoDoubleFloat
++  | MonoDecimal of int * int
+   | MonoNamedType of mono_id
+   | MonoRegionTy of region
+   | MonoReadRef of mono_ty * mono_ty
+diff -ruN a/lib/Monomorphize.ml b/lib/Monomorphize.ml
+--- a/lib/Monomorphize.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/Monomorphize.ml	2026-11-12 14:53:29.343003832 +0000
+@@ -53,6 +53,8 @@
+      (MonoSingleFloat, env)
+   | SDoubleFloat ->
+      (MonoDoubleFloat, env)
++  | SDecimal (p, s) ->
++     (MonoDecimal (p, s), env)
+   | SRegionTy r ->
+      (MonoRegionTy r, env)
+   | SReadRef (ty, region) ->
+@@ -774,6 +776,7 @@
+   | MonoInteger (s, w) -> Integer (s, w)
+   | MonoSingleFloat -> SingleFloat
+   | MonoDoubleFloat -> DoubleFloat
++  | MonoDecimal (p, s) -> DecimalTy (p, s)
+   | MonoNamedType mono_id ->
+      (* SPECIAL CASE *)
+      MonoTy mono_id
+diff -ruN a/lib/Parser.mly b/lib/Parser.mly
+--- a/lib/Parser.mly	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/Parser.mly	2026-11-12 14:53:29.343147023 +0000
+@@ -542,8 +542,13 @@
+   | IDENTIFIER { [$1] }
+   ;
+ 
++typespec_arg:
++  | typespec { $1 }
++  | DEC_CONSTANT { ConcreteNatSpec $1 }
++  ;
++
+ typespec:
+-  | identifier LBRACKET separated_list(COMMA, typespec) RBRACKET { TypeSpecifier ($1, $3) }
++  | identifier LBRACKET separated_list(COMMA, typespec_arg) RBRACKET { TypeSpecifier ($1, $3) }
+   | identifier { TypeSpecifier ($1, []) }
+   | BORROW_READ LBRACKET typespec COMMA typespec RBRACKET { ConcreteReadRef ($3, $5) }
+   | BORROW_WRITE LBRACKET typespec COMMA typespec RBRACKET { ConcreteWriteRef ($3, $5) }
+diff -ruN a/lib/Qualifier.ml b/lib/Qualifier.ml
+--- a/lib/Qualifier.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/Qualifier.ml	2026-11-12 14:53:29.343195885 +0000
+@@ -28,3 +28,5 @@
+      QSpan (qualify_typespec m t, qualify_typespec m r)
+   | ConcreteSpanWrite (t, r) ->
+      QSpanWrite (qualify_typespec m t, qualify_typespec m r)
++  | ConcreteNatSpec n ->
++     QNatSpec n
+diff -ruN a/lib/Stages.ml b/lib/Stages.ml
+--- a/lib/Stages.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/Stages.ml	2026-11-12 14:53:29.343245902 +0000
+@@ -21,6 +21,7 @@
+     | QWriteRef of qtypespec * qtypespec
+     | QSpan of qtypespec * qtypespec
+     | QSpanWrite of qtypespec * qtypespec
++    | QNatSpec of string
+   [@@deriving show]
+ 
+   type qbinding =
+diff -ruN a/lib/Type.ml b/lib/Type.ml
+--- a/lib/Type.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/Type.ml	2026-11-12 14:53:29.343306973 +0000
+@@ -42,6 +42,7 @@
+   | Integer of signedness * integer_width
+   | SingleFloat
+   | DoubleFloat
++  | DecimalTy of int * int
+   | NamedType of qident * ty list * universe
+   | RegionTy of region
+   | ReadRef of ty * ty
+@@ -92,6 +93,8 @@
+      single_float_name
+   | DoubleFloat ->
+      double_float_name
++  | DecimalTy (p, s) ->
++     "Decimal[" ^ (string_of_int p) ^ ", " ^ (string_of_int s) ^ "]"
+   | NamedType (n, args, _) ->
+      (ident_string (local_name n)) ^ args_string args
+   | RegionTy r ->
+@@ -162,6 +165,12 @@
+          true
+       | _ ->
+          false)
++  | DecimalTy (p, s) ->
++     (match b with
++      | DecimalTy (p', s') ->
++         (p = p') && (s = s')
++      | _ ->
++         false)
+   | NamedType (n, args, u) ->
+      (match b with
+       | NamedType (n', args', u') ->
+diff -ruN a/lib/Type.mli b/lib/Type.mli
+--- a/lib/Type.mli	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/Type.mli	2026-11-12 14:53:29.343377128 +0000
+@@ -39,6 +39,7 @@
+   | Integer of signedness * integer_width
+   | SingleFloat
+   | DoubleFloat
++  | DecimalTy of int * int
+   | NamedType of qident * ty list * universe
+   | RegionTy of region
+   | ReadRef of ty * ty
+diff -ruN a/lib/TypeBindings.ml b/lib/TypeBindings.ml
+--- a/lib/TypeBindings.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/TypeBindings.ml	2026-11-12 14:53:29.343420571 +0000
+@@ -148,6 +148,8 @@
+      SingleFloat
+   | DoubleFloat ->
+      DoubleFloat
++  | DecimalTy (p, s) ->
++     DecimalTy (p, s)
+   | NamedType (n, a, u) ->
+      let a' = List.map (replace_variables bindings) a in
+      if u = TypeUniverse then
+diff -ruN a/lib/TypeCheckExpr.ml b/lib/TypeCheckExpr.ml
+--- a/lib/TypeCheckExpr.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/TypeCheckExpr.ml	2026-11-12 14:53:29.343551483 +0000
+@@ -210,6 +210,207 @@
+   in
+   bindings_from_list (List.filter_map f (typarams_as_list typarams))
+ 
++(* Decimal prototype (issue #19). Throwaway code.
++
++   Every Decimal operation becomes a TEmbed of a call into the C runtime, so the
++   typed AST, the monomorphizer and the code generator need no new node. *)
++
++let decimal_error (text: ErrorText.err_text) =
++  austral_raise TypeError text
++
++let decimal_literal_text (e: aexpr): string option =
++  match e with
++  | IntConstant s -> Some s
++  | FloatConstant s -> Some s
++  | _ -> None
++
++let parse_decimal_literal (text: string): DecimalLit.literal =
++  match DecimalLit.parse text with
++  | DecimalLit.Parsed lit ->
++     lit
++  | DecimalLit.HasExponent ->
++     decimal_error [
++         Text "The literal ";
++         Code text;
++         Text " uses exponent notation, which is not allowed for a Decimal literal."
++       ]
++  | DecimalLit.Malformed ->
++     decimal_error [
++         Text "The literal ";
++         Code text;
++         Text " cannot be read as a Decimal literal."
++       ]
++
++(* A literal in a position that expects Decimal[p, s]: it must be that type's value exactly. *)
++let decimal_literal_as (p: int) (s: int) (text: string): texpr =
++  let ty = DecimalTy (p, s) in
++  let lit = parse_decimal_literal text in
++  match DecimalLit.coefficient lit s with
++  | None ->
++     decimal_error [
++         Text "The literal ";
++         Code text;
++         Text " is not exactly representable in ";
++         Type ty;
++         Text ": it needs more than ";
++         Text (string_of_int s);
++         Text " fractional digits."
++       ]
++  | Some coef ->
++     if DecimalLit.fits_precision coef p then
++       TEmbed (ty, DecimalLit.c_literal coef, [])
++     else
++       decimal_error [
++           Text "The literal ";
++           Code text;
++           Text " is not exactly representable in ";
++           Type ty;
++           Text ": it does not fit in ";
++           Text (string_of_int p);
++           Text " digits."
++         ]
++
++(* A literal operand of `*` or of a Decimal built-in: the smallest type that holds its value. *)
++let decimal_literal_minimal (text: string): texpr =
++  let lit = parse_decimal_literal text in
++  let (p, s) = DecimalLit.minimal_type lit in
++  if p > 38 then
++    decimal_error [
++        Text "The literal ";
++        Code text;
++        Text " needs more than 38 digits, so it has no Decimal type."
++      ]
++  else
++    decimal_literal_as p s text
++
++let is_decimal_type (ty: ty): bool =
++  match ty with
++  | DecimalTy _ -> true
++  | _ -> false
++
++(* Literal arguments passed where the declared parameter type is a Decimal.
++   The expected type does not reach an argument while it is being checked, so this
++   runs afterwards on the checked arguments, where the literal's text is still there. *)
++let coerce_decimal_literal_args (params: value_parameter list) (args: texpr list): texpr list =
++  if (List.length params) <> (List.length args) then
++    args
++  else
++    List.map2
++      (fun (ValueParameter (_, ty)) arg ->
++        match (ty, arg) with
++        | (DecimalTy (p, s), TIntConstant text) -> decimal_literal_as p s text
++        | (DecimalTy (p, s), TFloatConstant text) -> decimal_literal_as p s text
++        | _ -> arg)
++      params
++      args
++
++let augment_decimal_arithmetic (op: arithmetic_operator) ((lhs, lhs'): aexpr * texpr) ((rhs, rhs'): aexpr * texpr) (asserted_ty: ty option): texpr =
++  let not_decimal (symbol: string) (a: ty) (b: ty) =
++    decimal_error [
++        Text "Both operands of ";
++        Code symbol;
++        Text " must be Decimal values or literals, but their types are ";
++        Type a;
++        Text " and ";
++        Type b;
++        Text "."
++      ]
++  in
++  match op with
++  | Divide ->
++     decimal_error [
++         Text "The operator ";
++         Code "/";
++         Text " is not defined for Decimal. Use ";
++         Code "divide(a, b, mode)";
++         Text " and give the result a type, for example ";
++         Code "let q: Decimal[9, 4] := divide(a, b, NearestEven());"
++       ]
++  | Multiply ->
++     let operand (e, e') =
++       match decimal_literal_text e with
++       | Some text -> decimal_literal_minimal text
++       | None -> e'
++     in
++     let l = operand (lhs, lhs')
++     and r = operand (rhs, rhs') in
++     (match (get_type l, get_type r) with
++      | (DecimalTy (p1, s1), DecimalTy (p2, s2)) ->
++         if (p1 + p2) > 38 then
++           decimal_error [
++               Text "The product of ";
++               Type (get_type l);
++               Text " and ";
++               Type (get_type r);
++               Text " needs a precision of ";
++               Text (string_of_int (p1 + p2));
++               Text ", which is more than 38. Narrow an operand first with ";
++               Code "round";
++               Text " or ";
++               Code "exact";
++               Text "."
++             ]
++         else
++           TEmbed (DecimalTy (p1 + p2, s1 + s2), "zd_mul($1, $2)", [l; r])
++      | (a, b) ->
++         not_decimal "*" a b)
++  | Add | Subtract ->
++     let symbol = (match op with Add -> "+" | _ -> "-") in
++     let lhs_ty = get_type lhs'
++     and rhs_ty = get_type rhs' in
++     (* A literal takes the other operand's type. Two literals take the type the position expects. *)
++     let (p, s) =
++       (match (lhs_ty, rhs_ty, asserted_ty) with
++        | (DecimalTy (p, s), _, _) -> (p, s)
++        | (_, DecimalTy (p, s), _) -> (p, s)
++        | (_, _, Some (DecimalTy (p, s))) -> (p, s)
++        | _ -> not_decimal symbol lhs_ty rhs_ty)
++     in
++     let operand (e, e') =
++       match decimal_literal_text e with
++       | Some text -> decimal_literal_as p s text
++       | None -> e'
++     in
++     let l = operand (lhs, lhs')
++     and r = operand (rhs, rhs') in
++     (match (get_type l, get_type r) with
++      | (DecimalTy (p1, s1), DecimalTy (p2, s2)) ->
++         if (p1 = p2) && (s1 = s2) then
++           let fn = (match op with Add -> "au_dec_add" | _ -> "au_dec_sub") in
++           TEmbed (DecimalTy (p, s), Printf.sprintf "%s($1, $2, %d)" fn p, [l; r])
++         else
++           decimal_error [
++               Text "The operands of ";
++               Code symbol;
++               Text " must have the same Decimal type, but their types are ";
++               Type (get_type l);
++               Text " and ";
++               Type (get_type r);
++               Text ". Convert one side with ";
++               Code "widen";
++               Text ", ";
++               Code "round";
++               Text " or ";
++               Code "exact";
++               Text "."
++             ]
++      | (a, b) ->
++         not_decimal symbol a b)
++
++let decimal_builtin_names: string list =
++  ["divide"; "round"; "exact"; "widen"; "checkedAdd"; "checkedDivide"; "debugPrintDecimal"]
++
++(* The number of decimal digits that is enough for every value of an integer type. *)
++let integer_type_digits (signedness: signedness) (width: integer_width): int =
++  match (signedness, width) with
++  | (_, Width8) -> 3
++  | (_, Width16) -> 5
++  | (_, Width32) -> 10
++  | (Signed, Width64) -> 19
++  | (Unsigned, Width64) -> 20
++  | (_, WidthByteSize) -> 20
++  | (_, WidthIndex) -> 20
++
+ (* Type Checking: Function Calls *)
+ 
+ let rec augment_call (ctx: expr_ctx) (name: qident) (args: typed_arglist) (asserted_ty: ty option): texpr =
+@@ -289,6 +490,7 @@
+          list to a positional list. *)
+       let param_names = List.map (fun (ValueParameter (n, _)) -> n) params in
+       let arguments: texpr list = arglist_to_positional (args, param_names) in
++      let arguments = coerce_decimal_literal_args params arguments in
+       (* Check the list of params against the list of arguments *)
+       let bindings = check_argument_list ctx (original_name name) params arguments in
+       (* Use the bindings to get the effective return type *)
+@@ -323,6 +525,7 @@
+     let arguments = arglist_to_positional (args, slot_names) in
+     (* Check the list of params against the list of arguments *)
+     let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
++    let arguments = coerce_decimal_literal_args params arguments in
+     let bindings = check_argument_list ctx (original_name name) params arguments in
+     (* Use the bindings to get the effective return type *)
+     let rt = NamedType (name,
+@@ -363,6 +566,7 @@
+         let arguments = arglist_to_positional (args, slot_names) in
+         (* Check the list of params against the list of arguments *)
+         let params = List.map (fun (TypedSlot (n, t)) -> ValueParameter (n, t)) slots in
++        let arguments = coerce_decimal_literal_args params arguments in
+         ps ("Params", String.concat "\n" (List.map (fun (ValueParameter (n, t)) -> (ident_string n) ^ ": " ^ (type_string t)) params));
+         ps ("Arguments", String.concat "\n" (List.map show_texpr arguments));
+         let bindings = check_argument_list ctx case_name params arguments in
+@@ -522,9 +726,13 @@
+   | BoolConstant b ->
+      TBoolConstant b
+   | IntConstant i ->
+-     TIntConstant i
++     (match asserted_ty with
++      | Some (DecimalTy (p, s)) -> decimal_literal_as p s i
++      | _ -> TIntConstant i)
+   | FloatConstant f ->
+-     TFloatConstant f
++     (match asserted_ty with
++      | Some (DecimalTy (p, s)) -> decimal_literal_as p s f
++      | _ -> TFloatConstant f)
+   | StringConstant s ->
+      TStringConstant s
+   | Variable name ->
+@@ -532,8 +740,12 @@
+   | Temporary name ->
+      augment_temporary ctx name
+   | FunctionCall (name, args) ->
+-     let arglist: typed_arglist = augment_arglist ctx args in
+-     augment_call ctx name arglist asserted_ty
++     (match augment_decimal_builtin ctx name args asserted_ty with
++      | Some e ->
++         e
++      | None ->
++         let arglist: typed_arglist = augment_arglist ctx args in
++         augment_call ctx name arglist asserted_ty)
+   | ArithmeticExpression (op, lhs, rhs) ->
+      augment_arithmetic ctx op lhs rhs asserted_ty
+   | Comparison (op, lhs, rhs) ->
+@@ -613,6 +825,12 @@
+ and augment_comparison ctx op lhs rhs =
+   let lhs' = aug ctx lhs
+   and rhs' = aug ctx rhs in
++  let (lhs', rhs') =
++    match (get_type lhs', decimal_literal_text lhs, get_type rhs', decimal_literal_text rhs) with
++    | (DecimalTy (p, s), _, _, Some text) -> (lhs', decimal_literal_as p s text)
++    | (_, Some text, DecimalTy (p, s), _) -> (decimal_literal_as p s text, rhs')
++    | _ -> (lhs', rhs')
++  in
+   let _ = match_type_with_value_ctx ctx (get_type lhs') rhs' in
+   TComparison (op, lhs', rhs')
+ 
+@@ -934,6 +1152,11 @@
+     in
+     augment_call ctx op_qname args asserted_ty
+   in
++  let both_literals = (decimal_literal_text lhs <> None) && (decimal_literal_text rhs <> None)
++  and asserted_decimal = (match asserted_ty with Some (DecimalTy _) -> true | _ -> false) in
++  if (is_decimal_type lhs_ty) || (is_decimal_type rhs_ty) || (asserted_decimal && both_literals) then
++    augment_decimal_arithmetic op (lhs, lhs') (rhs, rhs') asserted_ty
++  else
+   (* Are the types the same? *)
+   if lhs_ty = rhs_ty then
+     (* If the types are the same type, check it is a numeric type. *)
+@@ -951,6 +1174,216 @@
+     else
+       Errors.arithmetic_incompatible_types ~lhs:lhs_ty ~rhs:rhs_ty
+ 
++(* The Decimal built-ins. Most of them take their result type from the position,
++   which is why they cannot be ordinary functions: a function cannot read its
++   own type arguments as numbers. Returns None when the name is not a built-in
++   or the program defines something with that name. *)
++and augment_decimal_builtin (ctx: expr_ctx) (name: qident) (args: abstract_arglist) (asserted_ty: ty option): texpr option =
++  let builtin: string = ident_string (original_name name) in
++  let shadowed _ =
++    (get_var (ctx_lexenv ctx) (local_name name) <> None)
++    || (get_callable (ctx_env ctx) (ctx_module_name ctx) (qident_to_sident name) <> None)
++  in
++  if not (List.mem builtin decimal_builtin_names) || shadowed () then
++    None
++  else
++    let args: aexpr list =
++      match args with
++      | Positional args -> args
++      | Named _ ->
++         decimal_error [Text "The built-in "; Code builtin; Text " takes positional arguments."]
++    in
++    let wrong_arity (expected: int) =
++      decimal_error [
++          Text "The built-in ";
++          Code builtin;
++          Text " takes ";
++          Text (string_of_int expected);
++          Text " arguments, but I found ";
++          Text (string_of_int (List.length args));
++          Text "."
++        ]
++    in
++    (* A literal argument gets the smallest Decimal type that holds it. *)
++    let operand (e: aexpr): texpr =
++      match decimal_literal_text e with
++      | Some text -> decimal_literal_minimal text
++      | None -> aug ctx e
++    in
++    let decimal_operand (e: aexpr): texpr * int * int =
++      let e' = operand e in
++      match get_type e' with
++      | DecimalTy (p, s) -> (e', p, s)
++      | ty ->
++         decimal_error [
++             Text "The built-in ";
++             Code builtin;
++             Text " expects a Decimal value here, but got a value of type ";
++             Type ty;
++             Text "."
++           ]
++    in
++    let mode_operand (e: aexpr): texpr =
++      let e' = aug ctx e in
++      match get_type e' with
++      | NamedType (n, [], _) when (equal_module_name (source_module_name n) pervasive_module_name)
++                                  && (ident_string (original_name n) = "RoundingMode") ->
++         e'
++      | ty ->
++         decimal_error [
++             Text "The rounding mode of ";
++             Code builtin;
++             Text " must be a RoundingMode, for example ";
++             Code "NearestEven()";
++             Text ", but got a value of type ";
++             Type ty;
++             Text "."
++           ]
++    in
++    let no_result_type _ =
++      decimal_error [
++          Text "The result type of ";
++          Code builtin;
++          Text " comes from where it is used, and this position does not give one. Bind it with a type, as in ";
++          Code ("let x: Decimal[9, 4] := " ^ builtin ^ "(...);");
++          Text ", return it from a function whose return type is a Decimal, or write ";
++          Code (builtin ^ "(...) : Decimal[9, 4]");
++          Text "."
++        ]
++    in
++    let result_type _: int * int =
++      match asserted_ty with
++      | Some (DecimalTy (p, s)) -> (p, s)
++      | _ -> no_result_type ()
++    in
++    (* `Option[Decimal[p, s]]` for the checked forms. *)
++    let optional_result_type _: ty * int * int =
++      match asserted_ty with
++      | Some ((NamedType (n, [DecimalTy (p, s)], _)) as ty)
++           when (equal_module_name (source_module_name n) pervasive_module_name)
++                && (ident_string (original_name n) = "Option") ->
++         (ty, p, s)
++      | _ ->
++         decimal_error [
++             Text "The result type of ";
++             Code builtin;
++             Text " comes from where it is used, and it must be an Option of a Decimal, as in ";
++             Code ("let r: Option[Decimal[9, 4]] := " ^ builtin ^ "(...);")
++           ]
++    in
++    (* The checked forms call the runtime twice: once for the verdict, once for
++       the value. Both calls evaluate the operand expressions. *)
++    let optional (ty: ty) (ok: texpr) (value: texpr): texpr =
++      TIfExpression (
++          ok,
++          TUnionConstructor (ty, make_ident "Some", [(make_ident "value", value)]),
++          TUnionConstructor (ty, make_ident "None", [])
++        )
++    in
++    let sp = Printf.sprintf in
++    Some
++      (match (builtin, args) with
++       | ("divide", [a; b; mode]) ->
++          let (a, _, s1) = decimal_operand a
++          and (b, _, s2) = decimal_operand b
++          and mode = mode_operand mode in
++          let (p3, s3) = result_type () in
++          TEmbed (DecimalTy (p3, s3), sp "au_dec_div($1, %d, $2, %d, %d, %d, (int)($3).tag)" s1 s2 p3 s3, [a; b; mode])
++       | ("divide", _) ->
++          wrong_arity 3
++       | ("round", [x; mode]) ->
++          let x' = operand x
++          and mode = mode_operand mode in
++          let (p2, s2) = result_type () in
++          (match get_type x' with
++           | DecimalTy (_, s) ->
++              TEmbed (DecimalTy (p2, s2), sp "au_dec_round($1, %d, %d, %d, (int)($2).tag)" s p2 s2, [x'; mode])
++           | DoubleFloat ->
++              TEmbed (DecimalTy (p2, s2), sp "au_dec_from_double($1, %d, %d, (int)($2).tag)" p2 s2, [x'; mode])
++           | ty ->
++              decimal_error [Text "The built-in "; Code "round"; Text " takes a Decimal or a Float64, but got a value of type "; Type ty; Text "."])
++       | ("round", _) ->
++          wrong_arity 2
++       | ("exact", [x]) ->
++          let x' = operand x in
++          let (p2, s2) = result_type () in
++          (match get_type x' with
++           | DecimalTy (_, s) ->
++              TEmbed (DecimalTy (p2, s2), sp "au_dec_exact($1, %d, %d, %d)" s p2 s2, [x'])
++           | Integer _ ->
++              TEmbed (DecimalTy (p2, s2), sp "au_dec_exact((au_decimal_t)($1), 0, %d, %d)" p2 s2, [x'])
++           | ty ->
++              decimal_error [Text "The built-in "; Code "exact"; Text " takes a Decimal or an integer, but got a value of type "; Type ty; Text "."])
++       | ("exact", _) ->
++          wrong_arity 1
++       | ("widen", [x]) ->
++          let x' = operand x in
++          let (p2, s2) = result_type () in
++          let source_ty = get_type x' in
++          (* The source as (digits before the point, scale). *)
++          let (int_digits, s, conversion) =
++            (match source_ty with
++             | DecimalTy (p, s) -> (p - s, s, "$1")
++             | Integer (signedness, width) -> (integer_type_digits signedness width, 0, "(au_decimal_t)($1)")
++             | ty ->
++                decimal_error [Text "The built-in "; Code "widen"; Text " takes a Decimal or an integer, but got a value of type "; Type ty; Text "."])
++          in
++          if (s2 >= s) && ((p2 - s2) >= int_digits) then
++            TEmbed (DecimalTy (p2, s2), sp "zd_widen(%s, %d, %d)" conversion s s2, [x'])
++          else
++            decimal_error [
++                Text "Cannot widen ";
++                Type source_ty;
++                Text " to ";
++                Type (DecimalTy (p2, s2));
++                Text ": the target needs a scale of at least ";
++                Text (string_of_int s);
++                Text " and at least ";
++                Text (string_of_int int_digits);
++                Text " digits before the point. Use ";
++                Code "round";
++                Text " or ";
++                Code "exact";
++                Text " for a conversion that can lose digits."
++              ]
++       | ("widen", _) ->
++          wrong_arity 1
++       | ("checkedAdd", [a; b]) ->
++          let (ty, p, s) = optional_result_type () in
++          let checked_operand (e: aexpr): texpr =
++            let e' =
++              (match decimal_literal_text e with
++               | Some text -> decimal_literal_as p s text
++               | None -> aug ctx e)
++            in
++            let _ = match_type_ctx ctx (DecimalTy (p, s)) (get_type e') in
++            e'
++          in
++          let a = checked_operand a
++          and b = checked_operand b in
++          optional ty
++            (TEmbed (Boolean, sp "zd_add($1, $2, %d, &(au_decimal_t){0})" p, [a; b]))
++            (TEmbed (DecimalTy (p, s), sp "au_dec_add($1, $2, %d)" p, [a; b]))
++       | ("checkedAdd", _) ->
++          wrong_arity 2
++       | ("checkedDivide", [a; b; mode]) ->
++          let (a, _, s1) = decimal_operand a
++          and (b, _, s2) = decimal_operand b
++          and mode = mode_operand mode in
++          let (ty, p3, s3) = optional_result_type () in
++          optional ty
++            (TEmbed (Boolean, sp "zd_div($1, %d, $2, %d, %d, %d, (zd_mode)($3).tag, &(au_decimal_t){0})" s1 s2 p3 s3, [a; b; mode]))
++            (TEmbed (DecimalTy (p3, s3), sp "au_dec_div($1, %d, $2, %d, %d, %d, (int)($3).tag)" s1 s2 p3 s3, [a; b; mode]))
++       | ("checkedDivide", _) ->
++          wrong_arity 3
++       | ("debugPrintDecimal", [x]) ->
++          let (x, _, s) = decimal_operand x in
++          TEmbed (Unit, sp "(au_dec_debug_print($1, %d), nil)" s, [x])
++       | ("debugPrintDecimal", _) ->
++          wrong_arity 1
++       | _ ->
++          internal_err ("unknown Decimal built-in: " ^ builtin))
++
+ (* Further utilities, these have to be defined here because of `let rec and`
+    bullshit. *)
+ 
+diff -ruN a/lib/TypeClasses.ml b/lib/TypeClasses.ml
+--- a/lib/TypeClasses.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/TypeClasses.ml	2026-11-12 14:53:29.343747465 +0000
+@@ -116,6 +116,7 @@
+   | Integer _ -> ()
+   | SingleFloat -> ()
+   | DoubleFloat -> ()
++  | DecimalTy _ -> ()
+   | NamedType (_, args, _) ->
+      let _ = all_distinct (List.map is_tyvar args) in
+      let _ = no_leftovers (List.length args) in
+@@ -181,6 +182,10 @@
+      (match b with
+       | DoubleFloat -> true
+       | _ -> false)
++  | DecimalTy (p, s) ->
++     (match b with
++      | DecimalTy (p', s') -> (p = p') && (s = s')
++      | _ -> false)
+   | NamedType (name, _, _) ->
+      (match b with
+       | NamedType (name', _, _) ->
+@@ -256,6 +261,8 @@
+      true
+   | DoubleFloat ->
+      true
++  | DecimalTy _ ->
++     true
+   | NamedType (name, _, _) ->
+      let type_mod_id: mod_id = decl_mod_id (get_decl_by_name_or_die env (qident_to_sident name)) in
+      equal_mod_id mod_id type_mod_id
+diff -ruN a/lib/TypeMatch.ml b/lib/TypeMatch.ml
+--- a/lib/TypeMatch.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/TypeMatch.ml	2026-11-12 14:53:29.343806420 +0000
+@@ -88,6 +88,15 @@
+          empty_bindings
+       | _ ->
+          Errors.type_mismatch a b)
++  | DecimalTy (p, s) ->
++     (match b with
++      | DecimalTy (p', s') ->
++         if (p = p') && (s = s') then
++           empty_bindings
++         else
++           Errors.type_mismatch a b
++      | _ ->
++         Errors.type_mismatch a b)
+   | NamedType (n, args, _) ->
+      (match b with
+       | NamedType (n', args', _) ->
+diff -ruN a/lib/TypeParser.ml b/lib/TypeParser.ml
+--- a/lib/TypeParser.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/TypeParser.ml	2026-11-12 14:53:29.343871135 +0000
+@@ -21,6 +21,13 @@
+ open ErrorText
+ 
+ module Errors = struct
++  let bad_decimal_type (why: string) =
++    austral_raise TypeError [
++      Text "Invalid Decimal type: ";
++      Text why;
++      Text "."
++    ]
++
+   let function_pointer_no_args () =
+     austral_raise ParseError [
+       Text "Function pointer type specifier must have at least one argument."
+@@ -228,6 +235,29 @@
+ 
+ let rec parse_type (env: env) (sigs: type_signature list) (rm: region_map) (typarams: typarams) (ts: qtypespec): ty =
+   match ts with
++  | QTypeSpecifier (name, args) when ident_string (original_name name) = "Decimal" ->
++     (match args with
++      | [QNatSpec p; QNatSpec s] ->
++         (* The lexer reads `-1` as one literal, so a sign shows up here as a failed parse or a negative number. *)
++         let (p, s) =
++           (match (int_of_string_opt p, int_of_string_opt s) with
++            | (Some p, Some s) -> (p, s)
++            | _ -> Errors.bad_decimal_type "the precision and the scale must be plain integer literals")
++         in
++         if (p < 1) || (p > 38) then
++           Errors.bad_decimal_type ("the precision must be between 1 and 38, but it is " ^ (string_of_int p))
++         else if (s < 0) || (s > p) then
++           Errors.bad_decimal_type ("the scale must be between 0 and the precision, but it is " ^ (string_of_int s))
++         else
++           DecimalTy (p, s)
++      | _ ->
++         Errors.bad_decimal_type "it takes exactly two integer literals, the precision and the scale")
++  | QNatSpec n ->
++     austral_raise TypeError [
++         Text "The integer literal ";
++         Code n;
++         Text " is not a type. Only Decimal takes integer literals as type arguments."
++       ]
+   | QTypeSpecifier (name, args) ->
+      let args' = List.map (parse_type env sigs rm typarams) args in
+      (match parse_built_in_type name args' with
+diff -ruN a/lib/TypeStripping.ml b/lib/TypeStripping.ml
+--- a/lib/TypeStripping.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/TypeStripping.ml	2026-11-12 14:53:29.343931937 +0000
+@@ -17,6 +17,7 @@
+   | SInteger of signedness * integer_width
+   | SSingleFloat
+   | SDoubleFloat
++  | SDecimal of int * int
+   | SNamedType of qident * stripped_ty list
+   | SRegionTy of region
+   | SReadRef of stripped_ty * stripped_ty
+@@ -48,6 +49,8 @@
+      Some SSingleFloat
+   | DoubleFloat ->
+      Some SDoubleFloat
++  | DecimalTy (p, s) ->
++     Some (SDecimal (p, s))
+   | NamedType (n, args, _) ->
+      Some (SNamedType (n, List.filter_map strip_type' args))
+   | RegionTy r ->
+diff -ruN a/lib/TypeStripping.mli b/lib/TypeStripping.mli
+--- a/lib/TypeStripping.mli	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/TypeStripping.mli	2026-11-12 14:53:29.343961870 +0000
+@@ -21,6 +21,7 @@
+   | SInteger of signedness * integer_width
+   | SSingleFloat
+   | SDoubleFloat
++  | SDecimal of int * int
+   | SNamedType of qident * stripped_ty list
+   | SRegionTy of region
+   | SReadRef of stripped_ty * stripped_ty
+diff -ruN a/lib/TypeSystem.ml b/lib/TypeSystem.ml
+--- a/lib/TypeSystem.ml	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/TypeSystem.ml	2026-11-12 14:53:29.344005909 +0000
+@@ -15,6 +15,7 @@
+   | Integer _ -> FreeUniverse
+   | SingleFloat -> FreeUniverse
+   | DoubleFloat -> FreeUniverse
++  | DecimalTy _ -> FreeUniverse
+   | NamedType (_, _, u) -> u
+   | RegionTy _ -> RegionUniverse
+   | ReadRef _ -> FreeUniverse
+@@ -33,6 +34,7 @@
+   | Integer _ -> true
+   | SingleFloat -> true
+   | DoubleFloat -> true
++  | DecimalTy _ -> false
+   | NamedType _ -> false
+   | RegionTy _ -> false
+   | ReadRef _ -> false
+@@ -51,6 +53,7 @@
+   | Integer _ -> true
+   | SingleFloat -> true
+   | DoubleFloat -> true
++  | DecimalTy _ -> true
+   | NamedType _ -> false
+   | RegionTy _ -> false
+   | ReadRef _ -> false
+@@ -74,6 +77,8 @@
+      TypeVarSet.empty
+   | DoubleFloat ->
+      TypeVarSet.empty
++  | DecimalTy _ ->
++     TypeVarSet.empty
+   | NamedType (_, a, _) ->
+      List.fold_left TypeVarSet.union TypeVarSet.empty (List.map type_variables a)
+   | RegionTy _ ->
+@@ -106,6 +111,7 @@
+   | Integer _ -> true
+   | SingleFloat -> true
+   | DoubleFloat -> true
++  | DecimalTy _ -> true
+   | NamedType _ -> false
+   | RegionTy _ ->
+      true
+diff -ruN a/lib/builtin/Pervasive.aui b/lib/builtin/Pervasive.aui
+--- a/lib/builtin/Pervasive.aui	2026-11-12 14:22:52.000000000 +0000
++++ b/lib/builtin/Pervasive.aui	2026-11-12 14:53:29.344047781 +0000
+@@ -39,6 +39,16 @@
+         case ExitFailure;
+     end;
+ 
++    union RoundingMode: Free is
++        case NearestEven;
++        case NearestAwayFromZero;
++        case NearestTowardZero;
++        case AwayFromZero;
++        case TowardZero;
++        case TowardGreater;
++        case TowardLesser;
++    end;
++
+     constant maximum_nat8: Nat8;
+     constant maximum_nat16: Nat16;
+     constant maximum_nat32: Nat32;

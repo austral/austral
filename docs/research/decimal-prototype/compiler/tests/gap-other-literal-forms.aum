@@ -1,0 +1,9 @@
+module body GapOtherLiteralForms is
+    function main(): ExitCode is
+        let x: Decimal[7, 2] := #xFF;
+        let y: Decimal[7, 2] := 'a';
+        debugPrintDecimal(x);
+        debugPrintDecimal(y);
+        return ExitSuccess();
+    end;
+end module body.

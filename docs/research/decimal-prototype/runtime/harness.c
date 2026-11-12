@@ -10,6 +10,10 @@ unsigned char au_abort_internal(const char *message) {
   exit(3);
 }
 
+static void zd_write_line(const char *text) {
+  puts(text);
+}
+
 #include "decimal.c"
 
 static au_decimal_t parse(const char *text) {

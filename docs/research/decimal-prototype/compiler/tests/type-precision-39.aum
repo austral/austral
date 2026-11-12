@@ -1,0 +1,6 @@
+module body TypePrecision39 is
+    function main(): ExitCode is
+        let a: Decimal[39, 2] := 0;
+        return ExitSuccess();
+    end;
+end module body.

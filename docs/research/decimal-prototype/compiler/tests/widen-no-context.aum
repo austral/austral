@@ -1,0 +1,7 @@
+module body WidenNoContext is
+    function main(): ExitCode is
+        let x: Decimal[7, 2] := 1;
+        debugPrintDecimal(widen(x));
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,10 @@
+module body LiteralReturnMisfit is
+    function rate(): Decimal[4, 4] is
+        return 0.08251;
+    end;
+
+    function main(): ExitCode is
+        debugPrintDecimal(rate());
+        return ExitSuccess();
+    end;
+end module body.

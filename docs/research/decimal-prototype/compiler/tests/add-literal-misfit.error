@@ -1,0 +1,1 @@
+The literal `0.001` is not exactly representable in `Decimal[7, 2]`

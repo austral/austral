@@ -1,0 +1,18 @@
+module body Widen is
+    function mills(x: Decimal[7, 2]): Decimal[8, 3] is
+        return widen(x);
+    end;
+
+    function main(): ExitCode is
+        let x: Decimal[7, 2] := 12.34;
+        let a: Decimal[9, 4] := widen(x);
+        debugPrintDecimal(a);
+        let b: Decimal[9, 2] := widen(x);
+        debugPrintDecimal(b);
+        debugPrintDecimal(widen(x) : Decimal[7, 2]);
+        let c: Decimal[38, 33] := widen(x);
+        debugPrintDecimal(c);
+        debugPrintDecimal(mills(-x));
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,7 @@
+module body GapIntegerLiteralDivisionFolds is
+    function main(): ExitCode is
+        let x: Decimal[7, 2] := 4 / 3;
+        debugPrintDecimal(x);
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,6 @@
+module body GapLiteralUnderGenericConstructor is
+    function main(): ExitCode is
+        let o: Option[Decimal[7, 2]] := Some(value => 1.23);
+        return ExitSuccess();
+    end;
+end module body.

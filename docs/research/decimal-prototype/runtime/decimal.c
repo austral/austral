@@ -238,9 +238,10 @@ au_decimal_t au_dec_lit(int negative, unsigned long long hi, unsigned long long 
   return negative ? -(au_decimal_t)n : (au_decimal_t)n;
 }
 
+/* The embedder defines zd_write_line. Declaring puts here would clash with a
+   program that imports puts under its own C prototype. */
 void au_dec_debug_print(au_decimal_t x, int s) {
-  extern int puts(const char *text);
   char buf[48];
   zd_format(x, s, buf);
-  puts(buf);
+  zd_write_line(buf);
 }

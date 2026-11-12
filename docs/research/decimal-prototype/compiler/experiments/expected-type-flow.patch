@@ -1,0 +1,78 @@
+--- a/lib/TypeCheckExpr.ml
++++ b/lib/TypeCheckExpr.ml
+@@ -744,7 +744,7 @@
+       | Some e ->
+          e
+       | None ->
+-         let arglist: typed_arglist = augment_arglist ctx args in
++         let arglist: typed_arglist = augment_arglist_expecting ctx name args in
+          augment_call ctx name arglist asserted_ty)
+   | ArithmeticExpression (op, lhs, rhs) ->
+      augment_arithmetic ctx op lhs rhs asserted_ty
+@@ -1112,6 +1112,33 @@
+                ~target:target_type
+                ~source:(get_type expr')))
+ 
++(* Experiment: when the callee is a plain function, a parameter declared with a
++   Decimal type is the expected type of its argument. *)
++and augment_arglist_expecting (ctx: expr_ctx) (name: qident) (args: abstract_arglist): typed_arglist =
++  let params: value_parameter list option =
++    if get_var (ctx_lexenv ctx) (local_name name) <> None then
++      None
++    else
++      match get_callable (ctx_env ctx) (ctx_module_name ctx) (qident_to_sident name) with
++      | Some (FunctionCallable (_, _, params, _)) -> Some params
++      | _ -> None
++  in
++  let expected (ValueParameter (_, ty)): ty option =
++    if is_decimal_type ty then Some ty else None
++  in
++  match (args, params) with
++  | (Positional es, Some ps) when (List.length es) = (List.length ps) ->
++     TPositionalArglist (List.map2 (fun e p -> augment_expr ctx (expected p) e) es ps)
++  | (Named pairs, Some ps) ->
++     let expected_by_name (n: identifier): ty option =
++       match List.find_opt (fun (ValueParameter (pn, _)) -> equal_identifier pn n) ps with
++       | Some p -> expected p
++       | None -> None
++     in
++     TNamedArglist (List.map (fun (n, e) -> (n, augment_expr ctx (expected_by_name n) e)) pairs)
++  | _ ->
++     augment_arglist ctx args
++
+ and augment_arglist (ctx: expr_ctx) (args: abstract_arglist): typed_arglist =
+   match args with
+   | Positional args' ->
+@@ -1120,9 +1147,29 @@
+      TNamedArglist (List.map (fun (n, v) -> (n, aug ctx v)) pairs)
+ 
+ and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (rhs: aexpr) (asserted_ty: ty option): texpr =
+-  (* Augment operands. *)
+-  let lhs' = aug ctx lhs
+-  and rhs' = aug ctx rhs in
++  (* Experiment: the operands of + and - have the result's type, so an expected
++     Decimal type goes down to them. With no expected type, an operand that
++     cannot be typed alone takes the type of the other operand. *)
++  let operand_ty: ty option =
++    match (op, asserted_ty) with
++    | ((Add | Subtract), Some (DecimalTy _)) -> asserted_ty
++    | _ -> None
++  in
++  let try_operand (e: aexpr): texpr option =
++    try Some (augment_expr ctx operand_ty e) with Austral_error _ -> None
++  in
++  let (lhs', rhs') =
++    match (op, try_operand lhs, try_operand rhs) with
++    | (_, Some l, Some r) ->
++       (l, r)
++    | ((Add | Subtract), Some l, None) when is_decimal_type (get_type l) ->
++       (l, augment_expr ctx (Some (get_type l)) rhs)
++    | ((Add | Subtract), None, Some r) when is_decimal_type (get_type r) ->
++       (augment_expr ctx (Some (get_type r)) lhs, r)
++    | _ ->
++       (* Runs again to raise the original error. *)
++       (augment_expr ctx operand_ty lhs, augment_expr ctx operand_ty rhs)
++  in
+   (* Get the types. *)
+   let lhs_ty = get_type lhs'
+   and rhs_ty = get_type rhs'

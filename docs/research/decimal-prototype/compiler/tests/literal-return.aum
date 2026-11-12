@@ -1,0 +1,15 @@
+module body LiteralReturn is
+    function rate(): Decimal[4, 4] is
+        return 0.0825;
+    end;
+
+    function floor(): Decimal[2, 0] is
+        return -3;
+    end;
+
+    function main(): ExitCode is
+        debugPrintDecimal(rate());
+        debugPrintDecimal(floor());
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,16 @@
+module body Exact is
+    function cents(x: Decimal[9, 4]): Decimal[7, 2] is
+        return exact(x);
+    end;
+
+    function main(): ExitCode is
+        let x: Decimal[9, 4] := 12.3400;
+        let a: Decimal[7, 2] := exact(x);
+        debugPrintDecimal(a);
+        debugPrintDecimal(exact(x) : Decimal[4, 2]);
+        let w: Decimal[11, 6] := exact(x);
+        debugPrintDecimal(w);
+        debugPrintDecimal(cents(x));
+        return ExitSuccess();
+    end;
+end module body.

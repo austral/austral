@@ -1,0 +1,6 @@
+module body TypeArgumentNotLiteral is
+    function main(): ExitCode is
+        let a: Decimal[Int32, 2] := 0;
+        return ExitSuccess();
+    end;
+end module body.

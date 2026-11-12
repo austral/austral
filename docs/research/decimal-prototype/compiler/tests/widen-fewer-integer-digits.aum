@@ -1,0 +1,7 @@
+module body WidenFewerIntegerDigits is
+    function main(): ExitCode is
+        let x: Decimal[7, 2] := 1;
+        let a: Decimal[8, 4] := widen(x);
+        return ExitSuccess();
+    end;
+end module body.

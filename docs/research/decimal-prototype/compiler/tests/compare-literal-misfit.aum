@@ -1,0 +1,7 @@
+module body CompareLiteralMisfit is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        printLn(a = 1.234);
+        return ExitSuccess();
+    end;
+end module body.

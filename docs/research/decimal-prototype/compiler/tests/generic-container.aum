@@ -1,0 +1,25 @@
+module body GenericContainer is
+    record Pair[T: Free]: Free is
+        first: T;
+        second: T;
+    end;
+
+    generic [T: Free]
+    function same(x: T): T is
+        return x;
+    end;
+
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1.25;
+        let o: Option[Decimal[7, 2]] := Some(value => a);
+        case o of
+            when Some(value: Decimal[7, 2]) do
+                debugPrintDecimal(same(value) + a);
+            when None do
+                skip;
+        end case;
+        let p: Pair[Decimal[7, 2]] := Pair(first => a, second => a);
+        debugPrintDecimal(p.first);
+        return ExitSuccess();
+    end;
+end module body.

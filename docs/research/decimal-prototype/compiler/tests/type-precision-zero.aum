@@ -1,0 +1,6 @@
+module body TypePrecisionZero is
+    function main(): ExitCode is
+        let a: Decimal[0, 0] := 0;
+        return ExitSuccess();
+    end;
+end module body.

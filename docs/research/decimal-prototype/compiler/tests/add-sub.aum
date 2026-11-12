@@ -1,0 +1,19 @@
+module body AddSub is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 10.25;
+        let b: Decimal[7, 2] := 0.75;
+        debugPrintDecimal(a + b);
+        debugPrintDecimal(a - b);
+        debugPrintDecimal(b - a);
+        debugPrintDecimal(a + 1);
+        debugPrintDecimal(1.5 + a);
+        debugPrintDecimal(a - 0.25);
+        debugPrintDecimal(100 - a);
+        debugPrintDecimal((a + b) - (b + 1));
+        let c: Decimal[7, 2] := a + b;
+        debugPrintDecimal(c);
+        let limit: Decimal[3, 2] := 9.98;
+        debugPrintDecimal(limit + 0.01);
+        return ExitSuccess();
+    end;
+end module body.

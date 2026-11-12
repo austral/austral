@@ -1,0 +1,9 @@
+module body DivideByZero is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        let b: Decimal[7, 2] := 0;
+        let q: Decimal[9, 4] := divide(a, b, NearestEven());
+        debugPrintDecimal(q);
+        return ExitSuccess();
+    end;
+end module body.

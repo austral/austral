@@ -1,0 +1,12 @@
+module body ExistingNumericsUnchanged is
+    function main(): ExitCode is
+        let i: Int32 := 2 + 3;
+        printLn(i);
+        let j: Int64 := 7;
+        printLn(j - 2);
+        let f: Float64 := 1.5 + 2.0;
+        printLn(f > 3.0);
+        printLn(1.5 < 2.5);
+        return ExitSuccess();
+    end;
+end module body.

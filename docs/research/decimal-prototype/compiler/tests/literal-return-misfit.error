@@ -1,0 +1,1 @@
+The literal `0.08251` is not exactly representable in `Decimal[4, 4]`

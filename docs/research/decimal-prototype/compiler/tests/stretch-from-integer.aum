@@ -1,0 +1,16 @@
+module body StretchFromInteger is
+    function main(): ExitCode is
+        let i: Int32 := 1234;
+        let w: Decimal[12, 2] := widen(i);
+        debugPrintDecimal(w);
+        let e: Decimal[5, 1] := exact(i);
+        debugPrintDecimal(e);
+        let n: Nat8 := 200;
+        let d: Decimal[3, 0] := widen(n);
+        debugPrintDecimal(d);
+        let big: Int64 := -9000000000000000000;
+        let l: Decimal[19, 0] := widen(big);
+        debugPrintDecimal(l);
+        return ExitSuccess();
+    end;
+end module body.

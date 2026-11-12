@@ -1,0 +1,9 @@
+module body DivideOverflow is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 99999.99;
+        let b: Decimal[7, 2] := 0.01;
+        let q: Decimal[7, 2] := divide(a, b, NearestEven());
+        debugPrintDecimal(q);
+        return ExitSuccess();
+    end;
+end module body.

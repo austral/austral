@@ -1,0 +1,13 @@
+module body LiteralArithmetic is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1.5 + 2.25;
+        let b: Decimal[7, 2] := 1 + 2;
+        let c: Decimal[7, 2] := 10 - 0.5;
+        let d: Decimal[3, 1] := 1.5 * 2;
+        debugPrintDecimal(a);
+        debugPrintDecimal(b);
+        debugPrintDecimal(c);
+        debugPrintDecimal(d);
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,8 @@
+module body MulPrecisionOver38 is
+    function main(): ExitCode is
+        let a: Decimal[20, 0] := 1;
+        let b: Decimal[19, 0] := 1;
+        debugPrintDecimal(a * b);
+        return ExitSuccess();
+    end;
+end module body.

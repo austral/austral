@@ -1,0 +1,12 @@
+import Money (Line, total, withTax, taxRate, show);
+
+module body InterfaceModule is
+    function main(): ExitCode is
+        let line: Line := Line(price => 19.99, quantity => 1.5);
+        let net: Decimal[12, 5] := total(line);
+        show(net);
+        show(withTax(net));
+        debugPrintDecimal(taxRate);
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,7 @@
+module body GapLiteralInIfExpression is
+    function main(): ExitCode is
+        let c: Bool := true;
+        let x: Decimal[7, 2] := if c then 1.5 else 2.5;
+        return ExitSuccess();
+    end;
+end module body.

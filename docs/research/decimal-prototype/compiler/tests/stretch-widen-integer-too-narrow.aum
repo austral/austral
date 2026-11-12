@@ -1,0 +1,7 @@
+module body StretchWidenIntegerTooNarrow is
+    function main(): ExitCode is
+        let i: Int32 := 1234;
+        let w: Decimal[9, 0] := widen(i);
+        return ExitSuccess();
+    end;
+end module body.

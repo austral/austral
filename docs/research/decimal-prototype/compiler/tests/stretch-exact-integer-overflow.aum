@@ -1,0 +1,8 @@
+module body StretchExactIntegerOverflow is
+    function main(): ExitCode is
+        let i: Int32 := 12345;
+        let e: Decimal[4, 0] := exact(i);
+        debugPrintDecimal(e);
+        return ExitSuccess();
+    end;
+end module body.

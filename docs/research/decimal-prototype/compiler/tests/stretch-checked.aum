@@ -1,0 +1,37 @@
+module body StretchChecked is
+    function show(r: Option[Decimal[3, 2]]): Unit is
+        case r of
+            when Some(value: Decimal[3, 2]) do
+                debugPrintDecimal(value);
+            when None do
+                printLn("none");
+        end case;
+        return nil;
+    end;
+
+    function showWide(r: Option[Decimal[9, 4]]): Unit is
+        case r of
+            when Some(value: Decimal[9, 4]) do
+                debugPrintDecimal(value);
+            when None do
+                printLn("none");
+        end case;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        let a: Decimal[3, 2] := 9.99;
+        let b: Decimal[3, 2] := 0.01;
+        let overflow: Option[Decimal[3, 2]] := checkedAdd(a, b);
+        show(overflow);
+        let sum: Option[Decimal[3, 2]] := checkedAdd(a, -0.01);
+        show(sum);
+        let quotient: Option[Decimal[9, 4]] := checkedDivide(a, b, NearestEven());
+        showWide(quotient);
+        let byZero: Option[Decimal[9, 4]] := checkedDivide(a, 0, NearestEven());
+        showWide(byZero);
+        let tooBig: Option[Decimal[3, 2]] := checkedDivide(a, b, NearestEven());
+        show(tooBig);
+        return ExitSuccess();
+    end;
+end module body.

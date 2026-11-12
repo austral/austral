@@ -1,0 +1,7 @@
+module body AddLiteralMisfit is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        debugPrintDecimal(a + 0.001);
+        return ExitSuccess();
+    end;
+end module body.

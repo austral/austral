@@ -1,0 +1,10 @@
+module body Assignment is
+    function main(): ExitCode is
+        var x: Decimal[7, 2] := 1;
+        x := 2.5 : Decimal[7, 2];
+        debugPrintDecimal(x);
+        x := x + 1;
+        debugPrintDecimal(x);
+        return ExitSuccess();
+    end;
+end module body.

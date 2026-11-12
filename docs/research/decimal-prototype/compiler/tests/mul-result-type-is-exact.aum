@@ -1,0 +1,8 @@
+module body MulResultTypeIsExact is
+    function main(): ExitCode is
+        let price: Decimal[7, 2] := 19.99;
+        let doubled: Decimal[9, 2] := price * 2;
+        debugPrintDecimal(doubled);
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,8 @@
+module body RoundOverflow is
+    function main(): ExitCode is
+        let x: Decimal[6, 3] := 999.995;
+        let r: Decimal[5, 2] := round(x, NearestAwayFromZero());
+        debugPrintDecimal(r);
+        return ExitSuccess();
+    end;
+end module body.

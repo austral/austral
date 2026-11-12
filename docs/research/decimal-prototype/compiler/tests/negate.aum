@@ -1,0 +1,15 @@
+module body Negate is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 10.25;
+        debugPrintDecimal(-a);
+        let n: Decimal[7, 2] := -a;
+        debugPrintDecimal(-n);
+        let z: Decimal[7, 2] := 0;
+        debugPrintDecimal(-z);
+        let m: Decimal[3, 2] := -9.99;
+        debugPrintDecimal(-m);
+        debugPrintDecimal(a + (-a));
+        debugPrintDecimal(-(-a));
+        return ExitSuccess();
+    end;
+end module body.

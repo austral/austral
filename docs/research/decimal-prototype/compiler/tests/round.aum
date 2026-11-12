@@ -1,0 +1,21 @@
+module body Round is
+    function cents(x: Decimal[9, 4]): Decimal[7, 2] is
+        return round(x, TowardLesser());
+    end;
+
+    function main(): ExitCode is
+        let x: Decimal[9, 4] := 12.3450;
+        let a: Decimal[7, 2] := round(x, NearestEven());
+        debugPrintDecimal(a);
+        let b: Decimal[7, 2] := round(x, NearestAwayFromZero());
+        debugPrintDecimal(b);
+        debugPrintDecimal(round(x, TowardZero()) : Decimal[5, 0]);
+        debugPrintDecimal(round(x, TowardGreater()) : Decimal[6, 1]);
+        debugPrintDecimal(cents(x));
+        let w: Decimal[12, 6] := round(x, NearestEven());
+        debugPrintDecimal(w);
+        let n: Decimal[9, 4] := -12.3450;
+        debugPrintDecimal(cents(n));
+        return ExitSuccess();
+    end;
+end module body.

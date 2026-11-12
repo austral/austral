@@ -1,0 +1,8 @@
+module body DivideOperandNotDecimal is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        let i: Int32 := 3;
+        let q: Decimal[9, 4] := divide(a, i, NearestEven());
+        return ExitSuccess();
+    end;
+end module body.

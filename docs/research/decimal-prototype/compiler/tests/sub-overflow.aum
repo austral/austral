@@ -1,0 +1,8 @@
+module body SubOverflow is
+    function main(): ExitCode is
+        let a: Decimal[3, 2] := -9.99;
+        let b: Decimal[3, 2] := 0.01;
+        debugPrintDecimal(a - b);
+        return ExitSuccess();
+    end;
+end module body.

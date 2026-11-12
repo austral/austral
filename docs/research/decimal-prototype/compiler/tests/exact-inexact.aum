@@ -1,0 +1,8 @@
+module body ExactInexact is
+    function main(): ExitCode is
+        let x: Decimal[9, 4] := 12.3450;
+        let a: Decimal[7, 2] := exact(x);
+        debugPrintDecimal(a);
+        return ExitSuccess();
+    end;
+end module body.

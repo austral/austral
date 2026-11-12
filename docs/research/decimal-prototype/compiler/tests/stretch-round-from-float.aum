@@ -1,0 +1,16 @@
+module body StretchRoundFromFloat is
+    function main(): ExitCode is
+        let f: Float64 := 0.125;
+        let a: Decimal[5, 2] := round(f, NearestEven());
+        debugPrintDecimal(a);
+        let g: Float64 := 0.1;
+        let b: Decimal[20, 18] := round(g, NearestEven());
+        debugPrintDecimal(b);
+        let h: Float64 := 2.5;
+        debugPrintDecimal(round(h, NearestEven()) : Decimal[3, 0]);
+        debugPrintDecimal(round(h, NearestAwayFromZero()) : Decimal[3, 0]);
+        let k: Float64 := -2.5;
+        debugPrintDecimal(round(k, TowardGreater()) : Decimal[3, 0]);
+        return ExitSuccess();
+    end;
+end module body.

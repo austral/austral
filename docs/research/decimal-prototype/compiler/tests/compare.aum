@@ -1,0 +1,27 @@
+module body Compare is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1.50;
+        let b: Decimal[7, 2] := 2.25;
+        let c: Decimal[7, 2] := 1.5;
+        printLn(a = c);
+        printLn(a /= b);
+        printLn(a < b);
+        printLn(a <= c);
+        printLn(b > a);
+        printLn(a >= b);
+        printLn(a = 1.5);
+        printLn(1.5 = a);
+        printLn(a < 2);
+        printLn(2 < a);
+        printLn(a /= 1.50);
+        printLn(-1 <= a);
+        printLn(a >= 1.51);
+        printLn(a > -0.01);
+        let n: Decimal[7, 2] := -3;
+        printLn(n < a);
+        if a < b then
+            printLn("less");
+        end if;
+        return ExitSuccess();
+    end;
+end module body.

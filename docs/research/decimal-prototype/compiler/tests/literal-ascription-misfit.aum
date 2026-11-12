@@ -1,0 +1,6 @@
+module body LiteralAscriptionMisfit is
+    function main(): ExitCode is
+        debugPrintDecimal(1.234 : Decimal[7, 2]);
+        return ExitSuccess();
+    end;
+end module body.

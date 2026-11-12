@@ -1,0 +1,8 @@
+module body StretchRoundFromFloatOverflow is
+    function main(): ExitCode is
+        let f: Float64 := 100000.0;
+        let a: Decimal[5, 2] := round(f, NearestEven());
+        debugPrintDecimal(a);
+        return ExitSuccess();
+    end;
+end module body.

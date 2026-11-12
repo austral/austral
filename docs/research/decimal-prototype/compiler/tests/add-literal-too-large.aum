@@ -1,0 +1,7 @@
+module body AddLiteralTooLarge is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1;
+        debugPrintDecimal(100000 + a);
+        return ExitSuccess();
+    end;
+end module body.

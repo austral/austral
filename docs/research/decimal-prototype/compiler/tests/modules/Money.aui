@@ -1,0 +1,19 @@
+module Money is
+    constant taxRate: Decimal[4, 4];
+
+    record Line: Free is
+        price: Decimal[7, 2];
+        quantity: Decimal[5, 3];
+    end;
+
+    function total(line: Line): Decimal[12, 5];
+
+    function withTax(amount: Decimal[12, 5]): Decimal[9, 2];
+
+    typeclass Show(T: Free) is
+        method show(value: T): Unit;
+    end;
+
+    instance Show(Decimal[9, 2]);
+    instance Show(Decimal[12, 5]);
+end module.

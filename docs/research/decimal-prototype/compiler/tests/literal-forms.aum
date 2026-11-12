@@ -1,0 +1,21 @@
+module body LiteralForms is
+    function main(): ExitCode is
+        let a: Decimal[7, 2] := 1.23;
+        let b: Decimal[7, 2] := 5;
+        let c: Decimal[7, 2] := 1.230;
+        let d: Decimal[7, 2] := -0.05;
+        let e: Decimal[7, 2] := 99999.99;
+        let f: Decimal[7, 2] := 12'345.5;
+        let g: Decimal[7, 2] := +7;
+        debugPrintDecimal(a);
+        debugPrintDecimal(b);
+        debugPrintDecimal(c);
+        debugPrintDecimal(d);
+        debugPrintDecimal(e);
+        debugPrintDecimal(f);
+        debugPrintDecimal(g);
+        debugPrintDecimal(1.5 : Decimal[3, 1]);
+        debugPrintDecimal(42 : Decimal[4, 0]);
+        return ExitSuccess();
+    end;
+end module body.

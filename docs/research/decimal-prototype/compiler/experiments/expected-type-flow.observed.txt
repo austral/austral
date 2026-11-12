@@ -1,0 +1,25 @@
+Observed with compiler-slice.patch + expected-type-flow.patch (apply both with patch -p1, in that order).
+Programs are in work/probe.py under the names below. Run: python3 work/probe.py <austral> exp-
+
+== exp-widen-plus-let          let gross: Decimal[16, 9] := widen(amount) + tax;
+  | 32.458762500
+== exp-widen-plus-sibling      debugPrintDecimal(widen(amount) + tax); debugPrintDecimal(tax - widen(amount));
+  | 32.458762500
+  | -27.511237500
+== exp-divide-plus-literal     let q: Decimal[9, 4] := divide(a, b, NearestEven()) + 1;
+  | 1.3333
+== exp-divide-argument         show(divide(a, b, NearestEven())); show(x => divide(a, b, TowardGreater()));
+  | 0.3333
+  | 0.3334
+== exp-nested                  let q: Decimal[9, 4] := (divide(a, b, NearestEven()) + widen(a)) - round(b, TowardZero());
+  | -1.6667
+== exp-both-need-context       debugPrintDecimal(widen(a) + widen(a));
+  compile error: The result type of `widen` comes from where it is used, and this position does not give one.
+== exp-mul-operand             let p: Decimal[18, 8] := widen(a) * b;
+  compile error: The result type of `widen` comes from where it is used, and this position does not give one.
+
+run-tests.sh against this build: pass 78 / fail 2.
+The two failures are divide-no-context-operand and divide-no-context-argument, which
+assert the compile error that this experiment removes. Nothing else changed.
+
+Not run against this build: the repository's own end-to-end suite (test-programs/runner.py).
