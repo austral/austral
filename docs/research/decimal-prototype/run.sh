@@ -8,6 +8,8 @@ set -uo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT=$(cd "$HERE/../../.." && pwd)
+# The patch and the tests describe the compiler at this commit, not at HEAD.
+BASE=f601bcb45f07e7b12a2ed026e5870ed4023fa8e3
 BUILD_TIMEOUT=${ZUSTRAL_BUILD_TIMEOUT:-900}
 read -r -a NIX_FLAGS <<< "${ZUSTRAL_NIX_FLAGS:-}"
 
@@ -27,7 +29,7 @@ build() { # tree
 
 tree="$T/compiler"
 mkdir -p "$tree"
-git -C "$ROOT" archive HEAD | tar -x -C "$tree"
+git -C "$ROOT" archive "$BASE" | tar -x -C "$tree"
 
 echo "== compiler: tests against the unpatched compiler (they must fail)"
 if build "$tree"; then
@@ -36,7 +38,7 @@ else
   echo "build failed: $(tail -n 3 "$tree/build.log")"; failed=1
 fi
 
-echo "== compiler: slice applied to a clean export of HEAD"
+echo "== compiler: slice applied to a clean export of the base commit"
 (cd "$tree" && patch -s -p1 --no-backup-if-mismatch < "$HERE/compiler/compiler-slice.patch") || failed=1
 python3 "$HERE/compiler/embed-runtime.py" "$tree" "$HERE/runtime" || failed=1
 if build "$tree"; then

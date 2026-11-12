@@ -12,6 +12,8 @@ set -uo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT=$(cd "$HERE/../../.." && pwd)
+# The patches and the recorded counts describe the compiler at this commit, not at HEAD.
+BASE=f601bcb45f07e7b12a2ed026e5870ed4023fa8e3
 BUILD_TIMEOUT=${ZUSTRAL_BUILD_TIMEOUT:-900}
 # Extra flags for `nix develop`, e.g. --override-input when GitHub's API is unreachable.
 read -r -a NIX_FLAGS <<< "${ZUSTRAL_NIX_FLAGS:-}"
@@ -26,7 +28,7 @@ trap 'rm -rf "$T"' EXIT
 build() { # name patch-or-empty
   local w="$T/$1"
   mkdir -p "$w"
-  git -C "$ROOT" archive HEAD | tar -x -C "$w"
+  git -C "$ROOT" archive "$BASE" | tar -x -C "$w"
   if [[ -n $2 ]]; then
     (cd "$w" && patch -s -p1 < "$2") || { echo "patch failed: $2" >&2; return 1; }
   fi
@@ -92,7 +94,7 @@ declare -A PATCHED=(
 mono_c() {
   local w="$T/head"
   mkdir -p "$w"
-  git -C "$ROOT" archive HEAD | tar -x -C "$w"
+  git -C "$ROOT" archive "$BASE" | tar -x -C "$w"
   (cd "$w" && timeout "$BUILD_TIMEOUT" nix develop "$ROOT" "${NIX_FLAGS[@]}" --command \
     bash -c 'python3 concat_builtins.py && dune build ./bin/austral.exe 2>&1') > "$T/head.log" \
     || { echo "build head failed, log: $(tail -n 3 "$T/head.log")" >&2; return 1; }
@@ -114,7 +116,7 @@ grammar() {
   for v in head literal expression; do
     w="$T/grammar-$v"
     mkdir -p "$w"
-    git -C "$ROOT" archive HEAD lib | tar -x -C "$w"
+    git -C "$ROOT" archive "$BASE" lib | tar -x -C "$w"
     if [[ $v != head ]]; then
       (cd "$w" && patch -s -p1 < "$HERE/patches/value-parameters.patch" \
         && patch -s -p1 < "$HERE/patches/grammar-$v.patch") || return 1

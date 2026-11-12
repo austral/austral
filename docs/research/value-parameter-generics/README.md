@@ -22,7 +22,7 @@ docs/research/value-parameter-generics/spike.sh            # expected/ と照合
 docs/research/value-parameter-generics/spike.sh --record   # expected/ を書き直す
 ```
 
-`spike.sh` は HEAD のコピーを一時ディレクトリに取り出し、リポジトリの flake の環境（`nix develop`）でビルドする。
+`spike.sh` はコミット f601bcb のコピーを一時ディレクトリに取り出し、リポジトリの flake の環境（`nix develop`）でビルドする。
 作業ツリーには何も書かない。
 4つの記録を照合し、最後に `match 4 / mismatch 0 / skipped 0` の形で結果を出す。
 このマシン（x86_64 Linux）では4つとも一致した。
