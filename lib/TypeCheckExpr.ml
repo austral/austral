@@ -108,6 +108,10 @@ let is_float_constant (e: aexpr): bool =
   | FloatConstant _ -> true
   | _ -> false
 
+(** Is this expression a numeric literal? *)
+let is_numeric_literal (e: aexpr): bool =
+  (is_int_constant e) || (is_float_constant e)
+
 (* Since the extraction pass has already happened, we can simplify the call to
    `parse_type` by passing an empty list of local type signatures. *)
 let parse_typespec (ctx: expr_ctx) (ty: qtypespec): ty =
@@ -613,7 +617,13 @@ and augment_temporary (ctx: expr_ctx) (name: identifier): texpr =
 and augment_comparison ctx op lhs rhs =
   let lhs' = aug ctx lhs
   and rhs' = aug ctx rhs in
-  let _ = match_type_with_value_ctx ctx (get_type lhs') rhs' in
+  let _ =
+    (* A lone literal on the left takes the type of the right operand. *)
+    if (is_numeric_literal lhs) && not (is_numeric_literal rhs) then
+      match_type_with_value_ctx ctx (get_type rhs') lhs'
+    else
+      match_type_with_value_ctx ctx (get_type lhs') rhs'
+  in
   TComparison (op, lhs', rhs')
 
 and augment_conjunction ctx lhs rhs =
@@ -909,6 +919,19 @@ and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (r
   let lhs_ty = get_type lhs'
   and rhs_ty = get_type rhs'
   in
+  (* A lone literal takes the type of the other operand, and has to fit it like
+     the initial value of a `let`. Otherwise the left operand decides. *)
+  let operand_ty =
+    match (is_numeric_literal lhs, is_numeric_literal rhs) with
+    | (true, false) ->
+       let _ = match_type_with_value_ctx ctx rhs_ty lhs' in
+       rhs_ty
+    | (false, true) ->
+       let _ = match_type_with_value_ctx ctx lhs_ty rhs' in
+       lhs_ty
+    | _ ->
+       lhs_ty
+  in
   let augment_arithmetic_call _ =
     (* Because method calls don't implement the lenient type checking
        rules for arithmetic, we have to cast the arguments to their
@@ -928,8 +951,8 @@ and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (r
     in
     let op_qname = make_qident (pervasive_module_name, make_ident op_name, make_ident op_name) in
     let args: typed_arglist = TPositionalArglist [
-                                  TCast (lhs', lhs_ty);
-                                  TCast (rhs', lhs_ty);
+                                  TCast (lhs', operand_ty);
+                                  TCast (rhs', operand_ty);
                                 ]
     in
     augment_call ctx op_qname args asserted_ty
@@ -946,7 +969,8 @@ and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (r
     let are_int_constants = (is_int_constant lhs) || (is_int_constant rhs)
     and are_float_constants = (is_float_constant lhs) || (is_float_constant rhs) in
     if (are_int_constants || are_float_constants) then
-      (* If either operand is a constant, let it pass *)
+      (* A lone constant was checked when choosing `operand_ty`. Two constants
+         pass. *)
       augment_arithmetic_call ()
     else
       Errors.arithmetic_incompatible_types ~lhs:lhs_ty ~rhs:rhs_ty
