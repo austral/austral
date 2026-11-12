@@ -103,6 +103,29 @@ let check_var_doesnt_collide_with_decl (ctx: stmt_ctx) (name: identifier) =
   | None ->
      ()
 
+(* The span of `stmt` if it assigns a temporary, which is what
+   `LiftControlPass` turns every assignment into. `DesugarBorrows` wraps such a
+   statement in the anonymous borrows of its lvalue. *)
+let rec lifted_assignment_span (stmt: astmt): span option =
+  match stmt with
+  | AAssign (span, _, Temporary _) | AAssignVar (span, _, Temporary _) ->
+     Some span
+  | ABorrow { body; _ } ->
+     lifted_assignment_span body
+  | _ ->
+     None
+
+(* Declare the temporary on the right-hand side of an assignment with the type
+   of the lvalue. The statement that computes the temporary is checked after
+   the assignment (see the `ABlock` case), against that type. *)
+let declare_assigned_temporary (lexenv: lexenv) (rvalue: aexpr) (ty: ty): unit =
+  match rvalue with
+  | Temporary name ->
+     let _ = push_var lexenv name ty (VarLocal Mutable) in
+     ()
+  | _ ->
+     ()
+
 let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
   with_frame ("Augment statement: " ^ (stmt_kind stmt))
     (fun _ ->
@@ -122,10 +145,20 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              remove_var lexenv name;
              TLet (span, mut, name, ty, body'))
       | LetTmp (name, value) ->
-         let value = augment_expr module_name env rm typarams lexenv None value in
-         let ty = get_type value in
-         let _ = push_var lexenv name ty (VarLocal Mutable) in
-         TLetTmp (name, ty, value)
+         (match get_var lexenv name with
+          | Some (ty, _) ->
+             (* The temporary holds the right-hand side of an assignment, which
+                has declared it with the type of its lvalue. That type is the
+                expected type of the right-hand side, as the annotation of a
+                `let` is for its value. *)
+             let value = augment_expr module_name env rm typarams lexenv (Some ty) value in
+             let _ = match_type_with_value (env, module_name) ty value in
+             TLetTmp (name, ty, value)
+          | None ->
+             let value = augment_expr module_name env rm typarams lexenv None value in
+             let ty = get_type value in
+             let _ = push_var lexenv name ty (VarLocal Mutable) in
+             TLetTmp (name, ty, value))
       | AssignTmp (name, value) ->
          let value = augment_expr module_name env rm typarams lexenv None value in
          begin
@@ -191,9 +224,8 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       | AAssign (span, lvalue, rvalue) ->
          adorn_error_with_span span
            (fun _ ->
-             (* Augment both sides. *)
-             let lvalue: texpr = augment_expr module_name env rm typarams lexenv None lvalue
-             and rvalue: texpr = augment_expr module_name env rm typarams lexenv None rvalue in
+             (* Augment the lvalue. *)
+             let lvalue: texpr = augment_expr module_name env rm typarams lexenv None lvalue in
              (* The type of the lvalue must be a read reference. *)
              let lvalue_ty: ty = get_type lvalue in
              let pointed_ty: ty = begin
@@ -204,6 +236,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                     err ("Can't assign: lvalue is not a mutable reference: " ^ (type_string lvalue_ty))
                end
              in
+             (* Augment the rvalue. *)
+             let _ = declare_assigned_temporary lexenv rvalue pointed_ty in
+             let rvalue: texpr = augment_expr module_name env rm typarams lexenv None rvalue in
              (* The pointed to type and the type of the rvalue must match. *)
              let _ = match_type_with_value (env, module_name) pointed_ty rvalue in
              (* The pointed-to type must be in the free universe. *)
@@ -222,8 +257,6 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
       | AAssignVar (span, name, rvalue) ->
          adorn_error_with_span span
            (fun _ ->
-             (* Augment the rvalue. *)
-             let rvalue: texpr = augment_expr module_name env rm typarams lexenv None rvalue in
              (* Get the type of the lvalue. *)
              let lvalue_ty: ty = begin
                  let name: identifier = original_name name in
@@ -246,6 +279,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                   Errors.unknown_name ~kind:"variable" ~name:name
                end
              in
+             (* Augment the rvalue. *)
+             let _ = declare_assigned_temporary lexenv rvalue lvalue_ty in
+             let rvalue: texpr = augment_expr module_name env rm typarams lexenv None rvalue in
              (* Types must match. *)
              let _ = match_type_with_value (env, module_name) lvalue_ty rvalue in
              (* Construct the assignment. *)
@@ -373,9 +409,19 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
               | None ->
                  Errors.unknown_name ~kind:"variable" ~name:original))
       | ABlock (span, f, r) ->
-         let a = augment_stmt ctx f in
-         let b = augment_stmt ctx r in
-         TBlock (span, a, b)
+         (match lifted_assignment_span r with
+          | Some assign_span ->
+             (* `f` computes the temporary that `r` assigns. `r` is checked
+                first because it gives the temporary its type, and the type of
+                a path is only known inside the borrows around `r`. An error
+                in `f` has no span of its own. *)
+             let b = augment_stmt ctx r in
+             let a = adorn_error_with_span assign_span (fun _ -> augment_stmt ctx f) in
+             TBlock (span, a, b)
+          | None ->
+             let a = augment_stmt ctx f in
+             let b = augment_stmt ctx r in
+             TBlock (span, a, b))
       | ADiscarding (span, e) ->
          adorn_error_with_span span
            (fun _ ->
