@@ -1,0 +1,21 @@
+module body Mono is
+    record Tagged[T: Free]: Free is
+        units: Int64;
+    end;
+
+    generic [T: Free]
+    function raw(x: Tagged[T]): Int64 is
+        return x.units;
+    end;
+
+    function main(): ExitCode is
+        let a: Tagged[Int8] := Tagged(units => 1);
+        let b: Tagged[Int16] := Tagged(units => 2);
+        let s: Int64 := raw(a) + raw(b);
+        if s = 3 then
+            return ExitSuccess();
+        else
+            return ExitFailure();
+        end if;
+    end;
+end module body.

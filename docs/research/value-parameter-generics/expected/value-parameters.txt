@@ -1,0 +1,81 @@
+partial-matches 27
+fragile-matches 87
+files 19
+functions 56
+# partial matches per file
+lib/TypeSystem.ml 5
+lib/TypeParser.ml 3
+lib/TypeClasses.ml 3
+lib/Type.ml 3
+lib/ExtractionPass.ml 3
+lib/TypeBindings.ml 2
+lib/CodeGen.ml 2
+lib/TypeStripping.ml 1
+lib/TypeMatch.ml 1
+lib/Qualifier.ml 1
+lib/Monomorphize.ml 1
+lib/ExportInstantiation.ml 1
+lib/CstUtil.ml 1
+# sites
+fragile	lib/CodeGen.ml	gen_exp	MonoType.mono_ty
+fragile	lib/CodeGen.ml	gen_stmt	MonoType.mono_ty
+fragile	lib/CodeGen.ml	union_type_id	MonoType.mono_ty
+fragile	lib/Entrypoint.ml	is_exit_code_type	Type.ty
+fragile	lib/Entrypoint.ml	is_exit_code_type	Type.universe
+fragile	lib/Entrypoint.ml	is_root_cap_type	Type.ty
+fragile	lib/Entrypoint.ml	is_root_cap_type	Type.universe
+fragile	lib/LinearityCheck.ml	check_stmt	Type.ty
+fragile	lib/LinearityCheck.ml	remove_entry	Type.ty
+fragile	lib/LinearityCheck.ml	universe_linear_ish	Type.universe
+fragile	lib/MtastUtil.ml	get_type	MonoType.mono_ty
+fragile	lib/TastUtil.ml	get_type	Type.ty
+fragile	lib/Type.ml	equal_ty	Type.ty
+fragile	lib/TypeBindings.ml	add_binding	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_array_index	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_deref	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_fptr_call	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_method_call	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_pointer_slot_access	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_slot_access	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_typecast	Type.ty
+fragile	lib/TypeCheckExpr.ml	cast_arguments	Type.ty
+fragile	lib/TypeCheckExpr.ml	is_bool	Type.ty
+fragile	lib/TypeClasses.ml	check_instance_argument_has_right_shape	Type.ty
+fragile	lib/TypeClasses.ml	overlapping_instances	Type.ty
+fragile	lib/TypeMatch.ml	match_type	Type.ty
+fragile	lib/TypeMatch.ml	match_type_var	Type.ty
+fragile	lib/TypeMatch.ml	match_type_with_value	Type.ty
+fragile	lib/TypeParser.ml	all_arguments_are_free	Type.universe
+fragile	lib/TypeSystem.ml	any_arg_is_linear	Type.universe
+fragile	lib/TypeSystem.ml	any_arg_is_type	Type.universe
+fragile	lib/TypingPass.ml	augment_case	Type.ty
+fragile	lib/TypingPass.ml	augment_stmt	Type.ty
+fragile	lib/TypingPass.ml	get_union_type_definition	Type.ty
+fragile	lib/TypingPass.ml	is_boolean	Type.ty
+partial	lib/CodeGen.ml	gen_decl	MonoNat _
+partial	lib/CodeGen.ml	gen_type	MonoNat _
+partial	lib/CstUtil.ml	typespec_string	ConcreteNatSpec _
+partial	lib/ExportInstantiation.ml	transform_ty	TyNat _
+partial	lib/ExtractionPass.ml	check_slots_are_free	NaturalUniverse
+partial	lib/ExtractionPass.ml	check_typarams_are_free	NaturalUniverse
+partial	lib/ExtractionPass.ml	extract_definition	NaturalUniverse
+partial	lib/Monomorphize.ml	mono_to_ty	MonoNat _
+partial	lib/Qualifier.ml	qualify_typespec	ConcreteNatSpec _
+partial	lib/Type.ml	equal_ty	TyNat _
+partial	lib/Type.ml	type_string	TyNat _
+partial	lib/Type.ml	universe_string	NaturalUniverse
+partial	lib/TypeBindings.ml	replace_variables	TyNat _
+partial	lib/TypeBindings.ml	universe_compatible	NaturalUniverse
+partial	lib/TypeClasses.ml	check_instance_argument_has_right_shape	TyNat _
+partial	lib/TypeClasses.ml	is_type_local	TyNat _
+partial	lib/TypeClasses.ml	overlapping_instances	TyNat _
+partial	lib/TypeMatch.ml	match_type	TyNat _
+partial	lib/TypeParser.ml	effective_universe	NaturalUniverse
+partial	lib/TypeParser.ml	parse_type	QNatSpec _
+partial	lib/TypeParser.ml	universe_compatible	NaturalUniverse
+partial	lib/TypeStripping.ml	strip_type'	TyNat _
+partial	lib/TypeSystem.ml	is_comparable	TyNat _
+partial	lib/TypeSystem.ml	is_concrete	TyNat _
+partial	lib/TypeSystem.ml	is_numeric	TyNat _
+partial	lib/TypeSystem.ml	type_universe	TyNat _
+partial	lib/TypeSystem.ml	type_variables	TyNat _

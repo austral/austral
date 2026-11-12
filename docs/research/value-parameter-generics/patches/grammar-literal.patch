@@ -1,0 +1,17 @@
+--- a/lib/Parser.mly
++++ b/lib/Parser.mly
+@@ -542,8 +542,13 @@
+   | IDENTIFIER { [$1] }
+   ;
+ 
++typespec_arg:
++  | typespec { $1 }
++  | DEC_CONSTANT { ConcreteNatSpec $1 }
++  ;
++
+ typespec:
+-  | identifier LBRACKET separated_list(COMMA, typespec) RBRACKET { TypeSpecifier ($1, $3) }
++  | identifier LBRACKET separated_list(COMMA, typespec_arg) RBRACKET { TypeSpecifier ($1, $3) }
+   | identifier { TypeSpecifier ($1, []) }
+   | BORROW_READ LBRACKET typespec COMMA typespec RBRACKET { ConcreteReadRef ($3, $5) }
+   | BORROW_WRITE LBRACKET typespec COMMA typespec RBRACKET { ConcreteWriteRef ($3, $5) }

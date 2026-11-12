@@ -1,0 +1,61 @@
+partial-matches 17
+fragile-matches 81
+files 15
+functions 42
+# partial matches per file
+lib/TypeSystem.ml 5
+lib/TypeClasses.ml 3
+lib/Type.ml 2
+lib/CodeGen.ml 2
+lib/TypeStripping.ml 1
+lib/TypeMatch.ml 1
+lib/TypeBindings.ml 1
+lib/Monomorphize.ml 1
+lib/ExportInstantiation.ml 1
+# sites
+fragile	lib/CodeGen.ml	gen_exp	MonoType.mono_ty
+fragile	lib/CodeGen.ml	gen_stmt	MonoType.mono_ty
+fragile	lib/CodeGen.ml	union_type_id	MonoType.mono_ty
+fragile	lib/Entrypoint.ml	is_exit_code_type	Type.ty
+fragile	lib/Entrypoint.ml	is_root_cap_type	Type.ty
+fragile	lib/LinearityCheck.ml	check_stmt	Type.ty
+fragile	lib/LinearityCheck.ml	remove_entry	Type.ty
+fragile	lib/MtastUtil.ml	get_type	MonoType.mono_ty
+fragile	lib/TastUtil.ml	get_type	Type.ty
+fragile	lib/Type.ml	equal_ty	Type.ty
+fragile	lib/TypeBindings.ml	add_binding	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_array_index	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_deref	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_fptr_call	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_method_call	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_pointer_slot_access	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_slot_access	Type.ty
+fragile	lib/TypeCheckExpr.ml	augment_typecast	Type.ty
+fragile	lib/TypeCheckExpr.ml	cast_arguments	Type.ty
+fragile	lib/TypeCheckExpr.ml	is_bool	Type.ty
+fragile	lib/TypeClasses.ml	check_instance_argument_has_right_shape	Type.ty
+fragile	lib/TypeClasses.ml	overlapping_instances	Type.ty
+fragile	lib/TypeMatch.ml	match_type	Type.ty
+fragile	lib/TypeMatch.ml	match_type_var	Type.ty
+fragile	lib/TypeMatch.ml	match_type_with_value	Type.ty
+fragile	lib/TypingPass.ml	augment_case	Type.ty
+fragile	lib/TypingPass.ml	augment_stmt	Type.ty
+fragile	lib/TypingPass.ml	get_union_type_definition	Type.ty
+fragile	lib/TypingPass.ml	is_boolean	Type.ty
+partial	lib/CodeGen.ml	gen_decl	MonoDecimal
+partial	lib/CodeGen.ml	gen_type	MonoDecimal
+partial	lib/ExportInstantiation.ml	transform_ty	DecimalTy
+partial	lib/Monomorphize.ml	mono_to_ty	MonoDecimal
+partial	lib/Type.ml	equal_ty	DecimalTy
+partial	lib/Type.ml	type_string	DecimalTy
+partial	lib/TypeBindings.ml	replace_variables	DecimalTy
+partial	lib/TypeClasses.ml	check_instance_argument_has_right_shape	DecimalTy
+partial	lib/TypeClasses.ml	is_type_local	DecimalTy
+partial	lib/TypeClasses.ml	overlapping_instances	DecimalTy
+partial	lib/TypeMatch.ml	match_type	DecimalTy
+partial	lib/TypeStripping.ml	strip_type'	DecimalTy
+partial	lib/TypeSystem.ml	is_comparable	DecimalTy
+partial	lib/TypeSystem.ml	is_concrete	DecimalTy
+partial	lib/TypeSystem.ml	is_numeric	DecimalTy
+partial	lib/TypeSystem.ml	type_universe	DecimalTy
+partial	lib/TypeSystem.ml	type_variables	DecimalTy

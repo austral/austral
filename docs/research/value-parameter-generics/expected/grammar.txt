@@ -1,0 +1,8 @@
+# head
+2 ** Conflict (shift/reduce).	** Token involved: TRIPLE_STRING_CONSTANT
+# literal
+2 ** Conflict (shift/reduce).	** Token involved: TRIPLE_STRING_CONSTANT
+# expression
+1 ** Conflict (reduce/reduce).	** Tokens involved: RBRACKET COMMA
+1 ** Conflict (shift/reduce).	** Token involved: RBRACKET
+2 ** Conflict (shift/reduce).	** Token involved: TRIPLE_STRING_CONSTANT

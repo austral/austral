@@ -1,0 +1,36 @@
+diff --git a/lib/MonoType.ml b/lib/MonoType.ml
+index 499c67a..9743eb6 100644
+--- a/lib/MonoType.ml
++++ b/lib/MonoType.ml
+@@ -18,6 +18,7 @@ type mono_ty =
+   | MonoInteger of signedness * integer_width
+   | MonoSingleFloat
+   | MonoDoubleFloat
++  | MonoDecimal
+   | MonoNamedType of mono_id
+   | MonoRegionTy of region
+   | MonoReadRef of mono_ty * mono_ty
+diff --git a/lib/Type.ml b/lib/Type.ml
+index 33812d6..1008b32 100644
+--- a/lib/Type.ml
++++ b/lib/Type.ml
+@@ -42,6 +42,7 @@ type ty =
+   | Integer of signedness * integer_width
+   | SingleFloat
+   | DoubleFloat
++  | DecimalTy
+   | NamedType of qident * ty list * universe
+   | RegionTy of region
+   | ReadRef of ty * ty
+diff --git a/lib/Type.mli b/lib/Type.mli
+index c67951e..c8fa0e0 100644
+--- a/lib/Type.mli
++++ b/lib/Type.mli
+@@ -39,6 +39,7 @@ type ty =
+   | Integer of signedness * integer_width
+   | SingleFloat
+   | DoubleFloat
++  | DecimalTy
+   | NamedType of qident * ty list * universe
+   | RegionTy of region
+   | ReadRef of ty * ty

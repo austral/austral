@@ -1,0 +1,76 @@
+diff --git a/lib/Cst.ml b/lib/Cst.ml
+index c5fb94e..8f54302 100644
+--- a/lib/Cst.ml
++++ b/lib/Cst.ml
+@@ -70,6 +70,7 @@ and typespec =
+   | ConcreteWriteRef of typespec * typespec
+   | ConcreteSpan of typespec * typespec
+   | ConcreteSpanWrite of typespec * typespec
++  | ConcreteNatSpec of string
+ 
+ and cexpr =
+   | CNilConstant of span
+diff --git a/lib/MonoType.ml b/lib/MonoType.ml
+index 499c67a..2795313 100644
+--- a/lib/MonoType.ml
++++ b/lib/MonoType.ml
+@@ -28,6 +28,7 @@ type mono_ty =
+   | MonoPointer of mono_ty
+   | MonoFnPtr of mono_ty list * mono_ty
+   | MonoRegionTyVar of identifier * qident
++  | MonoNat of int
+ [@@deriving (eq, show)]
+ 
+ (** A monomorphic record slot. *)
+diff --git a/lib/Stages.ml b/lib/Stages.ml
+index dacea37..1f488a1 100644
+--- a/lib/Stages.ml
++++ b/lib/Stages.ml
+@@ -21,6 +21,7 @@ module Ast = struct
+     | QWriteRef of qtypespec * qtypespec
+     | QSpan of qtypespec * qtypespec
+     | QSpanWrite of qtypespec * qtypespec
++    | QNatSpec of string
+   [@@deriving show]
+ 
+   type qbinding =
+diff --git a/lib/Type.ml b/lib/Type.ml
+index 33812d6..24f0f9a 100644
+--- a/lib/Type.ml
++++ b/lib/Type.ml
+@@ -17,6 +17,7 @@ type universe =
+   | LinearUniverse
+   | TypeUniverse
+   | RegionUniverse
++  | NaturalUniverse
+ [@@deriving (eq, show, sexp)]
+ 
+ type integer_width =
+@@ -53,6 +54,7 @@ type ty =
+   | Pointer of ty
+   | FnPtr of ty list * ty
+   | MonoTy of mono_id
++  | TyNat of int
+ [@@deriving (show, sexp)]
+ 
+ type typed_slot = TypedSlot of identifier * ty
+diff --git a/lib/Type.mli b/lib/Type.mli
+index c67951e..f6682df 100644
+--- a/lib/Type.mli
++++ b/lib/Type.mli
+@@ -14,6 +14,7 @@ type universe =
+   | LinearUniverse
+   | TypeUniverse
+   | RegionUniverse
++  | NaturalUniverse
+ [@@deriving (eq, show, sexp)]
+ 
+ type integer_width =
+@@ -50,6 +51,7 @@ type ty =
+   | Pointer of ty
+   | FnPtr of ty list * ty
+   | MonoTy of mono_id
++  | TyNat of int
+   (** Special case, see the `mono_to_ty` function. We need this to be able to do
+      monomorph instantiation, but this doesn't correspond to anything in the
+      code. *)
