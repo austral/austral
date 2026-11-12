@@ -11,3 +11,4 @@ result
 .claude/.headroom_wrap_settings.lock
 .serena/.gitignore
 .serena/project.yml
+.claude/worktrees/
