@@ -4,3 +4,27 @@ apar-ph64935	https://www.ibm.com/support/pages/node/7181540	Rounding off to 33 d
 apar-pi67723	https://www.ibm.com/support/pages/apar/PI67723	When the same program is compiled with COBOL V5.2, the binary field contains a positive value - which is incorrect.
 apar-ph44352	https://www.ibm.com/support/pages/apar/PH44352	ensure that an intermediate result of zero has a positive sign before being stored to a signed receiver
 apar-ph30657	https://www.ibm.com/support/pages/apar/PH30657	erroneously uses only the low order 9 digits. This can result in the subsequent READ returning the wrong record in large files.
+ibm-lr-digits	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	For binary items, the number of digit positions must range from 1 through 18
+ibm-lr-85-literal	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	The 85 COBOL Standard specifies a maximum of 18 digits
+ibm-pg-arith-extend	https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf	is raised from 18 to 31
+ibm-pg-compat-30	https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf	A maximum of 30 digits is used for fixed-point intermediate results.
+ibm-pg-extend-31	https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf	A maximum of 31 digits is used for fixed-point intermediate results.
+ibm-pg-truncate-intermediate	https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf	Whenever the number of digits in an intermediate result exceeds 30 in compatibility mode or 31 in extended mode, the compiler truncates to 30 (compatibility mode) or 31 (extended mode) digits and
+ibm-lr-size-final-only	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	The size error condition applies only to final results, not to any intermediate results.
+ibm-lr-truncate-unless-rounded	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	When the size of the fractional result exceeds the number of places provided for its storage, truncation occurs unless ROUNDED is specified.
+ibm-lr-rounded-half-up	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	the least significant digit of the resultant identifier is increased by 1 whenever the most significant digit of the excess is greater than or equal to 5
+ibm-lr-round-before-size	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	rounding takes place before size error checking
+ibm-lr-divide-by-zero	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	When division by zero occurs
+ibm-lr-no-phrase	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	truncation rules apply and the value of the affected resultant identifier is computed
+ibm-lr-phrase-unchanged	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	the value of the resultant identifier affected by the size error is not altered
+ibm-lr-giving-temporary	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	stores that result in a temporary location
+ibm-lr-move-align	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	The data is aligned on the assumed decimal point and, if necessary, truncated or padded with zeros.
+ibm-lr-unsigned-move	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	the absolute value of the sending item is used in the move
+mf-40-digits	https://www.microfocus.com/documentation/reuze/60d/lhpdf603.htm	evaluates each intermediate result using an internal floating-point register of 40 decimal digits
+gnucobol-guide-no-rounded	https://sourceforge.net/p/gnucobol/code/HEAD/tree/external-doc/guide/7.texi?format=raw	Absence of a @code{ROUNDED} clause is the same as specifying @code{ROUNDED MODE IS TRUNCATION}.
+gnucobol-guide-rounded	https://sourceforge.net/p/gnucobol/code/HEAD/tree/external-doc/guide/7.texi?format=raw	Use of a @code{ROUNDED} clause without a @code{MODE} specification is the same as specifying @code{ROUNDED MODE IS NEAREST-AWAY-FROM-ZERO}.
+gnucobol-guide-silent	https://sourceforge.net/p/gnucobol/code/HEAD/tree/external-doc/guide/7.texi?format=raw	Field size overflow conditions occur silently
+gnucobol-news-prohibited	https://sourceforge.net/p/gnucobol/code/HEAD/tree/branches/gnucobol-3.x/NEWS?format=raw	raising EC-SIZE-TRUNCATION and changed: not adjust the target field if
+ibm-pg-dmax	https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf	The number of decimal places needed for the final result field or fields
+ibm-lr-size-error-when	https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf	When the absolute value of the result of an arithmetic evaluation, after decimal point alignment, exceeds the largest value that can be contained in the result field.
+gnucobol-guide-size-error-verbs	https://sourceforge.net/p/gnucobol/code/HEAD/tree/external-doc/guide/7.texi?format=raw	@code{SIZE ERROR} clauses may be included on @syntaxref{ADD}, @syntaxref{COMPUTE}, @syntaxref{DIVIDE}, @syntaxref{MULTIPLY} and @syntaxref{SUBTRACT} statements.
