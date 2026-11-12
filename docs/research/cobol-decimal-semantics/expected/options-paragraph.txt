@@ -1,0 +1,4 @@
+cobc: cobc (GnuCOBOL) 3.1.2.0
+compile: ok
+rounded 2.345 under default nearest-even=+2.34
+exit: 0

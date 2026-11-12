@@ -1,0 +1,10 @@
+cobc: cobc (GnuCOBOL) 3.1.2.0
+compile: ok
+add 1 to 999 without phrase=000
+add 1 to 999 with phrase=size-error, X=999
+500 * 3 without phrase=500
+500 * 3 with phrase=size-error, X=500
+7 / 0 with phrase=size-error, X=007
+999.96 rounded into 9(3)V9=size-error, Y=000.0
+999.96 truncated into 9(3)V9=999.9
+exit: 0

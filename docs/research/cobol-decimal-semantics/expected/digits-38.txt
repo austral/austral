@@ -1,0 +1,4 @@
+cobc: cobc (GnuCOBOL) 3.1.2.0
+compile: ok
+pic 9(38)=00000000000000000000000000000000000001
+exit: 0

@@ -1,0 +1,5 @@
+cobc: cobc (GnuCOBOL) 3.1.2.0
+compile: ok
+line 5: warning: STANDARD-DECIMAL ARITHMETIC is not implemented [-Wpending]
+2 / 3 under standard-decimal=0.666666
+exit: 0

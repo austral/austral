@@ -1,0 +1,6 @@
+apar-ph48674	https://www.ibm.com/support/pages/apar/PH48674	The optimizer was incorrectly deciding that the addition of two 18-digit BINARY data items could be done as a binary addition instead of a packed-decimal addition.
+apar-pi85244	https://www.ibm.com/support/pages/apar/PI85244	When using TRUNC(OPT), the compiler shouldn't assume that binary data items fit their decimal digit picture clauses
+apar-ph64935	https://www.ibm.com/support/pages/node/7181540	Rounding off to 33 decimal places happens for COBOL 5/6 programs. This results in different results from COBOL 4.2/prior release.
+apar-pi67723	https://www.ibm.com/support/pages/apar/PI67723	When the same program is compiled with COBOL V5.2, the binary field contains a positive value - which is incorrect.
+apar-ph44352	https://www.ibm.com/support/pages/apar/PH44352	ensure that an intermediate result of zero has a positive sign before being stored to a signed receiver
+apar-ph30657	https://www.ibm.com/support/pages/apar/PH30657	erroneously uses only the low order 9 digits. This can result in the subsequent READ returning the wrong record in large files.

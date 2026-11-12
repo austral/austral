@@ -1,0 +1,28 @@
+*> One result stored into several receivers, each by its own PICTURE.
+IDENTIFICATION DIVISION.
+PROGRAM-ID. GIVING.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01 A  PIC 9(3)V99 VALUE 123.45.
+01 B  PIC 9(3)V99 VALUE 678.91.
+01 R2 PIC 9(2).
+01 R5 PIC 9(4)V9.
+01 R6 PIC 9(4)V99.
+01 P  PIC 9V9.
+PROCEDURE DIVISION.
+    ADD A B GIVING R2 R5 R6
+    DISPLAY "123.45 + 678.91 giving 9(2)=" R2
+    DISPLAY "123.45 + 678.91 giving 9(4)V9=" R5
+    DISPLAY "123.45 + 678.91 giving 9(4)V99=" R6
+    ADD A B GIVING R2 ROUNDED R5 ROUNDED R6
+    DISPLAY "rounded 123.45 + 678.91 giving 9(2)=" R2
+    DISPLAY "rounded 123.45 + 678.91 giving 9(4)V9=" R5
+    MOVE 0 TO R2 R5
+    ADD A B GIVING R2 R5
+        ON SIZE ERROR DISPLAY "size-error with two receivers, R2=" R2 " R5=" R5
+    END-ADD
+    MULTIPLY 1.25 BY 1.25 GIVING P
+    DISPLAY "1.25 * 1.25 giving 9V9=" P
+    MULTIPLY 1.25 BY 1.25 GIVING P ROUNDED
+    DISPLAY "1.25 * 1.25 giving 9V9 rounded=" P
+    STOP RUN.

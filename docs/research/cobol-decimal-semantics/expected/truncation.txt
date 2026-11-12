@@ -1,0 +1,9 @@
+cobc: cobc (GnuCOBOL) 3.1.2.0
+compile: ok
+move 12345.678 to 9(3)V99=345.67
+compute 12345.678 to 9(3)V99=345.67
+move -5 to 9(3)=005
+compute 2 - 7 to 9(3)=005
+compute 2 - 7 to S9(3)=-005
+move 1.999 to 9V9=1.9
+exit: 0

@@ -1,0 +1,11 @@
+cobc: cobc (GnuCOBOL) 3.1.2.0
+compile: ok
+123.45 + 678.91 giving 9(2)=02
+123.45 + 678.91 giving 9(4)V9=0802.3
+123.45 + 678.91 giving 9(4)V99=0802.36
+rounded 123.45 + 678.91 giving 9(2)=02
+rounded 123.45 + 678.91 giving 9(4)V9=0802.4
+size-error with two receivers, R2=00 R5=0802.3
+1.25 * 1.25 giving 9V9=1.5
+1.25 * 1.25 giving 9V9 rounded=1.6
+exit: 0
