@@ -1,0 +1,11 @@
+module body Test is
+    generic [T: Free]
+    function combine(a: T, b: T): Unit is
+        a + b;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

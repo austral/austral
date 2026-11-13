@@ -1,0 +1,5 @@
+module Test is
+    type Maybe[T: Free]: Free;
+
+    function main(): ExitCode;
+end module.

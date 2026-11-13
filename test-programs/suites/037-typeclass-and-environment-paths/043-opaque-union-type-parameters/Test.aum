@@ -1,0 +1,11 @@
+module body Test is
+    union Maybe[U: Free]: Free is
+        case Just is
+            value: U;
+        case Nothing;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

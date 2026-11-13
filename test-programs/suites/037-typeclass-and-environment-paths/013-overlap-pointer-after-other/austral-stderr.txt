@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [ { "type": "text", "content": "Instance overlaps." } ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/013-overlap-pointer-after-other/Test.aum",
+    "startp": { "line": 16, "column": 4 },
+    "end": { "line": 21, "column": 8 }
+  },
+  "context": [
+    [ 14, "    end;" ],
+    [ 15, "" ],
+    [ 16, "    generic [U: Type]" ],
+    [ 17, "    instance Tagged(Pointer[U]) is" ],
+    [ 18, "        method tag(value: Pointer[U]): Unit is" ],
+    [ 19, "            return nil;" ],
+    [ 20, "        end;" ],
+    [ 21, "    end;" ],
+    [ 22, "" ],
+    [ 23, "    function main(): ExitCode is" ]
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Both operands of an arithmetic operator must be numeric types, but "
+    },
+    { "type": "type", "content": "Pointer[Int32]" },
+    { "type": "text", "content": " is not." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/038-arithmetic-pointer/Test.aum",
+    "startp": { "line": 7, "column": 8 },
+    "end": { "line": 7, "column": 14 }
+  },
+  "context": [
+    [ 5, "module body Test is" ],
+    [
+      6,
+      "    function combine(a: Pointer[Int32], b: Pointer[Int32]): Unit is"
+    ],
+    [ 7, "        a + b;" ],
+    [ 8, "        return nil;" ],
+    [ 9, "    end;" ]
+  ]
+}

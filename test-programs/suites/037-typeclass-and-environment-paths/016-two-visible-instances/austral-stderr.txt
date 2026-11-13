@@ -1,0 +1,32 @@
+{
+  "module": "Test",
+  "kind": "Internal Error",
+  "text": [
+    { "type": "text", "content": "Internal compiler error: " },
+    {
+      "type": "text",
+      "content": "Multiple instances satisfy this call. The compiler should validate that there are no overlapping instances."
+    },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This is a bug in the compiler, please open an issue here: "
+    },
+    {
+      "type": "code",
+      "content": "https://github.com/austral/austral/issues"
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/016-two-visible-instances/Test.aum",
+    "startp": { "line": 12, "column": 8 },
+    "end": { "line": 12, "column": 29 }
+  },
+  "context": [
+    [ 10, "    function main(): ExitCode is" ],
+    [ 11, "        let n: Int32 := 10;" ],
+    [ 12, "        printLn(describe(n));" ],
+    [ 13, "        return ExitSuccess();" ],
+    [ 14, "    end;" ]
+  ]
+}

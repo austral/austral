@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Expected a value of type " },
+    { "type": "type", "content": "Span![Int32, R]" },
+    { "type": "text", "content": ", but got a value of type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/020-mismatch-span-mut/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 17 }
+  },
+  "context": [
+    [ 6, "" ],
+    [ 7, "    function main(): ExitCode is" ],
+    [ 8, "        fill(10);" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

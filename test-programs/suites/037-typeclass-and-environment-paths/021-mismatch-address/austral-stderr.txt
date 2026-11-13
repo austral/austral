@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot cast to " },
+    { "type": "type", "content": "Address[Int32]" },
+    { "type": "text", "content": " from " },
+    { "type": "type", "content": "Bool" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/021-mismatch-address/Test.aum",
+    "startp": { "line": 7, "column": 8 },
+    "end": { "line": 7, "column": 41 }
+  },
+  "context": [
+    [ 5, "module body Test is" ],
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let addr: Address[Int32] := true;" ],
+    [ 8, "        return ExitSuccess();" ],
+    [ 9, "    end;" ]
+  ]
+}

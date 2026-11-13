@@ -1,0 +1,9 @@
+module body Test is
+    record Pair: Free is
+    end;
+
+    function main(): ExitCode is
+        let n: Int32 := Pair;
+        return ExitSuccess();
+    end;
+end module body.

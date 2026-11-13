@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot cast to " },
+    { "type": "type", "content": "&[Int32, Region<0>]" },
+    { "type": "text", "content": " from " },
+    { "type": "type", "content": "&[Int32, R]" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/018-mismatch-region-and-type-variable/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 43 }
+  },
+  "context": [
+    [ 2, "    generic [R: Region]" ],
+    [ 3, "    function keep(ref: &[Int32, R]): Unit is" ],
+    [ 4, "        let other: &[Int32, Static] := ref;" ],
+    [ 5, "        return nil;" ],
+    [ 6, "    end;" ]
+  ]
+}

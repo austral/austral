@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The typeclass " },
+    { "type": "code", "content": "TrappingArithmetic" },
+    { "type": "text", "content": " has no instance which matches for " },
+    { "type": "type", "content": "Float32" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/029-arithmetic-float32/Test.aum",
+    "startp": { "line": 5, "column": 8 },
+    "end": { "line": 5, "column": 32 }
+  },
+  "context": [
+    [ 3, "        let a: Float32 := 1.5;" ],
+    [ 4, "        let b: Float32 := 2.25;" ],
+    [ 5, "        let c: Float32 := a + b;" ],
+    [ 6, "        printLn(c);" ],
+    [ 7, "        return ExitSuccess();" ]
+  ]
+}

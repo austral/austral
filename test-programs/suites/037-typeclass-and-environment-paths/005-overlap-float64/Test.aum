@@ -1,0 +1,21 @@
+module body Test is
+    typeclass Tagged(T: Type) is
+        method tag(value: T): Unit;
+    end;
+
+    instance Tagged(Float64) is
+        method tag(value: Float64): Unit is
+            return nil;
+        end;
+    end;
+
+    instance Tagged(Float64) is
+        method tag(value: Float64): Unit is
+            return nil;
+        end;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

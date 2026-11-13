@@ -1,0 +1,9 @@
+module body Test is
+    function main(): ExitCode is
+        let a: Float32 := 1.5;
+        let b: Float32 := 2.25;
+        let c: Float32 := a + b;
+        printLn(c);
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The interface declaration for " },
+    { "type": "code", "content": "Box" },
+    {
+      "type": "text",
+      "content": " and its implementation have different types."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/041-opaque-record-type-parameters/Test.aui",
+    "startp": { "line": 2, "column": 4 },
+    "end": { "line": 2, "column": 28 }
+  },
+  "context": [
+    [ 1, "module Test is" ],
+    [ 2, "    type Box[T: Free]: Free;" ],
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode;" ]
+  ]
+}

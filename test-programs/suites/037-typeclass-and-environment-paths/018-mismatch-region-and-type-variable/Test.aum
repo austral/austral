@@ -1,0 +1,12 @@
+module body Test is
+    generic [R: Region]
+    function keep(ref: &[Int32, R]): Unit is
+        let other: &[Int32, Static] := ref;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        
+        return ExitSuccess();
+    end;
+end module body.

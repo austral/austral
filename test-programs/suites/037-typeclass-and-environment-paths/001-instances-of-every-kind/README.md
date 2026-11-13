@@ -1,0 +1,1 @@
+Covers the shape, overlap and orphan checks of instances for write references, mutable spans, addresses, pointers and function pointers, and the no-overlap answers for unit and named types (lib/TypeClasses.ml, check_instance_argument_has_right_shape, overlapping_instances, is_type_local).

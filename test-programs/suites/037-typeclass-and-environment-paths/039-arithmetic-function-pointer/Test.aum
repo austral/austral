@@ -1,0 +1,10 @@
+module body Test is
+    function combine(a: Fn[Int32, Int32], b: Fn[Int32, Int32]): Unit is
+        a + b;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

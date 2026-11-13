@@ -1,0 +1,27 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Both operands of an arithmetic operator must be numeric types, but "
+    },
+    { "type": "type", "content": "Span![Int32, R]" },
+    { "type": "text", "content": " is not." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/035-arithmetic-span-mut/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 14 }
+  },
+  "context": [
+    [ 2, "    generic [R: Region]" ],
+    [
+      3,
+      "    function combine(a: Span![Int32, R], b: Span![Int32, R]): Unit is"
+    ],
+    [ 4, "        a + b;" ],
+    [ 5, "        return nil;" ],
+    [ 6, "    end;" ]
+  ]
+}

@@ -1,0 +1,9 @@
+module body Test is
+    record Box[U: Free]: Free is
+        value: U;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

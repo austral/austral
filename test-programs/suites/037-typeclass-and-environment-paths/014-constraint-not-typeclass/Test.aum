@@ -1,0 +1,14 @@
+module body Test is
+    record Foo: Free is
+    end;
+
+    generic [T: Free(Foo)]
+    function accept(value: T): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        accept(10);
+        return ExitSuccess();
+    end;
+end module body.

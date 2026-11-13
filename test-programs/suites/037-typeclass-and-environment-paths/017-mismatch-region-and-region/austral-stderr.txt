@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot cast to " },
+    { "type": "type", "content": "&[Int32, Region<0>]" },
+    { "type": "text", "content": " from " },
+    { "type": "type", "content": "&[Int32, Region<2>]" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/017-mismatch-region-and-region/Test.aum",
+    "startp": { "line": 5, "column": 12 },
+    "end": { "line": 5, "column": 47 }
+  },
+  "context": [
+    [ 3, "        let n: Int32 := 10;" ],
+    [ 4, "        borrow ref: &[Int32, rho] := &n do" ],
+    [ 5, "            let other: &[Int32, Static] := ref;" ],
+    [ 6, "        end borrow;" ],
+    [ 7, "        return ExitSuccess();" ]
+  ]
+}

@@ -1,0 +1,10 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (Address, Pointer);
+
+module body Test is
+    function main(): ExitCode is
+        let ptr: Pointer[Int32] := true;
+        return ExitSuccess();
+    end;
+end module body.

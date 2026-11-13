@@ -1,0 +1,27 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (Pointer);
+
+module body Test is
+    typeclass Tagged(T: Type) is
+        method tag(value: T): Unit;
+    end;
+
+    generic [U: Type]
+    instance Tagged(Pointer[U]) is
+        method tag(value: Pointer[U]): Unit is
+            return nil;
+        end;
+    end;
+
+    generic [V: Type]
+    instance Tagged(Pointer[V]) is
+        method tag(value: Pointer[V]): Unit is
+            return nil;
+        end;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

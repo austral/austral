@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    { "type": "text", "content": "I can't find a " },
+    { "type": "text", "content": "callable" },
+    { "type": "text", "content": " named " },
+    { "type": "code", "content": "Limit" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/024-call-constant/Test.aum",
+    "startp": { "line": 5, "column": 8 },
+    "end": { "line": 5, "column": 32 }
+  },
+  "context": [
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode is" ],
+    [ 5, "        let n: Int32 := Limit();" ],
+    [ 6, "        return ExitSuccess();" ],
+    [ 7, "    end;" ]
+  ]
+}

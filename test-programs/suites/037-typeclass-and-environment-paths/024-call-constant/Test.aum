@@ -1,0 +1,8 @@
+module body Test is
+    constant Limit: Int32 := 10;
+
+    function main(): ExitCode is
+        let n: Int32 := Limit();
+        return ExitSuccess();
+    end;
+end module body.

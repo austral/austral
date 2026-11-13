@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    { "type": "text", "content": "I can't find a " },
+    { "type": "text", "content": "variable" },
+    { "type": "text", "content": " named " },
+    { "type": "code", "content": "Pair" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/026-type-name-as-variable/Test.aum",
+    "startp": { "line": 6, "column": 8 },
+    "end": { "line": 6, "column": 29 }
+  },
+  "context": [
+    [ 4, "" ],
+    [ 5, "    function main(): ExitCode is" ],
+    [ 6, "        let n: Int32 := Pair;" ],
+    [ 7, "        return ExitSuccess();" ],
+    [ 8, "    end;" ]
+  ]
+}

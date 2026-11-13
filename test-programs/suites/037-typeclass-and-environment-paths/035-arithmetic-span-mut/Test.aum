@@ -1,0 +1,11 @@
+module body Test is
+    generic [R: Region]
+    function combine(a: Span![Int32, R], b: Span![Int32, R]): Unit is
+        a + b;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

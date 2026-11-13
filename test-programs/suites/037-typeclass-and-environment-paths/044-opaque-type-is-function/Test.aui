@@ -1,0 +1,5 @@
+module Test is
+    type Token: Free;
+
+    function main(): ExitCode;
+end module.

@@ -1,0 +1,1 @@
+Covers the internal error when a generic function over `T: Type` that mentions `Option[T]` is instantiated with a record type (lib/TypeSystem.ml, type_universe, reached from replace_variables in lib/TypeBindings.ml).

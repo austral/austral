@@ -1,0 +1,14 @@
+module body Test is
+    record Foo: Free is
+    end;
+
+    generic [T: Type]
+    function wrap(value: T): Option[T] is
+        return Some(value => value);
+    end;
+
+    function main(): ExitCode is
+        let opt: Option[Foo] := wrap(Foo());
+        return ExitSuccess();
+    end;
+end module body.

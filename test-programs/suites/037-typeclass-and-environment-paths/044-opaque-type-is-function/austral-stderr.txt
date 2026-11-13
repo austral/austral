@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The interface requires " },
+    { "type": "code", "content": "Token" },
+    { "type": "text", "content": " to be a " },
+    { "type": "text", "content": "type" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/044-opaque-type-is-function/Test.aui",
+    "startp": { "line": 2, "column": 4 },
+    "end": { "line": 2, "column": 21 }
+  },
+  "context": [
+    [ 1, "module Test is" ],
+    [ 2, "    type Token: Free;" ],
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode;" ]
+  ]
+}

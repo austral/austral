@@ -1,0 +1,9 @@
+module body Test is
+    function main(): ExitCode is
+        let n: Int32 := 10;
+        borrow ref: &[Int32, rho] := &n do
+            let other: &[Int32, Static] := ref;
+        end borrow;
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,10 @@
+module body Test is
+    function combine(a: Static, b: Static): Unit is
+        a + b;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

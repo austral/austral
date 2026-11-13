@@ -1,0 +1,32 @@
+{
+  "module": "Test",
+  "kind": "Internal Error",
+  "text": [
+    { "type": "text", "content": "Internal compiler error: " },
+    {
+      "type": "text",
+      "content": "Type parameter constraint refers to a declaration which is not a typeclass."
+    },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This is a bug in the compiler, please open an issue here: "
+    },
+    {
+      "type": "code",
+      "content": "https://github.com/austral/austral/issues"
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/014-constraint-not-typeclass/Test.aum",
+    "startp": { "line": 11, "column": 8 },
+    "end": { "line": 11, "column": 19 }
+  },
+  "context": [
+    [ 9, "" ],
+    [ 10, "    function main(): ExitCode is" ],
+    [ 11, "        accept(10);" ],
+    [ 12, "        return ExitSuccess();" ],
+    [ 13, "    end;" ]
+  ]
+}

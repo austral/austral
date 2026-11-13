@@ -1,0 +1,95 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Address,
+    Pointer,
+    nullPointer,
+    refToPointer,
+    spanWrite
+);
+
+module body Test is
+    record Foo: Free is
+    end;
+
+    typeclass Kind(T: Type) is
+        method kind(value: T): Int32;
+    end;
+
+    instance Kind(Bool) is
+        method kind(value: Bool): Int32 is
+            return 1;
+        end;
+    end;
+
+    instance Kind(Unit) is
+        method kind(value: Unit): Int32 is
+            return 2;
+        end;
+    end;
+
+    instance Kind(Foo) is
+        method kind(value: Foo): Int32 is
+            return 3;
+        end;
+    end;
+
+    generic [U: Type, R: Region]
+    instance Kind(&![U, R]) is
+        method kind(value: &![U, R]): Int32 is
+            return 4;
+        end;
+    end;
+
+    generic [U: Type, R: Region]
+    instance Kind(Span![U, R]) is
+        method kind(value: Span![U, R]): Int32 is
+            return 5;
+        end;
+    end;
+
+    generic [U: Type]
+    instance Kind(Address[U]) is
+        method kind(value: Address[U]): Int32 is
+            return 6;
+        end;
+    end;
+
+    generic [A: Type, B: Type]
+    instance Kind(Fn[A, B]) is
+        method kind(value: Fn[A, B]): Int32 is
+            return 7;
+        end;
+    end;
+
+    typeclass PointerKind(T: Type) is
+        method pointerKind(value: T): Int32;
+    end;
+
+    generic [U: Type]
+    instance PointerKind(Pointer[U]) is
+        method pointerKind(value: Pointer[U]): Int32 is
+            return 8;
+        end;
+    end;
+
+    function double(x: Int32): Int32 is
+        return x + x;
+    end;
+
+    function main(): ExitCode is
+        printLn(kind(true));
+        printLn(kind(nil));
+        printLn(kind(Foo()));
+        var n: Int32 := 10;
+        printLn(kind(&!n));
+        var ptr: Pointer[Int32] := refToPointer(&n);
+        printLn(kind(spanWrite(&!ptr, 0, 0)));
+        let addr: Address[Int32] := nullPointer();
+        printLn(kind(addr));
+        let f: Fn[Int32, Int32] := double;
+        printLn(kind(f));
+        printLn(pointerKind(ptr));
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,14 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (Address, Pointer);
+
+module body Test is
+    function combine(a: Pointer[Int32], b: Pointer[Int32]): Unit is
+        a + b;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

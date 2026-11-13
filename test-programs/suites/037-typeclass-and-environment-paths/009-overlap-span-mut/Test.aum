@@ -1,0 +1,23 @@
+module body Test is
+    typeclass Tagged(T: Type) is
+        method tag(value: T): Unit;
+    end;
+
+    generic [U: Type, R: Region]
+    instance Tagged(Span![U, R]) is
+        method tag(value: Span![U, R]): Unit is
+            return nil;
+        end;
+    end;
+
+    generic [V: Type, S: Region]
+    instance Tagged(Span![V, S]) is
+        method tag(value: Span![V, S]): Unit is
+            return nil;
+        end;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

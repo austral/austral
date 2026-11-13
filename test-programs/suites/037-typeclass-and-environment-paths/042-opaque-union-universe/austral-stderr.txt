@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The interface declaration for " },
+    { "type": "code", "content": "Choice" },
+    {
+      "type": "text",
+      "content": " and its implementation have different universes."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/042-opaque-union-universe/Test.aui",
+    "startp": { "line": 2, "column": 4 },
+    "end": { "line": 2, "column": 24 }
+  },
+  "context": [
+    [ 1, "module Test is" ],
+    [ 2, "    type Choice: Linear;" ],
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode;" ]
+  ]
+}

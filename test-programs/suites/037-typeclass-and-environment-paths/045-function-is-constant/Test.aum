@@ -1,0 +1,7 @@
+module body Test is
+    constant limit: Int32 := 10;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

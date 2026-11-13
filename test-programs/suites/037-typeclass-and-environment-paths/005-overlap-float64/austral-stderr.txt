@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [ { "type": "text", "content": "Instance overlaps." } ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/005-overlap-float64/Test.aum",
+    "startp": { "line": 10, "column": 8 },
+    "end": { "line": 16, "column": 8 }
+  },
+  "context": [
+    [ 8, "            return nil;" ],
+    [ 9, "        end;" ],
+    [ 10, "    end;" ],
+    [ 11, "" ],
+    [ 12, "    instance Tagged(Float64) is" ],
+    [ 13, "        method tag(value: Float64): Unit is" ],
+    [ 14, "            return nil;" ],
+    [ 15, "        end;" ],
+    [ 16, "    end;" ],
+    [ 17, "" ],
+    [ 18, "    function main(): ExitCode is" ]
+  ]
+}

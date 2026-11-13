@@ -1,0 +1,11 @@
+module body Test_TC is
+    typeclass Describe(T: Free) is
+        method describe(value: T): Int32;
+    end;
+
+    instance Describe(Int32) is
+        method describe(value: Int32): Int32 is
+            return 1;
+        end;
+    end;
+end module body.

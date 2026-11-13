@@ -1,0 +1,11 @@
+module body Test is
+    generic [R: Region]
+    function update(ref: &![Int32, R]): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        update(10);
+        return ExitSuccess();
+    end;
+end module body.

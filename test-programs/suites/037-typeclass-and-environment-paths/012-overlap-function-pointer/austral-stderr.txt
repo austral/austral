@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [ { "type": "text", "content": "Instance overlaps." } ],
+  "span": {
+    "filename": "test-programs/suites/037-typeclass-and-environment-paths/012-overlap-function-pointer/Test.aum",
+    "startp": { "line": 13, "column": 4 },
+    "end": { "line": 18, "column": 8 }
+  },
+  "context": [
+    [ 11, "    end;" ],
+    [ 12, "" ],
+    [ 13, "    generic [C: Type, D: Type]" ],
+    [ 14, "    instance Tagged(Fn[C, D]) is" ],
+    [ 15, "        method tag(value: Fn[C, D]): Unit is" ],
+    [ 16, "            return nil;" ],
+    [ 17, "        end;" ],
+    [ 18, "    end;" ],
+    [ 19, "" ],
+    [ 20, "    function main(): ExitCode is" ]
+  ]
+}

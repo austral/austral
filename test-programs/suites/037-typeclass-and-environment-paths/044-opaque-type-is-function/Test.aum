@@ -1,0 +1,9 @@
+module body Test is
+    function Token(): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.
