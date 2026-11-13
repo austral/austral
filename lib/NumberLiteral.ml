@@ -31,8 +31,8 @@ let without_separators (written: string): string =
   Util.remove_char written '\''
 
 (* Issues #121 and #85: the digits after a `#x`, `#b` or `#o` prefix are read
-   through OCaml's 63-bit `int`. A literal of 2^62 or more silently becomes
-   another value (#121), and one with too many digits raises
+   through OCaml's 63-bit `int`. A literal from 2^62 to 2^63 - 1 silently
+   becomes a negative value (#121), and one of 2^63 or more raises
    `Failure "int_of_string"` (#85). Tests pin both. Reading the digits with
    `Z.of_string` here fixes both. *)
 let value_through_native_int (ocaml_prefix: string) (written: string): Z.t =
@@ -65,6 +65,7 @@ let of_float (written: string): float_literal =
     | (Some i, _) | (None, Some i) -> i
     | (None, None) -> length
   in
+  (* The lexer's float token always has a period. *)
   let period: int = String.index written '.' in
   let fraction: string = String.sub written (period + 1) (exponent_start - period - 1) in
   let count_digit (n: int) (c: char): int =

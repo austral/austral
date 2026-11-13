@@ -626,8 +626,8 @@ module Mtast = struct
   and mexpr =
     | MNilConstant
     | MBoolConstant of bool
-    | MIntConstant of string
-    | MFloatConstant of string
+    | MIntConstant of NumberLiteral.int_literal
+    | MFloatConstant of NumberLiteral.float_literal
     | MStringConstant of escaped_string
     | MConstVar of qident * mono_ty
     | MParamVar of identifier * mono_ty
