@@ -20,6 +20,4 @@ val mono_bindings_from_list : (type_parameter * mono_ty) list -> mono_type_bindi
 
 val equal_mono_bindings : mono_type_bindings -> mono_type_bindings -> bool
 
-val show_mono_type_bindings : mono_type_bindings -> string
-
 val get_mono_binding : mono_type_bindings -> type_parameter -> mono_ty option

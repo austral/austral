@@ -23,10 +23,6 @@ val typarams_size : typarams -> int
 (** Find a type parameter by name. *)
 val get_typaram : typarams -> identifier -> type_parameter option
 
-(** Add a type parameter to the last position in the set. Throws an error if a
-    type parameter with this name already exists. *)
-val add_typaram : typarams -> type_parameter -> typarams
-
 (** Return the type parameters as a list, preserving order. *)
 val typarams_as_list : typarams -> type_parameter list
 

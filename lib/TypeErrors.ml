@@ -19,35 +19,6 @@ let arithmetic_not_numeric ty =
     Text " is not."
   ]
 
-let array_indexing_disallowed ty =
-  austral_raise TypeError [
-    Text "The array indexing operator is not allowed for the type ";
-    Type ty
-  ]
-
-let borrow_constant () =
-  austral_raise TypeError [
-    Text "Constants cannot be borrowed."
-  ]
-
-let reborrow_constant () =
-  austral_raise TypeError [
-    Text "Constants cannot be borrowed."
-  ]
-
-let reborrow_wrong_type (ty: ty) =
-  austral_raise TypeError [
-      Text "Reborrow expressions take a variable of mutable reference type, but the expression has type ";
-      Type ty
-  ]
-
-let borrow_non_linear ty =
-  austral_raise TypeError [
-      Text "Cannot borrow ";
-      Type ty;
-      Text " because it is not a linear type."
-    ]
-
 let cannot_borrow_immutable_var_mutably (name: identifier) =
   austral_raise TypeError [
       Text "Cannot borrow the variable ";
@@ -270,11 +241,6 @@ let logical_operands_not_boolean ~operator ~types = match types with
       Text "All operands of a logical operator must be boolean expressions."
     ]
 
-let lvalue_index () =
-  austral_raise TypeError [
-    Text "The array index operator doesn't work in lvalues."
-  ]
-
 let no_such_slot ~type_name ~slot_name =
   austral_raise TypeError [
     Text "The type ";
@@ -289,15 +255,6 @@ let no_suitable_instance ~typeclass ~ty =
     Code (ident_string typeclass);
     Text " has no instance which matches for ";
     Type ty
-  ]
-
-let path_not_free ty =
-  austral_raise TypeError [
-    Text "The path ends with the type ";
-    Type ty;
-    Text " which is not in the ";
-    Code "Free";
-    Text " universe."
   ]
 
 let path_not_public ~type_name ~slot_name =
@@ -374,13 +331,6 @@ let ref_transform_needs_ref ty =
   austral_raise GenericError [
       Text "The head of a reference transform expression must be of a reference type, but I got ";
       Type ty
-    ]
-
-let ref_transform_not_record ty =
-  austral_raise GenericError [
-      Text "Tried to transform a reference to a record into a reference into a slot, but the type ";
-      Type ty;
-      Text " is not a record"
     ]
 
 let var_collides_with_decl (name: identifier) =

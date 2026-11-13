@@ -5,7 +5,6 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
-open Common
 open Type
 open Stages.Tast
 open Identifier
@@ -115,65 +114,3 @@ let rec get_type = function
   | TPointerSlotAccessor (_, _, ty) -> ty
   | TArrayIndex (_, _, ty) -> ty
   | TSpanIndex (_, _, ty) -> ty
-
-let rec dump_stmt (stmt: tstmt): string =
-   pp stmt 0
-
-and pp (stmt: tstmt) (depth: int): string =
-  let indent (s: string): string =
-    (String.make depth ' ') ^ s
-
-  and inc: int = depth + 4
-  in
-  match stmt with
-  | TSkip _ ->
-     indent "skip\n"
-  | TLet (_, _, name, _, body) ->
-     (indent ("let " ^ (ident_string name) ^ "\n"))
-     ^ (pp body inc)
-     ^ (indent "end let\n")
-  | TDestructure (_, _, _, _, body) ->
-     (indent "let destructure\n")
-     ^ (pp body inc)
-     ^ (indent "end let destructure\n")
-  | TAssign (_, _, _) ->
-     indent "assign\n"
-  | TAssignVar _ ->
-     indent "assign var\n"
-  | TInitialAssign _ ->
-     indent "initial assign\n"
-  | TIf (_, _, t, f) ->
-     (indent "if\n")
-     ^ (pp t inc)
-     ^ (indent "else\n")
-     ^ (pp f inc)
-     ^ (indent "end if\n")
-  | TCase _ ->
-     indent "case\n"
-  | TWhile (_, _, body) ->
-     (indent "while\n")
-     ^ (pp body inc)
-     ^ (indent "end while\n")
-  | TFor (_, _, _, _, body) ->
-     (indent "for\n")
-     ^ (pp body inc)
-     ^ (indent "end for\n")
-  | TBorrow { body; original; rename; mode; _ } ->
-     let original = ident_string original
-     and rename = ident_string rename in
-     (indent ("borrow " ^ original ^ " as " ^ rename ^ "(" ^ (show_borrow_stmt_kind mode) ^ ")\n"))
-     ^ (pp body inc)
-     ^ (indent "end borrow\n")
-  | TBlock (_, a, b) ->
-     (indent "block\n")
-     ^ (pp a inc)
-     ^ (pp b inc)
-     ^ (indent "end block\n")
-  | TDiscarding _ ->
-     indent "discarding\n"
-  | TReturn _ ->
-     indent "return\n"
-  | TLetTmp _ ->
-     indent "let tmp\n"
-  | TAssignTmp _ ->
-     indent "assign tmp\n"

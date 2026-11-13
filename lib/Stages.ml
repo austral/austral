@@ -654,7 +654,6 @@ module Mtast = struct
     | MUnionConstructor of mono_ty * identifier * (identifier * mexpr) list
     | MEmbed of mono_ty * string * mexpr list
     | MDeref of mexpr
-    | MTypecast of mexpr * mono_ty
     | MSizeOf of mono_ty
     | MSlotAccessor of mexpr * identifier * mono_ty
     | MPointerSlotAccessor of mexpr * identifier * mono_ty

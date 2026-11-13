@@ -198,7 +198,7 @@ and extract_type_signatures' (def: combined_definition): type_signature option =
   | CInstance _ ->
      None
 
-let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id option) (body_file: file_id): (env * linked_module) =
+let rec extract (env: env) (cmodule: combined_module): (env * linked_module) =
   let (CombinedModule {
            name;
            kind;
@@ -231,9 +231,7 @@ let rec extract (env: env) (cmodule: combined_module) (interface_file: file_id o
   in
   let input: mod_input = {
       name;
-      interface_file;
       interface_docstring;
-      body_file;
       body_docstring;
       kind;
       imported_instances;

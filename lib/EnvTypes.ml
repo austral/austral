@@ -18,19 +18,11 @@ open MonoType
 open MonoTypeBindings
 open Stages.Mtast
 
-(** A file record contains a file's path and contents. *)
-type file_rec = FileRec of { id: file_id; path: string; contents: string }
-
-type file_input = { path: string; contents: string }
-
-(** A module record contains a module's name, docstring, and pointers to the
-   interface and body files. *)
+(** A module record contains a module's name and docstrings. *)
 type mod_rec = ModRec of {
       id: mod_id;
       name: module_name;
-      interface_file: file_id option;
       interface_docstring: docstring;
-      body_file: file_id;
       body_docstring: docstring;
       kind: module_kind;
       imported_instances: DeclIdSet.t;
@@ -39,9 +31,7 @@ type mod_rec = ModRec of {
 
 type mod_input = {
     name: module_name;
-    interface_file: file_id option;
     interface_docstring: docstring;
-    body_file: file_id;
     body_docstring: docstring;
     kind: module_kind;
     imported_instances: DeclIdSet.t;

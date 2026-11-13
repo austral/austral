@@ -1,10 +1,10 @@
 files 76
-lines 15280
-raise 476
+lines 14944
+raise 466
 catch 56
-state 15
+state 14
 io 56
-wildcard 207
-strings 240
-internal 93
-adhoc 43
+wildcard 206
+strings 230
+internal 92
+adhoc 42

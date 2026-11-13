@@ -122,9 +122,6 @@ and concrete_binding =
       rename: identifier;
     }
 
-and condition_branch =
-  ConditionBranch of cexpr * cstmt
-
 and concrete_when =
   ConcreteWhen of identifier * concrete_binding list * cstmt
 

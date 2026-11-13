@@ -36,8 +36,5 @@ let parse_module_body (s: string) (filename: string): concrete_module_body =
         ps ("Filename", filename);
         parse' Parser.module_body s filename)
 
-let parse_stmt s =
-  parse' Parser.standalone_statement s ""
-
 let parse_expr s =
   parse' Parser.standalone_expression s ""

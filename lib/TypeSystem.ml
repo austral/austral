@@ -45,24 +45,6 @@ let is_numeric = function
   | FnPtr _ -> false
   | MonoTy _ -> err "is_numeric called with MonoTy argument"
 
-let is_comparable = function
-  | Unit -> true
-  | Boolean -> true
-  | Integer _ -> true
-  | SingleFloat -> true
-  | DoubleFloat -> true
-  | NamedType _ -> false
-  | RegionTy _ -> false
-  | ReadRef _ -> false
-  | WriteRef _ -> false
-  | Span _ -> false
-  | SpanMut _ -> false
-  | TyVar _ -> false
-  | Address _ -> true
-  | Pointer _ -> true
-  | FnPtr _ -> true
-  | MonoTy _ -> err "is_comparable called with MonoTy argument"
-
 let rec type_variables = function
   | Unit ->
      TypeVarSet.empty
@@ -99,35 +81,6 @@ let rec type_variables = function
      TypeVarSet.union args' rt'
   | MonoTy _ ->
     TypeVarSet.empty
-
-let rec is_concrete = function
-  | Unit -> true
-  | Boolean -> true
-  | Integer _ -> true
-  | SingleFloat -> true
-  | DoubleFloat -> true
-  | NamedType _ -> false
-  | RegionTy _ ->
-     true
-  | ReadRef (ty, _) ->
-     is_concrete ty
-  | WriteRef (ty, _) ->
-     is_concrete ty
-  | Span (ty, _) ->
-     is_concrete ty
-  | SpanMut (ty, _) ->
-     is_concrete ty
-  | TyVar _ ->
-     (* Individual type variables need not be instantiated. *)
-     true
-  | Address _ ->
-     true
-  | Pointer _ ->
-     true
-  | FnPtr _ ->
-     true
-  | MonoTy _ ->
-     true
 
 (** Given a list of types, return whether any of them are in the Linear
     universe. *)

@@ -9,10 +9,6 @@
 The reason this is defined outside the `Env` module is to avoid a cyclic
 dependency (`Env` depends on `Tast` and `Tast` depends on IDs). *)
 
-(** The type of file IDs. *)
-type file_id
-[@@deriving eq]
-
 (** The type of module IDs. *)
 type mod_id = ModId of int
 [@@deriving eq]
@@ -29,7 +25,6 @@ type ins_meth_id = InsMethId of int
 type mono_id = MonoId of int
 [@@deriving (eq, show)]
 
-val fresh_file_id : unit -> file_id
 val fresh_mod_id : unit -> mod_id
 val fresh_decl_id : unit -> decl_id
 val fresh_ins_meth_id : unit -> ins_meth_id

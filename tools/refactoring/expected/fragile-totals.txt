@@ -1,5 +1,5 @@
-files 27
-fragile-matches 398
+files 26
+fragile-matches 396
 type CRepr.c_decl 4
 type CRepr.c_slot 2
 type CRepr.c_struct 2
@@ -17,7 +17,7 @@ type Cst.concrete_record 4
 type Cst.concrete_typeclass 2
 type Cst.concrete_union 4
 type Cst.cstmt 2
-type EnvTypes.decl 76
+type EnvTypes.decl 74
 type EnvTypes.ins_meth_rec 2
 type EnvTypes.mod_rec 4
 type EnvTypes.monomorph 16

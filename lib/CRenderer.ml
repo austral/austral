@@ -56,16 +56,6 @@ and render_decl i d =
        Line (i, "struct " ^ (avoid_ckw name) ^ ";");
        Line (i, "typedef struct " ^ (avoid_ckw name) ^ " " ^ (avoid_ckw name) ^ ";")
      ]
-  | CTypeDefinition (desc, name, def) ->
-     [
-       Line (i, desc_text desc);
-       Line (i, "typedef " ^ (render_type def) ^ " " ^ (avoid_ckw name) ^ ";")
-     ]
-  | CStructDefinition (desc, record) ->
-     [
-       Line (i, desc_text desc);
-       Line (i, (render_struct record) ^ ";")
-     ]
   | CNamedStructDefinition (desc, name, slots) ->
      [
        Line (i, desc_text desc);
@@ -231,8 +221,6 @@ and render_expr = function
      let e' = render_expr e
      and t' = render_type t in
      paren ((paren t') ^ " " ^ e')
-  | (CArithmetic (op, l, r)) ->
-     paren ((e l) ^ " " ^ render_arith op ^ " " ^ (e r))
   | (CComparison (op, l, r)) ->
      paren ((e l) ^ " " ^ (render_comp op) ^ " " ^ (e r))
   | (CConjunction (l, r)) ->
@@ -249,17 +237,8 @@ and render_expr = function
      (paren (e v)) ^ "." ^ n
   | (CPointerStructAccessor (v, n)) ->
      (paren (e v)) ^ "->" ^ n
-  | CIndex (arr, idx) ->
-     (e arr) ^ "[" ^ (e idx) ^ "]"
   | CAddressOf exp ->
      "&(" ^ (e exp) ^ ")"
-  | CPath (head, elems) ->
-     let f (elem: c_path_elem): string =
-       match elem with
-       | CPathSlot name -> "." ^ name
-       | CPathPointer name -> "->" ^ name
-     in
-     (render_expr head) ^ (String.concat "" (List.map f elems))
   | CEmbed (ty, expr, args) ->
      let strs = List.map render_expr args in
      (* the `expr` has a format like "derp $1 $2", so iterate over the list of
@@ -293,12 +272,6 @@ and e expr = render_expr expr
 and render_bool = function
   | false -> "false"
   | true -> "true"
-
-and render_arith = function
-  | Add -> "+"
-  | Subtract -> "-"
-  | Multiply -> "*"
-  | Divide -> "/"
 
 and render_comp = function
   | Equal -> "=="

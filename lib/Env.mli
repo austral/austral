@@ -24,11 +24,6 @@ type env
 (** The empty compiler. *)
 val empty_env : env
 
-(** {1 File Functions} *)
-
-(** Add a file's path and contents to the environment. *)
-val add_file : env -> file_input -> (env * file_id)
-
 (** {1 Module Functions} *)
 
 (** Add a module's information to the environment. *)
@@ -118,14 +113,6 @@ val get_callable : env -> module_name -> sident -> callable option
 
 (** {1 Monomorph Functions} *)
 
-val add_record_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
-
-val add_union_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
-
-val add_function_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
-
-val add_instance_method_monomorph : env -> ins_meth_id -> mono_type_bindings -> (env * mono_id)
-
 (** Given a record's ID and a list of arguments, register a monomorph and return
    its ID, or return the ID if it exists. *)
 val add_or_get_record_monomorph : env -> decl_id -> mono_type_bindings -> (env * mono_id)
@@ -157,10 +144,6 @@ val get_type_monomorph : env -> decl_id -> mono_type_bindings -> mono_id option
 (** Given the ID of a function and a set of monomorphic type arguments, return
    the ID of the corresponding monomorph if it exists. *)
 val get_function_monomorph : env -> decl_id -> mono_type_bindings -> mono_id option
-
-(** Given the ID of an instance method and a set of monomorphic type arguments,
-   return the ID of the corresponding monomorph if it exists. *)
-val get_instance_method_monomorph : env -> ins_meth_id -> mono_type_bindings -> mono_id option
 
 (** Get all uninstantiated monomorphs. *)
 val get_uninstantiated_monomorphs : env -> monomorph list

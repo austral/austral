@@ -159,8 +159,6 @@ let rec gen_type (ty: mono_ty): c_ty =
 
 (* Expressions *)
 
-let c_string_type = CPointer (CNamedType "uint8_t")
-
 let union_type_id = function
   | MonoNamedType id ->
      id
@@ -250,8 +248,6 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
      CEmbed (gen_type ty, expr, List.map g args)
   | MDeref e ->
      CDeref (g e)
-  | MTypecast (e, ty) ->
-     CCast (g e, gen_type ty)
   | MSizeOf ty ->
      CSizeOf (gen_type ty)
   | MSlotAccessor (expr, slot, _) ->
@@ -665,12 +661,8 @@ let decl_order = function
      0
   | CStructForwardDeclaration _ ->
      1
-  | CStructDefinition _ ->
-     2
   | CNamedStructDefinition _ ->
      3
-  | CTypeDefinition _ ->
-     4
   | CConstantDefinition _ ->
      5
   | CMacro _ ->

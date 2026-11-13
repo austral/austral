@@ -68,8 +68,6 @@ let rec get_type (e: mexpr): mono_ty =
          t
       | _ ->
          internal_err ("a dereference expression was constructed whose argument is not a reference type."))
-  | MTypecast (_, ty) ->
-     ty
   | MSizeOf _ ->
      MonoInteger (Unsigned, Width64)
   | MSlotAccessor (_, _, ty) -> ty

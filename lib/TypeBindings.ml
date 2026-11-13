@@ -78,9 +78,6 @@ module BindingsMap =
 
 type type_bindings = TypeBindings of ty BindingsMap.t
 
-let binding_count (TypeBindings m) =
-  BindingsMap.cardinal m
-
 let bindings_list (TypeBindings m) =
   (BindingsMap.bindings m)
 

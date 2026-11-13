@@ -5,23 +5,12 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
-open Identifier
 open Type
 open TypeSignature
 open TypeParameters
 open RegionMap
 open Stages.Ast
 open Env
-
-(* Given a type's list of type parameters, its declared universe, and a list of
-   supplied type arguments, evaluate the effective universe the type belongs to.
-
-   Preconditions: the lists have the same length. *)
-val effective_universe : qident -> typarams -> universe -> ty list -> universe
-
-(* Find the type signature of the type with the given name, if any
-   exists. Searches the local type signature list first. *)
-val get_type_signature : env -> type_signature list -> qident -> type_signature option
 
 (* Parse a qualified type specifier.
 

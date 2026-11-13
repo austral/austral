@@ -33,7 +33,6 @@ type c_expr =
   | CFuncall of string * c_expr list
   | CFptrCall of c_expr * c_ty * c_ty list * c_expr list
   | CCast of c_expr * c_ty
-  | CArithmetic of arithmetic_operator * c_expr * c_expr
   | CComparison of comparison_operator * c_expr * c_expr
   | CConjunction of c_expr * c_expr
   | CDisjunction of c_expr * c_expr
@@ -42,16 +41,10 @@ type c_expr =
   | CStructInitializer of (string * c_expr) list
   | CStructAccessor of c_expr * string
   | CPointerStructAccessor of c_expr * string
-  | CIndex of c_expr * c_expr
   | CAddressOf of c_expr
-  | CPath of c_expr * c_path_elem list
   | CEmbed of c_ty * string * c_expr list
   | CDeref of c_expr
   | CSizeOf of c_ty
-
-and c_path_elem =
-  | CPathSlot of string
-  | CPathPointer of string
 
 type c_stmt =
   | CLet of string * c_ty * c_expr option
@@ -76,8 +69,6 @@ type c_decl =
   | CMacro of desc * string * c_expr
   | CConstantDefinition of desc * string * c_ty * c_expr
   | CStructForwardDeclaration of desc * string
-  | CTypeDefinition of desc * string * c_ty
-  | CStructDefinition of desc * c_struct
   | CNamedStructDefinition of desc * string * c_slot list
   | CEnumDefinition of desc * string * string list
   | CFunctionDeclaration of desc * string * c_param list * c_ty * c_function_linkage

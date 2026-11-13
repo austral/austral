@@ -5,14 +5,11 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
-open Identifier
 
 type region
 [@@deriving (eq, show)]
 
 val region_id: region -> int
-
-val static_region_name : identifier
 
 val static_region : region
 

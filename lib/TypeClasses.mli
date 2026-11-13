@@ -29,10 +29,6 @@ val check_instance_argument_has_right_universe : universe -> ty -> unit
  *)
 val check_instance_argument_has_right_shape : typarams -> ty -> unit
 
-(** Given the argument types to two instances of the same typeclass, check
-    whether they overlap. *)
-val overlapping_instances : ty -> ty -> bool
-
 (** Given a list of instances of a given typeclass in a module, and a type
     argument, check if an instance with that type argument would overlap with
     any instance from the list. *)

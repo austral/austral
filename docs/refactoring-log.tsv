@@ -13,3 +13,9 @@ ts	phase	decision	why	evidence	result
 2026-11-13T10:54:36Z	R3	エラーのテスト 81 本を足した（030 に 40、031 に 24、032 に 16、cli に 1）	構造を動かす前に、エラーの文面と出る条件を固定する	tools/refactoring/coverage.sh --errors: error functions 140, unexecuted 15。runner.py 030/031/032 All tests passed。cli-runner 32 passed	実行されないエラー関数 100→15。カバレッジ 77.88%→84.49%。TypeErrors.ml 20.69%→87.36%
 2026-11-13T10:54:37Z	R3	残る 15 個は消さずに仕分けた。呼ぶコードのない 8 個は R7 で消す。届かない 5 個と不具合の 2 個は issue #124	届かないエラーを消すと、手前の検査との関係が変わる。振る舞いを変えない規則に従う	issue #124、#122（Pointer の重なりの誤判定）	plan.md の C8 と C10 に載せた
 2026-11-13T10:54:37Z	R3	計画の表の数を tools/refactoring/baseline/ に固定し、check-plan.py はそこを読む	expected/ は項目ごとに下がる。計画の表を毎回書き直すのは、同じ修正の繰り返しになる	python3 docs/check-plan.py: FINDING 0	計画の表の見出しを「計画の時点」にした
+2026-11-13T11:05:53Z	R7	外から使われない公開を .mli から外し、コンパイラが未使用と報告する定義を、ビルドと削除の繰り返しで消した	手で探すより、コンパイラの警告 32 に従うほうが漏れがない	tools/refactoring/check.sh refactoring-base: unit OK、e2e All tests passed、cli 32 passed、equivalence programs 432 differing 0	行 15280→14944、raise 476→466、state 15→14、internal 93→92、adhoc 43→42、fragile 398→396、unused exports 68→0、カバレッジ 87.48%
+2026-11-13T11:05:53Z	R7	pp_type_bindings は消さずに戻した。unused-exports.sh は pp_T と equal_T を、型 T への言及で使用済みと数える	deriving show が生成するコードが呼ぶ。名前の検索では見えない	ビルドのエラー Unbound value pp_type_bindings	道具を直した。記録は 0 個
+2026-11-13T11:05:53Z	R7	ファイルの id の一式（env.files、add_file、file_id、interface_file、body_file）を消した	書くだけで、読むコードがない	grep で読む箇所が 0。等価性 0 本	state が 1 減った（file_counter）
+2026-11-13T11:05:53Z	R7	lib/prelude.h のファイルは残し、埋め込みの prelude_h だけ消した	コンパイラが出力するのは prelude_c だけ。ヘッダのファイルを消すのは、未使用コードの削除の範囲を超える	lib/Compiler.ml が使うのは prelude_c のみ（grep）	D1 は実行時の C を prelude.c に入れる必要がある（推論）
+2026-11-13T11:05:53Z	R7	is_comparable は消し、比較の検査がない不具合を issue #125 にした	呼ぶコードがない関数は消す。検査の抜けは別の不具合	レコードの = が exit 0 で通り、cc が invalid operands to binary == を出す	plan.md の C12 に載せた
+2026-11-13T11:05:53Z	R7	委任した作業役がコンテナの再起動で止まったので、残りを自分で引き継いだ	作業役は .mli の編集の途中だった。差分を主の作業木へ移して続けた	git cherry-pick b5c5cb9、git apply r7-wip.patch	以後は主の作業木で1本ずつ進める

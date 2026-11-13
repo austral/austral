@@ -17,7 +17,5 @@ val memory_interface_source: string
 (** Source code of the Austral.Memory body file. *)
 val memory_body_source: string
 
-(** Source code of prelude.h *)
-val prelude_h: string
 (** Source code of prelude.c *)
 val prelude_c: string

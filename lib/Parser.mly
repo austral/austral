@@ -116,36 +116,18 @@ open Span
 
 %type <Cst.concrete_module_interface> module_int
 %type <Cst.concrete_module_body> module_body
-%type <Cst.concrete_decl> standalone_interface_decl
-%type <Cst.cstmt> standalone_statement
 %type <Cst.cexpr> standalone_expression
-%type <Identifier.identifier> standalone_identifier
 
 %start module_int
 %start module_body
-%start standalone_interface_decl
-%start standalone_statement
 %start standalone_expression
-%start standalone_identifier
 
 %%
 
 /* Entrypoints */
 
-standalone_interface_decl:
-  | interface_decl EOF { $1 }
-  ;
-
-standalone_statement:
-  | statement EOF { $1 }
-  ;
-
 standalone_expression:
   | expression EOF { $1 }
-  ;
-
-standalone_identifier:
-  | identifier EOF { $1 }
   ;
 
 /* Module interfaces and bodies */

@@ -32,7 +32,6 @@ lib/Entrypoint.ml	Type.value_parameter	2
 lib/Env.ml	EnvTypes.decl	18
 lib/Env.ml	EnvTypes.mod_rec	2
 lib/Env.ml	EnvTypes.monomorph	14
-lib/EnvExtras.ml	EnvTypes.decl	2
 lib/EnvUtils.ml	EnvTypes.decl	2
 lib/ExportInstantiation.ml	EnvTypes.decl	4
 lib/ExtractionPass.ml	Common.pragma	4

@@ -5,14 +5,10 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
-open Identifier
-
 type region = Region of int
 [@@deriving (eq, show)]
 
 let region_id (Region i) = i
-
-let static_region_name = make_ident "Static"
 
 let static_region = Region (0)
 

@@ -19,7 +19,11 @@ others() { # module: every source file except the module's own pair and the gene
 for mli in lib/*.mli; do
   module=$(basename "$mli" .mli)
   grep -oE '^val [a-z_][A-Za-z0-9_'"'"']*' "$mli" | sed 's/^val //' | sort -u | while read -r name; do
-    if ! others "$module" | xargs grep -qw -- "$name"; then
+    # The code that `deriving show` and `deriving eq` generate calls pp_T and
+    # equal_T for every field of type T, so a mention of T is a use.
+    used_as=$name
+    [[ $name =~ ^(pp|equal)_(.+)$ ]] && used_as=${BASH_REMATCH[2]}
+    if ! others "$module" | xargs grep -qw -e "$name" -e "$used_as"; then
       printf '%s\t%s\n' "$module" "$name"
     fi
   done

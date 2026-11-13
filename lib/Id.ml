@@ -5,9 +5,6 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 
-type file_id = FileId of int
-[@@deriving eq]
-
 type mod_id = ModId of int
 [@@deriving eq]
 
@@ -21,13 +18,6 @@ type mono_id = MonoId of int
 [@@deriving (eq, show)]
 
 (* ID utilities *)
-
-let file_counter: int ref = ref 1
-
-let fresh_file_id _: file_id =
-  let id = !file_counter in
-  file_counter := id + 1;
-  FileId id
 
 let mod_counter: int ref = ref 1
 

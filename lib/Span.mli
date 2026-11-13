@@ -30,6 +30,4 @@ val from_loc : (Lexing.position * Lexing.position) -> span
 
 val position_to_string : position -> string
 
-val span_to_string : span -> string
-
 val empty_span : span
