@@ -36,7 +36,7 @@ lib/IdentifierSet.ml	24	0	0	0	0	0	0	0	0
 lib/ImportResolution.ml	133	8	0	0	0	0	0	0	0
 lib/Imports.ml	63	1	0	0	0	0	0	0	1
 lib/LexEnv.ml	59	1	0	1	0	0	0	0	1
-lib/Lexer.mll	211	5	0	0	0	0	0	0	0
+lib/Lexer.mll	211	5	0	2	0	0	0	0	0
 lib/LiftControlPass.ml	205	0	0	0	0	0	0	0	0
 lib/LinearityCheck.ml	778	20	11	0	0	4	3	9	0
 lib/ModIdSet.ml	18	0	0	0	0	0	0	0	0
