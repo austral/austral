@@ -7,7 +7,9 @@
 This script runs the end-to-end tests of the compiler.
 """
 import os
+import shutil
 import subprocess
+import tempfile
 import time
 from concurrent.futures import ProcessPoolExecutor, Future
 
@@ -41,6 +43,20 @@ def report(properties, outputs):
 #
 
 
+_run_directory: str | None = None
+
+
+def run_directory() -> str:
+    """
+    The directory where this run keeps its C files and binaries. Every run has
+    its own, so two runs at the same time do not overwrite each other's files.
+    """
+    global _run_directory
+    if _run_directory is None:
+        _run_directory = tempfile.mkdtemp(prefix="austral_e2e_")
+    return _run_directory
+
+
 class Test(object):
     """
     Base class of test objects.
@@ -58,8 +74,8 @@ class Test(object):
         self.directory = directory
         self.cli = cli
         ident: str = suite_name + "_" + name
-        self.c_path = "/tmp/austral_e2e_" + ident + ".c"
-        self.bin_path = "/tmp/austral_e2e_" + ident + ".bin"
+        self.c_path = os.path.join(run_directory(), ident + ".c")
+        self.bin_path = os.path.join(run_directory(), ident + ".bin")
 
 
 class TestSuccess(Test):
@@ -444,6 +460,10 @@ def _run_success_test(test: TestSuccess) -> TestResult:
         )
     # Program ran successfully. Did it produce output?
     stdout: str = result.stdout.decode("utf-8").strip()
+    # A program that prints its own path prints the run's directory. The
+    # expected output names the path the runner used before runs had a
+    # directory each.
+    stdout = stdout.replace(os.path.dirname(test.bin_path) + os.sep, "/tmp/austral_e2e_")
     if stdout and expected_output:
         # Have output, expected output. Check they match.
         if stdout == expected_output:
@@ -735,6 +755,8 @@ if __name__ == "__main__":
             print("\nSome tests failed")
             exit(-1)
         else:
+            # The files of a failed run are kept, so that they can be looked at.
+            shutil.rmtree(run_directory(), ignore_errors=True)
             print("\nAll tests passed")
             exit(0)
     except ValueError as e:
