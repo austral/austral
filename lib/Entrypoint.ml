@@ -11,7 +11,6 @@ open Type
 open TypeParameters
 open Error
 open BuiltIn
-open Names
 open CodeGen
 open MonoTypeBindings
 
@@ -64,7 +63,7 @@ let rec check_entrypoint_validity (env: env) (name: qident): decl_id * entrypoin
 and is_root_cap_type = function
   | NamedType (name, [], LinearUniverse) ->
      let m = equal_module_name (source_module_name name) pervasive_module_name
-     and n = equal_identifier (original_name name) (make_ident root_cap_name) in
+     and n = equal_identifier (original_name name) (make_ident BuiltInNames.root_capability_name) in
      m && n
   | _ ->
      false
@@ -72,7 +71,7 @@ and is_root_cap_type = function
 and is_exit_code_type = function
   | NamedType (name, [], FreeUniverse) ->
      let m = equal_module_name (source_module_name name) pervasive_module_name
-     and n = equal_identifier (original_name name) (make_ident exit_code_name) in
+     and n = equal_identifier (original_name name) (make_ident BuiltInNames.exit_code_name) in
      m && n
   | _ ->
      false
@@ -107,7 +106,7 @@ let empty_entrypoint_code (entrypoint_id: decl_id) (exit_code_id: mono_id): stri
 
 let get_root_capability_monomorph (env: env): mono_id =
   let mn: module_name = make_mod_name "Austral.Pervasive"
-  and n: identifier = make_ident root_cap_name in
+  and n: identifier = make_ident BuiltInNames.root_capability_name in
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with
   | Some (Record { id; _ }) ->
@@ -121,7 +120,7 @@ let get_root_capability_monomorph (env: env): mono_id =
 
 let get_exit_code_monomorph (env: env): mono_id =
   let mn: module_name = make_mod_name "Austral.Pervasive"
-  and n: identifier = make_ident exit_code_name in
+  and n: identifier = make_ident BuiltInNames.exit_code_name in
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with
   | Some (Union { id; _ }) ->

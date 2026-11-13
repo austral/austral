@@ -8,7 +8,6 @@
 open Id
 open Identifier
 open Region
-open Names
 
 type universe =
   | FreeUniverse
@@ -66,55 +65,58 @@ let universe_string = function
   | TypeUniverse -> "Type"
   | RegionUniverse -> "Region"
 
+(* ByteSize and Index have one name each, whatever the signedness. *)
+let integer_built_in (s: signedness) (w: integer_width): BuiltInNames.builtin_type =
+  match (s, w) with
+  | (Unsigned, Width8) -> BuiltInNames.Nat8
+  | (Unsigned, Width16) -> BuiltInNames.Nat16
+  | (Unsigned, Width32) -> BuiltInNames.Nat32
+  | (Unsigned, Width64) -> BuiltInNames.Nat64
+  | (Signed, Width8) -> BuiltInNames.Int8
+  | (Signed, Width16) -> BuiltInNames.Int16
+  | (Signed, Width32) -> BuiltInNames.Int32
+  | (Signed, Width64) -> BuiltInNames.Int64
+  | (Unsigned, WidthByteSize) | (Signed, WidthByteSize) -> BuiltInNames.ByteSize
+  | (Unsigned, WidthIndex) | (Signed, WidthIndex) -> BuiltInNames.Index
+
 let rec type_string = function
   | Unit ->
-     unit_name
+     BuiltInNames.type_name BuiltInNames.Unit
   | Boolean ->
-     bool_name
+     BuiltInNames.type_name BuiltInNames.Bool
   | Integer (s, w) ->
-     let sgn: string =
-       match s with
-       | Unsigned -> nat_prefix
-       | Signed -> int_prefix
-     in
-     (match w with
-      | Width8 -> sgn ^ "8"
-      | Width16 -> sgn ^ "16"
-      | Width32 -> sgn ^ "32"
-      | Width64 -> sgn ^ "64"
-      | WidthByteSize -> "ByteSize"
-      | WidthIndex -> "Index")
+     BuiltInNames.type_name (integer_built_in s w)
   | SingleFloat ->
-     single_float_name
+     BuiltInNames.type_name BuiltInNames.Float32
   | DoubleFloat ->
-     double_float_name
+     BuiltInNames.type_name BuiltInNames.Float64
   | NamedType (n, args, _) ->
      (ident_string (local_name n)) ^ args_string args
   | RegionTy r ->
      "Region<" ^ (string_of_int (region_id r)) ^ ">"
   | ReadRef (t, r) ->
-     read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+     BuiltInNames.read_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | WriteRef (t, r) ->
-     write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+     BuiltInNames.write_ref_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | Span (t, r) ->
-     "Span[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+     BuiltInNames.span_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | SpanMut (t, r) ->
-     "Span![" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
+     BuiltInNames.span_mut_name ^ "[" ^ (type_string t) ^ ", " ^ (type_string r) ^ "]"
   | TyVar (TypeVariable (n, _, _, _)) ->
      ident_string n
   | Address ty ->
-     address_name ^ "[" ^ (type_string ty) ^ "]"
+     BuiltInNames.address_name ^ "[" ^ (type_string ty) ^ "]"
   | Pointer ty ->
-     pointer_name ^ "[" ^ (type_string ty) ^ "]"
+     BuiltInNames.pointer_name ^ "[" ^ (type_string ty) ^ "]"
   | FnPtr (args, rt) ->
      (match args with
       | [] ->
          (* No arguments case. *)
-         ("Fn[" ^ (type_string rt) ^ "]")
+         (BuiltInNames.type_name BuiltInNames.Fn ^ "[" ^ (type_string rt) ^ "]")
       | _ ->
          (* Some arguments case. *)
          let args': string = String.concat ", " (List.map type_string args) in
-         ("Fn[" ^ args' ^ ", " ^ (type_string rt) ^ "]"))
+         (BuiltInNames.type_name BuiltInNames.Fn ^ "[" ^ args' ^ ", " ^ (type_string rt) ^ "]"))
   | MonoTy _ ->
      "MonoTy)"
 

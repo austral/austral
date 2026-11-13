@@ -72,41 +72,40 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
              actual = None;
            })
     else
-      let name_str: string = ident_string (original_name name) in
-      match name_str with
-      | "Unit" ->
+      match BuiltInNames.type_of_name (ident_string (original_name name)) with
+      | Some BuiltInNames.Unit ->
          Some Unit
-      | "Bool" ->
+      | Some BuiltInNames.Bool ->
          Some Boolean
-      | "Nat8" ->
+      | Some BuiltInNames.Nat8 ->
          Some (Integer (Unsigned, Width8))
-      | "Nat16" ->
+      | Some BuiltInNames.Nat16 ->
          Some (Integer (Unsigned, Width16))
-      | "Nat32" ->
+      | Some BuiltInNames.Nat32 ->
          Some (Integer (Unsigned, Width32))
-      | "Nat64" ->
+      | Some BuiltInNames.Nat64 ->
          Some (Integer (Unsigned, Width64))
-      | "Int8" ->
+      | Some BuiltInNames.Int8 ->
          Some (Integer (Signed, Width8))
-      | "Int16" ->
+      | Some BuiltInNames.Int16 ->
          Some (Integer (Signed, Width16))
-      | "Int32" ->
+      | Some BuiltInNames.Int32 ->
          Some (Integer (Signed, Width32))
-      | "Int64" ->
+      | Some BuiltInNames.Int64 ->
          Some (Integer (Signed, Width64))
-      | "ByteSize" ->
+      | Some BuiltInNames.ByteSize ->
          Some (Integer (Unsigned, WidthByteSize))
-      | "Index" ->
+      | Some BuiltInNames.Index ->
          Some (Integer (Unsigned, WidthIndex))
-      | "Float32" ->
+      | Some BuiltInNames.Float32 ->
          Some SingleFloat
-      | "Float64" ->
+      | Some BuiltInNames.Float64 ->
          Some DoubleFloat
-      | "Static" ->
+      | Some BuiltInNames.Static ->
          Some (RegionTy static_region)
-      | "Fn" ->
+      | Some BuiltInNames.Fn ->
          Some (parse_function_pointer args)
-      | _ ->
+      | None ->
          None
 
 let rec effective_universe name (typarams: typarams) declared_universe args =
