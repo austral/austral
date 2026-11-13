@@ -100,6 +100,12 @@ python3 equivalence.py compare OUT_A OUT_B
 
 例外を投げる箇所が多いのは、`lib/TypeErrors.ml`（55）、`lib/TypeCheckExpr.ml`（50）、`lib/TypingPass.ml`（34）、`lib/CombiningPass.ml`（28）、`lib/TypeMatch.ml`（26）である。
 
+### 例外を投げうる関数（`raising-functions.py`）
+
+最上位の関数は 803 個ある。本体に例外を投げる箇所を持つものが 220 個。それを呼ぶものまで含めると 414 個である。
+関数の名前を、ファイルをまたいで単語として探した。同じ名前の関数が別のモジュールにあると、区別できない。414 は上限の見積もりである。
+計画の R12 が、この数を使う。失敗しうる関数のすべてに `result` を返させると、およそ半分の関数の型が変わる。
+
 ### 壊れやすい match（`measure.sh --fragile`）
 
 OCaml のコンパイラは、何でも受ける枝を持つ match のうち、型に構成子を足すと黙って飲み込むものを、警告 4 で報告する。コンパイラ全体をこの警告を有効にしてビルドし、数えた。sexp の導出が生成したコードの分は除いた。
