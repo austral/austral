@@ -1,0 +1,1 @@
+compile a,b,c --target-type=tc

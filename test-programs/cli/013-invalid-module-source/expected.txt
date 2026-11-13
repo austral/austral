@@ -1,0 +1,18 @@
+exit: 255
+files: calltree.html error.html
+--- stdout
+Compiler call tree printed to calltree.html
+--- stderr
+Error:
+  Title: Command Line Arguments Error
+  Module:
+    [unknown]
+  Location:
+    [no span available]
+  Description:
+    Invalid module source format `a,b,c`
+    
+    Sources must be supplied as either`interface.aui,body.aum` or `body.aum`
+  Code:
+    [no span available]
+

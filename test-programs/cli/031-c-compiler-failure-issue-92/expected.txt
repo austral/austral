@@ -1,0 +1,23 @@
+exit: 255
+files: calltree.html error.html
+--- stdout
+Compiler call tree printed to calltree.html
+--- stderr
+Error:
+  Title: Command Line Arguments Error
+  Module:
+    [unknown]
+  Location:
+    [no span available]
+  Description:
+    Failed to run C compiler.
+    
+    Command: `cc $TMP.c -fwrapv -lm -o slot`
+    
+    Exit code: 1
+    
+    Standard output:
+    
+    
+    Standard error:
+$CC_STDERR

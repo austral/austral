@@ -1,0 +1,10 @@
+module body Slot is
+    record R: Free is
+        double: Int64;
+    end;
+
+    function main(): ExitCode is
+        let r: R := R(double => 3);
+        return ExitSuccess();
+    end;
+end module body.

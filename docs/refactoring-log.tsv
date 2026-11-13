@@ -4,3 +4,7 @@ ts	phase	decision	why	evidence	result
 2026-11-13T10:03:51Z	R2	bisect_ppx を開発用のシェルと lib/dune に足し、dune の言語を 2.7 に上げた	カバレッジを、木の写しを書き換えずに測るため	tools/refactoring/coverage.sh, flake.nix, lib/dune, dune-project	等価性 0 本。手で書いたコードの 77.88% が実行される
 2026-11-13T10:03:51Z	frame	呼び出しの記録（calltree.html）は残さないと決めた	計画の推奨どおり。利用者は範囲を任せた。核に大域の状態を残す唯一の理由である	docs/refactoring-plan.md 21節	R9 の前に消す。振る舞いの変更として記録する
 2026-11-13T10:05:04Z	R1	CI に、指標が増えていないことと、基点の枝との等価性を見る段を足した	プルリクエストごとに同じ確認が走るようにするため	.github/workflows/build-and-test.yml	未確認。この枝では CI が走らない。同じスクリプトは手元で通った
+2026-11-13T10:09:45Z	R4	コマンドラインのテストを 31 件足した。終了コード、残すファイルの名前、出力を比べる	CliEngine は 47% しか実行されていなかった。出口の振る舞いを固定するため	test-programs/cli-runner.py, test-programs/cli/	31件が通る。不具合の振る舞いも今のまま固定した（#32 #33 #49 #85 #92）
+2026-11-13T10:09:45Z	R4	'--no-entrypoint を実行ファイルと一緒に指定したときのエラーが、専用の文面にならないと分かった	フラグの名前を、片方では先頭の -- 付きで比べている。専用のエラーの関数に届かない	lib/CliParser.ml parse_executable_target, test-programs/cli/018-no-entrypoint-with-exe	今の振る舞いを固定した。後で直す
+2026-11-13T10:09:45Z	R6	コンパイラの言葉を CONTEXT.md に足した	計画の残りの項目を、同じ言葉で書くため	CONTEXT.md	15語
+2026-11-13T10:09:45Z	R5	指標の確認は R1 のコミットで CI に入れた	measure.sh --check は、数が増えたときだけ失敗する	.github/workflows/build-and-test.yml	手元で通る。CI は未確認

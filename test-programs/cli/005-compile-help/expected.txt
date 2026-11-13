@@ -1,0 +1,22 @@
+exit: 0
+files: 
+--- stdout
+austral compile
+
+Usage:
+    austral compile [options] <module...>
+
+Options:
+    --help          Print this text.
+    --target-type   One of `bin`, `tc`, `c`. Default is `bin`.
+    --output        Path to the output file.
+    --entrypoint    The name of the entrypoint function, in the
+                    format `<module name>:<function name>`.
+    --no-entrypoint  Don't compile an entrypoint. Incompatible with
+                    `bin` target.
+
+Positional arguments:
+    module    Of the form 'file.aui,file.aum' for modules with
+              both an interface and body file, or 'file.aum' for
+              modules with only a body.
+--- stderr

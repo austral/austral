@@ -1,0 +1,1 @@
+compile DoesNotExist.aum --target-type=tc

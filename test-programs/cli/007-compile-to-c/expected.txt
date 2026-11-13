@@ -1,0 +1,4 @@
+exit: 0
+files: out.c
+--- stdout
+--- stderr

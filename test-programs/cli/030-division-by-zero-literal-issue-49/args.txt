@@ -1,0 +1,1 @@
+compile Zero.aum --target-type=tc

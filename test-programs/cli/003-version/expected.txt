@@ -1,0 +1,5 @@
+exit: 0
+files: 
+--- stdout
+0.2.0
+--- stderr

@@ -1,0 +1,21 @@
+exit: 255
+files: calltree.html error.html
+--- stdout
+Compiler call tree printed to calltree.html
+--- stderr
+Error:
+  Title: Type Error
+  Module:
+    Bad
+  Location:
+    Filename: 'Bad.aum'
+    From: line 3, column 8
+    To: line 3, column 29
+  Description:
+    Cannot cast to `Int64` from `Bool`
+  Code:
+    1 | module body Bad is
+    2 |     function main(): ExitCode is
+    3 |         let x: Int64 := true;
+    4 |         return ExitSuccess();
+    5 |     end;

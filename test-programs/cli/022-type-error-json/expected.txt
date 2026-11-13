@@ -1,0 +1,27 @@
+exit: 255
+files: calltree.html error.html
+--- stdout
+Compiler call tree printed to calltree.html
+--- stderr
+{
+  "module": "Bad",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot cast to " },
+    { "type": "type", "content": "Int64" },
+    { "type": "text", "content": " from " },
+    { "type": "type", "content": "Bool" }
+  ],
+  "span": {
+    "filename": "Bad.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 29 }
+  },
+  "context": [
+    [ 1, "module body Bad is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let x: Int64 := true;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

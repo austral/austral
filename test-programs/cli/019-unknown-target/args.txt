@@ -1,0 +1,1 @@
+compile Hello.aum --target-type=wasm

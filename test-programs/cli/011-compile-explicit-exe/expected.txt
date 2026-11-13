@@ -1,0 +1,4 @@
+exit: 0
+files: hello
+--- stdout
+--- stderr

@@ -1,0 +1,6 @@
+module body Zero is
+    function main(): ExitCode is
+        let y: Int64 := 7 / 0;
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,1 @@
+compile Slot.aum --entrypoint=Slot:main --output=slot

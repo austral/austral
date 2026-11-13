@@ -1,0 +1,5 @@
+exit: 2
+files: 
+--- stdout
+--- stderr
+Fatal error: exception Sys_error("nodir/out.c: No such file or directory")

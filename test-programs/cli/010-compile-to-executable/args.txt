@@ -1,0 +1,1 @@
+compile Hello.aum --entrypoint=Hello:main --output=hello

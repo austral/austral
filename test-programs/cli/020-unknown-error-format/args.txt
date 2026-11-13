@@ -1,0 +1,1 @@
+compile Hello.aum --error-format=xml --target-type=tc

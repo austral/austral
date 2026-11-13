@@ -1,0 +1,16 @@
+exit: 255
+files: calltree.html error.html
+--- stdout
+Compiler call tree printed to calltree.html
+--- stderr
+Error:
+  Title: Command Line Arguments Error
+  Module:
+    [unknown]
+  Location:
+    [no span available]
+  Description:
+    Expected `no-entrypoint` to be a boolean flag, but it was given as a value flag.
+  Code:
+    [no span available]
+

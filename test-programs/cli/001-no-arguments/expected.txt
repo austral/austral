@@ -1,0 +1,15 @@
+exit: 0
+files: 
+--- stdout
+austral 0.2.0
+
+Usage:
+    austral [options] <command>
+
+Options:
+    --help     Print this text.
+    --version  Print the compiler's version.
+
+Commands:
+    compile    Compile modules.
+--- stderr

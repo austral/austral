@@ -1,0 +1,6 @@
+module body Hello is
+    function main(): ExitCode is
+        printLn("hello");
+        return ExitSuccess();
+    end;
+end module body.

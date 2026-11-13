@@ -1,0 +1,18 @@
+exit: 255
+files: calltree.html error.html
+--- stdout
+Compiler call tree printed to calltree.html
+--- stderr
+Error:
+  Title: Command Line Arguments Error
+  Module:
+    [unknown]
+  Location:
+    [no span available]
+  Description:
+    Invalid entrypoint format `Hello`
+    
+    The entrypoint must be supplied in the form `Module:name`
+  Code:
+    [no span available]
+
