@@ -33,7 +33,10 @@ let rec render_unit (CUnit (name, decls)): string =
   ^ "\n/* --- END translation unit for module '" ^ name ^ "' --- */\n"
 
 and render_program (CProgram { prelude; units; entrypoint }): string =
-  String.concat "\n" ((prelude :: List.map render_unit units) @ Option.to_list entrypoint)
+  String.concat "\n" ((source_text prelude :: List.map render_unit units) @ List.map source_text (Option.to_list entrypoint))
+
+and source_text (CSource text): string =
+  text
 
 and render_decl i d =
   match d with
@@ -253,7 +256,7 @@ and render_expr = function
      (paren (e v)) ^ "->" ^ (CIdent.render n)
   | CAddressOf exp ->
      "&(" ^ (e exp) ^ ")"
-  | CEmbed (ty, expr, args) ->
+  | CEmbed (ty, CSource expr, args) ->
      let strs = List.map render_expr args in
      (* the `expr` has a format like "derp $1 $2", so iterate over the list of
         arg swith an index, and replace the corresponding dollar sign marker if

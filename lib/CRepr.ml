@@ -44,6 +44,10 @@ type c_ty =
 and c_slot = CSlot of CIdent.t * c_ty
 and c_param = CValueParam of CIdent.t * c_ty
 
+(** C source text that the compiler did not check: the text of an [@embed],
+    the prelude, the [main] function. *)
+type c_source = CSource of string
+
 type c_expr =
   | CBool of bool
   | CInt of string
@@ -62,7 +66,7 @@ type c_expr =
   | CStructAccessor of c_expr * CIdent.t
   | CPointerStructAccessor of c_expr * CIdent.t
   | CAddressOf of c_expr
-  | CEmbed of c_ty * string * c_expr list
+  | CEmbed of c_ty * c_source * c_expr list
   | CDeref of c_expr
   | CSizeOf of c_ty
 
@@ -95,10 +99,9 @@ type c_decl =
 
 type c_unit = CUnit of string * c_decl list
 
-(** A whole C program, in the order it is written out. The prelude and the
-    entrypoint are C source text. *)
+(** A whole C program, in the order it is written out. *)
 type c_program = CProgram of {
-      prelude: string;
+      prelude: c_source;
       units: c_unit list;
-      entrypoint: string option;
+      entrypoint: c_source option;
     }

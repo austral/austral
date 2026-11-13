@@ -271,7 +271,7 @@ let rec gen_exp (mn: module_name) (e: mexpr): c_expr =
                 (data_slot, CStructInitializer [(gen_member case_name, args)])
               ], gen_type ty)
   | MEmbed (ty, expr, args) ->
-     CEmbed (gen_type ty, expr, List.map g args)
+     CEmbed (gen_type ty, CSource expr, List.map g args)
   | MDeref e ->
      CDeref (g e)
   | MSizeOf ty ->
