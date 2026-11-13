@@ -135,6 +135,11 @@ def snapshot(compiler: str, outdir: pathlib.Path) -> None:
         shutil.rmtree(outdir)
     outdir.mkdir(parents=True)
     commands = [*suite_commands(), standard_command(), *example_commands()]
+    # coverage.sh --errors --only DIR runs one suite, to see what its tests reach.
+    only = os.environ.get("ZUSTRAL_EQUIVALENCE_ONLY")
+    if only:
+        prefix = "suites/" + pathlib.Path(only).name + "/"
+        commands = [c for c in commands if c[0].startswith(prefix)]
     with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as pool:
         names = list(pool.map(lambda c: run_one(compiler, outdir, *c), commands))
     lines = []

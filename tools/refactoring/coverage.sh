@@ -4,6 +4,10 @@
 #   coverage.sh              compare the per-file summary with expected/coverage.txt
 #   coverage.sh --record     rewrite expected/coverage.txt
 #   coverage.sh --lines F    print the line numbers of lib/F that no program executes
+#   coverage.sh --errors     list the error-raising functions that no program executes
+#   coverage.sh --errors --only DIR
+#                            the same, running only the programs under DIR
+#                            (a directory of test-programs/suites)
 # Environment:
 #   ZUSTRAL_NIX_FLAGS  extra flags for `nix develop`
 #
@@ -14,9 +18,11 @@ HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT=$(cd "$HERE/../.." && pwd)
 read -r -a NIX_FLAGS <<< "${ZUSTRAL_NIX_FLAGS:-}"
 MODE=compare FILE=
+ONLY=
 case ${1:-} in
   --record) MODE=record ;;
   --lines) MODE=lines; FILE=${2:?usage: coverage.sh --lines File.ml} ;;
+  --errors) MODE=errors; [[ ${2:-} == --only ]] && ONLY=${3:?usage: coverage.sh --errors --only DIR} ;;
 esac
 
 T=$(mktemp -d)
@@ -32,8 +38,15 @@ in_shell() {
 in_shell 'python3 concat_builtins.py && dune build --root . --build-dir _build_coverage --instrument-with bisect_ppx ./bin/austral.exe 2>&1' > "$T/build.log" 2>&1 \
   || { echo "instrumented build failed: $(tail -n 8 "$T/build.log")" >&2; exit 2; }
 
-BISECT_FILE="$T/cov/bisect" python3 "$HERE/equivalence.py" snapshot "$ROOT/_build_coverage/default/bin/austral.exe" "$T/snapshot" > "$T/snapshot.log" 2>&1 \
+ZUSTRAL_EQUIVALENCE_ONLY="$ONLY" BISECT_FILE="$T/cov/bisect" python3 "$HERE/equivalence.py" snapshot "$ROOT/_build_coverage/default/bin/austral.exe" "$T/snapshot" > "$T/snapshot.log" 2>&1 \
   || { echo "corpus run failed: $(tail -n 5 "$T/snapshot.log")" >&2; exit 2; }
+
+if [[ $MODE == errors ]]; then
+  in_shell "bisect-ppx-report cobertura --coverage-path '$T/cov' '$T/cobertura.xml'" > /dev/null 2> "$T/report.err" \
+    || { echo "report failed: $(tail -n 5 "$T/report.err")" >&2; exit 2; }
+  python3 "$HERE/unexecuted-errors.py" "$T/cobertura.xml"
+  exit $?
+fi
 
 if [[ $MODE == lines ]]; then
   in_shell "bisect-ppx-report cobertura --coverage-path '$T/cov' '$T/cobertura.xml'" > /dev/null 2> "$T/report.err" \
