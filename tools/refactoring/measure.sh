@@ -44,6 +44,19 @@ count_type_strings() { # file
   ' "$ROOT/$1"
 }
 
+# Lines where a string literal builds or tests the name of something built in:
+#   make_ident "x", make_mod_name "x"     a literal becomes a name
+#   | "X" ->                              a match arm on a capitalised literal
+#   = "X", <> "X"                         a capitalised literal is compared or bound
+#   (ident_string i) = "x"                the string of a name is compared with a literal
+#   "camelCase" alone on a line           a match arm whose result is a method name
+# The names module is where these literals belong, so it counts as 0.
+NAMES_MODULE=lib/BuiltInNames.ml
+count_names() { # file
+  if [[ $1 == "$NAMES_MODULE" ]]; then echo 0; return; fi
+  count 'make_(ident|mod_name) "|^\s*\| *"[A-Z][A-Za-z0-9_.]*" *->|(=|<>) *"[A-Z][A-Za-z0-9_.]*"|_string [a-z_]+\) *= *"|^\s*"[a-z]+[A-Z][A-Za-z0-9]*"\s*$' "$1"
+}
+
 # One row per file. Columns:
 #   raise     places that raise: raise_error, type_error and the other helpers of a category, internal_err,
 #             failwith, raise, assert false
@@ -55,10 +68,11 @@ count_type_strings() { # file
 #             Filename, exit, and the compiler's own file and process helpers
 #   wildcard  match arms that catch everything: | _ ->
 #   strings   string used as a field or constructor argument in a type definition
+#   names     string literals that build or test a built-in name, outside lib/BuiltInNames.ml
 metrics() {
-  printf 'file\tlines\traise\tcatch\tstate\tio\twildcard\tstrings\tinternal\tadhoc\n'
+  printf 'file\tlines\traise\tcatch\tstate\tio\twildcard\tstrings\tinternal\tadhoc\tnames\n'
   sources | while read -r f; do
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$f" \
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$f" \
       "$(wc -l < "$ROOT/$f")" \
       "$(count 'raise_error|(^|[^_a-zA-Z])(parse|cli|type|linearity|declaration|entrypoint|generic)_error(_at)? |internal_err|failwith|(^|[^_a-zA-Z])raise |assert false' "$f")" \
       "$(count '(^|[^_a-zA-Z])try($|[^_a-zA-Z])|adorn_error_with_[a-z_]+|with_errors' "$f")" \
@@ -67,14 +81,15 @@ metrics() {
       "$(count '^\s*\| _ ->' "$f")" \
       "$(count_type_strings "$f")" \
       "$(count 'internal_err' "$f")" \
-      "$(count '(^|[^_a-zA-Z])err [("]' "$f")"
+      "$(count '(^|[^_a-zA-Z])err [("]' "$f")" \
+      "$(count_names "$f")"
   done
 }
 
 totals() { # metrics-file
   # coreio is the part of io that is in the core (lib/). The plan wants it at 0.
   awk -F'\t' 'NR > 1 { for (i = 2; i <= NF; i++) s[i] += $i; n++; if ($1 ~ /^lib\//) coreio += $6 }
-    END { printf "files %d\nlines %d\nraise %d\ncatch %d\nstate %d\nio %d\nwildcard %d\nstrings %d\ninternal %d\nadhoc %d\ncoreio %d\n", n, s[2], s[3], s[4], s[5], s[6], s[7], s[8], s[9], s[10], coreio }' "$1"
+    END { printf "files %d\nlines %d\nraise %d\ncatch %d\nstate %d\nio %d\nwildcard %d\nstrings %d\ninternal %d\nadhoc %d\ncoreio %d\nnames %d\n", n, s[2], s[3], s[4], s[5], s[6], s[7], s[8], s[9], s[10], coreio, s[11] }' "$1"
 }
 
 # Fragile matches: a match that a new constructor would fall into without a
