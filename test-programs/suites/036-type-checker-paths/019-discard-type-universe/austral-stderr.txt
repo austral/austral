@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot discard a value in the " },
+    { "type": "code", "content": "Type" },
+    { "type": "text", "content": " universe." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/019-discard-type-universe/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 10 }
+  },
+  "context": [
+    [ 2, "    generic [T: Type]" ],
+    [ 3, "    function drop(x: T): Unit is" ],
+    [ 4, "        x;" ],
+    [ 5, "        return nil;" ],
+    [ 6, "    end;" ]
+  ]
+}

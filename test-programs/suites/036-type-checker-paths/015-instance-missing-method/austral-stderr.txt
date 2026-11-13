@@ -1,0 +1,32 @@
+{
+  "module": "Test",
+  "kind": "Internal Error",
+  "text": [
+    { "type": "text", "content": "Internal compiler error: " },
+    {
+      "type": "text",
+      "content": "Couldn't get instance method for `perimeter`"
+    },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This is a bug in the compiler, please open an issue here: "
+    },
+    {
+      "type": "code",
+      "content": "https://github.com/austral/austral/issues"
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/015-instance-missing-method/Test.aum",
+    "startp": { "line": 15, "column": 8 },
+    "end": { "line": 15, "column": 33 }
+  },
+  "context": [
+    [ 13, "    function main(): ExitCode is" ],
+    [ 14, "        let side: Int32 := 3;" ],
+    [ 15, "        printLn(perimeter(side));" ],
+    [ 16, "        return ExitSuccess();" ],
+    [ 17, "    end;" ]
+  ]
+}

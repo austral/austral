@@ -1,0 +1,11 @@
+module body Test is
+    generic [R: Region]
+    function peek(root: &[RootCapability, R]): Unit is
+        let value: Unit := root->value;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,19 @@
+module body Test is
+    record Rec: Free is
+        x: Int32;
+    end;
+
+    constant RecRef: &[Rec, Static] := @embed(&[Rec, Static], "(int32_t[]){ 42 }");
+
+    constant SlotRef: &[Int32, Static] := &(RecRef->x);
+
+    constant SpanRef: &[Span[Nat8, Static], Static] := @embed(&[Span[Nat8, Static], Static], "&(au_span_t){ .data = (char[]){ 97, 98, 99 }, .size = 3 }");
+
+    constant ElemRef: &[Nat8, Static] := &(SpanRef[1]);
+
+    function main(): ExitCode is
+        printLn(!SlotRef);
+        printLn(!ElemRef);
+        return ExitSuccess();
+    end;
+end module body.

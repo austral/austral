@@ -1,0 +1,13 @@
+module body Test is
+    function one(): Index is
+        return 1;
+    end;
+
+    constant Letters: Span[Nat8, Static] := "abc";
+
+    constant Letter: &[Nat8, Static] := &(Letters[one()]);
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

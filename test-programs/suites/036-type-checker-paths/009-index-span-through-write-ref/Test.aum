@@ -1,0 +1,16 @@
+module body Test is
+    record Holder: Free is
+        sp: Span[Nat8, Static];
+    end;
+
+    generic [R: Region]
+    function second(ref: &![Holder, R]): Nat8 is
+        return ref->sp[1];
+    end;
+
+    function main(): ExitCode is
+        var h: Holder := Holder(sp => "abc");
+        printLn(second(&!h));
+        return ExitSuccess();
+    end;
+end module body.

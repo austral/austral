@@ -1,0 +1,9 @@
+module body Test is
+    constant Ref: &[Int32, Static] := @embed(&[Int32, Static], "NULL");
+
+    constant Value: Int32 := !Ref;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

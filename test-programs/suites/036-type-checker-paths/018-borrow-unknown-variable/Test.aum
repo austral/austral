@@ -1,0 +1,8 @@
+module body Test is
+    function main(): ExitCode is
+        borrow ref: &[Int32, R] := &nosuch do
+            printLn(!ref);
+        end borrow;
+        return ExitSuccess();
+    end;
+end module body.

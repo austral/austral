@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "I can't use the array indexing operator here, because the type "
+    },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": " is not a span." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/010-assign-index-not-span/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 18 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        var x: Int32 := 1;" ],
+    [ 4, "        x[0] := 2;" ],
+    [ 5, "        return ExitSuccess();" ],
+    [ 6, "    end;" ]
+  ]
+}

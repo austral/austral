@@ -1,0 +1,20 @@
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "Cannot dereference non-free type " },
+    { "type": "type", "content": "Foo" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/006-dereference-write-ref-non-free/Test.aum",
+    "startp": { "line": 9, "column": 12 },
+    "end": { "line": 9, "column": 34 }
+  },
+  "context": [
+    [ 7, "        var foo: Foo := Foo(value => 10);" ],
+    [ 8, "        borrow ref: &![Foo, R] := &!foo do" ],
+    [ 9, "            let copy: Foo := !ref;" ],
+    [ 10, "        end borrow;" ],
+    [ 11, "        let { value: Int32 } := foo;" ]
+  ]
+}

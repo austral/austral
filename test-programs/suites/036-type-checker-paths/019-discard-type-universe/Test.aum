@@ -1,0 +1,11 @@
+module body Test is
+    generic [T: Type]
+    function drop(x: T): Unit is
+        x;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

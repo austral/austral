@@ -1,0 +1,28 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "code", "content": "identity" },
+    {
+      "type": "text",
+      "content": " is generic but unconstrained, so its type is ambiguous."
+    },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "Consider clarifying its type using a cast."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/003-generic-function-value-unconstrained/Test.aum",
+    "startp": { "line": 12, "column": 8 },
+    "end": { "line": 12, "column": 43 }
+  },
+  "context": [
+    [ 10, "" ],
+    [ 11, "    function main(): ExitCode is" ],
+    [ 12, "        let y: Int32 := apply(identity, 3);" ],
+    [ 13, "        return ExitSuccess();" ],
+    [ 14, "    end;" ]
+  ]
+}

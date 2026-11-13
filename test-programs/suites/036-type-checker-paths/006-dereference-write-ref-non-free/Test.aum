@@ -1,0 +1,14 @@
+module body Test is
+    record Foo: Linear is
+        value: Int32;
+    end;
+
+    function main(): ExitCode is
+        var foo: Foo := Foo(value => 10);
+        borrow ref: &![Foo, R] := &!foo do
+            let copy: Foo := !ref;
+        end borrow;
+        let { value: Int32 } := foo;
+        return ExitSuccess();
+    end;
+end module body.

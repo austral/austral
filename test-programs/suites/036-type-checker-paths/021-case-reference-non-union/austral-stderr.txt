@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The case expression has type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": " which is not a union type." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/021-case-reference-non-union/Test.aum",
+    "startp": { "line": 5, "column": 12 },
+    "end": { "line": 8, "column": 21 }
+  },
+  "context": [
+    [ 3, "        let x: Int32 := 1;" ],
+    [ 4, "        borrow ref: &[Int32, R] := &x do" ],
+    [ 5, "            case ref of" ],
+    [ 6, "                when Foo do" ],
+    [ 7, "                    skip;" ],
+    [ 8, "            end case;" ],
+    [ 9, "        end borrow;" ],
+    [ 10, "        return ExitSuccess();" ]
+  ]
+}

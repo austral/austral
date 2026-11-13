@@ -1,0 +1,12 @@
+module body Test is
+    union Wrapper: Free is
+        case Wrap is
+            x: Int32;
+    end;
+
+    function main(): ExitCode is
+        let w: Wrapper := Wrap(x => 1);
+        let { x: Int32 } := w;
+        return ExitSuccess();
+    end;
+end module body.

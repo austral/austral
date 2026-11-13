@@ -1,0 +1,20 @@
+module body Test is
+    constant Less: Bool := 1 < 2;
+
+    constant Both: Bool := true and false;
+
+    constant Any: Bool := false or true;
+
+    constant Negated: Bool := not true;
+
+    constant Chosen: Int32 := if true then 1 else 2;
+
+    function main(): ExitCode is
+        printLn(Less);
+        printLn(Both);
+        printLn(Any);
+        printLn(Negated);
+        printLn(Chosen);
+        return ExitSuccess();
+    end;
+end module body.

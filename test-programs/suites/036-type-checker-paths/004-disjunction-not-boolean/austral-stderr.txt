@@ -1,0 +1,27 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Both operands of a " },
+    { "type": "text", "content": "disjunction" },
+    {
+      "type": "text",
+      "content": " operator must be boolean expressions, but they have types "
+    },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": " and " },
+    { "type": "type", "content": "Int32" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/004-disjunction-not-boolean/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 30 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let b: Bool := 1 or 2;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The condition in " },
+    { "type": "code", "content": "if" },
+    { "type": "text", "content": "-" },
+    { "type": "text", "content": "statement" },
+    { "type": "text", "content": "s should be a boolean type, but is " },
+    { "type": "type", "content": "Int32" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/017-if-statement-condition-not-boolean/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 7, "column": 15 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        if 1 then" ],
+    [ 4, "            printLn(\"then\");" ],
+    [ 5, "        else" ],
+    [ 6, "            printLn(\"else\");" ],
+    [ 7, "        end if;" ],
+    [ 8, "        return ExitSuccess();" ],
+    [ 9, "    end;" ]
+  ]
+}

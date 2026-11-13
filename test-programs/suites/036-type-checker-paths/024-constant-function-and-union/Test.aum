@@ -1,0 +1,28 @@
+module body Test is
+    union Shape: Free is
+        case Circle is
+            radius: Int32;
+        case Dot;
+    end;
+
+    function double(x: Int32): Int32 is
+        return x * 2;
+    end;
+
+    constant Doubler: Fn[Int32, Int32] := double;
+
+    constant Round: Shape := Circle(radius => 3);
+
+    function main(): ExitCode is
+        let f: Fn[Int32, Int32] := Doubler;
+        let y: Int32 := f(4);
+        printLn(y);
+        case Round of
+            when Circle(radius: Int32) do
+                printLn(radius);
+            when Dot do
+                printLn("dot");
+        end case;
+        return ExitSuccess();
+    end;
+end module body.

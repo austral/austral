@@ -1,0 +1,12 @@
+module body Test is
+    function pick(b: Bool): Int32 is
+        let x: Int32 := if b then 10 else 20;
+        return x;
+    end;
+
+    function main(): ExitCode is
+        printLn(pick(true));
+        printLn(pick(false));
+        return ExitSuccess();
+    end;
+end module body.

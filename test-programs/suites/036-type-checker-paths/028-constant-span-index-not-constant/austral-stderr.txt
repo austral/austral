@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The expression is not a valid constant expression."
+    }
+  ],
+  "span": null,
+  "context": null
+}

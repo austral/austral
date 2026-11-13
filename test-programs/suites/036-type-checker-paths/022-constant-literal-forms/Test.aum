@@ -1,0 +1,21 @@
+module body Test is
+    constant Nothing: Unit := nil;
+
+    constant Greeting: Span[Nat8, Static] := "hello";
+
+    constant Ten: Int64 := 10 : Int64;
+
+    constant Size: ByteSize := sizeof(Int32);
+
+    function seven(u: Unit): Int32 is
+        return 7;
+    end;
+
+    function main(): ExitCode is
+        printLn(seven(Nothing));
+        printLn(Greeting);
+        printLn(Ten);
+        printLn(Size);
+        return ExitSuccess();
+    end;
+end module body.

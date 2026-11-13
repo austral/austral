@@ -1,0 +1,6 @@
+module body Test is
+    function main(): ExitCode is
+        nosuch(1);
+        return ExitSuccess();
+    end;
+end module body.

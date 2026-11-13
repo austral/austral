@@ -1,0 +1,18 @@
+module body Test is
+    typeclass Shape(T: Free) is
+        method area(x: T): Int32;
+        method perimeter(x: T): Int32;
+    end;
+
+    instance Shape(Int32) is
+        method area(x: Int32): Int32 is
+            return x;
+        end;
+    end;
+
+    function main(): ExitCode is
+        let side: Int32 := 3;
+        printLn(perimeter(side));
+        return ExitSuccess();
+    end;
+end module body.

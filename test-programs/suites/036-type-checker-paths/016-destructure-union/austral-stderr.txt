@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot take a path of the type " },
+    { "type": "type", "content": "Wrapper" },
+    { "type": "text", "content": " because it is not a record." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/016-destructure-union/Test.aum",
+    "startp": { "line": 9, "column": 8 },
+    "end": { "line": 9, "column": 30 }
+  },
+  "context": [
+    [ 7, "    function main(): ExitCode is" ],
+    [ 8, "        let w: Wrapper := Wrap(x => 1);" ],
+    [ 9, "        let { x: Int32 } := w;" ],
+    [ 10, "        return ExitSuccess();" ],
+    [ 11, "    end;" ]
+  ]
+}

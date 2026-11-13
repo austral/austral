@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Can't access the slot " },
+    { "type": "code", "content": "x" },
+    { "type": "text", "content": " because the type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": " is not a record." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/036-type-checker-paths/007-pointer-slot-not-record/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 22 }
+  },
+  "context": [
+    [ 2, "    generic [R: Region]" ],
+    [ 3, "    function get(ref: &[Int32, R]): Int32 is" ],
+    [ 4, "        return ref->x;" ],
+    [ 5, "    end;" ],
+    [ 6, "" ]
+  ]
+}

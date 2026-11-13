@@ -1,0 +1,15 @@
+module body Test is
+    generic [T: Free]
+    function identity(x: T): T is
+        return x;
+    end;
+
+    function apply(f: Fn[Int32, Int32], x: Int32): Int32 is
+        return f(x);
+    end;
+
+    function main(): ExitCode is
+        let y: Int32 := apply(identity, 3);
+        return ExitSuccess();
+    end;
+end module body.

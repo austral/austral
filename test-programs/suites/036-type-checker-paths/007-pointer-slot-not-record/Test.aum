@@ -1,0 +1,10 @@
+module body Test is
+    generic [R: Region]
+    function get(ref: &[Int32, R]): Int32 is
+        return ref->x;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

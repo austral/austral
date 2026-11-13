@@ -1,0 +1,12 @@
+module body Test is
+    function main(): ExitCode is
+        let x: Int32 := 1;
+        borrow ref: &[Int32, R] := &x do
+            case ref of
+                when Foo do
+                    skip;
+            end case;
+        end borrow;
+        return ExitSuccess();
+    end;
+end module body.

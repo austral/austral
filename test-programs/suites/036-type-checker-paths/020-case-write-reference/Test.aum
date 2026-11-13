@@ -1,0 +1,31 @@
+module body Test is
+    record Rec: Free is
+        x: Int32;
+    end;
+
+    union Foo: Free is
+        case Value is
+            value: Rec;
+    end;
+
+    generic [R: Region]
+    function setX(ref: &![Rec, R]): Unit is
+        ref->x := 5;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        var foo: Foo := Value(value => Rec(x => 1));
+        borrow fooref: &![Foo, R] := &!foo do
+            case fooref of
+                when Value(value: &![Rec, R]) do
+                    setX(value);
+            end case;
+        end borrow;
+        case foo of
+            when Value(value: Rec) do
+                printLn(value.x);
+        end case;
+        return ExitSuccess();
+    end;
+end module body.
