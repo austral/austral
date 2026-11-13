@@ -1,0 +1,1 @@
+Pins what type-check mode does with an `@embed` argument that contains `\1`: nothing, exit 0. Before the compile result became a value (R10), type-check mode also rendered the C and died as in test 037 (issue #130).

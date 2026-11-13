@@ -7,7 +7,8 @@ so that two builds of the compiler can be compared.
   equivalence.py compare --normalize-ids OUTDIR_A OUTDIR_B
                                              the same, after renumbering generated names
 
-The corpus is every end-to-end test (test-programs/suites/*/*), the standard
+The corpus is every end-to-end test (test-programs/suites/*/*), each of them
+once more in type-check mode (--target-type=tc), the standard
 library with its tests (the module list in standard/Makefile), every program
 under examples/ (the command its Makefile runs) and every command-line test
 (test-programs/cli/*, run in a directory holding a copy of its input files). For each program
@@ -78,7 +79,13 @@ def suite_commands() -> list[tuple[str, list[str]]]:
                 "--output=$C_PATH",
                 "--error-format=json",
             ]
-        commands.append((f"suites/{test_dir.parent.name}/{test_dir.name}", [w.replace("$DIR", str(test_dir)) for w in words]))
+        words = [w.replace("$DIR", str(test_dir)) for w in words]
+        name = f"{test_dir.parent.name}/{test_dir.name}"
+        commands.append((f"suites/{name}", words))
+        # The same program in type-check mode. That mode stops before code
+        # generation, so it can behave differently from the full compile.
+        typecheck = [w for w in words if not w.startswith(("--entrypoint=", "--target-type=", "--output="))]
+        commands.append((f"typecheck/{name}", [*typecheck, "--target-type=tc"]))
     return commands
 
 
@@ -155,6 +162,8 @@ def snapshot(compiler: str, outdir: pathlib.Path) -> None:
     if only:
         prefix = "suites/" + pathlib.Path(only).name + "/"
         commands = [c for c in commands if c[0].startswith(prefix)]
+    if not commands:
+        sys.exit("no programs to run: nothing would be compared")
     with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as pool:
         names = list(pool.map(lambda c: run_one(compiler, outdir, *c), commands))
     lines = []

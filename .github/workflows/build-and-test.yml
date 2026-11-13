@@ -45,6 +45,12 @@ jobs:
       - name: metrics must not go up
         run: nix-shell --command 'tools/refactoring/measure.sh --check'
 
+      - name: no unused exports
+        run: nix-shell --command 'tools/refactoring/unused-exports.sh'
+
+      - name: every error message has a test
+        run: nix-shell --command 'python tools/refactoring/unpinned-messages.py'
+
       # Compiles every program in the repository with the base branch's compiler and with
       # this one. A refactoring pull request must show 0 differing programs. A bug fix
       # shows the programs it changes, so a difference is reported and does not fail the job.

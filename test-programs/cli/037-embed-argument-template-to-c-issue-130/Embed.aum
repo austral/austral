@@ -1,0 +1,6 @@
+module body Embed is
+    function main(): ExitCode is
+        let c: Nat8 := @embed(Nat8, "$1", @embed(Nat8, "'\1'"));
+        return ExitSuccess();
+    end;
+end module body.

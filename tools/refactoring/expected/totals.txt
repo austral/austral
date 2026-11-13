@@ -3,7 +3,7 @@ lines 14854
 raise 353
 catch 53
 state 12
-io 47
+io 59
 wildcard 206
 strings 92
 internal 92

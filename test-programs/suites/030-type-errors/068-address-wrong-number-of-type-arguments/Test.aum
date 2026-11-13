@@ -1,0 +1,13 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (Address);
+
+module body Test is
+    function f(a: Address[Int32, Int32]): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,87 @@
+diff --git a/lib/Compiler.ml b/lib/Compiler.ml
+index 3cd3390..df7a354 100644
+--- a/lib/Compiler.ml
++++ b/lib/Compiler.ml
+@@ -88,7 +88,7 @@ let rec compile_mod (c: compiler) (source: module_source): compiler =
+       let combined: SmallCombined.combined_module = DesugaringPass.desugar combined in
+       let (env, linked): (env * linked_module) = extract env combined in
+       let typed: typed_module = augment_module env linked in
+-      let _ = check_module_linearity typed in
++      let _ = Outcome.or_raise (check_module_linearity typed) in
+       let env: env = extract_bodies env typed in
+       let (env, mono): (env * mono_module) = monomorphize env typed in
+       let unit: c_unit = gen_module env mono in
+diff --git a/lib/LinearityCheck.ml b/lib/LinearityCheck.ml
+index f3106e9..7de281c 100644
+--- a/lib/LinearityCheck.ml
++++ b/lib/LinearityCheck.ml
+@@ -9,6 +9,7 @@ open Stages.Tast
+ open Type
+ open TypeSystem
+ open Error
++open Outcome
+ 
+ (* Data structures *)
+ 
+@@ -754,9 +755,9 @@ let linearity_check (params: value_parameter list) (body: tstmt): unit =
+ 
+ (* Linearity checking of whole modules *)
+ 
+-let rec check_module_linearity (TypedModule (_, decls)): unit =
+-  let _ = List.map check_decl_linearity decls in
+-  ()
++let rec check_module_linearity (TypedModule (_, decls)): unit outcome =
++  let* _ = traverse (fun decl -> catch (fun _ -> check_decl_linearity decl)) decls in
++  Ok ()
+ 
+ and check_decl_linearity (decl: typed_decl): unit =
+   match decl with
+diff --git a/lib/LinearityCheck.mli b/lib/LinearityCheck.mli
+index 3fdac00..01a0975 100644
+--- a/lib/LinearityCheck.mli
++++ b/lib/LinearityCheck.mli
+@@ -27,4 +27,4 @@ type state_tbl
+ type appearances
+ 
+ (** Check the linearity of all functions and methods in a module. *)
+-val check_module_linearity : typed_module -> unit
++val check_module_linearity : typed_module -> unit Outcome.outcome
+diff --git a/lib/Outcome.ml b/lib/Outcome.ml
+new file mode 100644
+index 0000000..105bdb0
+--- /dev/null
++++ b/lib/Outcome.ml
+@@ -0,0 +1,33 @@
++open Error
++
++type 'a outcome = ('a, austral_error list) result
++
++let bind = Result.bind
++
++let ( let* ) = Result.bind
++
++let rec traverse (f: 'a -> 'b outcome) (list: 'a list): 'b list outcome =
++  match list with
++  | [] ->
++     Ok []
++  | first::rest ->
++     let* first = f first in
++     let* rest = traverse f rest in
++     Ok (first :: rest)
++
++(* The one place where a stage turns its exception into a value. *)
++let catch (f: unit -> 'a): 'a outcome =
++  try
++    Ok (f ())
++  with Austral_error error ->
++    Error [error]
++
++(* Temporary, until the caller of the stage returns an outcome itself. *)
++let or_raise (outcome: 'a outcome): 'a =
++  match outcome with
++  | Ok value ->
++     value
++  | Error (first::_) ->
++     raise (Austral_error first)
++  | Error [] ->
++     internal_err "A stage failed without an error."

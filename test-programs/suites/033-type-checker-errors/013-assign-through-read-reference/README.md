@@ -1,1 +1,1 @@
-Pins `Can't assign: lvalue is not a mutable reference: ` (lib/TypingPass.ml, `augment_stmt`, `AAssign`): assignment to a slot reached through a read reference.
+Pins `Can't assign: lvalue is not a mutable reference: ` (lib/TypingPass.ml, `augment_stmt`, `AAssign`): assignment to a slot reached through a read reference. The message prints a region number (`Region<2>`), which depends on how many regions the program made before this one.

@@ -1,0 +1,27 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    { "type": "text", "content": "The type " },
+    { "type": "code", "content": "Address" },
+    { "type": "text", "content": " expects " },
+    { "type": "code", "content": "1" },
+    { "type": "text", "content": " type arguments" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/068-address-wrong-number-of-type-arguments/Test.aum",
+    "startp": { "line": 5, "column": 19 },
+    "end": { "line": 8, "column": 8 }
+  },
+  "context": [
+    [ 3, "import Austral.Memory (Address);" ],
+    [ 4, "" ],
+    [ 5, "module body Test is" ],
+    [ 6, "    function f(a: Address[Int32, Int32]): Unit is" ],
+    [ 7, "        return nil;" ],
+    [ 8, "    end;" ],
+    [ 9, "" ],
+    [ 10, "    function main(): ExitCode is" ]
+  ]
+}

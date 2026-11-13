@@ -28,6 +28,5 @@ lib/ParseErrors.ml	StringInvalidCharacter	"Character not allowed in string liter
 lib/ParseErrors.ml	TripleStringEof	"End of file in triple string literal."
 lib/TypeErrors.ml	ForBoundsNonIntegral	" value in the loop range is "
 lib/TypeErrors.ml	LogicalOperandsNotBoolean	"All operands of a logical operator must be boolean expressions."
-lib/TypeErrors.ml	logical_operator_word	"disjunction"
 lib/TypeErrors.ml	loop_bound_word	"final"
 lib/TypeErrors.ml	loop_bound_word	"initial"

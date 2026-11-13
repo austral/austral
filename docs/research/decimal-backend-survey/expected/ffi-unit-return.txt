@@ -1,4 +1,3 @@
-Compiler call tree printed to calltree.html
 Error:
   Title: Generic Error
   Module:

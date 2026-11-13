@@ -41,6 +41,8 @@ done
 
 T=$(mktemp -d)
 trap 'rm -rf "$T"' EXIT
+# coverage.sh sets this to narrow the corpus; the gate always compares all of it.
+unset ZUSTRAL_EQUIVALENCE_ONLY
 cd "$ROOT" || exit 2
 
 # Inside a nix shell already (CI runs under nix-shell), run the command as it is.

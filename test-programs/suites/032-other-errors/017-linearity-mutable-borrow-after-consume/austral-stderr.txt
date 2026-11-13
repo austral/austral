@@ -1,0 +1,25 @@
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "Cannot borrow (mutably) the variable " },
+    { "type": "code", "content": "r" },
+    { "type": "text", "content": " because it is already " },
+    { "type": "text", "content": "consumed" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/017-linearity-mutable-borrow-after-consume/Test.aum",
+    "startp": { "line": 9, "column": 8 },
+    "end": { "line": 11, "column": 19 }
+  },
+  "context": [
+    [ 7, "        var r: R := R(x => 1);" ],
+    [ 8, "        let { x: Int32 } := r;" ],
+    [ 9, "        borrow ref: &![R, Rho] := &!r do" ],
+    [ 10, "            skip;" ],
+    [ 11, "        end borrow;" ],
+    [ 12, "        return ExitSuccess();" ],
+    [ 13, "    end;" ]
+  ]
+}

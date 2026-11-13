@@ -141,7 +141,7 @@ build() { # id dir -> $dir/bin
         -L"$b" -Wl,-rpath,"$b" -ldfp -lm -o "$d/bin" ;;
     ffi)
       local dev=${DEP[mpdecimal]% *} lib=${DEP[mpdecimal]#* }/lib
-      # The compiler writes calltree.html into its working directory, so it runs in the temp dir.
+      # The compiler writes error.html into its working directory on failure, so it runs in the temp dir.
       cp "$HERE/probes/ffi/Probe.aum" "$d/" &&
         (cd "$d" && "${DEP[zustral]}" compile Probe.aum --entrypoint=Probe:main --target-type=c --output=ffi.c) &&
         "${DEP[gcc]}/bin/gcc" -fwrapv -Wno-builtin-declaration-mismatch "$d/ffi.c" "$HERE/probes/ffi/shim.c" \
