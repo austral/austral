@@ -713,11 +713,7 @@ and augment_pointer_slot_access (ctx: expr_ctx) (expr: aexpr) (slot_name: identi
     | WriteRef (ty3, _) ->
        (ty3, WriteBorrow)
     | _ ->
-       austral_raise TypeError [
-           Text "The type ";
-           Type ty2;
-           Text " is not a reference."
-         ]
+       type_error (PointerAccessNotReference ty2)
   in
   (* ... to a record. *)
   let (type_name, type_args): qident * ty list = begin
@@ -788,10 +784,7 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
   | SpanMut (ty, reg) ->
      TSpanIndex (expr, index_expr, WriteRef (ty, reg))
   | _ ->
-     austral_raise TypeError [
-         Text "Expected the head of an array indexing operator to be a reference, but found the type ";
-         Type (get_type expr)
-       ]
+     type_error (ArrayIndexNotReference (get_type expr))
 
 
 and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =

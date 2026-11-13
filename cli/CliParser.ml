@@ -9,72 +9,6 @@ open Identifier
 open CliUtil
 open Error
 
-module Errors = struct
-  let invalid_entrypoint entry =
-    austral_raise CliError [
-      Text "Invalid entrypoint format ";
-      Code entry;
-      Break;
-      Text "The entrypoint must be supplied in the form ";
-      Code "Module:name"
-    ]
-
-  let invalid_module_source source =
-    austral_raise CliError [
-      Text "Invalid module source format ";
-      Code source;
-      Break;
-      Text "Sources must be supplied as either";
-      Code "interface.aui,body.aum";
-      Text " or ";
-      Code "body.aum"
-    ]
-
-  let missing_entrypoint () =
-    austral_raise CliError [
-      Code "--entrypoint";
-      Text " argument not provided."
-    ]
-
-  let missing_module () =
-    austral_raise CliError [
-      Text "The ";
-      Code "compile";
-      Text " command must specify at least one module."
-    ]
-
-  let missing_output () =
-    austral_raise CliError [
-      Code "--output";
-      Text " argument not provided."
-    ]
-
-  let no_entrypoint_wrong_target () =
-    austral_raise CliError [
-      Code "--no-entrypoint";
-      Text " requires ";
-      Code "--target-type=c";
-      Text ", because otherwise the compiler will try to build the generated C code, and will fail because there is no entrypoint function."
-    ]
-
-  let unknown_target target =
-    austral_raise CliError [
-      Text "Unknown target type ";
-      Code target
-    ]
-
-  let unknown_error_reporting_mode (mode: string) =
-    austral_raise CliError [
-      Text "Unknown error reporting mode: ";
-      Code mode;
-      Text ". Valid values are ";
-      Code "plain";
-      Text " and ";
-      Code "json";
-      Text "."
-    ]
-end
-
 type entrypoint =
   | Entrypoint of module_name * identifier
 [@@deriving eq]
@@ -120,7 +54,7 @@ let parse_mod_source (s: string): mod_source =
   | [inter_path; body_path] ->
      ModuleSource { inter_path = inter_path; body_path = body_path }
   | _ ->
-     Errors.invalid_module_source s
+     cli_error (InvalidModuleSource s)
 
 let parse_entrypoint (s: string): entrypoint =
   let ss = String.split_on_char ':' s in
@@ -128,7 +62,7 @@ let parse_entrypoint (s: string): entrypoint =
   | [mn; i] ->
      Entrypoint (make_mod_name mn, make_ident i)
   | _ ->
-     Errors.invalid_entrypoint s
+     cli_error (InvalidEntrypoint s)
 
 let parse_executable_target (arglist: arglist): (arglist * target) =
   (* Get the --entrypoint *)
@@ -138,20 +72,20 @@ let parse_executable_target (arglist: arglist): (arglist * target) =
       | Some (arglist, bin_path) ->
          (arglist, Executable { bin_path = bin_path; entrypoint = parse_entrypoint entrypoint })
       | None ->
-         Errors.missing_output ())
+         cli_error MissingOutput)
   | None ->
      (match pop_bool_flag arglist "--no-entrypoint" with
       | Some _ ->
-         Errors.no_entrypoint_wrong_target ()
+         cli_error NoEntrypointWrongTarget
       | None ->
-         Errors.missing_entrypoint ())
+         cli_error MissingEntrypoint)
 
 let get_output (arglist: arglist): (arglist * string) =
   match pop_value_flag arglist "output" with
   | Some (arglist, output_path) ->
      (arglist, output_path)
   | None ->
-     Errors.missing_output ()
+     cli_error MissingOutput
 
 let parse_c_target (arglist: arglist): (arglist * target) =
   (* Get the --entrypoint *)
@@ -167,7 +101,7 @@ let parse_c_target (arglist: arglist): (arglist * target) =
          let (arglist, output_path) = get_output arglist in
          (arglist, CStandalone { output_path = output_path; entrypoint = None })
       | None ->
-         Errors.missing_entrypoint ())
+         cli_error MissingEntrypoint)
 
 let parse_target_type (arglist: arglist): (arglist * target) =
   match pop_value_flag arglist "target-type" with
@@ -184,7 +118,7 @@ let parse_target_type (arglist: arglist): (arglist * target) =
          (* Typecheck. *)
          (arglist, TypeCheck)
       | _ ->
-         Errors.unknown_target target_value)
+         cli_error (UnknownTarget target_value))
   | None ->
      (* The default target is to build an executable binary. This means we need
         an entrypoint. *)
@@ -202,7 +136,7 @@ let parse_error_reporting_mode (arglist: arglist): (arglist * error_reporting_mo
          (* Report errors in JSON. *)
          (arglist, ErrorReportJson)
       | _ ->
-         Errors.unknown_error_reporting_mode value)
+         cli_error (UnknownErrorReportingMode value))
   | None ->
      (* The default target is plain text errors. *)
      (arglist, ErrorReportPlain)
@@ -214,7 +148,7 @@ let parse_compile_command' (arglist: arglist): (arglist * cmd) =
   let (arglist, error_reporting_mode) = parse_error_reporting_mode arglist in
   (* There must be at least one module. *)
   if ((List.length modules) < 1) then
-    Errors.missing_module ()
+    cli_error MissingModule
   else
     (* Parse the target type. *)
     let (arglist, target): (arglist * target) = parse_target_type arglist in

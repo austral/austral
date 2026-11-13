@@ -10,41 +10,6 @@ open Lexing
 open Error
 open Parser
 
-module Errors = struct
-  let raise_err lexbuf kind text : 'a =
-    let error =
-      AustralError {
-        module_name = None;
-        error = Unconverted (kind, text);
-        span = Some (Span.from_lexbuf lexbuf);
-        source_ctx = None
-      }
-    in
-    raise (Austral_error error)
-
-  let invalid_character lexbuf =
-    raise_err lexbuf ParseError [
-      Text "Character not allowed in source text: ";
-      Code (Lexing.lexeme lexbuf)
-    ]
-
-  let single_string_invalid_character lexbuf =
-    raise_err lexbuf ParseError [
-      Text "Character not allowed in string literal: ";
-      Code (Lexing.lexeme lexbuf)
-    ]
-
-  let single_string_eof lexbuf =
-    raise_err lexbuf ParseError [
-      Text "End of file in string literal."
-    ]
-
-  let triple_string_eof lexbuf =
-    raise_err lexbuf ParseError [
-      Text "End of file in triple string literal."
-    ]
-end
-
 let advance_line lexbuf =
   let pos = lexbuf.lex_curr_p in
   let pos' = { pos with
@@ -192,19 +157,19 @@ rule token = parse
   | newline { advance_line lexbuf; token lexbuf }
   | eof { EOF }
   | _ {
-    Errors.invalid_character lexbuf
+    parse_error_at (Span.from_lexbuf lexbuf) (InvalidCharacter (Lexing.lexeme lexbuf))
   }
 
 and read_string = parse
   | '"' { let c = Buffer.contents string_acc in Buffer.clear string_acc; STRING_CONSTANT c }
   | '\\' '"' { Buffer.add_char string_acc '"'; read_string lexbuf }
   | [^ '"'] { Buffer.add_string string_acc (Lexing.lexeme lexbuf); read_string lexbuf }
-  | eof { Errors.single_string_eof lexbuf }
-  | _ { Errors.single_string_invalid_character lexbuf }
+  | eof { parse_error_at (Span.from_lexbuf lexbuf) StringEof }
+  | _ { parse_error_at (Span.from_lexbuf lexbuf) (StringInvalidCharacter (Lexing.lexeme lexbuf)) }
 
 and read_triple_string = parse
   | "\"\"\"" { let c = Buffer.contents triple_string_acc in Buffer.clear triple_string_acc; TRIPLE_STRING_CONSTANT c }
   | '\n' { advance_line lexbuf; Buffer.add_string triple_string_acc "\n"; read_triple_string lexbuf }
   | '\\' "\"\"\"" { Buffer.add_string triple_string_acc "\"\"\""; read_triple_string lexbuf }
-  | eof { Errors.triple_string_eof lexbuf }
+  | eof { parse_error_at (Span.from_lexbuf lexbuf) TripleStringEof }
   | _ { Buffer.add_string triple_string_acc (Lexing.lexeme lexbuf); read_triple_string lexbuf }

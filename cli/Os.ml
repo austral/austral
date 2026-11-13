@@ -9,40 +9,6 @@ open Unix
 open Error
 open HtmlError
 
-module Errors = struct
-  let c_compiler_error ~command ~exit_code ~stdout ~stderr =
-    austral_raise CliError [
-      Text "Failed to run C compiler.";
-      Break;
-      Text "Command: ";
-      Code command;
-      Break;
-      Text "Exit code: ";
-      Text (string_of_int exit_code);
-      Break;
-      Text "Standard output:\n";
-      Text stdout;
-      Break;
-      Text "Standard error:\n";
-      Text stderr
-    ]
-
-  let write_error ~path ~error = match error with
-  | Sys_error msg ->
-      austral_raise CliError [
-        Text "Failed to write to file ";
-        Code path;
-        Text ": ";
-        Break;
-        Text msg
-      ]
-  | _ ->
-      austral_raise CliError [
-        Text "Failed to write to file ";
-        Code path
-      ]
-end
-
 let read_stream_to_string stream: string =
   let rec read_stream stream =
     try
@@ -67,7 +33,12 @@ let write_string_to_file (path: string) (contents: string): unit =
     ()
   with error ->
     close_out_noerr stream;
-    Errors.write_error ~path ~error
+    let reason =
+      match error with
+      | Sys_error msg -> Some msg
+      | _ -> None
+    in
+    cli_error (WriteError { path; reason })
 
 let get_exit_code = function
   | WEXITED i -> i
@@ -94,7 +65,7 @@ let compile_c_code (source_path: string) (output_path: string): command_output =
   let o = run_command cmd in
   let (CommandOutput { command; code; stdout; stderr }) = o in
   if code <> 0 then
-    Errors.c_compiler_error ~command ~exit_code:code ~stdout ~stderr
+    cli_error (CCompilerError { command; exit_code = code; stdout; stderr })
   else
     o
 

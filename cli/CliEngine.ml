@@ -180,6 +180,6 @@ and exec_target (mods: module_source list) (target: target): unit =
 and compile_to_c (mods: module_source list) (entrypoint: entrypoint option): string =
   let compiler = compile_multiple (empty_compiler ()) mods in
   let entrypoint =
-    Option.map (fun (Entrypoint (module_name, name)) -> (module_name, name)) entrypoint
+    Option.map (fun (Entrypoint (module_name, name): entrypoint) -> (module_name, name)) entrypoint
   in
   render_program (finish compiler entrypoint)

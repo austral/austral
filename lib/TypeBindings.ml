@@ -11,30 +11,6 @@ open TypeParameter
 open TypeSystem
 open Error
 
-module Errors = struct
-  let typaram_redefinition ~param ~was ~redef =
-    austral_raise TypeError [
-      Text "The type parameter ";
-      Code (typaram_name param |> ident_string);
-      Text " cannot be bound to both ";
-      Type was;
-      Text " and ";
-      Type redef;
-    ]
-
-  let typaram_wrong_universe ~param ~ty ~expected ~actual =
-    austral_raise TypeError [
-      Text "The type parameter ";
-      Code (typaram_name param |> ident_string);
-      Text " must be ";
-      Code (universe_string expected);
-      Text " but ";
-      Type ty;
-      Text " is ";
-      Code (universe_string actual)
-    ]
-end
-
 let universe_compatible param arg =
   (* The check here is:
 
@@ -102,10 +78,7 @@ let add_binding (TypeBindings m) (tp: type_parameter) (ty: ty): type_bindings =
      if equal_ty ty ty' then
        TypeBindings m
      else
-       Errors.typaram_redefinition
-         ~param:tp
-         ~was:ty'
-         ~redef:ty
+       type_error (TyparamRedefinition { param = tp; was = ty'; redef = ty })
   | None ->
      match ty with
      | MonoTy _ ->
@@ -115,11 +88,12 @@ let add_binding (TypeBindings m) (tp: type_parameter) (ty: ty): type_bindings =
       if universe_compatible (typaram_universe tp) (type_universe ty) then
         TypeBindings (BindingsMap.add tp ty m)
       else
-        Errors.typaram_wrong_universe
-          ~param:tp
-          ~ty
-          ~expected:(typaram_universe tp)
-          ~actual:(type_universe ty)
+        type_error (TyparamBindingWrongUniverse {
+            param = tp;
+            ty;
+            expected = typaram_universe tp;
+            actual = type_universe ty;
+          })
 
 (* Add multiple bindings to a bindings map. *)
 let rec add_bindings bs pairs =

@@ -8,15 +8,6 @@
 open Identifier
 open Error
 
-module Errors = struct
-  let long_character lit =
-    austral_raise ParseError [
-      Text "Character literal '";
-      Code lit;
-      Text " is more than one character."
-    ]
-end
-
 let string_explode (s: string): char list =
   List.init (String.length s) (String.get s)
 
@@ -69,7 +60,7 @@ let parse_ascii_char (s: string): int =
       | [c] ->
          Char.code c
       | _ ->
-         Errors.long_character s)
+         parse_error (LongCharacter s))
 
 let rec count_leading_whitespace (s: string): int =
   let chars = string_explode s in

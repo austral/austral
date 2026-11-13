@@ -420,10 +420,7 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
          | WriteRef (ty, r) ->
             (ty, WriteRefCaseMode r)
          | _ ->
-            austral_raise TypeError [
-                Text "The type for the expression in a case statement must be a union or a reference to a union, but I got ";
-                Type ty
-        ])
+            type_error (CaseNotUnionOrReference ty))
       in
       let case_ref: case_ref =
         (match mode with

@@ -7,6 +7,7 @@
 (** The errors that have no category yet, and their wording. *)
 open Identifier
 open Type
+open TypeParameter
 open ErrorText
 
 (** What a name that was not found was expected to name. *)
@@ -26,6 +27,11 @@ type t =
   | CantAssignToImmutableVar of identifier
   | RefTransformNeedsRef of ty
   | VarCollidesWithDecl of identifier
+  | WrongNumberOfArguments of { expected: int; actual: int }
+  | BrokenOrphanRule
+  | OverlappingInstances
+  | DuplicateTypeParameter of type_parameter option
+  | TypeWrongArity of { typename: identifier; expected: int; actual: int option }
 
 let render (error: t): err_text =
   match error with
@@ -62,3 +68,44 @@ let render (error: t): err_text =
        Code (ident_string name);
        Text " collides with the name of a declaration."
      ]
+  | WrongNumberOfArguments { expected; actual } ->
+     [
+       Text "Wrong number of arguments. Expected ";
+       Code (string_of_int expected);
+       Text " and got ";
+       Code (string_of_int actual);
+       Text "."
+     ]
+  | BrokenOrphanRule ->
+     [
+       Text "Orphan rule broken: typeclass and type are both foreign."
+     ]
+  | OverlappingInstances ->
+     [
+       Text "Instance overlaps."
+     ]
+  | DuplicateTypeParameter param ->
+     (match param with
+      | Some param -> [
+          Text "Duplicate type parameter ";
+          Code (typaram_name param |> ident_string)
+        ]
+      | None -> [
+          Text "Multiple type parameters have the same name.";
+        ])
+  | TypeWrongArity { typename; expected; actual } ->
+     (let text = [
+        Text "The type ";
+        Code (ident_string typename);
+        Text " expects ";
+        Code (string_of_int expected);
+        Text " type arguments";
+      ]
+      in
+      text @ match actual with
+      | Some actual -> [
+          Text ", but I only found ";
+          Code (string_of_int actual);
+          Text " arguments."
+        ]
+      | None -> [Text "."])

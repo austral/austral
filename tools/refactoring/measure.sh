@@ -46,7 +46,7 @@ count_type_strings() { # file
 
 # One row per file. Columns:
 #   raise     places that raise: raise_error, type_error and the other helpers of a category, internal_err,
-#             failwith, raise, assert false; and, until R11 is done, austral_raise, err, Errors.x
+#             failwith, raise, assert false; and, until R11 is done, err
 #   internal  the part of raise that is internal_err: a state the code believes cannot happen
 #   adhoc     the part of raise that is err with a bare string: an error with no name
 #   catch     places that catch or re-label: try, adorn_error_with_*, with_errors
@@ -59,7 +59,7 @@ metrics() {
   sources | while read -r f; do
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$f" \
       "$(wc -l < "$ROOT/$f")" \
-      "$(count 'raise_error|(^|[^_a-zA-Z])(type|linearity|declaration|generic)_error |austral_raise|(^|[^_a-zA-Z])err [("]|internal_err|(^|[^_a-zA-Z])Errors\.[a-z_]+|failwith|(^|[^_a-zA-Z])raise |assert false' "$f")" \
+      "$(count 'raise_error|(^|[^_a-zA-Z])(parse|cli|type|linearity|declaration|entrypoint|generic)_error(_at)? |(^|[^_a-zA-Z])err [("]|internal_err|failwith|(^|[^_a-zA-Z])raise |assert false' "$f")" \
       "$(count '(^|[^_a-zA-Z])try($|[^_a-zA-Z])|adorn_error_with_[a-z_]+|with_errors' "$f")" \
       "$(count '= *ref ([a-z0-9("\[]|\[\])|^\s*ref \(|Hashtbl\.(create|add|replace)|^\s*mutable [a-z_]+ *:|^let [a-z_]+ *(: *[A-Za-z_.]+ *)?= *Buffer\.create' "$f")" \
       "$(count 'open_out|open_in|print_string|print_endline|prerr_|Printf\.e?printf|Sys\.command|Unix\.|(^|[^_a-zA-Z])exit |output_string|write_string_to_file|read_file_to_string|run_command|Sys\.remove|Filename\.temp' "$f")" \

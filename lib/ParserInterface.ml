@@ -8,10 +8,6 @@
 open Cst
 open Span
 open Error
-open ErrorText
-
-let raise_parse_error (span: span): 'a =
-  adorn_error_with_span span (fun _ -> austral_raise ParseError [Text "Error during parse."])
 
 let parse' f (code: string) (filename: string) =
   let lexbuf = Lexing.from_string code in
@@ -19,7 +15,7 @@ let parse' f (code: string) (filename: string) =
   try
     f Lexer.token lexbuf
   with Parser.Error ->
-        raise_parse_error (from_lexbuf lexbuf)
+        parse_error_at (from_lexbuf lexbuf) SyntaxError
      | Austral_error error ->
         raise (Austral_error error)
 

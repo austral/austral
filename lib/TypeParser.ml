@@ -18,52 +18,6 @@ open Stages.Ast
 open Env
 open EnvTypes
 open Error
-open ErrorText
-
-module Errors = struct
-  let function_pointer_no_args () =
-    austral_raise ParseError [
-      Text "Function pointer type specifier must have at least one argument."
-    ]
-
-  let typaram_wrong_universe ~param ~expected ~actual =
-    austral_raise TypeError [
-      Text "The type parameter ";
-      Code (typaram_name param |> ident_string);
-      Text " is expected to be ";
-      Code (universe_string expected);
-      Text " but the supplied argument is ";
-      Code (universe_string actual)
-    ]
-
-  let unresolved_type name =
-    austral_raise TypeError [
-      Text "Unable to find a type with the name ";
-      Code (ident_string name);
-      Text ".";
-      Break;
-      Text "Consider importing it, if it is defined in another module."
-    ]
-
-  let wrong_arity ~typename ~expected ~actual =
-    let text = [
-      Text "The type ";
-      Code typename;
-      Text " expects ";
-      Code (string_of_int expected);
-      Text " type arguments";
-    ]
-    in
-    let text = text @ match actual with
-    | Some actual -> [
-        Text ", but I only found ";
-        Code (string_of_int actual);
-        Text " arguments."
-      ]
-    | None -> [Text "."]
-    in
-    austral_raise GenericError text
-end
 
 let decl_type_signature (decl: decl): type_signature option =
   match decl with
@@ -87,7 +41,7 @@ let decl_type_signature (decl: decl): type_signature option =
 let parse_function_pointer (args: ty list): ty =
   match args with
   | [] ->
-     Errors.function_pointer_no_args ()
+     parse_error FunctionPointerNoArgs
   | [r] ->
      FnPtr ([], r)
   | _ ->
@@ -101,14 +55,22 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
     | [ty] ->
        Some (Address ty)
     | _ ->
-       Errors.wrong_arity ~typename:"Address" ~expected:1 ~actual:None
+       generic_error (TypeWrongArity {
+           typename = make_ident "Address";
+           expected = 1;
+           actual = None;
+         })
   else
     if is_pointer_type name then
       match args with
       | [ty] ->
          Some (Pointer ty)
       | _ ->
-         Errors.wrong_arity ~typename:"Pointer" ~expected:1 ~actual:None
+         generic_error (TypeWrongArity {
+             typename = make_ident "Pointer";
+             expected = 1;
+             actual = None;
+           })
     else
       let name_str: string = ident_string (original_name name) in
       match name_str with
@@ -286,7 +248,7 @@ and parse_user_defined_type (env: env) (sigs: type_signature list) (name: qident
   | Some ts ->
      parse_user_defined_type' ts name args
   | None ->
-     Errors.unresolved_type (original_name name)
+     type_error (UnresolvedType (original_name name))
 
 and parse_user_defined_type' (ts: type_signature) (name: qident) (args: ty list): ty =
   let (TypeSignature (_, ts_params, declared_universe)) = ts in
@@ -307,10 +269,7 @@ and check_param_arity_matches (params: typarams) (args: ty list) (ty_name: qiden
   if expected = got then
     ()
   else
-    Errors.wrong_arity
-      ~typename:(original_name ty_name |> ident_string)
-      ~expected
-      ~actual:(Some got)
+    generic_error (TypeWrongArity { typename = original_name ty_name; expected; actual = Some got })
 
 and check_universes_match (params: typarams) (args: ty list): unit =
   let _ = List.map2 check_universes_match' (typarams_as_list params) args in ()
@@ -321,7 +280,7 @@ and check_universes_match' (tp: type_parameter) (arg: ty): unit =
   if universe_compatible param_u arg_u then
     ()
   else
-    Errors.typaram_wrong_universe ~param:tp ~expected:param_u ~actual:arg_u
+    type_error (TypeArgumentWrongUniverse { param = tp; expected = param_u; actual = arg_u })
 
 and universe_compatible param arg =
   (* The check here is:

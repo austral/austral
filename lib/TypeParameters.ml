@@ -8,21 +8,6 @@
 open Identifier
 open TypeParameter
 open Error
-open ErrorText
-
-module Errors = struct
-  let duplicate_type_parameter param =
-    let text = match param with 
-    | Some param -> [
-        Text "Duplicate type parameter ";
-        Code (typaram_name param |> ident_string)
-      ]
-    | None -> [
-        Text "Multiple type parameters have the same name.";
-      ]
-    in
-    austral_raise GenericError text
-end
 
 type typarams = TyParams of type_parameter list
 [@@deriving show]
@@ -43,7 +28,7 @@ let get_typaram (typarams: typarams) (name: identifier): type_parameter option =
 let add_typaram (typarams: typarams) (typaram: type_parameter): typarams =
   match get_typaram typarams (typaram_name typaram) with
   | Some _ ->
-    Errors.duplicate_type_parameter (Some typaram)
+    generic_error (DuplicateTypeParameter (Some typaram))
   | None ->
     let (TyParams lst) = typarams in
     let lst = List.rev lst in
@@ -69,7 +54,7 @@ let merge_typarams (a: typarams) (b: typarams): typarams =
   let _ =
     List.map (fun tp ->
         if List.exists (fun tp' -> equal_identifier (typaram_name tp) (typaram_name tp')) al then
-          Errors.duplicate_type_parameter None
+          generic_error (DuplicateTypeParameter None)
         else
           ()) bl
   in

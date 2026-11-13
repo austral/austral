@@ -10,61 +10,10 @@ open Env
 open Type
 open TypeParameters
 open Error
-open ErrorText
 open BuiltIn
 open Names
 open CodeGen
 open MonoTypeBindings
-
-module Errors = struct
-  let multiple_parameters () =
-    austral_raise EntrypointError [
-      Text "The entrypoint function should take a single parameter with type ";
-      Code "RootCapability";
-      Text ", or none at all, but it has several."
-    ]
-
-  let no_such_function ~name ~module_name =
-    austral_raise EntrypointError [
-      Text "No function named ";
-      Code (ident_string name);
-      Text " in module ";
-      Code (mod_name_string module_name)
-    ]
-
-  let not_function () =
-    austral_raise EntrypointError [
-      Text "The entrypoint must be a function."
-    ]
-
-  let not_monomorphic () =
-    austral_raise EntrypointError [
-      Text "The entrypoint function cannot be generic."
-    ]
-
-  let not_public () =
-    austral_raise EntrypointError [
-      Text "The entrypoint function is not public.";
-      Break;
-      Text "Consider declaring it in the module interface."
-    ]
-
-  let wrong_parameter_type ty =
-    austral_raise EntrypointError [
-      Text "The type of the entrypoint argument must be ";
-      Code "RootCapability";
-      Text " but it is ";
-      Type ty
-    ]
-
-  let wrong_return_type ty =
-    austral_raise EntrypointError [
-      Text "The type of the entrypoint function must be ";
-      Code "ExitCode";
-      Text " but it is ";
-      Type ty
-    ]
-end
 
 (** The kind of entrypoint function we have. *)
 type entrypoint_kind =
@@ -88,28 +37,29 @@ let rec check_entrypoint_validity (env: env) (name: qident): decl_id * entrypoin
                 if is_exit_code_type rt then
                   (id, EmptyEntrypoint)
                 else
-                  Errors.wrong_return_type rt
+                  entrypoint_error (WrongReturnType rt)
              | [ValueParameter (_, pt)] ->
                 (* Single parameter case: the `root` parameter. *)
                 if is_root_cap_type pt then
                   if is_exit_code_type rt then
                     (id, RootCapEntrypoint)
                   else
-                    Errors.wrong_return_type rt
+                    entrypoint_error (WrongReturnType rt)
                 else
-                  Errors.wrong_parameter_type pt
+                  entrypoint_error (WrongParameterType pt)
              | _ ->
-                Errors.multiple_parameters ()
+                entrypoint_error MultipleParameters
            else
-             Errors.not_monomorphic ()
+             entrypoint_error NotMonomorphic
          else
-           Errors.not_public ()
+           entrypoint_error NotPublic
       | _ ->
-         Errors.not_function ())
+         entrypoint_error NotFunction)
   | None ->
-      Errors.no_such_function
-        ~name:(original_name name)
-        ~module_name:(source_module_name name)
+      entrypoint_error (NoSuchFunction {
+          name = original_name name;
+          module_name = source_module_name name;
+        })
 
 and is_root_cap_type = function
   | NamedType (name, [], LinearUniverse) ->

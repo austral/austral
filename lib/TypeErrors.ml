@@ -7,6 +7,7 @@
 (** The type errors, and their wording. *)
 open Identifier
 open Type
+open TypeParameter
 open ErrorText
 
 (** Where a condition is. *)
@@ -82,6 +83,18 @@ type t =
   | UnconstrainedTypeParameter of { typeclass: identifier; typaram: identifier }
   | CantAccessSlotNotRecord of { slot_name: identifier; ty: ty }
   | CantIndexNotSpan of ty
+  | ExportDisallowedType of ty
+  | TyparamRedefinition of { param: type_parameter; was: ty; redef: ty }
+  | TyparamBindingWrongUniverse of { param: type_parameter; ty: ty; expected: universe; actual: universe }
+  | InstanceArgumentWrongUniverse of { ty: ty; expected: universe; actual: universe }
+  | TypeMismatch of { expected: ty; actual: ty }
+  | UnsatisfiedConstraint of { tyvar: type_var; ty: ty; typeclass: sident }
+  | TypeArgumentWrongUniverse of { param: type_parameter; expected: universe; actual: universe }
+  | UnresolvedType of identifier
+  | IntegerDoesNotFit of { value: string; ty: ty }
+  | PointerAccessNotReference of ty
+  | ArrayIndexNotReference of ty
+  | CaseNotUnionOrReference of ty
 
 let render (error: t): err_text =
   match error with
@@ -346,4 +359,102 @@ let render (error: t): err_text =
        Text "I can't use the array indexing operator here, because the type ";
        Type ty;
        Text " is not a span."
+     ]
+  | ExportDisallowedType ty ->
+     [
+       Text "The type ";
+       Type ty;
+       Text " is not allowed in the signature of an exported function."
+     ]
+  | TyparamRedefinition { param; was; redef } ->
+     [
+       Text "The type parameter ";
+       Code (typaram_name param |> ident_string);
+       Text " cannot be bound to both ";
+       Type was;
+       Text " and ";
+       Type redef;
+     ]
+  | TyparamBindingWrongUniverse { param; ty; expected; actual } ->
+     [
+       Text "The type parameter ";
+       Code (typaram_name param |> ident_string);
+       Text " must be ";
+       Code (universe_string expected);
+       Text " but ";
+       Type ty;
+       Text " is ";
+       Code (universe_string actual)
+     ]
+  | InstanceArgumentWrongUniverse { ty; expected; actual } ->
+     [
+       Text "Cannot define an instance with argument ";
+       Type ty;
+       Text " because it should belong to the ";
+       Code (universe_string expected);
+       Text " universe, but it is actually in the ";
+       Code (universe_string actual);
+       Text " universe."
+     ]
+  | TypeMismatch { expected; actual } ->
+     [
+       Text "Expected a value of type ";
+       Type expected;
+       Text ", but got a value of type ";
+       Type actual;
+       Text "."
+     ]
+  | UnsatisfiedConstraint { tyvar; ty; typeclass } ->
+     let (TypeVariable (tyvar_name, _, _, _)) = tyvar in
+     [
+       Text "Type constraint not satisfied: the type ";
+       Type ty;
+       Text " does not implement the typeclass ";
+       Code (ident_string (sident_name typeclass));
+       Text ".";
+       Break;
+       Text "This constraint is for the type variable ";
+       Code (ident_string tyvar_name);
+       Text "."
+     ]
+  | TypeArgumentWrongUniverse { param; expected; actual } ->
+     [
+       Text "The type parameter ";
+       Code (typaram_name param |> ident_string);
+       Text " is expected to be ";
+       Code (universe_string expected);
+       Text " but the supplied argument is ";
+       Code (universe_string actual)
+     ]
+  | UnresolvedType name ->
+     [
+       Text "Unable to find a type with the name ";
+       Code (ident_string name);
+       Text ".";
+       Break;
+       Text "Consider importing it, if it is defined in another module."
+     ]
+  | IntegerDoesNotFit { value; ty } ->
+     [
+       Text "The integer ";
+       Code value;
+       Text" does not fit the type ";
+       Type ty;
+       Text "."
+     ]
+  | PointerAccessNotReference ty ->
+     [
+       Text "The type ";
+       Type ty;
+       Text " is not a reference."
+     ]
+  | ArrayIndexNotReference ty ->
+     [
+       Text "Expected the head of an array indexing operator to be a reference, but found the type ";
+       Type ty
+     ]
+  | CaseNotUnionOrReference ty ->
+     [
+       Text "The type for the expression in a case statement must be a union or a reference to a union, but I got ";
+       Type ty
      ]

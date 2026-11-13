@@ -18,37 +18,15 @@ open EnvExtras
 open EnvUtils
 open Error
 
-module Errors = struct
-  let broken_orphan_rule () =
-    austral_raise GenericError [
-      Text "Orphan rule broken: typeclass and type are both foreign."
-    ]
-
-  let overlapping_instances () =
-    austral_raise GenericError [
-      Text "Instance overlaps."
-    ]
-
-  let wrong_universe ~ty ~expected ~actual =
-    austral_raise TypeError [
-      Text "Cannot define an instance with argument ";
-      Type ty;
-      Text " because it should belong to the ";
-      Code (universe_string expected);
-      Text " universe, but it is actually in the ";
-      Code (universe_string actual);
-      Text " universe."
-    ]
-end
-
 let check_instance_argument_has_right_universe (universe: universe) (arg: ty): unit =
   if universe_compatible universe (type_universe arg) then
     ()
   else
-    Errors.wrong_universe
-      ~ty:arg
-      ~expected:universe
-      ~actual:(type_universe arg)
+    type_error (InstanceArgumentWrongUniverse {
+        ty = arg;
+        expected = universe;
+        actual = type_universe arg;
+      })
 
 let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit =
   let is_tyvar (ty: ty): type_var =
@@ -192,7 +170,7 @@ let check_instance_locally_unique (instances: decl list) (argument: ty): unit =
        false
   in
   if List.exists pred instances then
-    Errors.overlapping_instances ()
+    generic_error OverlappingInstances
   else
     ()
 
@@ -201,7 +179,7 @@ let rec check_instance_orphan_rules (env: env) (mod_id: mod_id) (typeclass_mod_i
   and ty_local: bool = is_type_local env mod_id ty
   in
   if (not tc_local) && (not ty_local) then
-    Errors.broken_orphan_rule ()
+    generic_error BrokenOrphanRule
   else
     ()
 

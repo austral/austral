@@ -33,14 +33,17 @@ type error_kind =
 (** What went wrong. Each category has its own type, with one constructor per
     error; the wording is in the [render] function of the category's module. *)
 type error =
+  | Parse of ParseErrors.t
+  | Cli of CliErrors.t
   | Type of TypeErrors.t
   | Linearity of LinearityErrors.t
   | Declaration of DeclarationErrors.t
+  | Entrypoint of EntrypointErrors.t
   | Generic of GenericErrors.t
   | Internal of string
   (** A state the compiler believes cannot happen. The string says which. *)
   | Unconverted of error_kind * err_text
-  (** An error that is still raised as loose text. Goes away when R11 is done. *)
+  (** An error that {!err} raises from loose text. Goes away when R11 is done. *)
 
 (** An Austral compiler error. The module name, span, and source context rarely
     have to be passed in explicitly: they are added where the error is throw in
@@ -65,6 +68,16 @@ val error_kind : error -> error_kind
 (** The wording of an error. *)
 val error_text : error -> err_text
 
+(** Raise a parse error. *)
+val parse_error : ParseErrors.t -> 'a
+
+(** Raise a parse error at a place in the source text. The lexer and the
+    parser know the place where they stop. *)
+val parse_error_at : span -> ParseErrors.t -> 'a
+
+(** Raise an error with the user's command line arguments. *)
+val cli_error : CliErrors.t -> 'a
+
 (** Raise a type error. *)
 val type_error : TypeErrors.t -> 'a
 
@@ -74,14 +87,14 @@ val linearity_error : LinearityErrors.t -> 'a
 (** Raise a declaration error. *)
 val declaration_error : DeclarationErrors.t -> 'a
 
+(** Raise an error with the definition of the program entrypoint. *)
+val entrypoint_error : EntrypointErrors.t -> 'a
+
 (** Raise a generic error. *)
 val generic_error : GenericErrors.t -> 'a
 
 (** Raise an internal error. *)
 val internal_err : string -> 'a
-
-(** Raise an Austral error given the kind and text. *)
-val austral_raise : error_kind -> err_text -> 'a
 
 (** Add a source context to an error if it doesn't have one. *)
 val add_source_ctx : austral_error -> source_ctx -> austral_error

@@ -18,31 +18,6 @@ open Env
 open EnvTypes
 open Error
 
-module Errors = struct
-  let type_mismatch a b =
-    austral_raise TypeError [
-      Text "Expected a value of type ";
-      Type a;
-      Text ", but got a value of type ";
-      Type b;
-      Text "."
-    ]
-
-  let unsatisfied_constraint (tv: type_var) (ty: ty) (constraint_typeclass_name: sident) =
-    let (TypeVariable (tv_name, _, _, _)) = tv in
-    austral_raise TypeError [
-        Text "Type constraint not satisfied: the type ";
-        Type ty;
-        Text " does not implement the typeclass ";
-        Code (ident_string (sident_name constraint_typeclass_name));
-        Text ".";
-        Break;
-        Text "This constraint is for the type variable ";
-        Code (ident_string tv_name);
-        Text "."
-    ]
-end
-
 type ctx = env * module_name
 
 let ctx_env (env, _) = env
@@ -56,34 +31,34 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
       | Unit ->
          empty_bindings
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | Boolean ->
      (match b with
       | Boolean ->
          empty_bindings
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | Integer (s, w) ->
      (match b with
       | Integer (s', w') ->
          if (s = s') && (w = w') then
            empty_bindings
          else
-           Errors.type_mismatch a b
+           type_error (TypeMismatch { expected = a; actual = b })
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | SingleFloat ->
      (match b with
       | SingleFloat ->
          empty_bindings
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | DoubleFloat ->
      (match b with
       | DoubleFloat ->
          empty_bindings
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | NamedType (n, args, _) ->
      (match b with
       | NamedType (n', args', _) ->
@@ -91,18 +66,18 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          if n = n' then
            match_type_list ctx args args'
          else
-           Errors.type_mismatch a b
+           type_error (TypeMismatch { expected = a; actual = b })
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | RegionTy r ->
      (match b with
       | RegionTy r' ->
          if r = r' then
            empty_bindings
          else
-           Errors.type_mismatch a b
+           type_error (TypeMismatch { expected = a; actual = b })
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | ReadRef (t, r) ->
      (match b with
       | ReadRef (t', r') ->
@@ -110,7 +85,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | WriteRef (t, r) ->
      (match b with
       | WriteRef (t', r') ->
@@ -118,7 +93,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | Span (t, r) ->
      (match b with
       | Span (t', r') ->
@@ -126,7 +101,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | SpanMut (t, r) ->
      (match b with
       | SpanMut (t', r') ->
@@ -134,7 +109,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
          let bindings' = match_type ctx r r' in
          merge_bindings bindings bindings'
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | TyVar tyvar ->
      match_type_var ctx tyvar b
   | Address t ->
@@ -142,19 +117,19 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
       | Address t' ->
          match_type ctx t t'
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | Pointer t ->
      (match b with
       | Pointer t' ->
          match_type ctx t t'
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | FnPtr (args, rt) ->
      (match b with
       | FnPtr (args', rt') ->
          match_type_list ctx (rt :: args) (rt' :: args')
       | _ ->
-         Errors.type_mismatch a b)
+         type_error (TypeMismatch { expected = a; actual = b }))
   | MonoTy _ ->
      err "match_type called with MonoTy argument"
 
@@ -211,7 +186,7 @@ and try_constraint (ctx: ctx) (tv: type_var) (ty: ty) (typeclass_name: sident): 
       | Some _ ->
          ()
       | None ->
-         Errors.unsatisfied_constraint tv ty typeclass_name)
+         type_error (UnsatisfiedConstraint { tyvar = tv; ty; typeclass = typeclass_name }))
   | Some _ ->
      internal_err "Type parameter constraint refers to a declaration which is not a typeclass."
   | None ->
@@ -289,13 +264,7 @@ let match_int_type_with_value (signedness: signedness) (width: integer_width) (v
    if fits signedness width i then
       empty_bindings
    else
-      austral_raise TypeError [
-         Text "The integer ";
-         Code value;
-         Text" does not fit the type ";
-         Type (Integer (signedness, width));
-         Text "."
-      ]
+      type_error (IntegerDoesNotFit { value; ty = Integer (signedness, width) })
 
 let match_type_with_value (ctx: ctx) (ty: ty) (expr: texpr): type_bindings =
   (* Like type_match, but gentler with integer constants. *)

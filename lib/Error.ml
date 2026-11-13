@@ -22,9 +22,12 @@ type error_kind =
   | InternalError
 
 type error =
+  | Parse of ParseErrors.t
+  | Cli of CliErrors.t
   | Type of TypeErrors.t
   | Linearity of LinearityErrors.t
   | Declaration of DeclarationErrors.t
+  | Entrypoint of EntrypointErrors.t
   | Generic of GenericErrors.t
   | Internal of string
   | Unconverted of error_kind * err_text
@@ -40,18 +43,24 @@ exception Austral_error of austral_error
 
 let error_kind (error: error): error_kind =
   match error with
+  | Parse _ -> ParseError
+  | Cli _ -> CliError
   | Type _ -> TypeError
   | Linearity _ -> LinearityError
   | Declaration _ -> DeclarationError
+  | Entrypoint _ -> EntrypointError
   | Generic _ -> GenericError
   | Internal _ -> InternalError
   | Unconverted (kind, _) -> kind
 
 let error_text (error: error): err_text =
   match error with
+  | Parse e -> ParseErrors.render e
+  | Cli e -> CliErrors.render e
   | Type e -> TypeErrors.render e
   | Linearity e -> LinearityErrors.render e
   | Declaration e -> DeclarationErrors.render e
+  | Entrypoint e -> EntrypointErrors.render e
   | Generic e -> GenericErrors.render e
   | Internal message ->
      [
@@ -68,18 +77,24 @@ let error_text (error: error): err_text =
 let raise_error (error: error): 'a =
   raise (Austral_error (AustralError { module_name = None; error; span = None; source_ctx = None }))
 
+let parse_error (e: ParseErrors.t): 'a = raise_error (Parse e)
+
+let parse_error_at (span: span) (e: ParseErrors.t): 'a =
+  raise (Austral_error (AustralError { module_name = None; error = Parse e; span = Some span; source_ctx = None }))
+
+let cli_error (e: CliErrors.t): 'a = raise_error (Cli e)
+
 let type_error (e: TypeErrors.t): 'a = raise_error (Type e)
 
 let linearity_error (e: LinearityErrors.t): 'a = raise_error (Linearity e)
 
 let declaration_error (e: DeclarationErrors.t): 'a = raise_error (Declaration e)
 
+let entrypoint_error (e: EntrypointErrors.t): 'a = raise_error (Entrypoint e)
+
 let generic_error (e: GenericErrors.t): 'a = raise_error (Generic e)
 
 let internal_err (message: string): 'a = raise_error (Internal message)
-
-let austral_raise (kind: error_kind) (text: err_text): 'a =
-  raise_error (Unconverted (kind, text))
 
 let err (message: string): 'a =
   raise_error (Unconverted (GenericError, [Text message]))
