@@ -4,6 +4,8 @@ so that two builds of the compiler can be compared.
 
   equivalence.py snapshot COMPILER OUTDIR    run COMPILER over the corpus
   equivalence.py compare OUTDIR_A OUTDIR_B   list the programs that differ
+  equivalence.py compare --normalize-ids OUTDIR_A OUTDIR_B
+                                             the same, after renumbering generated names
 
 The corpus is every end-to-end test (test-programs/suites/*/*) and the standard
 library with its tests (the module list in standard/Makefile). For each program
@@ -11,6 +13,12 @@ the snapshot keeps the exit status, the generated C, stdout and stderr.
 
 A refactoring step must leave the snapshot unchanged. `compare` exits 1 when
 any program differs, and prints a diff of the first few.
+
+The compiler numbers the names it generates (decl_286, mono_13, _t127) from
+global counters, in the order it allocates them. A step that only changes that
+order changes the numbers and nothing else. `--normalize-ids` renumbers each
+kind of generated name by first appearance in the file before comparing. The
+renumbering is one-to-one, so it cannot hide any other difference.
 """
 import concurrent.futures
 import difflib
@@ -19,6 +27,7 @@ import os
 import pathlib
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -27,6 +36,20 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 SUITES = ROOT / "test-programs" / "suites"
 STANDARD = ROOT / "standard"
 FILES = ("exit", "out.c", "stdout", "stderr")
+# Generated names: a fixed prefix or a suffix, then the counter's value.
+GENERATED = re.compile(r"\b(?:(decl_|mono_|meth_|_t)|([A-Za-z_][A-Za-z0-9_]*?_tmp_ref))(\d+)\b")
+
+
+def normalize_ids(text: str) -> str:
+    seen: dict[tuple[str, str], int] = {}
+
+    def rename(match: re.Match) -> str:
+        kind = match.group(1) or "_tmp_ref"
+        stem = match.group(1) or match.group(2)
+        index = seen.setdefault((kind, match.group(3)), len([k for k in seen if k[0] == kind]))
+        return f"{stem}{index}"
+
+    return GENERATED.sub(rename, text)
 
 
 def suite_commands() -> list[tuple[str, list[str]]]:
@@ -92,13 +115,19 @@ def snapshot(compiler: str, outdir: pathlib.Path) -> None:
     print(f"programs {len(names)}, with generated C {with_c}, without {len(names) - with_c}")
 
 
-def read_index(outdir: pathlib.Path) -> dict[str, list[str]]:
-    rows = (line.split("\t") for line in (outdir / "index.tsv").read_text().splitlines())
-    return {row[0]: row[1:] for row in rows}
+def read_index(outdir: pathlib.Path, normalize: bool) -> dict[str, list[str]]:
+    rows = [line.split("\t") for line in (outdir / "index.tsv").read_text().splitlines()]
+    if not normalize:
+        return {row[0]: row[1:] for row in rows}
+    index = {}
+    for row in rows:
+        text = normalize_ids((outdir / row[0] / "out.c").read_text(errors="replace"))
+        index[row[0]] = [row[1], hashlib.sha256(text.encode()).hexdigest()[:16], *row[3:]]
+    return index
 
 
-def compare(a: pathlib.Path, b: pathlib.Path) -> int:
-    index_a, index_b = read_index(a), read_index(b)
+def compare(a: pathlib.Path, b: pathlib.Path, normalize: bool) -> int:
+    index_a, index_b = read_index(a, normalize), read_index(b, normalize)
     differing = []
     for name in sorted(index_a.keys() | index_b.keys()):
         if index_a.get(name) != index_b.get(name):
@@ -109,17 +138,24 @@ def compare(a: pathlib.Path, b: pathlib.Path) -> int:
         print(f"DIFFERS {name}: {' '.join(parts)}")
     for name, parts in differing[:3]:
         for part in parts:
-            old = (a / name / part).read_text(errors="replace").splitlines()
-            new = (b / name / part).read_text(errors="replace").splitlines()
+            old = (a / name / part).read_text(errors="replace")
+            new = (b / name / part).read_text(errors="replace")
+            if normalize and part == "out.c":
+                old, new = normalize_ids(old), normalize_ids(new)
+            old, new = old.splitlines(), new.splitlines()
             for line in list(difflib.unified_diff(old, new, f"a/{name}/{part}", f"b/{name}/{part}", lineterm="", n=1))[:30]:
                 print(line)
     return 1 if differing else 0
 
 
 if __name__ == "__main__":
+    # Let `| head` close the pipe without a traceback.
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     if len(sys.argv) == 4 and sys.argv[1] == "snapshot":
         snapshot(sys.argv[2], pathlib.Path(sys.argv[3]))
     elif len(sys.argv) == 4 and sys.argv[1] == "compare":
-        sys.exit(compare(pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3])))
+        sys.exit(compare(pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3]), normalize=False))
+    elif len(sys.argv) == 5 and sys.argv[1:3] == ["compare", "--normalize-ids"]:
+        sys.exit(compare(pathlib.Path(sys.argv[3]), pathlib.Path(sys.argv[4]), normalize=True))
     else:
         sys.exit(__doc__)
