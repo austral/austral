@@ -15,8 +15,8 @@ let is_abort (name: qident): bool =
   let mn: module_name = source_module_name name
   and orig: identifier = original_name name
   in
-  (((mod_name_string mn) = "Austral.Pervasive")
-   && ((ident_string orig) = "abort"))
+  (((mod_name_string mn) = BuiltInNames.pervasive_module)
+   && ((ident_string orig) = BuiltInNames.abort_name))
 
 let rec ends_in_return (stmt: astmt): bool =
   match stmt with

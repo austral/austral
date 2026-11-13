@@ -240,7 +240,7 @@ and augment_fptr_call (ctx: expr_ctx) (name: identifier) (fn_ptr_ty: ty) (assert
   (* Then, we synthesize a parameter list from the function pointer type. The
      parameter names are fake, but this is so we can reuse the arity-checking,
      value parameter list-checking infrastructure we use elsewhere. *)
-  let params: value_parameter list = List.map (fun paramty -> ValueParameter (make_ident "fake", paramty)) paramtys in
+  let params: value_parameter list = List.map (fun paramty -> ValueParameter (make_ident BuiltInNames.fake_parameter_name, paramty)) paramtys in
   (* Check synthetic parameter list against argument list. *)
   let bindings = check_argument_list ctx name params args in
   (* Use the bindings to get the effective return type *)
@@ -882,17 +882,7 @@ and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (r
        expected types, so that constants are allowed to be used as
        arguments. This means we have to transform a `ty` into a type
        specifier. *)
-    let op_name =
-      match op with
-      | Add ->
-         "trappingAdd"
-      | Subtract ->
-         "trappingSubtract"
-      | Multiply ->
-         "trappingMultiply"
-      | Divide ->
-         "trappingDivide"
-    in
+    let op_name = BuiltInNames.arithmetic_method_name op in
     let op_qname = make_qident (pervasive_module_name, make_ident op_name, make_ident op_name) in
     let args: typed_arglist = TPositionalArglist [
                                   TCast (lhs', operand_ty);

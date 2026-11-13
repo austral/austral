@@ -82,33 +82,33 @@ let get_instance_def (ConcreteModuleBody (_, _, _, _, defs)) (name: identifier) 
 
 let make_pragma name args =
   let s = ident_string name in
-  if s = "Foreign_Import" then
+  if s = BuiltInNames.foreign_import_pragma_name then
     let raise_err () =
       declaration_error (PragmaArgumentError ForeignImport)
     in
     match args with
     | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
-       if equal_identifier a (make_ident "External_Name") then
+       if equal_identifier a (make_ident BuiltInNames.external_name_argument) then
          ForeignImportPragma f
        else
          raise_err ()
     | _ ->
        raise_err ()
   else
-    if s = "Foreign_Export" then
+    if s = BuiltInNames.foreign_export_pragma_name then
       let raise_err () =
         declaration_error (PragmaArgumentError ForeignExport)
       in
       match args with
       | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
-         if equal_identifier a (make_ident "External_Name") then
+         if equal_identifier a (make_ident BuiltInNames.external_name_argument) then
            ForeignExportPragma f
          else
            raise_err ()
       | _ ->
          raise_err ()
     else
-      if s = "Unsafe_Module" then
+      if s = BuiltInNames.unsafe_module_pragma_name then
         let raise_err () =
           declaration_error (PragmaArgumentError UnsafeModule)
         in

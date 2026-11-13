@@ -101,9 +101,9 @@ let rec lift (stmt: Ast.astmt): AstLC.astmt =
      let idx =
        Ast.QTypeSpecifier (
            make_qident (
-               make_mod_name "Austral.Pervasive",
-               make_ident "Index",
-               make_ident "Index"
+               BuiltIn.pervasive_module_name,
+               make_ident (BuiltInNames.type_name BuiltInNames.Index),
+               make_ident (BuiltInNames.type_name BuiltInNames.Index)
              ),
            []
          )

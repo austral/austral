@@ -83,9 +83,9 @@ let entrypoint_code root_cap_mono_id exit_code_mono_id id =
    ^ "    au_store_cli_args(argc, argv);\n"
    ^ "    " ^ exit_code ^ " result = " ^ f ^ "((" ^ (gen_mono_id root_cap_mono_id) ^ "){ .value = false });\n"
    ^ "    switch(result.tag) {\n"
-   ^ "        case " ^ exit_code ^ "_tag_ExitSuccess:\n"
+   ^ "        case " ^ exit_code ^ "_tag_" ^ BuiltInNames.exit_success_name ^ ":\n"
    ^ "            return 0;\n"
-   ^ "        case " ^ exit_code ^ "_tag_ExitFailure:\n"
+   ^ "        case " ^ exit_code ^ "_tag_" ^ BuiltInNames.exit_failure_name ^ ":\n"
    ^ "            return 1;\n"
    ^ "    }\n"
    ^ "}")
@@ -97,15 +97,15 @@ let empty_entrypoint_code (entrypoint_id: decl_id) (exit_code_id: mono_id): stri
    ^ "    au_store_cli_args(argc, argv);\n"
    ^ "    " ^ exit_code ^ " result = " ^ f ^ "();\n"
    ^ "    switch(result.tag) {\n"
-   ^ "        case " ^ exit_code ^ "_tag_ExitSuccess:\n"
+   ^ "        case " ^ exit_code ^ "_tag_" ^ BuiltInNames.exit_success_name ^ ":\n"
    ^ "            return 0;\n"
-   ^ "        case " ^ exit_code ^ "_tag_ExitFailure:\n"
+   ^ "        case " ^ exit_code ^ "_tag_" ^ BuiltInNames.exit_failure_name ^ ":\n"
    ^ "            return 1;\n"
    ^ "    }\n"
    ^ "}")
 
 let get_root_capability_monomorph (env: env): mono_id =
-  let mn: module_name = make_mod_name "Austral.Pervasive"
+  let mn: module_name = pervasive_module_name
   and n: identifier = make_ident BuiltInNames.root_capability_name in
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with
@@ -119,7 +119,7 @@ let get_root_capability_monomorph (env: env): mono_id =
      internal_err "Can't find the RootCapability type in the environment."
 
 let get_exit_code_monomorph (env: env): mono_id =
-  let mn: module_name = make_mod_name "Austral.Pervasive"
+  let mn: module_name = pervasive_module_name
   and n: identifier = make_ident BuiltInNames.exit_code_name in
   let sn: sident = make_sident mn n in
   match get_decl_by_name env sn with

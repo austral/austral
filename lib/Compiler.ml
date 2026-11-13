@@ -106,8 +106,8 @@ let finish (compiler: compiler) (entrypoint: (module_name * identifier) option):
   let (Compiler (env, units)) = compiler in
   (* The wrapper functions. *)
   let (env, decls): env * mdecl list = monomorphize_wrappers env in
-  let wrapper_unit: c_unit = gen_module env (MonoModule (make_mod_name "Austral.Wrappers", decls)) in
-  let wrappers: c_unit = CUnit ("Wrappers", all_wrappers env) in
+  let wrapper_unit: c_unit = gen_module env (MonoModule (make_mod_name BuiltInNames.wrappers_module, decls)) in
+  let wrappers: c_unit = CUnit (BuiltInNames.wrappers_unit_name, all_wrappers env) in
   let entrypoint: string option =
     Option.map (fun (mn, i) -> entrypoint_code env (make_qident (mn, i, i))) entrypoint
   in

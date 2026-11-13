@@ -12,6 +12,8 @@
     Use these names qualified. Opening this module would shadow the
     constructors of [Type.ty]. *)
 
+open Common
+
 (* Types *)
 
 (** The types the type parser recognises by their name. *)
@@ -51,6 +53,11 @@ val span_mut_name : string
 val pervasive_module : string
 val memory_module : string
 
+(** The module the monomorphs of exported functions are generated in, and the
+    C unit that holds the wrappers of those functions. *)
+val wrappers_module : string
+val wrappers_unit_name : string
+
 (* Austral.Memory *)
 
 val address_name : string
@@ -58,9 +65,30 @@ val pointer_name : string
 
 (* Austral.Pervasive *)
 
+val abort_name : string
 val root_capability_name : string
 val exit_code_name : string
+val exit_success_name : string
+val exit_failure_name : string
+
+(** The method an arithmetic operator is a call to. *)
+val arithmetic_method_name : arithmetic_operator -> string
 
 (** The names every module imports from [Austral.Pervasive], in the order
     they are imported. *)
 val pervasive_import_names : string list
+
+(* Pragmas *)
+
+val foreign_import_pragma_name : string
+val foreign_export_pragma_name : string
+val unsafe_module_pragma_name : string
+
+(** The one named argument of the two foreign pragmas. *)
+val external_name_argument : string
+
+(* Names the compiler makes up *)
+
+(** A function pointer type has no parameter names. The type checker gives
+    every parameter this one. *)
+val fake_parameter_name : string

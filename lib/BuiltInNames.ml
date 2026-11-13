@@ -70,6 +70,11 @@ let span_mut_name: string = "Span!"
 let pervasive_module: string = "Austral.Pervasive"
 let memory_module: string = "Austral.Memory"
 
+(* The module the monomorphs of exported functions are generated in, and the
+   C unit that holds the wrappers of those functions. *)
+let wrappers_module: string = "Austral.Wrappers"
+let wrappers_unit_name: string = "Wrappers"
+
 (* Austral.Memory *)
 
 let address_name: string = "Address"
@@ -166,3 +171,14 @@ let pervasive_import_names: string list = [
     "Remainder";
     "rem"
   ]
+
+(* Pragmas *)
+
+let foreign_import_pragma_name: string = "Foreign_Import"
+let foreign_export_pragma_name: string = "Foreign_Export"
+let unsafe_module_pragma_name: string = "Unsafe_Module"
+let external_name_argument: string = "External_Name"
+
+(* Names the compiler makes up *)
+
+let fake_parameter_name: string = "fake"
