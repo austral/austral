@@ -9,7 +9,12 @@ so that two builds of the compiler can be compared.
 
 The corpus is every end-to-end test (test-programs/suites/*/*) and the standard
 library with its tests (the module list in standard/Makefile). For each program
-the snapshot keeps the exit status, the generated C, stdout and stderr.
+the snapshot keeps the exit status, the generated C, stdout, stderr, the
+error.html the compiler writes on failure, and the names of the files it leaves
+in its working directory.
+
+calltree.html is listed by name only. It is a trace of the compiler's own
+function calls, so any change of structure changes its contents.
 
 A refactoring step must leave the snapshot unchanged. `compare` exits 1 when
 any program differs, and prints a diff of the first few.
@@ -35,7 +40,7 @@ import tempfile
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 SUITES = ROOT / "test-programs" / "suites"
 STANDARD = ROOT / "standard"
-FILES = ("exit", "out.c", "stdout", "stderr")
+FILES = ("exit", "out.c", "stdout", "stderr", "error.html", "files")
 # Generated names: a fixed prefix or a suffix, then the counter's value.
 GENERATED = re.compile(r"\b(?:(decl_|mono_|meth_|_t|tmp)|([A-Za-z_][A-Za-z0-9_]*?_tmp_ref))(\d+)\b")
 
@@ -91,10 +96,14 @@ def run_one(compiler: str, outdir: pathlib.Path, name: str, words: list[str]) ->
         done = subprocess.run(command, cwd=cwd, capture_output=True, timeout=600)
         generated = pathlib.Path(c_path).read_bytes() if os.path.exists(c_path) else b""
         scrub = lambda data: data.replace(cwd.encode(), b"$CWD").replace(str(ROOT).encode(), b"$ROOT")
+        error_page = pathlib.Path(cwd, "error.html")
+        left_behind = sorted(f.name for f in pathlib.Path(cwd).iterdir() if f.name != "out.c")
         (target / "exit").write_text(f"{done.returncode}\n")
         (target / "out.c").write_bytes(scrub(generated))
         (target / "stdout").write_bytes(scrub(done.stdout))
         (target / "stderr").write_bytes(scrub(done.stderr))
+        (target / "error.html").write_bytes(scrub(error_page.read_bytes()) if error_page.exists() else b"")
+        (target / "files").write_text("".join(name + "\n" for name in left_behind))
     return name
 
 
@@ -131,7 +140,8 @@ def compare(a: pathlib.Path, b: pathlib.Path, normalize: bool) -> int:
     differing = []
     for name in sorted(index_a.keys() | index_b.keys()):
         if index_a.get(name) != index_b.get(name):
-            parts = [f for f, x, y in zip(FILES, index_a.get(name, [""] * 4), index_b.get(name, [""] * 4)) if x != y]
+            blank = [""] * len(FILES)
+            parts = [f for f, x, y in zip(FILES, index_a.get(name, blank), index_b.get(name, blank)) if x != y]
             differing.append((name, parts))
     print(f"programs {len(index_a.keys() | index_b.keys())}, differing {len(differing)}")
     for name, parts in differing:
