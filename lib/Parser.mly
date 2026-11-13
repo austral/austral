@@ -408,7 +408,7 @@ int_constant:
   | HEX_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_hexadecimal $1) }
   | BIN_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_binary $1) }
   | OCT_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_octal $1) }
-  | CHAR_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_character $1) }
+  | CHAR_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_character $1 (parse_ascii_char (remove_char $1 '\''))) }
   ;
 
 float_constant:

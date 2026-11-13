@@ -29,9 +29,6 @@ type replacement = { text: string; search: string; replacement: string }
 (** Replace a string with another in a text. *)
 val search_replace : replacement -> string
 
-(** Remove the first n characters of a string. *)
-val remove_leading : string -> int -> string
-
 (** Parse an ASCII character into its integer code, handling escape sequences. *)
 val parse_ascii_char : string -> int
 

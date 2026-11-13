@@ -47,7 +47,9 @@ val of_binary : string -> int_literal
 
 val of_octal : string -> int_literal
 
-val of_character : string -> int_literal
+(** The second argument is the character's code. The parser works it out,
+    because a character token that is not one character is a parse error. *)
+val of_character : string -> int -> int_literal
 
 val of_float : string -> float_literal
 

@@ -27,8 +27,11 @@ type float_literal = {
 }
 [@@deriving show]
 
+(* This module depends on nothing else in the compiler: the syntax tree carries
+   its records, and the modules that describe errors carry the syntax tree. *)
+
 let without_separators (written: string): string =
-  Util.remove_char written '\''
+  String.concat "" (String.split_on_char '\'' written)
 
 (* Issues #121 and #85: the digits after a `#x`, `#b` or `#o` prefix are read
    through OCaml's 63-bit `int`. A literal from 2^62 to 2^63 - 1 silently
@@ -36,7 +39,8 @@ let without_separators (written: string): string =
    `Failure "int_of_string"` (#85). Tests pin both. Reading the digits with
    `Z.of_string` here fixes both. *)
 let value_through_native_int (ocaml_prefix: string) (written: string): Z.t =
-  let digits: string = Util.remove_leading (without_separators written) 2 in
+  let unseparated: string = without_separators written in
+  let digits: string = String.sub unseparated 2 (String.length unseparated - 2) in
   Z.of_int (int_of_string (ocaml_prefix ^ digits))
 
 let of_decimal (written: string): int_literal =
@@ -53,10 +57,8 @@ let of_binary (written: string): int_literal =
 let of_octal (written: string): int_literal =
   { written; radix = Octal; value = value_through_native_int "0o" written }
 
-let of_character (written: string): int_literal =
-  (* The quotes around the character are the same character as the digit
-     separator. *)
-  { written; radix = Character; value = Z.of_int (Util.parse_ascii_char (without_separators written)) }
+let of_character (written: string) (code: int): int_literal =
+  { written; radix = Character; value = Z.of_int code }
 
 let of_float (written: string): float_literal =
   let length: int = String.length written in
