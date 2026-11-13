@@ -63,7 +63,7 @@ metrics() {
       "$(count 'raise_error|(^|[^_a-zA-Z])(parse|cli|type|linearity|declaration|entrypoint|generic)_error(_at)? |internal_err|failwith|(^|[^_a-zA-Z])raise |assert false' "$f")" \
       "$(count '(^|[^_a-zA-Z])try($|[^_a-zA-Z])|adorn_error_with_[a-z_]+|with_errors' "$f")" \
       "$(count '= *ref ([a-z0-9("\[]|\[\])|^\s*ref \(|Hashtbl\.(create|add|replace)|^\s*mutable [a-z_]+ *:|^let [a-z_]+ *(: *[A-Za-z_.]+ *)?= *Buffer\.create' "$f")" \
-      "$(count 'open_out|open_in|(^|[^_a-zA-Z])(print_(string|endline|newline|int|char|float|bytes)|prerr_[a-z]+|read_line|input_(line|char|value|byte)|really_input[a-z_]*|output_(string|char|bytes|value|byte))|Printf\.[a-z]*printf|Format\.[a-z]*printf|(^|[^_a-zA-Z.])exit( |$|\()|std(in|out|err)[^_a-zA-Z]|In_channel|Out_channel|Sys\.|(^|[^_a-zA-Z])Unix($|[^_a-zA-Z])|Filename\.|write_string_to_file|read_file_to_string|run_command' "$f")" \
+      "$(count 'open_out|open_in|(^|[^_a-zA-Z])(print_(string|endline|newline|int|char|float|bytes)|prerr_[a-z]+|read_line|input_(line|char|value|byte)|really_input[a-z_]*|output_(string|char|bytes|value|byte))|Printf\.[a-z]*printf|Format\.[a-z]*printf|(^|[^_a-zA-Z.])exit( |$|\()|(^|[^_a-zA-Z])flush( |$|\()|In_channel|Out_channel|Sys\.|(^|[^_a-zA-Z])Unix($|[^_a-zA-Z])|Filename\.|write_string_to_file|read_file_to_string|run_command' "$f")" \
       "$(count '^\s*\| _ ->' "$f")" \
       "$(count_type_strings "$f")" \
       "$(count 'internal_err' "$f")" \
