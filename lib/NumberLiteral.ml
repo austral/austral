@@ -11,18 +11,21 @@ type radix =
   | Binary
   | Octal
   | Character
+[@@deriving show]
 
 type int_literal = {
   written: string;
   radix: radix;
-  value: Z.t;
+  value: Z.t [@printer Z.pp_print];
 }
+[@@deriving show]
 
 type float_literal = {
   written: string;
   fraction_digits: int;
   has_exponent: bool;
 }
+[@@deriving show]
 
 let without_separators (written: string): string =
   Util.remove_char written '\''

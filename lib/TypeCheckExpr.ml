@@ -487,9 +487,9 @@ let rec augment_expr (ctx: expr_ctx) (asserted_ty: ty option) (expr: aexpr): tex
   | BoolConstant b ->
      TBoolConstant b
   | IntConstant i ->
-     TIntConstant (NumberLiteral.int_text i)
+     TIntConstant i
   | FloatConstant f ->
-     TFloatConstant (NumberLiteral.float_text f)
+     TFloatConstant f
   | StringConstant s ->
      TStringConstant s
   | Variable name ->

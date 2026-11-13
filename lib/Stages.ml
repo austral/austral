@@ -499,8 +499,8 @@ module Tast = struct
   and texpr =
     | TNilConstant
     | TBoolConstant of bool
-    | TIntConstant of string
-    | TFloatConstant of string
+    | TIntConstant of NumberLiteral.int_literal
+    | TFloatConstant of NumberLiteral.float_literal
     | TStringConstant of escaped_string
     | TConstVar of qident * ty
     | TParamVar of identifier * ty

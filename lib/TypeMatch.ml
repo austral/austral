@@ -232,13 +232,6 @@ let match_typarams (ctx: ctx) (typarams: typarams) (args: ty list): type_binding
   let typarams' = List.map (fun tp -> TyVar (typaram_to_tyvar tp)) (typarams_as_list typarams) in
   match_type_list ctx typarams' args
 
-let parse_bigint (s: string): Z.t =
-  try
-    Z.of_string s
-  with
-    | Invalid_argument _ ->
-      internal_err ("Failed to parse '" ^ s ^ "' as a big int. This is a bug in the parser.")
-
 (* Check the given value fits in the given type. *)
 let fits (signed : signedness) (width : integer_width) (n : Z.t) : bool =
   let min_bound, max_bound = match signed, width with
@@ -257,11 +250,12 @@ let fits (signed : signedness) (width : integer_width) (n : Z.t) : bool =
   in
   Z.compare min_bound n <= 0 && Z.compare n max_bound <= 0
 
-let match_int_type_with_value (signedness: signedness) (width: integer_width) (value: string): type_bindings =
-   (* Parse the constant as a big integer. *)
-   let i: Z.t = parse_bigint value in
+let match_int_type_with_value (signedness: signedness) (width: integer_width) (literal: NumberLiteral.int_literal): type_bindings =
+   (* The message shows the literal's text, not its value: a decimal literal
+      appears as it was written. *)
+   let value: string = NumberLiteral.int_text literal in
    (* Check that it fits *)
-   if fits signedness width i then
+   if fits signedness width literal.value then
       empty_bindings
    else
       type_error (IntegerDoesNotFit { value; ty = Integer (signedness, width) })

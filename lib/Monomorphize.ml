@@ -132,9 +132,9 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
   | TBoolConstant b ->
      (MBoolConstant b, env)
   | TIntConstant i ->
-     (MIntConstant i, env)
+     (MIntConstant (NumberLiteral.int_text i), env)
   | TFloatConstant f ->
-     (MFloatConstant f, env)
+     (MFloatConstant (NumberLiteral.float_text f), env)
   | TStringConstant s ->
      (MStringConstant s, env)
   | TConstVar (name, ty) ->
