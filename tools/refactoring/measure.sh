@@ -31,6 +31,18 @@ count() { # regex file
   grep -cE -- "$1" "$ROOT/$2" || true
 }
 
+# Lines inside a type or exception definition that use string as a field or a
+# constructor argument. A definition starts at `type` or `exception` and ends
+# at the next item that is not a type (`and` continues a type definition).
+count_type_strings() { # file
+  awk '
+    /^[ \t]*(type|exception)[ \t]/ { in_type = 1 }
+    /^[ \t]*(let|val|external|open|include|module|end|class)([ \t]|$)/ { in_type = 0 }
+    in_type && /(of|\*|:) string( |;|$|\))/ { n++ }
+    END { print n + 0 }
+  ' "$ROOT/$1"
+}
+
 # One row per file. Columns:
 #   raise     places that raise: austral_raise, err, internal_err, Errors.x, failwith, raise, assert false
 #   internal  the part of raise that is internal_err: a state the code believes cannot happen
@@ -50,7 +62,7 @@ metrics() {
       "$(count '= *ref ([a-z0-9("\[]|\[\])|^\s*ref \(|Hashtbl\.(create|add|replace)|^\s*mutable [a-z_]+ *:|^let [a-z_]+ *(: *[A-Za-z_.]+ *)?= *Buffer\.create' "$f")" \
       "$(count 'open_out|open_in|print_string|print_endline|prerr_|Printf\.e?printf|Sys\.command|Unix\.|(^|[^_a-zA-Z])exit |output_string|write_string_to_file|read_file_to_string|run_command|Sys\.remove|Filename\.temp' "$f")" \
       "$(count '^\s*\| _ ->' "$f")" \
-      "$(count '(of|\*|:) string( |;|$|\))' "$f")" \
+      "$(count_type_strings "$f")" \
       "$(count 'internal_err' "$f")" \
       "$(count '(^|[^_a-zA-Z])err [("]' "$f")"
   done

@@ -28,7 +28,6 @@ open ReturnCheck
 open LinearityCheck
 open Entrypoint
 open ExportInstantiation
-open HtmlError
 
 let append_import_to_interface (ci: concrete_module_interface) (import: concrete_import_list): concrete_module_interface =
   let (ConcreteModuleInterface (mn, docstring, imports, decls)) = ci in
@@ -115,9 +114,6 @@ let compile_entrypoint c mn i =
 let fake_mod_source (is: string) (bs: string): module_source =
   TwoFileModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
 
-let dump_and_die _: 'a =
-  exit (-1)
-
 let post_compile (compiler: compiler): compiler =
   let env: env = cenv compiler in
   let (env, decls): env * mdecl list = monomorphize_wrappers env in
@@ -128,30 +124,11 @@ let post_compile (compiler: compiler): compiler =
   let code: string = (compiler_code compiler) ^ "\n" ^ unit_code ^ "\n" ^ wrapper_code in
   Compiler (env, code)
 
-let empty_compiler: compiler =
+let empty_compiler (): compiler =
   (* We have to compile the Austral.Pervasive module, followed by
      Austral.Memory, since the latter uses declarations from the former. *)
   let env: env = empty_env in
   (* Start with the C prelude. *)
   let c = Compiler (env, prelude_c) in
-  let c =
-    (* Handle errors during the compilation of the Austral,Pervasive
-       module. Otherwise, a typo in the source code of this module will cause a
-       fatal error due to an exception stack overflow (unsure why this
-       happens). *)
-    try
-      compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
-    with Austral_error error ->
-      Printf.eprintf "%s" (render_error_to_plain error);
-      html_error_dump error;
-      dump_and_die ()
-  in
-  let c =
-    try
-      compile_mod c (fake_mod_source memory_interface_source memory_body_source)
-    with Austral_error error ->
-      Printf.eprintf "%s" (render_error_to_plain error);
-      html_error_dump error;
-      dump_and_die ()
-  in
-  c
+  let c = compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source) in
+  compile_mod c (fake_mod_source memory_interface_source memory_body_source)

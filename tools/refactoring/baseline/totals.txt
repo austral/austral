@@ -5,6 +5,6 @@ catch 56
 state 15
 io 56
 wildcard 207
-strings 240
+strings 84
 internal 93
 adhoc 43

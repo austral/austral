@@ -8,7 +8,9 @@ open Identifier
 
 type compiler
 
-val empty_compiler : compiler
+(** The compiler after compiling the built-in modules. Raises [Austral_error]
+    if a built-in module does not compile. *)
+val empty_compiler : unit -> compiler
 
 val compiler_code : compiler -> string
 

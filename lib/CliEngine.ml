@@ -69,6 +69,20 @@ let parse_source_files (mods: mod_source list): (module_source list * source_map
 
 (* Execution *)
 
+(** Write the error to stderr and to error.html, then exit with a failure
+    status. *)
+let report_and_exit (mode: error_reporting_mode) (error: austral_error): 'a =
+  let text: string =
+    match mode with
+    | ErrorReportPlain ->
+       render_error_to_plain error
+    | ErrorReportJson ->
+       Yojson.Basic.pretty_to_string (render_error_to_json error)
+  in
+  Printf.eprintf "%s" text;
+  html_error_dump error;
+  exit (-1)
+
 let rec exec (cmd: cmd): unit =
   match cmd with
   | HelpCommand ->
@@ -123,23 +137,7 @@ and exec_compile (modules: mod_source list) (target: target) (error_reporting_mo
   try
     exec_target mods target
   with Austral_error error ->
-    (* Print errors *)
-    begin
-      match error_reporting_mode with
-      | ErrorReportPlain ->
-         let error: austral_error = try_adding_source_ctx error source_map in
-         Printf.eprintf "%s" (render_error_to_plain error);
-         html_error_dump error;
-         dump_and_die ()
-      | ErrorReportJson ->
-         let error: austral_error = try_adding_source_ctx error source_map in
-         Printf.eprintf "%s" (Yojson.Basic.pretty_to_string (render_error_to_json error));
-         html_error_dump error;
-         dump_and_die ()
-    end
-
-and dump_and_die _: unit =
-  exit (-1)
+    report_and_exit error_reporting_mode (try_adding_source_ctx error source_map)
 
 and try_adding_source_ctx (error: austral_error) (source_map: source_map): austral_error =
   let (AustralError { span; source_ctx; _ }) = error in
@@ -163,44 +161,30 @@ and exec_target (mods: module_source list) (target: target): unit =
   match target with
   | TypeCheck ->
      (* Compile everything, emit no code. *)
-     let _ = compile_multiple empty_compiler mods in
+     let _ = compile_multiple (empty_compiler ()) mods in
      ()
   | Executable { bin_path; entrypoint; } ->
-     exec_compile_to_bin mods bin_path entrypoint
+     let code: string = compile_to_c mods (Some entrypoint) in
+     (* Write the output to a temporary file. *)
+     let cfile: string = Filename.temp_file "austral_" ".c" in
+     write_string_to_file cfile code;
+     (* Invoke `cc`. *)
+     let _ = compile_c_code cfile bin_path in
+     ()
   | CStandalone { output_path; entrypoint; } ->
-     exec_compile_to_c mods output_path entrypoint
+     write_string_to_file output_path (compile_to_c mods entrypoint)
 
-and exec_compile_to_bin (mods: module_source list) (bin_path: string) (entrypoint: entrypoint): unit =
-  (* Compile everything to a C file. *)
-  let compiler = compile_multiple empty_compiler mods in
+(** Compile the modules to C. Without an entrypoint, the result is a
+    library. *)
+and compile_to_c (mods: module_source list) (entrypoint: entrypoint option): string =
+  let compiler = compile_multiple (empty_compiler ()) mods in
   (* Compile the wrapper functions *)
   let compiler = post_compile compiler in
-  (* Compile the entrypoint. *)
-  let compiler =
-    let (Entrypoint (module_name, name)) = entrypoint in
-    compile_entrypoint compiler module_name name
-  in
-  (* Write the output to a temporary file. *)
-  let cfile: string = Filename.temp_file "austral_" ".c" in
-  write_string_to_file cfile (compiler_code compiler);
-  (* Invoke `cc`. *)
-  let _ = compile_c_code cfile bin_path in
-  ()
-
-and exec_compile_to_c (mods: module_source list) (output_path: string) (entrypoint: entrypoint option): unit =
-  (* Compile everything to a C file. *)
-  let compiler = compile_multiple empty_compiler mods in
-  (* Compile the wrapper functions *)
-  let compiler = post_compile compiler in
-  (* Compile the entrypoint, if needed. *)
   let compiler =
     match entrypoint with
     | Some (Entrypoint (module_name, name)) ->
-       (* It's an executable. *)
        compile_entrypoint compiler module_name name
     | None ->
-       (* It's a library. *)
        compiler
   in
-  (* Write the output to the given file. *)
-  write_string_to_file output_path (compiler_code compiler)
+  compiler_code compiler
