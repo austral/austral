@@ -65,8 +65,10 @@ python3 equivalence.py compare OUT_A OUT_B
 | 指標 | 数 | 意味 |
 |---|---|---|
 | `raise` | 476 | 例外を投げる箇所。`austral_raise`、`err`、`internal_err`、`Errors.x`、`failwith`、`raise`、`assert false` |
+| `internal` | 93 | `raise` のうち、`internal_err` の数。「ここには来ないはず」とコードが考えている箇所である。型が、その状態を表せてしまっている |
+| `adhoc` | 43 | `raise` のうち、`err "..."` の数。名前のないエラーである |
 | `catch` | 56 | 例外を捕まえるか、位置を付け直す箇所。`try`、`adorn_error_with_*` |
-| `state` | 32 | 可変の状態。`ref`、`Hashtbl`、`mutable` |
+| `state` | 13 | 可変の状態。`ref` のセルを作る箇所、`Hashtbl` を作る箇所、`mutable` な欄の宣言 |
 | `io` | 56 | 入出力とプロセスの制御。ファイル、表示、`Sys.command`、`exit` |
 | `wildcard` | 207 | 何でも受ける match の枝。<code>&#124; _ -></code> |
 | `strings` | 240 | 型の定義の中で、欄や引数に `string` を使っている箇所 |
@@ -74,6 +76,20 @@ python3 equivalence.py compare OUT_A OUT_B
 数え方は正規表現である。厳密な構文解析ではない。同じ数え方で前後を比べるための数であり、絶対値に意味を持たせすぎない。
 
 入出力は、すでに端に寄っている。56 箇所のうち 40 箇所が `lib/CliEngine.ml` にある。残りは `lib/Util.ml` に 6、`lib/Cli.ml` に 4、`lib/Compiler.ml` に 4、`lib/HtmlError.ml` と `lib/Reporter.ml` に 1 ずつである。
+
+例外を投げる 476 箇所の内訳は、次のとおりである。
+
+| 仕組み | 数 |
+|---|---|
+| `austral_raise`。文面を作って投げる関数の定義。エラーの種類の数に当たる | 145 |
+| `Errors.x`。その関数を呼ぶ箇所 | 239 |
+| `internal_err` | 93 |
+| `err "..."` | 43 |
+| `raise` | 11 |
+
+1つの行に2つの仕組みが現れることがあるので、合計は 476 を超える。
+
+`internal_err` が多いのは、`lib/Monomorphize.ml`（13）、`lib/TypeStripping.ml`（12）、`lib/Env.ml`（12）、`lib/CodeGen.ml`（10）、`lib/LinearityCheck.ml`（9）である。
 
 例外を投げる箇所が多いのは、`lib/TypeErrors.ml`（55）、`lib/TypeCheckExpr.ml`（50）、`lib/TypingPass.ml`（34）、`lib/CombiningPass.ml`（28）、`lib/TypeMatch.ml`（26）である。
 

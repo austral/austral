@@ -31,28 +31,32 @@ count() { # regex file
 
 # One row per file. Columns:
 #   raise     places that raise: austral_raise, err, internal_err, Errors.x, failwith, raise, assert false
+#   internal  the part of raise that is internal_err: a state the code believes cannot happen
+#   adhoc     the part of raise that is err with a bare string: an error with no name
 #   catch     places that catch or re-label: try, adorn_error_with_*, with_errors
-#   state     mutable state: ref cells, Hashtbl, mutable fields
+#   state     mutable state: creating a ref cell or a Hashtbl, declaring a mutable field
 #   io        input, output and process control: files, printing, Sys.command, exit
 #   wildcard  match arms that catch everything: | _ ->
 #   strings   string used as a field or constructor argument in a type definition
 metrics() {
-  printf 'file\tlines\traise\tcatch\tstate\tio\twildcard\tstrings\n'
+  printf 'file\tlines\traise\tcatch\tstate\tio\twildcard\tstrings\tinternal\tadhoc\n'
   sources | while read -r f; do
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$f" \
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$f" \
       "$(wc -l < "$ROOT/$f")" \
       "$(count 'austral_raise|(^|[^_a-zA-Z])err [("]|internal_err|Errors\.[a-z_]+|failwith|(^|[^_a-zA-Z])raise |assert false' "$f")" \
       "$(count '(^|[^_a-zA-Z])try($|[^_a-zA-Z])|adorn_error_with_[a-z_]+|with_errors' "$f")" \
-      "$(count '= ref |ref \(|Hashtbl\.|(^|[^_a-zA-Z])mutable ' "$f")" \
+      "$(count '= *ref ([a-z0-9("\[]|\[\])|^\s*ref \(|Hashtbl\.(create|add|replace)|^\s*mutable [a-z_]+ *:' "$f")" \
       "$(count 'open_out|open_in|print_string|print_endline|prerr_|Printf\.e?printf|Sys\.command|Unix\.|(^|[^_a-zA-Z])exit |output_string|write_string_to_file|read_file_to_string|run_command|Sys\.remove|Filename\.temp' "$f")" \
       "$(count '^\s*\| _ ->' "$f")" \
-      "$(count '(of|\*|:) string( |;|$|\))' "$f")"
+      "$(count '(of|\*|:) string( |;|$|\))' "$f")" \
+      "$(count 'internal_err' "$f")" \
+      "$(count '(^|[^_a-zA-Z])err [("]' "$f")"
   done
 }
 
 totals() { # metrics-file
   awk -F'\t' 'NR > 1 { for (i = 2; i <= NF; i++) s[i] += $i; n++ }
-    END { printf "files %d\nlines %d\nraise %d\ncatch %d\nstate %d\nio %d\nwildcard %d\nstrings %d\n", n, s[2], s[3], s[4], s[5], s[6], s[7], s[8] }' "$1"
+    END { printf "files %d\nlines %d\nraise %d\ncatch %d\nstate %d\nio %d\nwildcard %d\nstrings %d\ninternal %d\nadhoc %d\n", n, s[2], s[3], s[4], s[5], s[6], s[7], s[8], s[9], s[10] }' "$1"
 }
 
 # Fragile matches: a match that a new constructor would fall into without a
