@@ -1,10 +1,10 @@
-files 76
-lines 14944
+files 75
+lines 14599
 raise 466
 catch 56
-state 14
-io 56
+state 12
+io 52
 wildcard 206
-strings 230
+strings 220
 internal 92
 adhoc 42

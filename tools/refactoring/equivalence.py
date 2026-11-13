@@ -49,6 +49,7 @@ EXAMPLES = ROOT / "examples"
 CLI_TESTS = ROOT / "test-programs" / "cli"
 CLI_NOT_INPUTS = {"args.txt", "expected.txt", "README.md"}
 CALLTREE_LINE = "Compiler call tree printed to calltree.html\n"
+CALLTREE_LINK = "            <a target='_blank' href='./calltree.html'>\n                Compiler Call Tree</a>\n"
 FILES = ("exit", "out.c", "stdout", "stderr", "error.html", "files")
 # Generated names: a fixed prefix or a suffix, then the counter's value.
 GENERATED = re.compile(r"\b(?:(decl_|mono_|meth_|_t|tmp)|([A-Za-z_][A-Za-z0-9_]*?_tmp_ref))(\d+)\b")
@@ -177,6 +178,8 @@ def view(outdir: pathlib.Path, name: str, part: str, normalize: bool, ignore_cal
         text = normalize_ids(text)
     if ignore_calltree and part == "stdout":
         text = text.replace(CALLTREE_LINE, "")
+    if ignore_calltree and part == "error.html":
+        text = text.replace(CALLTREE_LINK, "")
     if ignore_calltree and part == "files":
         text = "".join(line + "\n" for line in text.splitlines() if line != "calltree.html")
     return text

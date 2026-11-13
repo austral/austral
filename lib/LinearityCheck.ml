@@ -8,7 +8,6 @@ open Identifier
 open Stages.Tast
 open Type
 open TypeSystem
-open Reporter
 open Error
 
 (* Data structures *)
@@ -756,23 +755,18 @@ let linearity_check (params: value_parameter list) (body: tstmt): unit =
 (* Linearity checking of whole modules *)
 
 let rec check_module_linearity (TypedModule (_, decls)): unit =
-  with_frame "Linearity Checker"
-    (fun _ ->
-      let _ = List.map check_decl_linearity decls in
-      ())
+  let _ = List.map check_decl_linearity decls in
+  ()
 
 and check_decl_linearity (decl: typed_decl): unit =
   match decl with
-  | TFunction (_, _, name, _, params, _, b, _) ->
-     with_frame ("Checking linearity of function " ^ (ident_string name))
-       (fun _ ->
-         linearity_check params b)
+  | TFunction (_, _, _, _, params, _, b, _) ->
+     (linearity_check params b)
   | TInstance (_, _, _, _, _, methods, _) ->
      let _ = List.map check_method_linearity methods in
      ()
   | _ ->
      ()
 
-and check_method_linearity (TypedMethodDef (_, name, params, _, b)) =
-  with_frame ("Checking linearity of method " ^ (ident_string name))
-    (fun _ -> linearity_check params b)
+and check_method_linearity (TypedMethodDef (_, _, params, _, b)) =
+  linearity_check params b

@@ -83,7 +83,7 @@ let bindings_list (TypeBindings m) =
 
 let empty_bindings = TypeBindings BindingsMap.empty
 
-let show_bindings (TypeBindings m) =
+let show_type_bindings (TypeBindings m) =
   let show_binding (tp, t) =
     (show_type_parameter tp) ^ " => " ^ (show_ty t)
   in
@@ -190,5 +190,3 @@ let rec bindings_from_list lst =
    empty_bindings
 
 let pp_type_bindings _ _ = ()
-
-let show_type_bindings = show_bindings

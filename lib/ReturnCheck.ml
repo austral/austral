@@ -8,7 +8,6 @@
 open Identifier
 open Stages.Ast
 open Stages.Combined
-open Reporter
 open Error
 open Span
 
@@ -67,47 +66,45 @@ let rec ends_in_return (stmt: astmt): bool =
      false
 
 let check_ends_in_return (CombinedModule { decls; _ }): unit =
-  with_frame "Return check"
-    (fun _ ->
-      let check_method_ends_in_return (span: span) (CMethodDef (name, _, _, _, _, body)): unit =
-        adorn_error_with_span span
-          (fun _ ->
-            if ends_in_return body then
-              ()
-            else
-              Errors.missing_return
-                ~name:name
-                ~declaration:"method")
-      in
-      let check_decl_ends_in_return (decl: combined_definition): unit =
-        match decl with
-        | CConstant _ ->
-           ()
-        | CRecord _ ->
-           ()
-        | CUnion _ ->
-           ()
-        | CFunction (span, _, name, _, _, _, body, _, pragmas) ->
-           adorn_error_with_span span
-             (fun _ ->
-               match pragmas with
-               | [] ->
-                  (* No pragmas: regular function. *)
-                  if ends_in_return body then
-                    ()
-                  else
-                    Errors.missing_return
-                      ~name
-                      ~declaration:"function"
-               | _ ->
-                  (* Yes pragmas: foreign function, ignore the body. *)
-                  ())
-        | CTypeclass _ ->
-           ()
-        | CInstance (span, _, _, _, _, methods, _) ->
-           let _ = List.map (check_method_ends_in_return span) methods in
-           ()
-      in
-      let _ = List.map check_decl_ends_in_return decls
-      in
-      ())
+  let check_method_ends_in_return (span: span) (CMethodDef (name, _, _, _, _, body)): unit =
+    adorn_error_with_span span
+      (fun _ ->
+        if ends_in_return body then
+          ()
+        else
+          Errors.missing_return
+            ~name:name
+            ~declaration:"method")
+  in
+  let check_decl_ends_in_return (decl: combined_definition): unit =
+    match decl with
+    | CConstant _ ->
+       ()
+    | CRecord _ ->
+       ()
+    | CUnion _ ->
+       ()
+    | CFunction (span, _, name, _, _, _, body, _, pragmas) ->
+       adorn_error_with_span span
+         (fun _ ->
+           match pragmas with
+           | [] ->
+              (* No pragmas: regular function. *)
+              if ends_in_return body then
+                ()
+              else
+                Errors.missing_return
+                  ~name
+                  ~declaration:"function"
+           | _ ->
+              (* Yes pragmas: foreign function, ignore the body. *)
+              ())
+    | CTypeclass _ ->
+       ()
+    | CInstance (span, _, _, _, _, methods, _) ->
+       let _ = List.map (check_method_ends_in_return span) methods in
+       ()
+  in
+  let _ = List.map check_decl_ends_in_return decls
+  in
+  ()

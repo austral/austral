@@ -19,3 +19,4 @@ ts	phase	decision	why	evidence	result
 2026-11-13T11:05:53Z	R7	lib/prelude.h のファイルは残し、埋め込みの prelude_h だけ消した	コンパイラが出力するのは prelude_c だけ。ヘッダのファイルを消すのは、未使用コードの削除の範囲を超える	lib/Compiler.ml が使うのは prelude_c のみ（grep）	D1 は実行時の C を prelude.c に入れる必要がある（推論）
 2026-11-13T11:05:53Z	R7	is_comparable は消し、比較の検査がない不具合を issue #125 にした	呼ぶコードがない関数は消す。検査の抜けは別の不具合	レコードの = が exit 0 で通り、cc が invalid operands to binary == を出す	plan.md の C12 に載せた
 2026-11-13T11:05:53Z	R7	委任した作業役がコンテナの再起動で止まったので、残りを自分で引き継いだ	作業役は .mli の編集の途中だった。差分を主の作業木へ移して続けた	git cherry-pick b5c5cb9、git apply r7-wip.patch	以後は主の作業木で1本ずつ進める
+2026-11-13T11:11:07Z	frame	呼び出しの記録（lib/Reporter、with_frame 29 箇所、ps/pi/pt/pqi の行）を、変換スクリプトで消した	大域の可変の状態を持ち、失敗のたびに約 1.2 MB の calltree.html を書く。計画 21 節の判断	equivalence.py compare --ignore-calltree: programs 432, differing 0。cli の期待値の差は calltree の行だけ（19 ファイル）。runner.py All tests passed。dune runtest OK	宣言した振る舞いの変更。stdout の1行と calltree.html と error.html のリンクがなくなる

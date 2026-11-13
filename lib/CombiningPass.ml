@@ -15,7 +15,6 @@ open CstUtil
 open Stages.Combined
 open Env
 open ImportResolution
-open Reporter
 open Error
 
 module Errors = struct
@@ -325,30 +324,27 @@ let private_def module_name im def =
                 docstring)
 
 let rec combine (env: env) (cmi: concrete_module_interface) (cmb: concrete_module_body): combined_module =
-  with_frame "Module combining pass: combining .aui and .aum files"
-    (fun _ ->
-      let (ConcreteModuleInterface (mn, interface_docstring, interface_imports, decls)) = cmi
-      and (ConcreteModuleBody (mn', kind, body_docstring, body_imports, defs)) = cmb
-      in
-      ps ("Module name", (mod_name_string mn));
-      if mn <> mn' then
-        Errors.module_name_mismatch ~interface:mn ~body:mn'
-      else
-        let im = resolve mn kind env interface_imports
-        and bm = resolve mn kind env body_imports
-        in
-        let public_decls = List.map (parse_decl mn im bm cmb) decls
-        and private_decls = parse_defs mn cmi bm defs
-        in
-        CombinedModule {
-            name = mn;
-            kind = kind;
-            interface_docstring = interface_docstring;
-            interface_imports = im;
-            body_docstring = body_docstring;
-            body_imports = bm;
-            decls = List.concat [public_decls; private_decls];
-    })
+  let (ConcreteModuleInterface (mn, interface_docstring, interface_imports, decls)) = cmi
+  and (ConcreteModuleBody (mn', kind, body_docstring, body_imports, defs)) = cmb
+  in
+  if mn <> mn' then
+    Errors.module_name_mismatch ~interface:mn ~body:mn'
+  else
+    let im = resolve mn kind env interface_imports
+    and bm = resolve mn kind env body_imports
+    in
+    let public_decls = List.map (parse_decl mn im bm cmb) decls
+    and private_decls = parse_defs mn cmi bm defs
+    in
+    CombinedModule {
+        name = mn;
+        kind = kind;
+        interface_docstring = interface_docstring;
+        interface_imports = im;
+        body_docstring = body_docstring;
+        body_imports = bm;
+        decls = List.concat [public_decls; private_decls];
+}
 
 and parse_decl (module_name: module_name) (im: import_map) (bm: import_map) (cmb: concrete_module_body) (decl: concrete_decl): combined_definition =
   let make_qname n =
@@ -448,22 +444,19 @@ let as_public (def: combined_definition): combined_definition =
      CInstance (span, VisPublic, name, typarams, argument, methods, docstring)
 
 let body_as_combined (env: env) (body: concrete_module_body): combined_module =
-  with_frame "Module combining pass: module body without interface"
-    (fun _ ->
-      let (ConcreteModuleBody (mn, kind, body_docstring, body_imports, defs)) = body in
-      ps ("Module name", (mod_name_string mn));
-      (* We fake an empty module interface. *)
-      let cmi: concrete_module_interface = ConcreteModuleInterface (mn, Docstring "", [], []) in
-      let imports = resolve mn kind env body_imports in
-      let decls = parse_defs mn cmi imports defs in
-      (* Go through the declarations and make them public. *)
-      let decls = List.map as_public decls in
-      CombinedModule {
-          name = mn;
-          kind = kind;
-          interface_docstring = Docstring "";
-          interface_imports = empty_map mn;
-          body_docstring = body_docstring;
-          body_imports = imports;
-          decls = decls;
-    })
+  let (ConcreteModuleBody (mn, kind, body_docstring, body_imports, defs)) = body in
+  (* We fake an empty module interface. *)
+  let cmi: concrete_module_interface = ConcreteModuleInterface (mn, Docstring "", [], []) in
+  let imports = resolve mn kind env body_imports in
+  let decls = parse_defs mn cmi imports defs in
+  (* Go through the declarations and make them public. *)
+  let decls = List.map as_public decls in
+  CombinedModule {
+      name = mn;
+      kind = kind;
+      interface_docstring = Docstring "";
+      interface_imports = empty_map mn;
+      body_docstring = body_docstring;
+      body_imports = imports;
+      decls = decls;
+}

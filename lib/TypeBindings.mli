@@ -35,4 +35,3 @@ val get_binding : type_bindings -> type_parameter -> ty option
    found in the bindings, do nothing. *)
 val replace_variables : type_bindings -> ty -> ty
 
-val show_bindings : type_bindings -> string

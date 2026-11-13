@@ -25,6 +25,4 @@ and main' (args: string list): unit =
   exec cmd
 
 and dump_and_die _: unit =
-  print_endline "Compiler call tree printed to calltree.html";
-  Reporter.dump ();
   exit (-1)

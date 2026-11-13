@@ -16,8 +16,6 @@ open Stages.Tast
 open TastUtil
 open Env
 open EnvTypes
-open EnvExtras
-open Reporter
 open Error
 
 module Errors = struct
@@ -52,8 +50,6 @@ let ctx_env (env, _) = env
 let ctx_mn (_, mn) = mn
 
 let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
-  pt ("A", a);
-  pt ("B", b);
   match a with
   | Unit ->
      (match b with
@@ -197,18 +193,14 @@ and check_tyvar_implements_constraints (param: sident list) (arg: sident list): 
   SIdentSet.subset param arg
 
 and check_type_implements_constraints (ctx: ctx) (tv: type_var) (ty: ty) (constraints: sident list): unit =
-  with_frame "Check type implements constraints"
-    (fun _ ->
-      pt ("Type", ty);
-      ps ("Constraints", "[" ^ (String.concat ", " (List.map show_sident constraints)) ^ "]");
-      (* If there are no constraints, do nothing. *)
-      if constraints = [] then
-        ()
-      else
-        (* If there are constraints, make them into a set. *)
-        let constraints: SIdentSet.t = SIdentSet.of_list constraints in
-        (* Try to find an instance for this type for each of the constraints. *)
-        List.iter (try_constraint ctx tv ty) (List.of_seq (SIdentSet.to_seq constraints)))
+  (* If there are no constraints, do nothing. *)
+  if constraints = [] then
+    ()
+  else
+    (* If there are constraints, make them into a set. *)
+    let constraints: SIdentSet.t = SIdentSet.of_list constraints in
+    (* Try to find an instance for this type for each of the constraints. *)
+    List.iter (try_constraint ctx tv ty) (List.of_seq (SIdentSet.to_seq constraints))
 
 and try_constraint (ctx: ctx) (tv: type_var) (ty: ty) (typeclass_name: sident): unit =
   (* Find the typeclass. *)
@@ -226,45 +218,36 @@ and try_constraint (ctx: ctx) (tv: type_var) (ty: ty) (typeclass_name: sident): 
      internal_err "No typeclass with the given name. This should have been validated in the extraction pass."
 
 and get_instance (env: env) (source_module_name: module_name) (dispatch_ty: ty) (typeclass: decl_id): (decl * type_bindings) option =
-  with_frame "Typeclass Resolution"
-    (fun _ ->
-      ps ("In module", (mod_name_string source_module_name));
-      ps ("Typeclass", (get_decl_name_or_die env typeclass));
-      pt ("Dispatch type", dispatch_ty);
-      let mod_id: mod_id =
-        let (ModRec { id; _ }) = Option.get (get_module_by_name env source_module_name) in
-        id
-      in
-      let pred (decl: decl): (decl * type_bindings) option =
-        match decl with
-        | Instance { typeclass_id; argument; _ } ->
-           if equal_decl_id typeclass_id typeclass then
-             let _ = pt ("Trying instance with argument", argument) in
-             try
-               let bindings = match_type (env, source_module_name) argument dispatch_ty in
-               ps ("Resolution", "Success");
-               Some (decl, bindings)
-             with
-               Austral_error _ ->
-               (* Does not match, just skip to the next instance, *)
-               ps ("Resolution", "Failure");
-               None
-           else
-             None
-        | _ ->
+  let mod_id: mod_id =
+    let (ModRec { id; _ }) = Option.get (get_module_by_name env source_module_name) in
+    id
+  in
+  let pred (decl: decl): (decl * type_bindings) option =
+    match decl with
+    | Instance { typeclass_id; argument; _ } ->
+       if equal_decl_id typeclass_id typeclass then
+         try
+           let bindings = match_type (env, source_module_name) argument dispatch_ty in
+           Some (decl, bindings)
+         with
+           Austral_error _ ->
+           (* Does not match, just skip to the next instance, *)
            None
-      in
-      let filtered: (decl * type_bindings) list =
-        with_frame "Filtering instances"
-          (fun _ -> List.filter_map pred (visible_instances env mod_id))
-      in
-      match filtered with
-      | [a] ->
-         Some a
-      | _::_ ->
-         internal_err "Multiple instances satisfy this call. The compiler should validate that there are no overlapping instances."
-      | [] ->
-         None)
+       else
+         None
+    | _ ->
+       None
+  in
+  let filtered: (decl * type_bindings) list =
+    (List.filter_map pred (visible_instances env mod_id))
+  in
+  match filtered with
+  | [a] ->
+     Some a
+  | _::_ ->
+     internal_err "Multiple instances satisfy this call. The compiler should validate that there are no overlapping instances."
+  | [] ->
+     None
 
 and match_type_list ctx tys tys' =
   let bs = List.map2 (match_type ctx) tys tys' in

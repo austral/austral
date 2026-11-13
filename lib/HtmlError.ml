@@ -288,8 +288,6 @@ let render_error_to_html (error: austral_error): string =
     <footer>
         <h3>Quick Links</h3>
         <div id='footer-list'>
-            <a target='_blank' href='./calltree.html'>
-                Compiler Call Tree</a>
             <a target='_blank' href='http://austral-lang.org'>
                 austral-lang.org</a>
             <a target='_blank' href='http://austral-lang.org/spec/spec.html'>

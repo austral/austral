@@ -1,7 +1,6 @@
 exit: 255
-files: calltree.html error.html
+files: error.html
 --- stdout
-Compiler call tree printed to calltree.html
 --- stderr
 Error:
   Title: Generic Error

@@ -139,8 +139,6 @@ and exec_compile (modules: mod_source list) (target: target) (error_reporting_mo
     end
 
 and dump_and_die _: unit =
-  print_endline "Compiler call tree printed to calltree.html";
-  Reporter.dump ();
   exit (-1)
 
 and try_adding_source_ctx (error: austral_error) (source_map: source_map): austral_error =

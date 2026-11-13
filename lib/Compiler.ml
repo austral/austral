@@ -26,7 +26,6 @@ open Mtast
 open Monomorphize
 open ReturnCheck
 open LinearityCheck
-open Reporter
 open Entrypoint
 open ExportInstantiation
 open HtmlError
@@ -86,23 +85,21 @@ let parse_and_combine (env: env) (source: module_source): (module_name * Combine
          (name, combined))
 
 let rec compile_mod (c: compiler) (source: module_source): compiler =
-  with_frame "Compile module"
+  let env: env = cenv c in
+  let (name, combined) = parse_and_combine env source in
+  adorn_error_with_module_name name
     (fun _ ->
-      let env: env = cenv c in
-      let (name, combined) = parse_and_combine env source in
-      adorn_error_with_module_name name
-        (fun _ ->
-          let _ = check_ends_in_return combined in
-          let combined: SmallCombined.combined_module = DesugaringPass.desugar combined in
-          let (env, linked): (env * linked_module) = extract env combined in
-          let typed: typed_module = augment_module env linked in
-          let _ = check_module_linearity typed in
-          let env: env = extract_bodies env typed in
-          let (env, mono): (env * mono_module) = monomorphize env typed in
-          let unit: c_unit = gen_module env mono in
-          let unit_code: string = render_unit unit in
-          let code: string = (compiler_code c) ^ "\n" ^ unit_code in
-          Compiler (env, code)))
+      let _ = check_ends_in_return combined in
+      let combined: SmallCombined.combined_module = DesugaringPass.desugar combined in
+      let (env, linked): (env * linked_module) = extract env combined in
+      let typed: typed_module = augment_module env linked in
+      let _ = check_module_linearity typed in
+      let env: env = extract_bodies env typed in
+      let (env, mono): (env * mono_module) = monomorphize env typed in
+      let unit: c_unit = gen_module env mono in
+      let unit_code: string = render_unit unit in
+      let code: string = (compiler_code c) ^ "\n" ^ unit_code in
+      Compiler (env, code))
 
 let rec compile_multiple c modules =
   match modules with
@@ -119,8 +116,6 @@ let fake_mod_source (is: string) (bs: string): module_source =
   TwoFileModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
 
 let dump_and_die _: 'a =
-  print_endline "Compiler call tree printed to calltree.html";
-  Reporter.dump ();
   exit (-1)
 
 let post_compile (compiler: compiler): compiler =
@@ -134,31 +129,29 @@ let post_compile (compiler: compiler): compiler =
   Compiler (env, code)
 
 let empty_compiler: compiler =
-  with_frame "Compile built-in modules"
-    (fun _ ->
-      (* We have to compile the Austral.Pervasive module, followed by
-         Austral.Memory, since the latter uses declarations from the former. *)
-      let env: env = empty_env in
-      (* Start with the C prelude. *)
-      let c = Compiler (env, prelude_c) in
-      let c =
-        (* Handle errors during the compilation of the Austral,Pervasive
-           module. Otherwise, a typo in the source code of this module will cause a
-           fatal error due to an exception stack overflow (unsure why this
-           happens). *)
-        try
-          compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
-        with Austral_error error ->
-          Printf.eprintf "%s" (render_error_to_plain error);
-          html_error_dump error;
-          dump_and_die ()
-      in
-      let c =
-        try
-          compile_mod c (fake_mod_source memory_interface_source memory_body_source)
-        with Austral_error error ->
-          Printf.eprintf "%s" (render_error_to_plain error);
-          html_error_dump error;
-          dump_and_die ()
-      in
-      c)
+  (* We have to compile the Austral.Pervasive module, followed by
+     Austral.Memory, since the latter uses declarations from the former. *)
+  let env: env = empty_env in
+  (* Start with the C prelude. *)
+  let c = Compiler (env, prelude_c) in
+  let c =
+    (* Handle errors during the compilation of the Austral,Pervasive
+       module. Otherwise, a typo in the source code of this module will cause a
+       fatal error due to an exception stack overflow (unsure why this
+       happens). *)
+    try
+      compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source)
+    with Austral_error error ->
+      Printf.eprintf "%s" (render_error_to_plain error);
+      html_error_dump error;
+      dump_and_die ()
+  in
+  let c =
+    try
+      compile_mod c (fake_mod_source memory_interface_source memory_body_source)
+    with Austral_error error ->
+      Printf.eprintf "%s" (render_error_to_plain error);
+      html_error_dump error;
+      dump_and_die ()
+  in
+  c
