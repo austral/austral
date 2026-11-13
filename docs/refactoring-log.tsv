@@ -10,6 +10,6 @@ ts	phase	decision	why	evidence	result
 2026-11-13T10:09:45Z	R5	指標の確認は R1 のコミットで CI に入れた	measure.sh --check は、数が増えたときだけ失敗する	.github/workflows/build-and-test.yml	手元で通る。CI は未確認
 2026-11-13T10:12:46Z	R3	エントリポイント、公開する関数、借用、型の束縛、型の読み取りのエラー 15 個に、テストを足した	エラーの作り直し（R11）の前に、文面を固定するため	test-programs/suites/032-other-errors	15個すべてが実行される。届かないものはなかった
 2026-11-13T10:12:46Z	R3	書き込みの借用のエラーの文面に、空白が1つ足りないと分かった	lib/LinearityCheck.ml の 446 行。436 行にはある	test-programs/suites/032-other-errors/010-linearity-write-borrowed-and-consumed	今の文面を固定した。小さいので R11 の後で直す
-2026-11-13T10:54:36Z	R3	エラーのテスト 82 本を足した（030 に 40、031 に 24、032 に 16、cli に 2）	構造を動かす前に、エラーの文面と出る条件を固定する	tools/refactoring/coverage.sh --errors: error functions 140, unexecuted 15。runner.py 030/031/032 All tests passed。cli-runner 32 passed	実行されないエラー関数 100→15。カバレッジ 77.88%→84.49%。TypeErrors.ml 20.69%→87.36%
+2026-11-13T10:54:36Z	R3	エラーのテスト 81 本を足した（030 に 40、031 に 24、032 に 16、cli に 1）	構造を動かす前に、エラーの文面と出る条件を固定する	tools/refactoring/coverage.sh --errors: error functions 140, unexecuted 15。runner.py 030/031/032 All tests passed。cli-runner 32 passed	実行されないエラー関数 100→15。カバレッジ 77.88%→84.49%。TypeErrors.ml 20.69%→87.36%
 2026-11-13T10:54:37Z	R3	残る 15 個は消さずに仕分けた。呼ぶコードのない 8 個は R7 で消す。届かない 5 個と不具合の 2 個は issue #124	届かないエラーを消すと、手前の検査との関係が変わる。振る舞いを変えない規則に従う	issue #124、#122（Pointer の重なりの誤判定）	plan.md の C8 と C10 に載せた
 2026-11-13T10:54:37Z	R3	計画の表の数を tools/refactoring/baseline/ に固定し、check-plan.py はそこを読む	expected/ は項目ごとに下がる。計画の表を毎回書き直すのは、同じ修正の繰り返しになる	python3 docs/check-plan.py: FINDING 0	計画の表の見出しを「計画の時点」にした
