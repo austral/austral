@@ -1,0 +1,1 @@
+Covers an exported function and a foreign function with boolean, integer and floating point parameters; the foreign function calls the exported one through its C name (lib/ExportInstantiation.ml transform_ty, lib/CodeGen.ml param_type_to_c_type).

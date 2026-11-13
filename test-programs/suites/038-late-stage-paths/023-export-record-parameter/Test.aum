@@ -1,0 +1,14 @@
+module body Test is
+    record Foo: Free is
+        x: Int32;
+    end;
+
+    pragma Foreign_Export(External_Name => "f");
+    function f(x: Foo): Int32 is
+        return 1;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

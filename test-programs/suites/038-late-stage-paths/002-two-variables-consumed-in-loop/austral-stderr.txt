@@ -1,0 +1,29 @@
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The " },
+    { "type": "text", "content": " variables " },
+    { "type": "code", "content": "b, a" },
+    { "type": "text", "content": " were " },
+    {
+      "type": "text",
+      "content": "consumed in the loop, without afterwards being reassigned."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/038-late-stage-paths/002-two-variables-consumed-in-loop/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 11, "column": 16 }
+  },
+  "context": [
+    [ 6, "        let a: Foo := Foo();" ],
+    [ 7, "        let b: Foo := Foo();" ],
+    [ 8, "        for i from 0 to 2 do" ],
+    [ 9, "            let {} := a;" ],
+    [ 10, "            let {} := b;" ],
+    [ 11, "        end for;" ],
+    [ 12, "        return ExitSuccess();" ],
+    [ 13, "    end;" ]
+  ]
+}

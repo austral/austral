@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Typeclass resolution failed. Dispatch type: Int32"
+    }
+  ],
+  "span": null,
+  "context": null
+}

@@ -1,0 +1,96 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Pointer,
+    Address,
+    allocateBuffer,
+    nullCheck,
+    store,
+    positiveOffset,
+    deallocate,
+    span
+);
+
+module body Test is
+    record Flags: Free is
+        on: Bool;
+    end;
+
+    function ofBool(x: Bool): Int32 is
+        if x then
+            return 1;
+        else
+            return 0;
+        end if;
+    end;
+
+    generic [R: Region]
+    function ofRef(x: &[Bool, R]): Int32 is
+        return ofBool(!x);
+    end;
+
+    generic [R: Region]
+    function viaRead(b: Fn[Bool, Int32], r: &[Bool, R]): Int32 is
+        let n: Int32 := b(!r);
+        return n;
+    end;
+
+    generic [R: Region]
+    function viaWrite(b: Fn[Bool, Int32], w: &![Bool, R]): Int32 is
+        let n: Int32 := b(!w);
+        return n;
+    end;
+
+    generic [R: Region]
+    function viaPointerSlot(b: Fn[Bool, Int32], r: &[Flags, R]): Int32 is
+        let n: Int32 := b(r->on);
+        return n;
+    end;
+
+    generic [R: Region]
+    function viaRefSlot(g: Fn[&[Bool, R], Int32], r: &[Flags, R]): Int32 is
+        let n: Int32 := g(&(r->on));
+        return n;
+    end;
+
+    generic [R: Region]
+    function viaSpan(b: Fn[Bool, Int32], g: Fn[&[Bool, R], Int32], sp: Span[Bool, R]): Int32 is
+        let n: Int32 := b(sp[0]);
+        let m: Int32 := g(&(sp[1]));
+        return n + m;
+    end;
+
+    function allocateOrDie(): Pointer[Bool] is
+        let addr: Address[Bool] := allocateBuffer(2);
+        case nullCheck(addr) of
+            when Some(value: Pointer[Bool]) do
+                return value;
+            when None do
+                abort("Allocation failed.");
+        end case;
+    end;
+
+    function main(): ExitCode is
+        let b: Fn[Bool, Int32] := ofBool;
+        var flag: Bool := true;
+        let flags: Flags := Flags(on => true);
+        printLn(viaRead(b, &flag));
+        printLn(viaWrite(b, &!flag));
+        let n: Int32 := b(flags.on);
+        printLn(n);
+        printLn(viaPointerSlot(b, &flags));
+        borrow r: &[Flags, R] := &flags do
+            let g: Fn[&[Bool, R], Int32] := ofRef;
+            printLn(viaRefSlot(g, r));
+        end borrow;
+        let ptr: Pointer[Bool] := allocateOrDie();
+        store(ptr, true);
+        store(positiveOffset(ptr, 1), true);
+        borrow pref: &[Pointer[Bool], S] := &ptr do
+            let h: Fn[&[Bool, S], Int32] := ofRef;
+            printLn(viaSpan(b, h, span(pref, 0, 1)));
+        end borrow;
+        deallocate(ptr);
+        return ExitSuccess();
+    end;
+end module body.

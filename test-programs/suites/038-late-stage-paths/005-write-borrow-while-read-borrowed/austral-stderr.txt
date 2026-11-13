@@ -1,0 +1,25 @@
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "Cannot borrow (mutably) the variable " },
+    { "type": "code", "content": "foo" },
+    { "type": "text", "content": " because it is already " },
+    { "type": "text", "content": "borrowed (read-only)" },
+    { "type": "text", "content": "." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/038-late-stage-paths/005-write-borrow-while-read-borrowed/Test.aum",
+    "startp": { "line": 9, "column": 12 },
+    "end": { "line": 11, "column": 23 }
+  },
+  "context": [
+    [ 7, "        var foo: Foo := Foo(x => 1);" ],
+    [ 8, "        borrow r: &[Foo, R] := &foo do" ],
+    [ 9, "            borrow w: &![Foo, S] := &!foo do" ],
+    [ 10, "                printLn(w->x);" ],
+    [ 11, "            end borrow;" ],
+    [ 12, "        end borrow;" ],
+    [ 13, "        let { x: Int32 } := foo;" ]
+  ]
+}

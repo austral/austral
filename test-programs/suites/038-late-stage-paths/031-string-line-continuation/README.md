@@ -1,0 +1,1 @@
+Covers a backslash followed by a newline or a tab in a string literal, which skips newlines, tabs and spaces up to the next backslash; the program prints the character codes (lib/Escape.ml, escape_list and consume_whitespace). The source contains tab characters.

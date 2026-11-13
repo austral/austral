@@ -1,0 +1,17 @@
+module body Test is
+    typeclass Shape(T: Type) is
+        generic [R: Region]
+        method area(x: T, r: R): Int32;
+    end;
+
+    instance Shape(Int32) is
+        generic [R: Region]
+        method area(x: Int32, r: R): Int32 is
+            return x;
+        end;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

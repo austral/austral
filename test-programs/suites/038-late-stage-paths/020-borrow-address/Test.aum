@@ -1,0 +1,16 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Address,
+    nullPointer
+);
+
+module body Test is
+    function main(): ExitCode is
+        let a: Address[Int32] := nullPointer();
+        borrow r: &[Address[Int32], R] := &a do
+            printLn(1);
+        end borrow;
+        return ExitSuccess();
+    end;
+end module body.

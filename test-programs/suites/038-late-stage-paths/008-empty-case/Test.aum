@@ -1,0 +1,17 @@
+module body Test is
+    union Never: Free is
+    end;
+
+    record Foo: Linear is
+    end;
+
+    function f(n: Never, foo: Foo): Int32 is
+        case n of
+        end case;
+        return 1;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

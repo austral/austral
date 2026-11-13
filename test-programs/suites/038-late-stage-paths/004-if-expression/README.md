@@ -1,0 +1,1 @@
+Covers the `if` expression after the typing pass: counting a linear variable in its branches, monomorphizing it, the type of a destructured `if` expression and the C conditional (lib/LinearityCheck.ml count, lib/Monomorphize.ml monomorphize_expr, lib/MtastUtil.ml get_type, lib/CodeGen.ml gen_exp).

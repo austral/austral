@@ -1,0 +1,70 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Address,
+    Pointer,
+    allocateBuffer,
+    nullCheck,
+    load,
+    store,
+    deallocate,
+    spanWrite
+);
+
+module body Test is
+    pragma Foreign_Export(External_Name => "test_peek");
+    function peek(a: Address[Int32]): Int32 is
+        case nullCheck(a) of
+            when Some(value: Pointer[Int32]) do
+                return load(value);
+            when None do
+                return 0;
+        end case;
+    end;
+
+    pragma Foreign_Import(External_Name => "test_peek");
+    function peekPointer(p: Pointer[Int32]): Int32 is
+    end;
+
+    pragma Foreign_Import(External_Name => "test_peek");
+    function peekSpan(sp: Span![Int32, Static]): Int32 is
+    end;
+
+    function double(x: Int32): Int32 is
+        return x + x;
+    end;
+
+    pragma Foreign_Export(External_Name => "test_apply");
+    function apply(f: Fn[Int32, Int32], x: Int32): Int32 is
+        let r: Int32 := f(x);
+        return r;
+    end;
+
+    pragma Foreign_Import(External_Name => "test_apply");
+    function foreignApply(f: Fn[Int32, Int32], x: Int32): Int32 is
+    end;
+
+    function allocateOrDie(): Pointer[Int32] is
+        let addr: Address[Int32] := allocateBuffer(1);
+        case nullCheck(addr) of
+            when Some(value: Pointer[Int32]) do
+                return value;
+            when None do
+                abort("Allocation failed.");
+        end case;
+    end;
+
+    function main(): ExitCode is
+        var ptr: Pointer[Int32] := allocateOrDie();
+        store(ptr, 42);
+        printLn(peekPointer(ptr));
+        borrow ref: &![Pointer[Int32], R] := &!ptr do
+            var sp: Span![Int32, R] := spanWrite(ref, 0, 0);
+            sp[0] := 43;
+            printLn(peekSpan(@embed(Span![Int32, Static], "$1", sp)));
+        end borrow;
+        deallocate(ptr);
+        printLn(foreignApply(double, 22));
+        return ExitSuccess();
+    end;
+end module body.

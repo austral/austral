@@ -1,0 +1,47 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Address,
+    nullPointer
+);
+
+module body Test is
+    record Box: Free is
+        v: Int32;
+    end;
+
+    generic [T: Type]
+    function same(x: T): T is
+        return x;
+    end;
+
+    function inc(x: Int32): Int32 is
+        return x + 1;
+    end;
+
+    generic [R: Region]
+    function setTo(ref: &![Box, R], value: Int32): Unit is
+        ref->v := value;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        var b: Box := Box(v => 5);
+        borrow r: &[Box, R] := &b do
+            let r2: &[Box, R] := same(r);
+            printLn(r2->v);
+        end borrow;
+        borrow w: &![Box, S] := &!b do
+            setTo(same(w), 6);
+        end borrow;
+        printLn(b.v);
+        let f: Fn[Int32, Int32] := inc;
+        let g: Fn[Int32, Int32] := same(f);
+        let one: Int32 := g(1);
+        printLn(one);
+        let a: Address[Int32] := nullPointer();
+        let a2: Address[Int32] := same(a);
+        printLn(a = a2);
+        return ExitSuccess();
+    end;
+end module body.

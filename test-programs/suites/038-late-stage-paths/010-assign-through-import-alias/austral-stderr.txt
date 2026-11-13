@@ -1,0 +1,32 @@
+{
+  "module": "Test",
+  "kind": "Internal Error",
+  "text": [
+    { "type": "text", "content": "Internal compiler error: " },
+    {
+      "type": "text",
+      "content": "variable `y` not in state table. Table contents: \n\nEntries:\n_t127\t0\tLinearityCheck.Unconsumed\nargumentCount\t0\tLinearityCheck.Unconsumed\nPending:\n"
+    },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This is a bug in the compiler, please open an issue here: "
+    },
+    {
+      "type": "code",
+      "content": "https://github.com/austral/austral/issues"
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/038-late-stage-paths/010-assign-through-import-alias/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 15 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        var argumentCount: Int32 := 1;" ],
+    [ 8, "        y := 2;" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

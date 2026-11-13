@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Internal Error",
+  "text": [
+    { "type": "text", "content": "Internal compiler error: " },
+    {
+      "type": "text",
+      "content": "Couldn't find instance method from instance ID `(Id.DeclId 284)` and method name `bar`."
+    },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This is a bug in the compiler, please open an issue here: "
+    },
+    {
+      "type": "code",
+      "content": "https://github.com/austral/austral/issues"
+    }
+  ],
+  "span": null,
+  "context": null
+}

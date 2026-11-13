@@ -1,0 +1,29 @@
+{
+  "module": "Test",
+  "kind": "Internal Error",
+  "text": [
+    { "type": "text", "content": "Internal compiler error: " },
+    { "type": "text", "content": "Identifier twice marked pending." },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This is a bug in the compiler, please open an issue here: "
+    },
+    {
+      "type": "code",
+      "content": "https://github.com/austral/austral/issues"
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/038-late-stage-paths/009-twice-marked-pending/Test.aum",
+    "startp": { "line": 15, "column": 12 },
+    "end": { "line": 15, "column": 41 }
+  },
+  "context": [
+    [ 13, "                let { x: Int32 } := foo;" ],
+    [ 14, "            end borrow;" ],
+    [ 15, "            let { x as y: Int32 } := foo;" ],
+    [ 16, "        end for;" ],
+    [ 17, "        return ExitSuccess();" ]
+  ]
+}

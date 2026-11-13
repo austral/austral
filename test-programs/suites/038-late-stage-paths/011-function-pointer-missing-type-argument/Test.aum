@@ -1,0 +1,12 @@
+module body Test is
+    generic [T: Free, U: Free]
+    function first(x: T, y: U): T is
+        let f: Fn[T, T, T] := first;
+        return x;
+    end;
+
+    function main(): ExitCode is
+        printLn(first(true, 1));
+        return ExitSuccess();
+    end;
+end module body.

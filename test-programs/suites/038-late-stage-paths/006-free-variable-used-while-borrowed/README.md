@@ -1,0 +1,1 @@
+Covers the use of a variable of a Free type inside its own immutable and mutable borrows, which the linearity checker allows (lib/LinearityCheck.ml, check_var_in_expr, error_read_borrowed_and_consumed and error_write_borrowed_and_consumed).

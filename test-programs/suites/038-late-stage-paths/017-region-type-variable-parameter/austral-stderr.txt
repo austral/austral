@@ -1,0 +1,19 @@
+{
+  "module": "Test",
+  "kind": "Internal Error",
+  "text": [
+    { "type": "text", "content": "Internal compiler error: " },
+    { "type": "text", "content": "Invalid C type" },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This is a bug in the compiler, please open an issue here: "
+    },
+    {
+      "type": "code",
+      "content": "https://github.com/austral/austral/issues"
+    }
+  ],
+  "span": null,
+  "context": null
+}

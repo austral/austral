@@ -1,0 +1,1 @@
+Covers a `case` statement without `when` clauses, which leaves the linearity state unchanged, so the unconsumed parameter is reported at the `return` (lib/LinearityCheck.ml, the TCase case of check_stmt).

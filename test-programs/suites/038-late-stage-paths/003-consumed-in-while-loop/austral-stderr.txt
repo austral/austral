@@ -1,0 +1,29 @@
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The " },
+    { "type": "text", "content": " variable " },
+    { "type": "code", "content": "foo" },
+    { "type": "text", "content": " was " },
+    {
+      "type": "text",
+      "content": "consumed in the loop, without afterwards being reassigned."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/038-late-stage-paths/003-consumed-in-while-loop/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 11, "column": 18 }
+  },
+  "context": [
+    [ 6, "        let foo: Foo := Foo();" ],
+    [ 7, "        var going: Bool := true;" ],
+    [ 8, "        while going do" ],
+    [ 9, "            let {} := foo;" ],
+    [ 10, "            going := false;" ],
+    [ 11, "        end while;" ],
+    [ 12, "        return ExitSuccess();" ],
+    [ 13, "    end;" ]
+  ]
+}

@@ -1,0 +1,1 @@
+Covers the internal error for a method call on a type parameter when the instance does not define the method (lib/Monomorphize.ml, the TVarMethodCall case of monomorphize_expr). The message contains a declaration ID (`DeclId 284`), which changes when the number of declarations before it changes.

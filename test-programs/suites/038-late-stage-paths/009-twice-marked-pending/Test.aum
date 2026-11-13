@@ -1,0 +1,19 @@
+module body Test is
+    record Foo: Linear is
+        x: Int32;
+    end;
+
+    function main(): ExitCode is
+        let foo: Foo := Foo(x => 1);
+        for i from 0 to 1 do
+            borrow a: &[Foo, R] := &foo do
+                borrow b: &[Foo, S] := &foo do
+                    skip;
+                end borrow;
+                let { x: Int32 } := foo;
+            end borrow;
+            let { x as y: Int32 } := foo;
+        end for;
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,11 @@
+import Austral.Pervasive (
+    argumentCount as y
+);
+
+module body Test is
+    function main(): ExitCode is
+        var argumentCount: Int32 := 1;
+        y := 2;
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Parameter list and argument list don't have the same length:\n\nparameters:\n(TypeParameter.TypeParameter ((Identifier.Identifier \"T\"), Type.FreeUniverse,\n   { Identifier.source = (Identifier.ModuleName \"Test\");\n     original = (Identifier.Identifier \"first\");\n     local = (Identifier.Identifier \"first\") },\n   [])), (TypeParameter.TypeParameter ((Identifier.Identifier \"U\"), Type.FreeUniverse,\n   { Identifier.source = (Identifier.ModuleName \"Test\");\n     original = (Identifier.Identifier \"first\");\n     local = (Identifier.Identifier \"first\") },\n   []))\narguments:\nMonoType.MonoBoolean"
+    }
+  ],
+  "span": null,
+  "context": null
+}

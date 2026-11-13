@@ -1,0 +1,46 @@
+module body Test is
+    constant flag: Bool := true;
+
+    function ofUnit(x: Unit): Int32 is
+        return 1;
+    end;
+
+    function ofBool(x: Bool): Int32 is
+        if x then
+            return 1;
+        else
+            return 0;
+        end if;
+    end;
+
+    function ofFloat(x: Float64): Float64 is
+        return x;
+    end;
+
+    function main(): ExitCode is
+        let u: Fn[Unit, Int32] := ofUnit;
+        let b: Fn[Bool, Int32] := ofBool;
+        let f: Fn[Float64, Float64] := ofFloat;
+        let one: Int32 := 1;
+        let two: Int32 := 2;
+        let r1: Int32 := u(nil);
+        printLn(r1);
+        let r2: Int32 := b(true);
+        printLn(r2);
+        let r3: Float64 := f(1.5);
+        printLn(r3);
+        let r4: Int32 := b(flag);
+        printLn(r4);
+        let r5: Int32 := b(one < two);
+        printLn(r5);
+        let r6: Int32 := b(flag and false);
+        printLn(r6);
+        let r7: Int32 := b(flag or false);
+        printLn(r7);
+        let r8: Int32 := b(not flag);
+        printLn(r8);
+        let r9: Int32 := b(if flag then false else true);
+        printLn(r9);
+        return ExitSuccess();
+    end;
+end module body.

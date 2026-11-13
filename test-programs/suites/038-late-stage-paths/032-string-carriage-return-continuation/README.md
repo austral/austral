@@ -1,0 +1,1 @@
+Covers a backslash followed by a carriage return in a string literal and a carriage return inside the skipped whitespace; the program prints the character codes (lib/Escape.ml, escape_list and consume_whitespace). The source contains carriage return characters.

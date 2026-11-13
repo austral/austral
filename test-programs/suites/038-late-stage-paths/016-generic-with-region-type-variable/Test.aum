@@ -1,0 +1,29 @@
+module body Test is
+    typeclass Shape(T: Type) is
+        generic [R: Region]
+        method area(ref: &[T, R]): Int32;
+    end;
+
+    record Sq: Free is
+        side: Int32;
+    end;
+
+    generic [T: Free]
+    function ignore(x: T): Unit is
+        return nil;
+    end;
+
+    instance Shape(Sq) is
+        generic [R: Region]
+        method area(ref: &[Sq, R]): Int32 is
+            ignore(ref);
+            return (ref->side) * (ref->side);
+        end;
+    end;
+
+    function main(): ExitCode is
+        let s: Sq := Sq(side => 3);
+        printLn(area(&s));
+        return ExitSuccess();
+    end;
+end module body.

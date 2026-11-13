@@ -1,0 +1,20 @@
+module body Test is
+    typeclass Foo(T: Free) is
+        method foo(value: T): Unit;
+    end;
+
+    generic [T: Free(Foo)]
+    function fooable(value: T): Unit is
+        return foo(value);
+    end;
+
+    generic [U: Free]
+    function wrapper(value: U): Unit is
+        return fooable(value);
+    end;
+
+    function main(): ExitCode is
+        wrapper(10);
+        return ExitSuccess();
+    end;
+end module body.

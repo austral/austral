@@ -1,0 +1,1 @@
+Covers exported functions with an address and a function pointer parameter and foreign functions with a pointer, a mutable span and a function pointer parameter; the foreign functions call the exported ones through their C names (lib/ExportInstantiation.ml transform_ty, lib/CodeGen.ml param_type_to_c_type).

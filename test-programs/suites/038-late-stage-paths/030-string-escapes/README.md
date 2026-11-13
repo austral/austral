@@ -1,0 +1,1 @@
+Covers the escape sequences for newline, carriage return, tab, single quote, double quote and backslash in a string literal, and the same characters in the generated C string; the program prints the character codes (lib/Escape.ml, escape_list and unescape_char).

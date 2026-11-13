@@ -1,0 +1,1 @@
+Covers the comparison of the pending lists of nested loops, where a variable consumed in the outer loop is still pending when the inner loop ends and is reassigned afterwards (lib/LinearityCheck.ml, subtract and the TFor case of check_stmt).

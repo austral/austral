@@ -1,0 +1,17 @@
+module body Test is
+    record Pair: Free is
+        a: Int32;
+        b: Int32;
+    end;
+
+    function make(x: Int32): Pair is
+        return Pair(a => x, b => x + 1);
+    end;
+
+    function main(): ExitCode is
+        let f: Fn[Int32, Pair] := make;
+        let { a: Int32, b: Int32 } := f(1);
+        printLn(a + b);
+        return ExitSuccess();
+    end;
+end module body.

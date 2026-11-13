@@ -1,0 +1,24 @@
+module body Test is
+    union Shape: Free is
+        case Circle is
+            radius: Int32;
+        case Dot;
+    end;
+
+    generic [R: Region]
+    function show(ref: &![Shape, R]): Unit is
+        case ref of
+            when Circle(radius: &![Int32, R]) do
+                printLn(!radius);
+            when Dot do
+                printLn(0);
+        end case;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        var s: Shape := Circle(radius => 7);
+        show(&!s);
+        return ExitSuccess();
+    end;
+end module body.

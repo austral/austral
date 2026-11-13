@@ -1,0 +1,1 @@
+Covers the error for a method call on a type parameter whose type argument has no instance, reached through a generic function without the constraint (lib/Monomorphize.ml, the TVarMethodCall case of monomorphize_expr).

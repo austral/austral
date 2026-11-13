@@ -1,0 +1,24 @@
+pragma Unsafe_Module;
+
+module body Test is
+    pragma Foreign_Export(External_Name => "test_show");
+    function show(a: Bool, b: Nat8, c: Int16, d: Int64, e: ByteSize, f: Index, g: Float32, h: Float64): Float64 is
+        printLn(a);
+        printLn(b);
+        printLn(c);
+        printLn(d);
+        printLn(e);
+        printLn(f);
+        printLn(g);
+        return h;
+    end;
+
+    pragma Foreign_Import(External_Name => "test_show");
+    function foreignShow(a: Bool, b: Nat8, c: Int16, d: Int64, e: ByteSize, f: Index, g: Float32, h: Float64): Float64 is
+    end;
+
+    function main(): ExitCode is
+        printLn(foreignShow(true, 8, 16, 64, 4, 5, 1.5, 2.5));
+        return ExitSuccess();
+    end;
+end module body.

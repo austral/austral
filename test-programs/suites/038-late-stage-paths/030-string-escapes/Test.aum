@@ -1,0 +1,13 @@
+module body Test is
+    function show(s: Span[Nat8, Static]): Unit is
+        for i from 0 to spanLength(s) - 1 do
+            printLn(s[i]);
+        end for;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        show("\n\r\t\'\\"\\z");
+        return ExitSuccess();
+    end;
+end module body.

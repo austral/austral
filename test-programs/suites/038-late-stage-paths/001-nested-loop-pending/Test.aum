@@ -1,0 +1,19 @@
+module body Test is
+    record Foo: Linear is
+        x: Int32;
+    end;
+
+    function main(): ExitCode is
+        var foo: Foo := Foo(x => 0);
+        for i from 0 to 2 do
+            let { x: Int32 } := foo;
+            for j from 0 to 1 do
+                printLn(x);
+            end for;
+            foo := Foo(x => x + 1);
+        end for;
+        let { x as y: Int32 } := foo;
+        printLn(y);
+        return ExitSuccess();
+    end;
+end module body.

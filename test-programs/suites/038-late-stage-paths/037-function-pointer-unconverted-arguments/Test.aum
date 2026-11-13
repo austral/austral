@@ -1,0 +1,29 @@
+module body Test is
+    function next(x: Int32): Int32 is
+        return x + 1;
+    end;
+
+    generic [T: Free]
+    function callWithLiteral(f: Fn[T, T]): T is
+        let r: T := f(41);
+        return r;
+    end;
+
+    function sameSize(x: ByteSize): ByteSize is
+        return x;
+    end;
+
+    generic [T: Free]
+    function callWithSize(f: Fn[T, T]): T is
+        let r: T := f(sizeof(Int32));
+        return r;
+    end;
+
+    function main(): ExitCode is
+        let n: Int32 := callWithLiteral(next);
+        printLn(n);
+        let s: ByteSize := callWithSize(sameSize);
+        printLn(s);
+        return ExitSuccess();
+    end;
+end module body.

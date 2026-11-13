@@ -1,0 +1,1 @@
+Covers the internal error for a variable consumed twice in a loop, which a nested immutable borrow makes possible because the end of the inner borrow marks the variable as not consumed (lib/LinearityCheck.ml, mark_pending).

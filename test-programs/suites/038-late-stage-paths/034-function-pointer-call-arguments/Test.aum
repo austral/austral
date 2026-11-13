@@ -1,0 +1,96 @@
+module body Test is
+    record Pair: Free is
+        a: Int32;
+        b: Int32;
+    end;
+
+    union Shape: Free is
+        case Circle is
+            radius: Int32;
+        case Dot;
+    end;
+
+    record Box[T: Free]: Free is
+        v: T;
+    end;
+
+    typeclass Describe(T: Free) is
+        method isBig(x: T): Bool;
+    end;
+
+    instance Describe(Int32) is
+        method isBig(x: Int32): Bool is
+            return x > 100;
+        end;
+    end;
+
+    generic [A: Free]
+    instance Describe(Box[A]) is
+        method isBig(x: Box[A]): Bool is
+            return true;
+        end;
+    end;
+
+    generic [T: Free]
+    function same(x: T): T is
+        return x;
+    end;
+
+    function inc(x: Int32): Int32 is
+        return x + 1;
+    end;
+
+    function isPositive(x: Int32): Bool is
+        return x > 0;
+    end;
+
+    function ofBool(x: Bool): Int32 is
+        if x then
+            return 1;
+        else
+            return 0;
+        end if;
+    end;
+
+    function ofFn(f: Fn[Int32, Int32]): Int32 is
+        let r: Int32 := f(10);
+        return r;
+    end;
+
+    function ofPair(p: Pair): Int32 is
+        return p.a + p.b;
+    end;
+
+    function ofShape(s: Shape): Int32 is
+        case s of
+            when Circle(radius: Int32) do
+                return radius;
+            when Dot do
+                return 0;
+        end case;
+    end;
+
+    function main(): ExitCode is
+        let b: Fn[Bool, Int32] := ofBool;
+        let f: Fn[Fn[Int32, Int32], Int32] := ofFn;
+        let p: Fn[Pair, Int32] := ofPair;
+        let s: Fn[Shape, Int32] := ofShape;
+        let r1: Int32 := b(isPositive(5));
+        printLn(r1);
+        let r2: Int32 := b(isBig(5));
+        printLn(r2);
+        let r3: Int32 := b(isBig(Box(v => 5)));
+        printLn(r3);
+        let r4: Int32 := f(inc);
+        printLn(r4);
+        let r5: Int32 := f(same : Fn[Int32, Int32]);
+        printLn(r5);
+        let r6: Int32 := p(Pair(a => 1, b => 2));
+        printLn(r6);
+        let r7: Int32 := s(Circle(radius => 7));
+        printLn(r7);
+        let r8: Int32 := b(@embed(Bool, "true"));
+        printLn(r8);
+        return ExitSuccess();
+    end;
+end module body.
