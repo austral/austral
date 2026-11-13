@@ -243,6 +243,6 @@ and transform_whens (whens: AstDP.abstract_when list): AstDB.abstract_when list 
 let transform_expr (expr: AstDP.aexpr): AstDB.aexpr =
   let (expr, acc) = lift_borrows expr [] in
   if (List.length acc) > 0 then
-    Error.err "Borrow expressions not allowed in this context."
+    Error.generic_error BorrowExpressionNotAllowed
   else
     expr

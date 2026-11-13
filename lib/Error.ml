@@ -30,7 +30,6 @@ type error =
   | Entrypoint of EntrypointErrors.t
   | Generic of GenericErrors.t
   | Internal of string
-  | Unconverted of error_kind * err_text
 
 type austral_error = AustralError of {
       module_name: module_name option;
@@ -51,7 +50,6 @@ let error_kind (error: error): error_kind =
   | Entrypoint _ -> EntrypointError
   | Generic _ -> GenericError
   | Internal _ -> InternalError
-  | Unconverted (kind, _) -> kind
 
 let error_text (error: error): err_text =
   match error with
@@ -70,7 +68,6 @@ let error_text (error: error): err_text =
        Text "This is a bug in the compiler, please open an issue here: ";
        Code "https://github.com/austral/austral/issues"
      ]
-  | Unconverted (_, text) -> text
 
 (* Raising *)
 
@@ -95,9 +92,6 @@ let entrypoint_error (e: EntrypointErrors.t): 'a = raise_error (Entrypoint e)
 let generic_error (e: GenericErrors.t): 'a = raise_error (Generic e)
 
 let internal_err (message: string): 'a = raise_error (Internal message)
-
-let err (message: string): 'a =
-  raise_error (Unconverted (GenericError, [Text message]))
 
 (* Error context-augmenting functions *)
 

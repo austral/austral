@@ -19,6 +19,6 @@ let get_region m n =
 let add_region m n r =
   match get_region m n with
   | Some _ ->
-     err "Region map already has a region with this name"
+     generic_error RegionAlreadyExists
   | None ->
      IdentifierMap.add n r m

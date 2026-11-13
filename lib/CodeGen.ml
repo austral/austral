@@ -549,7 +549,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      let param_type_to_c_type (t: mono_ty): c_ty =
        (match t with
         | MonoUnit ->
-           err "Not allowed"
+           generic_error ForeignFunctionTypeNotAllowed
         | MonoBoolean ->
            gen_type t
         | MonoInteger _ ->
@@ -559,13 +559,13 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
         | MonoDoubleFloat ->
            gen_type t
         | MonoNamedType _ ->
-           err "Not allowed"
+           generic_error ForeignFunctionTypeNotAllowed
         | MonoRegionTy _ ->
-           err "Not allowed"
+           generic_error ForeignFunctionTypeNotAllowed
         | MonoReadRef _ ->
-           err "Not allowed"
+           generic_error ForeignFunctionTypeNotAllowed
         | MonoWriteRef _ ->
-           err "Not allowed"
+           generic_error ForeignFunctionTypeNotAllowed
         | MonoSpan (ty, _) ->
            CPointer (gen_type ty)
         | MonoSpanMut (ty, _) ->
@@ -577,7 +577,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
         | MonoFnPtr _ ->
            gen_type t
         | MonoRegionTyVar _ ->
-           err "Not allowed")
+           generic_error ForeignFunctionTypeNotAllowed)
      in
      let return_type_to_c_type t =
        match t with

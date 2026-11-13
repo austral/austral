@@ -122,7 +122,7 @@ let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * typ
   | Some _ ->
      type_error (PathNotRecord ty)
   | None ->
-     err ("No record with this name: " ^ (ident_string (original_name name)))
+     generic_error (NoRecordWithName (original_name name))
 
 let get_slot_with_name type_name slots slot_name =
   match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
@@ -142,12 +142,9 @@ and check_bindings (typarams: typarams) (bindings: type_bindings): unit =
         if universe_compatible u (type_universe ty) then
           ()
         else
-          err ("Mismatched universes: expected "
-               ^ (show_universe u)
-               ^ " and got "
-               ^ (show_universe (type_universe ty)))
+          generic_error (BindingUniverseMismatch { expected = u; actual = type_universe ty })
      | None ->
-        err ("No binding for this parameter: " ^ (ident_string n)))
+        generic_error (NoBindingForParameter n))
   in
   let _ = List.map check (typarams_as_list typarams) in
   ()
@@ -327,7 +324,7 @@ and augment_record_constructor (ctx: expr_ctx) (name: qident) (typarams: typaram
     if universe_compatible universe (type_universe rt'') then
       TRecordConstructor (rt'', List.map2 (fun a b -> (a, b)) slot_names arguments)
     else
-      err "Universe mismatch"
+      generic_error ConstructorUniverseMismatch
 
 and augment_union_constructor (ctx: expr_ctx) (type_name: qident) (typarams: typarams) (universe: universe) (case: typed_case) (asserted_ty: ty option) (args: typed_arglist) =
   let args' = (match args with
@@ -363,7 +360,7 @@ and augment_union_constructor (ctx: expr_ctx) (type_name: qident) (typarams: typ
     if universe_compatible universe (type_universe rt'') then
       TUnionConstructor (rt'', case_name, List.map2 (fun a b -> (a, b)) slot_names arguments)
     else
-      err "Universe mismatch"
+      generic_error ConstructorUniverseMismatch
 
 and augment_method_call (ctx: expr_ctx) (typeclass_id: decl_id) (typaram: type_parameter) (callable_name: qident) (params: value_parameter list) (rt: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
   (* At this point, we know the method's name and the typeclass it belongs

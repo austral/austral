@@ -139,7 +139,7 @@ let rec effective_universe name (typarams: typarams) declared_universe args =
      if all_arguments_are_free args then
        FreeUniverse
      else
-       err ("Free type called with non-free argument: " ^ (qident_debug_name name))
+       generic_error (FreeTypeWithNonFreeArgument name)
   | LinearUniverse ->
      LinearUniverse
   | RegionUniverse ->

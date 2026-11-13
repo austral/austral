@@ -42,7 +42,7 @@ type cmd =
 
 let check_leftovers (arglist: arglist): unit =
   if (arglist_size arglist) > 0 then
-    err "There are leftover arguments."
+    generic_error LeftoverArguments
   else
     ()
 

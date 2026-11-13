@@ -3,8 +3,9 @@
 
   unexecuted-errors.py COBERTURA_XML
 
-Called by coverage.sh --errors. A place is a line that calls `austral_raise`
-or `err` with a literal message. `internal_err` is left out: it marks a state
+Called by coverage.sh --errors. A place is a line that calls one of the
+functions that raise an error of a category (`type_error`, `cli_error`, and
+so on; lib/Error.mli lists them). `internal_err` is left out: it marks a state
 the code believes cannot happen.
 
 A place counts as executed if its own line was hit. The coverage tool puts a
@@ -13,7 +14,7 @@ says nothing about the place. Where the line carries no point, the nearest
 earlier point in the same definition decides.
 
 Prints one line per unexecuted place: file, line, the enclosing definition and
-the start of the message. The last line gives the totals.
+the constructor of the error. The last line gives the totals.
 """
 import pathlib
 import re
@@ -22,8 +23,8 @@ import xml.etree.ElementTree as ET
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DEFINITION = re.compile(r"^\s*(?:let rec|let|and) ([a-z_][A-Za-z0-9_']*)", re.M)
-PLACE = re.compile(r"""austral_raise\b|(?<![_a-zA-Z])err [("]""")
-LITERAL = re.compile(r'"((?:[^"\\]|\\.)*)"')
+PLACE = re.compile(r"(?<![_a-zA-Z])%s\b" % r"(?:parse|cli|type|linearity|declaration|entrypoint|generic)_error(?:_at)?")
+CONSTRUCTOR = re.compile(r"\b[A-Z][A-Za-z0-9_]*")
 
 hits: dict[str, dict[int, int]] = {}
 for cls in ET.parse(sys.argv[1]).iter("class"):
@@ -60,15 +61,15 @@ def without_comments(text: str) -> list[str]:
 total = unexecuted = 0
 sources = [*(ROOT / "lib").glob("*.ml"), *(ROOT / "cli").glob("*.ml")]
 for path in sorted(sources):
-    if path.name == "BuiltInModules.ml":
+    if path.name in ("BuiltInModules.ml", "Error.ml"):  # Error.ml defines the functions
         continue
     name = str(path.relative_to(ROOT))
     text = path.read_text()
-    raw = text.split("\n")
     file_hits = hits.get(name, {})
     starts = [(text.count("\n", 0, m.start()) + 1, m.group(1)) for m in DEFINITION.finditer(text)]
     for number, line in enumerate(without_comments(text), start=1):
-        if not PLACE.search(line) or re.match(r"\s*let (rec )?(austral_raise|err)\b", line):
+        place = PLACE.search(line)
+        if not place:
             continue
         total += 1
         enclosing = [(first, definition) for first, definition in starts if first <= number]
@@ -78,6 +79,6 @@ for path in sorted(sources):
         if point is not None and file_hits[point] > 0:
             continue
         unexecuted += 1
-        message = LITERAL.search("\n".join(raw[number - 1 : number + 6]))
-        print(f"{name}\t{number}\t{definition}\t{message.group(1)[:60] if message else ''}")
+        constructor = CONSTRUCTOR.search(line, place.end())
+        print(f"{name}\t{number}\t{definition}\t{constructor.group(0) if constructor else ''}")
 print(f"error places {total}, unexecuted {unexecuted}")

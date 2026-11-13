@@ -207,8 +207,7 @@ let rec monomorphize_expr (env: env) (expr: texpr): (mexpr * env) =
        (match get_instance env source_module_name dispatch_ty typeclass_id with
         | Some (i, b) -> (i, b)
         | None ->
-           err ("Typeclass resolution failed. Dispatch type: "
-                ^ (type_string dispatch_ty)))
+           generic_error (TypeclassResolutionFailed dispatch_ty))
      in
      let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
      let arguments' = TypeCheckExpr.cast_arguments instance_bindings params' args in
@@ -733,16 +732,16 @@ and make_bindings (typarams: typarams) (args: mono_type_bindings): type_bindings
            | Some ty ->
               (tp, mono_to_ty ty)
            | None ->
-              err "Parameter not found."))
+              generic_error ParameterNotFound))
         typarams
     in
     let b = bindings_from_list pairs in
     b
   else
-    err ("Parameter list and argument list don't have the same length:\n\nparameters:\n"
-         ^ (String.concat ", " (List.map show_type_parameter typarams))
-         ^ "\narguments:\n"
-         ^ (String.concat ", " (List.map (fun (_, ty) -> show_mono_ty ty) (mono_bindings_as_list args))))
+    generic_error (ParameterArgumentLengthMismatch {
+        parameters = typarams;
+        arguments = List.map (fun (_, ty) -> ty) (mono_bindings_as_list args);
+      })
 
 and mono_to_ty (ty: mono_ty): ty =
   let r = mono_to_ty in

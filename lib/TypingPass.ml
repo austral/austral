@@ -54,7 +54,7 @@ let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * typ
   | Some _ ->
      type_error (PathNotRecord ty)
   | None ->
-     err ("No record with this name: " ^ (ident_string (original_name name)))
+     generic_error (NoRecordWithName (original_name name))
 
 let is_boolean = function
   | Boolean -> true
@@ -206,7 +206,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              | WriteRef (ty, _) ->
                 ty
              | _ ->
-                err ("Can't assign: lvalue is not a mutable reference: " ^ (type_string lvalue_ty))
+                generic_error (AssignToNonMutableReference lvalue_ty)
            end
          in
          (* Augment the rvalue. *)
@@ -345,7 +345,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                        | WriteRef (pointed_ty, _) ->
                           pointed_ty
                        | _ ->
-                          err ("Cannot reborrow something that is not a mutable reference: " ^ (type_string orig_ty))
+                          generic_error (ReborrowOfNonMutableReference orig_ty)
                      end
                    in
                    WriteRef (pointed_ty, RegionTy region_obj))

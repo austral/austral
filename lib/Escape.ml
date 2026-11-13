@@ -35,7 +35,7 @@ and consume_whitespace lst =
   | ('\r' :: rest) -> consume_whitespace rest
   | ('\t' :: rest) -> consume_whitespace rest
   | ('\\' :: rest) -> rest
-  | _ -> err "Bad whitespace escape sequence"
+  | _ -> generic_error BadWhitespaceEscape
 
 let escaped_to_string (EscapedString s) =
   s

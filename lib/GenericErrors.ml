@@ -7,6 +7,7 @@
 (** The errors that have no category yet, and their wording. *)
 open Identifier
 open Type
+open MonoType
 open TypeParameter
 open ErrorText
 
@@ -32,6 +33,37 @@ type t =
   | OverlappingInstances
   | DuplicateTypeParameter of type_parameter option
   | TypeWrongArity of { typename: identifier; expected: int; actual: int option }
+  | LetOutsideStatementList
+  | DestructureOutsideStatementList
+  | ForeignFunctionTypeNotAllowed
+  | InvalidDeclInContext
+  | BorrowExpressionNotAllowed
+  | InvalidLvalue
+  | NoUnionWithId
+  | DeclHasNoName
+  | BadWhitespaceEscape
+  | SymbolImportedTwice
+  | VariableAlreadyExists of identifier
+  | TypeclassResolutionFailed of ty
+  | ParameterNotFound
+  | ParameterArgumentLengthMismatch of { parameters: type_parameter list; arguments: mono_ty list }
+  | TypeOfStringConstant
+  | RegionAlreadyExists
+  | NoRecordWithName of identifier
+  | BindingUniverseMismatch of { expected: universe; actual: universe }
+  | NoBindingForParameter of identifier
+  | ConstructorUniverseMismatch
+  | InstanceArgumentShapeNotAllowed
+  | InstanceOverlapTypeNotAllowed
+  | MatchTypeOnMonoTy
+  | FreeTypeWithNonFreeArgument of qident
+  | TypeVariableNotReplaced of identifier
+  | IsNumericOnMonoTy
+  | AssignToNonMutableReference of ty
+  | ReborrowOfNonMutableReference of ty
+  | MinOfEmptyList
+  | SplitReturnedEmpty
+  | LeftoverArguments
 
 let render (error: t): err_text =
   match error with
@@ -109,3 +141,134 @@ let render (error: t): err_text =
           Text " arguments."
         ]
       | None -> [Text "."])
+  | LetOutsideStatementList ->
+     [
+       Text "Let statement not in a list context"
+     ]
+  | DestructureOutsideStatementList ->
+     [
+       Text "Destructure statement not in a list context"
+     ]
+  | ForeignFunctionTypeNotAllowed ->
+     [
+       Text "Not allowed"
+     ]
+  | InvalidDeclInContext ->
+     [
+       Text "Invalid decl in this context"
+     ]
+  | BorrowExpressionNotAllowed ->
+     [
+       Text "Borrow expressions not allowed in this context."
+     ]
+  | InvalidLvalue ->
+     [
+       Text "Invalid lvalue."
+     ]
+  | NoUnionWithId ->
+     [
+       Text "No union with ID"
+     ]
+  | DeclHasNoName ->
+     [
+       Text "decl has no name"
+     ]
+  | BadWhitespaceEscape ->
+     [
+       Text "Bad whitespace escape sequence"
+     ]
+  | SymbolImportedTwice ->
+     [
+       Text "Cannot add symbol to the import map twice."
+     ]
+  | VariableAlreadyExists name ->
+     [
+       Text ("push_var: var with the name " ^ (ident_string name) ^ " already exists")
+     ]
+  | TypeclassResolutionFailed dispatch_ty ->
+     [
+       Text ("Typeclass resolution failed. Dispatch type: "
+             ^ (type_string dispatch_ty))
+     ]
+  | ParameterNotFound ->
+     [
+       Text "Parameter not found."
+     ]
+  | ParameterArgumentLengthMismatch { parameters; arguments } ->
+     [
+       Text ("Parameter list and argument list don't have the same length:\n\nparameters:\n"
+             ^ (String.concat ", " (List.map show_type_parameter parameters))
+             ^ "\narguments:\n"
+             ^ (String.concat ", " (List.map show_mono_ty arguments)))
+     ]
+  | TypeOfStringConstant ->
+     [
+       Text "Type of the string constant"
+     ]
+  | RegionAlreadyExists ->
+     [
+       Text "Region map already has a region with this name"
+     ]
+  | NoRecordWithName name ->
+     [
+       Text ("No record with this name: " ^ (ident_string name))
+     ]
+  | BindingUniverseMismatch { expected; actual } ->
+     [
+       Text ("Mismatched universes: expected "
+             ^ (show_universe expected)
+             ^ " and got "
+             ^ (show_universe actual))
+     ]
+  | NoBindingForParameter name ->
+     [
+       Text ("No binding for this parameter: " ^ (ident_string name))
+     ]
+  | ConstructorUniverseMismatch ->
+     [
+       Text "Universe mismatch"
+     ]
+  | InstanceArgumentShapeNotAllowed ->
+     [
+       Text "Not allowed"
+     ]
+  | InstanceOverlapTypeNotAllowed ->
+     [
+       Text "Not allowed"
+     ]
+  | MatchTypeOnMonoTy ->
+     [
+       Text "match_type called with MonoTy argument"
+     ]
+  | FreeTypeWithNonFreeArgument name ->
+     [
+       Text ("Free type called with non-free argument: " ^ (qident_debug_name name))
+     ]
+  | TypeVariableNotReplaced name ->
+     [
+       Text ("strip_type': Variable not replaced: '" ^ (ident_string name) ^ "'")
+     ]
+  | IsNumericOnMonoTy ->
+     [
+       Text "is_numeric called with MonoTy argument"
+     ]
+  | AssignToNonMutableReference ty ->
+     [
+       Text ("Can't assign: lvalue is not a mutable reference: " ^ (type_string ty))
+     ]
+  | ReborrowOfNonMutableReference ty ->
+     [
+       Text ("Cannot reborrow something that is not a mutable reference: " ^ (type_string ty))
+     ]
+  | MinOfEmptyList ->
+     [
+       Text "empty list passed to min_list"
+     ]
+  | SplitReturnedEmpty ->
+     [
+       Text "split_on_char returned empty"
+     ]
+  | LeftoverArguments ->
+     [
+       Text "There are leftover arguments."
+     ]

@@ -168,7 +168,7 @@ let match_decls (module_name: module_name) (ii: import_map) (bi: import_map) (de
          | _ ->
             declaration_error (DeclarationKindMismatch { name; expected = InstanceDeclaration }))
   | _ ->
-     err "Invalid decl in this context"
+     generic_error InvalidDeclInContext
 
 let private_def module_name im def =
   let make_qname n =

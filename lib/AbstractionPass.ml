@@ -19,9 +19,9 @@ let rec abs_stmt im stmt =
   | CSkip span ->
      ASkip span
   | CLet _ ->
-     err "Let statement not in a list context"
+     generic_error LetOutsideStatementList
   | CDestructure _ ->
-     err "Destructure statement not in a list context"
+     generic_error DestructureOutsideStatementList
   | CAssign (span, lvalue, value) ->
      AAssign (span, abs_expr im lvalue, abs_expr im value)
   | CIf (span, c, t, f) ->

@@ -43,7 +43,7 @@ let is_numeric = function
   | Address _ -> false
   | Pointer _ -> false
   | FnPtr _ -> false
-  | MonoTy _ -> err "is_numeric called with MonoTy argument"
+  | MonoTy _ -> generic_error IsNumericOnMonoTy
 
 let rec type_variables = function
   | Unit ->

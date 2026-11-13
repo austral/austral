@@ -101,7 +101,7 @@ and strip_type' (ty: ty): stripped_ty option =
           left over by stripping time, that's an error. Anyways, the
           search-and-replace step should *also* have signalled an error if a
           type variable has no replacement. *)
-       err ("strip_type': Variable not replaced: '" ^ (ident_string name) ^ "'")
+       generic_error (TypeVariableNotReplaced name)
   | Address ty ->
      (match (strip_type' ty) with
       | Some ty ->

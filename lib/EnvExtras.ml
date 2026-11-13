@@ -35,7 +35,7 @@ let get_decl_sident_or_die (env: env) (id: decl_id): sident =
       | Some name ->
          make_sident (get_module_name_or_die env (decl_mod_id decl)) name
       | None ->
-         err "decl has no name")
+         generic_error DeclHasNoName)
   | None ->
    internal_err ("decl with ID `" 
                   ^ (show_decl_id id)
@@ -48,7 +48,7 @@ let get_decl_name_or_die (env: env) (id: decl_id): string =
       | Some name ->
          (ident_string name)
       | None ->
-         err "decl has no name")
+         generic_error DeclHasNoName)
   | None ->
    internal_err ("decl with ID `" 
                   ^ (show_decl_id id)

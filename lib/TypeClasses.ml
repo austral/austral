@@ -93,7 +93,7 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = no_leftovers (List.length args') in
      ()
   | MonoTy _ ->
-     err "Not allowed"
+     generic_error InstanceArgumentShapeNotAllowed
 
 let overlapping_instances (a: ty) (b: ty): bool =
   match a with
@@ -127,7 +127,7 @@ let overlapping_instances (a: ty) (b: ty): bool =
       | _ ->
          false)
   | RegionTy _ ->
-     err "Not allowed"
+     generic_error InstanceOverlapTypeNotAllowed
   | ReadRef _ ->
      (match b with
       | ReadRef _ -> true
@@ -145,7 +145,7 @@ let overlapping_instances (a: ty) (b: ty): bool =
       | SpanMut _ -> true
       | _ -> false)
   | TyVar _ ->
-     err "Not allowed"
+     generic_error InstanceOverlapTypeNotAllowed
   | Address _ ->
      (match b with
       | Address _ -> true
@@ -159,7 +159,7 @@ let overlapping_instances (a: ty) (b: ty): bool =
       | FnPtr _ -> true
       | _ -> false)
   | MonoTy _ ->
-     err "Not allowed"
+     generic_error InstanceOverlapTypeNotAllowed
 
 let check_instance_locally_unique (instances: decl list) (argument: ty): unit =
   let pred (decl: decl): bool =

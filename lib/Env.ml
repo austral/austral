@@ -277,7 +277,7 @@ let get_callable (env: env) (importing_module_name: module_name) (name: sident):
          let (typarams, universe) =
            (match get_decl_by_id env union_id with
             | Some (Union { typarams; universe; _}) -> (typarams, universe)
-            | _ -> err "No union with ID")
+            | _ -> generic_error NoUnionWithId)
          in
          Some (
              UnionConstructor {

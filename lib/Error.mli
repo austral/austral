@@ -42,8 +42,6 @@ type error =
   | Generic of GenericErrors.t
   | Internal of string
   (** A state the compiler believes cannot happen. The string says which. *)
-  | Unconverted of error_kind * err_text
-  (** An error that {!err} raises from loose text. Goes away when R11 is done. *)
 
 (** An Austral compiler error. The module name, span, and source context rarely
     have to be passed in explicitly: they are added where the error is throw in
@@ -115,6 +113,3 @@ val render_error_to_plain : austral_error -> string
 
 (** Render an error to JSON, for tools or the end to end tests. *)
 val render_error_to_json : austral_error -> Yojson.Basic.t
-
-(** Utility: raise a generic error. *)
-val err : string -> 'a

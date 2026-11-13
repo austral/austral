@@ -29,7 +29,7 @@ let push_var l name ty source =
   let (LexEnv inner) = !l in
   match get_var l name with
   | (Some _) ->
-     err ("push_var: var with the name " ^ (ident_string name) ^ " already exists")
+     generic_error (VariableAlreadyExists name)
   | None ->
      let inner' = LexEnv ((name, ty, source) :: inner) in
      l := inner';

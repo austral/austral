@@ -19,7 +19,7 @@ let rec get_type (e: mexpr): mono_ty =
   | MFloatConstant _ ->
      MonoDoubleFloat
   | MStringConstant _ ->
-     err "Type of the string constant"
+     generic_error TypeOfStringConstant
   | MConstVar (_, ty) ->
      ty
   | MParamVar (_, ty) ->

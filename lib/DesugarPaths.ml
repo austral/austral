@@ -96,7 +96,7 @@ and transform_lvalue (expr: AstLC.aexpr): AstDP.aexpr =
      desugar_path head path_exprs WriteBorrow false
   (* Everything else is not a valid lvalue. *)
   | _ ->
-     err "Invalid lvalue."
+     generic_error InvalidLvalue
 
 and transform_stmt (stmt: AstLC.astmt): AstDP.astmt =
   match stmt with

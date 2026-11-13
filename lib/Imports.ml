@@ -31,7 +31,7 @@ let get_symbol (im: import_map) (name: identifier): qident option =
 let add_symbol (im: import_map) (q: qident) =
   match get_symbol im (local_name q) with
   | Some _ ->
-     err "Cannot add symbol to the import map twice."
+     generic_error SymbolImportedTwice
   | None ->
      let (ImportMap { import_into; symbols; instances }) = im in
      ImportMap {

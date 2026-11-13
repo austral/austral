@@ -131,7 +131,7 @@ let rec match_type (ctx: ctx) (a: ty) (b: ty): type_bindings =
       | _ ->
          type_error (TypeMismatch { expected = a; actual = b }))
   | MonoTy _ ->
-     err "match_type called with MonoTy argument"
+     generic_error MatchTypeOnMonoTy
 
 and match_type_var (ctx: ctx) (tv: type_var) (ty: ty): type_bindings =
   let (TypeVariable (name, universe, from, constraints)) = tv in
