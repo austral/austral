@@ -301,6 +301,8 @@ let total: Decimal[20, 0] := widen(subtotal) + widen(tax);
 | `TowardGreater` | 2.35 | 2.36 | −2.34 | 2.35 |
 | `TowardLesser` | 2.34 | 2.35 | −2.35 | 2.34 |
 
+この表と、3.2節のリテラルの型の表は、`python3 docs/check-decimal-tables.py` で計算し直せる。
+
 ### 7.3 COBOL との対応
 
 | COBOL | Zustral |
@@ -506,7 +508,8 @@ import Austral.Decimal (RoundingMode, NearestEven, divide, round, widen);
 
 ### 13.1 型クラス
 
-- 利用者は、自分の型クラスのインスタンスを、具体的な Decimal の型に宣言できる。`instance Describable(Decimal[11, 2])` と書く。型クラスは、インスタンスと同じモジュールで宣言したものに限る。組み込みの他の型と同じ規則である。
+- 利用者は、自分の型クラスのインスタンスを、具体的な Decimal の型に宣言できる。`instance Describable(Decimal[11, 2])` と書く。
+- 型クラスは、インスタンスと同じモジュールで宣言したものに限る。他のモジュールの型クラスのインスタンスを Decimal の型に宣言すると、コンパイルエラーになる。`Int32` に自分の型クラスのインスタンスを宣言できるのと同じ扱いである。
 - `Decimal[11, 2]` と `Decimal[13, 2]` のインスタンスは、別のものである。すべての Decimal の型をまとめて受けるインスタンスは書けない。
 - Decimal は、`TrappingArithmetic`、`ModularArithmetic`、`BitwiseOperations` のインスタンスではない。これらを制約に持つ汎用の関数には渡せない。
 - stdlib の `Standard.Equality` と `Standard.Order` のインスタンスは、コンパイラが作らない（issue #44）。
@@ -562,7 +565,7 @@ import Austral.Decimal (RoundingMode, NearestEven, divide, round, widen);
 
 - 定数の初期値に、演算の呼び出しを書いた。
 - 外部関数の引数か戻り値に、Decimal を値で書いた。
-- 利用者が、`Printable` のインスタンスを Decimal の型に宣言した。
+- 利用者が、他のモジュールの型クラスのインスタンスを Decimal の型に宣言した。`Printable` を含む。
 - 演算の呼び出しに、名前付きの引数を使った。演算を関数の値として使った。
 
 ## 15. この仕様に含めていないこと
@@ -665,6 +668,7 @@ COBOL は、`ON SIZE ERROR` を書かなければ、あふれた上位の桁を�
 - **union の C のタグは、宣言の逆順に並ぶ**（issue #39）。`RoundingMode` の case の番号を実行時に渡すなら、順序に頼らない渡し方にするか、順序を保証する。
 - **取り込んだ名前は、同じ名前の自分の宣言に黙って勝つ**（issue #28）。組み込みの型と同じ名前の型も宣言できてしまう（issue #51）。
 - **外部関数に使えない型の検査は、C を生成する段にある。** エラーは「Not allowed」だけである（issue #54）。13.2節の検査は、ここを直してから載せる。
+- **組み込みの型には、孤児の規則が効いていない。** `instance Printable(Int32)` を宣言でき、呼び出しでコンパイラの内部エラーになる（issue #72）。11.2節と13.1節の検査は、ここを直してから載せる。
 - **実行時の C は、libc の関数を自分で宣言してはいけない。** プログラムが同じ関数を取り込むと、C の宣言が衝突する。
 
 ## 18. 決定の一覧
