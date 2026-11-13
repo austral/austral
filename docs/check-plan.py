@@ -10,7 +10,8 @@ Checks that
   - every row of the spec's "not included" table (section 15) names an issue,
   - the dependencies of both plans name existing items and have no cycle,
   - in the refactoring plan, every dependency on another R item points backward,
-  - the overall plan lists every item of the refactoring plan.
+  - the overall plan lists every item of the refactoring plan,
+  - the refactoring plan's table of measurements quotes the recorded numbers.
 Prints the items Decimal needs (the closure of D7). Exits 1 on any finding.
 """
 import pathlib
@@ -104,6 +105,28 @@ for item in refactoring_items:
             findings.append(f"{item} depends on {need}, which is not an earlier item")
     if not re.search(rf"^\| {item} \|", plan, re.M):
         findings.append(f"{item} is not in the overall plan's table")
+
+# The refactoring plan's table of measurements must quote the recorded numbers.
+expected = docs / "research" / "functional-domain-refactoring" / "expected"
+totals = dict(line.split() for line in (expected / "totals.txt").read_text().splitlines())
+fragile = (expected / "fragile-totals.txt").read_text()
+coverage = (expected / "coverage.txt").read_text()
+unused = len((expected / "unused-exports.txt").read_text().splitlines())
+measured = refactoring[refactoring.index("## 6.") : refactoring.index("## 7.")]
+quoted = {
+    f"| 例外を投げる箇所 | {totals['raise']} |": "raise",
+    f"（`internal_err`） | {totals['internal']} |": "internal",
+    f"（`err \"...\"`） | {totals['adhoc']} |": "adhoc",
+    f"| 例外を捕まえる箇所 | {totals['catch']} |": "catch",
+    f"| 可変の状態 | {totals['state']} |": "state",
+    f"| 何でも受ける match の枝 | {totals['wildcard']} |": "wildcard",
+    f"| 壊れやすい match | {re.search(r'fragile-matches (\d+)', fragile).group(1)} |": "fragile",
+    f"| 外から使われていない公開関数 | {unused}（": "unused exports",
+    f"| テストが実行するコード | {re.search(r'total-hand-written\t([0-9.]+)', coverage).group(1)}% |": "coverage",
+}
+for text, name in quoted.items():
+    if text not in measured:
+        findings.append(f"refactoring plan section 6 does not quote the recorded {name}: expected {text!r}")
 
 path = sorted(closure("D7", {"D7"}), key=by_id)
 print(f"open issues: {len(open_issues)}, items with a heading: {len(deps)}, of which refactoring: {len(refactoring_items)}, spec 15 rows: {len(rows)}")
