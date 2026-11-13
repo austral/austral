@@ -30,16 +30,26 @@ type error_kind =
   | InternalError
   (** An internal error in the compiler. *)
 
+(** What went wrong. Each category has its own type, with one constructor per
+    error; the wording is in the [render] function of the category's module. *)
+type error =
+  | Type of TypeErrors.t
+  | Linearity of LinearityErrors.t
+  | Declaration of DeclarationErrors.t
+  | Generic of GenericErrors.t
+  | Internal of string
+  (** A state the compiler believes cannot happen. The string says which. *)
+  | Unconverted of error_kind * err_text
+  (** An error that is still raised as loose text. Goes away when R11 is done. *)
+
 (** An Austral compiler error. The module name, span, and source context rarely
     have to be passed in explicitly: they are added where the error is throw in
     the context of {!adorn_error_with_span}. *)
 type austral_error = AustralError of {
       module_name: module_name option;
       (** The name of the module where the error occurred, if available. *)
-      kind: error_kind;
-      (** The error kind. *)
-      text: err_text;
-      (** The error text. *)
+      error: error;
+      (** What went wrong. *)
       span: span option;
       (** The source span where the error happened, if available. *)
       source_ctx: source_ctx option;
@@ -48,6 +58,27 @@ type austral_error = AustralError of {
 
 (** The exception that carries Austral errors. *)
 exception Austral_error of austral_error
+
+(** The category of an error. *)
+val error_kind : error -> error_kind
+
+(** The wording of an error. *)
+val error_text : error -> err_text
+
+(** Raise a type error. *)
+val type_error : TypeErrors.t -> 'a
+
+(** Raise a linearity error. *)
+val linearity_error : LinearityErrors.t -> 'a
+
+(** Raise a declaration error. *)
+val declaration_error : DeclarationErrors.t -> 'a
+
+(** Raise a generic error. *)
+val generic_error : GenericErrors.t -> 'a
+
+(** Raise an internal error. *)
+val internal_err : string -> 'a
 
 (** Raise an Austral error given the kind and text. *)
 val austral_raise : error_kind -> err_text -> 'a
@@ -74,6 +105,3 @@ val render_error_to_json : austral_error -> Yojson.Basic.t
 
 (** Utility: raise a generic error. *)
 val err : string -> 'a
-
-(** Utility: raise an internal error. *)
-val internal_err : string -> 'a

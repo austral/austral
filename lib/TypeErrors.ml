@@ -1,357 +1,349 @@
-open Error
-open ErrorText
+(*
+   Part of the Austral project, under the Apache License v2.0 with LLVM Exceptions.
+   See LICENSE file for details.
+
+   SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*)
+(** The type errors, and their wording. *)
 open Identifier
 open Type
+open ErrorText
 
-let arithmetic_incompatible_types ~lhs ~rhs =
-  austral_raise TypeError [
-    Text "Both operands to an arithmetic expression must be compatible types. The LHS has type ";
-    Type lhs;
-    Text " but the RHS has type ";
-    Type rhs;
-    Text "."
-  ]
+(** Where a condition is. *)
+type condition =
+  | IfExpressionCondition
+  | IfStatementCondition
+  | WhileStatementCondition
 
-let arithmetic_not_numeric ty =
-  austral_raise TypeError [
-    Text "Both operands of an arithmetic operator must be numeric types, but ";
-    Type ty;
-    Text " is not."
-  ]
+(** The kinds of type whose values are built with a constructor. *)
+type aggregate =
+  | RecordAggregate
+  | UnionAggregate
 
-let cannot_borrow_immutable_var_mutably (name: identifier) =
-  austral_raise TypeError [
-      Text "Cannot borrow the variable ";
-      Code (ident_string name);
-      Text " mutably because the variable is immutable."
-    ]
+let aggregate_word (aggregate: aggregate): string =
+  match aggregate with
+  | RecordAggregate -> "record"
+  | UnionAggregate -> "union"
 
-let cannot_borrow_param_mutably (name: identifier) (ty: ty) =
-  austral_raise TypeError [
-      Text "Cannot borrow the variable ";
-      Code (ident_string name);
-      Text " mutably because it is a function parameter, and therefore immutable.";
-      Text "\nYou can move it to a mutable local variable: ";
-      Code ("var mut_" ^ (ident_string name) ^ ": " ^ (type_string ty) ^ " := " ^ (ident_string name) ^ ";");
-    ]
+type logical_operator =
+  | ConjunctionOperator
+  | DisjunctionOperator
+  | NegationOperator
 
-let call_non_callable ty =
-  austral_raise TypeError [
-    Text "The type ";
-    Type ty;
-    Text " is neither a function, method or function pointer, and cannot be called."
-  ]
+let logical_operator_word (operator: logical_operator): string =
+  match operator with
+  | ConjunctionOperator -> "conjunction"
+  | DisjunctionOperator -> "disjunction"
+  | NegationOperator -> "negation"
 
-let call_wrong_arity ~name ~expected ~actual =
-  austral_raise TypeError [
-    Text "The callable ";
-    Code (ident_string name);
-    Text " expects ";
-    Text (string_of_int expected);
-    Text " argument";
-    Text (if expected = 1 then " " else "s ");
-    Text "but ";
-    Text (string_of_int actual);
-    Text (if actual = 1 then " was " else " were ");
-    Text "given."
-  ]
+(** The two ends of the range of a [for] loop. *)
+type loop_bound =
+  | InitialBound
+  | FinalBound
 
-let case_non_exhaustive () =
-  austral_raise TypeError [
-    Text "Non-exhaustive case statement."
-  ]
+let loop_bound_word (bound: loop_bound): string =
+  match bound with
+  | InitialBound -> "initial"
+  | FinalBound -> "final"
 
-let case_non_public () =
-  austral_raise TypeError [
-    Text "Union must be public or from the same module to be used in a case statement."
-  ]
+type t =
+  | ArithmeticIncompatibleTypes of { lhs: ty; rhs: ty }
+  | ArithmeticNotNumeric of ty
+  | CannotBorrowImmutableVarMutably of identifier
+  | CannotBorrowParamMutably of { name: identifier; ty: ty }
+  | CallNonCallable of ty
+  | CallWrongArity of { name: identifier; expected: int; actual: int }
+  | CaseNonExhaustive
+  | CaseNonPublic
+  | CaseNonUnion of ty
+  | CaseWrongSlots of { binding_names: identifier list; slot_names: identifier list }
+  | CastDifferentReferences of { different_types: bool; different_regions: bool }
+  | CastInvalid of { target: ty; source: ty }
+  | CastWriteRefToNonRef
+  | ConditionNotBoolean of { condition: condition; ty: ty }
+  | ConstructorNotNamed of aggregate
+  | ConstructorWrongArgs of aggregate
+  | DereferenceNonReference of ty
+  | DestructureNonRecord of ty
+  | DestructureNotPublic of ty
+  | DestructureWrongSlots of ty
+  | DiscardLinear of universe
+  | ExpressionNotConstant
+  | ForBoundsNonIntegral of { bound: loop_bound; ty: ty }
+  | FunPointerNamedArgs
+  | IfInequal of { lhs: ty; rhs: ty }
+  | LogicalOperandsNotBoolean of { operator: logical_operator; types: ty list }
+  | NoSuchSlot of { type_name: identifier; slot_name: identifier }
+  | NoSuitableInstance of { typeclass: identifier; ty: ty }
+  | PathNotPublic of { type_name: identifier; slot_name: identifier }
+  | PathNotRecord of ty
+  | SlotWrongType of { name: identifier; expected: ty; actual: ty }
+  | UnconstrainedGenericFunction of identifier
+  | UnconstrainedTypeParameter of { typeclass: identifier; typaram: identifier }
+  | CantAccessSlotNotRecord of { slot_name: identifier; ty: ty }
+  | CantIndexNotSpan of ty
 
-let case_non_union ty =
-  austral_raise TypeError [
-    Text "The case expression has type ";
-    Type ty;
-    Text " which is not a union type."
-  ]
-
-let case_wrong_slots (binding_names, slot_names) =
-  austral_raise TypeError [
-    Text "The set of slots (";
-    Code (String.concat ", " binding_names);
-    Text ") in the case statement doesn't match the set of slots in the union definition (";
-    Code (String.concat ", " slot_names);
-    Text ")."
-  ]
-
-let cast_different_references ~different_types ~different_regions =
-  let text = match different_types, different_regions with
-  | true, false -> [
-      Text "Cannot cast a reference to one with a different underlying type."
-    ]
-  | false, true -> [
-      Text "Cannot cast a reference to one with a different underlying region."
-    ]
-  | _ -> [
-      Text "Cannot cast to a different region"
-    ]
-  in
-  austral_raise TypeError text
-
-let cast_invalid ~target ~source =
-  austral_raise TypeError [
-    Text "Cannot cast to ";
-    Type target;
-    Text " from ";
-    Type source
-  ]
-
-let cast_write_ref_to_non_ref () =
-  austral_raise TypeError [
-    Text "Write references can only be casted to a read reference."
-  ]
-
-let condition_not_boolean ~kind ~form ~ty =
-  austral_raise TypeError [
-    Text "The condition in ";
-    Code kind;
-    Text "-";
-    Text form;
-    Text "s should be a boolean type, but is ";
-    Type ty
-  ]
-
-let constructor_not_named declaration =
-  austral_raise TypeError [
-    Text "Arguments to ";
-    Text declaration;
-    Text " constructor must be named."
-  ]
-
-let constructor_wrong_args declaration =
-  austral_raise TypeError [
-    Text "Arguments to ";
-    Text declaration;
-    Text " constructor have the wrong names."
-  ]
-
-let dereference_non_reference ty =
-  austral_raise TypeError [
-    Text "Only references can be dereferenced, but ";
-    Type ty;
-    Text " is not."
-  ]
-
-let dereference_non_free ty =
-  austral_raise LinearityError [
-    Text "Cannot dereference non-free type ";
-    Type ty
-  ]
-
-let destructure_non_record ty =
-  austral_raise TypeError [
-    Text "The type ";
-    Type ty;
-    Text " cannot be destructured because it is not a record."
-  ]
-
-let destructure_not_public ty =
-  austral_raise TypeError [
-    Text "The type ";
-    Type ty;
-    Text " is not a public record and so cannot be destructured."
-  ]
-
-let destructure_wrong_slots ty =
-  austral_raise TypeError [
-    Text "The set of slots mentioned differs from the set of slots in ";
-    Type ty;
-  ]
-
-let discard_linear universe =
-  austral_raise TypeError [
-    Text "Cannot discard a value in the ";
-    Code (universe_string universe);
-    Text " universe."
-  ]
-
-let expression_not_constant () =
-  austral_raise TypeError [
-    Text "The expression is not a valid constant expression."
-  ]
-
-let for_bounds_non_integral ~bound ~ty =
-  austral_raise TypeError [
-    Text "The type of the ";
-    Text bound;
-    Text " value in the loop range is ";
-    Type ty;
-    Text " which is not ";
-    Code "Index";
-    Text "."
-  ]
-
-let foreign_in_safe_module () =
-  austral_raise DeclarationError [
-    Text "Can't declare a foreign function in a safe module."
-  ]
-
-let foreign_type_parameters () =
-  austral_raise DeclarationError [
-    Text "Foreign functions can't have type parameters."
-  ]
-
-let fun_pointer_named_args () =
-  austral_raise TypeError [
-    Text "You can't call a function pointer with a named argument list, because function pointers don't preserve parameter names, so we wouldn't know how to assign arguments to parameters."
-  ]
-
-let fun_invalid_pragmas () =
-  austral_raise DeclarationError [
-    Text "Only import and export pragmas are allowed inside functions."
-  ]
-
-let if_inequal ~lhs ~rhs =
-  austral_raise TypeError [
-    Text "The branches of the ";
-    Code "if";
-    Text "-expression have different types: ";
-    Type lhs;
-    Text " and ";
-    Type rhs
-  ]
-
-let logical_operands_not_boolean ~operator ~types = match types with
-| [ty] ->
-    austral_raise TypeError [
-      Text "The operand of a ";
-      Text operator;
-      Text " operator must be a boolean expression, but it has the type ";
-      Type ty
-    ]
-| [first; second] ->
-    austral_raise TypeError [
-      Text "Both operands of a ";
-      Text operator;
-      Text " operator must be boolean expressions, but they have types ";
-      Type first;
-      Text " and ";
-      Type second
-    ]
-  | _ ->
-    austral_raise TypeError [
-      Text "All operands of a logical operator must be boolean expressions."
-    ]
-
-let no_such_slot ~type_name ~slot_name =
-  austral_raise TypeError [
-    Text "The type ";
-    Code (ident_string type_name);
-    Text " has no slot with name ";
-    Code (ident_string slot_name)
-  ]
-
-let no_suitable_instance ~typeclass ~ty =
-  austral_raise TypeError [
-    Text "The typeclass ";
-    Code (ident_string typeclass);
-    Text " has no instance which matches for ";
-    Type ty
-  ]
-
-let path_not_public ~type_name ~slot_name =
-  austral_raise TypeError [
-    Text "The slot ";
-    Code (ident_string slot_name);
-    Text " is not publically visible in the type ";
-    Code (ident_string type_name);
-    Text " and so cannot be read."
-  ]
-
-let path_not_record ty =
-  austral_raise TypeError [
-    Text "Cannot take a path of the type ";
-    Type ty;
-    Text " because it is not a record."
-  ]
-
-let slot_wrong_type ~name ~expected ~actual =
-  austral_raise TypeError [
-    Text "The slot ";
-    Code (ident_string name);
-    Text " should have type ";
-    Type expected;
-    Text " but is declared to have type ";
-    Type actual
-  ]
-
-let unconstrained_generic_function name =
-  austral_raise TypeError [
-    Code (ident_string name);
-    Text " is generic but unconstrained, so its type is ambiguous.";
-    Break;
-    Text "Consider clarifying its type using a cast."
-  ]
-
-let unconstrained_type_parameter ~typeclass ~typaram =
-  austral_raise TypeError [
-    Text "The type parameter ";
-    Code (ident_string typaram);
-    Text " does not implement the type class ";
-    Code (ident_string typeclass);
-    Break;
-    Text "Consider adding a constraint to the type parameter."
-  ]
-
-let unknown_name ~kind ~name =
-  austral_raise GenericError [
-    Text "I can't find a ";
-    Text kind;
-    Text " named ";
-    Code (ident_string name);
-    Text "."
-  ]
-
-let cannot_assign_to_constant _ =
-  austral_raise GenericError [
-      Text "Cannot assign a value to a constant."
-    ]
-
-let cannot_assign_to_parameter _ =
-  austral_raise GenericError [
-      Text "Cannot assign a value to a function parameter."
-    ]
-
-let cant_assign_to_immutable_var (name: identifier) =
-  austral_raise GenericError [
-      Text "Cannot assign a value to ";
-      Code (ident_string name);
-      Text " because it is immutable."
-    ]
-
-let ref_transform_needs_ref ty =
-  austral_raise GenericError [
-      Text "The head of a reference transform expression must be of a reference type, but I got ";
-      Type ty
-    ]
-
-let var_collides_with_decl (name: identifier) =
-  austral_raise GenericError [
-      Text "The variable ";
-      Code (ident_string name);
-      Text " collides with the name of a declaration."
-    ]
-
-let cant_access_slot_not_record (slot_name: identifier) (ty: ty) =
-  austral_raise TypeError [
-      Text "Can't access the slot ";
-      Code (ident_string slot_name);
-      Text " because the type ";
-      Type ty;
-      Text " is not a record."
-    ]
-
-let cant_index_not_span (ty: ty) =
-  austral_raise TypeError [
-      Text "I can't use the array indexing operator here, because the type ";
-      Type ty;
-      Text " is not a span."
-    ]
+let render (error: t): err_text =
+  match error with
+  | ArithmeticIncompatibleTypes { lhs; rhs } ->
+     [
+       Text "Both operands to an arithmetic expression must be compatible types. The LHS has type ";
+       Type lhs;
+       Text " but the RHS has type ";
+       Type rhs;
+       Text "."
+     ]
+  | ArithmeticNotNumeric ty ->
+     [
+       Text "Both operands of an arithmetic operator must be numeric types, but ";
+       Type ty;
+       Text " is not."
+     ]
+  | CannotBorrowImmutableVarMutably name ->
+     [
+       Text "Cannot borrow the variable ";
+       Code (ident_string name);
+       Text " mutably because the variable is immutable."
+     ]
+  | CannotBorrowParamMutably { name; ty } ->
+     [
+       Text "Cannot borrow the variable ";
+       Code (ident_string name);
+       Text " mutably because it is a function parameter, and therefore immutable.";
+       Text "\nYou can move it to a mutable local variable: ";
+       Code ("var mut_" ^ (ident_string name) ^ ": " ^ (type_string ty) ^ " := " ^ (ident_string name) ^ ";");
+     ]
+  | CallNonCallable ty ->
+     [
+       Text "The type ";
+       Type ty;
+       Text " is neither a function, method or function pointer, and cannot be called."
+     ]
+  | CallWrongArity { name; expected; actual } ->
+     [
+       Text "The callable ";
+       Code (ident_string name);
+       Text " expects ";
+       Text (string_of_int expected);
+       Text " argument";
+       Text (if expected = 1 then " " else "s ");
+       Text "but ";
+       Text (string_of_int actual);
+       Text (if actual = 1 then " was " else " were ");
+       Text "given."
+     ]
+  | CaseNonExhaustive ->
+     [
+       Text "Non-exhaustive case statement."
+     ]
+  | CaseNonPublic ->
+     [
+       Text "Union must be public or from the same module to be used in a case statement."
+     ]
+  | CaseNonUnion ty ->
+     [
+       Text "The case expression has type ";
+       Type ty;
+       Text " which is not a union type."
+     ]
+  | CaseWrongSlots { binding_names; slot_names } ->
+     [
+       Text "The set of slots (";
+       Code (String.concat ", " (List.map ident_string binding_names));
+       Text ") in the case statement doesn't match the set of slots in the union definition (";
+       Code (String.concat ", " (List.map ident_string slot_names));
+       Text ")."
+     ]
+  | CastDifferentReferences { different_types; different_regions } ->
+     (match different_types, different_regions with
+      | true, false -> [
+          Text "Cannot cast a reference to one with a different underlying type."
+        ]
+      | false, true -> [
+          Text "Cannot cast a reference to one with a different underlying region."
+        ]
+      | _ -> [
+          Text "Cannot cast to a different region"
+        ])
+  | CastInvalid { target; source } ->
+     [
+       Text "Cannot cast to ";
+       Type target;
+       Text " from ";
+       Type source
+     ]
+  | CastWriteRefToNonRef ->
+     [
+       Text "Write references can only be casted to a read reference."
+     ]
+  | ConditionNotBoolean { condition; ty } ->
+     let (kind, form) = match condition with
+       | IfExpressionCondition -> ("if", "expression")
+       | IfStatementCondition -> ("if", "statement")
+       | WhileStatementCondition -> ("while", "statement")
+     in
+     [
+       Text "The condition in ";
+       Code kind;
+       Text "-";
+       Text form;
+       Text "s should be a boolean type, but is ";
+       Type ty
+     ]
+  | ConstructorNotNamed aggregate ->
+     [
+       Text "Arguments to ";
+       Text (aggregate_word aggregate);
+       Text " constructor must be named."
+     ]
+  | ConstructorWrongArgs aggregate ->
+     [
+       Text "Arguments to ";
+       Text (aggregate_word aggregate);
+       Text " constructor have the wrong names."
+     ]
+  | DereferenceNonReference ty ->
+     [
+       Text "Only references can be dereferenced, but ";
+       Type ty;
+       Text " is not."
+     ]
+  | DestructureNonRecord ty ->
+     [
+       Text "The type ";
+       Type ty;
+       Text " cannot be destructured because it is not a record."
+     ]
+  | DestructureNotPublic ty ->
+     [
+       Text "The type ";
+       Type ty;
+       Text " is not a public record and so cannot be destructured."
+     ]
+  | DestructureWrongSlots ty ->
+     [
+       Text "The set of slots mentioned differs from the set of slots in ";
+       Type ty;
+     ]
+  | DiscardLinear universe ->
+     [
+       Text "Cannot discard a value in the ";
+       Code (universe_string universe);
+       Text " universe."
+     ]
+  | ExpressionNotConstant ->
+     [
+       Text "The expression is not a valid constant expression."
+     ]
+  | ForBoundsNonIntegral { bound; ty } ->
+     [
+       Text "The type of the ";
+       Text (loop_bound_word bound);
+       Text " value in the loop range is ";
+       Type ty;
+       Text " which is not ";
+       Code "Index";
+       Text "."
+     ]
+  | FunPointerNamedArgs ->
+     [
+       Text "You can't call a function pointer with a named argument list, because function pointers don't preserve parameter names, so we wouldn't know how to assign arguments to parameters."
+     ]
+  | IfInequal { lhs; rhs } ->
+     [
+       Text "The branches of the ";
+       Code "if";
+       Text "-expression have different types: ";
+       Type lhs;
+       Text " and ";
+       Type rhs
+     ]
+  | LogicalOperandsNotBoolean { operator; types } ->
+     (match types with
+      | [ty] ->
+         [
+           Text "The operand of a ";
+           Text (logical_operator_word operator);
+           Text " operator must be a boolean expression, but it has the type ";
+           Type ty
+         ]
+      | [first; second] ->
+         [
+           Text "Both operands of a ";
+           Text (logical_operator_word operator);
+           Text " operator must be boolean expressions, but they have types ";
+           Type first;
+           Text " and ";
+           Type second
+         ]
+      | _ ->
+         [
+           Text "All operands of a logical operator must be boolean expressions."
+         ])
+  | NoSuchSlot { type_name; slot_name } ->
+     [
+       Text "The type ";
+       Code (ident_string type_name);
+       Text " has no slot with name ";
+       Code (ident_string slot_name)
+     ]
+  | NoSuitableInstance { typeclass; ty } ->
+     [
+       Text "The typeclass ";
+       Code (ident_string typeclass);
+       Text " has no instance which matches for ";
+       Type ty
+     ]
+  | PathNotPublic { type_name; slot_name } ->
+     [
+       Text "The slot ";
+       Code (ident_string slot_name);
+       Text " is not publically visible in the type ";
+       Code (ident_string type_name);
+       Text " and so cannot be read."
+     ]
+  | PathNotRecord ty ->
+     [
+       Text "Cannot take a path of the type ";
+       Type ty;
+       Text " because it is not a record."
+     ]
+  | SlotWrongType { name; expected; actual } ->
+     [
+       Text "The slot ";
+       Code (ident_string name);
+       Text " should have type ";
+       Type expected;
+       Text " but is declared to have type ";
+       Type actual
+     ]
+  | UnconstrainedGenericFunction name ->
+     [
+       Code (ident_string name);
+       Text " is generic but unconstrained, so its type is ambiguous.";
+       Break;
+       Text "Consider clarifying its type using a cast."
+     ]
+  | UnconstrainedTypeParameter { typeclass; typaram } ->
+     [
+       Text "The type parameter ";
+       Code (ident_string typaram);
+       Text " does not implement the type class ";
+       Code (ident_string typeclass);
+       Break;
+       Text "Consider adding a constraint to the type parameter."
+     ]
+  | CantAccessSlotNotRecord { slot_name; ty } ->
+     [
+       Text "Can't access the slot ";
+       Code (ident_string slot_name);
+       Text " because the type ";
+       Type ty;
+       Text " is not a record."
+     ]
+  | CantIndexNotSpan ty ->
+     [
+       Text "I can't use the array indexing operator here, because the type ";
+       Type ty;
+       Text " is not a span."
+     ]

@@ -29,8 +29,6 @@ open TypeMatch
 open Error
 open Util
 
-module Errors = TypeErrors
-
 (* Expression Context *)
 
 type expr_ctx =
@@ -122,7 +120,7 @@ let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * typ
      let mod_name: module_name = module_name_from_id env mod_id in
      (mod_name, vis, typarams, slots)
   | Some _ ->
-     Errors.path_not_record ty
+     type_error (PathNotRecord ty)
   | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
@@ -130,9 +128,7 @@ let get_slot_with_name type_name slots slot_name =
   match List.find_opt (fun (TypedSlot (n, _)) -> n = slot_name) slots with
   | Some s -> s
   | None ->
-     Errors.no_such_slot
-       ~type_name:(original_name type_name)
-       ~slot_name
+     type_error (NoSuchSlot { type_name = original_name type_name; slot_name })
 
 (* Check that there are as many bindings as there are type parameters, and that
    every type parameter is satisfied. *)
@@ -175,7 +171,7 @@ and check_arity (name: identifier) (params: value_parameter list) (args: texpr l
   if nparams = nargs then
     ()
   else
-    Errors.call_wrong_arity ~name ~expected:nparams ~actual:nargs
+    type_error (CallWrongArity { name; expected = nparams; actual = nargs })
 
 (* Precondition: both lists have the same length. *)
 and check_argument_list' (ctx: expr_ctx) (bindings: type_bindings) (params: value_parameter list) (args: texpr list): type_bindings =
@@ -226,9 +222,7 @@ let rec augment_call (ctx: expr_ctx) (name: qident) (args: typed_arglist) (asser
       | Some callable ->
          augment_callable ctx name callable asserted_ty args
       | None ->
-         Errors.unknown_name
-           ~kind:"callable"
-           ~name:(original_name name))
+         generic_error (UnknownName { kind = CallableName; name = original_name name }))
 
 and augment_fptr_call (ctx: expr_ctx) (name: identifier) (fn_ptr_ty: ty) (asserted_ty: ty option) (args: typed_arglist): texpr =
   (* Because function pointers don't preserve value parameter names, we can't
@@ -237,14 +231,14 @@ and augment_fptr_call (ctx: expr_ctx) (name: identifier) (fn_ptr_ty: ty) (assert
     match args with
     | TPositionalArglist args -> args
     | TNamedArglist _ ->
-       Errors.fun_pointer_named_args ()
+       type_error FunPointerNamedArgs
   in
   (* We extract the parameter types and return type from the function pointer
      type. *)
   let (paramtys, rt): (ty list * ty) =
     match fn_ptr_ty with
     | FnPtr (paramtys, rt) -> (paramtys, rt)
-    | _ -> Errors.call_non_callable fn_ptr_ty
+    | _ -> type_error (CallNonCallable fn_ptr_ty)
   in
   (* Then, we synthesize a parameter list from the function pointer type. The
      parameter names are fake, but this is so we can reuse the arity-checking,
@@ -306,14 +300,14 @@ and augment_record_constructor (ctx: expr_ctx) (name: qident) (typarams: typaram
                   if l = [] then
                     []
                   else
-                    Errors.constructor_not_named "record"
+                    type_error (ConstructorNotNamed RecordAggregate)
                | TNamedArglist a ->
                   a) in
   (* Check: the set of slots matches the set of param names *)
   let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
   let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
   if not (ident_set_eq slot_names argument_names) then
-    Errors.constructor_wrong_args "record"
+    type_error (ConstructorWrongArgs RecordAggregate)
   else
     (* Convert args to positional *)
     let arguments = arglist_to_positional (args, slot_names) in
@@ -341,7 +335,7 @@ and augment_union_constructor (ctx: expr_ctx) (type_name: qident) (typarams: typ
                   if l = [] then
                     []
                   else
-                    Errors.constructor_not_named "union"
+                    type_error (ConstructorNotNamed UnionAggregate)
                | TNamedArglist a ->
                   a) in
   (* Check: the set of slots matches the set of param names *)
@@ -349,7 +343,7 @@ and augment_union_constructor (ctx: expr_ctx) (type_name: qident) (typarams: typ
   let slot_names: identifier list = List.map (fun (TypedSlot (name, _)) -> name) slots in
   let argument_names: identifier list = List.map (fun (n, _) -> n) args' in
   if not (ident_set_eq slot_names argument_names) then
-    Errors.constructor_wrong_args "union"
+    type_error (ConstructorWrongArgs UnionAggregate)
   else
     (* Convert args to positional *)
     let arguments = arglist_to_positional (args, slot_names) in
@@ -411,9 +405,7 @@ and augment_method_call (ctx: expr_ctx) (typeclass_id: decl_id) (typaram: type_p
              }
          else
            (* If it doesn't, that's an error *)
-           Errors.unconstrained_type_parameter
-             ~typeclass:(sident_name tc_name)
-             ~typaram
+           type_error (UnconstrainedTypeParameter { typeclass = sident_name tc_name; typaram })
       | _ ->
          (* If it's not a type variable, continue normal instance resolution. *)
          let (instance, instance_bindings): decl * type_bindings =
@@ -421,9 +413,7 @@ and augment_method_call (ctx: expr_ctx) (typeclass_id: decl_id) (typaram: type_p
             | Some (i, b) -> (i, b)
             | None ->
                let tc_name: sident = get_decl_sident_or_die (ctx_env ctx) typeclass_id in
-               Errors.no_suitable_instance
-                 ~typeclass:(sident_name tc_name)
-                 ~ty:dispatch_ty)
+               type_error (NoSuitableInstance { typeclass = sident_name tc_name; ty = dispatch_ty }))
          in
          let params' = List.map (fun (ValueParameter (n, t)) -> ValueParameter (n, replace_variables instance_bindings t)) params in
          let arguments' = cast_arguments instance_bindings params' arguments in
@@ -464,7 +454,7 @@ and handle_return_type_polymorphism (ctx: expr_ctx) (name: identifier) (params: 
        let bindings'' = merge_bindings bindings bindings' in
        (bindings'', replace_variables bindings'' rt)
     | None ->
-       Errors.unconstrained_generic_function name
+       type_error (UnconstrainedGenericFunction name)
   else
     (empty_bindings, replace_variables bindings rt)
 
@@ -562,7 +552,7 @@ and augment_variable (ctx: expr_ctx) (name: qident) (asserted_ty: ty option): te
            let effective_fn_ty: ty = FnPtr (arg_tys, rt) in
            TFunVar (id, effective_fn_ty, bindings)
         | None ->
-           Errors.unconstrained_generic_function (original_name name))
+           type_error (UnconstrainedGenericFunction (original_name name)))
      else
        (* Function is concrete. *)
        TFunVar (id, fn_ty, empty_bindings)
@@ -577,9 +567,7 @@ and augment_variable (ctx: expr_ctx) (name: qident) (asserted_ty: ty option): te
           | VarLocal _ ->
              TLocalVar ((original_name name), ty))
       | None ->
-         Errors.unknown_name
-           ~kind:"variable"
-           ~name:(original_name name))
+         generic_error (UnknownName { kind = VariableName; name = original_name name }))
 
 and augment_temporary (ctx: expr_ctx) (name: identifier): texpr =
   match get_var (ctx_lexenv ctx) name with
@@ -606,9 +594,10 @@ and augment_conjunction ctx lhs rhs =
   if ((is_bool lhs') && (is_bool rhs')) then
     TConjunction (lhs', rhs')
   else
-    Errors.logical_operands_not_boolean
-      ~operator:"conjunction"
-      ~types:[get_type lhs'; get_type rhs']
+    type_error (LogicalOperandsNotBoolean {
+        operator = ConjunctionOperator;
+        types = [get_type lhs'; get_type rhs'];
+      })
 
 and augment_disjunction ctx lhs rhs =
   let lhs': texpr = aug ctx lhs
@@ -616,18 +605,17 @@ and augment_disjunction ctx lhs rhs =
   if ((is_bool lhs') && (is_bool rhs')) then
     TDisjunction (lhs', rhs')
   else
-    Errors.logical_operands_not_boolean
-      ~operator:"disjunction"
-      ~types:[get_type lhs'; get_type rhs']
+    type_error (LogicalOperandsNotBoolean {
+        operator = DisjunctionOperator;
+        types = [get_type lhs'; get_type rhs'];
+      })
 
 and augment_negation ctx e =
   let e' = aug ctx e in
   if is_bool e' then
     TNegation e'
   else
-    Errors.logical_operands_not_boolean
-      ~operator:"negation"
-      ~types:[get_type e']
+    type_error (LogicalOperandsNotBoolean { operator = NegationOperator; types = [get_type e'] })
 
 and augment_if_expr ctx c t f =
   let c' = aug ctx c
@@ -637,14 +625,9 @@ and augment_if_expr ctx c t f =
     if (get_type t') = (get_type f') then
       TIfExpression (c', t', f')
     else
-      Errors.if_inequal
-        ~lhs:(get_type t')
-        ~rhs:(get_type f')
+      type_error (IfInequal { lhs = get_type t'; rhs = get_type f' })
   else
-    Errors.condition_not_boolean
-      ~kind:"if"
-      ~form:"expression"
-      ~ty:(get_type c')
+    type_error (ConditionNotBoolean { condition = IfExpressionCondition; ty = get_type c' })
 
 and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
   (* The type of the expression being dereferenced must be either a read-only
@@ -656,14 +639,14 @@ and augment_deref (ctx: expr_ctx) (expr: aexpr): texpr =
       if type_universe ty' = FreeUniverse then
         TDeref expr'
       else
-        Errors.dereference_non_free ty'
+        linearity_error (DereferenceNonFree ty')
    | WriteRef (ty', _) ->
       if type_universe ty' = FreeUniverse then
         TDeref expr'
       else
-        Errors.dereference_non_free ty'
+        linearity_error (DereferenceNonFree ty')
    | _ ->
-      Errors.dereference_non_reference ty)
+      type_error (DereferenceNonReference ty))
 
 and augment_slot_access (ctx: expr_ctx) (expr: aexpr) (slot_name: identifier): texpr =
   (* The type of the expression is a reference. *)
@@ -675,7 +658,7 @@ and augment_slot_access (ctx: expr_ctx) (expr: aexpr) (slot_name: identifier): t
     | WriteRef (ty, reg) ->
        (ty, reg, WriteBorrow)
     | _ ->
-       Errors.ref_transform_needs_ref (get_type expr)
+       generic_error (RefTransformNeedsRef (get_type expr))
   in
   (* The pointed-to type is a record. *)
   let (type_name, type_args): qident * ty list = begin
@@ -683,7 +666,7 @@ and augment_slot_access (ctx: expr_ctx) (expr: aexpr) (slot_name: identifier): t
       | NamedType (name, args, _) ->
          (name, args)
       | _ ->
-         Errors.cant_access_slot_not_record slot_name ty
+         type_error (CantAccessSlotNotRecord { slot_name; ty })
     end
   in
   let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name ty in
@@ -693,9 +676,7 @@ and augment_slot_access (ctx: expr_ctx) (expr: aexpr) (slot_name: identifier): t
       (* The record is public, or it is defined in the same module as we are. *)
       ()
     else
-      Errors.path_not_public
-        ~type_name:(original_name type_name)
-        ~slot_name:slot_name
+      type_error (PathNotPublic { type_name = original_name type_name; slot_name })
   in
   (* Get the slot with the given name. *)
   let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
@@ -722,7 +703,7 @@ and augment_pointer_slot_access (ctx: expr_ctx) (expr: aexpr) (slot_name: identi
     | WriteRef (ty2, reg) ->
        (ty2, reg)
     | _ ->
-       Errors.ref_transform_needs_ref (get_type expr)
+       generic_error (RefTransformNeedsRef (get_type expr))
   in
   (* ... to a reference... *)
   let (ty3, mode): ty * borrowing_mode =
@@ -744,7 +725,7 @@ and augment_pointer_slot_access (ctx: expr_ctx) (expr: aexpr) (slot_name: identi
       | NamedType (name, args, _) ->
          (name, args)
       | _ ->
-         Errors.cant_access_slot_not_record slot_name ty3
+         type_error (CantAccessSlotNotRecord { slot_name; ty = ty3 })
     end
   in
   let (source_module, vis, typarams, slots) = get_record_definition (ctx_env ctx) type_name ty3 in
@@ -754,9 +735,7 @@ and augment_pointer_slot_access (ctx: expr_ctx) (expr: aexpr) (slot_name: identi
       (* The record is public, or it is defined in the same module as we are. *)
       ()
     else
-      Errors.path_not_public
-        ~type_name:(original_name type_name)
-        ~slot_name:slot_name
+      type_error (PathNotPublic { type_name = original_name type_name; slot_name })
   in
   (* Get the slot with the given name. *)
   let (TypedSlot (_, slot_ty)) = get_slot_with_name type_name slots slot_name in
@@ -786,7 +765,7 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
         | SpanMut (ty, _) ->
            ty
         | _ ->
-           Errors.cant_index_not_span ty
+           type_error (CantIndexNotSpan ty)
       in
       (* Construct the result type. *)
       TArrayIndex (expr, index_expr, ReadRef (elem_ty, reg))
@@ -799,7 +778,7 @@ and augment_array_index (ctx: expr_ctx) (expr: aexpr) (index_expr: aexpr): texpr
         | SpanMut (ty, _) ->
            ty
         | _ ->
-           Errors.cant_index_not_span ty
+           type_error (CantIndexNotSpan ty)
       in
       (* Construct the result type. *)
       TArrayIndex (expr, index_expr, WriteRef (elem_ty, reg))
@@ -866,19 +845,18 @@ and augment_typecast (ctx: expr_ctx) (expr: aexpr) (ty: qtypespec): texpr =
               if ((equal_ty underlying_ty underlying_ty') && (equal_ty region region')) then
                 TCast (expr', target_type)
               else
-                Errors.cast_different_references
-                  ~different_types:(not (equal_ty underlying_ty underlying_ty'))
-                  ~different_regions:(not (equal_ty region region'))
+                type_error (CastDifferentReferences {
+                    different_types = not (equal_ty underlying_ty underlying_ty');
+                    different_regions = not (equal_ty region region');
+                  })
            | _ ->
-              Errors.cast_write_ref_to_non_ref ())
+              type_error CastWriteRefToNonRef)
        | _ ->
           (try
              let _ = match_type_ctx ctx target_type (get_type expr') in
              expr'
            with Austral_error _ ->
-             Errors.cast_invalid
-               ~target:target_type
-               ~source:(get_type expr')))
+             type_error (CastInvalid { target = target_type; source = get_type expr' })))
 
 and augment_arglist (ctx: expr_ctx) (args: abstract_arglist): typed_arglist =
   match args with
@@ -939,7 +917,7 @@ and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (r
     if (is_numeric lhs_ty) then
       augment_arithmetic_call ()
     else
-      Errors.arithmetic_not_numeric lhs_ty
+      type_error (ArithmeticNotNumeric lhs_ty)
   else
     (* If the types are different, check if at least one operator is a constant.*)
     if (is_numeric_literal lhs) <> (is_numeric_literal rhs) then
@@ -947,7 +925,7 @@ and augment_arithmetic (ctx: expr_ctx) (op: arithmetic_operator) (lhs: aexpr) (r
          different types are an integer and a float, and neither decides. *)
       augment_arithmetic_call ()
     else
-      Errors.arithmetic_incompatible_types ~lhs:lhs_ty ~rhs:rhs_ty
+      type_error (ArithmeticIncompatibleTypes { lhs = lhs_ty; rhs = rhs_ty })
 
 (* Further utilities, these have to be defined here because of `let rec and`
    bullshit. *)

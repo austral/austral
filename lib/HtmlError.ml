@@ -263,19 +263,19 @@ let code_to_html_table (span: span option) (ctx: source_ctx option): string =
 
 
 let render_error_to_html (error: austral_error): string =
-    let (AustralError { span; kind; text; source_ctx; module_name }) = error
+    let (AustralError { span; error = cause; source_ctx; module_name }) = error
     in
     let main: string = "
     <div id='main'>
         <h1>Error Report</h1>
         <div id='split'>
             <div id='left'>
-                <h3><code>" ^  sanatize_string (error_title kind) ^ "</code>
+                <h3><code>" ^  sanatize_string (error_title (error_kind cause)) ^ "</code>
                      in module <code>" 
                         ^ sanatize_string (module_name_to_text module_name) 
                         ^ "</code></h3>
                 <pre id='description'>" 
-                    ^ error_text_to_html text
+                    ^ error_text_to_html (error_text cause)
                     ^ "</pre>
             </div>
 

@@ -28,8 +28,6 @@ open Stages.Linked
 open Util
 open Error
 
-module Errors = TypeErrors
-
 type stmt_ctx = StmtCtx of module_name * env * region_map * typarams * lexenv * ty
 
 let update_lexenv (StmtCtx (mn, menv, rm, typarams, _, rt)) (lexenv: lexenv): stmt_ctx =
@@ -54,7 +52,7 @@ let get_record_definition (env: env) (name: qident) (ty: ty): (module_name * typ
      let mod_name: module_name = module_name_from_id env mod_id in
      (mod_name, vis, typarams, slots)
   | Some _ ->
-     Errors.path_not_record ty
+     type_error (PathNotRecord ty)
   | None ->
      err ("No record with this name: " ^ (ident_string (original_name name)))
 
@@ -78,7 +76,7 @@ let check_var_doesnt_collide_with_decl (ctx: stmt_ctx) (name: identifier) =
   let sname: sident = make_sident module_name name in
   match get_decl_by_name env sname with
   | Some _ ->
-     Errors.var_collides_with_decl name
+     generic_error (VarCollidesWithDecl name)
   | None ->
      ()
 
@@ -191,11 +189,11 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                      body'
                    )
                else
-                 Errors.destructure_wrong_slots rec_ty
+                 type_error (DestructureWrongSlots rec_ty)
              else
-               Errors.destructure_not_public rec_ty
+               type_error (DestructureNotPublic rec_ty)
           | _ ->
-             Errors.destructure_non_record rec_ty))
+             type_error (DestructureNonRecord rec_ty)))
   | AAssign (span, lvalue, rvalue) ->
      adorn_error_with_span span
        (fun _ ->
@@ -242,16 +240,16 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  | VarLocal Mutable ->
                     ()
                  | VarLocal Immutable ->
-                    Errors.cant_assign_to_immutable_var name
+                    generic_error (CantAssignToImmutableVar name)
                  | VarConstant ->
-                    Errors.cannot_assign_to_constant name
+                    generic_error CannotAssignToConstant
                  | VarParam ->
-                    Errors.cannot_assign_to_parameter name
+                    generic_error CannotAssignToParameter
                in
                orig_ty
              end
            | None ->
-              Errors.unknown_name ~kind:"variable" ~name:name
+              generic_error (UnknownName { kind = VariableName; name })
            end
          in
          (* Augment the rvalue. *)
@@ -273,10 +271,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          if is_boolean (get_type c') then
            TIf (span, c', augment_stmt ctx t, augment_stmt ctx f)
          else
-           Errors.condition_not_boolean
-             ~kind:"if"
-             ~form:"statement"
-             ~ty:(get_type c'))
+           type_error (ConditionNotBoolean { condition = IfStatementCondition; ty = get_type c' }))
   | AWhen (span, c, t) ->
      adorn_error_with_span span
        (fun _ ->
@@ -284,10 +279,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          if is_boolean (get_type c) then
            TIf (span, c, augment_stmt ctx t, TSkip span)
          else
-           Errors.condition_not_boolean
-             ~kind:"if"
-             ~form:"statement"
-             ~ty:(get_type c))
+           type_error (ConditionNotBoolean { condition = IfStatementCondition; ty = get_type c }))
   | ACase (span, expr, whens) ->
      augment_case ctx span expr whens
   | AWhile (span, c, body) ->
@@ -297,10 +289,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          if is_boolean (get_type c') then
            TWhile (span, c', augment_stmt ctx body)
          else
-           Errors.condition_not_boolean
-             ~kind:"while"
-             ~form:"statement"
-             ~ty:(get_type c'))
+           type_error (ConditionNotBoolean { condition = WhileStatementCondition; ty = get_type c' }))
   | AFor { span; name; initial; final; body; } ->
      adorn_error_with_span span
        (fun _ ->
@@ -313,9 +302,9 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
              remove_var lexenv name;
              TFor (span, name, i', f', b')
            else
-             Errors.for_bounds_non_integral ~bound:"final" ~ty:(get_type f')
+             type_error (ForBoundsNonIntegral { bound = FinalBound; ty = get_type f' })
          else
-           Errors.for_bounds_non_integral ~bound:"initial" ~ty:(get_type i'))
+           type_error (ForBoundsNonIntegral { bound = InitialBound; ty = get_type i' }))
   | ABorrow { span; original; rename; region; body; mode; } ->
      adorn_error_with_span span
        (fun _ ->
@@ -330,7 +319,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                   ()
                | (VarLocal Immutable, Write) ->
                   (* Immutable variables cannot be borrowed mutably. *)
-                  Errors.cannot_borrow_immutable_var_mutably original
+                  type_error (CannotBorrowImmutableVarMutably original)
                | (VarParam, Write) ->
                   (* Parameters cannot be borrowed mutably, unless they're mutable references. *)
                   let is_mut = begin
@@ -342,7 +331,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                   if is_mut then
                     ()
                   else
-                    Errors.cannot_borrow_param_mutably original orig_ty
+                    type_error (CannotBorrowParamMutably { name = original; ty = orig_ty })
                | _ ->
                   (* And anything else is fine. *)
                   ()
@@ -382,7 +371,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
                  mode=mode
                }
           | None ->
-             Errors.unknown_name ~kind:"variable" ~name:original))
+             generic_error (UnknownName { kind = VariableName; name = original })))
   | ABlock (span, f, r) ->
      (match lifted_assignment_span r with
       | Some assign_span ->
@@ -403,7 +392,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
          let e' = augment_expr module_name env rm typarams lexenv None e in
          let u = type_universe (get_type e') in
          if ((u = LinearUniverse) || (u = TypeUniverse)) then
-           Errors.discard_linear u
+           type_error (DiscardLinear u)
          else
            TDiscarding (span, e'))
   | AReturn (span, e) ->
@@ -456,14 +445,14 @@ and augment_case (ctx: stmt_ctx) (span: span) (expr: aexpr) (whens: abstract_whe
         let whens'' = List.map (fun (c, w) -> augment_when ctx typebindings w c mode) whens' in
         TCase (span, expr', whens'', case_ref)
       else
-        Errors.case_non_exhaustive ())
+        type_error CaseNonExhaustive)
 
 and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty): (ty * decl list) =
   let name: qident = (match ty with
                       | NamedType (n, _, _) ->
                          n
                       | _ ->
-                         Errors.case_non_union ty) in
+                         type_error (CaseNonUnion ty)) in
   match get_decl_by_name env (qident_to_sident name) with
   | Some (Union { id; vis; name; mod_id; typarams; universe; _ }) ->
      let module_name = module_name_from_id env mod_id in
@@ -475,9 +464,9 @@ and get_union_type_definition (importing_module: module_name) (env: env) (ty: ty
        and cases = get_union_cases env id in
        (ty, cases)
      else
-       Errors.case_non_public ()
+       type_error CaseNonPublic
   | _ ->
-     Errors.case_non_union ty
+     type_error (CaseNonUnion ty)
 
 and group_cases_whens (cases: decl list) (whens: abstract_when list): (typed_case * abstract_when) list =
   List.map (fun (TypedCase (n, s)) -> (TypedCase (n, s), List.find (fun (AbstractWhen (n', _, _)) -> n = n') whens))
@@ -526,23 +515,24 @@ and augment_when (ctx: stmt_ctx) (typebindings: type_bindings) (w: abstract_when
                       if equal_ty decl_ty user_ty then
                         (rename, decl_ty, VarLocal Immutable)
                       else
-                        Errors.slot_wrong_type
-                          ~name:rename
-                          ~expected:decl_ty
-                          ~actual:user_ty)
+                        type_error (SlotWrongType {
+                            name = rename;
+                            expected = decl_ty;
+                            actual = user_ty;
+                          }))
                     bindings'' in
     let lexenv' = push_vars lexenv newvars in
     let body' = augment_stmt (update_lexenv ctx lexenv') body in
     remove_vars lexenv (List.map (fun (n, _, _) -> n) newvars);
     TypedWhen (name, List.map (fun (name, _, ty, rename) -> TypedBinding { name; ty; rename}) bindings'', body')
   else
-    Errors.case_wrong_slots (List.map ident_string binding_names, List.map ident_string slot_names)
+    type_error (CaseWrongSlots { binding_names; slot_names })
 
 let rec validate_constant_expression (expr: texpr): unit =
   if is_constant expr then
     ()
   else
-    Errors.expression_not_constant ()
+    type_error ExpressionNotConstant
 
 and is_constant = function
   | TNilConstant ->
@@ -627,9 +617,9 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
            if kind = UnsafeModule then
              TForeignFunction (decl_id, vis, name, params, rt, s, doc)
            else
-             Errors.foreign_in_safe_module ()
+             declaration_error ForeignInSafeModule
          else
-           Errors.foreign_type_parameters ()
+           declaration_error ForeignTypeParameters
       | [ForeignExportPragma _] ->
          let body' = augment_stmt ctx body in
          TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
@@ -637,7 +627,7 @@ let rec augment_decl (module_name: module_name) (kind: module_kind) (env: env) (
          let body' = augment_stmt ctx body in
          TFunction (decl_id, vis, name, typarams, params, rt, body', doc)
       | _ ->
-         Errors.fun_invalid_pragmas ())
+         declaration_error FunInvalidPragmas)
   | LTypeclass (decl_id, vis, name, typaram, methods, doc) ->
      TTypeClass (decl_id, vis, name, typaram, List.map (augment_method_decl env rm typaram) methods, doc)
   | LInstance (decl_id, vis, name, typarams, arg, methods, doc) ->

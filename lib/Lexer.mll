@@ -15,8 +15,7 @@ module Errors = struct
     let error =
       AustralError {
         module_name = None;
-        kind = kind;
-        text = text;
+        error = Unconverted (kind, text);
         span = Some (Span.from_lexbuf lexbuf);
         source_ctx = None
       }

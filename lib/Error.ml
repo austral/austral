@@ -21,72 +21,111 @@ type error_kind =
   | EntrypointError
   | InternalError
 
+type error =
+  | Type of TypeErrors.t
+  | Linearity of LinearityErrors.t
+  | Declaration of DeclarationErrors.t
+  | Generic of GenericErrors.t
+  | Internal of string
+  | Unconverted of error_kind * err_text
+
 type austral_error = AustralError of {
       module_name: module_name option;
-      kind: error_kind;
-      text: err_text;
+      error: error;
       span: span option;
       source_ctx: source_ctx option;
     }
 
 exception Austral_error of austral_error
 
+let error_kind (error: error): error_kind =
+  match error with
+  | Type _ -> TypeError
+  | Linearity _ -> LinearityError
+  | Declaration _ -> DeclarationError
+  | Generic _ -> GenericError
+  | Internal _ -> InternalError
+  | Unconverted (kind, _) -> kind
+
+let error_text (error: error): err_text =
+  match error with
+  | Type e -> TypeErrors.render e
+  | Linearity e -> LinearityErrors.render e
+  | Declaration e -> DeclarationErrors.render e
+  | Generic e -> GenericErrors.render e
+  | Internal message ->
+     [
+       Text "Internal compiler error: ";
+       Text message;
+       Break;
+       Text "This is a bug in the compiler, please open an issue here: ";
+       Code "https://github.com/austral/austral/issues"
+     ]
+  | Unconverted (_, text) -> text
+
 (* Raising *)
 
+let raise_error (error: error): 'a =
+  raise (Austral_error (AustralError { module_name = None; error; span = None; source_ctx = None }))
+
+let type_error (e: TypeErrors.t): 'a = raise_error (Type e)
+
+let linearity_error (e: LinearityErrors.t): 'a = raise_error (Linearity e)
+
+let declaration_error (e: DeclarationErrors.t): 'a = raise_error (Declaration e)
+
+let generic_error (e: GenericErrors.t): 'a = raise_error (Generic e)
+
+let internal_err (message: string): 'a = raise_error (Internal message)
+
 let austral_raise (kind: error_kind) (text: err_text): 'a =
-  let error: austral_error =
-    AustralError {
-        module_name = None;
-        kind = kind;
-        text = text;
-        span = None;
-        source_ctx = None;
-      }
-  in
-  raise (Austral_error error)
+  raise_error (Unconverted (kind, text))
+
+let err (message: string): 'a =
+  raise_error (Unconverted (GenericError, [Text message]))
 
 (* Error context-augmenting functions *)
 
 let add_source_ctx (error: austral_error) (ctx: source_ctx): austral_error =
-  let (AustralError { module_name; kind; text; span; source_ctx }) = error in
+  let (AustralError { module_name; error = cause; span; source_ctx }) = error in
   match source_ctx with
   | Some _ ->
      error
   | None ->
-     AustralError { module_name; kind; text; span; source_ctx = Some ctx; }
+     AustralError { module_name; error = cause; span; source_ctx = Some ctx; }
 
 let adorn_error_with_module_name (new_module_name: module_name) (f: unit -> 'a): 'a =
   try
     f ()
   with Austral_error error ->
-    let (AustralError { module_name; kind; text; span; source_ctx }) = error in
+    let (AustralError { module_name; error = cause; span; source_ctx }) = error in
     match module_name with
     | Some _ ->
        (* The error already has a module name, do nothing. *)
        raise (Austral_error error)
     | None ->
        (* Add the span *)
-       let new_err = AustralError { module_name = Some new_module_name; kind; text; span; source_ctx } in
+       let new_err = AustralError { module_name = Some new_module_name; error = cause; span; source_ctx } in
        raise (Austral_error new_err)
 
 let adorn_error_with_span (new_span: span) (f: unit -> 'a): 'a =
   try
     f ()
   with Austral_error error ->
-    let (AustralError { module_name; kind; text; span; source_ctx }) = error in
+    let (AustralError { module_name; error = cause; span; source_ctx }) = error in
     match span with
     | Some span' ->
        (* The error already has a span. *)
        if span' = empty_span then
          (* The error has the empty span, add ours. *)
-         let new_err = AustralError { module_name; kind; text; span = Some new_span; source_ctx } in
+         let new_err = AustralError { module_name; error = cause; span = Some new_span; source_ctx } in
          raise (Austral_error new_err)
        else
          (* The error has a non-empty span, reraise. *)
          raise (Austral_error error)
     | None ->
        (* Add the span *)
-       let new_err = AustralError { module_name; kind; text; span = Some new_span; source_ctx } in
+       let new_err = AustralError { module_name; error = cause; span = Some new_span; source_ctx } in
        raise (Austral_error new_err)
 
 (* Error rendering to plain text *)
@@ -115,7 +154,7 @@ let indent_text (text: string) (indent: int): string =
   String.concat "\n" lines
 
 let render_error_to_plain (error: austral_error): string =
-  let (AustralError { span; kind; text; source_ctx; module_name }) = error in
+  let (AustralError { span; error = cause; source_ctx; module_name }) = error in
   let mn_text: string =
     match module_name with
     | Some mn ->
@@ -125,7 +164,7 @@ let render_error_to_plain (error: austral_error): string =
        "  Module:\n"
        ^ "    [unknown]\n"
   in
-  let title: string = error_title kind in
+  let title: string = error_title (error_kind cause) in
   let span_text =
     match span with
     | Some (Span { filename; startp; endp }) ->
@@ -150,7 +189,7 @@ let render_error_to_plain (error: austral_error): string =
   ^ mn_text
   ^ span_text
   ^ "  Description:\n"
-  ^ (indent_text (error_text_to_plain text) 4) ^ "\n"
+  ^ (indent_text (error_text_to_plain (error_text cause)) 4) ^ "\n"
   ^ code_text
   ^ "\n"
 
@@ -178,7 +217,7 @@ let source_ctx_json (ctx: source_ctx): Yojson.Basic.t =
 
 let render_error_to_json (error: austral_error): Yojson.Basic.t =
   (* Break up the error. *)
-  let (AustralError { span; kind; text; source_ctx; module_name }) = error in
+  let (AustralError { span; error = cause; source_ctx; module_name }) = error in
   (* Render components to JSON. *)
   let module_name: Yojson.Basic.t =
     match module_name with
@@ -198,40 +237,8 @@ let render_error_to_json (error: austral_error): Yojson.Basic.t =
   (* Put it together. *)
   `Assoc [
       ("module", module_name);
-      ("kind", `String (error_title kind));
-      ("text", error_text_to_json text);
+      ("kind", `String (error_title (error_kind cause)));
+      ("text", error_text_to_json (error_text cause));
       ("span", span);
       ("context", source_ctx)
     ]
-
-(* Utility functions. *)
-
-let err (message: string) =
-  let e: austral_error =
-    AustralError {
-        module_name = None;
-        kind = GenericError;
-        text = [Text message];
-        span = None;
-        source_ctx = None;
-      }
-  in
-  raise (Austral_error e)
-
-let internal_err (message: string) =
-  let e: austral_error =
-    AustralError {
-        module_name = None;
-        kind = InternalError;
-        text = [
-            Text "Internal compiler error: ";
-            Text message;
-            Break;
-            Text "This is a bug in the compiler, please open an issue here: ";
-            Code "https://github.com/austral/austral/issues"
-          ];
-        span = None;
-        source_ctx = None;
-      }
-  in
-  raise (Austral_error e)

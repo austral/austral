@@ -4,17 +4,21 @@
   unpinned-messages.py            compare with expected/unpinned-messages.txt
   unpinned-messages.py --record   rewrite it
 
-A place that raises an error to the user is a call of `austral_raise`, or of
-`err` with a literal message (`internal_err` marks a state the code believes
-cannot happen, and is left out). The pieces of its message are the string
-literals it is built from. A piece is pinned if it appears in the expected
-output of some test: the message in an `austral-stderr.txt` of the end-to-end
-suite, or an `expected.txt` of the command-line tests.
+An error to the user is a constructor of one of the types in lib/*Errors.ml,
+and its wording is in that module's `render`. The pieces of a message are the
+string literals it is built from: every literal in the arm of `render` for the
+constructor, and every literal in the functions `render` calls for the words
+of an enumeration. A piece is pinned if it appears in the expected output of
+some test: the message in an `austral-stderr.txt` of the end-to-end suite, or
+an `expected.txt` of the command-line tests.
 
-Where the place is in a small definition, every literal of the definition
-counts as a piece. That covers the functions that choose between wordings
-before they raise. In a large definition, only the literals inside the raising
-expression count.
+While R11 is under way, some errors are still raised from loose text, by a
+call of `austral_raise`, or of `err` with a literal message (`internal_err`
+marks a state the code believes cannot happen, and is left out). Where such a
+place is in a small definition, every literal of the definition counts as a
+piece. That covers the functions that choose between wordings before they
+raise. In a large definition, only the literals inside the raising expression
+count.
 
 A piece on the recorded list is one that no program can reach, or that a known
 bug hides. docs/refactoring-plan.md (R3) says which. A new piece that is not on
@@ -32,6 +36,8 @@ PLACE = re.compile(r"""austral_raise\b|(?<![_a-zA-Z])err [("]""")
 LITERAL = re.compile(r'"((?:[^"\\]|\\.)*)"')
 # A definition at the top of the file, or directly inside a module.
 DEFINITION = re.compile(r"^ {0,2}(?:let rec|let|and) ([a-z_][A-Za-z0-9_']*)", re.M)
+# An arm of `render`: the constructor it is for.
+ARM = re.compile(r"^  \| ([A-Z][A-Za-z0-9_]*)", re.M)
 SMALL = 45  # lines
 
 
@@ -97,9 +103,29 @@ def without_comments(text: str) -> str:
     return "".join(chars)
 
 
+def sections(text: str, pattern: re.Pattern):
+    """The text cut at each match of the pattern: (name the match captured, text up to the next match)."""
+    starts = [(m.start(), m.group(1)) for m in pattern.finditer(text)]
+    for (start, name), (end, _) in zip(starts, starts[1:] + [(len(text), "")]):
+        yield name, text[start:end]
+
+
+def error_module_pieces(path: pathlib.Path):
+    """Every literal of a module of errors, under the constructor or the function it is in."""
+    text = without_comments(path.read_text())
+    for name, body in sections(text, DEFINITION):
+        parts = sections(body, ARM) if name == "render" else [(name, body)]
+        for part_name, part in parts:
+            for literal in LITERAL.findall(part):
+                if len(literal.strip()) >= 4:
+                    yield str(path.relative_to(ROOT)), part_name, unescape(literal)
+
+
 def pieces():
+    for path in sorted((ROOT / "lib").glob("*Errors.ml")):
+        yield from error_module_pieces(path)
     for path in sorted([*(ROOT / "lib").glob("*.ml"), *(ROOT / "cli").glob("*.ml")]):
-        if path.name == "BuiltInModules.ml":
+        if path.name == "BuiltInModules.ml" or path.name.endswith("Errors.ml"):
             continue
         text = without_comments(path.read_text())
         starts = [(m.start(), m.group(1)) for m in DEFINITION.finditer(text)]
