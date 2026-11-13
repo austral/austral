@@ -30,21 +30,6 @@ open TypeVarSet
 open Util
 open Error
 
-module Errors = struct
-  let free_contains_linear ~name ~universe ~parameter =
-    austral_raise LinearityError [
-      Code (ident_string name);
-      Text " was declared to belong to the ";
-      Code "Free";
-      Text " universe, but it ";
-      Text (if parameter then "has a type parameter" else "contains a type");
-      Text " that belongs to the ";
-      Code universe;
-      Text " universe."
-    ]
-
-end
-
 let check_slots_are_free (name: identifier) (slots: typed_slot list): unit =
   let check_slot_is_free (slot: typed_slot): unit =
     let (TypedSlot (_, ty)) = slot in
@@ -54,9 +39,9 @@ let check_slots_are_free (name: identifier) (slots: typed_slot list): unit =
     | RegionUniverse ->
        ()
     | LinearUniverse ->
-        Errors.free_contains_linear ~name ~universe:"Linear" ~parameter:false
+        linearity_error (FreeContainsLinear { name; universe = LinearUniverse; parameter = false })
     | TypeUniverse ->
-        Errors.free_contains_linear ~name ~universe:"Type" ~parameter:false
+        linearity_error (FreeContainsLinear { name; universe = TypeUniverse; parameter = false })
   in
   List.iter check_slot_is_free slots
 
@@ -75,9 +60,9 @@ let check_typarams_are_free (name: identifier) (typarams: typarams): unit =
     | RegionUniverse ->
        ()
     | LinearUniverse ->
-       Errors.free_contains_linear ~name ~universe:"Linear" ~parameter:true
+       linearity_error (FreeContainsLinear { name; universe = LinearUniverse; parameter = true })
     | TypeUniverse ->
-       Errors.free_contains_linear ~name ~universe:"Type" ~parameter:true
+       linearity_error (FreeContainsLinear { name; universe = TypeUniverse; parameter = true })
   in
   List.iter (fun tp -> check_universe (typaram_universe tp)) (typarams_as_list typarams)
 

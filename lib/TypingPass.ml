@@ -219,11 +219,7 @@ let rec augment_stmt (ctx: stmt_ctx) (stmt: astmt): tstmt =
            if (type_universe pointed_ty) = FreeUniverse then
              ()
            else
-             austral_raise LinearityError [
-                 Text "Cannot assign to a path that ends in a type, ";
-                 Type pointed_ty;
-                 Text ", not in the Free universe."
-               ]
+             linearity_error (AssignToNonFreePath pointed_ty)
          in
          (* Construct the assignment. *)
          TAssign (span, lvalue, rvalue))

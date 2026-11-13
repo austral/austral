@@ -14,12 +14,20 @@ open Error
 
 type loop_depth = int
 
-type var_state =
+type var_state = LinearityErrors.var_state =
   | Unconsumed
   | BorrowedRead
   | BorrowedWrite
   | Consumed
-[@@deriving show]
+
+(* What `deriving show` printed while the type was defined in this module.
+   Internal errors print the state table with these names. *)
+let show_var_state (state: var_state): string =
+  match state with
+  | Unconsumed -> "LinearityCheck.Unconsumed"
+  | BorrowedRead -> "LinearityCheck.BorrowedRead"
+  | BorrowedWrite -> "LinearityCheck.BorrowedWrite"
+  | Consumed -> "LinearityCheck.Consumed"
 
 let universe_linear_ish = function
   | LinearUniverse -> true
@@ -110,11 +118,7 @@ let remove_entry (tbl: state_tbl) (name: identifier): state_tbl =
        StateTable (others, pending)
      else
        if universe_linear_ish (type_universe ty) then
-         austral_raise LinearityError [
-             Text "Forgot to consume a linear variable: ";
-             Code (ident_string name);
-             Text "."
-           ]
+         linearity_error (ForgotToConsume name)
        else
          let (StateTable (rows, pending)) = tbl in
          let others = List.filter (fun (n, _, _, _) -> not (equal_identifier name n)) rows in
@@ -158,22 +162,6 @@ let subtract (a: identifier list) (b: identifier list): identifier list =
     List.exists (fun elem -> equal_identifier name elem) l
   in
   List.filter (fun elem -> not (is_in elem b)) a
-
-let pending_error (names: identifier list) =
-  let c: int = List.length names in
-  austral_raise LinearityError [
-      Text "The ";
-      if (c = 1) then
-        Text " variable "
-      else
-        Text " variables ";
-      Code (String.concat ", " (List.map ident_string names));
-      if (c = 1) then
-        Text " was "
-      else
-        Text " were ";
-      Text "consumed in the loop, without afterwards being reassigned."
-    ]
 
 type appearances = { consumed: int; }
 
@@ -276,13 +264,6 @@ let is_unconsumed (tbl: state_tbl) (name: identifier): bool =
   | Unconsumed -> true
   | _ -> false
 
-let humanize_state (state: var_state): string =
-  match state with
-  | Unconsumed -> "not yet consumed"
-  | BorrowedRead -> "borrowed (read-only)"
-  | BorrowedWrite -> "borrowed (read-write)"
-  | Consumed -> "consumed"
-
 type partitions =
   | Zero
   | One
@@ -302,7 +283,7 @@ let partition (n: int): partitions =
 
 (* Table consistency *)
 
-let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): unit =
+let tables_are_consistent (statement: LinearityErrors.branching) (a: state_tbl) (b: state_tbl): unit =
   let a: state_tbl = trim_free a
   and b: state_tbl = trim_free b in
   (* Find common variables. *)
@@ -337,17 +318,7 @@ let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): uni
   (* Ensure the states are the same. *)
   List.iter (fun (name, state_a, state_b) ->
       if state_a <> state_b then
-        austral_raise LinearityError [
-            Text "The variable ";
-            Code (ident_string name);
-            Text " is used inconsistently in the branches of ";
-            Text stmt_name;
-            Text " statement. In one branch it is ";
-            Text (humanize_state state_a);
-            Text " while in the other it is ";
-            Text (humanize_state state_b);
-            Text "."
-          ]
+        linearity_error (InconsistentBranches { name; statement; state_a; state_b })
       else
         ())
     common
@@ -355,7 +326,7 @@ let tables_are_consistent (stmt_name: string) (a: state_tbl) (b: state_tbl): uni
 let rec table_list_is_consistent (lst: state_tbl list): unit =
   match lst with
   | a::b::rest ->
-     let _ = tables_are_consistent "a case" a b in
+     let _ = tables_are_consistent CaseBranching a b in
      table_list_is_consistent rest
   | [a] ->
      let _ = a in
@@ -419,41 +390,25 @@ and consume_once (tbl: state_tbl) (depth: loop_depth) (name: identifier) (ty: ty
 
 and error_consumed_more_than_once (name: identifier) (ty: ty) =
   if universe_linear_ish (type_universe ty) then
-    austral_raise LinearityError [
-        Text "The variable ";
-        Code (ident_string name);
-        Text " is consumed multiple times within the same expression.";
-      ]
+    linearity_error (ConsumedMoreThanOnce name)
   else
     ()
 
 and error_read_borrowed_and_consumed (name: identifier) (ty: ty) =
   if universe_linear_ish (type_universe ty) then
-    austral_raise LinearityError [
-        Text "The variable ";
-        Code (ident_string name);
-        Text " cannot be consumed while it is borrowed (immutably).";
-      ]
+    linearity_error (ConsumedWhileBorrowedRead name)
   else
     ()
 
 and error_write_borrowed_and_consumed (name: identifier) (ty: ty) =
   if universe_linear_ish (type_universe ty) then
-    austral_raise LinearityError [
-        Text "The variable ";
-        Code (ident_string name);
-        Text "cannot be consumed while it is borrowed (mutably).";
-      ]
+    linearity_error (ConsumedWhileBorrowedWrite name)
   else
     ()
 
 and error_already_consumed (name: identifier) (ty: ty) =
   if universe_linear_ish (type_universe ty) then
-    austral_raise LinearityError [
-        Text "The variable ";
-        Code (ident_string name);
-        Text " has already been consumed.";
-      ]
+    linearity_error (AlreadyConsumed name)
   else
     ()
 
@@ -495,11 +450,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
            match state with
            | Unconsumed | BorrowedRead | BorrowedWrite ->
               if universe_linear_ish (type_universe ty) then
-                austral_raise LinearityError [
-                    Text "Cannot assign to the variable ";
-                    Code (ident_string name);
-                    Text " because it is not yet consumed."
-                  ]
+                linearity_error (AssignToUnconsumed name)
               else
                 tbl
            | Consumed ->
@@ -551,11 +502,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
            match state with
            | Unconsumed | BorrowedRead | BorrowedWrite ->
               if universe_linear_ish (type_universe ty) then
-                austral_raise LinearityError [
-                    Text "Cannot assign to the variable ";
-                    Code (ident_string name);
-                    Text " because it is not yet consumed."
-                  ]
+                linearity_error (AssignToUnconsumed name)
               else
                 tbl
            | Consumed ->
@@ -574,7 +521,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          let tbl: state_tbl = check_expr tbl depth cond in
          let true_tbl: state_tbl = check_stmt tbl depth tb in
          let false_tbl: state_tbl = check_stmt tbl depth fb in
-         let _ = tables_are_consistent "an if" true_tbl false_tbl in
+         let _ = tables_are_consistent IfBranching true_tbl false_tbl in
          true_tbl)
   | TCase (span, expr, whens, _) ->
      adorn_error_with_span span
@@ -599,7 +546,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
             assigned to *)
          let new_pending: identifier list = subtract pending_after pending_before in
          if (List.length new_pending) > 0 then
-           pending_error new_pending
+           linearity_error (ConsumedInLoop new_pending)
          else
            tbl)
   | TFor (span, _, start, final, body) ->
@@ -612,7 +559,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
          let pending_after: identifier list = get_pending tbl in
          let new_pending: identifier list = subtract pending_after pending_before in
          if (List.length new_pending) > 0 then
-           pending_error new_pending
+           linearity_error (ConsumedInLoop new_pending)
          else
            tbl)
   | TBorrow { original; mode; body; rename; ref_type; span; _ } ->
@@ -655,23 +602,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
              let tbl: state_tbl = remove_entry tbl rename in
              tbl
            else
-            let mode_string = begin
-             match mode with
-             | Read ->
-                "borrow (immutably)"
-             | Write ->
-                "borrow (mutably)"
-             | Reborrow ->
-                "reborrow"
-            end
-            in
-            austral_raise LinearityError [
-                  Text ("Cannot " ^ mode_string ^ " the variable ");
-                  Code (ident_string original);
-                  Text " because it is already ";
-                  Text (humanize_state state);
-                  Text "."
-               ])
+             linearity_error (CannotBorrow { mode; name = original; state }))
   | TBlock (_, a, b) ->
      let tbl: state_tbl = check_stmt tbl depth a in
      let tbl: state_tbl = check_stmt tbl depth b in
@@ -701,11 +632,7 @@ let rec check_stmt (tbl: state_tbl) (depth: loop_depth) (stmt: tstmt): state_tbl
                      ()
                   | _ ->
                      if universe_linear_ish (type_universe ty) then
-                       austral_raise LinearityError [
-                           Text "The variable ";
-                           Code (ident_string name);
-                           Text " is not consumed by the time of the return statement. Did you forget to call a destructor, or destructure the contents?"
-                         ]
+                       linearity_error (NotConsumedAtReturn name)
                      else
                        ()))
              (tbl_to_list tbl)
