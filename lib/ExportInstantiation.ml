@@ -89,7 +89,8 @@ let make_wrapper (env: env) (decl_id: decl_id) (export_name: string): c_decl =
   and (params, rt): value_parameter list * ty = get_export_data env decl_id in
   CFunctionDefinition (
       Desc "Wrapper function",
-      export_name,
+      (* The name the user asked for gets the reserved-word escape (issue #92). *)
+      CIdent.external_escaped export_name,
       List.map transform_param params,
       transform_ty rt,
       CBlock [

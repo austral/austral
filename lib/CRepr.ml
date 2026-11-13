@@ -16,21 +16,19 @@ type c_function_linkage =
 type c_ty =
   | CNamedType of string
   | CPointer of c_ty
-  | CStructType of c_struct
+  | CStructType of c_slot list
   | CUnionType of c_slot list
-[@@deriving show]
 
-and c_slot = CSlot of string * c_ty
-and c_struct = CStruct of string option * c_slot list
-and c_param = CValueParam of string * c_ty
+and c_slot = CSlot of CIdent.t * c_ty
+and c_param = CValueParam of CIdent.t * c_ty
 
 type c_expr =
   | CBool of bool
   | CInt of string
   | CFloat of string
   | CString of escaped_string
-  | CVar of string
-  | CFuncall of string * c_expr list
+  | CVar of CIdent.t
+  | CFuncall of CIdent.t * c_expr list
   | CFptrCall of c_expr * c_ty * c_ty list * c_expr list
   | CCast of c_expr * c_ty
   | CComparison of comparison_operator * c_expr * c_expr
@@ -38,26 +36,26 @@ type c_expr =
   | CDisjunction of c_expr * c_expr
   | CNegation of c_expr
   | CIfExpression of c_expr * c_expr * c_expr
-  | CStructInitializer of (string * c_expr) list
-  | CStructAccessor of c_expr * string
-  | CPointerStructAccessor of c_expr * string
+  | CStructInitializer of (CIdent.t * c_expr) list
+  | CStructAccessor of c_expr * CIdent.t
+  | CPointerStructAccessor of c_expr * CIdent.t
   | CAddressOf of c_expr
   | CEmbed of c_ty * string * c_expr list
   | CDeref of c_expr
   | CSizeOf of c_ty
 
 type c_stmt =
-  | CLet of string * c_ty * c_expr option
+  | CLet of CIdent.t * c_ty * c_expr option
   | CAssign of c_expr * c_expr
   | CDiscarding of c_expr
   | CIf of c_expr * c_stmt * c_stmt
   | CSwitch of c_expr * c_switch_case list
   | CWhile of c_expr * c_stmt
-  | CFor of string * c_expr * c_stmt
+  | CFor of CIdent.t * c_expr * c_stmt
   | CReturn of c_expr
   | CBlock of c_stmt list
   | CExplicitBlock of c_stmt list
-  | CLocalFunctionDeclaration of string * c_param list * c_ty * c_function_linkage
+  | CLocalFunctionDeclaration of CIdent.t * c_param list * c_ty * c_function_linkage
 
 (** Represents a case of a C switch statement *)
 and c_switch_case =
@@ -66,12 +64,12 @@ and c_switch_case =
 type desc = Desc of string
 
 type c_decl =
-  | CMacro of desc * string * c_expr
-  | CStructForwardDeclaration of desc * string
-  | CNamedStructDefinition of desc * string * c_slot list
-  | CEnumDefinition of desc * string * string list
-  | CFunctionDeclaration of desc * string * c_param list * c_ty * c_function_linkage
-  | CFunctionDefinition of desc * string * c_param list * c_ty * c_stmt
+  | CMacro of desc * CIdent.t * c_expr
+  | CStructForwardDeclaration of desc * CIdent.t
+  | CNamedStructDefinition of desc * CIdent.t * c_slot list
+  | CEnumDefinition of desc * CIdent.t * CIdent.t list
+  | CFunctionDeclaration of desc * CIdent.t * c_param list * c_ty * c_function_linkage
+  | CFunctionDefinition of desc * CIdent.t * c_param list * c_ty * c_stmt
 
 type c_unit = CUnit of string * c_decl list
 

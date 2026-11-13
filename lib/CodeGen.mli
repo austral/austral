@@ -10,11 +10,12 @@ open Env
 open Stages.Mtast
 open CRepr
 
-val gen_decl_id : decl_id -> string
+val gen_decl_id : decl_id -> CIdent.t
 
-val gen_mono_id : mono_id -> string
+val gen_mono_id : mono_id -> CIdent.t
 
-val gen_ident : identifier -> string
+(** The C name of a variable or a parameter. *)
+val gen_ident : identifier -> CIdent.t
 
 val fn_type : c_ty
 
