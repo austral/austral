@@ -12,3 +12,4 @@ result
 .serena/project.yml
 .claude/worktrees/
 _build_coverage
+__pycache__/

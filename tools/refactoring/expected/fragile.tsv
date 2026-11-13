@@ -1,9 +1,9 @@
+cli/CliParser.ml	CliUtil.arg	2
+cli/CliUtil.ml	CliUtil.arg	8
 lib/AbstractionPass.ml	Cst.cstmt	2
 lib/AbstractionPass.ml	Stages.Ast.aexpr	2
 lib/AbstractionPass.ml	Stages.Ast.astmt	2
 lib/BodyExtractionPass.ml	Stages.Tast.typed_decl	2
-lib/CliParser.ml	CliUtil.arg	2
-lib/CliUtil.ml	CliUtil.arg	8
 lib/CodeGen.ml	CRepr.c_decl	4
 lib/CodeGen.ml	CRepr.c_slot	2
 lib/CodeGen.ml	CRepr.c_struct	2
