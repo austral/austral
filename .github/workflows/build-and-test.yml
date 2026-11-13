@@ -38,6 +38,9 @@ jobs:
       - name: end-to-end tests
         run: nix-shell --command 'python test-programs/runner.py'
 
+      - name: command-line tests
+        run: nix-shell --command 'python test-programs/cli-runner.py'
+
       # The counts the refactoring plan wants to shrink (docs/refactoring-plan.md) may not grow.
       - name: metrics must not go up
         run: nix-shell --command 'tools/refactoring/measure.sh --check'
@@ -49,7 +52,10 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           git fetch --depth=1 origin ${{ github.base_ref }}
-          nix-shell --command 'tools/refactoring/check.sh FETCH_HEAD --quick' || echo "::warning::the compiler's output differs from the base branch"
+          status=0
+          nix-shell --command 'tools/refactoring/check.sh FETCH_HEAD --quick' || status=$?
+          # 1: the output differs, which a bug fix does on purpose. Anything else: the check could not run.
+          if [ "$status" -eq 1 ]; then echo "::warning::the compiler's output differs from the base branch"; elif [ "$status" -ne 0 ]; then exit "$status"; fi
 
       - name: examples
         run: nix-shell --command 'bash run-examples.sh'

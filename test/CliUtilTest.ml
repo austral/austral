@@ -16,7 +16,6 @@ let tests _ =
   assert_equal [BoolFlag "help"; ValueFlag ("foo", "bar"); PositionalArg "derp"] (arglist_to_list arglist);
   assert_equal None (pop_bool_flag arglist "none");
   assert_equal None (pop_value_flag arglist "none");
-  assert_equal ["derp"] (get_positional arglist);
   let (arglist, pos) = pop_positional arglist in
   assert_equal ["derp"] pos;
   let arglist: arglist =

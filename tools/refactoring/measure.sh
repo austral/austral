@@ -97,8 +97,6 @@ fragile() {
     want && /constructors are added to type/ {
       t = $0; sub(/.*to type /, "", t); sub(/\.$/, "", t); sub(/^Austral_(core|cli)__/, "", t)
       want = 0
-      # Matches written by the sexp deriver are not ours to fix.
-      if (t ~ /^Sexplib/) next
       # A type named without its module is defined in the file being compiled.
       if (t !~ /\./) { m = file; sub(/.*\//, "", m); sub(/\.ml$/, "", m); t = m "." t }
       print file "\t" t

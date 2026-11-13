@@ -67,7 +67,6 @@ type desc = Desc of string
 
 type c_decl =
   | CMacro of desc * string * c_expr
-  | CConstantDefinition of desc * string * c_ty * c_expr
   | CStructForwardDeclaration of desc * string
   | CNamedStructDefinition of desc * string * c_slot list
   | CEnumDefinition of desc * string * string list

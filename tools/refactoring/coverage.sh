@@ -78,7 +78,7 @@ summarize() {
 }
 
 # Lines look like " 87.50 %   14/16   lib/Foo.ml"; the generated modules are left out.
-grep -E '%' "$T/report.txt" | grep -v -E 'BuiltInModules|Parser\.ml|Lexer\.ml' \
+grep -E '%' "$T/report.txt" | grep -v -E 'lib/(BuiltInModules|Parser|Lexer)\.ml$' \
   | awk '{ pct = $1; frac = $3; file = $4; if (file == "") file = "total"; printf "%s\t%s\t%s\n", file, pct, frac }' \
   | sort | summarize > "$T/coverage.txt"
 

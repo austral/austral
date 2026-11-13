@@ -495,7 +495,6 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
   | MConstant (_, n, _, e) ->
      let d = Desc "Constant" in
      [
-       (* CConstantDefinition (d, gen_sident mn n, gen_type ty, gen_exp mn e) *)
        CMacro (d, gen_sident mn n, gen_exp mn e)
      ]
   | MRecord _ ->
@@ -663,8 +662,6 @@ let decl_order = function
      1
   | CNamedStructDefinition _ ->
      3
-  | CConstantDefinition _ ->
-     5
   | CMacro _ ->
      5
   | CFunctionDeclaration _ ->

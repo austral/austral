@@ -666,11 +666,4 @@ module Mtast = struct
   and mvalue_parameter =
     MValueParameter of identifier * mono_ty
 
-  type mono_method =
-    MonoMethod of {
-        method_id: ins_meth_id;
-        params: mvalue_parameter list;
-        rt: mono_ty;
-        body: mstmt;
-      }
 end

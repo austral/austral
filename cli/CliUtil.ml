@@ -152,7 +152,3 @@ let pop_positional (arglist: arglist): (arglist * string list) =
   let pos: arg list = List.filter is_pos l
   and nonpos: arg list = List.filter (fun a -> not (is_pos a)) l in
   (ArgList nonpos, List.map pos_name pos)
-
-let get_positional (arglist: arglist): string list =
-  let (ArgList l) = arglist in
-  List.map pos_name (List.filter is_pos l)

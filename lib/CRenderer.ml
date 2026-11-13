@@ -48,11 +48,6 @@ and render_decl i d =
        Line (i, desc_text desc);
        Line (i, "#define " ^ name ^ " " ^ (e value))
      ]
-  | CConstantDefinition (desc, name, ty, value) ->
-     [
-       Line (i, desc_text desc);
-       Line (i, (render_type ty) ^ " " ^ (avoid_ckw name) ^ " = " ^ (e value) ^ ";")
-     ]
   | CStructForwardDeclaration (desc, name) ->
      [
        Line (i, desc_text desc);

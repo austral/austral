@@ -1,0 +1,1 @@
+compile Bad.aum --target-type=tc --error-format=plain

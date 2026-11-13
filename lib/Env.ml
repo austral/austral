@@ -89,16 +89,13 @@ let module_name_from_id (env: env) (mod_id: mod_id): module_name =
      internal_err "No module with this ID"
 
 let add_module (env: env) (input: mod_input): (env * mod_id) =
-  let { name; interface_docstring; body_docstring; kind; imported_instances; imports_from } = input in
+  let { name; imported_instances; imports_from } = input in
   let _ = ensure_no_mod_with_name env name in
   let (Env { mods; methods; decls; monos; exports }) = env in
   let id = fresh_mod_id () in
   let md = ModRec {
                id;
                name;
-               interface_docstring;
-               body_docstring;
-               kind;
                imported_instances;
                imports_from;
              }

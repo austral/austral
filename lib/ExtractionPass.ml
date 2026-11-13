@@ -231,9 +231,6 @@ let rec extract (env: env) (cmodule: combined_module): (env * linked_module) =
   in
   let input: mod_input = {
       name;
-      interface_docstring;
-      body_docstring;
-      kind;
       imported_instances;
       imports_from;
     }

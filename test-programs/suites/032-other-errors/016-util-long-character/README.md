@@ -1,0 +1,1 @@
+Pins what the compiler says for the character literal `'''`. The message is wrong: the literal is one quote character, and the compiler reports an empty literal as "more than one character" (issue #124).

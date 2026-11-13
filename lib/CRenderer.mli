@@ -10,8 +10,6 @@ type indentation
 
 type line
 
-val render_unit : c_unit -> string
-
 (** The text of the whole program. The parts are separated by a newline. *)
 val render_program : c_program -> string
 

@@ -22,7 +22,10 @@ The compiler numbers the names it generates (decl_286, mono_13, _t127, tmp4) fro
 global counters, in the order it allocates them. A step that only changes that
 order changes the numbers and nothing else. `--normalize-ids` renumbers each
 kind of generated name by first appearance in the file before comparing. The
-renumbering is one-to-one, so it cannot hide any other difference.
+renumbering is one-to-one per kind of name, so two files that use the names
+differently still differ. It also renumbers such names where they appear inside
+a string or as a name the user wrote (`tmp1`), so it can hide a difference
+there. Use it only for a step that changes how names are numbered.
 """
 import concurrent.futures
 import difflib
@@ -129,7 +132,7 @@ def run_one(compiler: str, outdir: pathlib.Path, name: str, words: list[str], in
         done = subprocess.run(command, cwd=cwd, capture_output=True, timeout=600)
         generated = pathlib.Path(c_path).read_bytes() if os.path.exists(c_path) else b""
         # The compiler names its temporary C file at random.
-        scrub = lambda data: re.sub(rb"/tmp/austral_[0-9a-f]+\.c", b"$TMP.c", data.replace(cwd.encode(), b"$CWD").replace(str(ROOT).encode(), b"$ROOT"))
+        scrub = lambda data: re.sub(rb"[^\s'\"`]*/austral_[0-9a-f]+\.c", b"$TMP.c", data.replace(cwd.encode(), b"$CWD").replace(str(ROOT).encode(), b"$ROOT"))
         error_page = pathlib.Path(cwd, "error.html")
         left_behind = sorted(f.name for f in pathlib.Path(cwd).iterdir() if f.name != "out.c" and f.name not in copied)
         (target / "exit").write_text(f"{done.returncode}\n")
@@ -188,6 +191,9 @@ def compare(a: pathlib.Path, b: pathlib.Path, normalize: bool = False) -> int:
             parts = [f for f, x, y in zip(FILES, index_a.get(name, blank), index_b.get(name, blank)) if x != y]
             differing.append((name, parts))
     print(f"programs {len(index_a.keys() | index_b.keys())}, differing {len(differing)}")
+    if not index_a or not index_b:
+        print("a snapshot is empty: nothing was compared")
+        return 1
     for name, parts in differing:
         print(f"DIFFERS {name}: {' '.join(parts)}")
     for name, parts in differing[:3]:

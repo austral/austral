@@ -18,22 +18,16 @@ open MonoType
 open MonoTypeBindings
 open Stages.Mtast
 
-(** A module record contains a module's name and docstrings. *)
+(** A module record contains a module's name and what it imports. *)
 type mod_rec = ModRec of {
       id: mod_id;
       name: module_name;
-      interface_docstring: docstring;
-      body_docstring: docstring;
-      kind: module_kind;
       imported_instances: DeclIdSet.t;
       imports_from: ModIdSet.t;
     }
 
 type mod_input = {
     name: module_name;
-    interface_docstring: docstring;
-    body_docstring: docstring;
-    kind: module_kind;
     imported_instances: DeclIdSet.t;
     imports_from: ModIdSet.t;
   }

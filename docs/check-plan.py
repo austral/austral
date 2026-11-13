@@ -113,6 +113,8 @@ fragile = (baseline / "fragile-totals.txt").read_text()
 coverage = (baseline / "coverage.txt").read_text()
 unused = len((baseline / "unused-exports.txt").read_text().splitlines())
 measured = refactoring[refactoring.index("## 6.") : refactoring.index("## 7.")]
+fragile_total = re.search(r"fragile-matches (\d+)", fragile).group(1)
+coverage_total = re.search(r"total-hand-written\t([0-9.]+)", coverage).group(1)
 quoted = {
     f"| 例外を投げる箇所 | {totals['raise']} |": "raise",
     f"（`internal_err`） | {totals['internal']} |": "internal",
@@ -120,9 +122,9 @@ quoted = {
     f"| 例外を捕まえる箇所 | {totals['catch']} |": "catch",
     f"| 可変の状態 | {totals['state']} |": "state",
     f"| 何でも受ける match の枝 | {totals['wildcard']} |": "wildcard",
-    f"| 壊れやすい match | {re.search(r'fragile-matches (\d+)', fragile).group(1)} |": "fragile",
+    f"| 壊れやすい match | {fragile_total} |": "fragile",
     f"| 外から使われていない公開関数 | {unused}（": "unused exports",
-    f"| テストが実行するコード | {re.search(r'total-hand-written\t([0-9.]+)', coverage).group(1)}% |": "coverage",
+    f"| テストが実行するコード | {coverage_total}% |": "coverage",
 }
 for text, name in quoted.items():
     if text not in measured:

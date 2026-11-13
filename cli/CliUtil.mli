@@ -38,6 +38,3 @@ val pop_value_flag : arglist -> string -> (arglist * string) option
 (** Take all positional arguments from the arglist, returning the arglist
     without the arguments and the list of positional arguments. **)
 val pop_positional : arglist -> (arglist * string list)
-
-(** Get positional arguments without removing them. **)
-val get_positional : arglist -> string list
