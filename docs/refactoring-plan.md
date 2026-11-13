@@ -70,7 +70,7 @@
 | 制約のある単純な型。構成子を隠し、`create` で1回だけ検査する | `Common.SimpleTypes.fs` の `String50`、`ConstrainedType` | `identifier`、`module_name`、`qident`、`env` は、すでに抽象型である。id は構成子が見えている。C の識別子と C のコード片は `string` である | R16 から R19 |
 | エラーを値で運ぶ。段のエラーを、流れのエラーの直和にまとめる | `Result.fs`、`PlaceOrderError` | エラーは1種類の例外 `Austral_error` で、中身は文面である。投げる箇所が 476、捕まえる箇所が 56 ある | R11 から R15 |
 | 複数のエラーを集める | `Result.fs` の `Validation` | 最初のエラーで止まる | R13 の後で issue #57 |
-| 入出力を端に置く。核は純粋な関数にする | `PlaceOrder.Api.fs` | 入出力の 56 箇所のうち 40 箇所は、すでに `lib/CliEngine.ml` にある。残りが核に混ざっている。`lib/Compiler.ml` は、モジュールを読み込んだ時点で組み込みモジュールをコンパイルし、失敗すると `exit` する | R8、R9 |
+| 入出力を端に置く。核は純粋な関数にする | `PlaceOrder.Api.fs` | 入出力の 56 箇所のうち 44 箇所は、すでにコマンドラインのモジュール（`lib/CliEngine.ml` に 40、`lib/Cli.ml` に 4）にある。残りの 12 箇所が、核に混ざっている。`lib/Compiler.ml` は、モジュールを読み込んだ時点で組み込みモジュールをコンパイルし、失敗すると `exit` する | R8、R9 |
 | 外の形と中の型の変換を、端に置く | `PlaceOrder.Dto.fs` | 外の形は、コマンドラインの引数と、エラーの JSON の2つだけである。引数の解析は `lib/CliParser.ml` にある | R11 |
 | すべての場合を match で受ける | F# の網羅性の検査 | 新しい構成子を黙って飲み込む match が 398 ある | R20、R25 |
 
@@ -188,7 +188,7 @@ val traverse : ('a -> 'b outcome) -> 'a list -> 'b list outcome
 | そのうち、名前のないエラー（`err "..."`） | 43 | 0 | R11 |
 | 例外を捕まえる箇所 | 56 | 段の境界の数だけ | R13、R14 |
 | 可変の状態 | 15 | 核では 0 | R9、R16 |
-| 核の中の入出力 | 16 | 0 | R8、R9 |
+| コマンドラインのモジュール（`lib/Cli.ml`、`lib/CliEngine.ml`）の外にある入出力 | 12 | 0 | R8、R9 |
 | 何でも受ける match の枝 | 207 | ドメインの型については 0 | R20、R25 |
 | 壊れやすい match | 398 | 0 | R20、R25 |
 | 外から使われていない公開関数 | 68（346 個中） | 0 | R7 |

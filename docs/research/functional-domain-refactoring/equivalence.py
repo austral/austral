@@ -14,7 +14,7 @@ the snapshot keeps the exit status, the generated C, stdout and stderr.
 A refactoring step must leave the snapshot unchanged. `compare` exits 1 when
 any program differs, and prints a diff of the first few.
 
-The compiler numbers the names it generates (decl_286, mono_13, _t127) from
+The compiler numbers the names it generates (decl_286, mono_13, _t127, tmp4) from
 global counters, in the order it allocates them. A step that only changes that
 order changes the numbers and nothing else. `--normalize-ids` renumbers each
 kind of generated name by first appearance in the file before comparing. The
@@ -37,7 +37,7 @@ SUITES = ROOT / "test-programs" / "suites"
 STANDARD = ROOT / "standard"
 FILES = ("exit", "out.c", "stdout", "stderr")
 # Generated names: a fixed prefix or a suffix, then the counter's value.
-GENERATED = re.compile(r"\b(?:(decl_|mono_|meth_|_t)|([A-Za-z_][A-Za-z0-9_]*?_tmp_ref))(\d+)\b")
+GENERATED = re.compile(r"\b(?:(decl_|mono_|meth_|_t|tmp)|([A-Za-z_][A-Za-z0-9_]*?_tmp_ref))(\d+)\b")
 
 
 def normalize_ids(text: str) -> str:
