@@ -1,0 +1,112 @@
+pragma Unsafe_Module;
+
+import Austral.Memory (
+    Address,
+    nullPointer
+);
+
+module body forms is
+    constant integer: Int32 := 7;
+
+    record interval: Free is
+        double: Int64;
+        form: Int64;
+    end;
+
+    union switcher: Free is
+        case doIt is
+            intValue: Int32;
+        case default;
+    end;
+
+    pragma Foreign_Import(External_Name => "fork");
+    function spawn(intArg: Int32): Int32 is
+    end;
+
+    pragma Foreign_Import(External_Name => "format");
+    function show(const: Span[Nat8, Static]): Int32 is
+    end;
+
+    pragma Foreign_Export(External_Name => "double_it");
+    function doubleIt(float: Int32): Int32 is
+        return float;
+    end;
+
+    typeclass Switchable(T: Free) is
+        method flip(enum: T): T;
+    end;
+
+    instance Switchable(Int32) is
+        method flip(enum: Int32): Int32 is
+            return enum;
+        end;
+    end;
+
+    generic [U: Free]
+    instance Switchable(Address[U]) is
+        method flip(enum: Address[U]): Address[U] is
+            return enum;
+        end;
+    end;
+
+    generic [T: Free]
+    function same(unsigned: T): T is
+        return unsigned;
+    end;
+
+    function pick(switch: switcher): Int32 is
+        case switch of
+            when doIt(intValue as short: Int32) do
+                return short;
+            when default do
+                return integer;
+        end case;
+    end;
+
+    generic [R: Region]
+    function peek(restrict: &[switcher, R]): Int32 is
+        case restrict of
+            when doIt(intValue as breaks: &[Int32, R]) do
+                return !breaks;
+            when default do
+                return integer;
+        end case;
+    end;
+
+    generic [R: Region]
+    function poke(asm: &![interval, R]): Unit is
+        borrow fortran: &![interval, union_region] := &~asm do
+            let nullptr: Int64 := fortran->form;
+        end borrow;
+        asm->form := 1;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        let double: interval := interval(double => 3, form => 4);
+        let { double as long: Int64, form as char: Int64 } := double;
+        let auto: interval := interval(double => long, form => char);
+        let static: Int64 := auto.form;
+        let void: switcher := doIt(intValue => integer);
+        let signed: Int32 := pick(void);
+        let typedef: Int32 := peek(&void);
+        let structure: Fn[Int32, Int32] := doubleIt;
+        for goto from 0 to 3 do
+            spawn(structure(flip(same(signed))));
+        end for;
+        show("x");
+        var volatile: interval := interval(double => static, form => static);
+        volatile := auto;
+        borrow extern: &[interval, register] := &volatile do
+            let inline: Int64 := extern->form;
+        end borrow;
+        borrow continue: &![interval, sizeof_region] := &!volatile do
+            poke(continue);
+        end borrow;
+        var floating: Address[Int32] := nullPointer();
+        borrow alignas: &[Address[Int32], enum_region] := &floating do
+            let boolean: Address[Int32] := flip(!alignas);
+        end borrow;
+        return ExitSuccess();
+    end;
+end module body.
