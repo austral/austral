@@ -461,12 +461,12 @@ module Tast = struct
         ty: ty;
         rename: identifier;
       }
-  [@@deriving (show, sexp)]
+  [@@deriving show]
 
   type case_ref =
     | CasePlain
     | CaseRef
-  [@@deriving (show, sexp)]
+  [@@deriving show]
 
   type tstmt =
     | TSkip of span

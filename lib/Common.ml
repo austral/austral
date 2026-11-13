@@ -12,7 +12,7 @@ type arithmetic_operator =
   | Subtract
   | Multiply
   | Divide
-[@@deriving (show, sexp)]
+[@@deriving show]
 
 (** The comparison operators. *)
 type comparison_operator =
@@ -22,7 +22,7 @@ type comparison_operator =
   | LessThanOrEqual
   | GreaterThan
   | GreaterThanOrEqual
-[@@deriving (show, sexp)]
+[@@deriving show]
 
 (** The type of documentation strings. *)
 type docstring = Docstring of string
@@ -43,14 +43,14 @@ type mutability =
 type borrowing_mode =
   | ReadBorrow
   | WriteBorrow
-[@@deriving (show, sexp)]
+[@@deriving show]
 
 (** Whether a borrow statement is borrowing as read, write, or reborrow. *)
 type borrow_stmt_kind =
   | Read
   | Write
   | Reborrow
-[@@deriving (show, sexp)]
+[@@deriving show]
 
 (** Whether a module is safe or unsafe. *)
 type module_kind =

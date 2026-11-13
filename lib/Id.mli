@@ -15,7 +15,7 @@ type file_id
 
 (** The type of module IDs. *)
 type mod_id = ModId of int
-[@@deriving (eq, sexp)]
+[@@deriving eq]
 
 (** The type of declaration IDs. *)
 type decl_id = DeclId of int
@@ -27,7 +27,7 @@ type ins_meth_id = InsMethId of int
 
 (** The type of monomorph IDs. *)
 type mono_id = MonoId of int
-[@@deriving (eq, show, sexp)]
+[@@deriving (eq, show)]
 
 val fresh_file_id : unit -> file_id
 val fresh_mod_id : unit -> mod_id

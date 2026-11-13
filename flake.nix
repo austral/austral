@@ -21,11 +21,10 @@
 
           # OCaml libraries
           ocamlPackages.yojson
+          ocamlPackages.ppxlib
           ocamlPackages.ppx_deriving
           ocamlPackages.ounit2
           ocamlPackages.menhir
-          ocamlPackages.sexplib
-          ocamlPackages.ppx_sexp_conv
           ocamlPackages.zarith
           ocamlPackages.bisect_ppx
         ];

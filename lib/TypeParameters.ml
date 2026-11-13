@@ -9,8 +9,6 @@ open Identifier
 open TypeParameter
 open Error
 open ErrorText
-open Sexplib
-open Std
 
 module Errors = struct
   let duplicate_type_parameter param =
@@ -27,7 +25,7 @@ module Errors = struct
 end
 
 type typarams = TyParams of type_parameter list
-[@@deriving (show, sexp)]
+[@@deriving show]
 
 let empty_typarams: typarams = TyParams []
 

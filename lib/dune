@@ -6,9 +6,9 @@
  (name austral_core)
  (public_name austral.austral_core)
  (synopsis "The bootstrapping compiler for Austral.")
- (libraries unix str sexplib zarith yojson)
+ (libraries unix str zarith yojson)
  (instrumentation (backend bisect_ppx))
- (preprocess (pps ppx_deriving.eq ppx_deriving.show ppx_sexp_conv))
+ (preprocess (pps ppx_deriving.eq ppx_deriving.show))
  (flags
   ;menhir generates instances of the "unused rec flag"
   ; warning

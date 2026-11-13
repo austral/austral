@@ -13,8 +13,6 @@
  (depends
   (ppxlib (>= 0.25.1))
   (ppx_deriving (= 5.2.1))
-  (ppx_sexp_conv (= v0.15.0))
-  (sexplib (= v0.15.1))
   (ounit2 (= 2.2.7))
   (menhir (= 20220210))
   (zarith (= 1.12))

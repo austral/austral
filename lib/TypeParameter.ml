@@ -7,11 +7,9 @@
 
 open Identifier
 open Type
-open Sexplib
-open Std
 
 type type_parameter = TypeParameter of identifier * universe * qident * sident list
-[@@deriving (show, sexp)]
+[@@deriving show]
 
 let make_typaram (i, u, q, s) =
   TypeParameter (i, u, q, s)

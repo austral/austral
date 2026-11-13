@@ -6,11 +6,9 @@
 *)
 open Util
 open Error
-open Sexplib
-open Std
 
 type escaped_string = EscapedString of string
-[@@deriving (show, sexp)]
+[@@deriving show]
 
 let rec escape_string s =
   EscapedString (string_implode (escape_list (string_explode s)))

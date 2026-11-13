@@ -54,8 +54,6 @@ Span	span_to_string
 TastUtil	dump_stmt
 TypeBindings	binding_count
 TypeBindings	pp_type_bindings
-TypeBindings	sexp_of_type_bindings
-TypeBindings	type_bindings_of_sexp
 TypeClasses	overlapping_instances
 TypeMatch	match_type_list
 TypeParameters	add_typaram

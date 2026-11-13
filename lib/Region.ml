@@ -6,11 +6,9 @@
 *)
 
 open Identifier
-open Sexplib
-open Std
 
 type region = Region of int
-[@@deriving (eq, show, sexp)]
+[@@deriving (eq, show)]
 
 let region_id (Region i) = i
 
