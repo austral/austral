@@ -1,0 +1,14 @@
+module body Test is
+    record Foo: Linear is
+    end;
+
+    generic [T: Free]
+    function f(a: T): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        f(Foo());
+        return ExitSuccess();
+    end;
+end module body.

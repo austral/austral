@@ -1,0 +1,14 @@
+{
+  "module": null,
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The type " },
+    { "type": "type", "content": "Unit" },
+    {
+      "type": "text",
+      "content": " is not allowed in the signature of an exported function."
+    }
+  ],
+  "span": null,
+  "context": null
+}

@@ -1,0 +1,27 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Unable to find a type with the name " },
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": "." },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "Consider importing it, if it is defined in another module."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/015-type-parser-unresolved-type/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end": { "line": 4, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function f(x: Foo): Unit is" ],
+    [ 3, "        return nil;" ],
+    [ 4, "    end;" ],
+    [ 5, "" ],
+    [ 6, "    function main(): ExitCode is" ]
+  ]
+}

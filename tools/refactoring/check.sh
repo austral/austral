@@ -5,7 +5,8 @@
 # Builds the compiler at BASE_REF (once; kept in a cache) and the compiler of
 # the working tree, then runs, in this order:
 #   1. the unit tests (dune runtest)
-#   2. the end-to-end suite (test-programs/runner.py)
+#   2. the end-to-end suite (test-programs/runner.py) and the command-line
+#      tests (test-programs/cli-runner.py)
 #   3. the equivalence check: every program in the repository compiled by both
 #      compilers, with the generated C, stdout, stderr, exit status, error.html
 #      and the names of the files left behind compared
@@ -71,6 +72,7 @@ in_shell 'make 2>&1' > "$T/head.log" 2>&1 || { echo "build failed:"; tail -n 40 
 if ((!QUICK)); then
   step "unit tests" in_shell 'dune runtest --force 2>&1'
   step "end-to-end suite" python3 test-programs/runner.py
+  step "command-line tests" python3 test-programs/cli-runner.py
 fi
 python3 "$HERE/equivalence.py" snapshot "$base" "$T/a" > /dev/null || { echo "FAIL  base snapshot"; exit 1; }
 python3 "$HERE/equivalence.py" snapshot "$ROOT/austral" "$T/b" > /dev/null || { echo "FAIL  head snapshot"; exit 1; }

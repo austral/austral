@@ -1,0 +1,12 @@
+{
+  "module": null,
+  "kind": "Entrypoint Definition Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The entrypoint function cannot be generic."
+    }
+  ],
+  "span": null,
+  "context": null
+}

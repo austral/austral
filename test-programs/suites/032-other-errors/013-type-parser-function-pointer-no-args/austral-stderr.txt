@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Parse Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Function pointer type specifier must have at least one argument."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/013-type-parser-function-pointer-no-args/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end": { "line": 4, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function f(g: Fn): Unit is" ],
+    [ 3, "        return nil;" ],
+    [ 4, "    end;" ],
+    [ 5, "" ],
+    [ 6, "    function main(): ExitCode is" ]
+  ]
+}

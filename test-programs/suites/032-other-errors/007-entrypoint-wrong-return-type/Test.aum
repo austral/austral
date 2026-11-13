@@ -1,0 +1,5 @@
+module body Test is
+    function main(): Unit is
+        return nil;
+    end;
+end module body.

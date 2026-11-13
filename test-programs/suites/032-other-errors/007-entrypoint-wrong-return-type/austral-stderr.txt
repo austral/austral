@@ -1,0 +1,15 @@
+{
+  "module": null,
+  "kind": "Entrypoint Definition Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The type of the entrypoint function must be "
+    },
+    { "type": "code", "content": "ExitCode" },
+    { "type": "text", "content": " but it is " },
+    { "type": "type", "content": "Unit" }
+  ],
+  "span": null,
+  "context": null
+}

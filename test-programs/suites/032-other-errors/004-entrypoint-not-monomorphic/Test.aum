@@ -1,0 +1,6 @@
+module body Test is
+    generic [T: Free]
+    function main(x: T): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

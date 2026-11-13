@@ -8,3 +8,5 @@ ts	phase	decision	why	evidence	result
 2026-11-13T10:09:45Z	R4	'--no-entrypoint を実行ファイルと一緒に指定したときのエラーが、専用の文面にならないと分かった	フラグの名前を、片方では先頭の -- 付きで比べている。専用のエラーの関数に届かない	lib/CliParser.ml parse_executable_target, test-programs/cli/018-no-entrypoint-with-exe	今の振る舞いを固定した。後で直す
 2026-11-13T10:09:45Z	R6	コンパイラの言葉を CONTEXT.md に足した	計画の残りの項目を、同じ言葉で書くため	CONTEXT.md	15語
 2026-11-13T10:09:45Z	R5	指標の確認は R1 のコミットで CI に入れた	measure.sh --check は、数が増えたときだけ失敗する	.github/workflows/build-and-test.yml	手元で通る。CI は未確認
+2026-11-13T10:12:46Z	R3	エントリポイント、公開する関数、借用、型の束縛、型の読み取りのエラー 15 個に、テストを足した	エラーの作り直し（R11）の前に、文面を固定するため	test-programs/suites/032-other-errors	15個すべてが実行される。届かないものはなかった
+2026-11-13T10:12:46Z	R3	書き込みの借用のエラーの文面に、空白が1つ足りないと分かった	lib/LinearityCheck.ml の 446 行。436 行にはある	test-programs/suites/032-other-errors/010-linearity-write-borrowed-and-consumed	今の文面を固定した。小さいので R11 の後で直す

@@ -6,10 +6,14 @@ so that two builds of the compiler can be compared.
   equivalence.py compare OUTDIR_A OUTDIR_B   list the programs that differ
   equivalence.py compare --normalize-ids OUTDIR_A OUTDIR_B
                                              the same, after renumbering generated names
+  equivalence.py compare --ignore-calltree OUTDIR_A OUTDIR_B
+                                             the same, ignoring calltree.html and the line
+                                             on stdout that announces it
 
 The corpus is every end-to-end test (test-programs/suites/*/*), the standard
-library with its tests (the module list in standard/Makefile) and every program
-under examples/ (the command its Makefile runs). For each program
+library with its tests (the module list in standard/Makefile), every program
+under examples/ (the command its Makefile runs) and every command-line test
+(test-programs/cli/*, run in a directory holding a copy of its input files). For each program
 the snapshot keeps the exit status, the generated C, stdout, stderr, the
 error.html the compiler writes on failure, and the names of the files it leaves
 in its working directory.
@@ -42,6 +46,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 SUITES = ROOT / "test-programs" / "suites"
 STANDARD = ROOT / "standard"
 EXAMPLES = ROOT / "examples"
+CLI_TESTS = ROOT / "test-programs" / "cli"
+CLI_NOT_INPUTS = {"args.txt", "expected.txt", "README.md"}
+CALLTREE_LINE = "Compiler call tree printed to calltree.html\n"
 FILES = ("exit", "out.c", "stdout", "stderr", "error.html", "files")
 # Generated names: a fixed prefix or a suffix, then the counter's value.
 GENERATED = re.compile(r"\b(?:(decl_|mono_|meth_|_t|tmp)|([A-Za-z_][A-Za-z0-9_]*?_tmp_ref))(\d+)\b")
@@ -108,18 +115,30 @@ def example_commands() -> list[tuple[str, list[str]]]:
     return commands
 
 
-def run_one(compiler: str, outdir: pathlib.Path, name: str, words: list[str]) -> str:
+def cli_commands() -> list[tuple[str, list[str], pathlib.Path]]:
+    tests = sorted(p for p in CLI_TESTS.iterdir() if (p / "args.txt").exists()) if CLI_TESTS.exists() else []
+    return [(f"cli/{t.name}", (t / "args.txt").read_text().split(), t) for t in tests]
+
+
+def run_one(compiler: str, outdir: pathlib.Path, name: str, words: list[str], inputs: pathlib.Path | None = None) -> str:
     target = outdir / name
     target.mkdir(parents=True, exist_ok=True)
     # The compiler writes error.html and calltree.html into its working directory.
     with tempfile.TemporaryDirectory() as cwd:
+        copied = set()
+        if inputs is not None:
+            for f in inputs.iterdir():
+                if f.name not in CLI_NOT_INPUTS:
+                    shutil.copy(f, cwd)
+                    copied.add(f.name)
         c_path = os.path.join(cwd, "out.c")
         command = [compiler, *(w.replace("$C_PATH", c_path) for w in words)]
         done = subprocess.run(command, cwd=cwd, capture_output=True, timeout=600)
         generated = pathlib.Path(c_path).read_bytes() if os.path.exists(c_path) else b""
-        scrub = lambda data: data.replace(cwd.encode(), b"$CWD").replace(str(ROOT).encode(), b"$ROOT")
+        # The compiler names its temporary C file at random.
+        scrub = lambda data: re.sub(rb"/tmp/austral_[0-9a-f]+\.c", b"$TMP.c", data.replace(cwd.encode(), b"$CWD").replace(str(ROOT).encode(), b"$ROOT"))
         error_page = pathlib.Path(cwd, "error.html")
-        left_behind = sorted(f.name for f in pathlib.Path(cwd).iterdir() if f.name != "out.c")
+        left_behind = sorted(f.name for f in pathlib.Path(cwd).iterdir() if f.name != "out.c" and f.name not in copied)
         (target / "exit").write_text(f"{done.returncode}\n")
         (target / "out.c").write_bytes(scrub(generated))
         (target / "stdout").write_bytes(scrub(done.stdout))
@@ -134,7 +153,7 @@ def snapshot(compiler: str, outdir: pathlib.Path) -> None:
     if outdir.exists():
         shutil.rmtree(outdir)
     outdir.mkdir(parents=True)
-    commands = [*suite_commands(), standard_command(), *example_commands()]
+    commands = [*suite_commands(), standard_command(), *example_commands(), *cli_commands()]
     # coverage.sh --errors --only DIR runs one suite, to see what its tests reach.
     only = os.environ.get("ZUSTRAL_EQUIVALENCE_ONLY")
     if only:
@@ -151,19 +170,28 @@ def snapshot(compiler: str, outdir: pathlib.Path) -> None:
     print(f"programs {len(names)}, with generated C {with_c}, without {len(names) - with_c}")
 
 
-def read_index(outdir: pathlib.Path, normalize: bool) -> dict[str, list[str]]:
+def view(outdir: pathlib.Path, name: str, part: str, normalize: bool, ignore_calltree: bool) -> str:
+    """The text of one recorded part, as the comparison sees it."""
+    text = (outdir / name / part).read_text(errors="replace")
+    if normalize and part == "out.c":
+        text = normalize_ids(text)
+    if ignore_calltree and part == "stdout":
+        text = text.replace(CALLTREE_LINE, "")
+    if ignore_calltree and part == "files":
+        text = "".join(line + "\n" for line in text.splitlines() if line != "calltree.html")
+    return text
+
+
+def read_index(outdir: pathlib.Path, normalize: bool, ignore_calltree: bool) -> dict[str, list[str]]:
     rows = [line.split("\t") for line in (outdir / "index.tsv").read_text().splitlines()]
-    if not normalize:
+    if not (normalize or ignore_calltree):
         return {row[0]: row[1:] for row in rows}
-    index = {}
-    for row in rows:
-        text = normalize_ids((outdir / row[0] / "out.c").read_text(errors="replace"))
-        index[row[0]] = [row[1], hashlib.sha256(text.encode()).hexdigest()[:16], *row[3:]]
-    return index
+    digest = lambda name, part: hashlib.sha256(view(outdir, name, part, normalize, ignore_calltree).encode()).hexdigest()[:16]
+    return {row[0]: [digest(row[0], part) for part in FILES] for row in rows}
 
 
-def compare(a: pathlib.Path, b: pathlib.Path, normalize: bool) -> int:
-    index_a, index_b = read_index(a, normalize), read_index(b, normalize)
+def compare(a: pathlib.Path, b: pathlib.Path, normalize: bool = False, ignore_calltree: bool = False) -> int:
+    index_a, index_b = read_index(a, normalize, ignore_calltree), read_index(b, normalize, ignore_calltree)
     differing = []
     for name in sorted(index_a.keys() | index_b.keys()):
         if index_a.get(name) != index_b.get(name):
@@ -174,12 +202,12 @@ def compare(a: pathlib.Path, b: pathlib.Path, normalize: bool) -> int:
     for name, parts in differing:
         print(f"DIFFERS {name}: {' '.join(parts)}")
     for name, parts in differing[:3]:
+        if name not in index_a or name not in index_b:
+            print(f"only in {'A' if name in index_a else 'B'}: {name}")
+            continue
         for part in parts:
-            old = (a / name / part).read_text(errors="replace")
-            new = (b / name / part).read_text(errors="replace")
-            if normalize and part == "out.c":
-                old, new = normalize_ids(old), normalize_ids(new)
-            old, new = old.splitlines(), new.splitlines()
+            old = view(a, name, part, normalize, ignore_calltree).splitlines()
+            new = view(b, name, part, normalize, ignore_calltree).splitlines()
             for line in list(difflib.unified_diff(old, new, f"a/{name}/{part}", f"b/{name}/{part}", lineterm="", n=1))[:30]:
                 print(line)
     return 1 if differing else 0
@@ -190,9 +218,10 @@ if __name__ == "__main__":
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     if len(sys.argv) == 4 and sys.argv[1] == "snapshot":
         snapshot(sys.argv[2], pathlib.Path(sys.argv[3]))
-    elif len(sys.argv) == 4 and sys.argv[1] == "compare":
-        sys.exit(compare(pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3]), normalize=False))
-    elif len(sys.argv) == 5 and sys.argv[1:3] == ["compare", "--normalize-ids"]:
-        sys.exit(compare(pathlib.Path(sys.argv[3]), pathlib.Path(sys.argv[4]), normalize=True))
+    elif len(sys.argv) >= 4 and sys.argv[1] == "compare":
+        flags, dirs = sys.argv[2:-2], sys.argv[-2:]
+        if set(flags) - {"--normalize-ids", "--ignore-calltree"}:
+            sys.exit(__doc__)
+        sys.exit(compare(pathlib.Path(dirs[0]), pathlib.Path(dirs[1]), "--normalize-ids" in flags, "--ignore-calltree" in flags))
     else:
         sys.exit(__doc__)

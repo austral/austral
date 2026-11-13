@@ -1,0 +1,28 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The type parameter " },
+    { "type": "code", "content": "T" },
+    { "type": "text", "content": " is expected to be " },
+    { "type": "code", "content": "Free" },
+    { "type": "text", "content": " but the supplied argument is " },
+    { "type": "code", "content": "Linear" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/014-type-parser-typaram-wrong-universe/Test.aum",
+    "startp": { "line": 6, "column": 8 },
+    "end": { "line": 10, "column": 8 }
+  },
+  "context": [
+    [ 4, "" ],
+    [ 5, "    record Box[T: Free]: Free is" ],
+    [ 6, "    end;" ],
+    [ 7, "" ],
+    [ 8, "    function f(b: Box[Foo]): Unit is" ],
+    [ 9, "        return nil;" ],
+    [ 10, "    end;" ],
+    [ 11, "" ],
+    [ 12, "    function main(): ExitCode is" ]
+  ]
+}

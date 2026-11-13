@@ -1,0 +1,15 @@
+module body Test is
+    record Foo: Linear is
+    end;
+
+    record Box[T: Free]: Free is
+    end;
+
+    function f(b: Box[Foo]): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,10 @@
+module body Test is
+    pragma Foreign_Export(External_Name => "f");
+    function f(): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

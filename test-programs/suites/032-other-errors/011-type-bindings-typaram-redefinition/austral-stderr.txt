@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The type parameter " },
+    { "type": "code", "content": "T" },
+    { "type": "text", "content": " cannot be bound to both " },
+    { "type": "type", "content": "Bool" },
+    { "type": "text", "content": " and " },
+    { "type": "type", "content": "Unit" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/011-type-bindings-typaram-redefinition/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 21 }
+  },
+  "context": [
+    [ 6, "" ],
+    [ 7, "    function main(): ExitCode is" ],
+    [ 8, "        f(true, nil);" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

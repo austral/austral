@@ -1,0 +1,9 @@
+{
+  "module": null,
+  "kind": "Entrypoint Definition Error",
+  "text": [
+    { "type": "text", "content": "The entrypoint must be a function." }
+  ],
+  "span": null,
+  "context": null
+}

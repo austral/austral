@@ -1,0 +1,14 @@
+{
+  "module": null,
+  "kind": "Entrypoint Definition Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The entrypoint function should take a single parameter with type "
+    },
+    { "type": "code", "content": "RootCapability" },
+    { "type": "text", "content": ", or none at all, but it has several." }
+  ],
+  "span": null,
+  "context": null
+}

@@ -1,0 +1,3 @@
+module body Test is
+    constant main: Int32 := 0;
+end module body.

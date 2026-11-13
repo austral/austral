@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    { "type": "text", "content": "The variable " },
+    { "type": "code", "content": "foo" },
+    {
+      "type": "text",
+      "content": " cannot be consumed while it is borrowed (immutably)."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/009-linearity-read-borrowed-and-consumed/Test.aum",
+    "startp": { "line": 8, "column": 12 },
+    "end": { "line": 8, "column": 26 }
+  },
+  "context": [
+    [ 6, "        let foo: Foo := Foo();" ],
+    [ 7, "        borrow fooref: &[Foo, R] := &foo do" ],
+    [ 8, "            let {} := foo;" ],
+    [ 9, "        end borrow;" ],
+    [ 10, "        return ExitSuccess();" ]
+  ]
+}
