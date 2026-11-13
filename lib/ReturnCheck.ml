@@ -11,17 +11,6 @@ open Stages.Combined
 open Error
 open Span
 
-module Errors = struct
-  let missing_return ~name ~declaration =
-    austral_raise DeclarationError [
-      Text "The ";
-      Text declaration;
-      Text " ";
-      Code (ident_string name);
-      Text " does not end in a return statement."
-    ]
-end
-
 let is_abort (name: qident): bool =
   let mn: module_name = source_module_name name
   and orig: identifier = original_name name
@@ -72,9 +61,7 @@ let check_ends_in_return (CombinedModule { decls; _ }): unit =
         if ends_in_return body then
           ()
         else
-          Errors.missing_return
-            ~name:name
-            ~declaration:"method")
+          declaration_error (MissingReturn { name; declaration = MethodDeclaration }))
   in
   let check_decl_ends_in_return (decl: combined_definition): unit =
     match decl with
@@ -93,9 +80,7 @@ let check_ends_in_return (CombinedModule { decls; _ }): unit =
               if ends_in_return body then
                 ()
               else
-                Errors.missing_return
-                  ~name
-                  ~declaration:"function"
+                declaration_error (MissingReturn { name; declaration = FunctionDeclaration })
            | _ ->
               (* Yes pragmas: foreign function, ignore the body. *)
               ())

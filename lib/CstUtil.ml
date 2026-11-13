@@ -8,22 +8,6 @@ open Identifier
 open Common
 open Cst
 open Error
-open ErrorText
-
-module Errors = struct
-  let pragma_argument_error ~pragma_name ~argument =
-    let text = Text ("Invalid " ^ pragma_name ^ " pragma.") :: match argument with
-    | Some argument -> [Break; Text "This pragma takes exactly one argument, "; Code argument]
-    | None -> [Break; Text "This pragma takes no arguments."]
-    in
-    austral_raise DeclarationError text
-
-  let unknown_pragma name =
-    austral_raise DeclarationError [
-      Text "Unknown pragma ";
-      Code name
-    ]
-end
 
 let make_module_body (name: module_name) (imports: concrete_import_list list) (pragmas: pragma list) (defs: concrete_def list) (docstring: docstring) =
   let is_unsafe_module p =
@@ -100,9 +84,7 @@ let make_pragma name args =
   let s = ident_string name in
   if s = "Foreign_Import" then
     let raise_err () =
-      Errors.pragma_argument_error
-        ~pragma_name:"Foreign_Import"
-        ~argument:(Some "External_Name")
+      declaration_error (PragmaArgumentError ForeignImport)
     in
     match args with
     | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
@@ -115,9 +97,7 @@ let make_pragma name args =
   else
     if s = "Foreign_Export" then
       let raise_err () =
-        Errors.pragma_argument_error
-          ~pragma_name:"Foreign_Export"
-          ~argument:(Some "External_Name")
+        declaration_error (PragmaArgumentError ForeignExport)
       in
       match args with
       | ConcreteNamedArgs [(a, CStringConstant (_, f))] ->
@@ -130,9 +110,7 @@ let make_pragma name args =
     else
       if s = "Unsafe_Module" then
         let raise_err () =
-          Errors.pragma_argument_error
-            ~pragma_name:"Unsafe_Module"
-            ~argument:None
+          declaration_error (PragmaArgumentError UnsafeModule)
         in
         match args with
         | ConcretePositionalArgs [] ->
@@ -140,7 +118,7 @@ let make_pragma name args =
         | _ ->
            raise_err ()
       else
-        Errors.unknown_pragma s
+        declaration_error (UnknownPragma name)
 
 let mod_int_name (inter: concrete_module_interface): module_name =
   let (ConcreteModuleInterface (name, _, _, _)) = inter in
@@ -149,21 +127,6 @@ let mod_int_name (inter: concrete_module_interface): module_name =
 let mod_body_name (body: concrete_module_body): module_name =
   let (ConcreteModuleBody (name, _, _, _, _)) = body in
   name
-
-let rec typespec_string (ts: typespec): string =
-  match ts with
-  | TypeSpecifier (name, args) ->
-     (match args with
-      | [] -> (ident_string name)
-      | args -> (ident_string name) ^ "[" ^ (String.concat ", " (List.map typespec_string args)) ^ "]")
-  | ConcreteReadRef (ty, reg) ->
-     "&[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
-  | ConcreteWriteRef (ty, reg) ->
-     "&![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
-  | ConcreteSpan (ty, reg) ->
-     "Span[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
-  | ConcreteSpanWrite (ty, reg) ->
-     "Span![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
 
 let decl_replace_docstring_and_pragmas (decl: concrete_decl) (docstring: docstring) (pragmas: pragma list): concrete_decl =
   let _ = pragmas in

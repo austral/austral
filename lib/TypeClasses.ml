@@ -24,48 +24,9 @@ module Errors = struct
       Text "Orphan rule broken: typeclass and type are both foreign."
     ]
 
-  let duplicate_tyvars () =
-    austral_raise DeclarationError [
-      Text "Generic instances can only use each type parameter once in the argument."
-    ]
-
-  let leftovers () =
-    austral_raise DeclarationError [
-      Text "The number of type parameters in the instance declaration must be the same as the number of type variables applied to the argument."
-    ]
-
-  let lone_tyvar () =
-    austral_raise DeclarationError [
-      Text "Typeclass arguments cannot be lone type parameters."
-    ]
-
-  let not_a_tyvar ty =
-    austral_raise DeclarationError [
-      Text "The type ";
-      Type ty;
-      Text " is not a type parameter, but generic instances must use either all type parameters or none of them in the argument.";
-      Break;
-      Text "Consider adding another generic parameter with universe ";
-      Code (type_universe ty |> universe_string)
-    ]
-
   let overlapping_instances () =
     austral_raise GenericError [
       Text "Instance overlaps."
-    ]
-
-  let region_arg () =
-    austral_raise DeclarationError [
-      Text "Typeclass arguments cannot be regions."
-    ]
-
-  let shadowing_typeclass_param name =
-    austral_raise DeclarationError [
-      Text "The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is ";
-      Code (ident_string name);
-      Text ".";
-      Break;
-      Text "This is, regrettably, a load-bearing hack for https://github.com/austral/austral/issues/244. Fixing this properly would require rewriting large parts of the frontend."
     ]
 
   let wrong_universe ~ty ~expected ~actual =
@@ -95,20 +56,20 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
     | TyVar tv ->
        tv
     | _ ->
-       Errors.not_a_tyvar ty
+       declaration_error (InstanceArgumentNotATyvar { ty; universe = type_universe ty })
   and all_distinct (tyvars: type_var list): unit =
     let names: identifier list = List.map (fun (TypeVariable (name, _, _, _)) -> name) tyvars in
     let set: IdentifierSet.t = IdentifierSet.of_list names in
     if List.length tyvars = IdentifierSet.cardinal set then
       ()
     else
-      Errors.duplicate_tyvars ()
+      declaration_error InstanceDuplicateTyvars
   (* Assert the number of type parameters *)
   and no_leftovers (n: int): unit =
     if (typarams_size typarams) = n then
       ()
     else
-      Errors.leftovers ()
+      declaration_error InstanceLeftoverTypeParameters
   in
   match arg with
   | Unit -> ()
@@ -121,7 +82,7 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = no_leftovers (List.length args) in
      ()
   | RegionTy _ ->
-     Errors.region_arg ()
+     declaration_error InstanceArgumentRegion
   | ReadRef (ty, r) ->
      let _ = all_distinct [is_tyvar ty; is_tyvar r] in
      let _ = no_leftovers 2 in
@@ -139,7 +100,7 @@ let check_instance_argument_has_right_shape (typarams: typarams) (arg: ty): unit
      let _ = no_leftovers 2 in
      ()
   | TyVar _ ->
-     Errors.lone_tyvar ()
+     declaration_error InstanceArgumentLoneTyvar
   | Address ty ->
      let _ = is_tyvar ty in
      let _ = no_leftovers 1 in
@@ -286,7 +247,7 @@ and is_type_local (env: env) (mod_id: mod_id) (ty: ty): bool =
 let check_disjoint_typarams (name: identifier) (typarams: typarams): unit =
   match get_typaram typarams name with
   | Some _ ->
-     Errors.shadowing_typeclass_param name
+     declaration_error (InstanceShadowsTypeclassParam name)
   | None ->
      (* No collision *)
      ()

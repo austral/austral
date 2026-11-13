@@ -31,24 +31,6 @@ open Util
 open Error
 
 module Errors = struct
-  let export_generic name =
-    austral_raise DeclarationError [
-      Text "The function ";
-      Code (ident_string name);
-      Text " cannot be exported because it is generic."
-    ]
-
-  let foreign_import_export name =
-    austral_raise DeclarationError [
-      Text "The function ";
-      Code (ident_string name);
-      Text " cannot have both the ";
-      Code "Foreign_Import";
-      Text " and ";
-      Code "Foreign_Export";
-      Text " pragmas simultaneously."
-    ]
-
   let free_contains_linear ~name ~universe ~parameter =
     austral_raise LinearityError [
       Code (ident_string name);
@@ -61,69 +43,6 @@ module Errors = struct
       Text " universe."
     ]
 
-  let instance_for_non_typeclass name =
-    austral_raise DeclarationError [
-      Text "Cannot create an instance for ";
-      Code (ident_string name);
-      Text " because it is not a typeclass."
-    ]
-
-  let typeclass_no_method ~typeclass ~method_name =
-    austral_raise DeclarationError [
-      Text "The typeclass ";
-      Code (ident_string typeclass);
-      Text " has no method named ";
-      Code (ident_string method_name)
-    ]
-
-  let typeclass_param_not_region name =
-    austral_raise DeclarationError [
-      Text "The parameter for the typeclass ";
-      Code (ident_string name);
-      Text " cannot be declared to be in the ";
-      Code "Region";
-      Text " universe, because regions are distinct from types.";
-      Break;
-      Text "Consider using one of ";
-      Code "Type";
-      Text ", ";
-      Code "Linear";
-      Text ", or ";
-      Code "Free";
-      Text " instead.";
-    ]
-
-  let types_are_not_regions ~name ~declaration =
-    austral_raise DeclarationError [
-      Text "The ";
-      Text declaration;
-      Text " ";
-      Code (ident_string name);
-      Text " was declared to belong to the ";
-      Code "Region";
-      Text " universe, but regions are distinct from types.";
-      Break;
-      Text "Consider using one of ";
-      Code "Type";
-      Text ", ";
-      Code "Linear";
-      Text ", or ";
-      Code "Free";
-      Text " instead.";
-    ]
-
-  let unknown_typeclass name =
-    austral_raise DeclarationError [
-      Text "Cannot find typeclass with the name ";
-      Code (ident_string name)
-      ]
-
-  let typaram_not_in_signature (tp: type_parameter) =
-    austral_raise DeclarationError [
-        Text "The type parameter ";
-        Code (ident_string (typaram_name tp));
-        Text " does not appear anywhere in the signature of the function."
-      ]
 end
 
 let check_slots_are_free (name: identifier) (slots: typed_slot list): unit =
@@ -176,7 +95,7 @@ let check_all_type_parameters_appear_in_signature (typarams: typarams) (params: 
     if TypeVarSet.mem tv signature_tyvars then
       ()
     else
-      Errors.typaram_not_in_signature tp
+      declaration_error (TyparamNotInSignature tp)
   in
   List.iter check_typaram (typarams_as_list typarams)
 
@@ -310,7 +229,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
          (* If the universe is `Region`, fail. *)
          let _ =
            if universe = RegionUniverse then
-             Errors.types_are_not_regions ~name ~declaration:"record"
+             declaration_error (TypesAreNotRegions { name; declaration = RecordDeclaration })
            else
              ()
          in
@@ -340,7 +259,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
          (* If the universe is `Region`, fail. *)
          let _ =
            if universe = RegionUniverse then
-             Errors.types_are_not_regions ~name ~declaration:"union"
+             declaration_error (TypesAreNotRegions { name; declaration = UnionDeclaration })
            else
              ()
          in
@@ -393,7 +312,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            (* Check: if we have both an export name and an external name, raise an error. *)
            match (external_name, export_name) with
            | (Some _, Some _) ->
-              Errors.foreign_import_export name
+              declaration_error (ForeignImportExport name)
            | _ ->
               ()
          in
@@ -402,7 +321,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            match export_name with
            | Some _ ->
               if typarams_size typarams > 0 then
-                Errors.export_generic name
+                declaration_error (ExportGeneric name)
               else
                 ()
            | None ->
@@ -445,7 +364,7 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
            | LinearUniverse -> ()
            | FreeUniverse -> ()
            | RegionUniverse ->
-              Errors.typeclass_param_not_region name
+              declaration_error (TypeclassParamIsRegion name)
          in
          (* Add the typeclass itself to the env *)
          let (env, typeclass_id) = add_type_class env { mod_id; vis; name; docstring; param = typaram; } in
@@ -486,9 +405,9 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
                | TypeClass { id; mod_id; param; _ } ->
                   (id, mod_id, typaram_name param, typaram_universe param)
                | _ ->
-                  Errors.instance_for_non_typeclass typeclass_name)
+                  declaration_error (InstanceForNonTypeclass typeclass_name))
            | None ->
-              Errors.unknown_typeclass typeclass_name
+              declaration_error (UnknownTypeclass typeclass_name)
          in
          (* Check the argument has the right universe for the typeclass. *)
          let _ = check_instance_argument_has_right_universe universe argument in
@@ -524,9 +443,10 @@ and extract_definition (env: env) (mod_id: mod_id) (mn: module_name) (local_type
               | Some (TypeClassMethod { id; _ }) ->
                  id
               | _ ->
-                 Errors.typeclass_no_method
-                   ~typeclass:typeclass_name
-                   ~method_name:name)
+                 declaration_error (TypeclassNoMethod {
+                     typeclass = typeclass_name;
+                     method_name = name;
+                   }))
            in
            ({
                instance_id = instance_id;

@@ -139,3 +139,18 @@ and concrete_path_elem =
   | CSlotAccessor of identifier
   | CPointerSlotAccessor of identifier
   | CArrayIndex of cexpr
+
+let rec typespec_string (ts: typespec): string =
+  match ts with
+  | TypeSpecifier (name, args) ->
+     (match args with
+      | [] -> (ident_string name)
+      | args -> (ident_string name) ^ "[" ^ (String.concat ", " (List.map typespec_string args)) ^ "]")
+  | ConcreteReadRef (ty, reg) ->
+     "&[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+  | ConcreteWriteRef (ty, reg) ->
+     "&![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+  | ConcreteSpan (ty, reg) ->
+     "Span[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+  | ConcreteSpanWrite (ty, reg) ->
+     "Span![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
