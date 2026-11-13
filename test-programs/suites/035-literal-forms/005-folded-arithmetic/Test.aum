@@ -1,0 +1,19 @@
+module body Test is
+    function main(): ExitCode is
+        let a: Int32 := 1 + 2;
+        printLn(a);
+        let b: Int32 := (1 + 2) * 3;
+        printLn(b);
+        let c: Int32 := 7 / 2;
+        printLn(c);
+        let d: Int32 := 2 - 5;
+        printLn(d);
+        let e: Int64 := (9223372036854775807 + 1) - 1;
+        printLn(e);
+        let f: Int32 := 1'000 * 1'000;
+        printLn(f);
+        let g: Int32 := #x10 + 1;
+        printLn(g);
+        return ExitSuccess();
+    end;
+end module body.

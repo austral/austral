@@ -1,0 +1,11 @@
+module body Test is
+    function main(): ExitCode is
+        let a: Int64 := #x3FFFFFFFFFFFFFFF;
+        printLn(a);
+        let b: Int64 := #x4000000000000000;
+        printLn(b);
+        let c: Int64 := #x7FFFFFFFFFFFFFFF;
+        printLn(c);
+        return ExitSuccess();
+    end;
+end module body.

@@ -1,0 +1,3 @@
+module body Lit is
+    constant c: Nat64 := #xFFFFFFFFFFFFFFFFF;
+end module body.

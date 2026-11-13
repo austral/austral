@@ -1,0 +1,27 @@
+module body Test is
+    function main(): ExitCode is
+        let a: Int32 := 24;
+        printLn(a);
+        let b: Int32 := 1'000'000;
+        printLn(b);
+        let c: Int32 := #x18;
+        printLn(c);
+        let d: Int32 := #xFF'FF;
+        printLn(d);
+        let e: Int32 := #b11000;
+        printLn(e);
+        let f: Int32 := #o30;
+        printLn(f);
+        let g: Nat8 := 'a';
+        printLn(g);
+        let h: Int32 := -24;
+        printLn(h);
+        let i: Int32 := +24;
+        printLn(i);
+        let j: Int64 := 9223372036854775807;
+        printLn(j);
+        let k: Nat64 := 18446744073709551615;
+        printLn(k);
+        return ExitSuccess();
+    end;
+end module body.

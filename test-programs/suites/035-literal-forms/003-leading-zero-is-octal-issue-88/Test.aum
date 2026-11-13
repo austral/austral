@@ -1,0 +1,9 @@
+module body Test is
+    function main(): ExitCode is
+        let a: Int32 := 010;
+        printLn(a);
+        let b: Int32 := 0017;
+        printLn(b);
+        return ExitSuccess();
+    end;
+end module body.
