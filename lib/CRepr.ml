@@ -75,3 +75,11 @@ type c_decl =
   | CFunctionDefinition of desc * string * c_param list * c_ty * c_stmt
 
 type c_unit = CUnit of string * c_decl list
+
+(** A whole C program, in the order it is written out. The prelude and the
+    entrypoint are C source text. *)
+type c_program = CProgram of {
+      prelude: string;
+      units: c_unit list;
+      entrypoint: string option;
+    }

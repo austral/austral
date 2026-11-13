@@ -8,6 +8,7 @@ open Austral_core
 open CliParser
 open Version
 open Compiler
+open CRenderer
 open Os
 open Error
 open SourceContext
@@ -178,13 +179,7 @@ and exec_target (mods: module_source list) (target: target): unit =
     library. *)
 and compile_to_c (mods: module_source list) (entrypoint: entrypoint option): string =
   let compiler = compile_multiple (empty_compiler ()) mods in
-  (* Compile the wrapper functions *)
-  let compiler = post_compile compiler in
-  let compiler =
-    match entrypoint with
-    | Some (Entrypoint (module_name, name)) ->
-       compile_entrypoint compiler module_name name
-    | None ->
-       compiler
+  let entrypoint =
+    Option.map (fun (Entrypoint (module_name, name)) -> (module_name, name)) entrypoint
   in
-  compiler_code compiler
+  render_program (finish compiler entrypoint)

@@ -14,7 +14,6 @@ open ExtractionPass
 open TypingPass
 open BodyExtractionPass
 open CodeGen
-open CRenderer
 open CRepr
 open Cst
 open CstUtil
@@ -43,12 +42,9 @@ let append_import_to_body (cb: concrete_module_body) (import: concrete_import_li
   else
     ConcreteModuleBody (mn, kind, docstring, import :: imports, decls)
 
-type compiler = Compiler of env * string
-
-(** Extract the env from the compiler. *)
-let cenv (Compiler (m, _)): env = m
-
-let compiler_code (Compiler (_, c)): string = c
+(** The environment, and the C generated so far, one unit per module in the
+    order the modules were compiled. *)
+type compiler = Compiler of env * c_unit list
 
 type module_source =
   | TwoFileModuleSource of {
@@ -84,7 +80,7 @@ let parse_and_combine (env: env) (source: module_source): (module_name * Combine
          (name, combined))
 
 let rec compile_mod (c: compiler) (source: module_source): compiler =
-  let env: env = cenv c in
+  let (Compiler (env, units)) = c in
   let (name, combined) = parse_and_combine env source in
   adorn_error_with_module_name name
     (fun _ ->
@@ -96,39 +92,30 @@ let rec compile_mod (c: compiler) (source: module_source): compiler =
       let env: env = extract_bodies env typed in
       let (env, mono): (env * mono_module) = monomorphize env typed in
       let unit: c_unit = gen_module env mono in
-      let unit_code: string = render_unit unit in
-      let code: string = (compiler_code c) ^ "\n" ^ unit_code in
-      Compiler (env, code))
+      Compiler (env, units @ [unit]))
 
 let rec compile_multiple c modules =
   match modules with
   | m::rest -> compile_multiple (compile_mod c m) rest
   | [] -> c
 
-let compile_entrypoint c mn i =
-  let qi = make_qident (mn, i, i) in
-  let (Compiler (m, code)) = c in
-  let entry_code: string = entrypoint_code m qi in
-  Compiler (m, code ^ "\n" ^ entry_code)
-
 let fake_mod_source (is: string) (bs: string): module_source =
   TwoFileModuleSource { int_filename = ""; int_code = is; body_filename = ""; body_code = bs }
 
-let post_compile (compiler: compiler): compiler =
-  let env: env = cenv compiler in
+let finish (compiler: compiler) (entrypoint: (module_name * identifier) option): c_program =
+  let (Compiler (env, units)) = compiler in
+  (* The wrapper functions. *)
   let (env, decls): env * mdecl list = monomorphize_wrappers env in
-  let unit: c_unit = gen_module env (MonoModule (make_mod_name "Austral.Wrappers", decls)) in
-  let unit_code: string = render_unit unit in
+  let wrapper_unit: c_unit = gen_module env (MonoModule (make_mod_name "Austral.Wrappers", decls)) in
   let wrappers: c_unit = CUnit ("Wrappers", all_wrappers env) in
-  let wrapper_code: string = render_unit wrappers in
-  let code: string = (compiler_code compiler) ^ "\n" ^ unit_code ^ "\n" ^ wrapper_code in
-  Compiler (env, code)
+  let entrypoint: string option =
+    Option.map (fun (mn, i) -> entrypoint_code env (make_qident (mn, i, i))) entrypoint
+  in
+  CProgram { prelude = prelude_c; units = units @ [wrapper_unit; wrappers]; entrypoint }
 
 let empty_compiler (): compiler =
   (* We have to compile the Austral.Pervasive module, followed by
      Austral.Memory, since the latter uses declarations from the former. *)
-  let env: env = empty_env in
-  (* Start with the C prelude. *)
-  let c = Compiler (env, prelude_c) in
+  let c = Compiler (empty_env, []) in
   let c = compile_mod c (fake_mod_source pervasive_interface_source pervasive_body_source) in
   compile_mod c (fake_mod_source memory_interface_source memory_body_source)

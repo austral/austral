@@ -5,14 +5,13 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 open Identifier
+open CRepr
 
 type compiler
 
 (** The compiler after compiling the built-in modules. Raises [Austral_error]
     if a built-in module does not compile. *)
 val empty_compiler : unit -> compiler
-
-val compiler_code : compiler -> string
 
 type module_source =
   | TwoFileModuleSource of {
@@ -28,6 +27,7 @@ type module_source =
 
 val compile_multiple : compiler -> module_source list -> compiler
 
-val compile_entrypoint : compiler -> module_name -> identifier -> compiler
-
-val post_compile : compiler -> compiler
+(** Generate the wrapper functions and, if asked for, the entrypoint, and
+    return the whole C program. The entrypoint is a module name and the name
+    of a function in it. *)
+val finish : compiler -> (module_name * identifier) option -> c_program

@@ -38,6 +38,9 @@ let rec render_unit (CUnit (name, decls)): string =
   ^ (String.concat "\n\n" (List.map rd decls))
   ^ "\n/* --- END translation unit for module '" ^ name ^ "' --- */\n"
 
+and render_program (CProgram { prelude; units; entrypoint }): string =
+  String.concat "\n" ((prelude :: List.map render_unit units) @ Option.to_list entrypoint)
+
 and render_decl i d =
   match d with
   | CMacro (desc, name, value) ->
