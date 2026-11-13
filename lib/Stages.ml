@@ -180,8 +180,8 @@ module AstLC = struct
   and aexpr =
     | NilConstant
     | BoolConstant of bool
-    | IntConstant of string
-    | FloatConstant of string
+    | IntConstant of NumberLiteral.int_literal
+    | FloatConstant of NumberLiteral.float_literal
     | StringConstant of escaped_string
     | Variable of qident
     | Temporary of identifier
@@ -260,8 +260,8 @@ module AstDP = struct
   and aexpr =
     | NilConstant
     | BoolConstant of bool
-    | IntConstant of string
-    | FloatConstant of string
+    | IntConstant of NumberLiteral.int_literal
+    | FloatConstant of NumberLiteral.float_literal
     | StringConstant of escaped_string
     | Variable of qident
     | Temporary of identifier
@@ -337,8 +337,8 @@ module AstDB = struct
   and aexpr =
     | NilConstant
     | BoolConstant of bool
-    | IntConstant of string
-    | FloatConstant of string
+    | IntConstant of NumberLiteral.int_literal
+    | FloatConstant of NumberLiteral.float_literal
     | StringConstant of escaped_string
     | Variable of qident
     | Temporary of identifier
