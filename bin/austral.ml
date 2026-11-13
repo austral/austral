@@ -4,6 +4,6 @@
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
-open Austral_core.Cli
+open Austral_cli.Cli
 
 let _ = main (Array.to_list Sys.argv)

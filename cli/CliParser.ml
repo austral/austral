@@ -4,6 +4,7 @@
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
+open Austral_core
 open Identifier
 open CliUtil
 open Error

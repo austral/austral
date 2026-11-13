@@ -344,6 +344,7 @@ R27           流れを型として書く
 - **目標の形。** 核のライブラリは、`unix` に依存しない。コマンドラインのライブラリが、`lib/Cli.ml`、`lib/CliEngine.ml`、`lib/CliParser.ml`、`lib/CliUtil.ml` と、ファイルとプロセスを触る関数を持つ。
 - **呼び出しの記録。** `lib/Reporter.ml` は、21節の判断に従って、R8 の前に消した。この項目で移すものはない。
 - **確かめ方。** 核のライブラリの `dune` に `unix` がない。核のファイルの入出力の数が 0 である。等価性の検査が 0 本である。
+- **結果。** 核は `lib/`（ライブラリ `austral_core`）、端は `cli/`（ライブラリ `austral_cli`）になった。`lib/dune` に `unix` はない。端には、`Cli`、`CliEngine`、`CliParser`、`CliUtil` と、新しいモジュール `Os` がある。`Os` は、ファイルの読み書き、`cc` の実行、`error.html` の書き出しを持つ。核の `HtmlError` は、HTML の文字列を作るだけになった。指標に `coreio`（核の入出力の数）を足した。0 である。
 - **大きさ。** 中。
 
 ### R10. コンパイルの結果を、値にする（issue #103）

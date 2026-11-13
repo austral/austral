@@ -15,14 +15,6 @@ val string_explode : string -> char list
 (** Implode a list of characters into a string. *)
 val string_implode : char list -> string
 
-(** Read the file at the given path into a string. *)
-val read_file_to_string : string -> string
-
-(** Write the contents of a string to a file.
-
-    The first argument is the path, the second the contents. *)
-val write_string_to_file : string -> string -> unit
-
 (** Remove all instances of a given character from a string. *)
 val remove_char : string -> char -> string
 
@@ -58,20 +50,6 @@ val process_triple_string : string -> string
 
 (** Check whether two lists of identifiers are the same set. *)
 val ident_set_eq : identifier list -> identifier list -> bool
-
-(** Represents the output of running an external command. *)
-type command_output =
-  CommandOutput of { command: string; code: int; stdout: string; stderr: string }
-
-(** Run a shell command, and return its output. *)
-val run_command : string -> command_output
-
-(** Call the C compiler on the given file.
-
-    The first argument is the source file path.
-
-    The second argument is the output binary file path. *)
-val compile_c_code : string -> string -> command_output
 
 (** Like `mapAccumL` in Haskell. *)
 val map_with_context : (('c * 'a) -> ('c * 'b)) -> 'c -> 'a list -> ('c * ('b list))

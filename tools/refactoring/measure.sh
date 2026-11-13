@@ -24,8 +24,9 @@ done
 T=$(mktemp -d)
 trap 'rm -rf "$T"' EXIT
 
-# BuiltInModules.ml is generated from lib/builtin/ by concat_builtins.py.
-sources() { (cd "$ROOT" && ls lib/*.ml lib/*.mll lib/*.mly | grep -v '^lib/BuiltInModules\.ml$'); }
+# The core is lib/, the command line is cli/. BuiltInModules.ml is generated
+# from lib/builtin/ by concat_builtins.py.
+sources() { (cd "$ROOT" && ls lib/*.ml lib/*.mll lib/*.mly cli/*.ml | grep -v '^lib/BuiltInModules\.ml$'); }
 
 count() { # regex file
   grep -cE -- "$1" "$ROOT/$2" || true
@@ -69,8 +70,9 @@ metrics() {
 }
 
 totals() { # metrics-file
-  awk -F'\t' 'NR > 1 { for (i = 2; i <= NF; i++) s[i] += $i; n++ }
-    END { printf "files %d\nlines %d\nraise %d\ncatch %d\nstate %d\nio %d\nwildcard %d\nstrings %d\ninternal %d\nadhoc %d\n", n, s[2], s[3], s[4], s[5], s[6], s[7], s[8], s[9], s[10] }' "$1"
+  # coreio is the part of io that is in the core (lib/). The plan wants it at 0.
+  awk -F'\t' 'NR > 1 { for (i = 2; i <= NF; i++) s[i] += $i; n++; if ($1 ~ /^lib\//) coreio += $6 }
+    END { printf "files %d\nlines %d\nraise %d\ncatch %d\nstate %d\nio %d\nwildcard %d\nstrings %d\ninternal %d\nadhoc %d\ncoreio %d\n", n, s[2], s[3], s[4], s[5], s[6], s[7], s[8], s[9], s[10], coreio }' "$1"
 }
 
 # Fragile matches: a match that a new constructor would fall into without a
@@ -78,9 +80,9 @@ totals() { # metrics-file
 fragile() {
   local w="$T/tree"
   mkdir -p "$w"
-  (cd "$ROOT" && git ls-files -z lib bin dune-project concat_builtins.py austral.opam | xargs -0 tar -cf - ) | tar -xf - -C "$w"
+  (cd "$ROOT" && git ls-files -z lib cli bin dune-project concat_builtins.py austral.opam | xargs -0 tar -cf - ) | tar -xf - -C "$w"
   read -r -a nix_flags <<< "${ZUSTRAL_NIX_FLAGS:-}"
-  local build='python3 concat_builtins.py && dune build --root . --profile release ./lib 2>&1'
+  local build='python3 concat_builtins.py && dune build --root . --profile release ./lib ./cli 2>&1'
   if [[ -n ${IN_NIX_SHELL:-} ]]; then
     (cd "$w" && OCAMLPARAM="_,w=+4,warn-error=-a" timeout "${ZUSTRAL_BUILD_TIMEOUT:-900}" bash -c "$build") > "$T/build.log"
   else
@@ -93,7 +95,7 @@ fragile() {
     /^File "/ { split($0, a, "\""); file = a[2]; next }
     /^Warning 4 / { want = 1; next }
     want && /constructors are added to type/ {
-      t = $0; sub(/.*to type /, "", t); sub(/\.$/, "", t); sub(/^Austral_core__/, "", t)
+      t = $0; sub(/.*to type /, "", t); sub(/\.$/, "", t); sub(/^Austral_(core|cli)__/, "", t)
       want = 0
       # Matches written by the sexp deriver are not ours to fix.
       if (t ~ /^Sexplib/) next

@@ -14,9 +14,9 @@ trap 'rm -rf "$T"' EXIT
 
 cd "$ROOT"
 others() { # module: every source file except the module's own pair and the generated one
-  ls lib/*.ml lib/*.mli lib/*.mll lib/*.mly bin/*.ml test/*.ml | grep -v -e "^lib/$1\.mli\?$" -e '^lib/BuiltInModules\.ml$'
+  ls lib/*.ml lib/*.mli lib/*.mll lib/*.mly cli/*.ml cli/*.mli bin/*.ml test/*.ml | grep -v -e "^\(lib\|cli\)/$1\.mli\?$" -e '^lib/BuiltInModules\.ml$'
 }
-for mli in lib/*.mli; do
+for mli in lib/*.mli cli/*.mli; do
   module=$(basename "$mli" .mli)
   grep -oE '^val [a-z_][A-Za-z0-9_'"'"']*' "$mli" | sed 's/^val //' | sort -u | while read -r name; do
     # The code that `deriving show` and `deriving eq` generate calls pp_T and

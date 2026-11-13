@@ -1,5 +1,5 @@
 BIN := austral
-SRC := lib/*.ml lib/*.mli lib/*.mll lib/*.mly lib/dune bin/dune bin/austral.ml lib/BuiltInModules.ml
+SRC := lib/*.ml lib/*.mli lib/*.mll lib/*.mly lib/dune cli/*.ml cli/*.mli cli/dune bin/dune bin/austral.ml lib/BuiltInModules.ml
 PREFIX ?= /usr/local
 
 .PHONY: all

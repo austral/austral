@@ -6,8 +6,8 @@
 *)
 open OUnit2
 open Austral_core.Identifier
-open Austral_core.CliUtil
-open Austral_core.CliParser
+open Austral_cli.CliUtil
+open Austral_cli.CliParser
 
 let parse_cmd (args: string list): cmd =
   parse (parse_args args)

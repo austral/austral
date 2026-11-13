@@ -8,3 +8,4 @@ wildcard 207
 strings 84
 internal 93
 adhoc 43
+coreio 12

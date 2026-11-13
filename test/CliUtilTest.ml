@@ -5,7 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 open OUnit2
-open Austral_core.CliUtil
+open Austral_cli.CliUtil
 
 let tests _ =
   assert_equal [] (arglist_to_list (parse_args ["bin"]));

@@ -1,5 +1,5 @@
 open Error
 
-(* writes the html representation of the error to error.html *)
-val html_error_dump : austral_error -> unit
+(** The error as a standalone HTML page. *)
+val render_error_to_html : austral_error -> string
 

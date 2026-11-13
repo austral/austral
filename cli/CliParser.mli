@@ -5,6 +5,7 @@
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
 (** CLI parsing module. *)
+open Austral_core
 open Identifier
 open CliUtil
 

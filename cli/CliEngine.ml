@@ -4,12 +4,12 @@
 
    SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 *)
+open Austral_core
 open CliParser
 open Version
 open Compiler
-open Util
+open Os
 open Error
-open HtmlError
 open SourceContext
 
 (* Source map stuff *)

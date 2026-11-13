@@ -17,7 +17,7 @@ RAISE = re.compile(r'austral_raise|(^|[^_a-zA-Z])err [("]|internal_err|Errors\.[
 DEFINITION = re.compile(r"^(?:let rec|let|and) ([a-z_][A-Za-z0-9_']*)[^=\n]*=", re.M)
 
 bodies: dict[tuple[str, str], str] = {}
-for path in sorted((ROOT / "lib").glob("*.ml")):
+for path in sorted([*(ROOT / "lib").glob("*.ml"), *(ROOT / "cli").glob("*.ml")]):
     if path.name == "BuiltInModules.ml":
         continue
     text = path.read_text()

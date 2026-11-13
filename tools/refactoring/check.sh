@@ -45,12 +45,15 @@ in_shell() {
 }
 
 # Two commits with the same compiler sources share one cached binary.
-key=$(git rev-parse "$BASE_REF:lib" "$BASE_REF:bin" "$BASE_REF:dune-project" | sha1sum | cut -c1-16)
+# The command-line library (cli/) exists from R9 on.
+compiler_sources=(lib bin dune-project)
+git cat-file -e "$BASE_REF:cli" 2> /dev/null && compiler_sources+=(cli)
+key=$(for s in "${compiler_sources[@]}"; do git rev-parse "$BASE_REF:$s"; done | sha1sum | cut -c1-16)
 base="$CACHE/$key/austral"
 if [[ ! -x $base ]]; then
   echo "== building the compiler at $BASE_REF"
   mkdir -p "$T/base" "$CACHE/$key"
-  git archive "$BASE_REF" lib bin dune-project concat_builtins.py austral.opam | tar -x -C "$T/base"
+  git archive "$BASE_REF" "${compiler_sources[@]}" concat_builtins.py austral.opam | tar -x -C "$T/base"
   (cd "$T/base" && in_shell 'python3 concat_builtins.py && dune build --root . ./bin/austral.exe 2>&1') > "$T/base.log" 2>&1 \
     || { echo "base build failed: $(tail -n 5 "$T/base.log")"; exit 1; }
   cp "$T/base/_build/default/bin/austral.exe" "$base"

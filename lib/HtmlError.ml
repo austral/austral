@@ -1,5 +1,4 @@
 open Span
-open Util
 open Error
 open Identifier
 open SourceContext
@@ -299,7 +298,4 @@ let render_error_to_html (error: austral_error): string =
     in
     prefix ^ main ^ suffix
 
-let html_error_dump (error: austral_error): unit =
-    let filename: string = "error.html" in
-    write_string_to_file filename (render_error_to_html error)
 

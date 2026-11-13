@@ -2,7 +2,8 @@
  (names
   ExpressionParserTest
   UtilTest
+  OsTest
   CliUtilTest
   CliParserTest
   CRendererTest)
- (libraries austral_core ounit2))
+ (libraries austral_core austral_cli ounit2))

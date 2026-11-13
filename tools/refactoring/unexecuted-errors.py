@@ -24,7 +24,7 @@ for cls in ET.parse(sys.argv[1]).iter("class"):
         lines[number] = max(lines.get(number, 0), int(line.get("hits")))
 
 total = unexecuted = 0
-for path in sorted((ROOT / "lib").glob("*.ml")):
+for path in sorted([*(ROOT / "lib").glob("*.ml"), *(ROOT / "cli").glob("*.ml")]):
     if path.name == "BuiltInModules.ml":
         continue
     text = path.read_text()
@@ -39,5 +39,5 @@ for path in sorted((ROOT / "lib").glob("*.ml")):
         file_hits = hits.get(path.name, {})
         if not any(file_hits.get(n, 0) > 0 for n in range(first, last + 1)):
             unexecuted += 1
-            print(f"lib/{path.name}\t{first}\t{name}")
+            print(f"{path.relative_to(ROOT)}\t{first}\t{name}")
 print(f"error functions {total}, unexecuted {unexecuted}")
