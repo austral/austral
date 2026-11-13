@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Colliding imports: a declaration with name "
+    },
+    { "type": "code", "content": "Option" },
+    { "type": "text", "content": " has already been imported." },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "Consider giving it a different nickname using "
+    },
+    { "type": "code", "content": "as" },
+    { "type": "text", "content": "." }
+  ],
+  "span": null,
+  "context": null
+}

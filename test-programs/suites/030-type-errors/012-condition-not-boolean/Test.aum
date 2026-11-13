@@ -1,0 +1,8 @@
+module body Test is
+    function main(): ExitCode is
+        if 1 then
+            skip;
+        end if;
+        return ExitSuccess();
+    end;
+end module body.

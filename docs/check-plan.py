@@ -106,12 +106,12 @@ for item in refactoring_items:
     if not re.search(rf"^\| {item} \|", plan, re.M):
         findings.append(f"{item} is not in the overall plan's table")
 
-# The refactoring plan's table of measurements must quote the recorded numbers.
-expected = docs.parent / "tools" / "refactoring" / "expected"
-totals = dict(line.split() for line in (expected / "totals.txt").read_text().splitlines())
-fragile = (expected / "fragile-totals.txt").read_text()
-coverage = (expected / "coverage.txt").read_text()
-unused = len((expected / "unused-exports.txt").read_text().splitlines())
+# The refactoring plan's table of measurements must quote the numbers recorded when the plan was made.
+baseline = docs.parent / "tools" / "refactoring" / "baseline"
+totals = dict(line.split() for line in (baseline / "totals.txt").read_text().splitlines())
+fragile = (baseline / "fragile-totals.txt").read_text()
+coverage = (baseline / "coverage.txt").read_text()
+unused = len((baseline / "unused-exports.txt").read_text().splitlines())
 measured = refactoring[refactoring.index("## 6.") : refactoring.index("## 7.")]
 quoted = {
     f"| 例外を投げる箇所 | {totals['raise']} |": "raise",

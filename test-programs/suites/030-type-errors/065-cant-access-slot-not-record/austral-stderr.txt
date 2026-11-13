@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Can't access the slot " },
+    { "type": "code", "content": "y" },
+    { "type": "text", "content": " because the type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": " is not a record." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/065-cant-access-slot-not-record/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 28 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let x: Int32 := 10;" ],
+    [ 4, "        let y: Int32 := x.y;" ],
+    [ 5, "        return ExitSuccess();" ],
+    [ 6, "    end;" ]
+  ]
+}

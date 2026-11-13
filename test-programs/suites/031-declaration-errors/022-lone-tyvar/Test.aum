@@ -1,0 +1,12 @@
+module body Test is
+    typeclass Foo(T: Free) is
+    end;
+
+    generic [U: Free]
+    instance Foo(U) is
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

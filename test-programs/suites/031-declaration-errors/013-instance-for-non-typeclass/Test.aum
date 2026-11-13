@@ -1,0 +1,11 @@
+module body Test is
+    record Foo: Free is
+    end;
+
+    instance Foo(Int32) is
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

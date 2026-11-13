@@ -1,0 +1,7 @@
+module body Test is
+    constant Foo: Int64 := 0;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

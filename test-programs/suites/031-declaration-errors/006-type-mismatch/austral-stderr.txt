@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The interface declaration for " },
+    { "type": "code", "content": "Foo" },
+    {
+      "type": "text",
+      "content": " and its implementation have different types."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/006-type-mismatch/Test.aui",
+    "startp": { "line": 2, "column": 4 },
+    "end": { "line": 2, "column": 24 }
+  },
+  "context": [
+    [ 1, "module Test is" ],
+    [ 2, "    constant Foo: Int32;" ],
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode;" ]
+  ]
+}

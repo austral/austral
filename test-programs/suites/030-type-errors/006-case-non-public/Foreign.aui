@@ -1,0 +1,5 @@
+module Foreign is
+    type Secret: Free;
+
+    function make(): Secret;
+end module.

@@ -1,0 +1,10 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": " is private and cannot be imported." }
+  ],
+  "span": null,
+  "context": null
+}

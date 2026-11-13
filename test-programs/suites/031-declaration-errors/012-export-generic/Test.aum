@@ -1,0 +1,11 @@
+module body Test is
+    pragma Foreign_Export(External_Name => "foo");
+    generic [T: Free]
+    function Foo(x: T): T is
+        return x;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

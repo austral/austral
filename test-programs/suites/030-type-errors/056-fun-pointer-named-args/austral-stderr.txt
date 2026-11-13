@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "You can't call a function pointer with a named argument list, because function pointers don't preserve parameter names, so we wouldn't know how to assign arguments to parameters."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/056-fun-pointer-named-args/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 19 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let f: Fn[Int32, Int32] := id;" ],
+    [ 8, "        f(x => 10);" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

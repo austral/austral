@@ -1,0 +1,10 @@
+module body Foreign is
+    union Secret: Free is
+        case A;
+        case B;
+    end;
+
+    function make(): Secret is
+        return A();
+    end;
+end module body.

@@ -1,0 +1,16 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The instance " },
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": " with type " },
+    { "type": "code", "content": "Int32" },
+    {
+      "type": "text",
+      "content": " has no corresponding body implementation."
+    }
+  ],
+  "span": null,
+  "context": null
+}

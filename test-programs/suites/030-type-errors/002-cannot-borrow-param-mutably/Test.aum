@@ -1,0 +1,12 @@
+module body Test is
+    function f(x: Int32): Unit is
+        borrow ref: &![Int32, R] := &!x do
+            skip;
+        end borrow;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

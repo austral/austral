@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The type " },
+    { "type": "code", "content": "R" },
+    { "type": "text", "content": " has no slot with name " },
+    { "type": "code", "content": "y" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/061-no-such-slot/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 28 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let r: R := R(x => 10);" ],
+    [ 8, "        let y: Int32 := r.y;" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

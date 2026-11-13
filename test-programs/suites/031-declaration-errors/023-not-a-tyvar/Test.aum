@@ -1,0 +1,11 @@
+module body Test is
+    typeclass Foo(T: Free) is
+    end;
+
+    instance Foo(Option[Int32]) is
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

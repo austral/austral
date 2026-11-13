@@ -1,0 +1,11 @@
+{
+  "module": null,
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "Invalid Unsafe_Module pragma." },
+    { "type": "break" },
+    { "type": "text", "content": "This pragma takes no arguments." }
+  ],
+  "span": null,
+  "context": null
+}

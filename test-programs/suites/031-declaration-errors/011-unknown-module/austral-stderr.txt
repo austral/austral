@@ -1,0 +1,11 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "Unknown module " },
+    { "type": "code", "content": "Nonexistent" },
+    { "type": "text", "content": "." }
+  ],
+  "span": null,
+  "context": null
+}

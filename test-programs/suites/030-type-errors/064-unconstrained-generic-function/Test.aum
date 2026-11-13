@@ -1,0 +1,11 @@
+module body Test is
+    generic [T: Free]
+    function make(): Option[T] is
+        return None();
+    end;
+
+    function main(): ExitCode is
+        make();
+        return ExitSuccess();
+    end;
+end module body.

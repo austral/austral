@@ -1,0 +1,20 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "Cannot find typeclass with the name " },
+    { "type": "code", "content": "Foo" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/015-unknown-typeclass/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end": { "line": 3, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    instance Foo(Int32) is" ],
+    [ 3, "    end;" ],
+    [ 4, "" ],
+    [ 5, "    function main(): ExitCode is" ]
+  ]
+}

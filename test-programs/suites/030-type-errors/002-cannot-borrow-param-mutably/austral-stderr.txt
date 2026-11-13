@@ -1,0 +1,31 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot borrow the variable " },
+    { "type": "code", "content": "x" },
+    {
+      "type": "text",
+      "content": " mutably because it is a function parameter, and therefore immutable."
+    },
+    {
+      "type": "text",
+      "content": "\nYou can move it to a mutable local variable: "
+    },
+    { "type": "code", "content": "var mut_x: Int32 := x;" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/002-cannot-borrow-param-mutably/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 5, "column": 19 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function f(x: Int32): Unit is" ],
+    [ 3, "        borrow ref: &![Int32, R] := &!x do" ],
+    [ 4, "            skip;" ],
+    [ 5, "        end borrow;" ],
+    [ 6, "        return nil;" ],
+    [ 7, "    end;" ]
+  ]
+}

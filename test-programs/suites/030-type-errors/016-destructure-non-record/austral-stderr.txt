@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The type " },
+    { "type": "type", "content": "Int32" },
+    {
+      "type": "text",
+      "content": " cannot be destructured because it is not a record."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/016-destructure-non-record/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 30 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let x: Int32 := 1;" ],
+    [ 4, "        let { y: Int32 } := x;" ],
+    [ 5, "        return ExitSuccess();" ],
+    [ 6, "    end;" ]
+  ]
+}

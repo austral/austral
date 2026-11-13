@@ -1,0 +1,10 @@
+module body Test is
+    record R: Linear is
+        x: Int32;
+    end;
+
+    function main(): ExitCode is
+        R(x => 10);
+        return ExitSuccess();
+    end;
+end module body.

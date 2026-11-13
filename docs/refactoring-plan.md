@@ -202,7 +202,9 @@ val traverse : ('a -> 'b outcome) -> 'a list -> 'b list outcome
 
 数え方と再実行のしかたは、`docs/research/functional-domain-refactoring/README.md` にある。
 
-| 指標 | 今 | 目標 | 減らす項目 |
+「計画の時点」の数は、`tools/refactoring/baseline/` に固定してある。今の数は `tools/refactoring/expected/` にあり、項目が終わるたびに記録し直す。
+
+| 指標 | 計画の時点 | 目標 | 減らす項目 |
 |---|---|---|---|
 | 例外を投げる箇所 | 476 | 段の内側だけ。段の外へ出る例外は 0 | R11、R13、R15 |
 | そのうち、「ここには来ないはず」（`internal_err`） | 93 | 20 以下。残りには、型で表せない理由を書く | R16、R21、R24 |
@@ -265,9 +267,13 @@ R27           流れを型として書く
 
 - **依存。** R2。
 - **今の形。** エラーの文面を作って投げる関数は 140 個ある。うち 53 個が `lib/TypeErrors.ml` にある。`lib/TypeErrors.ml` は、87 点のうち 18 点しかテストが実行しない（20.69%）。大半のエラーは、文面も、出る条件も、どのテストも見ていない。
-- **作るもの。** エラーの種類ごとに、それを起こすプログラムを1本ずつ足す。期待値は、今のコンパイラが出す文面である。置き場所は `test-programs/suites/030-type-errors`、`031-declaration-errors`、`032-linearity-errors`、`033-other-errors` とする。
+- **作るもの。** エラーの種類ごとに、それを起こすプログラムを1本ずつ足す。期待値は、今のコンパイラが出す文面である。置き場所は `test-programs/suites/030-type-errors`、`031-declaration-errors`、`032-other-errors` とする。線形性のエラーは `032-other-errors` に入れた。書き込みに失敗するエラーは、コマンドラインのテスト（`test-programs/cli`）にある。
 - **起こせないエラー。** どう書いても起こせないエラーは、到達できないコードである。一覧にして、R7 で消す。
 - **確かめ方。** 140 個の関数のすべてが、テストに実行されるか、R7 の一覧に載る。足したテストは、今のコンパイラで通る。
+- **結果。** 140 個のうち 125 個を、テストが実行する（`tools/refactoring/coverage.sh --errors`）。手で書いたコードのカバレッジは 77.88% から 84.49% に、`lib/TypeErrors.ml` は 20.69% から 87.36% になった。残る 15 個は、次のとおりである。
+  - 呼ぶコードがない 8 個。`lib/TypeErrors.ml` の `array_indexing_disallowed`、`borrow_constant`、`reborrow_constant`、`reborrow_wrong_type`、`borrow_non_linear`、`lvalue_index`、`path_not_free`、`ref_transform_not_record` である。R7 で消す。
+  - 呼ぶコードはあるが、手前の検査が先に止めるので届かない 5 個。`cannot_assign_to_constant`、`for_bounds_non_integral`、`multiarg_typeclass`、`region_arg`、`empty_args` である。消すと手前の検査との関係が変わるので、R7 では消さない。理由は issue #124 に書いた。
+  - 不具合のために届かない 2 個。`foreign_import_export` と `no_entrypoint_wrong_target` である。issue #124 にある。
 - **大きさ。** 大。次の4つに分ける。
   1. 型エラー（`lib/TypeErrors.ml` の 53 個）。
   2. 宣言と取り込みのエラー（`lib/CombiningPass.ml`、`lib/ExtractionPass.ml`、`lib/ImportResolution.ml`、`lib/TypeClasses.ml`）。

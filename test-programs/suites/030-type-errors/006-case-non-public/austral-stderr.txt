@@ -1,0 +1,27 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Union must be public or from the same module to be used in a case statement."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/006-case-non-public/Test.aum",
+    "startp": { "line": 6, "column": 8 },
+    "end": { "line": 11, "column": 17 }
+  },
+  "context": [
+    [ 4, "    function main(): ExitCode is" ],
+    [ 5, "        let s: Secret := make();" ],
+    [ 6, "        case s of" ],
+    [ 7, "            when A do" ],
+    [ 8, "                skip;" ],
+    [ 9, "            when B do" ],
+    [ 10, "                skip;" ],
+    [ 11, "        end case;" ],
+    [ 12, "        return ExitSuccess();" ],
+    [ 13, "    end;" ]
+  ]
+}

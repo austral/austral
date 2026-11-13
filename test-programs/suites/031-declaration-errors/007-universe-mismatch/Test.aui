@@ -1,0 +1,5 @@
+module Test is
+    type Foo: Linear;
+
+    function main(): ExitCode;
+end module.

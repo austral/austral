@@ -1,0 +1,10 @@
+module body Test is
+    pragma Unsafe_Module;
+    function f(): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

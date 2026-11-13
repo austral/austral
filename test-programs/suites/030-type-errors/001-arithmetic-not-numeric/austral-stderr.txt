@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Both operands of an arithmetic operator must be numeric types, but "
+    },
+    { "type": "type", "content": "Bool" },
+    { "type": "text", "content": " is not." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/001-arithmetic-not-numeric/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 36 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let b: Bool := true + false;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

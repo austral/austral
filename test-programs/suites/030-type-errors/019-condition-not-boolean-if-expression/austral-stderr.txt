@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The condition in " },
+    { "type": "code", "content": "if" },
+    { "type": "text", "content": "-" },
+    { "type": "text", "content": "expression" },
+    { "type": "text", "content": "s should be a boolean type, but is " },
+    { "type": "type", "content": "Int32" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/019-condition-not-boolean-if-expression/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 43 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let x: Int32 := if 1 then 2 else 3;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "Cannot import from the " },
+    { "type": "code", "content": "Austral.Memory" },
+    { "type": "text", "content": " module in a safe module." },
+    { "type": "break" },
+    { "type": "text", "content": "Consider using a safe wrapper or adding " },
+    { "type": "code", "content": "pragma Unsafe_Module;" }
+  ],
+  "span": null,
+  "context": null
+}

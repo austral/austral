@@ -1,0 +1,31 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The type parameters in a generic instance declaration cannot have the same name as the type parameter in the corresponding typeclass. The colliding name is "
+    },
+    { "type": "code", "content": "T" },
+    { "type": "text", "content": "." },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "This is, regrettably, a load-bearing hack for https://github.com/austral/austral/issues/244. Fixing this properly would require rewriting large parts of the frontend."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/024-shadowing-typeclass-param/Test.aum",
+    "startp": { "line": 5, "column": 4 },
+    "end": { "line": 7, "column": 8 }
+  },
+  "context": [
+    [ 3, "    end;" ],
+    [ 4, "" ],
+    [ 5, "    generic [T: Free]" ],
+    [ 6, "    instance Foo(Option[T]) is" ],
+    [ 7, "    end;" ],
+    [ 8, "" ],
+    [ 9, "    function main(): ExitCode is" ]
+  ]
+}

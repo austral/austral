@@ -1,0 +1,11 @@
+{
+  "module": null,
+  "kind": "Parse Error",
+  "text": [
+    { "type": "text", "content": "Character literal '" },
+    { "type": "code", "content": "" },
+    { "type": "text", "content": " is more than one character." }
+  ],
+  "span": null,
+  "context": null
+}

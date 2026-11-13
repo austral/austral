@@ -1,0 +1,8 @@
+module body Test is
+    record Foo: Free is
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

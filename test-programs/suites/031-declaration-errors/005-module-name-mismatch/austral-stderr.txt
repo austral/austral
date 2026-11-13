@@ -1,0 +1,15 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Module interface and body have different names: "
+    },
+    { "type": "code", "content": "Test" },
+    { "type": "text", "content": " and " },
+    { "type": "code", "content": "Other" }
+  ],
+  "span": null,
+  "context": null
+}

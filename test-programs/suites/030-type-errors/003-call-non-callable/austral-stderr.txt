@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The type " },
+    { "type": "type", "content": "Int32" },
+    {
+      "type": "text",
+      "content": " is neither a function, method or function pointer, and cannot be called."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/003-call-non-callable/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 4, "column": 12 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let f: Int32 := 1;" ],
+    [ 4, "        f();" ],
+    [ 5, "        return ExitSuccess();" ],
+    [ 6, "    end;" ]
+  ]
+}

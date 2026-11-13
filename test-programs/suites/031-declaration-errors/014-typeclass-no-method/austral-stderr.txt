@@ -1,0 +1,28 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The typeclass " },
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": " has no method named " },
+    { "type": "code", "content": "Bar" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/014-typeclass-no-method/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 9, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    typeclass Foo(T: Free) is" ],
+    [ 3, "    end;" ],
+    [ 4, "" ],
+    [ 5, "    instance Foo(Int32) is" ],
+    [ 6, "        method Bar(x: Int32): Unit is" ],
+    [ 7, "            return nil;" ],
+    [ 8, "        end;" ],
+    [ 9, "    end;" ],
+    [ 10, "" ],
+    [ 11, "    function main(): ExitCode is" ]
+  ]
+}

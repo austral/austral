@@ -1,0 +1,7 @@
+import Other (Foo);
+
+module body Test is
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

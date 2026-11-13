@@ -1,0 +1,33 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The type " },
+    { "type": "type", "content": "Int32" },
+    {
+      "type": "text",
+      "content": " is not a type parameter, but generic instances must use either all type parameters or none of them in the argument."
+    },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "Consider adding another generic parameter with universe "
+    },
+    { "type": "code", "content": "Free" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/023-not-a-tyvar/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 6, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    typeclass Foo(T: Free) is" ],
+    [ 3, "    end;" ],
+    [ 4, "" ],
+    [ 5, "    instance Foo(Option[Int32]) is" ],
+    [ 6, "    end;" ],
+    [ 7, "" ],
+    [ 8, "    function main(): ExitCode is" ]
+  ]
+}

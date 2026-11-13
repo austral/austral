@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Arguments to " },
+    { "type": "text", "content": "union" },
+    { "type": "text", "content": " constructor have the wrong names." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/022-constructor-wrong-args-union/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 48 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let o: Option[Int32] := Some(valu => 1);" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

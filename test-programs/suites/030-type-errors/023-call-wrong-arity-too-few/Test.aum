@@ -1,0 +1,11 @@
+module body Test is
+    function add(x: Int32, y: Int32): Int32 is
+        return x + y;
+    end;
+
+    function main(): ExitCode is
+        let f: Fn[Int32, Int32, Int32] := add;
+        f(1);
+        return ExitSuccess();
+    end;
+end module body.

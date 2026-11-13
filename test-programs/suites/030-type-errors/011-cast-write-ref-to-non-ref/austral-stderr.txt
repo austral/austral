@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Write references can only be casted to a read reference."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/011-cast-write-ref-to-non-ref/Test.aum",
+    "startp": { "line": 5, "column": 12 },
+    "end": { "line": 5, "column": 40 }
+  },
+  "context": [
+    [ 3, "        var x: Int32 := 1;" ],
+    [ 4, "        borrow ref: &![Int32, R] := &!x do" ],
+    [ 5, "            let y: Int32 := ref : Int32;" ],
+    [ 6, "        end borrow;" ],
+    [ 7, "        return ExitSuccess();" ]
+  ]
+}

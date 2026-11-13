@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Arguments to " },
+    { "type": "text", "content": "record" },
+    { "type": "text", "content": " constructor have the wrong names." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/014-constructor-wrong-args/Test.aum",
+    "startp": { "line": 7, "column": 8 },
+    "end": { "line": 7, "column": 30 }
+  },
+  "context": [
+    [ 5, "" ],
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let r: R := R(y => 1);" ],
+    [ 8, "        return ExitSuccess();" ],
+    [ 9, "    end;" ]
+  ]
+}

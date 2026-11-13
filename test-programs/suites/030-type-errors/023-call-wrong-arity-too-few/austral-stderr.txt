@@ -1,0 +1,28 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The callable " },
+    { "type": "code", "content": "f" },
+    { "type": "text", "content": " expects " },
+    { "type": "text", "content": "2" },
+    { "type": "text", "content": " argument" },
+    { "type": "text", "content": "s " },
+    { "type": "text", "content": "but " },
+    { "type": "text", "content": "1" },
+    { "type": "text", "content": " was " },
+    { "type": "text", "content": "given." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/023-call-wrong-arity-too-few/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 13 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let f: Fn[Int32, Int32, Int32] := add;" ],
+    [ 8, "        f(1);" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

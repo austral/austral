@@ -1,0 +1,14 @@
+module body Test is
+    typeclass Foo(T: Free) is
+    end;
+
+    instance Foo(Int32) is
+        method Bar(x: Int32): Unit is
+            return nil;
+        end;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

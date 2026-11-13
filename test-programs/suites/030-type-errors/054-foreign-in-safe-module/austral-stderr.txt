@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Can't declare a foreign function in a safe module."
+    }
+  ],
+  "span": null,
+  "context": null
+}

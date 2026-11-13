@@ -1,0 +1,20 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [ { "type": "text", "content": "Non-exhaustive case statement." } ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/005-case-non-exhaustive/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 7, "column": 17 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let o: Option[Int32] := None();" ],
+    [ 4, "        case o of" ],
+    [ 5, "            when None do" ],
+    [ 6, "                skip;" ],
+    [ 7, "        end case;" ],
+    [ 8, "        return ExitSuccess();" ],
+    [ 9, "    end;" ]
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Cannot cast a reference to one with a different underlying type."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/009-cast-different-references/Test.aum",
+    "startp": { "line": 5, "column": 12 },
+    "end": { "line": 5, "column": 50 }
+  },
+  "context": [
+    [ 3, "        var x: Int32 := 1;" ],
+    [ 4, "        borrow ref: &![Int32, R] := &!x do" ],
+    [ 5, "            let r: &[Bool, R] := ref : &[Bool, R];" ],
+    [ 6, "        end borrow;" ],
+    [ 7, "        return ExitSuccess();" ]
+  ]
+}

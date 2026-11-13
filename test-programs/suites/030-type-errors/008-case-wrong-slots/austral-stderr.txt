@@ -1,0 +1,31 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The set of slots (" },
+    { "type": "code", "content": "valu" },
+    {
+      "type": "text",
+      "content": ") in the case statement doesn't match the set of slots in the union definition ("
+    },
+    { "type": "code", "content": "value" },
+    { "type": "text", "content": ")." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/008-case-wrong-slots/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 9, "column": 17 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let o: Option[Int32] := None();" ],
+    [ 4, "        case o of" ],
+    [ 5, "            when Some(valu: Int32) do" ],
+    [ 6, "                skip;" ],
+    [ 7, "            when None do" ],
+    [ 8, "                skip;" ],
+    [ 9, "        end case;" ],
+    [ 10, "        return ExitSuccess();" ],
+    [ 11, "    end;" ]
+  ]
+}

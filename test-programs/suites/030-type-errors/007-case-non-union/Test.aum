@@ -1,0 +1,14 @@
+module body Test is
+    record R: Free is
+        x: Int32;
+    end;
+
+    function main(): ExitCode is
+        let r: R := R(x => 1);
+        case r of
+            when A do
+                skip;
+        end case;
+        return ExitSuccess();
+    end;
+end module body.

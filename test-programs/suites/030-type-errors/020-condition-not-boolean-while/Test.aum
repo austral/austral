@@ -1,0 +1,8 @@
+module body Test is
+    function main(): ExitCode is
+        while 1 do
+            skip;
+        end while;
+        return ExitSuccess();
+    end;
+end module body.

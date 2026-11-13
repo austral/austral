@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The set of slots mentioned differs from the set of slots in "
+    },
+    { "type": "type", "content": "R" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/051-destructure-wrong-slots/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 30 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let r: R := R(x => 10);" ],
+    [ 8, "        let { y: Int32 } := r;" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

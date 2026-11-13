@@ -1,0 +1,14 @@
+import Foreign (Secret, make);
+
+module body Test is
+    function main(): ExitCode is
+        let s: Secret := make();
+        case s of
+            when A do
+                skip;
+            when B do
+                skip;
+        end case;
+        return ExitSuccess();
+    end;
+end module body.

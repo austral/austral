@@ -1,0 +1,4 @@
+module body Test is
+    function main(): ExitCode is
+    end;
+end module body.

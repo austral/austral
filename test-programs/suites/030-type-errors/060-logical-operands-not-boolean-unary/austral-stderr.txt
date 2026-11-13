@@ -1,0 +1,25 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The operand of a " },
+    { "type": "text", "content": "negation" },
+    {
+      "type": "text",
+      "content": " operator must be a boolean expression, but it has the type "
+    },
+    { "type": "type", "content": "Unit" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/060-logical-operands-not-boolean-unary/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 31 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let b: Bool := not nil;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

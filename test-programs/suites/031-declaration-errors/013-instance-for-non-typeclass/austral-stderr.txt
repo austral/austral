@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "Cannot create an instance for " },
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": " because it is not a typeclass." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/013-instance-for-non-typeclass/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 6, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    record Foo: Free is" ],
+    [ 3, "    end;" ],
+    [ 4, "" ],
+    [ 5, "    instance Foo(Int32) is" ],
+    [ 6, "    end;" ],
+    [ 7, "" ],
+    [ 8, "    function main(): ExitCode is" ]
+  ]
+}

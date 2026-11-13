@@ -1,0 +1,28 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "code", "content": "make" },
+    {
+      "type": "text",
+      "content": " is generic but unconstrained, so its type is ambiguous."
+    },
+    { "type": "break" },
+    {
+      "type": "text",
+      "content": "Consider clarifying its type using a cast."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/064-unconstrained-generic-function/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 15 }
+  },
+  "context": [
+    [ 6, "" ],
+    [ 7, "    function main(): ExitCode is" ],
+    [ 8, "        make();" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

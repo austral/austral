@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Cannot cast a reference to one with a different underlying region."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/017-cast-different-references-region/Test.aum",
+    "startp": { "line": 5, "column": 12 },
+    "end": { "line": 5, "column": 62 }
+  },
+  "context": [
+    [ 3, "        var x: Int32 := 1;" ],
+    [ 4, "        borrow ref: &![Int32, R] := &!x do" ],
+    [ 5, "            let r: &[Int32, Static] := ref : &[Int32, Static];" ],
+    [ 6, "        end borrow;" ],
+    [ 7, "        return ExitSuccess();" ]
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The branches of the " },
+    { "type": "code", "content": "if" },
+    { "type": "text", "content": "-expression have different types: " },
+    { "type": "type", "content": "Unit" },
+    { "type": "text", "content": " and " },
+    { "type": "type", "content": "Bool" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/058-if-inequal/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 51 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let x: Unit := if true then nil else false;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

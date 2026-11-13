@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The " },
+    { "type": "text", "content": "function" },
+    { "type": "text", "content": " " },
+    { "type": "code", "content": "main" },
+    { "type": "text", "content": " does not end in a return statement." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/021-missing-return/Test.aum",
+    "startp": { "line": 1, "column": 19 },
+    "end": { "line": 3, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "    end;" ],
+    [ 4, "end module body." ]
+  ]
+}

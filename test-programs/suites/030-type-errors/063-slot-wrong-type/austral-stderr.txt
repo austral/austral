@@ -1,0 +1,29 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The slot " },
+    { "type": "code", "content": "value" },
+    { "type": "text", "content": " should have type " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": " but is declared to have type " },
+    { "type": "type", "content": "Int64" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/063-slot-wrong-type/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 9, "column": 17 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let o: Option[Int32] := Some(value => 10);" ],
+    [ 4, "        case o of" ],
+    [ 5, "            when Some(value: Int64) do" ],
+    [ 6, "                skip;" ],
+    [ 7, "            when None do" ],
+    [ 8, "                skip;" ],
+    [ 9, "        end case;" ],
+    [ 10, "        return ExitSuccess();" ],
+    [ 11, "    end;" ]
+  ]
+}

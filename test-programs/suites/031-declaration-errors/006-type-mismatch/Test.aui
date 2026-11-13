@@ -1,0 +1,5 @@
+module Test is
+    constant Foo: Int32;
+
+    function main(): ExitCode;
+end module.

@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Only import and export pragmas are allowed inside functions."
+    }
+  ],
+  "span": null,
+  "context": null
+}

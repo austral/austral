@@ -1,0 +1,8 @@
+module Test is
+    typeclass Foo(T: Free) is
+    end;
+
+    instance Foo(Int32);
+
+    function main(): ExitCode;
+end module.

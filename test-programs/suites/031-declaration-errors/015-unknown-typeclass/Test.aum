@@ -1,0 +1,8 @@
+module body Test is
+    instance Foo(Int32) is
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

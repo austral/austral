@@ -1,0 +1,3 @@
+module body Other is
+    constant Foo: Int32 := 0;
+end module body.

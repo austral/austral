@@ -1,0 +1,6 @@
+module body Test is
+    function main(): ExitCode is
+        let x: Int32 := if 1 then 2 else 3;
+        return ExitSuccess();
+    end;
+end module body.

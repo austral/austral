@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot cast to " },
+    { "type": "type", "content": "Int32" },
+    { "type": "text", "content": " from " },
+    { "type": "type", "content": "Bool" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/010-cast-invalid/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 37 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let x: Int32 := true : Int32;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

@@ -1,0 +1,7 @@
+module body Test is
+    constant c: Index := argumentCount();
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

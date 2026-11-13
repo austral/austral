@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Typeclass arguments cannot be lone type parameters."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/022-lone-tyvar/Test.aum",
+    "startp": { "line": 5, "column": 4 },
+    "end": { "line": 7, "column": 8 }
+  },
+  "context": [
+    [ 3, "    end;" ],
+    [ 4, "" ],
+    [ 5, "    generic [U: Free]" ],
+    [ 6, "    instance Foo(U) is" ],
+    [ 7, "    end;" ],
+    [ 8, "" ],
+    [ 9, "    function main(): ExitCode is" ]
+  ]
+}

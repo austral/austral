@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "Cannot discard a value in the " },
+    { "type": "code", "content": "Linear" },
+    { "type": "text", "content": " universe." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/052-discard-linear/Test.aum",
+    "startp": { "line": 7, "column": 8 },
+    "end": { "line": 7, "column": 19 }
+  },
+  "context": [
+    [ 5, "" ],
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        R(x => 10);" ],
+    [ 8, "        return ExitSuccess();" ],
+    [ 9, "    end;" ]
+  ]
+}

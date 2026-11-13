@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The slot " },
+    { "type": "code", "content": "value" },
+    { "type": "text", "content": " is not publically visible in the type " },
+    { "type": "code", "content": "RootCapability" },
+    { "type": "text", "content": " and so cannot be read." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/062-path-not-public/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 3, "column": 38 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function f(root: RootCapability): Unit is" ],
+    [ 3, "        let value: Unit := root.value;" ],
+    [ 4, "        surrenderRoot(root);" ],
+    [ 5, "        return nil;" ]
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The condition in " },
+    { "type": "code", "content": "while" },
+    { "type": "text", "content": "-" },
+    { "type": "text", "content": "statement" },
+    { "type": "text", "content": "s should be a boolean type, but is " },
+    { "type": "type", "content": "Int32" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/020-condition-not-boolean-while/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 5, "column": 18 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        while 1 do" ],
+    [ 4, "            skip;" ],
+    [ 5, "        end while;" ],
+    [ 6, "        return ExitSuccess();" ],
+    [ 7, "    end;" ]
+  ]
+}

@@ -1,0 +1,10 @@
+module body Test is
+    function f(root: RootCapability): Unit is
+        let { value: Unit } := root;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

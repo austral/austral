@@ -1,0 +1,10 @@
+{
+  "module": null,
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "Unknown pragma " },
+    { "type": "code", "content": "Bogus" }
+  ],
+  "span": null,
+  "context": null
+}

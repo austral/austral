@@ -1,0 +1,12 @@
+module body Test is
+    function main(): ExitCode is
+        let o: Option[Int32] := None();
+        case o of
+            when Some(valu: Int32) do
+                skip;
+            when None do
+                skip;
+        end case;
+        return ExitSuccess();
+    end;
+end module body.

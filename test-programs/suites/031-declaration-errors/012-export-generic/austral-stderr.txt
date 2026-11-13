@@ -1,0 +1,27 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The function " },
+    { "type": "code", "content": "Foo" },
+    {
+      "type": "text",
+      "content": " cannot be exported because it is generic."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/012-export-generic/Test.aum",
+    "startp": { "line": 3, "column": 4 },
+    "end": { "line": 6, "column": 8 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    pragma Foreign_Export(External_Name => \"foo\");" ],
+    [ 3, "    generic [T: Free]" ],
+    [ 4, "    function Foo(x: T): T is" ],
+    [ 5, "        return x;" ],
+    [ 6, "    end;" ],
+    [ 7, "" ],
+    [ 8, "    function main(): ExitCode is" ]
+  ]
+}

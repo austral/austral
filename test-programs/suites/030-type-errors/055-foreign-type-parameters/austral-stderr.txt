@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Foreign functions can't have type parameters."
+    }
+  ],
+  "span": null,
+  "context": null
+}

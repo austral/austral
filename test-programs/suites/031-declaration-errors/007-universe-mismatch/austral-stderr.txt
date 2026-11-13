@@ -1,0 +1,23 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The interface declaration for " },
+    { "type": "code", "content": "Foo" },
+    {
+      "type": "text",
+      "content": " and its implementation have different universes."
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/007-universe-mismatch/Test.aui",
+    "startp": { "line": 2, "column": 4 },
+    "end": { "line": 2, "column": 21 }
+  },
+  "context": [
+    [ 1, "module Test is" ],
+    [ 2, "    type Foo: Linear;" ],
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode;" ]
+  ]
+}

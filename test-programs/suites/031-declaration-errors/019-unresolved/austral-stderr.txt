@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "No declaration with the name " },
+    { "type": "code", "content": "Nonexistent" },
+    { "type": "text", "content": " in the module " },
+    { "type": "code", "content": "Austral.Pervasive" }
+  ],
+  "span": null,
+  "context": null
+}

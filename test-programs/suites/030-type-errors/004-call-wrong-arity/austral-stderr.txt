@@ -1,0 +1,28 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The callable " },
+    { "type": "code", "content": "f" },
+    { "type": "text", "content": " expects " },
+    { "type": "text", "content": "1" },
+    { "type": "text", "content": " argument" },
+    { "type": "text", "content": " " },
+    { "type": "text", "content": "but " },
+    { "type": "text", "content": "2" },
+    { "type": "text", "content": " were " },
+    { "type": "text", "content": "given." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/030-type-errors/004-call-wrong-arity/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 16 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let f: Fn[Int32, Int32] := id;" ],
+    [ 8, "        f(1, 2);" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

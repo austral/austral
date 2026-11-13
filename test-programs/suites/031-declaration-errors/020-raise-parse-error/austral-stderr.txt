@@ -1,0 +1,16 @@
+{
+  "module": null,
+  "kind": "Parse Error",
+  "text": [ { "type": "text", "content": "Error during parse." } ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/020-raise-parse-error/Test.aum",
+    "startp": { "line": 4, "column": 4 },
+    "end": { "line": 4, "column": 7 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        return ExitSuccess()" ],
+    [ 4, "    end;" ],
+    [ 5, "end module body." ]
+  ]
+}
