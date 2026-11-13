@@ -74,8 +74,8 @@ and typespec =
 and cexpr =
   | CNilConstant of span
   | CBoolConstant of span * bool
-  | CIntConstant of span * string
-  | CFloatConstant of span * string
+  | CIntConstant of span * NumberLiteral.int_literal
+  | CFloatConstant of span * NumberLiteral.float_literal
   | CStringConstant of span * string
   | CVariable of span * identifier
   | CArith of span * arithmetic_operator * cexpr * cexpr

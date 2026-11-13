@@ -62,21 +62,14 @@ let rec abs_stmt im stmt =
 and try_folding (e: aexpr): aexpr =
   match try_folding' e with
   | Some bi ->
-     IntConstant (Z.to_string bi)
+     IntConstant (NumberLiteral.of_value bi)
   | None ->
      e
 
 and try_folding' (e: aexpr): Z.t option =
-  let parse_bigint (s: string): Z.t =
-    try
-      Z.of_string s
-    with
-    | Invalid_argument _ ->
-       internal_err ("Failed to parse '" ^ s ^ "' as a big int. This is a bug in the parser.")
-  in
   match e with
   | IntConstant i ->
-     Some (parse_bigint i)
+     Some i.value
   | ArithmeticExpression (op, lhs, rhs) -> begin
       match (try_folding' lhs) with
       | Some lhs -> begin

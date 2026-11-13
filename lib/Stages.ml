@@ -62,8 +62,8 @@ module Ast = struct
   and aexpr =
     | NilConstant
     | BoolConstant of bool
-    | IntConstant of string
-    | FloatConstant of string
+    | IntConstant of NumberLiteral.int_literal
+    | FloatConstant of NumberLiteral.float_literal
     | StringConstant of escaped_string
     | Variable of qident
     | FunctionCall of qident * abstract_arglist

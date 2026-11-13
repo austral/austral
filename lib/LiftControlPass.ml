@@ -144,10 +144,10 @@ and transform (expr: Ast.aexpr): AstLC.aexpr =
     AstLC.NilConstant
   | Ast.BoolConstant b ->
     AstLC.BoolConstant b
-  | Ast.IntConstant s ->
-    AstLC.IntConstant s
-  | Ast.FloatConstant s ->
-    AstLC.FloatConstant s
+  | Ast.IntConstant i ->
+    AstLC.IntConstant (NumberLiteral.int_text i)
+  | Ast.FloatConstant f ->
+    AstLC.FloatConstant (NumberLiteral.float_text f)
   | Ast.StringConstant es ->
     AstLC.StringConstant es
   | Ast.Variable q ->

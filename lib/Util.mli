@@ -32,15 +32,6 @@ val search_replace : replacement -> string
 (** Remove the first n characters of a string. *)
 val remove_leading : string -> int -> string
 
-(** Parse a hexadecimal string into an integer. *)
-val parse_hex : string -> int
-
-(** Parse a binary string into an integer. *)
-val parse_bin : string -> int
-
-(** Parse an octal string into an integer. *)
-val parse_oct : string -> int
-
 (** Parse an ASCII character into its integer code, handling escape sequences. *)
 val parse_ascii_char : string -> int
 

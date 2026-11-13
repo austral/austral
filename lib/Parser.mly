@@ -404,15 +404,15 @@ atomic_expression:
   ;
 
 int_constant:
-  | DEC_CONSTANT { CIntConstant (from_loc $loc, remove_char $1 '\'') }
-  | HEX_CONSTANT { CIntConstant (from_loc $loc, string_of_int (parse_hex (remove_leading (remove_char $1 '\'') 2))) }
-  | BIN_CONSTANT { CIntConstant (from_loc $loc, string_of_int (parse_bin (remove_leading (remove_char $1 '\'') 2))) }
-  | OCT_CONSTANT { CIntConstant (from_loc $loc, string_of_int (parse_oct (remove_leading (remove_char $1 '\'') 2))) }
-  | CHAR_CONSTANT { CIntConstant (from_loc $loc, string_of_int (parse_ascii_char (remove_char $1 '\''))) }
+  | DEC_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_decimal $1) }
+  | HEX_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_hexadecimal $1) }
+  | BIN_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_binary $1) }
+  | OCT_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_octal $1) }
+  | CHAR_CONSTANT { CIntConstant (from_loc $loc, NumberLiteral.of_character $1) }
   ;
 
 float_constant:
-  | FLOAT_CONSTANT { CFloatConstant (from_loc $loc, remove_char $1 '\'') }
+  | FLOAT_CONSTANT { CFloatConstant (from_loc $loc, NumberLiteral.of_float $1) }
   ;
 
 string_constant:
@@ -506,7 +506,7 @@ arith_expr:
   | atomic_expression MINUS atomic_expression { CArith (from_loc $loc, Subtract, $1, $3) }
   | atomic_expression MUL atomic_expression   { CArith (from_loc $loc, Multiply, $1, $3) }
   | atomic_expression DIV atomic_expression   { CArith (from_loc $loc, Divide, $1, $3) }
-  | MINUS atomic_expression                   { CArith (from_loc $loc, Subtract, CIntConstant (from_loc $loc, "0"), $2) }
+  | MINUS atomic_expression                   { CArith (from_loc $loc, Subtract, CIntConstant (from_loc $loc, NumberLiteral.of_value Z.zero), $2) }
   ;
 
 /* Common */

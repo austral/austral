@@ -36,15 +36,6 @@ let search_replace (r: replacement): string =
 let remove_leading (s: string) (n: int): string =
   String.sub s n ((String.length s) - n)
 
-let parse_hex (s: string): int =
-  int_of_string ("0x" ^ s)
-
-let parse_bin (s: string): int =
-  int_of_string ("0b" ^ s)
-
-let parse_oct (s: string): int =
-  int_of_string ("0o" ^ s)
-
 let parse_ascii_char (s: string): int =
   match s with
   | "\\n" ->
