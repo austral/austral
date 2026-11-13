@@ -36,3 +36,6 @@ let render (ident: t): string =
     "au_ckw_" ^ ident.name
   else
     ident.name
+
+let equal (a: t) (b: t): bool =
+  String.equal (render a) (render b)

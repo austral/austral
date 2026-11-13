@@ -35,6 +35,9 @@ val austral_unescaped : string -> t
     fix for that issue replaces every use with [external_name]. *)
 val external_escaped : string -> t
 
+(** Whether two names are spelled the same in C. *)
+val equal : t -> t -> bool
+
 (** The spelling in C. The reserved-word escape puts [au_ckw_] before a name
     that starts with a C reserved word: before [double], and before [doubled]
     too. *)

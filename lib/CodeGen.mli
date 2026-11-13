@@ -6,6 +6,7 @@
 *)
 open Identifier
 open Id
+open Type
 open Env
 open Stages.Mtast
 open CRepr
@@ -18,5 +19,8 @@ val gen_mono_id : mono_id -> CIdent.t
 val gen_ident : identifier -> CIdent.t
 
 val fn_type : c_ty
+
+(** The C type of an integer type. *)
+val gen_integer_type : signedness -> integer_width -> c_ty
 
 val gen_module : env -> mono_module -> c_unit

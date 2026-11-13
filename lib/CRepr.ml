@@ -13,8 +13,30 @@ type c_function_linkage =
   | LinkageInternal
   | LinkageExternal
 
+(** The types that C or the prelude defines. *)
+type c_builtin_ty =
+  | CUnitType
+  | CBoolType
+  | CNat8Type
+  | CNat16Type
+  | CNat32Type
+  | CNat64Type
+  | CInt8Type
+  | CInt16Type
+  | CInt32Type
+  | CInt64Type
+  | CSizeType
+  | CIndexType
+  | CFloatType
+  | CDoubleType
+  | CRegionType
+  | CSpanType
+  | CFnPtrType
+
 type c_ty =
-  | CNamedType of string
+  | CBuiltinType of c_builtin_ty
+  (* A type the generated C defines: a monomorph or the tag enum of a union. *)
+  | CNamedType of CIdent.t
   | CPointer of c_ty
   | CStructType of c_slot list
   | CUnionType of c_slot list

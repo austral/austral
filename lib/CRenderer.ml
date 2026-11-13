@@ -174,8 +174,10 @@ and render_switch_case i (CSwitchCase (value, b)) =
     ]
 
 and render_type = function
+  | CBuiltinType b ->
+     render_builtin_type b
   | CNamedType n ->
-     n
+     CIdent.render n
   | CPointer t ->
      (render_type t) ^ "*"
   | CStructType slots ->
@@ -188,6 +190,25 @@ and render_type = function
      ^ "{ "
      ^ (String.concat "" (List.map render_slot slots))
      ^ "}"
+
+and render_builtin_type = function
+  | CUnitType -> "au_unit_t"
+  | CBoolType -> "au_bool_t"
+  | CNat8Type -> "au_nat8_t"
+  | CNat16Type -> "au_nat16_t"
+  | CNat32Type -> "au_nat32_t"
+  | CNat64Type -> "au_nat64_t"
+  | CInt8Type -> "au_int8_t"
+  | CInt16Type -> "au_int16_t"
+  | CInt32Type -> "au_int32_t"
+  | CInt64Type -> "au_int64_t"
+  | CSizeType -> "size_t"
+  | CIndexType -> "au_index_t"
+  | CFloatType -> "float"
+  | CDoubleType -> "double"
+  | CRegionType -> "au_region_t"
+  | CSpanType -> "au_span_t"
+  | CFnPtrType -> "au_fnptr_t"
 
 and render_slot (CSlot (n, t)) =
   (render_type t) ^ " " ^ (CIdent.render n) ^ ";"

@@ -126,46 +126,49 @@ let data_slot: CIdent.t = CIdent.generated "data"
 
 (* Types *)
 
-let fn_type: c_ty = CNamedType "au_fnptr_t"
+let fn_type: c_ty = CBuiltinType CFnPtrType
+
+let gen_integer_type (s: signedness) (w: integer_width): c_ty =
+  let sized (unsigned: c_builtin_ty) (signed: c_builtin_ty): c_builtin_ty =
+    match s with
+    | Unsigned -> unsigned
+    | Signed -> signed
+  in
+  let ty: c_builtin_ty =
+    match w with
+    | Width8 -> sized CNat8Type CInt8Type
+    | Width16 -> sized CNat16Type CInt16Type
+    | Width32 -> sized CNat32Type CInt32Type
+    | Width64 -> sized CNat64Type CInt64Type
+    | WidthByteSize -> CSizeType
+    | WidthIndex -> CIndexType
+  in
+  CBuiltinType ty
 
 let rec gen_type (ty: mono_ty): c_ty =
   match ty with
   | MonoUnit ->
-     CNamedType "au_unit_t"
+     CBuiltinType CUnitType
   | MonoBoolean ->
-     CNamedType "au_bool_t"
+     CBuiltinType CBoolType
   | MonoInteger (s, w) ->
-     let sgn: string =
-       match s with
-       | Unsigned -> "au_nat"
-       | Signed -> "au_int"
-     in
-     let name: string =
-       match w with
-       | Width8 -> sgn ^ "8_t"
-       | Width16 -> sgn ^ "16_t"
-       | Width32 -> sgn ^ "32_t"
-       | Width64 -> sgn ^ "64_t"
-       | WidthByteSize -> "size_t"
-       | WidthIndex -> "au_index_t"
-     in
-     CNamedType name
+     gen_integer_type s w
   | MonoSingleFloat ->
-     CNamedType "float"
+     CBuiltinType CFloatType
   | MonoDoubleFloat ->
-     CNamedType "double"
+     CBuiltinType CDoubleType
   | MonoNamedType id ->
-     CNamedType (mono_id_text id)
+     CNamedType (gen_mono_id id)
   | MonoRegionTy _ ->
-     CNamedType "au_region_t"
+     CBuiltinType CRegionType
   | MonoReadRef (t, _) ->
      CPointer (gen_type t)
   | MonoWriteRef (t, _) ->
      CPointer (gen_type t)
   | MonoSpan _ ->
-     CNamedType "au_span_t"
+     CBuiltinType CSpanType
   | MonoSpanMut _ ->
-     CNamedType "au_span_t"
+     CBuiltinType CSpanType
   | MonoAddress t ->
      CPointer (gen_type t)
   | MonoPointer t ->
@@ -354,7 +357,7 @@ let rec gen_stmt (mn: module_name) (stmt: mstmt): c_stmt =
      CWhile (ge c, gs b)
   | MFor (v, i, f, b) ->
      CExplicitBlock [
-         CLet (gen_ident v, CNamedType "size_t", Some (ge i));
+         CLet (gen_ident v, CBuiltinType CSizeType, Some (ge i));
          CFor (gen_ident v, ge f, gs b)
        ]
   | MBorrow { original; rename; orig_type; body; mode; _ } ->
@@ -544,7 +547,7 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
                          union_d,
                          mono_id,
                          [
-                           CSlot (tag_slot, CNamedType (union_tag_enum_text id));
+                           CSlot (tag_slot, CNamedType (union_tag_enum_name id));
                            CSlot (data_slot, CUnionType (gen_cases cases))
                          ]
                        )
@@ -614,11 +617,17 @@ let gen_decl (env: env) (mn: module_name) (decl: mdecl): c_decl list =
      and ff_rt = return_type_to_c_type rt in
      let ff_local_decl = CLocalFunctionDeclaration (CIdent.external_name underlying, ff_params, ff_rt, LinkageExternal) in
      let make_param (n: identifier) (t: mono_ty) =
-       if (gen_type t) = (CNamedType "au_span_t") then
-         (* Extract the pointer from the Array struct *)
-         CStructAccessor (CVar (gen_ident n), CIdent.generated "data")
-       else
-         CVar (gen_ident n)
+       match gen_type t with
+       | CBuiltinType CSpanType ->
+          (* Extract the pointer from the Array struct *)
+          CStructAccessor (CVar (gen_ident n), CIdent.generated "data")
+       | CBuiltinType (CUnitType | CBoolType
+                       | CNat8Type | CNat16Type | CNat32Type | CNat64Type
+                       | CInt8Type | CInt16Type | CInt32Type | CInt64Type
+                       | CSizeType | CIndexType | CFloatType | CDoubleType
+                       | CRegionType | CFnPtrType)
+       | CNamedType _ | CPointer _ | CStructType _ | CUnionType _ ->
+          CVar (gen_ident n)
      in
      let args = List.map (fun (MValueParameter (n, t)) -> make_param n t) params in
      let funcall = CFuncall (CIdent.external_escaped underlying, args) in
@@ -701,14 +710,16 @@ let decl_order = function
 let rec slot_depth decls (slot: c_slot) =
   match slot with
   | CSlot (_, CNamedType name) -> name_depth name decls
+  (* The depth of a named type that has no definition among the declarations. *)
+  | CSlot (_, CBuiltinType _) -> 1
   | CSlot (_, CStructType slots) -> slots_depth slots decls
   | CSlot (_, CUnionType slots) -> slots_depth slots decls
-  | _ -> 0
+  | CSlot (_, CPointer _) -> 0
 
 and get_slots name decl =
   match decl with
   | CNamedStructDefinition (_, decl_name, slots) ->
-     if name = CIdent.render decl_name then
+     if CIdent.equal name decl_name then
        Some slots
      else
        None

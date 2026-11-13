@@ -37,27 +37,13 @@ let rec transform_ty (ty: ty): c_ty =
   | Unit ->
      type_error (ExportDisallowedType ty)
   | Boolean ->
-     CNamedType "au_bool_t"
+     CBuiltinType CBoolType
   | Integer (s, w) ->
-     let sgn: string =
-       match s with
-       | Unsigned -> "au_nat"
-       | Signed -> "au_int"
-     in
-     let name: string =
-       match w with
-       | Width8 -> sgn ^ "8_t"
-       | Width16 -> sgn ^ "16_t"
-       | Width32 -> sgn ^ "32_t"
-       | Width64 -> sgn ^ "64_t"
-       | WidthByteSize -> "size_t"
-       | WidthIndex -> "au_index_t"
-     in
-     CNamedType name
+     gen_integer_type s w
   | SingleFloat ->
-     CNamedType "float"
+     CBuiltinType CFloatType
   | DoubleFloat ->
-     CNamedType "double"
+     CBuiltinType CDoubleType
   | NamedType _ ->
      type_error (ExportDisallowedType ty)
   | RegionTy _ ->
