@@ -1,0 +1,26 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "The type for the expression in a case statement must be a union or a reference to a union, but I got "
+    },
+    { "type": "type", "content": "Bool" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/033-type-checker-errors/016-case-non-union-or-reference/Test.aum",
+    "startp": { "line": 3, "column": 8 },
+    "end": { "line": 6, "column": 17 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        case true of" ],
+    [ 4, "            when Foo do" ],
+    [ 5, "                skip;" ],
+    [ 6, "        end case;" ],
+    [ 7, "        return ExitSuccess();" ],
+    [ 8, "    end;" ]
+  ]
+}

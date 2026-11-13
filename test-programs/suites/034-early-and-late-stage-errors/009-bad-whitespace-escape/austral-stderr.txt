@@ -1,0 +1,7 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [ { "type": "text", "content": "Bad whitespace escape sequence" } ],
+  "span": null,
+  "context": null
+}

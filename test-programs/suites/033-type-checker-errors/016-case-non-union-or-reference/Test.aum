@@ -1,0 +1,9 @@
+module body Test is
+    function main(): ExitCode is
+        case true of
+            when Foo do
+                skip;
+        end case;
+        return ExitSuccess();
+    end;
+end module body.

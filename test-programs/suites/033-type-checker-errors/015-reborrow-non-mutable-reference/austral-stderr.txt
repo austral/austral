@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Cannot reborrow something that is not a mutable reference: Int32"
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/033-type-checker-errors/015-reborrow-non-mutable-reference/Test.aum",
+    "startp": { "line": 4, "column": 8 },
+    "end": { "line": 6, "column": 19 }
+  },
+  "context": [
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        var x: Int32 := 1;" ],
+    [ 4, "        borrow r: &![Int32, R] := &~x do" ],
+    [ 5, "            skip;" ],
+    [ 6, "        end borrow;" ],
+    [ 7, "        return ExitSuccess();" ],
+    [ 8, "    end;" ]
+  ]
+}

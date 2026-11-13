@@ -1,0 +1,9 @@
+module body Test is
+    function Foo(y: Int32): Int32 is
+        return y;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

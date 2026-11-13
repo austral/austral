@@ -270,10 +270,13 @@ R27           流れを型として書く
 - **作るもの。** エラーの種類ごとに、それを起こすプログラムを1本ずつ足す。期待値は、今のコンパイラが出す文面である。置き場所は `test-programs/suites/030-type-errors`、`031-declaration-errors`、`032-other-errors` とする。線形性のエラーは `032-other-errors` に入れた。書き込みに失敗するエラーは、コマンドラインのテスト（`test-programs/cli`）にある。
 - **起こせないエラー。** どう書いても起こせないエラーは、到達できないコードである。一覧にして、R7 で消す。
 - **確かめ方。** 140 個の関数のすべてが、テストに実行されるか、R7 の一覧に載る。足したテストは、今のコンパイラで通る。
-- **結果。** 140 個のうち 125 個を、テストが実行する（`tools/refactoring/coverage.sh --errors`）。手で書いたコードのカバレッジは 77.88% から 84.49% に、`lib/TypeErrors.ml` は 20.69% から 87.36% になった。残る 15 個は、次のとおりである。
-  - 呼ぶコードがない 8 個。`lib/TypeErrors.ml` の `array_indexing_disallowed`、`borrow_constant`、`reborrow_constant`、`reborrow_wrong_type`、`borrow_non_linear`、`lvalue_index`、`path_not_free`、`ref_transform_not_record` である。R7 で消す。
-  - 呼ぶコードはあるが、手前の検査が先に止めるので届かない 5 個。`cannot_assign_to_constant`、`for_bounds_non_integral`、`multiarg_typeclass`、`region_arg`、`empty_args` である。消すと手前の検査との関係が変わるので、R7 では消さない。理由は issue #124 に書いた。
-  - 不具合のために届かない 2 個。`foreign_import_export` と `no_entrypoint_wrong_target` である。issue #124 にある。
+- **結果。** 2回に分けて足した。
+  - 1回目は、エラーを作る関数が1回でも実行されるかを見た。テストを 81 本足し、140 個の関数のうち 125 個が実行されるようになった。
+  - レビューが、この見方の穴を指摘した。関数の中で文面を選ぶ場合と、`err "..."` で直接投げる場合を見落としていた。
+  - 2回目は、文面を作る文字列リテラルの1つ1つが、どれかのテストの期待値に現れるかを見た（`tools/refactoring/unpinned-messages.py`）。テストを 29 本足した。345 個のかけらのうち、期待値に現れないものは 33 個である。33 個は、どのプログラムでも出せない。一覧は `tools/refactoring/expected/unpinned-messages.txt` に、理由は issue #124 にある。新しい文面を足してテストを書かないと、`check.sh` が失敗する。
+  - 手で書いたコードのカバレッジは、77.27% から 86% 台になった（`tools/refactoring/expected/coverage.txt`）。
+  - 見つけた不具合は、issue #122、#124、#125、#126、#127、#128 と、#85、#90 へのコメントにある。
+- **固定の限界。** 同じ文面を複数の箇所が投げる場合（`Not allowed` の 11 か所など）、期待値からは、どの箇所が動いたかを区別できない。R11 の手順 5 が、箇所ごとに名前を付ける。
 - **大きさ。** 大。次の4つに分ける。
   1. 型エラー（`lib/TypeErrors.ml` の 53 個）。
   2. 宣言と取り込みのエラー（`lib/CombiningPass.ml`、`lib/ExtractionPass.ml`、`lib/ImportResolution.ml`、`lib/TypeClasses.ml`）。
@@ -288,6 +291,7 @@ R27           流れを型として書く
 - **作るもの。** コマンドラインのテストの種別。引数、期待する終了コード、標準出力、標準エラー、作業ディレクトリにできるファイルの一覧を比べる。引数なし、`--help`、`--version`、知らないコマンド、実行ファイルまでのコンパイル、`--target-type=c`、`--error-format=json`、存在しないファイル、の各場合を足す。
 - **不具合も、今のまま固定する。** 知らないコマンドで終了コードが 0 になること（issue #32）、失敗すると `error.html` を書くこと（issue #33）、利用者の入力で OCaml の例外のまま落ちて終了コードが 2 になること（issue #49、#85）は、今の振る舞いとしてテストにする。テストの名前に issue の番号を入れる。不具合を直すプルリクエストが、その期待値を書き換える。
 - **確かめ方。** `lib/CliEngine.ml` と `lib/Cli.ml` のカバレッジが 100% になる。
+- **結果。** コマンドラインのテストは 34 本ある。端のファイル（`cli/`）のカバレッジは、`CliEngine` が 96.74%、`Cli` が 85.71%、`CliUtil` と `Os` が 92% 台、`CliParser` が 64.86% である。100% にならない理由は3つある。`CliParser` の残りは、型の比較の関数（`deriving eq`）で、単体テストだけが使う。`exit 0` の後ろの点は、実行されることがない。残りは、届かない枝である（issue #124）。
 - **大きさ。** 中。
 
 ### R5. 数えた指標を CI に入れる（issue #98）

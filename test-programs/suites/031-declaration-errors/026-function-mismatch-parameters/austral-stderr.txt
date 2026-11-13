@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "The interface declaration for " },
+    { "type": "code", "content": "Foo" },
+    { "type": "text", "content": " and its implementation " },
+    { "type": "text", "content": "have different parameters." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/031-declaration-errors/026-function-mismatch-parameters/Test.aui",
+    "startp": { "line": 1, "column": 14 },
+    "end": { "line": 2, "column": 34 }
+  },
+  "context": [
+    [ 1, "module Test is" ],
+    [ 2, "    function Foo(x: Int32): Int32;" ],
+    [ 3, "" ],
+    [ 4, "    function main(): ExitCode;" ]
+  ]
+}

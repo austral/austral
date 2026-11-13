@@ -1,0 +1,17 @@
+module body Test is
+    record Lin: Linear is
+        x: Int32;
+    end;
+
+    record User: Linear is
+        b: Box[Lin];
+    end;
+
+    record Box[T: Type]: Free is
+        x: Int32;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

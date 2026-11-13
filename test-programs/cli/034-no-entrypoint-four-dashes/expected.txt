@@ -1,0 +1,15 @@
+exit: 255
+files: error.html
+--- stdout
+--- stderr
+Error:
+  Title: Command Line Arguments Error
+  Module:
+    [unknown]
+  Location:
+    [no span available]
+  Description:
+    `--no-entrypoint` requires `--target-type=c`, because otherwise the compiler will try to build the generated C code, and will fail because there is no entrypoint function.
+  Code:
+    [no span available]
+

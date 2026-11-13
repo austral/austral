@@ -1,0 +1,11 @@
+module body Test is
+    record S: Free is
+        a: Int32;
+    end;
+
+    function main(): ExitCode is
+        let s: S := S(a => 1);
+        let v: Int32 := s->a;
+        return ExitSuccess();
+    end;
+end module body.

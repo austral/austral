@@ -1,0 +1,10 @@
+module body Test is
+    generic [T: Free, T: Free]
+    function foo(x: T): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

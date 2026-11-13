@@ -1,0 +1,15 @@
+pragma Unsafe_Module;
+
+module body Test is
+    record R: Free is
+        x: Int32;
+    end;
+
+    pragma Foreign_Import(External_Name => "f");
+    function f(r: R): Int32 is
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

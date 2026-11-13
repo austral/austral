@@ -1,0 +1,11 @@
+module body Test is
+    function foo(s: Span[Nat8, Static]): Unit is
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        let f: Fn[Span[Nat8, Static], Unit] := foo;
+        f("a");
+        return ExitSuccess();
+    end;
+end module body.

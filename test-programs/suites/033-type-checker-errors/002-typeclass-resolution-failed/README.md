@@ -1,0 +1,1 @@
+Pins `Typeclass resolution failed. Dispatch type: ` (lib/Monomorphize.ml, `monomorphize_expr`, `TVarMethodCall`): an unconstrained type variable is passed to a constrained one, so the missing instance is only found when the monomorph is instantiated.

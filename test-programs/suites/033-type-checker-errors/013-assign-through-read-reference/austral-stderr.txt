@@ -1,0 +1,22 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Can't assign: lvalue is not a mutable reference: &[Int32, Region<2>]"
+    }
+  ],
+  "span": {
+    "filename": "test-programs/suites/033-type-checker-errors/013-assign-through-read-reference/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 19 }
+  },
+  "context": [
+    [ 6, "    function set(r: &[S, Static]): Unit is" ],
+    [ 7, "        var r2: &[S, Static] := r;" ],
+    [ 8, "        r2->a := 2;" ],
+    [ 9, "        return nil;" ],
+    [ 10, "    end;" ]
+  ]
+}

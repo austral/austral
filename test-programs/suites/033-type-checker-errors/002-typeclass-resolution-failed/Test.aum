@@ -1,0 +1,20 @@
+module body Test is
+    typeclass TC(T: Free) is
+        method accept(x: T): Unit;
+    end;
+
+    generic [T: Free(TC)]
+    function f(x: T): Unit is
+        return accept(x);
+    end;
+
+    generic [U: Free]
+    function g(x: U): Unit is
+        return f(x);
+    end;
+
+    function main(): ExitCode is
+        g(true);
+        return ExitSuccess();
+    end;
+end module body.

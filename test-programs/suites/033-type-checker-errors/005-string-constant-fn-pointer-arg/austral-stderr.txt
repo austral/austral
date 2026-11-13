@@ -1,0 +1,7 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [ { "type": "text", "content": "Type of the string constant" } ],
+  "span": null,
+  "context": null
+}

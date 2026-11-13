@@ -1,0 +1,17 @@
+module body Test is
+    typeclass TC(T: Free) is
+        generic [U: Free]
+        method foo(x: T, y: U): Unit;
+    end;
+
+    instance TC(Int32) is
+        generic [U: Free]
+        method foo(x: Int32, y: U): Unit is
+            return nil;
+        end;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

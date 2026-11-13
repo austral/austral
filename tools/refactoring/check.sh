@@ -12,6 +12,8 @@
 #      and the names of the files left behind compared
 #   4. the metrics: none of the counts in expected/totals.txt may go up
 #   5. the interface files export nothing that no other file uses
+#   6. every piece of an error message appears in some test's expected output,
+#      or is on the recorded list of pieces no program can reach
 # Exits 1 if a step fails, 2 if a compiler could not be built or run.
 # --quick skips steps 1 and 2.
 #
@@ -95,5 +97,6 @@ step "equivalence with $BASE_REF" python3 "$HERE/equivalence.py" compare "${NORM
 if ((failed)); then python3 "$HERE/equivalence.py" compare "${NORMALIZE[@]}" "$T/a" "$T/b" | head -n 60; fi
 step "metrics" "$HERE/measure.sh" --check
 step "unused exports" "$HERE/unused-exports.sh"
+step "error messages have tests" python3 "$HERE/unpinned-messages.py"
 
 exit "$failed"

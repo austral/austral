@@ -1,0 +1,15 @@
+module body Test is
+    record S: Free is
+        a: Int32;
+    end;
+
+    function set(r: &[S, Static]): Unit is
+        var r2: &[S, Static] := r;
+        r2->a := 2;
+        return nil;
+    end;
+
+    function main(): ExitCode is
+        return ExitSuccess();
+    end;
+end module body.

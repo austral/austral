@@ -1,0 +1,18 @@
+module body Test is
+    typeclass TC(T: Free) is
+        method accept(x: T): Unit;
+    end;
+
+    generic [A: Free]
+    instance TC(Option[A]) is
+        method accept(x: Option[A]): Unit is
+            return accept(x);
+        end;
+    end;
+
+    function main(): ExitCode is
+        let o: Option[Bool] := None();
+        accept(o);
+        return ExitSuccess();
+    end;
+end module body.

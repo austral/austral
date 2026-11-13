@@ -1,0 +1,10 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    { "type": "text", "content": "Duplicate type parameter " },
+    { "type": "code", "content": "T" }
+  ],
+  "span": null,
+  "context": null
+}

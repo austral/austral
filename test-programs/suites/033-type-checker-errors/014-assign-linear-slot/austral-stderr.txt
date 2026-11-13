@@ -1,0 +1,24 @@
+{
+  "module": "Test",
+  "kind": "Linearity Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Cannot assign to a path that ends in a type, "
+    },
+    { "type": "type", "content": "L" },
+    { "type": "text", "content": ", not in the Free universe." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/033-type-checker-errors/014-assign-linear-slot/Test.aum",
+    "startp": { "line": 12, "column": 8 },
+    "end": { "line": 12, "column": 25 }
+  },
+  "context": [
+    [ 10, "    function main(): ExitCode is" ],
+    [ 11, "        var s: S := S(l => L(a => 1));" ],
+    [ 12, "        s.l := L(a => 2);" ],
+    [ 13, "        return ExitSuccess();" ],
+    [ 14, "    end;" ]
+  ]
+}

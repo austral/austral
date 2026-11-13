@@ -74,11 +74,34 @@ def raising_expression(body: str, start: int) -> str:
     return body[start:]
 
 
+def without_comments(text: str) -> str:
+    """The text with comments blanked out. Literals keep their place."""
+    chars, depth, i = list(text), 0, 0
+    while i < len(text):
+        if text.startswith("(*", i):
+            depth += 1
+            chars[i] = chars[i + 1] = " "
+            i += 2
+        elif depth and text.startswith("*)", i):
+            depth -= 1
+            chars[i] = chars[i + 1] = " "
+            i += 2
+        elif depth:
+            if text[i] != "\n":
+                chars[i] = " "
+            i += 1
+        elif text[i] == '"':
+            i = LITERAL.match(text, i).end()
+        else:
+            i += 1
+    return "".join(chars)
+
+
 def pieces():
     for path in sorted([*(ROOT / "lib").glob("*.ml"), *(ROOT / "cli").glob("*.ml")]):
         if path.name == "BuiltInModules.ml":
             continue
-        text = path.read_text()
+        text = without_comments(path.read_text())
         starts = [(m.start(), m.group(1)) for m in DEFINITION.finditer(text)]
         for (start, name), (end, _) in zip(starts, starts[1:] + [(len(text), "")]):
             body = text[start:end]

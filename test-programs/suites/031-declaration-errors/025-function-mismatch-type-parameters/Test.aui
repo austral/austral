@@ -1,0 +1,6 @@
+module Test is
+    generic [T: Free]
+    function Foo(x: T): T;
+
+    function main(): ExitCode;
+end module.

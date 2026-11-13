@@ -1,0 +1,12 @@
+{
+  "module": null,
+  "kind": "Declaration Error",
+  "text": [
+    { "type": "text", "content": "Invalid Foreign_Import pragma." },
+    { "type": "break" },
+    { "type": "text", "content": "This pragma takes exactly one argument, " },
+    { "type": "code", "content": "External_Name" }
+  ],
+  "span": null,
+  "context": null
+}

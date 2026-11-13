@@ -1,0 +1,9 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    { "type": "text", "content": "strip_type': Variable not replaced: 'U'" }
+  ],
+  "span": null,
+  "context": null
+}

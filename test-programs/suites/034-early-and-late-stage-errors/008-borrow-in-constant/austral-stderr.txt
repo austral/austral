@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Borrow expressions not allowed in this context."
+    }
+  ],
+  "span": null,
+  "context": null
+}

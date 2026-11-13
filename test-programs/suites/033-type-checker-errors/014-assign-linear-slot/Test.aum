@@ -1,0 +1,15 @@
+module body Test is
+    record L: Linear is
+        a: Int32;
+    end;
+
+    record S: Linear is
+        l: L;
+    end;
+
+    function main(): ExitCode is
+        var s: S := S(l => L(a => 1));
+        s.l := L(a => 2);
+        return ExitSuccess();
+    end;
+end module body.

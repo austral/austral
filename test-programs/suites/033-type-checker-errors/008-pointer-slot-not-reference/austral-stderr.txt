@@ -1,0 +1,21 @@
+{
+  "module": "Test",
+  "kind": "Type Error",
+  "text": [
+    { "type": "text", "content": "The type " },
+    { "type": "type", "content": "S" },
+    { "type": "text", "content": " is not a reference." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/033-type-checker-errors/008-pointer-slot-not-reference/Test.aum",
+    "startp": { "line": 8, "column": 8 },
+    "end": { "line": 8, "column": 29 }
+  },
+  "context": [
+    [ 6, "    function main(): ExitCode is" ],
+    [ 7, "        let s: S := S(a => 1);" ],
+    [ 8, "        let v: Int32 := s->a;" ],
+    [ 9, "        return ExitSuccess();" ],
+    [ 10, "    end;" ]
+  ]
+}

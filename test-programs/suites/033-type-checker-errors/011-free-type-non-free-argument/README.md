@@ -1,0 +1,1 @@
+Pins `Free type called with non-free argument: ` (lib/TypeParser.ml, `effective_universe`): a slot type applies a `Free` record to a linear argument before the declaration of that record has been checked.

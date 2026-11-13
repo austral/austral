@@ -1,0 +1,12 @@
+{
+  "module": "Test",
+  "kind": "Generic Error",
+  "text": [
+    {
+      "type": "text",
+      "content": "Parameter list and argument list don't have the same length:\n\nparameters:\n(TypeParameter.TypeParameter ((Identifier.Identifier \"A\"), Type.FreeUniverse,\n   { Identifier.source = (Identifier.ModuleName \"Test\");\n     original = (Identifier.Identifier \"TC\");\n     local = (Identifier.Identifier \"TC\") },\n   []))\narguments:\n"
+    }
+  ],
+  "span": null,
+  "context": null
+}

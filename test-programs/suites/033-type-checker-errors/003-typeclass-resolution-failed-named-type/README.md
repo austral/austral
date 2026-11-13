@@ -1,0 +1,1 @@
+Pins the `MonoTy)` variant of `Typeclass resolution failed. Dispatch type: ` (lib/Monomorphize.ml, `monomorphize_expr`, `TVarMethodCall`): a constrained generic function is called with a named type that does have an instance.
