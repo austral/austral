@@ -1,4 +1,4 @@
-(lang dune 2.1)
+(lang dune 2.7)
 (using menhir 2.0)
 
 (name austral)

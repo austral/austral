@@ -1,0 +1,6 @@
+ts	phase	decision	why	evidence	result
+2026-11-13T10:03:51Z	R1	検証を1コマンドにした。tools/refactoring/check.sh が、基点のコンパイラと今の木を比べる	27項目のすべてで同じ確かめ方を使うため	tools/refactoring/check.sh	単体テスト、e2e 307件、等価性 320本、指標がすべて ok。65秒
+2026-11-13T10:03:51Z	R1	等価性の検査の対象に examples の12本を足した	テストが通らない道を少しでも減らすため	tools/refactoring/equivalence.py	308本から320本。基点どうしで 0 本
+2026-11-13T10:03:51Z	R2	bisect_ppx を開発用のシェルと lib/dune に足し、dune の言語を 2.7 に上げた	カバレッジを、木の写しを書き換えずに測るため	tools/refactoring/coverage.sh, flake.nix, lib/dune, dune-project	等価性 0 本。手で書いたコードの 77.88% が実行される
+2026-11-13T10:03:51Z	frame	呼び出しの記録（calltree.html）は残さないと決めた	計画の推奨どおり。利用者は範囲を任せた。核に大域の状態を残す唯一の理由である	docs/refactoring-plan.md 21節	R9 の前に消す。振る舞いの変更として記録する
+2026-11-13T10:05:04Z	R1	CI に、指標が増えていないことと、基点の枝との等価性を見る段を足した	プルリクエストごとに同じ確認が走るようにするため	.github/workflows/build-and-test.yml	未確認。この枝では CI が走らない。同じスクリプトは手元で通った

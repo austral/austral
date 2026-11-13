@@ -16,6 +16,11 @@ $(BIN): $(SRC)
 test: $(BIN)
 	dune runtest
 
+# How much of the compiler the programs in the repository execute.
+.PHONY: coverage
+coverage:
+	tools/refactoring/coverage.sh
+
 .PHONY: install
 install: $(BIN)
 	install -D -m 755 austral $(PREFIX)/bin/austral

@@ -8,7 +8,7 @@
 set -uo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-ROOT=$(cd "$HERE/../../.." && pwd)
+ROOT=$(cd "$HERE/../.." && pwd)
 T=$(mktemp -d)
 trap 'rm -rf "$T"' EXIT
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Counts, per source file of the compiler, the things the refactoring plan
-# wants to shrink. See README.md.
+# wants to shrink. See docs/research/functional-domain-refactoring/README.md.
 #   measure.sh            compare with expected/
 #   measure.sh --record   rewrite expected/ from the current tree
+#   measure.sh --check    fail only if a total went up; print what changed
 #   measure.sh --fragile  also count fragile matches (needs a compiler build)
 # Environment for --fragile:
 #   ZUSTRAL_NIX_FLAGS      extra flags for `nix develop`
@@ -10,12 +11,13 @@
 set -uo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-ROOT=$(cd "$HERE/../../.." && pwd)
-RECORD=0 FRAGILE=0
+ROOT=$(cd "$HERE/../.." && pwd)
+RECORD=0 FRAGILE=0 CHECK=0
 for a in "$@"; do
   case $a in
     --record) RECORD=1 ;;
     --fragile) FRAGILE=1 ;;
+    --check) CHECK=1 ;;
   esac
 done
 
@@ -66,9 +68,13 @@ fragile() {
   mkdir -p "$w"
   (cd "$ROOT" && git ls-files -z lib bin dune-project concat_builtins.py austral.opam | xargs -0 tar -cf - ) | tar -xf - -C "$w"
   read -r -a nix_flags <<< "${ZUSTRAL_NIX_FLAGS:-}"
-  (cd "$w" && OCAMLPARAM="_,w=+4,warn-error=-a" timeout "${ZUSTRAL_BUILD_TIMEOUT:-900}" \
-    nix develop "$ROOT" "${nix_flags[@]}" --command \
-    bash -c 'python3 concat_builtins.py && dune build --root . --profile release ./lib 2>&1') > "$T/build.log"
+  local build='python3 concat_builtins.py && dune build --root . --profile release ./lib 2>&1'
+  if [[ -n ${IN_NIX_SHELL:-} ]]; then
+    (cd "$w" && OCAMLPARAM="_,w=+4,warn-error=-a" timeout "${ZUSTRAL_BUILD_TIMEOUT:-900}" bash -c "$build") > "$T/build.log"
+  else
+    (cd "$w" && OCAMLPARAM="_,w=+4,warn-error=-a" timeout "${ZUSTRAL_BUILD_TIMEOUT:-900}" \
+      nix develop "$ROOT" "${nix_flags[@]}" --command bash -c "$build") > "$T/build.log"
+  fi
   local rc=$?
   ((rc == 0)) || { echo "build failed ($rc): $(tail -n 3 "$T/build.log")" >&2; return 1; }
   awk '
@@ -98,6 +104,15 @@ check() { # name
 failed=0
 metrics > "$T/metrics.tsv"
 totals "$T/metrics.tsv" > "$T/totals.txt"
+if ((CHECK)); then
+  # The size of the code may grow; the things the plan wants to shrink may not.
+  awk 'NR == FNR { was[$1] = $2; next }
+    $1 == "files" || $1 == "lines" { next }
+    $2 != was[$1] { printf "%s %d -> %d\n", $1, was[$1], $2; changed = 1 }
+    $2 > was[$1] { up = 1 }
+    END { if (!changed) print "no total changed"; exit up }' "$HERE/expected/totals.txt" "$T/totals.txt" || { echo "a total went up"; exit 1; }
+  exit 0
+fi
 check metrics.tsv
 check totals.txt
 if ((FRAGILE)); then

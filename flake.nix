@@ -27,6 +27,7 @@
           ocamlPackages.sexplib
           ocamlPackages.ppx_sexp_conv
           ocamlPackages.zarith
+          ocamlPackages.bisect_ppx
         ];
 
       in {

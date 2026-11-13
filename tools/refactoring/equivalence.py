@@ -7,8 +7,9 @@ so that two builds of the compiler can be compared.
   equivalence.py compare --normalize-ids OUTDIR_A OUTDIR_B
                                              the same, after renumbering generated names
 
-The corpus is every end-to-end test (test-programs/suites/*/*) and the standard
-library with its tests (the module list in standard/Makefile). For each program
+The corpus is every end-to-end test (test-programs/suites/*/*), the standard
+library with its tests (the module list in standard/Makefile) and every program
+under examples/ (the command its Makefile runs). For each program
 the snapshot keeps the exit status, the generated C, stdout, stderr, the
 error.html the compiler writes on failure, and the names of the files it leaves
 in its working directory.
@@ -37,9 +38,10 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = pathlib.Path(__file__).resolve().parents[3]
+ROOT = pathlib.Path(__file__).resolve().parents[2]
 SUITES = ROOT / "test-programs" / "suites"
 STANDARD = ROOT / "standard"
+EXAMPLES = ROOT / "examples"
 FILES = ("exit", "out.c", "stdout", "stderr", "error.html", "files")
 # Generated names: a fixed prefix or a suffix, then the counter's value.
 GENERATED = re.compile(r"\b(?:(decl_|mono_|meth_|_t|tmp)|([A-Za-z_][A-Za-z0-9_]*?_tmp_ref))(\d+)\b")
@@ -86,6 +88,26 @@ def standard_command() -> tuple[str, list[str]]:
     return "standard", ["compile", *paths, "--entrypoint=Standard.Test:Main", "--target-type=c", "--output=$C_PATH", "--error-format=json"]
 
 
+def example_commands() -> list[tuple[str, list[str]]]:
+    commands = []
+    for example in sorted(p for p in EXAMPLES.iterdir() if (p / "Makefile").exists()):
+        # `make -n` prints the compile command with the Makefile's variables expanded.
+        printed = subprocess.run(["make", "-n", "-C", str(example)], capture_output=True, text=True).stdout
+        line = next((l for l in printed.splitlines() if "austral compile" in l), None)
+        if line is None:
+            sys.exit(f"no compile command in {example}/Makefile")
+        words = []
+        for word in line.split()[1:]:
+            if word.startswith("--output="):
+                words += ["--target-type=c", "--output=$C_PATH"]
+            elif word.startswith("--") or word == "compile":
+                words.append(word)
+            else:
+                words.append(",".join(str((example / part).resolve()) for part in word.split(",")))
+        commands.append((f"examples/{example.name}", [*words, "--error-format=json"]))
+    return commands
+
+
 def run_one(compiler: str, outdir: pathlib.Path, name: str, words: list[str]) -> str:
     target = outdir / name
     target.mkdir(parents=True, exist_ok=True)
@@ -112,7 +134,7 @@ def snapshot(compiler: str, outdir: pathlib.Path) -> None:
     if outdir.exists():
         shutil.rmtree(outdir)
     outdir.mkdir(parents=True)
-    commands = [*suite_commands(), standard_command()]
+    commands = [*suite_commands(), standard_command(), *example_commands()]
     with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as pool:
         names = list(pool.map(lambda c: run_one(compiler, outdir, *c), commands))
     lines = []

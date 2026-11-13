@@ -107,7 +107,7 @@ for item in refactoring_items:
         findings.append(f"{item} is not in the overall plan's table")
 
 # The refactoring plan's table of measurements must quote the recorded numbers.
-expected = docs / "research" / "functional-domain-refactoring" / "expected"
+expected = docs.parent / "tools" / "refactoring" / "expected"
 totals = dict(line.split() for line in (expected / "totals.txt").read_text().splitlines())
 fragile = (expected / "fragile-totals.txt").read_text()
 coverage = (expected / "coverage.txt").read_text()

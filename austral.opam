@@ -6,7 +6,7 @@ description: "The bootstrapping compiler for Austral."
 homepage: "https://austral-lang.org/"
 bug-reports: "https://github.com/austral/austral/issues"
 depends: [
-  "dune" {>= "2.1"}
+  "dune" {>= "2.7"}
   "ppxlib" {>= "0.25.1"}
   "ppx_deriving" {= "5.2.1"}
   "ppx_sexp_conv" {= "v0.15.0"}
@@ -15,9 +15,10 @@ depends: [
   "menhir" {= "20220210"}
   "zarith" {= "1.12"}
   "yojson" {= "2.1.0"}
+  "odoc" {with-doc}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"
