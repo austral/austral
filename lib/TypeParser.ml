@@ -56,7 +56,7 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
        Some (Address ty)
     | _ ->
        generic_error (TypeWrongArity {
-           typename = make_ident "Address";
+           typename = make_ident BuiltInNames.address_name;
            expected = 1;
            actual = None;
          })
@@ -67,7 +67,7 @@ let parse_built_in_type (name: qident) (args: ty list): ty option =
          Some (Pointer ty)
       | _ ->
          generic_error (TypeWrongArity {
-             typename = make_ident "Pointer";
+             typename = make_ident BuiltInNames.pointer_name;
              expected = 1;
              actual = None;
            })

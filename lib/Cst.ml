@@ -147,10 +147,10 @@ let rec typespec_string (ts: typespec): string =
       | [] -> (ident_string name)
       | args -> (ident_string name) ^ "[" ^ (String.concat ", " (List.map typespec_string args)) ^ "]")
   | ConcreteReadRef (ty, reg) ->
-     "&[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+     BuiltInNames.read_ref_name ^ "[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
   | ConcreteWriteRef (ty, reg) ->
-     "&![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+     BuiltInNames.write_ref_name ^ "[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
   | ConcreteSpan (ty, reg) ->
-     "Span[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+     BuiltInNames.span_name ^ "[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
   | ConcreteSpanWrite (ty, reg) ->
-     "Span![" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"
+     BuiltInNames.span_mut_name ^ "[" ^ (typespec_string ty) ^ ", " ^ (typespec_string reg) ^ "]"

@@ -10,8 +10,6 @@ open Type
 open Stages.Tast
 open Identifier
 
-val arglist_size : typed_arglist -> int
-
 (* This function converts an argument list to a list of typed expressions.
 
    The second argument is the list of parameter names of the function being

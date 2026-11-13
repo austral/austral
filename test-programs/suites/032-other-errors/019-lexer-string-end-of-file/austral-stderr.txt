@@ -1,0 +1,17 @@
+{
+  "module": null,
+  "kind": "Parse Error",
+  "text": [ { "type": "text", "content": "End of file in string literal." } ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/019-lexer-string-end-of-file/Test.aum",
+    "startp": { "line": 3, "column": 98 },
+    "end": { "line": 3, "column": 98 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let s: Span[Nat8, Static] := \"abc;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}Fatal error: exception Invalid_argument("String.sub / Bytes.sub")

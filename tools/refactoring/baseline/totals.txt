@@ -9,3 +9,4 @@ strings 84
 internal 93
 adhoc 43
 coreio 15
+names 120

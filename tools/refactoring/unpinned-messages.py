@@ -13,7 +13,7 @@ some test: the message in an `austral-stderr.txt` of the end-to-end suite, or
 an `expected.txt` of the command-line tests.
 
 A piece on the recorded list is one that no program can reach, or that a known
-bug hides. docs/refactoring-plan.md (R3) says which. A new piece that is not on
+bug hides. Issue #124 gives the reason for each. A new piece that is not on
 the list fails the comparison: write a test for it.
 
 R11 made seven pieces visible that programs can reach and that no test expects

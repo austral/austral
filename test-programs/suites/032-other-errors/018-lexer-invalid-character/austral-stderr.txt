@@ -1,0 +1,20 @@
+{
+  "module": null,
+  "kind": "Parse Error",
+  "text": [
+    { "type": "text", "content": "Character not allowed in source text: " },
+    { "type": "code", "content": "$" }
+  ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/018-lexer-invalid-character/Test.aum",
+    "startp": { "line": 3, "column": 26 },
+    "end": { "line": 3, "column": 27 }
+  },
+  "context": [
+    [ 1, "module body Test is" ],
+    [ 2, "    function main(): ExitCode is" ],
+    [ 3, "        let x: Int32 := 1 $ 2;" ],
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ]
+  ]
+}

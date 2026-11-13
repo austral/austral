@@ -1,0 +1,6 @@
+module body Test is
+    function main(): ExitCode is
+        let s: Span[Nat8, Static] := "abc;
+        return ExitSuccess();
+    end;
+end module body.

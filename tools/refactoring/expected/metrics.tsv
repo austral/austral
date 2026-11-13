@@ -1,83 +1,85 @@
-file	lines	raise	catch	state	io	wildcard	strings	internal	adhoc
-cli/Cli.ml	23	0	1	0	1	0	0	0	0
-cli/CliEngine.ml	185	0	1	0	39	0	0	0	0
-cli/CliParser.ml	177	11	0	0	0	5	4	0	0
-cli/CliUtil.ml	120	6	0	0	0	5	3	1	0
-cli/Os.ml	73	2	2	0	7	1	1	0	0
-lib/AbstractionPass.ml	187	3	1	0	0	2	0	1	0
-lib/BodyExtractionPass.ml	25	0	0	0	0	1	0	0	0
-lib/BuiltIn.ml	112	0	0	0	0	0	0	0	0
-lib/CRenderer.ml	286	0	0	0	0	0	1	0	0
-lib/CRepr.ml	84	0	0	0	0	0	24	0	0
-lib/CliErrors.ml	142	0	1	0	0	0	10	0	0
-lib/CodeGen.ml	719	16	0	1	0	14	0	10	0
-lib/CombiningPass.ml	376	19	4	0	0	10	0	2	0
-lib/Common.ml	69	0	0	0	0	0	3	0	0
-lib/Compiler.ml	121	0	3	0	0	0	6	0	0
-lib/Cst.ml	156	0	0	0	0	0	4	0	0
-lib/CstUtil.ml	162	4	0	0	0	6	0	0	0
-lib/DeclIdSet.ml	18	0	0	0	0	0	0	0	0
-lib/DeclarationErrors.ml	344	0	0	0	0	0	0	0	0
-lib/DesugarBorrows.ml	248	1	0	2	0	0	0	0	0
-lib/DesugarPaths.ml	153	1	0	0	0	2	0	0	0
-lib/DesugaringPass.ml	32	0	0	0	0	0	0	0	0
-lib/Entrypoint.ml	142	12	0	0	0	8	0	4	0
-lib/EntrypointErrors.ml	63	0	0	0	0	0	0	0	0
-lib/Env.ml	594	16	0	0	0	19	1	12	0
-lib/EnvExtras.ml	55	6	0	0	0	0	0	4	0
-lib/EnvTypes.ml	270	0	0	0	0	0	2	0	0
-lib/EnvUtils.ml	71	1	0	0	0	1	0	1	0
-lib/Error.ml	253	17	4	0	0	0	1	1	0
-lib/ErrorText.ml	57	0	0	0	0	0	2	0	0
-lib/Escape.ml	53	1	0	0	0	1	1	0	0
-lib/ExportInstantiation.ml	101	13	0	0	0	3	0	3	0
-lib/ExtractionPass.ml	486	15	6	0	0	6	0	1	0
-lib/GenericErrors.ml	274	0	0	0	0	0	0	0	0
-lib/HtmlError.ml	301	0	0	0	0	0	0	0	0
-lib/Id.ml	48	0	0	4	0	0	0	0	0
-lib/Identifier.ml	65	0	0	1	0	0	2	0	0
-lib/IdentifierMap.ml	24	0	0	0	0	0	0	0	0
-lib/IdentifierSet.ml	24	0	0	0	0	0	0	0	0
-lib/ImportResolution.ml	96	4	0	0	0	0	0	0	0
-lib/Imports.ml	63	1	0	0	0	0	0	0	0
-lib/LexEnv.ml	59	1	0	1	0	0	0	0	0
-lib/Lexer.mll	175	4	0	2	0	0	0	0	0
-lib/LiftControlPass.ml	205	0	0	0	0	0	0	0	0
-lib/LinearityCheck.ml	699	21	11	0	0	4	0	9	0
-lib/LinearityErrors.ml	157	0	0	0	0	0	0	0	0
-lib/ModIdSet.ml	18	0	0	0	0	0	0	0	0
-lib/ModuleNameSet.ml	15	0	0	0	0	0	0	0	0
-lib/MonoType.ml	37	0	0	0	0	0	0	0	0
-lib/MonoTypeBindings.ml	44	0	0	0	0	0	0	0	0
-lib/Monomorphize.ml	791	16	0	0	0	9	0	13	0
-lib/MtastUtil.ml	76	2	0	0	0	1	0	1	0
-lib/Names.ml	24	0	0	0	0	0	0	0	0
-lib/ParseErrors.ml	52	0	0	0	0	0	3	0	0
-lib/Parser.mly	570	0	0	0	0	0	0	0	0
-lib/ParserInterface.ml	29	2	1	0	0	0	0	0	0
-lib/Qualifier.ml	30	0	0	0	0	0	0	0	0
-lib/Region.ml	19	0	0	1	0	0	0	0	0
-lib/RegionMap.ml	24	1	0	0	0	0	0	0	0
-lib/ReturnCheck.ml	95	2	2	0	0	2	0	0	0
-lib/SourceContext.ml	60	0	0	0	0	0	1	0	0
-lib/Span.ml	64	0	0	0	0	0	1	0	0
-lib/Stages.ml	669	0	0	0	0	0	20	0	0
-lib/StringSet.ml	8	0	0	0	0	0	0	0	0
-lib/TastUtil.ml	105	2	0	0	0	1	0	1	0
-lib/Type.ml	229	0	0	0	0	17	0	0	0
-lib/TypeBindings.ml	166	2	0	0	0	1	0	0	0
-lib/TypeCheckExpr.ml	925	50	1	0	0	27	0	7	0
-lib/TypeClasses.ml	231	13	0	0	0	15	0	0	0
-lib/TypeErrors.ml	460	0	0	0	0	2	1	0	0
-lib/TypeMatch.ml	297	24	2	0	0	20	0	4	0
-lib/TypeParameter.ml	35	0	0	0	0	0	0	0	0
-lib/TypeParameters.ml	61	2	0	0	0	0	0	0	0
-lib/TypeParser.ml	302	8	0	0	0	5	0	1	0
-lib/TypeReplace.ml	198	0	0	0	0	0	0	0	0
-lib/TypeSignature.ml	18	0	0	0	0	0	0	0	0
-lib/TypeStripping.ml	125	13	0	0	0	1	0	12	0
-lib/TypeSystem.ml	101	2	0	0	0	2	0	1	0
-lib/TypeVarSet.ml	15	0	0	0	0	0	0	0	0
-lib/TypingPass.ml	651	34	13	0	0	12	0	1	0
-lib/Util.ml	145	5	0	0	0	3	1	2	0
-lib/Version.ml	18	0	0	0	0	0	0	0	0
+file	lines	raise	catch	state	io	wildcard	strings	internal	adhoc	names
+cli/Cli.ml	23	0	1	0	1	0	0	0	0	0
+cli/CliEngine.ml	185	0	1	0	39	0	0	0	0	0
+cli/CliParser.ml	177	11	0	0	0	5	4	0	0	0
+cli/CliUtil.ml	120	6	0	0	0	5	3	1	0	0
+cli/Os.ml	73	2	2	0	10	1	1	0	0	0
+lib/AbstractionPass.ml	180	2	0	0	0	2	0	0	0	0
+lib/BodyExtractionPass.ml	25	0	0	0	0	1	0	0	0	0
+lib/BuiltIn.ml	36	0	0	0	0	0	0	0	0	0
+lib/BuiltInNames.ml	184	0	0	0	0	0	0	0	0	0
+lib/CIdent.ml	41	0	0	0	0	0	1	0	0	0
+lib/CRenderer.ml	305	0	0	0	0	0	1	0	0	0
+lib/CRepr.ml	107	0	0	0	0	0	5	0	0	0
+lib/CliErrors.ml	142	0	1	0	0	0	10	0	0	0
+lib/CodeGen.ml	756	16	0	1	0	13	0	10	0	0
+lib/CombiningPass.ml	376	19	4	0	0	10	0	2	0	0
+lib/Common.ml	69	0	0	0	0	0	3	0	0	0
+lib/Compiler.ml	121	0	3	0	0	0	6	0	0	0
+lib/Cst.ml	156	0	0	0	0	0	2	0	0	0
+lib/CstUtil.ml	162	4	0	0	0	6	0	0	0	0
+lib/DeclIdSet.ml	18	0	0	0	0	0	0	0	0	0
+lib/DeclarationErrors.ml	344	0	0	0	0	0	0	0	0	0
+lib/DesugarBorrows.ml	248	1	0	2	0	0	0	0	0	0
+lib/DesugarPaths.ml	153	1	0	0	0	2	0	0	0	0
+lib/DesugaringPass.ml	32	0	0	0	0	0	0	0	0	0
+lib/Entrypoint.ml	141	12	0	0	0	8	0	4	0	0
+lib/EntrypointErrors.ml	63	0	0	0	0	0	0	0	0	0
+lib/Env.ml	594	16	0	0	0	19	1	12	0	0
+lib/EnvExtras.ml	42	4	0	0	0	0	0	3	0	0
+lib/EnvTypes.ml	270	0	0	0	0	0	2	0	0	0
+lib/EnvUtils.ml	71	1	0	0	0	1	0	1	0	0
+lib/Error.ml	253	17	4	0	0	0	1	1	0	0
+lib/ErrorText.ml	57	0	0	0	0	0	2	0	0	0
+lib/Escape.ml	53	1	0	0	0	1	1	0	0	0
+lib/ExportInstantiation.ml	88	13	0	0	0	3	0	3	0	0
+lib/ExtractionPass.ml	486	15	6	0	0	6	0	1	0	0
+lib/GenericErrors.ml	274	0	0	0	0	0	0	0	0	0
+lib/HtmlError.ml	301	0	0	0	0	0	0	0	0	0
+lib/Id.ml	48	0	0	4	0	0	0	0	0	0
+lib/Identifier.ml	65	0	0	1	0	0	2	0	0	0
+lib/IdentifierMap.ml	24	0	0	0	0	0	0	0	0	0
+lib/IdentifierSet.ml	24	0	0	0	0	0	0	0	0	0
+lib/ImportResolution.ml	96	4	0	0	0	0	0	0	0	0
+lib/Imports.ml	63	1	0	0	0	0	0	0	0	0
+lib/LexEnv.ml	59	1	0	1	0	0	0	0	0	0
+lib/Lexer.mll	175	4	0	2	0	0	0	0	0	0
+lib/LiftControlPass.ml	205	0	0	0	0	0	0	0	0	0
+lib/LinearityCheck.ml	699	21	11	0	0	4	0	9	0	0
+lib/LinearityErrors.ml	157	0	0	0	0	0	0	0	0	0
+lib/ModIdSet.ml	18	0	0	0	0	0	0	0	0	0
+lib/ModuleNameSet.ml	15	0	0	0	0	0	0	0	0	0
+lib/MonoType.ml	37	0	0	0	0	0	0	0	0	0
+lib/MonoTypeBindings.ml	44	0	0	0	0	0	0	0	0	0
+lib/Monomorphize.ml	791	16	0	0	0	9	0	13	0	0
+lib/MtastUtil.ml	76	2	0	0	0	1	0	1	0	0
+lib/NumberLiteral.ml	92	0	0	0	0	0	2	0	0	0
+lib/ParseErrors.ml	52	0	0	0	0	0	3	0	0	0
+lib/Parser.mly	570	0	0	0	0	0	0	0	0	0
+lib/ParserInterface.ml	29	2	1	0	0	0	0	0	0	0
+lib/Qualifier.ml	30	0	0	0	0	0	0	0	0	0
+lib/Region.ml	19	0	0	1	0	0	0	0	0	0
+lib/RegionMap.ml	24	1	0	0	0	0	0	0	0	0
+lib/ReturnCheck.ml	95	2	2	0	0	2	0	0	0	0
+lib/SourceContext.ml	60	0	0	0	0	0	1	0	0	0
+lib/Span.ml	64	0	0	0	0	0	1	0	0	0
+lib/Stages.ml	669	0	0	0	0	0	8	0	0	0
+lib/StringSet.ml	8	0	0	0	0	0	0	0	0	0
+lib/TastUtil.ml	105	2	0	0	0	1	0	1	0	0
+lib/Type.ml	231	0	0	0	0	17	0	0	0	0
+lib/TypeBindings.ml	166	2	0	0	0	1	0	0	0	0
+lib/TypeCheckExpr.ml	915	50	1	0	0	27	0	7	0	0
+lib/TypeClasses.ml	231	13	0	0	0	15	0	0	0	0
+lib/TypeErrors.ml	460	0	0	0	0	2	1	0	0	0
+lib/TypeMatch.ml	291	23	1	0	0	20	0	3	0	0
+lib/TypeParameter.ml	35	0	0	0	0	0	0	0	0	0
+lib/TypeParameters.ml	61	2	0	0	0	0	0	0	0	0
+lib/TypeParser.ml	301	8	0	0	0	4	0	1	0	0
+lib/TypeReplace.ml	198	0	0	0	0	0	0	0	0	0
+lib/TypeSignature.ml	18	0	0	0	0	0	0	0	0	0
+lib/TypeStripping.ml	125	13	0	0	0	1	0	12	0	0
+lib/TypeSystem.ml	101	2	0	0	0	2	0	1	0	0
+lib/TypeVarSet.ml	15	0	0	0	0	0	0	0	0	0
+lib/TypingPass.ml	651	34	13	0	0	12	0	1	0	0
+lib/Util.ml	136	5	0	0	0	3	1	2	0	0
+lib/Version.ml	18	0	0	0	0	0	0	0	0	0

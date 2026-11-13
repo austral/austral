@@ -1,0 +1,17 @@
+{
+  "module": null,
+  "kind": "Parse Error",
+  "text": [
+    { "type": "text", "content": "End of file in triple string literal." }
+  ],
+  "span": {
+    "filename": "test-programs/suites/032-other-errors/020-lexer-triple-string-end-of-file/Test.aum",
+    "startp": { "line": 6, "column": 16 },
+    "end": { "line": 6, "column": 16 }
+  },
+  "context": [
+    [ 4, "        return ExitSuccess();" ],
+    [ 5, "    end;" ],
+    [ 6, "end module body." ]
+  ]
+}
