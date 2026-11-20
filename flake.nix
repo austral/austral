@@ -3,16 +3,28 @@
 
   inputs.nixpkgs.url = "https://channels.nixos.org/nixos-23.11/nixexprs.tar.xz";
 
-  inputs.utils.url = "github:numtide/flake-utils";
+  outputs = { self, nixpkgs }: 
+    let
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "i686-linux"
+        "aarch64-darwin"
+      ];
 
-  outputs = { self, nixpkgs, utils }: 
+      eachSystem =
+        systems: f:
+        builtins.foldl' (
+          a: s: a // builtins.mapAttrs (k: v: (a.${k} or { }) // { ${s} = v; }) (f s)
+        ) { } systems;
+    in
     {
        overlays = {
          default = import ./nix/overlay;
          development = import ./nix/overlay/development.nix;
        };
     } 
-    // utils.lib.eachDefaultSystem (system:
+    // eachSystem supportedSystems (system:
       let
         pkgs = import nixpkgs {
           inherit system;
