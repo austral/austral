@@ -11,12 +11,14 @@ let
     inherit system;
     overlays = [ 
       (import ./nix/overlay)
+      (import ./nix/overlay/development.nix)
     ];
   };
 in
 {
   inherit (pkgs.austral)
     default
+    dev-shell
     austral
     vim-plugin;
 }
