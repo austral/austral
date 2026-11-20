@@ -2,8 +2,8 @@
 
 let
   pinnedPkgs = builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/23.05.tar.gz";
-    sha256 = "10wn0l08j9lgqcw8177nh2ljrnxdrpri7bp0g7nvrsn9rkawvlbf";
+    url = "https://releases.nixos.org/nixos/23.11/nixos-23.11.7870.205fd4226592/nixexprs.tar.xz";
+    sha256 = "sha256-h3DunxVF01tidoonuEFjA6Ie8HvYITV42g/337w8d9U=";
   };
   pkgs = import pinnedPkgs {};
 in

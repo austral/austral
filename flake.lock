@@ -2,18 +2,14 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1689503327,
-        "narHash": "sha256-qVwzYLA8oT2oWNDXO0A3bZHOhoPOihIB9T677+Hor1E=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "f64b9738da8e86195766147e9752c67fccee006c",
-        "type": "github"
+        "lastModified": 1720768140,
+        "narHash": "sha256-h3DunxVF01tidoonuEFjA6Ie8HvYITV42g/337w8d9U=",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixos/23.11/nixos-23.11.7870.205fd4226592/nixexprs.tar.xz"
       },
       "original": {
-        "owner": "NixOS",
-        "ref": "nixos-23.05",
-        "repo": "nixpkgs",
-        "type": "github"
+        "type": "tarball",
+        "url": "https://channels.nixos.org/nixos-23.11/nixexprs.tar.xz"
       }
     },
     "root": {

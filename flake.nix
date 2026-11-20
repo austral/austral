@@ -1,7 +1,8 @@
 {
   description = "Systems language with linear types and capability-based security.";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+  inputs.nixpkgs.url = "https://channels.nixos.org/nixos-23.11/nixexprs.tar.xz";
+
   inputs.utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, utils }: 
