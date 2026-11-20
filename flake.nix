@@ -6,41 +6,31 @@
   inputs.utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, utils }: 
-    utils.lib.eachDefaultSystem (system:
+    {
+       overlays = {
+         default = import ./nix/overlay;
+         development = import ./nix/overlay/development.nix;
+       };
+    } 
+    // utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
-        buildInputs = with pkgs; [
-          # General
-          gmp
-          python311
-
-          # Tooling
-          ocamlPackages.ocaml
-          ocamlPackages.dune_3
-          ocamlPackages.findlib
-          ocamlPackages.odoc
-
-          # OCaml libraries
-          ocamlPackages.yojson
-          ocamlPackages.ppx_deriving
-          ocamlPackages.ounit2
-          ocamlPackages.menhir
-          ocamlPackages.sexplib
-          ocamlPackages.ppx_sexp_conv
-          ocamlPackages.zarith
-        ];
-
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            self.overlays.default
+            self.overlays.development
+          ];
+        };
       in {
-        packages.default = pkgs.stdenv.mkDerivation {
-          pname = "austral";
-          version = "0.2.0";
-          src = ./.;
-          installFlags = [ "PREFIX=$(out)" ];
-          inherit buildInputs;
+        packages = {
+          inherit (pkgs.austral)
+            default
+            austral
+            vim-plugin;
         };
 
-        devShells.default = pkgs.mkShell {
-          inherit buildInputs;
+        devShells = {
+          default = pkgs.austral.dev-shell;
         };
       });
 }
